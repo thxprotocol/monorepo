@@ -1,0 +1,19 @@
+{
+  "name": "vue-3-monorepo",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "start": "nx serve",
+    "build": "nx build",
+    "test": "nx test"
+  },
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "nx": "14.8.6",
+    "@nrwl/cli": "14.8.6",
+    "@nrwl/workspace": "14.8.6",
+    "typescript": "~4.8.2",
+    "prettier": "^2.6.2"
+  }
+}
