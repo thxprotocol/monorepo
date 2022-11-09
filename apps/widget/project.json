@@ -27,7 +27,14 @@
     "serve": {
       "executor": "@nx-plus/vue:dev-server",
       "options": {
-        "browserTarget": "widget:build"
+        "port": 8080,
+        "browserTarget": "widget:build",
+        "devServer": {
+          "https": {
+            "key": "./certs/localhost.key",
+            "cert": "./certs/localhost.crt"
+          }
+        }
       },
       "configurations": {
         "production": {
