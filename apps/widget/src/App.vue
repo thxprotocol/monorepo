@@ -1,30 +1,35 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div class="d-flex flex-column h-100">
+    <b-navbar type="dark" variant="dark" class="navbar-top">
+      <b-button @click="onClick()">x</b-button>
+    </b-navbar>
+    <div class="flex-grow-1 overflow-scroll">
+      <router-view />
+    </div>
+    <b-navbar type="dark" variant="dark" class="navbar-bottom">
+      <router-link to="/">Points</router-link>
+      <router-link to="/perks">Store</router-link>
+      <router-link to="/wallet">Wallet</router-link>
+    </b-navbar>
   </div>
-  <router-view />
 </template>
 
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  methods: {
+    onClick: () => {
+      window.top?.postMessage('message', 'https://localhost:8083');
+    },
+  },
+});
+</script>
+
 <style lang="scss">
+html,
+body,
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+  height: 100%;
 }
 </style>

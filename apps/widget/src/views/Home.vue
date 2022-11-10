@@ -1,18 +1,52 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <div class="py-2 text-center">
+      <div class="text-success h1 m-0">
+        <strong>{{ balance }}</strong>
+      </div>
+      <div>points</div>
+    </div>
+    <component
+      v-for="(reward, key) of rewardsStore.rewards"
+      :key="key"
+      :is="rewardComponents[reward.variant]"
+      :reward="reward"
+      class="mb-2"
+    />
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
-import HelloWorld from '../components/HelloWorld.vue';
+import BaseCardRewardReferral from '../components/BaseCardRewardReferral.vue';
+import BaseCardRewardToken from '../components/BaseCardRewardToken.vue';
+import BaseCardRewardNFT from '../components/BaseCardRewardNFT.vue';
+import { mapStores } from 'pinia';
+import { useRewardStore } from '../stores/Reward';
+import { RewardVariant } from '../utils/rewards';
+import { Brands } from '../utils/social';
 
 export default defineComponent({
   name: 'Home',
   components: {
-    HelloWorld,
+    BaseCardRewardReferral,
+    BaseCardRewardToken,
+    BaseCardRewardNFT,
+  },
+  computed: {
+    ...mapStores(useRewardStore),
+  },
+  data() {
+    return {
+      Brands,
+      RewardVariant,
+      balance: 50,
+      rewardComponents: [
+        'BaseCardRewardReferral',
+        'BaseCardRewardToken',
+        'BaseCardRewardNFT',
+      ],
+    };
   },
 });
 </script>
