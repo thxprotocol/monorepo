@@ -25,7 +25,9 @@
 </template>
 
 <script lang="ts">
+import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
+import { useRewardStore } from '../stores/Reward';
 import { RewardVariant } from '../utils/rewards';
 import { Brands } from '../utils/social';
 
@@ -46,10 +48,12 @@ export default defineComponent({
             required: true,
         },
     },
+    computed: {
+        ...mapStores(useRewardStore),
+    },
     methods: {
         onClick: () => {
-            // Should pass in client origin for targetOrigin here
-            window.top?.postMessage('thx.reward.claimed', 'https://localhost:8081');
+            // signin
         },
     },
 });

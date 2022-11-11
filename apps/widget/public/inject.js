@@ -26,6 +26,7 @@ async function createBaseElements() {
     iframe.style.transition = '.2s opacity ease, .1s transform ease';
 
     launcher.id = 'thx-launcher';
+    launcher.style.zIndex = 9999999;
     launcher.style.display = 'flex';
     launcher.style.width = '60px';
     launcher.style.height = '60px';
