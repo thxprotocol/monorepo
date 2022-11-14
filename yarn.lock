@@ -2948,10 +2948,12 @@
     vue-loader "^16.4.1"
     webpack ">=4.0.0 <6.0.0"
 
-"@thxnetwork/sdk@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.0.2.tgz#20f0371adcb4e66233354ed1e453fc1673b29fe4"
-  integrity sha512-5me2wu0LF0GQ997wm5Jw56T8NpVv82J7x0EUIKY7GU2S9vMoBn7uDDzBz2trjE3m8uAnuhq27meOxCWdiVBpig==
+"@thxnetwork/sdk@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.0.3.tgz#ea136b5ad5dc5ef88c7322c5714dbf7aa3122c4a"
+  integrity sha512-xsdcN7+NURlVG/VEF4mwAgCWDPjgHXqDueuN0tOhTQJzpkJIPHZuDPp2KNy7o73PKB4JnrnRPmlH6sJWlRJrqA==
+  dependencies:
+    oidc-client-ts "2.1.0"
 
 "@tootallnate/once@2":
   version "2.0.0"
@@ -6304,6 +6306,11 @@ crypto-browserify@^3.11.0:
     public-encrypt "^4.0.0"
     randombytes "^2.0.0"
     randomfill "^1.0.3"
+
+crypto-js@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
+  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 css-color-names@0.0.4, css-color-names@^0.0.4:
   version "0.0.4"
@@ -10632,6 +10639,11 @@ junk@^3.1.0:
   resolved "https://registry.yarnpkg.com/junk/-/junk-3.1.0.tgz#31499098d902b7e98c5d9b9c80f43457a88abfa1"
   integrity sha512-pBxcB3LFc8QVgdggvZWyeys+hnrNWg4OcZIU/1X59k5jQdLBlCsYGRQaz234SqoRLTCgMH00fY0xRJH+F9METQ==
 
+jwt-decode@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-3.1.2.tgz#3fb319f3675a2df0c2895c8f5e9fa4b67b04ed59"
+  integrity sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==
+
 killable@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"
@@ -11946,6 +11958,14 @@ obuf@^1.0.0, obuf@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"
   integrity sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==
+
+oidc-client-ts@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/oidc-client-ts/-/oidc-client-ts-2.1.0.tgz#903b6d9c94a45f6f6eaa3c0aac7c6953a0f3905b"
+  integrity sha512-Rmfl/10g7tTLy8cXezn0Ek+Wa3bKwNnW7oRzLB/hU5EK/DC1D/W1d0GCjGf23WYd6b4Ifa8ud/NzgsMOnbNp8Q==
+  dependencies:
+    crypto-js "^4.1.1"
+    jwt-decode "^3.1.2"
 
 on-finished@2.4.1:
   version "2.4.1"
