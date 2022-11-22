@@ -5,6 +5,8 @@
                 <strong>{{ accountStore.balance }}</strong>
             </div>
             <div>points</div>
+            <b-button :disabled="accountStore.isAuthenticated" @click="accountStore.api.signin()">Signin</b-button>
+            <b-button @click="accountStore.api.signout()">Signout</b-button>
         </div>
         <component
             v-for="(reward, key) of rewardsStore.rewards"
@@ -34,7 +36,10 @@ export default defineComponent({
         BaseCardRewardToken,
         BaseCardRewardNFT,
     },
-    mounted: function () {
+    mounted: async function () {
+        const poolId = this.$route.query.id as string;
+        this.accountStore.setPoolId(poolId);
+        this.accountStore.getBalance().catch(console.error);
         this.rewardsStore.list();
     },
     computed: {
@@ -45,7 +50,6 @@ export default defineComponent({
         return {
             Brands,
             RewardVariant,
-            balance: 50,
         };
     },
 });

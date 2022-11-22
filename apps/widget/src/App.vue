@@ -24,13 +24,21 @@
 </template>
 
 <script lang="ts">
+import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
+import { useAccountStore } from './stores/Account';
 
 export default defineComponent({
     methods: {
         onClick: () => {
             window.top?.postMessage('thx.close', 'https://localhost:8081');
         },
+    },
+    computed: {
+        ...mapStores(useAccountStore),
+    },
+    mounted: function () {
+        this.accountStore.init();
     },
 });
 </script>

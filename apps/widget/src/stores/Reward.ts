@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { API_URL } from '../config/secrets';
+import { useAccountStore } from './Account';
 
 export const useRewardStore = defineStore('rewards', {
     state: (): IState => ({
@@ -21,7 +22,12 @@ export const useRewardStore = defineStore('rewards', {
     }),
     actions: {
         async list() {
-            const r = await fetch(API_URL + '/v1/point-rewards');
+            const account = useAccountStore();
+            const r = await fetch(API_URL + '/v1/point-rewards', {
+                method: 'GET',
+                headers: new Headers([['X-PoolId', account.poolId]]),
+                mode: 'cors',
+            });
             const data = await r.json();
             const components = ['BaseCardRewardReferral', 'BaseCardRewardToken', 'BaseCardRewardNFT'];
 

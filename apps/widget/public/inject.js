@@ -11,7 +11,7 @@ async function createBaseElements() {
 
     iframe.id = 'thx-iframe';
     iframe.style.zIndex = 9999999;
-    iframe.src = 'https://localhost:8080';
+    iframe.src = 'https://localhost:8080?id=637b549df88c31b994f1cc38';
     iframe.style.display = 'flex';
     iframe.style.position = 'fixed';
     iframe.style.bottom = '100px';

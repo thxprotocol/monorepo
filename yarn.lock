@@ -2948,10 +2948,10 @@
     vue-loader "^16.4.1"
     webpack ">=4.0.0 <6.0.0"
 
-"@thxnetwork/sdk@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.0.3.tgz#ea136b5ad5dc5ef88c7322c5714dbf7aa3122c4a"
-  integrity sha512-xsdcN7+NURlVG/VEF4mwAgCWDPjgHXqDueuN0tOhTQJzpkJIPHZuDPp2KNy7o73PKB4JnrnRPmlH6sJWlRJrqA==
+"@thxnetwork/sdk@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.0.4.tgz#494e380e31c455665f3a58a1559eb17ddfb95baf"
+  integrity sha512-LvZCCIChj0ZTt40VPr4tAeXWsB31J/jt2+/B41YsdcKHudQuIfN5blXWgIK74sK6yU0tm8K8w/lCFGejcKFpWA==
   dependencies:
     oidc-client-ts "2.1.0"
 
