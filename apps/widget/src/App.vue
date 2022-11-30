@@ -2,6 +2,8 @@
     <div class="d-flex flex-column h-100">
         <b-navbar type="dark" variant="dark" class="navbar-top">
             <b-button @click="onClick()">x</b-button>
+            <b-button v-if="!accountStore.isAuthenticated" @click="accountStore.api.signin()">Signin</b-button>
+            <b-button v-else @click="accountStore.api.signout()">Signout</b-button>
         </b-navbar>
         <div class="flex-grow-1 overflow-scroll">
             <router-view />
@@ -27,6 +29,7 @@
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { useAccountStore } from './stores/Account';
+import { useRewardStore } from './stores/Reward';
 
 export default defineComponent({
     methods: {
@@ -36,9 +39,14 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useRewardStore),
     },
-    mounted: function () {
-        this.accountStore.init();
+    created: async function () {
+        const poolId = this.$route.query.id as string;
+        this.accountStore.init(poolId).then(() => {
+            this.accountStore.getBalance();
+            this.rewardsStore.list();
+        });
     },
 });
 </script>

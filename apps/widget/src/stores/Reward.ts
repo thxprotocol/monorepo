@@ -3,7 +3,7 @@ import { API_URL } from '../config/secrets';
 import { useAccountStore } from './Account';
 
 export const useRewardStore = defineStore('rewards', {
-    state: (): IState => ({
+    state: (): TState => ({
         erc20s: [
             {
                 balance: 500,
@@ -25,14 +25,13 @@ export const useRewardStore = defineStore('rewards', {
             const account = useAccountStore();
             const r = await fetch(API_URL + '/v1/point-rewards', {
                 method: 'GET',
-                headers: new Headers([['X-PoolId', account.poolId]]),
+                headers: new Headers([['X-PoolId', account.poolId()]]),
                 mode: 'cors',
             });
-            const data = await r.json();
-            const components = ['BaseCardRewardReferral', 'BaseCardRewardToken', 'BaseCardRewardNFT'];
+            const { results } = await r.json();
 
-            this.rewards = data.map((r: IReward) => {
-                r.component = components[r.variant];
+            this.rewards = results.map((r: TPointReward) => {
+                r.component = 'BaseCardRewardReferral';
                 return r;
             });
         },

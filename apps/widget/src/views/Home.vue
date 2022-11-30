@@ -4,9 +4,7 @@
             <div class="text-success h1 m-0">
                 <strong>{{ accountStore.balance }}</strong>
             </div>
-            <div>points</div>
-            <b-button :disabled="accountStore.isAuthenticated" @click="accountStore.api.signin()">Signin</b-button>
-            <b-button @click="accountStore.api.signout()">Signout</b-button>
+            <div class="text-white">points</div>
         </div>
         <component
             v-for="(reward, key) of rewardsStore.rewards"
@@ -36,12 +34,6 @@ export default defineComponent({
         BaseCardRewardToken,
         BaseCardRewardNFT,
     },
-    mounted: async function () {
-        const poolId = this.$route.query.id as string;
-        this.accountStore.setPoolId(poolId);
-        this.accountStore.getBalance().catch(console.error);
-        this.rewardsStore.list();
-    },
     computed: {
         ...mapStores(useRewardStore),
         ...mapStores(useAccountStore),
@@ -54,3 +46,34 @@ export default defineComponent({
     },
 });
 </script>
+<style lang="scss">
+.overflow-scroll {
+    background-color: #241956;
+    color: white;
+}
+
+.navbar.bg-dark {
+    background-color: #241956 !important;
+    a {
+        i {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        line-height: 1;
+        width: 70px;
+        height: 70px;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        background-color: #31236d;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+}
+
+.card {
+    background-color: #31236d !important;
+}
+</style>

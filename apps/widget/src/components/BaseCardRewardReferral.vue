@@ -5,7 +5,7 @@
                 <img
                     class="img-brand"
                     :src="`https://avatars.dicebear.com/api/identicon/${reward.brand}.svg`"
-                    :alt="String(reward.brand)"
+                    :alt="String(reward.platform)"
                 />
             </div>
             <div class="flex-grow-1">{{ reward.title }}</div>
@@ -28,23 +28,12 @@
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useRewardStore } from '../stores/Reward';
-import { RewardVariant } from '../utils/rewards';
-import { Brands } from '../utils/social';
-
-interface IReward {
-    amount: number;
-    title: string;
-    description: string;
-    variant: RewardVariant;
-    claimed: boolean;
-    brand: Brands;
-}
 
 export default defineComponent({
     name: 'BaseCardRewardReferral',
     props: {
         reward: {
-            type: Object as PropType<IReward>,
+            type: Object as PropType<TPointReward>,
             required: true,
         },
     },
@@ -65,5 +54,17 @@ export default defineComponent({
     height: 25px;
     display: block;
     margin-right: 0.5rem;
+}
+.btn {
+    border: 0;
+    padding: 0.8rem 1rem;
+}
+.btn-primary {
+    background-color: #5942c1;
+    border-radius: 25px;
+}
+
+p {
+    font-size: 0.9rem;
 }
 </style>

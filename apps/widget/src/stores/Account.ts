@@ -5,16 +5,16 @@ import { API_URL } from '../config/secrets';
 export const useAccountStore = defineStore('account', {
     state: () => ({
         api: thx,
-        poolId: '',
+        poolId: () => sessionStorage.getItem('thx:widget:poolId') as string,
         user: thx.session.cached.user,
         balance: 0,
         isAuthenticated: false,
     }),
     actions: {
-        setPoolId(id: string) {
-            this.poolId = id;
-        },
-        async init() {
+        async init(id: string) {
+            if (id) {
+                sessionStorage.setItem('thx:widget:poolId', id);
+            }
             this.isAuthenticated = (await this.api.init()) || false;
         },
         async getBalance() {
@@ -23,13 +23,13 @@ export const useAccountStore = defineStore('account', {
                 const r = await fetch(`${API_URL}/v1/point-balances`, {
                     method: 'GET',
                     headers: new Headers([
-                        ['X-PoolId', this.poolId],
+                        ['X-PoolId', this.poolId()],
                         ['Authorization', `Bearer ${accessToken}`],
                     ]),
                     mode: 'cors',
                 });
-                const data = await r.json();
-                this.balance = data.balance;
+                const { balance } = await r.json();
+                this.balance = balance;
             }
         },
     },
