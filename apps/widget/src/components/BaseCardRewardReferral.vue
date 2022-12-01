@@ -17,9 +17,17 @@
         </b-card-text>
 
         <b-input-group v-if="accountStore.isAuthenticated" size="sm">
-            <b-form-input :model-value="`${baseUrl}${reward._id}`" size="sm" />
+            <b-form-input :model-value="referralUrl" readonly size="sm" />
             <b-input-group-append>
-                <b-button size="sm" variant="primary">
+                <b-button
+                    v-b-tooltip.hover.v-success.left
+                    tooltip-left
+                    :title="tooltipContent"
+                    size="sm"
+                    variant="primary"
+                    v-clipboard:copy="referralUrl"
+                    v-clipboard:success="() => (tooltipContent = 'URL copied!')"
+                >
                     <i class="fas fa-clipboard"></i>
                 </b-button>
             </b-input-group-append>
@@ -45,8 +53,8 @@ export default defineComponent({
             required: true,
         },
     },
-    data: () => {
-        return { baseUrl: 'https://xyz.com?referral=' };
+    data: function () {
+        return { tooltipContent: 'Copy URL', referralUrl: `https://xyz.com?referral=${this.reward._id}` };
     },
     computed: {
         ...mapStores(useAccountStore),
@@ -83,7 +91,7 @@ export default defineComponent({
     background-color: #241956;
     color: white;
 }
-.btn-block {
+.btn.w-100 {
     border-radius: 25px;
 }
 

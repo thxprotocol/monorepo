@@ -44,33 +44,19 @@ export default defineComponent({
             RewardVariant,
         };
     },
+    created: function () {
+        const poolId = this.$route.query.id as string;
+        this.accountStore.init(poolId).then(() => {
+            this.accountStore.getBalance();
+            this.rewardsStore.list();
+        });
+    },
 });
 </script>
 <style lang="scss">
 .overflow-auto {
     background-color: #241956;
     color: white;
-}
-
-.navbar.bg-dark {
-    background-color: #241956 !important;
-    a {
-        i {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-        line-height: 1;
-        width: 70px;
-        height: 70px;
-        align-items: center;
-        justify-content: center;
-        display: flex;
-        background-color: #31236d;
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 0.9rem;
-    }
 }
 
 .card {

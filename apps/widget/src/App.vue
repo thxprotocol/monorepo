@@ -14,7 +14,10 @@
                 <template #button-content>
                     <i class="fas fa-bars text-white"></i>
                 </template>
-                <b-dropdown-item-button @click="accountStore.api.signout()">Signout</b-dropdown-item-button>
+                <b-dropdown-item-button disabled size="sm" @click="accountStore.api.signin()">
+                    Account
+                </b-dropdown-item-button>
+                <b-dropdown-item-button size="sm" @click="accountStore.api.signout()">Signout</b-dropdown-item-button>
             </b-dropdown>
         </b-navbar>
         <div class="flex-grow-1 overflow-auto">
@@ -41,24 +44,16 @@
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { useAccountStore } from './stores/Account';
-import { useRewardStore } from './stores/Reward';
 
 export default defineComponent({
     methods: {
         onClick: () => {
+            // TODO Figure out how to get the parent window location href here. Probably by searching for pool or by adding the location the the iframe source. We will need to cache it locally though to make sure things go well after sigin (or pass it in the OIDC state)
             window.top?.postMessage('thx.close', 'https://localhost:8081');
         },
     },
     computed: {
         ...mapStores(useAccountStore),
-        ...mapStores(useRewardStore),
-    },
-    created: async function () {
-        const poolId = this.$route.query.id as string;
-        this.accountStore.init(poolId).then(() => {
-            this.accountStore.getBalance();
-            this.rewardsStore.list();
-        });
     },
 });
 </script>
@@ -68,5 +63,50 @@ html,
 body,
 #app {
     height: 100%;
+}
+.navbar-top .btn {
+    transition: transform ease 0.2s;
+    &:hover {
+        transform: scale(1.2);
+    }
+}
+.navbar.bg-dark {
+    padding: 0.5rem;
+    border-top: 1px solid #31236d;
+    background-color: #241956 !important;
+
+    .container-fluid {
+        padding: 0;
+    }
+
+    a {
+        margin: 0;
+        line-height: 1;
+        width: 70px;
+        height: 70px;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+
+        i {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+            transition: opacity ease 0.2s, transform ease 0.2s;
+        }
+
+        &:hover i {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        &.router-link-active {
+            background-color: #31236d;
+        }
+    }
 }
 </style>
