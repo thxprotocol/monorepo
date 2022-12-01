@@ -5,7 +5,7 @@
             <b-button v-if="!accountStore.isAuthenticated" @click="accountStore.api.signin()">Signin</b-button>
             <b-button v-else @click="accountStore.api.signout()">Signout</b-button>
         </b-navbar>
-        <div class="flex-grow-1 overflow-scroll">
+        <div class="flex-grow-1 overflow-auto">
             <router-view />
         </div>
         <b-navbar type="dark" variant="dark" class="navbar-bottom">

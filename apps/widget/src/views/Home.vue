@@ -47,7 +47,7 @@ export default defineComponent({
 });
 </script>
 <style lang="scss">
-.overflow-scroll {
+.overflow-auto {
     background-color: #241956;
     color: white;
 }
