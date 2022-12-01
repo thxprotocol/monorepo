@@ -1,6 +1,14 @@
 <template>
     <b-card bg-variant="light" class="m-2">
         <b-card-title class="d-flex">
+            <div>
+                <img
+                    v-if="reward.platform"
+                    class="img-brand"
+                    :src="`https://avatars.dicebear.com/api/identicon/${reward.platform}.svg`"
+                    :alt="reward.platform"
+                />
+            </div>
             <div class="flex-grow-1">{{ reward.title }}</div>
             <div class="text-success">{{ reward.amount }}</div>
         </b-card-title>
@@ -9,24 +17,7 @@
             {{ reward.description }}
         </b-card-text>
 
-        <b-input-group v-if="accountStore.isAuthenticated" size="sm">
-            <b-form-input :model-value="referralUrl" readonly size="sm" />
-            <b-input-group-append>
-                <b-button
-                    v-b-tooltip.hover.v-success.left
-                    tooltip-left
-                    :title="tooltipContent"
-                    size="sm"
-                    variant="primary"
-                    v-clipboard:copy="referralUrl"
-                    v-clipboard:success="() => (tooltipContent = 'URL copied!')"
-                >
-                    <i class="fas fa-clipboard"></i>
-                </b-button>
-            </b-input-group-append>
-        </b-input-group>
-
-        <b-button v-else variant="primary" block class="w-100" @click="accountStore.api.signin()">
+        <b-button variant="primary" block class="w-100" @click="accountStore.api.signin()">
             Claim <strong>{{ reward.amount }} points</strong>
         </b-button>
     </b-card>
@@ -39,10 +30,10 @@ import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
 
 export default defineComponent({
-    name: 'BaseCardRewardReferral',
+    name: 'BaseCardRewardPoints',
     props: {
         reward: {
-            type: Object as PropType<TReferralReward>,
+            type: Object as PropType<TPointReward>,
             required: true,
         },
     },

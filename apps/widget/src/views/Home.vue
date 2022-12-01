@@ -19,7 +19,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BaseCardRewardReferral from '../components/BaseCardRewardReferral.vue';
-import BaseCardRewardToken from '../components/BaseCardRewardToken.vue';
+import BaseCardRewardPoints from '../components/BaseCardRewardPoints.vue';
 import BaseCardRewardNFT from '../components/BaseCardRewardNFT.vue';
 import { mapStores } from 'pinia';
 import { useRewardStore } from '../stores/Reward';
@@ -31,7 +31,7 @@ export default defineComponent({
     name: 'Home',
     components: {
         BaseCardRewardReferral,
-        BaseCardRewardToken,
+        BaseCardRewardPoints,
         BaseCardRewardNFT,
     },
     computed: {

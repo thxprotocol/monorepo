@@ -25,11 +25,12 @@ type TERC20 = {
 };
 type TPointReward = TBaseReward & {
     amount: number;
-    title: string;
-    description: string;
-    variant: number;
     component?: string;
-    claimed: boolean;
+};
+
+type TReferralReward = TBaseReward & {
+    amount: number;
+    component?: string;
 };
 type TState = {
     erc20s: IERC20[];

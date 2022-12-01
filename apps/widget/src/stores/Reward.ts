@@ -23,17 +23,23 @@ export const useRewardStore = defineStore('rewards', {
     actions: {
         async list() {
             const account = useAccountStore();
-            const r = await fetch(API_URL + '/v1/point-rewards', {
+            const r = await fetch(API_URL + '/v1/rewards', {
                 method: 'GET',
                 headers: new Headers([['X-PoolId', account.poolId()]]),
                 mode: 'cors',
             });
-            const { results } = await r.json();
+            const results = await r.json();
 
-            this.rewards = results.map((r: TPointReward) => {
-                r.component = 'BaseCardRewardReferral';
-                return r;
-            });
+            this.rewards = [
+                ...Object.values(results.referralRewards).map((r: any) => {
+                    r.component = 'BaseCardRewardReferral';
+                    return r;
+                }),
+                ...Object.values(results.pointRewards).map((r: any) => {
+                    r.component = 'BaseCardRewardPoints';
+                    return r;
+                }),
+            ];
         },
     },
 });
