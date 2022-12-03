@@ -1,5 +1,5 @@
 <template>
-    <b-card bg-variant="light" class="m-2">
+    <b-card bg-variant="purple-dark" class="m-2">
         <b-card-title class="d-flex">
             <div class="flex-grow-1">{{ reward.title }}</div>
             <div class="text-success">{{ reward.amount }}</div>
@@ -9,8 +9,8 @@
             {{ reward.description }}
         </b-card-text>
 
-        <b-input-group v-if="accountStore.isAuthenticated" size="sm">
-            <b-form-input :model-value="referralUrl" readonly size="sm" />
+        <b-input-group v-if="accountStore.isAuthenticated">
+            <b-form-input :model-value="referralUrl" />
             <b-input-group-append>
                 <b-button
                     v-b-tooltip.hover.v-success.left
@@ -21,7 +21,7 @@
                     v-clipboard:copy="referralUrl"
                     v-clipboard:success="() => (tooltipContent = 'URL copied!')"
                 >
-                    <i class="fas fa-clipboard"></i>
+                    <i class="fas fa-clipboard px-2"></i>
                 </b-button>
             </b-input-group-append>
         </b-input-group>
@@ -64,31 +64,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style scoped lang="scss">
-.img-brand {
-    width: 25px;
-    height: 25px;
-    display: block;
-    margin-right: 0.5rem;
-}
-.btn {
-    border: 0;
-    padding: 0.8rem 1rem;
-}
-.btn-primary {
-    background-color: #5942c1;
-}
-.form-control {
-    border-color: #241956;
-    background-color: #241956;
-    color: white;
-}
-.btn.w-100 {
-    border-radius: 25px;
-}
-
-p {
-    font-size: 0.9rem;
-}
-</style>

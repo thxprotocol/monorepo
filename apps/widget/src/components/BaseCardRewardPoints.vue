@@ -1,13 +1,8 @@
 <template>
-    <b-card bg-variant="light" class="m-2">
+    <b-card class="m-2">
         <b-card-title class="d-flex">
-            <div>
-                <img
-                    v-if="reward.platform"
-                    class="img-brand"
-                    :src="`https://avatars.dicebear.com/api/identicon/${reward.platform}.svg`"
-                    :alt="reward.platform"
-                />
+            <div v-if="reward.platform" class="me-2">
+                <img height="25" :src="platformImg[reward.platform]" :alt="reward.platform" />
             </div>
             <div class="flex-grow-1">{{ reward.title }}</div>
             <div class="text-success">{{ reward.amount }}</div>
@@ -15,9 +10,12 @@
 
         <b-card-text>
             {{ reward.description }}
+            <b-link :href="content.url" v-if="content">
+                <i class="fas fa-link text-muted"></i>
+            </b-link>
         </b-card-text>
 
-        <b-button variant="primary" block class="w-100" @click="accountStore.api.signin()">
+        <b-button variant="primary" block class="w-100" @click="onClick">
             Claim <strong>{{ reward.amount }} points</strong>
         </b-button>
     </b-card>
@@ -28,6 +26,8 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
+import { RewardConditionInteraction } from '../types/enums/rewards';
+import { Brands } from '../utils/social';
 
 export default defineComponent({
     name: 'BaseCardRewardPoints',
@@ -37,49 +37,49 @@ export default defineComponent({
             required: true,
         },
     },
-    data: function () {
-        return { tooltipContent: 'Copy URL', referralUrl: `https://xyz.com?referral=${this.reward.uuid}` };
+    data: function (): any {
+        return {
+            platformImg: {
+                [Brands.None]: '',
+                [Brands.Google]: require('../assets/google-logo.png'),
+                [Brands.Twitter]: require('../assets/twitter-logo.png'),
+            },
+            tooltipContent: 'Copy URL',
+            referralUrl: `https://xyz.com?referral=${this.reward.uuid}`,
+        };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
+        content: function () {
+            if (!this.reward.interaction || !this.reward.content) return;
+            return this.getChannelActionURL(this.reward.interaction, this.reward.content);
+        },
     },
     methods: {
+        getChannelActionURL(interaction: RewardConditionInteraction, content: string) {
+            switch (interaction) {
+                case RewardConditionInteraction.YouTubeLike:
+                    return { url: `https://youtu.be/${content}` };
+                case RewardConditionInteraction.YouTubeSubscribe:
+                    return { url: `https://youtube.com/channel/${content}` };
+                case RewardConditionInteraction.TwitterLike:
+                    return { url: `https://www.twitter.com/twitter/status/${content}` };
+                case RewardConditionInteraction.TwitterRetweet:
+                    return { url: `https://www.twitter.com/twitter/status/${content}` };
+                case RewardConditionInteraction.TwitterFollow:
+                    return { url: `https://www.twitter.com/i/user/${content}` };
+                default:
+                    return '';
+            }
+        },
         onClick: function () {
             if (this.accountStore.isAuthenticated) {
-                alert('authenticated');
+                this.rewardsStore.claim(this.reward.uuid);
             } else {
-                alert('not authenticated');
+                this.accountStore.api.signin();
             }
         },
     },
 });
 </script>
-
-<style scoped lang="scss">
-.img-brand {
-    width: 25px;
-    height: 25px;
-    display: block;
-    margin-right: 0.5rem;
-}
-.btn {
-    border: 0;
-    padding: 0.8rem 1rem;
-}
-.btn-primary {
-    background-color: #5942c1;
-}
-.form-control {
-    border-color: #241956;
-    background-color: #241956;
-    color: white;
-}
-.btn.w-100 {
-    border-radius: 25px;
-}
-
-p {
-    font-size: 0.9rem;
-}
-</style>

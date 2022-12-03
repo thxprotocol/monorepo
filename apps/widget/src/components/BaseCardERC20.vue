@@ -1,7 +1,7 @@
 <template>
-    <b-card bg-variant="light" body-class="d-flex" class="m-2">
-        <div>
-            <img class="img-brand" :src="erc20.logoImg" />
+    <b-card body-class="d-flex" class="m-2">
+        <div class="pe-3">
+            <img height="25" :src="erc20.logoImg" />
         </div>
         <div class="flex-grow-1">
             <strong>{{ erc20.name }}</strong>
@@ -30,12 +30,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style scoped lang="scss">
-.img-brand {
-    width: 25px;
-    height: 25px;
-    display: block;
-    margin-right: 0.5rem;
-}
-</style>

@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex flex-column h-100">
-        <b-navbar type="dark" variant="dark" class="navbar-top pt-3">
+        <b-navbar class="navbar-top pt-3" :style="`background-image: url(${planetImg})`">
             <b-button variant="link" @click="onClick()"> <i class="fas fa-times text-white"></i></b-button>
             <b-button
                 variant="link"
@@ -8,7 +8,7 @@
                 @click="accountStore.api.signin()"
                 class="text-white"
             >
-                Signin <i class="fas fa-sign-in-alt ml-1"></i>
+                Sign in
             </b-button>
             <b-dropdown variant="link" v-else no-caret right>
                 <template #button-content>
@@ -23,7 +23,7 @@
         <div class="flex-grow-1 overflow-auto">
             <router-view />
         </div>
-        <b-navbar variant="dark" class="navbar-bottom">
+        <b-navbar class="navbar-bottom">
             <router-link to="/" class="d-flex flex-column justify-content-center align-items-center">
                 <i class="fas fa-coins"></i>
                 Points
@@ -52,28 +52,90 @@ export default defineComponent({
             window.top?.postMessage('thx.close', 'https://localhost:8081');
         },
     },
+    data: function () {
+        return {
+            planetImg: require('./assets/bg-planet.png'),
+        };
+    },
     computed: {
         ...mapStores(useAccountStore),
     },
 });
 </script>
-
 <style lang="scss">
+@import url('https://fonts.googleapis.com/css?family=Exo+2:200,400,400i,700,700i,900,900i');
+
+@import '~bootstrap/scss/functions';
+@import './scss/variables';
+@import '~bootstrap/scss/maps';
+@import '~bootstrap/scss/mixins';
+@import '~bootstrap/scss/utilities';
+
+@import '~bootstrap/scss/root';
+@import '~bootstrap/scss/reboot';
+@import '~bootstrap/scss/type';
+@import '~bootstrap/scss/images';
+@import '~bootstrap/scss/containers';
+@import '~bootstrap/scss/grid';
+@import '~bootstrap/scss/tables';
+@import '~bootstrap/scss/forms';
+@import '~bootstrap/scss/buttons';
+@import '~bootstrap/scss/transitions';
+@import '~bootstrap/scss/dropdown';
+@import '~bootstrap/scss/button-group';
+@import '~bootstrap/scss/nav';
+@import '~bootstrap/scss/navbar';
+@import '~bootstrap/scss/card';
+@import '~bootstrap/scss/accordion';
+@import '~bootstrap/scss/breadcrumb';
+@import '~bootstrap/scss/pagination';
+@import '~bootstrap/scss/badge';
+@import '~bootstrap/scss/alert';
+@import '~bootstrap/scss/progress';
+@import '~bootstrap/scss/list-group';
+@import '~bootstrap/scss/close';
+@import '~bootstrap/scss/toasts';
+@import '~bootstrap/scss/modal';
+@import '~bootstrap/scss/tooltip';
+@import '~bootstrap/scss/popover';
+@import '~bootstrap/scss/carousel';
+@import '~bootstrap/scss/spinners';
+@import '~bootstrap/scss/offcanvas';
+@import '~bootstrap/scss/placeholders';
+
+// Helpers
+@import '~bootstrap/scss/helpers';
+
+// Utilities
+@import '~bootstrap/scss/utilities/api';
+// scss-docs-end import-stack
+
+// Bootstrap Vue
+@import '~bootstrap-vue-3/dist/bootstrap-vue-3.css';
+
 html,
 body,
 #app {
     height: 100%;
 }
-.navbar-top .btn {
-    transition: transform ease 0.2s;
-    &:hover {
-        transform: scale(1.2);
+
+.navbar-top {
+    background-position: center -50px;
+    background-repeat: no-repeat;
+
+    .btn {
+        transition: opacity ease 0.2s;
+        opacity: 0.8;
+
+        &:hover {
+            opacity: 1;
+        }
     }
 }
-.navbar.bg-dark {
+
+.navbar-bottom {
     padding: 0.5rem;
-    border-top: 1px solid #31236d;
-    background-color: #241956 !important;
+    border-top: 1px solid $purple-dark;
 
     .container-fluid {
         padding: 0;
@@ -105,7 +167,7 @@ body,
         }
 
         &.router-link-active {
-            background-color: #31236d;
+            background-color: $purple-dark;
         }
     }
 }

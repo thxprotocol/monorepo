@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <div class="py-2 text-center">
+        <div class="py-2 text-center" v-if="accountStore.isAuthenticated">
             <div class="text-success h1 m-0">
                 <strong>{{ accountStore.balance }}</strong>
             </div>
@@ -53,13 +53,3 @@ export default defineComponent({
     },
 });
 </script>
-<style lang="scss">
-.overflow-auto {
-    background-color: #241956;
-    color: white;
-}
-
-.card {
-    background-color: #31236d !important;
-}
-</style>

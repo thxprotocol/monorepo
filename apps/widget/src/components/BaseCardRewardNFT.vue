@@ -46,12 +46,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style scoped lang="scss">
-.img-brand {
-    width: 25px;
-    height: 25px;
-    display: block;
-    margin-right: 0.5rem;
-}
-</style>

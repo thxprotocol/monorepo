@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { API_URL } from '../config/secrets';
+import { thx } from '../utils/thx';
 import { useAccountStore } from './Account';
 
 export const useRewardStore = defineStore('rewards', {
@@ -21,11 +22,23 @@ export const useRewardStore = defineStore('rewards', {
         rewards: [],
     }),
     actions: {
+        async claim(id: string) {
+            const accessToken = thx.session.cached.user?.access_token || '';
+            const r = await fetch(API_URL + `/v1/rewards/${id}/claim`, {
+                method: 'POST',
+                headers: new Headers([
+                    ['X-PoolId', useAccountStore().poolId()],
+                    ['Authorization', `Bearer ${accessToken}`],
+                ]),
+                mode: 'cors',
+            });
+            const results = await r.json();
+            console.log(results);
+        },
         async list() {
-            const account = useAccountStore();
             const r = await fetch(API_URL + '/v1/rewards', {
                 method: 'GET',
-                headers: new Headers([['X-PoolId', account.poolId()]]),
+                headers: new Headers([['X-PoolId', useAccountStore().poolId()]]),
                 mode: 'cors',
             });
             const results = await r.json();
