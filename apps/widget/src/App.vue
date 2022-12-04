@@ -1,7 +1,7 @@
 <template>
     <div class="d-flex flex-column h-100">
         <b-navbar class="navbar-top pt-3" :style="`background-image: url(${planetImg})`">
-            <b-button variant="link" @click="onClick()"> <i class="fas fa-times text-white"></i></b-button>
+            <b-button variant="link" @click="onClickClose"> <i class="fas fa-times text-white"></i></b-button>
             <b-button
                 variant="link"
                 v-if="!accountStore.isAuthenticated"
@@ -14,9 +14,7 @@
                 <template #button-content>
                     <i class="fas fa-bars text-white"></i>
                 </template>
-                <b-dropdown-item-button disabled size="sm" @click="accountStore.api.signin()">
-                    Account
-                </b-dropdown-item-button>
+                <b-dropdown-item-button size="sm" @click="onClickAccount"> Account </b-dropdown-item-button>
                 <b-dropdown-item-button size="sm" @click="accountStore.api.signout()">Signout</b-dropdown-item-button>
             </b-dropdown>
         </b-navbar>
@@ -47,9 +45,17 @@ import { useAccountStore } from './stores/Account';
 
 export default defineComponent({
     methods: {
-        onClick: () => {
-            // TODO Figure out how to get the parent window location href here. Probably by searching for pool or by adding the location the the iframe source. We will need to cache it locally though to make sure things go well after sigin (or pass it in the OIDC state)
-            window.top?.postMessage('thx.close', 'https://localhost:8081');
+        onClickClose: function () {
+            const origin = this.accountStore.config().origin;
+            window.top?.postMessage('thx.close', origin);
+        },
+        onClickAccount: function () {
+            this.accountStore.api.userManager.cached.signinRedirect({
+                extraQueryParams: {
+                    prompt: 'account-settings',
+                    return_url: window.location.href,
+                },
+            });
         },
     },
     data: function () {

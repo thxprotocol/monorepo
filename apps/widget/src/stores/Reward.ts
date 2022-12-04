@@ -24,21 +24,35 @@ export const useRewardStore = defineStore('rewards', {
     actions: {
         async claim(id: string) {
             const accessToken = thx.session.cached.user?.access_token || '';
+            const accountStore = useAccountStore();
             const r = await fetch(API_URL + `/v1/rewards/${id}/claim`, {
                 method: 'POST',
                 headers: new Headers([
-                    ['X-PoolId', useAccountStore().poolId()],
+                    ['X-PoolId', accountStore.config().poolId],
+                    ['Authorization', `Bearer ${accessToken}`],
+                ]),
+                mode: 'cors',
+            });
+            accountStore.getBalance();
+        },
+        async get(id: string) {
+            const accessToken = thx.session.cached.user?.access_token || '';
+            const r = await fetch(`${API_URL}/v1/referral-rewards/${id}`, {
+                method: 'GET',
+                headers: new Headers([
+                    ['X-PoolId', useAccountStore().config().poolId],
                     ['Authorization', `Bearer ${accessToken}`],
                 ]),
                 mode: 'cors',
             });
             const results = await r.json();
-            console.log(results);
+            const index = this.rewards.findIndex((r) => r._id === id);
+            this.rewards[index] = { ...this.rewards[index], ...results };
         },
         async list() {
             const r = await fetch(API_URL + '/v1/rewards', {
                 method: 'GET',
-                headers: new Headers([['X-PoolId', useAccountStore().poolId()]]),
+                headers: new Headers([['X-PoolId', useAccountStore().config().poolId]]),
                 mode: 'cors',
             });
             const results = await r.json();

@@ -30,6 +30,7 @@ type TPointReward = TBaseReward & {
 
 type TReferralReward = TBaseReward & {
     amount: number;
+    referralUrl?: string;
     component?: string;
 };
 type TState = {

@@ -45,8 +45,7 @@ export default defineComponent({
         };
     },
     created: function () {
-        const poolId = this.$route.query.id as string;
-        this.accountStore.init(poolId).then(() => {
+        this.accountStore.init(this.$route.query).then(() => {
             this.accountStore.getBalance();
             this.rewardsStore.list();
         });

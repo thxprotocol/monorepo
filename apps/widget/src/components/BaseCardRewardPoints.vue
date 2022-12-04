@@ -15,8 +15,18 @@
             </b-link>
         </b-card-text>
 
-        <b-button variant="primary" block class="w-100" @click="onClick">
+        <b-button
+            v-if="!reward.platform || (reward.platform && isConnected)"
+            variant="primary"
+            block
+            class="w-100"
+            @click="onClick"
+        >
             Claim <strong>{{ reward.amount }} points</strong>
+        </b-button>
+
+        <b-button v-if="reward.platform && !isConnected" variant="primary" block class="w-100" @click="onClick">
+            Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
         </b-button>
     </b-card>
 </template>
@@ -26,7 +36,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
-import { RewardConditionInteraction } from '../types/enums/rewards';
+import { RewardConditionPlatform, RewardConditionInteraction } from '../types/enums/rewards';
 import { Brands } from '../utils/social';
 
 export default defineComponent({
@@ -37,20 +47,24 @@ export default defineComponent({
             required: true,
         },
     },
-    data: function (): any {
+    data: function () {
         return {
+            RewardConditionPlatform,
             platformImg: {
                 [Brands.None]: '',
                 [Brands.Google]: require('../assets/google-logo.png'),
                 [Brands.Twitter]: require('../assets/twitter-logo.png'),
             },
             tooltipContent: 'Copy URL',
-            referralUrl: `https://xyz.com?referral=${this.reward.uuid}`,
         };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
+        isConnected: function () {
+            if (!this.reward.platform || !this.accountStore.account) return;
+            return this.accountStore.isConnected[this.reward.platform];
+        },
         content: function () {
             if (!this.reward.interaction || !this.reward.content) return;
             return this.getChannelActionURL(this.reward.interaction, this.reward.content);
@@ -74,11 +88,19 @@ export default defineComponent({
             }
         },
         onClick: function () {
-            if (this.accountStore.isAuthenticated) {
-                this.rewardsStore.claim(this.reward.uuid);
-            } else {
+            if (!this.accountStore.isAuthenticated) {
                 this.accountStore.api.signin();
             }
+            if (!this.isConnected) {
+                this.accountStore.api.userManager.cached.signinRedirect({
+                    extraQueryParams: {
+                        channel: this.reward.platform,
+                        prompt: 'connect',
+                    },
+                });
+            }
+
+            this.rewardsStore.claim(this.reward.uuid);
         },
     },
 });

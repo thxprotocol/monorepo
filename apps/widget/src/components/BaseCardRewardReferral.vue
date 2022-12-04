@@ -9,7 +9,7 @@
             {{ reward.description }}
         </b-card-text>
 
-        <b-input-group v-if="accountStore.isAuthenticated">
+        <b-input-group v-if="accountStore.isAuthenticated && referralUrl">
             <b-form-input :model-value="referralUrl" />
             <b-input-group-append>
                 <b-button
@@ -47,20 +47,21 @@ export default defineComponent({
         },
     },
     data: function () {
-        return { tooltipContent: 'Copy URL', referralUrl: `https://xyz.com?referral=${this.reward.uuid}` };
+        return { tooltipContent: 'Copy URL', referralUrl: '' };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
     },
-    methods: {
-        onClick: function () {
-            if (this.accountStore.isAuthenticated) {
-                alert('authenticated');
-            } else {
-                alert('not authenticated');
-            }
-        },
+    mounted() {
+        if (this.accountStore.isAuthenticated) {
+            this.rewardsStore.get(this.reward._id as string).then(() => {
+                const origin = this.accountStore.config().origin;
+                if (origin && this.reward.claims) {
+                    this.referralUrl = `${origin}?ref=${this.reward.claims[0].uuid}`;
+                }
+            });
+        }
     },
 });
 </script>

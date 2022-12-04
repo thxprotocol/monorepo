@@ -6,5 +6,5 @@ export const thx = new THXClient({
     clientId: CLIENT_ID,
     clientSecret: CLIENT_SECRET,
     redirectUrl: WIDGET_URL,
-    scopes: 'openid account:read point_balances:read',
+    scopes: 'openid account:read point_balances:read referral_rewards:read',
 });
