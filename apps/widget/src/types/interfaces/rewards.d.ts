@@ -26,6 +26,7 @@ type TERC20 = {
 type TPointReward = TBaseReward & {
     amount: number;
     component?: string;
+    isClaimed?: boolean;
 };
 
 type TReferralReward = TBaseReward & {
@@ -33,7 +34,8 @@ type TReferralReward = TBaseReward & {
     referralUrl?: string;
     component?: string;
 };
-type TState = {
+
+type TRewardState = {
     erc20s: IERC20[];
     rewards: IReward[];
 };

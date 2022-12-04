@@ -28,7 +28,7 @@
             </router-link>
             <router-link to="/perks" class="d-flex flex-column justify-content-center align-items-center">
                 <i class="fas fa-store"></i>
-                Store
+                Perks
             </router-link>
             <router-link to="/wallet" class="d-flex flex-column justify-content-center align-items-center">
                 <i class="fas fa-user"></i>
@@ -123,6 +123,20 @@ html,
 body,
 #app {
     height: 100%;
+}
+
+blockquote {
+    border-left: 3px solid $purple;
+    background-color: $purple-darker;
+    padding: 0.5rem;
+
+    a {
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: white !important;
+        }
+    }
 }
 
 .navbar-top {

@@ -1,5 +1,5 @@
 <template>
-    <b-card class="m-2">
+    <b-card class="m-2 disabled">
         <b-card-title class="d-flex">
             <div v-if="reward.platform" class="me-2">
                 <img height="25" :src="platformImg[reward.platform]" :alt="reward.platform" />
@@ -10,10 +10,18 @@
 
         <b-card-text>
             {{ reward.description }}
-            <b-link :href="content.url" v-if="content">
-                <i class="fas fa-link text-muted"></i>
-            </b-link>
         </b-card-text>
+
+        <blockquote class="d-flex" v-if="reward.platform && reward.interaction">
+            {{ interactionLabel[reward.interaction] }}
+            <b-link v-if="content" :href="content.url" target="_blank" class="text-muted ms-auto">
+                <i class="fas fa-external-link-alt"></i>
+            </b-link>
+        </blockquote>
+
+        <b-alert class="p-2" v-if="error && !isSubmitting" variant="danger" show>
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+        </b-alert>
 
         <b-button
             v-if="!reward.platform || (reward.platform && isConnected)"
@@ -21,8 +29,16 @@
             block
             class="w-100"
             @click="onClick"
+            :disabled="isSubmitting || reward.isClaimed"
         >
-            Claim <strong>{{ reward.amount }} points</strong>
+            <template v-if="reward.isClaimed"> Reward claimed</template>
+            <template v-else-if="isSubmitting">
+                <b-spinner small></b-spinner>
+                Adding points...
+            </template>
+            <template v-else>
+                Claim <strong>{{ reward.amount }} points</strong>
+            </template>
         </b-button>
 
         <b-button v-if="reward.platform && !isConnected" variant="primary" block class="w-100" @click="onClick">
@@ -37,7 +53,6 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
 import { RewardConditionPlatform, RewardConditionInteraction } from '../types/enums/rewards';
-import { Brands } from '../utils/social';
 
 export default defineComponent({
     name: 'BaseCardRewardPoints',
@@ -47,13 +62,22 @@ export default defineComponent({
             required: true,
         },
     },
-    data: function () {
+    data: function (): any {
         return {
+            error: '',
+            isSubmitting: false,
             RewardConditionPlatform,
             platformImg: {
-                [Brands.None]: '',
-                [Brands.Google]: require('../assets/google-logo.png'),
-                [Brands.Twitter]: require('../assets/twitter-logo.png'),
+                [RewardConditionPlatform.None]: '',
+                [RewardConditionPlatform.Google]: require('../assets/google-logo.png'),
+                [RewardConditionPlatform.Twitter]: require('../assets/twitter-logo.png'),
+            },
+            interactionLabel: {
+                [RewardConditionInteraction.YouTubeLike]: 'Like a Youtube video.',
+                [RewardConditionInteraction.YouTubeSubscribe]: 'Subscribe to a Youtube channel.',
+                [RewardConditionInteraction.TwitterLike]: 'Like a Twitter tweet.',
+                [RewardConditionInteraction.TwitterRetweet]: 'Retweet a Twitter tweet.',
+                [RewardConditionInteraction.TwitterFollow]: 'Follow a Twitter account.',
             },
             tooltipContent: 'Copy URL',
         };
@@ -69,6 +93,9 @@ export default defineComponent({
             if (!this.reward.interaction || !this.reward.content) return;
             return this.getChannelActionURL(this.reward.interaction, this.reward.content);
         },
+    },
+    mounted() {
+        this.rewardsStore.getPointReward(this.reward._id as string);
     },
     methods: {
         getChannelActionURL(interaction: RewardConditionInteraction, content: string) {
@@ -87,20 +114,28 @@ export default defineComponent({
                     return '';
             }
         },
-        onClick: function () {
+        onClick: async function () {
+            this.error = '';
+            this.isSubmitting = true;
             if (!this.accountStore.isAuthenticated) {
                 this.accountStore.api.signin();
             }
-            if (!this.isConnected) {
-                this.accountStore.api.userManager.cached.signinRedirect({
+            if (this.reward.platform && !this.isConnected) {
+                await this.accountStore.api.userManager.cached.signinPopup({
                     extraQueryParams: {
                         channel: this.reward.platform,
                         prompt: 'connect',
+                        return_url: window.location.href,
                     },
                 });
+            } else {
+                try {
+                    await this.rewardsStore.claim(this.reward.uuid);
+                } catch (error) {
+                    this.error = error;
+                }
             }
-
-            this.rewardsStore.claim(this.reward.uuid);
+            this.isSubmitting = false;
         },
     },
 });

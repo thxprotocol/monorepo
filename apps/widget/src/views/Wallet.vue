@@ -1,35 +1,37 @@
 <template>
-  <div class="wallet">
-    <component
-      v-for="(erc20, key) of rewardsStore.erc20s"
-      :key="key"
-      :is="'BaseCardERC20'"
-      :erc20="erc20"
-    />
-  </div>
+    <div class="wallet">
+        <component :key="key" v-for="(token, key) of list" :is="token.component" :token="token" />
+    </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import BaseCardERC20 from '../components/BaseCardERC20.vue';
 import { mapStores } from 'pinia';
-import { useRewardStore } from '../stores/Reward';
-import { RewardVariant } from '../utils/rewards';
-import { Brands } from '../utils/social';
+import { useWalletStore } from '../stores/Wallet';
+import { useAccountStore } from '../stores/Account';
+import BaseCardERC20 from '../components/BaseCardERC20.vue';
+import BaseCardERC721 from '../components/BaseCardERC721.vue';
 
 export default defineComponent({
-  name: 'Wallet',
-  components: {
-    BaseCardERC20,
-  },
-  computed: {
-    ...mapStores(useRewardStore),
-  },
-  data() {
-    return {
-      Brands,
-      RewardVariant,
-    };
-  },
+    name: 'Home',
+    components: {
+        BaseCardERC20,
+        BaseCardERC721,
+    },
+    computed: {
+        ...mapStores(useWalletStore),
+        ...mapStores(useAccountStore),
+        list: function (): any {
+            return [...this.walletStore.erc20, ...this.walletStore.erc721].sort(
+                (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+            );
+        },
+    },
+    created: function () {
+        this.accountStore.init(this.$route.query).then(() => {
+            this.accountStore.getBalance();
+            this.walletStore.list();
+        });
+    },
 });
 </script>

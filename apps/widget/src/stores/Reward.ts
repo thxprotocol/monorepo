@@ -4,7 +4,7 @@ import { thx } from '../utils/thx';
 import { useAccountStore } from './Account';
 
 export const useRewardStore = defineStore('rewards', {
-    state: (): TState => ({
+    state: (): TRewardState => ({
         erc20s: [
             {
                 balance: 500,
@@ -22,10 +22,10 @@ export const useRewardStore = defineStore('rewards', {
         rewards: [],
     }),
     actions: {
-        async claim(id: string) {
+        async claim(uuid: string) {
             const accessToken = thx.session.cached.user?.access_token || '';
             const accountStore = useAccountStore();
-            const r = await fetch(API_URL + `/v1/rewards/${id}/claim`, {
+            const r = await fetch(API_URL + `/v1/rewards/${uuid}/claim`, {
                 method: 'POST',
                 headers: new Headers([
                     ['X-PoolId', accountStore.config().poolId],
@@ -33,7 +33,14 @@ export const useRewardStore = defineStore('rewards', {
                 ]),
                 mode: 'cors',
             });
-            accountStore.getBalance();
+            const claim = await r.json();
+            if (claim.error) {
+                throw claim.error;
+            } else {
+                accountStore.getBalance();
+                const index = this.rewards.findIndex((r) => r.uuid === uuid);
+                this.rewards[index].isClaimed = true;
+            }
         },
         async get(id: string) {
             const accessToken = thx.session.cached.user?.access_token || '';
@@ -46,7 +53,21 @@ export const useRewardStore = defineStore('rewards', {
                 mode: 'cors',
             });
             const results = await r.json();
-            const index = this.rewards.findIndex((r) => r._id === id);
+            const index = this.rewards.findIndex((r: any) => r._id === id);
+            this.rewards[index] = { ...this.rewards[index], ...results };
+        },
+        async getPointReward(id: string) {
+            const accessToken = thx.session.cached.user?.access_token || '';
+            const r = await fetch(`${API_URL}/v1/point-rewards/${id}`, {
+                method: 'GET',
+                headers: new Headers([
+                    ['X-PoolId', useAccountStore().config().poolId],
+                    ['Authorization', `Bearer ${accessToken}`],
+                ]),
+                mode: 'cors',
+            });
+            const results = await r.json();
+            const index = this.rewards.findIndex((r: any) => r._id === id);
             this.rewards[index] = { ...this.rewards[index], ...results };
         },
         async list() {
