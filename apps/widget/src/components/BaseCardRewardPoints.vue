@@ -23,26 +23,24 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <b-button
-            v-if="!reward.platform || (reward.platform && isConnected)"
-            variant="primary"
-            block
-            class="w-100"
-            @click="onClick"
-            :disabled="isSubmitting || reward.isClaimed"
-        >
-            <template v-if="reward.isClaimed"> Reward claimed</template>
-            <template v-else-if="isSubmitting">
+        <b-button v-if="!accountStore.isAuthenticated" variant="primary" block class="w-100">
+            Claim <strong>{{ reward.amount }} points</strong>
+        </b-button>
+
+        <b-button v-else-if="reward.isClaimed" variant="primary" block class="w-100" disabled> Reward claimed</b-button>
+
+        <b-button v-else-if="reward.platform && !isConnected" variant="primary" block class="w-100" @click="onClick">
+            Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
+        </b-button>
+
+        <b-button v-else variant="primary" block class="w-100" @click="onClick" :disabled="isSubmitting">
+            <template v-if="isSubmitting">
                 <b-spinner small></b-spinner>
                 Adding points...
             </template>
             <template v-else>
                 Claim <strong>{{ reward.amount }} points</strong>
             </template>
-        </b-button>
-
-        <b-button v-if="reward.platform && !isConnected" variant="primary" block class="w-100" @click="onClick">
-            Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
         </b-button>
     </b-card>
 </template>

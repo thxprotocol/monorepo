@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { API_URL } from '../config/secrets';
-import { thx } from '../utils/thx';
 import { useAccountStore } from './Account';
 
 export const usePerkStore = defineStore('perks', {

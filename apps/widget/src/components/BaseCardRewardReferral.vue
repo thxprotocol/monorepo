@@ -33,6 +33,7 @@
 </template>
 
 <script lang="ts">
+import { UserProfile } from 'oidc-client-ts';
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
@@ -55,10 +56,10 @@ export default defineComponent({
     },
     mounted() {
         if (this.accountStore.isAuthenticated) {
-            this.rewardsStore.get(this.reward._id as string).then(() => {
+            this.accountStore.api.userManager.getUser().then(({ profile }: { profile: UserProfile }) => {
                 const origin = this.accountStore.config().origin;
-                if (origin && this.reward.claims) {
-                    this.referralUrl = `${origin}?ref=${this.reward.claims[0].uuid}`;
+                if (origin && profile.sub) {
+                    this.referralUrl = `${origin}?ref=${profile.sub}`;
                 }
             });
         }

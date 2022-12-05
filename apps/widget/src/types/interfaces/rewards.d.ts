@@ -36,6 +36,5 @@ type TReferralReward = TBaseReward & {
 };
 
 type TRewardState = {
-    erc20s: IERC20[];
     rewards: IReward[];
 };

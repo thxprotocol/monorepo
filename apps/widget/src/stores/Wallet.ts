@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { thx } from '../utils/thx';
+import { useAccountStore } from './Account';
 
 export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
@@ -8,10 +8,11 @@ export const useWalletStore = defineStore('wallet', {
     }),
     actions: {
         async list() {
-            this.erc20 = (await thx.erc20.list()).map((t: any) => {
+            const { api } = useAccountStore();
+            this.erc20 = (await api.erc20.list()).map((t: any) => {
                 return { ...t, component: 'BaseCardERC20' };
             });
-            this.erc721 = (await thx.erc721.list()).map((t: any) => {
+            this.erc721 = (await api.erc721.list()).map((t: any) => {
                 return { ...t, component: 'BaseCardERC721' };
             });
             console.log(this.erc721);
