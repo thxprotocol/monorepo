@@ -37,7 +37,7 @@ export default defineComponent({
             RewardVariant,
         };
     },
-    created: function () {
+    created() {
         this.accountStore.init(this.$route.query).then(() => {
             this.accountStore.getBalance();
             this.perksStore.list();

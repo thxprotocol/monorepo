@@ -26,14 +26,15 @@ export const useAccountStore = defineStore('account', {
             if (id && origin) {
                 sessionStorage.setItem('thx:widget:config', JSON.stringify({ origin, poolId: id }));
             }
-            this.isAuthenticated = (await this.api.init()) || false;
+
+            this.isAuthenticated = await thx.init();
 
             if (this.isAuthenticated) {
                 this.getAccount();
             }
         },
         async getAccount() {
-            this.account = await this.api.account.get();
+            this.account = await thx.account.get();
             if (!this.account) return;
 
             this.isConnected[RewardConditionPlatform.Google] = this.account.googleAccess;

@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex flex-column h-100">
-        <b-navbar class="navbar-top pt-3" :style="`background-image: url(${planetImg})`">
+        <b-navbar class="navbar-top pt-3" :style="`background-image: url(${require('./assets/bg-planet.png')})`">
             <b-button variant="link" @click="onClickClose"> <i class="fas fa-times text-white"></i></b-button>
             <b-button
                 variant="link"
@@ -44,12 +44,18 @@ import { defineComponent } from 'vue';
 import { useAccountStore } from './stores/Account';
 
 export default defineComponent({
+    computed: {
+        ...mapStores(useAccountStore),
+    },
+    mounted() {
+        // this.accountStore.api.userManager.cached.signinPopupCallback();
+    },
     methods: {
-        onClickClose: function () {
+        onClickClose() {
             const origin = this.accountStore.config().origin;
             window.top?.postMessage('thx.close', origin);
         },
-        onClickAccount: function () {
+        onClickAccount() {
             this.accountStore.api.userManager.cached.signinRedirect({
                 extraQueryParams: {
                     prompt: 'account-settings',
@@ -57,14 +63,6 @@ export default defineComponent({
                 },
             });
         },
-    },
-    data: function () {
-        return {
-            planetImg: require('./assets/bg-planet.png'),
-        };
-    },
-    computed: {
-        ...mapStores(useAccountStore),
     },
 });
 </script>

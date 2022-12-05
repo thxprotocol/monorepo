@@ -27,7 +27,7 @@ export default defineComponent({
             );
         },
     },
-    created: function () {
+    created() {
         this.accountStore.init(this.$route.query).then(() => {
             this.accountStore.getBalance();
             this.walletStore.list();
