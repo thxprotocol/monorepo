@@ -42,7 +42,7 @@
         <router-view />
         <b-navbar class="navbar-bottom">
             <router-link to="/" class="d-flex flex-column justify-content-center align-items-center">
-                <i class="fas fa-coins"></i>
+                <i class="fas fa-trophy"></i>
                 Points
             </router-link>
             <router-link to="/perks" class="d-flex flex-column justify-content-center align-items-center">
@@ -50,7 +50,7 @@
                 Perks
             </router-link>
             <router-link to="/wallet" class="d-flex flex-column justify-content-center align-items-center">
-                <i class="fas fa-user"></i>
+                <i class="fas fa-wallet"></i>
                 Wallet
             </router-link>
         </b-navbar>
