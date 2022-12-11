@@ -2,7 +2,7 @@
     <b-card bg-variant="purple-dark" class="m-2">
         <b-card-title class="d-flex">
             <div class="flex-grow-1">{{ reward.title }}</div>
-            <div class="text-success">{{ reward.amount }}</div>
+            <div class="text-success fw-bold">{{ reward.amount }}</div>
         </b-card-title>
 
         <b-card-text>
@@ -13,33 +13,23 @@
             <b-form-input :model-value="referralUrl" />
             <b-input-group-append>
                 <b-button
-                    v-b-tooltip.hover.v-success.left
-                    tooltip-left
-                    :title="tooltipContent"
                     size="sm"
                     variant="primary"
                     v-clipboard:copy="referralUrl"
-                    v-clipboard:success="() => (tooltipContent = 'URL copied!')"
+                    v-clipboard:success="onCopySuccess"
                 >
-                    <i class="fas fa-clipboard px-2"></i>
+                    <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
+                    <i v-else class="fas fa-clipboard px-2"></i>
                 </b-button>
             </b-input-group-append>
         </b-input-group>
-
-        <b-button
-            v-else
-            variant="primary"
-            block
-            class="w-100"
-            @click="accountStore.api.userManager.cached.signinPopup()"
-        >
+        <b-button v-else variant="primary" block class="w-100" @click="onClickClaim">
             Claim <strong>{{ reward.amount }} points</strong>
         </b-button>
     </b-card>
 </template>
 
 <script lang="ts">
-import { UserProfile } from 'oidc-client-ts';
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
@@ -53,22 +43,30 @@ export default defineComponent({
             required: true,
         },
     },
-    data: function () {
-        return { tooltipContent: 'Copy URL', referralUrl: '' };
+    data() {
+        return {
+            isCopied: false,
+        };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
+        referralUrl() {
+            const { config, account } = useAccountStore();
+            if (!config || !account) return '';
+
+            const { origin } = config();
+            if (!origin || !account.id) return '';
+            return `${origin}?ref=${account.id}`;
+        },
     },
-    mounted() {
-        if (this.accountStore.isAuthenticated) {
-            this.accountStore.api.userManager.getUser().then(({ profile }: { profile: UserProfile }) => {
-                const origin = this.accountStore.config().origin;
-                if (origin && profile.sub) {
-                    this.referralUrl = `${origin}?ref=${profile.sub}`;
-                }
-            });
-        }
+    methods: {
+        onClickClaim() {
+            this.accountStore.api.userManager.cached.signinPopup();
+        },
+        onCopySuccess() {
+            this.isCopied = true;
+        },
     },
 });
 </script>

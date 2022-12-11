@@ -21,7 +21,7 @@
                 Sign in
                 <i class="fas fa-sign-in-alt ms-2"></i>
             </b-button>
-            <b-button variant="link" @click="onClickSignup"> Sign up </b-button>
+            <b-button variant="link" @click="onClickSignup" class="text-white"> Sign up </b-button>
         </div>
     </div>
 </template>
@@ -35,7 +35,7 @@ import BaseCardERC20 from '../components/BaseCardERC20.vue';
 import BaseCardERC721 from '../components/BaseCardERC721.vue';
 
 export default defineComponent({
-    name: 'Home',
+    name: 'Wallet',
     components: {
         BaseCardERC20,
         BaseCardERC721,
@@ -49,10 +49,8 @@ export default defineComponent({
             );
         },
     },
-    mounted() {
-        this.accountStore.init(this.$route.query).then(() => {
-            this.walletStore.list();
-        });
+    created() {
+        this.walletStore.list();
     },
     methods: {
         onClickSignin() {

@@ -34,24 +34,9 @@ export default defineComponent({
         BaseCardRewardNFT,
     },
     computed: {
-        ...mapStores(useRewardStore),
         ...mapStores(useAccountStore),
+        ...mapStores(useRewardStore),
         ...mapStores(useWalletStore),
-    },
-    mounted() {
-        this.accountStore.init(this.$route.query).then(async () => {
-            await this.rewardsStore.list();
-            this.updateLauncher();
-        });
-    },
-    methods: {
-        updateLauncher() {
-            // Send the amount of unclaimed rewards to the parent window and update the launcher
-            const { origin } = this.accountStore.config();
-            const amount = this.rewardsStore.rewards.filter((r) => !r.isClaimed).length;
-
-            window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
-        },
     },
 });
 </script>

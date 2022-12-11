@@ -8,7 +8,7 @@ export const useRewardStore = defineStore('rewards', {
     actions: {
         async claim(uuid: string) {
             const { api, getBalance } = useAccountStore();
-            const claim = await api.rewardsManager.claimPointsReward(uuid);
+            const claim = await api.rewardsManager.points.claim(uuid);
             if (claim.error) {
                 throw claim.error;
             } else {
@@ -17,30 +17,23 @@ export const useRewardStore = defineStore('rewards', {
                 this.rewards[index].isClaimed = true;
             }
         },
-        async getPointReward(id: string) {
-            const { api } = useAccountStore();
-            const results = await api.pointRewardManager.get(id);
-            const index = this.rewards.findIndex((r: any) => r._id === id);
-            this.rewards[index] = { ...this.rewards[index], ...results };
-        },
         async list() {
-            const { api } = useAccountStore();
+            const { api, isAuthenticated } = useAccountStore();
             const { referralRewards, pointRewards } = await api.rewardsManager.list();
+            const referralRewardsList = Object.values(referralRewards).map((r: any) => {
+                r.component = 'BaseCardRewardReferral';
+                return r;
+            });
+            const pointRewardsList = await Promise.all(
+                Object.values(pointRewards).map(async (r: any) => {
+                    r.component = 'BaseCardRewardPoints';
+                    if (!isAuthenticated) return r;
+                    const pointReward = await api.pointRewardManager.get(r._id);
+                    return { ...r, ...pointReward };
+                }),
+            );
 
-            this.rewards = [
-                ...(referralRewards
-                    ? Object.values(referralRewards).map((r: any) => {
-                          r.component = 'BaseCardRewardReferral';
-                          return r;
-                      })
-                    : []),
-                ...(pointRewards
-                    ? Object.values(pointRewards).map((r: any) => {
-                          r.component = 'BaseCardRewardPoints';
-                          return r;
-                      })
-                    : []),
-            ];
+            this.rewards = [...referralRewardsList, ...pointRewardsList];
         },
     },
 });

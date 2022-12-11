@@ -2,12 +2,7 @@
     <div class="d-flex flex-column h-100">
         <b-navbar class="navbar-top pt-3" :style="`background-image: url(${require('./assets/bg-planet.png')})`">
             <b-button variant="link" @click="onClickClose"> <i class="fas fa-times text-white"></i></b-button>
-            <b-button
-                variant="link"
-                v-if="!accountStore.isAuthenticated"
-                @click="accountStore.api.userManager.cached.signinPopup()"
-                class="text-white"
-            >
+            <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin" class="text-white">
                 Sign in
             </b-button>
             <b-dropdown variant="link" v-else no-caret right>
@@ -21,20 +16,20 @@
                 >
                     <div class="d-flex align-items-center justify-content-between">
                         {{ walletAddress }}
-                        <i class="fas fa-clipboard text-muted ml-auto"></i>
+                        <i class="fas fa-clipboard ml-auto"></i>
                     </div>
                 </b-dropdown-item-button>
                 <b-dropdown-item-button size="sm" @click="onClickAccount">
                     <div class="d-flex align-items-center justify-content-between">
                         Account
-                        <i class="fas fa-user text-muted ml-auto"></i>
+                        <i class="fas fa-user ml-auto"></i>
                     </div>
                 </b-dropdown-item-button>
                 <b-dropdown-divider />
                 <b-dropdown-item-button size="sm" @click="accountStore.api.signout()">
                     <div class="d-flex align-items-center justify-content-between">
                         Signout
-                        <i class="fas fa-sign-out-alt text-muted ml-auto"></i>
+                        <i class="fas fa-sign-out-alt ml-auto"></i>
                     </div>
                 </b-dropdown-item-button>
             </b-dropdown>
@@ -79,19 +74,24 @@ export default defineComponent({
             )}`;
         },
     },
-    created() {
+    async created() {
+        await this.accountStore.init(this.$route.query);
+
         window.onmessage = async (event) => {
             const origin = this.accountStore.config().origin;
             if (!WIDGET_URL || event.origin !== new URL(origin).origin) return;
             switch (event.data.message) {
                 case 'thx.referral.claim.create': {
-                    await this.accountStore.api.rewardsManager.claimReferralReward(event.data);
+                    await this.accountStore.api.rewardsManager.referral.claim(event.data);
                     this.accountStore.getBalance();
                 }
             }
         };
     },
     methods: {
+        onClickSignin() {
+            this.accountStore.api.userManager.cached.signinPopup();
+        },
         onClickClose() {
             const { origin } = this.accountStore.config();
             window.top?.postMessage({ message: 'thx.widget.close' }, origin);
@@ -176,6 +176,19 @@ blockquote {
             color: white !important;
         }
     }
+}
+
+.card-title {
+    font-size: 1.15rem;
+
+    .me-2 {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.card-text {
+    opacity: 0.7;
 }
 
 .navbar-top {

@@ -4,8 +4,8 @@
             <div v-if="reward.platform" class="me-2">
                 <img height="20" :src="platformImg[reward.platform]" :alt="reward.platform" />
             </div>
-            <div class="flex-grow-1">{{ reward.title }}</div>
-            <div class="text-success">{{ reward.amount }}</div>
+            <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
+            <div class="text-success fw-bold">{{ reward.amount }}</div>
         </b-card-title>
 
         <b-card-text>
@@ -97,19 +97,23 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
-        isConnected: function () {
-            if (!this.reward.platform || !this.accountStore.account) return;
-            return this.accountStore.isConnected[this.reward.platform];
-        },
-        content: function () {
+        content() {
             if (!this.reward.interaction || !this.reward.content) return;
             return this.getChannelActionURL(this.reward.interaction, this.reward.content);
         },
-    },
-    mounted() {
-        if (this.accountStore.isAuthenticated) {
-            this.rewardsStore.getPointReward(this.reward._id as string);
-        }
+        isConnected() {
+            const { account } = useAccountStore();
+            if (!account || !this.reward) return;
+
+            switch (this.reward.platform) {
+                case RewardConditionPlatform.Google:
+                    return account.googleAccess;
+                case RewardConditionPlatform.Twitter:
+                    return account.twitterAccess;
+                default:
+                    return true;
+            }
+        },
     },
     methods: {
         getChannelActionURL(interaction: RewardConditionInteraction, content: string) {
@@ -154,18 +158,17 @@ export default defineComponent({
                         return_url: WIDGET_URL + '/signin-popup.html',
                     },
                 });
-                // On successful auth we also get the account info
-                this.accountStore.getAccount();
+                await this.accountStore.getAccount();
             } catch (error) {
                 this.error = error;
+                await this.accountStore.getAccount();
+            } finally {
+                this.isSubmitting = false;
+                this.error = '';
                 // As window.opener is set to null right after redirect from auth.thx to Twitter
                 // we currently update account info on an error as this might be caused by the
                 // opener not being available in the popup. User will need to run the popup flow twice.
-                this.accountStore.getAccount();
-            } finally {
-                this.accountStore.getAccount();
-                this.isSubmitting = false;
-                this.error = '';
+                await this.accountStore.getAccount();
             }
         },
     },

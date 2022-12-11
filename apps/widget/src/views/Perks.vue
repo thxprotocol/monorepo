@@ -15,27 +15,17 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { usePerkStore } from '../stores/Perk';
 import { useAccountStore } from '../stores/Account';
-import { RewardVariant } from '../utils/rewards';
-import { Brands } from '../utils/social';
 import BaseCardPerkERC721 from '../components/BaseCardPerkERC721.vue';
 
 export default defineComponent({
-    name: 'Home',
+    name: 'Perks',
     components: { BaseCardPerkERC721 },
     computed: {
-        ...mapStores(usePerkStore),
         ...mapStores(useAccountStore),
+        ...mapStores(usePerkStore),
     },
-    data() {
-        return {
-            Brands,
-            RewardVariant,
-        };
-    },
-    mounted() {
-        this.accountStore.init(this.$route.query).then(() => {
-            this.perksStore.list();
-        });
+    created() {
+        this.perksStore.list();
     },
 });
 </script>

@@ -1,5 +1,6 @@
 <template>
-    <b-card class="m-2 disabled" :img-src="imgUrl">
+    <b-card class="m-2 disabled">
+        <img :src="imgUrl" width="auto" class="img-fluid w-auto rounded-2 mt-1 mb-3" />
         <b-card-title class="d-flex">
             <div class="flex-grow-1">{{ perk.title }}</div>
             <div class="text-warning">{{ perk.pointPrice }}</div>

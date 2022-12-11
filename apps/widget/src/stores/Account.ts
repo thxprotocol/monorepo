@@ -2,22 +2,25 @@ import { Client as THXClient } from '@thxnetwork/sdk/src/lib/client';
 import { defineStore } from 'pinia';
 import { API_URL, CLIENT_ID, CLIENT_SECRET, WIDGET_URL } from '../config/secrets';
 import { RewardConditionPlatform } from '../types/enums/rewards';
+import { usePerkStore } from './Perk';
+import { useRewardStore } from './Reward';
+import { useWalletStore } from './Wallet';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
-        api: null,
         config: (): TWidgetConfig => {
             const data = sessionStorage.getItem('thx:widget:config');
             if (!data) return {} as TWidgetConfig;
             return JSON.parse(data);
         },
+        api: null,
+        account: null,
         balance: 0,
         isAuthenticated: false,
         isConnected: {
             [RewardConditionPlatform.Google]: false,
             [RewardConditionPlatform.Twitter]: false,
         },
-        account: null,
     }),
     actions: {
         async init({ id, origin, chainId }: { origin: string; id: string; chainId: number } & any) {
@@ -37,51 +40,65 @@ export const useAccountStore = defineStore('account', {
                 poolId,
             });
 
-            const onUserLoaded = async () => {
-                this.isAuthenticated = !this.api.initialized ? await this.api.init() : true;
+            this.api.userManager.cached.events.addAccessTokenExpired(this.onAccessTokenExpired);
+            this.api.userManager.cached.events.addAccessTokenExpiring(this.onAccessTokenExpiring);
+            this.api.userManager.cached.events.addUserLoaded(this.onUserLoaded);
+            this.api.userManager.cached.events.addUserUnloaded(this.onUserLoaded);
+            this.api.userManager.cached.events.load(this.onLoad);
+        },
+        updateLauncher() {
+            const rewardsStore = useRewardStore();
+            const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
+            const { origin } = this.config();
 
-                if (this.isAuthenticated) {
-                    await this.api.userManager.getUser();
-                    await this.getAccount();
-                    await this.getBalance();
-                }
-            };
+            // Send the amount of unclaimed rewards to the parent window and update the launcher
+            window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+        },
+        onLoad() {
+            debugger;
+        },
+        async onUserUnloaded() {
+            const rewardsStore = useRewardStore();
+            rewardsStore.list().then(this.updateLauncher);
 
-            const onAccessTokenExpired = async () => {
-                await this.api.signout();
-            };
+            this.isAuthenticated = false;
+        },
+        async onUserLoaded() {
+            const rewardsStore = useRewardStore();
+            const perksStore = usePerkStore();
+            const walletStore = useWalletStore();
 
-            const onAccessTokenExpiring = async () => {
-                await this.api.userManager.cached.signinSilent();
-            };
+            this.isAuthenticated = !!(await this.api.userManager.getUser());
 
-            this.api.userManager.cached.events.addUserLoaded(onUserLoaded);
-            this.api.userManager.cached.events.addAccessTokenExpired(onAccessTokenExpired);
-            this.api.userManager.cached.events.addAccessTokenExpiring(onAccessTokenExpiring);
+            rewardsStore.list().then(() => {
+                const { origin } = this.config();
+                const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
+                // Send the amount of unclaimed rewards to the parent window and update the launcher
+                window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+            });
 
-            await onUserLoaded();
+            // Guard HTTP requests that do require auth
+            if (!this.isAuthenticated) return;
+
+            this.getAccount().then(() => this.getBalance());
+
+            perksStore.list();
+            walletStore.list();
+
+            this.isAuthenticated = true;
+        },
+        onAccessTokenExpired() {
+            this.api.signout();
+        },
+        onAccessTokenExpiring() {
+            this.api.userManager.cached.signinSilent();
         },
         async getAccount() {
             this.account = await this.api.account.get();
-            if (!this.account) return;
-
-            this.isConnected[RewardConditionPlatform.Google] = this.account.googleAccess;
-            this.isConnected[RewardConditionPlatform.Twitter] = this.account.twitterAccess;
         },
         async getBalance() {
-            const accessToken = this.api.session.cached.user?.access_token || '';
-            if (accessToken) {
-                const r = await fetch(`${API_URL}/v1/point-balances`, {
-                    method: 'GET',
-                    headers: new Headers([
-                        ['X-PoolId', this.config().poolId],
-                        ['Authorization', `Bearer ${accessToken}`],
-                    ]),
-                    mode: 'cors',
-                });
-                const { balance } = await r.json();
-                this.balance = balance;
-            }
+            const { balance } = await this.api.pointBalanceManager.list();
+            this.balance = balance;
         },
     },
 });
