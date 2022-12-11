@@ -2,15 +2,14 @@ import { Client as THXClient } from '@thxnetwork/sdk/src/lib/client';
 import { defineStore } from 'pinia';
 import { API_URL, CLIENT_ID, CLIENT_SECRET, WIDGET_URL } from '../config/secrets';
 import { RewardConditionPlatform } from '../types/enums/rewards';
-import { useWalletStore } from './Wallet';
 
 export const useAccountStore = defineStore('account', {
-    state: (): { api: THXClient | null } & any => ({
+    state: (): TAccountState => ({
         api: null,
-        config: () => {
+        config: (): TWidgetConfig => {
             const data = sessionStorage.getItem('thx:widget:config');
-            if (!data) return;
-            return JSON.parse(data) as { poolId: string; origin: string };
+            if (!data) return {} as TWidgetConfig;
+            return JSON.parse(data);
         },
         balance: 0,
         isAuthenticated: false,
@@ -21,7 +20,7 @@ export const useAccountStore = defineStore('account', {
         account: null,
     }),
     actions: {
-        async init({ id, origin, chainId }: { origin: string; id: string; chainId: number }) {
+        async init({ id, origin, chainId }: { origin: string; id: string; chainId: number } & any) {
             if (id && origin) {
                 sessionStorage.setItem('thx:widget:config', JSON.stringify({ origin, poolId: id, chainId }));
             }

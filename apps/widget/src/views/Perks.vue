@@ -6,13 +6,7 @@
         <div class="text-white">points</div>
     </div>
     <div class="flex-grow-1 overflow-auto">
-        <component
-            v-for="(perk, key) of perksStore.perks"
-            :key="key"
-            :is="perk.component"
-            :reward="perk"
-            class="mb-2"
-        />
+        <component v-for="(perk, key) of perksStore.perks" :key="key" :is="perk.component" :perk="perk" class="mb-2" />
     </div>
 </template>
 
@@ -23,10 +17,11 @@ import { usePerkStore } from '../stores/Perk';
 import { useAccountStore } from '../stores/Account';
 import { RewardVariant } from '../utils/rewards';
 import { Brands } from '../utils/social';
+import BaseCardPerkERC721 from '../components/BaseCardPerkERC721.vue';
 
 export default defineComponent({
     name: 'Home',
-    components: {},
+    components: { BaseCardPerkERC721 },
     computed: {
         ...mapStores(usePerkStore),
         ...mapStores(useAccountStore),

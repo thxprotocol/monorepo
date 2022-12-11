@@ -7,12 +7,12 @@ export const useRewardStore = defineStore('rewards', {
     }),
     actions: {
         async claim(uuid: string) {
-            const accountStore = useAccountStore();
-            const claim = await accountStore.api.rewardsManager.claimPointsReward(uuid);
+            const { api, getBalance } = useAccountStore();
+            const claim = await api.rewardsManager.claimPointsReward(uuid);
             if (claim.error) {
                 throw claim.error;
             } else {
-                accountStore.getBalance();
+                getBalance();
                 const index = this.rewards.findIndex((r) => r.uuid === uuid);
                 this.rewards[index].isClaimed = true;
             }
