@@ -5,7 +5,7 @@
             <b-button
                 variant="link"
                 v-if="!accountStore.isAuthenticated"
-                @click="accountStore.api.signin()"
+                @click="accountStore.api.userManager.cached.signinPopup()"
                 class="text-white"
             >
                 Sign in
@@ -14,13 +14,32 @@
                 <template #button-content>
                     <i class="fas fa-bars text-white"></i>
                 </template>
-                <b-dropdown-item-button size="sm" @click="onClickAccount"> Account </b-dropdown-item-button>
-                <b-dropdown-item-button size="sm" @click="accountStore.api.signout()">Signout</b-dropdown-item-button>
+                <b-dropdown-item-button
+                    v-if="walletStore.wallet"
+                    size="sm"
+                    v-clipboard:copy="walletStore.wallet.address"
+                >
+                    <div class="d-flex align-items-center justify-content-between">
+                        {{ walletAddress }}
+                        <i class="fas fa-clipboard text-muted ml-auto"></i>
+                    </div>
+                </b-dropdown-item-button>
+                <b-dropdown-item-button size="sm" @click="onClickAccount">
+                    <div class="d-flex align-items-center justify-content-between">
+                        Account
+                        <i class="fas fa-user text-muted ml-auto"></i>
+                    </div>
+                </b-dropdown-item-button>
+                <b-dropdown-divider />
+                <b-dropdown-item-button size="sm" @click="accountStore.api.signout()">
+                    <div class="d-flex align-items-center justify-content-between">
+                        Signout
+                        <i class="fas fa-sign-out-alt text-muted ml-auto"></i>
+                    </div>
+                </b-dropdown-item-button>
             </b-dropdown>
         </b-navbar>
-        <div class="flex-grow-1 overflow-auto">
-            <router-view />
-        </div>
+        <router-view />
         <b-navbar class="navbar-bottom">
             <router-link to="/" class="d-flex flex-column justify-content-center align-items-center">
                 <i class="fas fa-coins"></i>
@@ -41,19 +60,41 @@
 <script lang="ts">
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
+import { WIDGET_URL } from './config/secrets';
 import { useAccountStore } from './stores/Account';
+import { useRewardStore } from './stores/Reward';
+import { useWalletStore } from './stores/Wallet';
 
 export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useRewardStore),
+        ...mapStores(useWalletStore),
+        walletAddress() {
+            const { wallet } = useWalletStore();
+            if (!wallet) return '';
+            return `${wallet.address.substring(0, 6)}...${wallet.address.substring(
+                wallet.address.length - 4,
+                wallet.address.length,
+            )}`;
+        },
     },
-    mounted() {
-        // this.accountStore.api.userManager.cached.signinPopupCallback();
+    created() {
+        window.onmessage = async (event) => {
+            const origin = this.accountStore.config().origin;
+            if (!WIDGET_URL || event.origin !== new URL(origin).origin) return;
+            switch (event.data.message) {
+                case 'thx.referral.claim.create': {
+                    await this.accountStore.api.rewardsManager.claimReferralReward(event.data);
+                    this.accountStore.getBalance();
+                }
+            }
+        };
     },
     methods: {
         onClickClose() {
-            const origin = this.accountStore.config().origin;
-            window.top?.postMessage('thx.close', origin);
+            const { origin } = this.accountStore.config();
+            window.top?.postMessage({ message: 'thx.widget.close' }, origin);
         },
         onClickAccount() {
             this.accountStore.api.userManager.cached.signinRedirect({

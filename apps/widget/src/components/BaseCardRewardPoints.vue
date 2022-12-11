@@ -2,7 +2,7 @@
     <b-card class="m-2 disabled">
         <b-card-title class="d-flex">
             <div v-if="reward.platform" class="me-2">
-                <img height="25" :src="platformImg[reward.platform]" :alt="reward.platform" />
+                <img height="20" :src="platformImg[reward.platform]" :alt="reward.platform" />
             </div>
             <div class="flex-grow-1">{{ reward.title }}</div>
             <div class="text-success">{{ reward.amount }}</div>
@@ -23,17 +23,30 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <b-button v-if="!accountStore.isAuthenticated" variant="primary" block class="w-100">
+        <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
             Claim <strong>{{ reward.amount }} points</strong>
         </b-button>
 
         <b-button v-else-if="reward.isClaimed" variant="primary" block class="w-100" disabled> Reward claimed</b-button>
 
-        <b-button v-else-if="reward.platform && !isConnected" variant="primary" block class="w-100" @click="onClick">
-            Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
+        <b-button
+            v-else-if="reward.platform && !isConnected"
+            variant="primary"
+            block
+            class="w-100"
+            @click="onClickConnect"
+            :disabled="isSubmitting"
+        >
+            <template v-if="isSubmitting">
+                <b-spinner small></b-spinner>
+                Connecting platform
+            </template>
+            <template v-else>
+                Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
+            </template>
         </b-button>
 
-        <b-button v-else variant="primary" block class="w-100" @click="onClick" :disabled="isSubmitting">
+        <b-button v-else variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
             <template v-if="isSubmitting">
                 <b-spinner small></b-spinner>
                 Adding points...
@@ -48,6 +61,7 @@
 <script lang="ts">
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
+import { WIDGET_URL } from '../config/secrets';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
 import { RewardConditionPlatform, RewardConditionInteraction } from '../types/enums/rewards';
@@ -93,7 +107,9 @@ export default defineComponent({
         },
     },
     mounted() {
-        this.rewardsStore.getPointReward(this.reward._id as string);
+        if (this.accountStore.isAuthenticated) {
+            this.rewardsStore.getPointReward(this.reward._id as string);
+        }
     },
     methods: {
         getChannelActionURL(interaction: RewardConditionInteraction, content: string) {
@@ -112,28 +128,45 @@ export default defineComponent({
                     return '';
             }
         },
-        onClick: async function () {
-            this.error = '';
-            this.isSubmitting = true;
-            if (!this.accountStore.isAuthenticated) {
-                this.accountStore.api.signin();
+        onClickSignin: function () {
+            this.accountStore.api.userManager.cached.signinPopup();
+        },
+        onClickClaim: async function () {
+            try {
+                this.error = '';
+                this.isSubmitting = true;
+                await this.rewardsStore.claim(this.reward.uuid);
+            } catch (error) {
+                this.error = error;
+            } finally {
+                this.isSubmitting = false;
             }
-            if (this.reward.platform && !this.isConnected) {
+        },
+        onClickConnect: async function () {
+            try {
+                this.error = '';
+                this.isSubmitting = true;
+
                 await this.accountStore.api.userManager.cached.signinPopup({
                     extraQueryParams: {
                         channel: this.reward.platform,
                         prompt: 'connect',
-                        return_url: window.location.href,
+                        return_url: WIDGET_URL + '/signin-popup.html',
                     },
                 });
-            } else {
-                try {
-                    await this.rewardsStore.claim(this.reward.uuid);
-                } catch (error) {
-                    this.error = error;
-                }
+                // On successful auth we also get the account info
+                this.accountStore.getAccount();
+            } catch (error) {
+                this.error = error;
+                // As window.opener is set to null right after redirect from auth.thx to Twitter
+                // we currently update account info on an error as this might be caused by the
+                // opener not being available in the popup. User will need to run the popup flow twice.
+                this.accountStore.getAccount();
+            } finally {
+                this.accountStore.getAccount();
+                this.isSubmitting = false;
+                this.error = '';
             }
-            this.isSubmitting = false;
         },
     },
 });

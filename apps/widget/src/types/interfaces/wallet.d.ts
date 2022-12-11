@@ -1,4 +1,9 @@
+type TWallet = {
+    address: string;
+};
+
 type TWalletState = {
+    wallet: TWallet | null;
     erc20: any[];
     erc721: any[];
 };

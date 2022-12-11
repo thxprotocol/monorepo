@@ -26,7 +26,13 @@
             </b-input-group-append>
         </b-input-group>
 
-        <b-button v-else variant="primary" block class="w-100" @click="accountStore.api.signin()">
+        <b-button
+            v-else
+            variant="primary"
+            block
+            class="w-100"
+            @click="accountStore.api.userManager.cached.signinPopup()"
+        >
             Claim <strong>{{ reward.amount }} points</strong>
         </b-button>
     </b-card>

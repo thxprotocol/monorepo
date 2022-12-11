@@ -1,5 +1,5 @@
 <template>
-    <div class="wallet">
+    <div class="flex-grow-1 overflow-auto">
         <component :key="key" v-for="(token, key) of list" :is="token.component" :token="token" />
     </div>
 </template>
@@ -27,9 +27,8 @@ export default defineComponent({
             );
         },
     },
-    created() {
+    mounted() {
         this.accountStore.init(this.$route.query).then(() => {
-            this.accountStore.getBalance();
             this.walletStore.list();
         });
     },

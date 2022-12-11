@@ -1,16 +1,16 @@
 <template>
-    <div class="perks">
-        <div class="py-2 text-center" v-if="accountStore.isAuthenticated">
-            <div class="text-success h1 m-0">
-                <strong>{{ accountStore.balance }}</strong>
-            </div>
-            <div class="text-white">points</div>
+    <div class="py-2 text-center" v-if="accountStore.isAuthenticated">
+        <div class="text-success h1 m-0">
+            <strong>{{ accountStore.balance }}</strong>
         </div>
+        <div class="text-white">points</div>
+    </div>
+    <div class="flex-grow-1 overflow-auto">
         <component
             v-for="(perk, key) of perksStore.perks"
             :key="key"
-            :is="reward.component"
-            :reward="reward"
+            :is="perk.component"
+            :reward="perk"
             class="mb-2"
         />
     </div>
@@ -37,9 +37,8 @@ export default defineComponent({
             RewardVariant,
         };
     },
-    created() {
+    mounted() {
         this.accountStore.init(this.$route.query).then(() => {
-            this.accountStore.getBalance();
             this.perksStore.list();
         });
     },
