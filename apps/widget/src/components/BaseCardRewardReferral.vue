@@ -1,5 +1,5 @@
 <template>
-    <b-card bg-variant="purple-dark" class="m-2">
+    <b-card class="m-2">
         <b-card-title class="d-flex">
             <div class="flex-grow-1">{{ reward.title }}</div>
             <div class="text-success fw-bold">{{ reward.amount }}</div>

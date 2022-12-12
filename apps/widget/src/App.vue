@@ -1,14 +1,26 @@
 <template>
     <div class="d-flex flex-column h-100">
-        <b-navbar class="navbar-top pt-3" :style="`background-image: url(${require('./assets/bg-planet.png')})`">
-            <b-button variant="link" @click="onClickClose"> <i class="fas fa-times text-white"></i></b-button>
-            <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin" class="text-white">
-                Sign in
-            </b-button>
+        <b-navbar
+            class="navbar-top pt-3"
+            :style="{
+                backgroundImage: activeTheme.class === 'thx-default' ? `url(${require('./assets/bg-planet.png')})` : '',
+            }"
+        >
+            <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
+            <div class="py-2 text-center" v-if="accountStore.isAuthenticated">
+                <div class="text-success h1 m-0">
+                    <strong>{{ accountStore.balance }}</strong>
+                </div>
+                <div>points</div>
+            </div>
+            <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin"> Sign in </b-button>
             <b-dropdown variant="link" v-else no-caret right>
                 <template #button-content>
-                    <i class="fas fa-bars text-white"></i>
+                    <i class="fas fa-bars"></i>
                 </template>
+                <b-dropdown-item-button size="sm" @click="onClickTheme">
+                    Theme: {{ activeTheme.label }}
+                </b-dropdown-item-button>
                 <b-dropdown-item-button
                     v-if="walletStore.wallet"
                     size="sm"
@@ -60,7 +72,28 @@ import { useAccountStore } from './stores/Account';
 import { useRewardStore } from './stores/Reward';
 import { useWalletStore } from './stores/Wallet';
 
+const themeList = [
+    {
+        label: 'Default',
+        class: 'thx-default',
+    },
+    {
+        label: 'Light',
+        class: 'thx-light',
+    },
+    {
+        label: 'Dark',
+        class: 'thx-dark',
+    },
+];
+
 export default defineComponent({
+    data() {
+        return {
+            themes: themeList,
+            activeTheme: themeList[0],
+        };
+    },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
@@ -75,7 +108,12 @@ export default defineComponent({
         },
     },
     async created() {
-        await this.accountStore.init(this.$route.query);
+        // this.$route is not yet available at this point so we use the browser location API
+        // to obtain the query
+        const params = new URLSearchParams(window.location.search);
+        const [id, origin, chainId] = ['id', 'origin', 'chainId'].map((key) => params.get(key));
+
+        await this.accountStore.init({ id, origin, chainId });
 
         window.onmessage = async (event) => {
             const origin = this.accountStore.config().origin;
@@ -87,6 +125,8 @@ export default defineComponent({
                 }
             }
         };
+
+        document.body.classList.add(this.activeTheme.class);
     },
     methods: {
         onClickSignin() {
@@ -104,143 +144,23 @@ export default defineComponent({
                 },
             });
         },
+        onClickTheme() {
+            switch (this.activeTheme.class) {
+                case themeList[0].class:
+                    document.body.classList.remove(this.activeTheme.class);
+                    document.body.classList.add(themeList[1].class);
+                    this.activeTheme = themeList[1];
+                    break;
+                case themeList[1].class:
+                    document.body.classList.remove(this.activeTheme.class);
+                    document.body.classList.add(themeList[0].class);
+                    this.activeTheme = themeList[0];
+                    break;
+            }
+        },
     },
 });
 </script>
-<style lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Exo+2:200,400,400i,700,700i,900,900i');
 
-@import '~bootstrap/scss/functions';
-@import './scss/variables';
-@import '~bootstrap/scss/maps';
-@import '~bootstrap/scss/mixins';
-@import '~bootstrap/scss/utilities';
-
-@import '~bootstrap/scss/root';
-@import '~bootstrap/scss/reboot';
-@import '~bootstrap/scss/type';
-@import '~bootstrap/scss/images';
-@import '~bootstrap/scss/containers';
-@import '~bootstrap/scss/grid';
-@import '~bootstrap/scss/tables';
-@import '~bootstrap/scss/forms';
-@import '~bootstrap/scss/buttons';
-@import '~bootstrap/scss/transitions';
-@import '~bootstrap/scss/dropdown';
-@import '~bootstrap/scss/button-group';
-@import '~bootstrap/scss/nav';
-@import '~bootstrap/scss/navbar';
-@import '~bootstrap/scss/card';
-@import '~bootstrap/scss/accordion';
-@import '~bootstrap/scss/breadcrumb';
-@import '~bootstrap/scss/pagination';
-@import '~bootstrap/scss/badge';
-@import '~bootstrap/scss/alert';
-@import '~bootstrap/scss/progress';
-@import '~bootstrap/scss/list-group';
-@import '~bootstrap/scss/close';
-@import '~bootstrap/scss/toasts';
-@import '~bootstrap/scss/modal';
-@import '~bootstrap/scss/tooltip';
-@import '~bootstrap/scss/popover';
-@import '~bootstrap/scss/carousel';
-@import '~bootstrap/scss/spinners';
-@import '~bootstrap/scss/offcanvas';
-@import '~bootstrap/scss/placeholders';
-
-// Helpers
-@import '~bootstrap/scss/helpers';
-
-// Utilities
-@import '~bootstrap/scss/utilities/api';
-// scss-docs-end import-stack
-
-// Bootstrap Vue
-@import '~bootstrap-vue-3/dist/bootstrap-vue-3.css';
-
-html,
-body,
-#app {
-    height: 100%;
-}
-
-blockquote {
-    border-left: 3px solid $purple;
-    background-color: $purple-darker;
-    padding: 0.5rem;
-
-    a {
-        transition: color 0.2s ease;
-
-        &:hover {
-            color: white !important;
-        }
-    }
-}
-
-.card-title {
-    font-size: 1.15rem;
-
-    .me-2 {
-        display: flex;
-        align-items: center;
-    }
-}
-
-.card-text {
-    opacity: 0.7;
-}
-
-.navbar-top {
-    background-position: center -50px;
-    background-repeat: no-repeat;
-
-    .btn {
-        transition: opacity ease 0.2s;
-        opacity: 0.8;
-
-        &:hover {
-            opacity: 1;
-        }
-    }
-}
-
-.navbar-bottom {
-    padding: 0.5rem;
-    border-top: 1px solid $purple-dark;
-
-    .container-fluid {
-        padding: 0;
-    }
-
-    a {
-        margin: 0;
-        line-height: 1;
-        width: 70px;
-        height: 70px;
-        align-items: center;
-        justify-content: center;
-        display: flex;
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 0.9rem;
-
-        i {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-            opacity: 0.5;
-            transition: opacity ease 0.2s, transform ease 0.2s;
-        }
-
-        &:hover i {
-            transform: scale(1.1);
-            opacity: 1;
-        }
-
-        &.router-link-active {
-            background-color: $purple-dark;
-        }
-    }
-}
-</style>
+<style lang="scss" src="./scss/default/default.theme.scss"></style>
+<style lang="scss" src="./scss/light/light.theme.scss"></style>

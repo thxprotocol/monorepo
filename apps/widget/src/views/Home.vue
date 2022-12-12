@@ -1,10 +1,4 @@
 <template>
-    <div class="py-2 text-center" v-if="accountStore.isAuthenticated">
-        <div class="text-success h1 m-0">
-            <strong>{{ accountStore.balance }}</strong>
-        </div>
-        <div class="text-white">points</div>
-    </div>
     <div class="flex-grow-1 overflow-auto">
         <component
             v-for="(reward, key) of rewardsStore.rewards"

@@ -1,0 +1,57 @@
+.navbar-top {
+    background-position: -100px -50px;
+    background-repeat: no-repeat;
+    
+    .btn {
+        transition: opacity ease 0.2s;
+        opacity: 0.8;
+        color: $navbar-top-color;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        &.dropdown-toggle-no-caret:after {
+            content: unset;
+        }
+    }
+}
+
+.navbar-bottom {
+    padding: 0.5rem;
+    border-top: 1px solid $navbar-bottom-border-color;
+    background-color: $navbar-bottom-bg;
+
+    .container-fluid {
+        padding: 0;
+    }
+
+    a {
+        margin: 0;
+        line-height: 1;
+        width: 70px;
+        height: 70px;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        color: $navbar-bottom-color;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+
+        i {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+            transition: opacity ease 0.2s;
+        }
+
+        &:hover i {
+            opacity: 1;
+        }
+
+        &.router-link-active {
+            background-color: $navbar-bottom-bg-active;
+        }
+    }
+}
