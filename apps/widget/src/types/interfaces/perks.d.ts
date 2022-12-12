@@ -3,6 +3,7 @@ type TPerkState = {
 };
 
 type TPerk = {
+    uuid: string;
     title: string;
     description: string;
     pointPrice: number;

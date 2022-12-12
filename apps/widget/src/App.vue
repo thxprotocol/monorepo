@@ -6,45 +6,52 @@
                 backgroundImage: activeTheme.class === 'thx-default' ? `url(${require('./assets/bg-planet.png')})` : '',
             }"
         >
-            <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
-            <div class="py-2 text-center" v-if="accountStore.isAuthenticated">
+            <div style="width: 75px">
+                <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
+            </div>
+            <div class="pl-3 py-2 text-center" v-if="accountStore.isAuthenticated">
                 <div class="text-success h1 m-0">
                     <strong>{{ accountStore.balance }}</strong>
                 </div>
                 <div>points</div>
             </div>
-            <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin"> Sign in </b-button>
-            <b-dropdown variant="link" v-else no-caret right>
-                <template #button-content>
-                    <i class="fas fa-bars"></i>
-                </template>
-                <b-dropdown-item-button size="sm" @click="onClickTheme">
-                    Theme: {{ activeTheme.label }}
-                </b-dropdown-item-button>
-                <b-dropdown-item-button
-                    v-if="walletStore.wallet"
-                    size="sm"
-                    v-clipboard:copy="walletStore.wallet.address"
-                >
-                    <div class="d-flex align-items-center justify-content-between">
-                        {{ walletAddress }}
-                        <i class="fas fa-clipboard ml-auto"></i>
-                    </div>
-                </b-dropdown-item-button>
-                <b-dropdown-item-button size="sm" @click="onClickAccount">
-                    <div class="d-flex align-items-center justify-content-between">
-                        Account
-                        <i class="fas fa-user ml-auto"></i>
-                    </div>
-                </b-dropdown-item-button>
-                <b-dropdown-divider />
-                <b-dropdown-item-button size="sm" @click="accountStore.api.signout()">
-                    <div class="d-flex align-items-center justify-content-between">
-                        Signout
-                        <i class="fas fa-sign-out-alt ml-auto"></i>
-                    </div>
-                </b-dropdown-item-button>
-            </b-dropdown>
+            <div>
+                <b-button variant="link" size="sm" @click="onClickTheme">
+                    <i v-if="activeTheme.class === 'thx-light'" class="fas fa-moon"></i>
+                    <i v-if="activeTheme.class === 'thx-default'" class="fas fa-sun"></i>
+                </b-button>
+                <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin">
+                    Sign in
+                </b-button>
+                <b-dropdown variant="link" v-else no-caret right>
+                    <template #button-content>
+                        <i class="fas fa-bars"></i>
+                    </template>
+                    <b-dropdown-item-button
+                        v-if="walletStore.wallet"
+                        size="sm"
+                        v-clipboard:copy="walletStore.wallet.address"
+                    >
+                        <div class="d-flex align-items-center justify-content-between">
+                            {{ walletAddress }}
+                            <i class="fas fa-clipboard ml-auto"></i>
+                        </div>
+                    </b-dropdown-item-button>
+                    <b-dropdown-item-button size="sm" @click="onClickAccount">
+                        <div class="d-flex align-items-center justify-content-between">
+                            Account
+                            <i class="fas fa-user ml-auto"></i>
+                        </div>
+                    </b-dropdown-item-button>
+                    <b-dropdown-divider />
+                    <b-dropdown-item-button size="sm" @click="accountStore.api.signout()">
+                        <div class="d-flex align-items-center justify-content-between">
+                            Signout
+                            <i class="fas fa-sign-out-alt ml-auto"></i>
+                        </div>
+                    </b-dropdown-item-button>
+                </b-dropdown>
+            </div>
         </b-navbar>
         <router-view />
         <b-navbar class="navbar-bottom">

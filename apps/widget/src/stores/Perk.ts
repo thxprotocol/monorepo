@@ -6,9 +6,12 @@ export const usePerkStore = defineStore('perks', {
         perks: [],
     }),
     actions: {
-        async purchase(uuid: string) {
-            const { api } = useAccountStore();
-            const result = await api.perksManager.erc721.redeem();
+        payment: {
+            async post(uuid: string) {
+                const { api } = useAccountStore();
+                const result = await api.perksManager.erc721.payment.post(uuid);
+                debugger;
+            },
         },
         async get(id: string) {
             const { api } = useAccountStore();

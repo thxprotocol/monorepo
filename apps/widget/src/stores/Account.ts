@@ -80,10 +80,12 @@ export const useAccountStore = defineStore('account', {
             // Guard HTTP requests that do require auth
             if (!this.isAuthenticated) return;
 
-            this.getAccount().then(() => this.getBalance());
+            await this.getAccount();
+            await this.getBalance();
 
-            perksStore.list();
-            walletStore.list();
+            await perksStore.list();
+            await walletStore.list();
+            await walletStore.getWallet();
 
             this.isAuthenticated = true;
         },
