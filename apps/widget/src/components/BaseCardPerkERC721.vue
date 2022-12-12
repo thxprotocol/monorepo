@@ -20,7 +20,9 @@
 <script lang="ts">
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
+import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
+import { useWalletStore } from '../stores/Wallet';
 
 export default defineComponent({
     name: 'BaseCardPerkERC721',
@@ -32,6 +34,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(usePerkStore),
+        ...mapStores(useAccountStore),
         imgUrl: function () {
             const attr = this.perk.metadata.attributes.find((attr) => attr.key === 'image');
             if (!attr) return '';
@@ -40,7 +43,14 @@ export default defineComponent({
     },
     methods: {
         onClickPay() {
-            this.perksStore.payment.post(this.perk.uuid);
+            if (!this.accountStore.isAuthenticated) {
+                return this.accountStore.api.userManager.cached.signinPopup();
+            }
+            this.perksStore.createPayment(this.perk.uuid).then(() => {
+                const walletStore = useWalletStore();
+                walletStore.list();
+                this.accountStore.getBalance();
+            });
         },
     },
 });
