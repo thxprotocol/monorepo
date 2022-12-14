@@ -1,6 +1,6 @@
 import { Client as THXClient } from '@thxnetwork/sdk/src/lib/client';
 import { defineStore } from 'pinia';
-import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL } from '../config/secrets';
+import { PKG_ENV, CLIENT_ID, CLIENT_SECRET, WIDGET_URL } from '../config/secrets';
 import { RewardConditionPlatform } from '../types/enums/rewards';
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
@@ -31,7 +31,7 @@ export const useAccountStore = defineStore('account', {
             if (!poolId) throw new Error('No poolId in settings.');
 
             this.api = new THXClient({
-                env: 'local',
+                env: PKG_ENV,
                 clientId: CLIENT_ID,
                 clientSecret: CLIENT_SECRET,
                 redirectUrl: WIDGET_URL + '/signin-popup.html',
