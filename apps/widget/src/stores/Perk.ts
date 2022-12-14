@@ -6,11 +6,19 @@ export const usePerkStore = defineStore('perks', {
         perks: [],
     }),
     actions: {
-        async createPayment(uuid: string) {
+        async createERC20PerkPayment(uuid: string) {
+            const { api } = useAccountStore();
+            await api.perksManager.erc20.payment.post(uuid);
+        },
+        async createERC721PerkPayment(uuid: string) {
             const { api } = useAccountStore();
             await api.perksManager.erc721.payment.post(uuid);
         },
-        async get(uuid: string) {
+        async getERC20Perk(uuid: string) {
+            const { api } = useAccountStore();
+            await api.perksManager.erc20.get(uuid);
+        },
+        async getERC721Perk(uuid: string) {
             const { api } = useAccountStore();
             await api.perksManager.erc721.get(uuid);
         },

@@ -46,7 +46,7 @@ export default defineComponent({
             if (!this.accountStore.isAuthenticated) {
                 return this.accountStore.api.userManager.cached.signinPopup();
             }
-            this.perksStore.createERC721PerkPayment(this.perk.uuid).then(() => {
+            this.perksStore.createERC20PerkPayment(this.perk.uuid).then(() => {
                 const walletStore = useWalletStore();
                 walletStore.list();
                 this.accountStore.getBalance();
