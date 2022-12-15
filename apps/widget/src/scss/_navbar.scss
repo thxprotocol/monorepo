@@ -52,6 +52,9 @@
 
         &.router-link-active {
             background-color: $navbar-bottom-bg-active;
+            i {
+                opacity: 1;
+            }                
         }
     }
 }
