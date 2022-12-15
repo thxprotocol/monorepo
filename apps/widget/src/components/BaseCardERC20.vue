@@ -6,7 +6,7 @@
         <div class="flex-grow-1">
             <strong>{{ token.erc20.name }}</strong>
         </div>
-        <div class="text-success fw-bold">{{ token.balance }} {{ token.erc20.symbol }}</div>
+        <div class="text-success fw-bold">{{ token.walletBalance }} {{ token.erc20.symbol }}</div>
     </b-card>
 </template>
 
@@ -17,6 +17,7 @@ type TERC20Token = {
     name: string;
     symbol: string;
     balance: number;
+    walletBalance: number;
     logoImg: string;
     erc20: TERC20;
 };
