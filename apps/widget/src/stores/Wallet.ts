@@ -21,7 +21,6 @@ export const useWalletStore = defineStore('wallet', {
                 return { ...t, component: 'BaseCardERC20' };
             });
             this.erc721 = (await api.erc721.list()).map((t: any) => {
-                debugger;
                 return { ...t, component: 'BaseCardERC721' };
             });
         },
