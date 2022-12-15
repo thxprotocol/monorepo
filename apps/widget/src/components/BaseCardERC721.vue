@@ -1,12 +1,12 @@
 <template>
     <b-card body-class="d-flex align-items-center" class="m-2">
         <div class="pe-3">
-            <img height="25" :src="`https://avatars.dicebear.com/api/identicon/${token.erc721.address}.svg`" />
+            <img height="25" :src="token.logoImg" />
         </div>
         <div class="flex-grow-1">
-            <strong>{{ token.erc721.name }}</strong>
+            <strong>{{ token.erc721.name }} #{{ token.tokenId }}</strong>
         </div>
-        <div class="text-success fw-bold">{{ token.erc721.symbol }} #{{ token.tokenId }}</div>
+        <div class="text-success fw-bold">{{ token.erc721.symbol }}</div>
     </b-card>
 </template>
 

@@ -15,5 +15,6 @@ type TERC721 = {
         logoImg: string;
         address: string;
     };
+    logoImg: string;
     tokenId: string;
 };
