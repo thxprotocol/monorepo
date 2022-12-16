@@ -74,10 +74,11 @@
 <script lang="ts">
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-import { WIDGET_URL } from './config/secrets';
+import { WIDGET_URL, GTM } from './config/secrets';
 import { useAccountStore } from './stores/Account';
 import { useRewardStore } from './stores/Reward';
 import { useWalletStore } from './stores/Wallet';
+import { initGTM } from './utils/ga';
 
 type TTheme = { class: string; name: string; label: string };
 
@@ -115,6 +116,7 @@ export default defineComponent({
         },
     },
     async created() {
+        if (GTM) initGTM();
         // this.$route is not yet available at this point so we use the browser location API
         // to obtain the query
         const params = new URLSearchParams(window.location.search);
