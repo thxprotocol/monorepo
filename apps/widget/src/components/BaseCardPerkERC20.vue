@@ -15,14 +15,32 @@
             </template>
         </b-button>
 
-        <b-modal id="test" no-close-on-backdrop centered body-bg-variant="dark" hide-header hide-footer no-close-on-esc>
-            <div class="text-center">
-                <b-spinner v-if="isSubmitting" variant="light" show size="sm" />
-                <template v-else>
-                    <hr />
-                    <b-button variant="primary" class="w-100 rounded-pill" @click="onClickPay">Redeem now!</b-button>
-                </template>
+        <b-modal
+            id="test"
+            :title="perk.title"
+            no-close-on-backdrop
+            centered
+            header-bg-variant="purple-darker"
+            body-bg-variant="purple-darker"
+            footer-bg-variant="purple-darker"
+            header-close-white
+            no-close-on-esc
+        >
+            <div v-if="isSubmitting" class="text-center">
+                <b-spinner variant="light" show size="sm" />
             </div>
+            <template v-else>
+                <p>
+                    You are about to redeem <strong>{{ perk.pointPrice }} points</strong> for
+                    <strong>{{ perk.title }}</strong
+                    >. Are you sure?
+                </p>
+            </template>
+            <template #footer>
+                <b-button variant="primary" class="w-100 rounded-pill" @click="onClickPay">
+                    Redeem for {{ perk.pointPrice }} points
+                </b-button>
+            </template>
         </b-modal>
     </b-card>
 </template>
