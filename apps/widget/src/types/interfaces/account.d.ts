@@ -18,4 +18,5 @@ type TWidgetConfig = {
     poolId: string;
     origin: string;
     chainId: number;
+    theme: string;
 };

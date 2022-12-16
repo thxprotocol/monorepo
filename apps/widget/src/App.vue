@@ -79,18 +79,18 @@ import { useAccountStore } from './stores/Account';
 import { useRewardStore } from './stores/Reward';
 import { useWalletStore } from './stores/Wallet';
 
+type TTheme = { class: string; name: string; label: string };
+
 const themeList = [
     {
-        label: 'Default',
-        class: 'thx-default',
-    },
-    {
         label: 'Light',
+        name: 'light',
         class: 'thx-light',
     },
     {
         label: 'Dark',
-        class: 'thx-dark',
+        name: 'dark',
+        class: 'thx-default',
     },
 ];
 
@@ -118,11 +118,21 @@ export default defineComponent({
         // this.$route is not yet available at this point so we use the browser location API
         // to obtain the query
         const params = new URLSearchParams(window.location.search);
-        const [id, origin, chainId] = ['id', 'origin', 'chainId'].map((key) => params.get(key));
+        const [id, origin, chainId, theme] = ['id', 'origin', 'chainId', 'theme'].map((key) => params.get(key));
 
-        await this.accountStore.init({ id, origin, chainId });
+        await this.accountStore.init({ id, origin, chainId, theme });
 
-        window.onmessage = async (event) => {
+        window.onmessage = this.onMessage;
+
+        this.setTheme();
+    },
+    methods: {
+        setTheme() {
+            const { theme } = this.accountStore.config();
+            this.activeTheme = themeList.find((t) => t.name === theme) as TTheme;
+            document.body.classList.add(this.activeTheme.class);
+        },
+        async onMessage(event: MessageEvent) {
             const origin = this.accountStore.config().origin;
             if (!WIDGET_URL || event.origin !== new URL(origin).origin) return;
             switch (event.data.message) {
@@ -131,11 +141,7 @@ export default defineComponent({
                     this.accountStore.getBalance();
                 }
             }
-        };
-
-        document.body.classList.add(this.activeTheme.class);
-    },
-    methods: {
+        },
         onClickSignin() {
             this.accountStore.api.userManager.cached.signinPopup();
         },
@@ -164,6 +170,7 @@ export default defineComponent({
                     this.activeTheme = themeList[0];
                     break;
             }
+            this.accountStore.setTheme(this.activeTheme.name);
         },
     },
 });

@@ -23,9 +23,18 @@ export const useAccountStore = defineStore('account', {
         },
     }),
     actions: {
-        async init({ id, origin, chainId }: { origin: string; id: string; chainId: number } & any) {
+        async init({
+            id,
+            origin,
+            chainId,
+            theme,
+        }: { origin: string; id: string; chainId: number; theme: string } & any) {
             if (id && origin) {
-                sessionStorage.setItem('thx:widget:config', JSON.stringify({ origin, poolId: id, chainId }));
+                const config = this.config();
+                sessionStorage.setItem(
+                    'thx:widget:config',
+                    JSON.stringify({ origin, poolId: id, chainId, theme: config.theme || theme }),
+                );
             }
             const { poolId } = this.config();
             if (!poolId) throw new Error('No poolId in settings.');
@@ -45,6 +54,10 @@ export const useAccountStore = defineStore('account', {
             this.api.userManager.cached.events.addUserLoaded(this.onUserLoaded);
             this.api.userManager.cached.events.addUserUnloaded(this.onUserLoaded);
             this.api.userManager.cached.events.load(this.onLoad);
+        },
+        setTheme(theme: string) {
+            const data = JSON.parse(sessionStorage.getItem('thx:widget:config') as string);
+            sessionStorage.setItem('thx:widget:config', JSON.stringify({ ...data, theme }));
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();

@@ -8,12 +8,22 @@
             <div class="flex-grow-1">{{ perk.title }}</div>
         </b-card-title>
         <b-card-text> {{ perk.description }} </b-card-text>
-        <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" @click="onClickPay">
+        <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" v-b-modal="'test'">
             <template v-if="perk.isOwned"> Claimed </template>
             <template v-else>
                 Redeem for <strong>{{ perk.pointPrice }} points</strong>
             </template>
         </b-button>
+
+        <b-modal id="test" no-close-on-backdrop centered body-bg-variant="dark" hide-header hide-footer no-close-on-esc>
+            <div class="text-center">
+                <b-spinner v-if="isSubmitting" variant="light" show size="sm" />
+                <template v-else>
+                    <hr />
+                    <b-button variant="primary" class="w-100 rounded-pill" @click="onClickPay">Redeem now!</b-button>
+                </template>
+            </div>
+        </b-modal>
     </b-card>
 </template>
 
@@ -26,6 +36,11 @@ import { useWalletStore } from '../stores/Wallet';
 
 export default defineComponent({
     name: 'BaseCardPerkERC721',
+    data() {
+        return {
+            isSubmitting: false,
+        };
+    },
     props: {
         perk: {
             type: Object as PropType<TPerk>,
@@ -41,11 +56,14 @@ export default defineComponent({
             if (!this.accountStore.isAuthenticated) {
                 return this.accountStore.api.userManager.cached.signinPopup();
             }
+            this.isSubmitting = true;
             this.perksStore.createERC20PerkPayment(this.perk.uuid).then(() => {
                 const walletStore = useWalletStore();
                 walletStore.list();
                 this.accountStore.getBalance();
+                this.isSubmitting = false;
             });
+            // this.$bvModal.hide('test');
         },
     },
 });
