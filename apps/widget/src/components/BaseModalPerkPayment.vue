@@ -16,7 +16,10 @@
             <b-spinner show size="sm" />
         </div>
         <template v-else>
-            <b-alert v-if="error" show variant="danger">{{ error }}</b-alert>
+            <b-alert v-if="error" show variant="danger" class="p-2">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {{ error }}
+            </b-alert>
             <p class="m-0">
                 You are about to redeem <strong>{{ perk.pointPrice }} points</strong> for
                 <strong>{{ perk.title }}</strong>
