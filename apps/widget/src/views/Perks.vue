@@ -9,8 +9,8 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { usePerkStore } from '../stores/Perk';
 import { useAccountStore } from '../stores/Account';
-import BaseCardPerkERC721 from '../components/BaseCardPerkERC721.vue';
 import BaseCardPerkERC20 from '../components/BaseCardPerkERC20.vue';
+import BaseCardPerkERC721 from '../components/BaseCardPerkERC721.vue';
 
 export default defineComponent({
     name: 'Perks',

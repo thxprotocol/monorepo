@@ -8,12 +8,22 @@
             <div class="flex-grow-1">{{ perk.title }}</div>
         </b-card-title>
         <b-card-text> {{ perk.description }} </b-card-text>
-        <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" @click="onClickPay">
+        <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" @click="onClickRedeem">
             <template v-if="perk.isOwned"> Claimed </template>
             <template v-else>
                 Redeem for <strong>{{ perk.pointPrice }} points</strong>
             </template>
         </b-button>
+        <BaseModalPerkPayment
+            :id="`${id}${perk.uuid}`"
+            :show="isModalShown"
+            :error="error"
+            :perk="perk"
+            :is-loading="isSubmitting"
+            :submit-handler="onSubmitPayment"
+            @hidden="onModalHidden"
+            @submit="onSubmitPayment"
+        />
     </b-card>
 </template>
 
@@ -23,9 +33,16 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
+import BaseModalPerkPayment from './BaseModalPerkPayment.vue';
 
 export default defineComponent({
     name: 'BaseCardPerkERC721',
+    components: {
+        BaseModalPerkPayment,
+    },
+    data() {
+        return { id: 'modalERC721PerkPayment', error: '', isModalShown: false, isSubmitting: false };
+    },
     props: {
         perk: {
             type: Object as PropType<TPerk>,
@@ -42,15 +59,32 @@ export default defineComponent({
         },
     },
     methods: {
-        onClickPay() {
+        onModalHidden() {
+            this.isModalShown = false;
+            this.error = '';
+        },
+        onClickRedeem() {
             if (!this.accountStore.isAuthenticated) {
                 return this.accountStore.api.userManager.cached.signinPopup();
             }
-            this.perksStore.createERC721PerkPayment(this.perk.uuid).then(() => {
-                const walletStore = useWalletStore();
-                walletStore.list();
-                this.accountStore.getBalance();
-            });
+            this.isModalShown = true;
+        },
+        onSubmitPayment() {
+            this.isSubmitting = true;
+            this.perksStore
+                .createERC721PerkPayment(this.perk.uuid)
+                .then(async () => {
+                    const walletStore = useWalletStore();
+                    await this.accountStore.getBalance();
+                    walletStore.list();
+                    this.isModalShown = false;
+                })
+                .catch((error) => {
+                    this.error = error.message;
+                })
+                .finally(() => {
+                    this.isSubmitting = false;
+                });
         },
     },
 });

@@ -1,4 +1,4 @@
-import BootstrapVue3 from 'bootstrap-vue-3';
+import { BootstrapVue3 } from 'bootstrap-vue-3';
 import VueClipboard from 'vue3-clipboard';
 import { createApp } from 'vue';
 
