@@ -12,7 +12,7 @@ export const useWalletStore = defineStore('wallet', {
             const { api, config, account } = useAccountStore();
             if (!account) return;
 
-            const wallets = await api.walletManager.list(config().chainId, account.id);
+            const wallets = await api.walletManager.list(config().chainId, account.sub);
             this.wallet = wallets[0];
         },
         async list() {

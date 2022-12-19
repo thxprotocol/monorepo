@@ -8,5 +8,6 @@ type TPerk = {
     description: string;
     pointPrice: number;
     isOwned: boolean;
+    isPromoted: boolean;
     metadata: { attributes: { key: string; value: string }[] };
 };

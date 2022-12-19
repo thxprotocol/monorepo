@@ -56,8 +56,8 @@ export default defineComponent({
             if (!config || !account) return '';
 
             const { origin } = config();
-            if (!origin || !account.id) return '';
-            return `${origin}?ref=${account.id}`;
+            if (!origin || !account.sub) return '';
+            return `${origin}?ref=${account.sub}`;
         },
     },
     methods: {

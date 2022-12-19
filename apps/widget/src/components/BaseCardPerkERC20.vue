@@ -1,10 +1,8 @@
 <template>
-    <b-card class="m-2 disabled">
-        <div class="position-relative mt-1">
-            <b-badge class="badge-point-price py-1 px-2 rounded-2">{{ perk.pointPrice }} p.</b-badge>
-        </div>
+    <b-card class="m-2" :class="{ 'card-promoted': perk.isPromoted }">
         <b-card-title class="d-flex">
             <div class="flex-grow-1">{{ perk.title }}</div>
+            <div class="text-success fw-bold">{{ perk.pointPrice }}</div>
         </b-card-title>
         <b-card-text> {{ perk.description }} </b-card-text>
         <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" @click="onClickRedeem">

@@ -1,5 +1,5 @@
 type TAccount = {
-    id: string;
+    sub: string;
     address: string;
     googleAccess: boolean;
     twitterAccess: boolean;

@@ -10,3 +10,17 @@
 .card-text {
     opacity: 0.7;
 }
+
+.card-promoted {
+    border: 5px solid $orange;
+    border-radius: 10px;
+    box-shadow: 0 0 10px $orange;
+
+    .card-title {
+        color: $orange;
+
+        .text-success {
+            color: $orange !important;
+        }
+    }
+}

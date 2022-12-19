@@ -1,11 +1,11 @@
 <template>
-    <b-card class="m-2 disabled">
-        <div class="position-relative mt-1">
-            <b-badge class="badge-point-price py-1 px-2 rounded-2">{{ perk.pointPrice }} p.</b-badge>
+    <b-card class="m-2" :class="{ 'card-promoted': perk.isPromoted }">
+        <div class="mt-1">
             <img :src="imgUrl" width="auto" class="img-fluid w-auto rounded-2 mb-3" />
         </div>
         <b-card-title class="d-flex">
             <div class="flex-grow-1">{{ perk.title }}</div>
+            <div class="text-success fw-bold">{{ perk.pointPrice }}</div>
         </b-card-title>
         <b-card-text> {{ perk.description }} </b-card-text>
         <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" @click="onClickRedeem">
@@ -53,6 +53,7 @@ export default defineComponent({
         ...mapStores(usePerkStore),
         ...mapStores(useAccountStore),
         imgUrl: function () {
+            if (!this.perk.metadata) return;
             const attr = this.perk.metadata.attributes.find((attr) => attr.key === 'image');
             if (!attr) return '';
             return attr.value;
