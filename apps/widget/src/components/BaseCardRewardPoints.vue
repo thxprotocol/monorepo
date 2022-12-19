@@ -12,7 +12,7 @@
             {{ reward.description }}
         </b-card-text>
 
-        <blockquote class="d-flex" v-if="reward.platform && reward.interaction">
+        <blockquote class="d-flex" v-if="reward.platform && interactionLabel[reward.interaction]">
             {{ interactionLabel[reward.interaction] }}
             <b-link v-if="content" :href="content.url" target="_blank" class="text-muted ms-auto">
                 <i class="fas fa-external-link-alt"></i>
