@@ -98,7 +98,7 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
         content() {
-            if (!this.reward.interaction || !this.reward.content) return;
+            if (!this.interactionLabel[this.reward.interaction] || !this.reward.content) return;
             return this.getChannelActionURL(this.reward.interaction, this.reward.content);
         },
         isConnected() {
