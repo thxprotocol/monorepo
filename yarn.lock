@@ -3009,10 +3009,10 @@
     vue-loader "^16.4.1"
     webpack ">=4.0.0 <6.0.0"
 
-"@thxnetwork/sdk@^1.0.11":
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.0.11.tgz#8662b3cfca1dda0c01f6b859b65f0f11fe624087"
-  integrity sha512-Wo6gfEvMCgte1x5QN/rbsPB6h6PDDGrjCW5dH9E8PZJ2dE920yuTlOBwmcn+G2XYIjnDKo4ifdwE1f0D8NJKyA==
+"@thxnetwork/sdk@^1.0.12":
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.0.12.tgz#2ba2c5069f0a76e408ca68a9b4d6659e7de04466"
+  integrity sha512-x9pqGcuHbPiNXAvlI9IxrT1V/IZGdj60+blsKieDsZG9tG1Rkvit+Nvpv0kFbavoNvxGWcuwmKUvUW+OLvJFGQ==
   dependencies:
     oidc-client-ts "2.1.0"
 
@@ -16103,11 +16103,6 @@ void-elements@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-3.1.0.tgz#614f7fbf8d801f0bb5f0661f5b2f5785750e4f09"
   integrity sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==
-
-vue-bootstrap-3@^1.0.0-beta.0:
-  version "1.0.0-beta.0"
-  resolved "https://registry.yarnpkg.com/vue-bootstrap-3/-/vue-bootstrap-3-1.0.0-beta.0.tgz#bc676124a4cc39fa33c9f4b2dbd3676569a59146"
-  integrity sha512-qEfu0gvyAZmtlTic97w3NGXBEx0zcBWl4nhHjKOBRVI6fMsEcsRImR+gqaXqt55LD2a8rEHRr81hs4XoFtpO1g==
 
 vue-demi@*:
   version "0.13.11"

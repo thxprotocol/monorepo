@@ -1,4 +1,4 @@
-import { Client as THXClient } from '@thxnetwork/sdk/src/lib/client';
+import { THXClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
 import { PKG_ENV, CLIENT_ID, CLIENT_SECRET, WIDGET_URL } from '../config/secrets';
 import { RewardConditionPlatform } from '../types/enums/rewards';
