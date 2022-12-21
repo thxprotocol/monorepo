@@ -127,20 +127,35 @@ export default defineComponent({
         window.onmessage = this.onMessage;
 
         this.setTheme();
+        this.ready();
     },
     methods: {
         setTheme() {
-            const { theme } = this.accountStore.config();
+            const { theme } = this.accountStore.getConfig(this.accountStore.poolId);
             this.activeTheme = themeList.find((t) => t.name === theme) as TTheme;
             document.body.classList.add(this.activeTheme.class);
         },
+        ready() {
+            const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
+            window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
+        },
         async onMessage(event: MessageEvent) {
-            const origin = this.accountStore.config().origin;
-            if (!WIDGET_URL || event.origin !== new URL(origin).origin) return;
+            const { getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
+            const config = getConfig(this.accountStore.poolId);
+            if (!WIDGET_URL || event.origin !== new URL(config.origin).origin) return;
             switch (event.data.message) {
                 case 'thx.referral.claim.create': {
-                    await this.accountStore.api.rewardsManager.referral.claim(event.data);
-                    this.accountStore.getBalance();
+                    const { ref } = getConfig(poolId);
+                    if (ref) {
+                        await api.rewardsManager.referral.claim({ ...event.data, sub: ref });
+                        setConfig(poolId, { ref: '' } as TWidgetConfig);
+                        getBalance();
+                    }
+                    break;
+                }
+                case 'thx.config.ref': {
+                    setConfig(poolId, { ref: event.data.sub } as TWidgetConfig);
+                    break;
                 }
             }
         },
@@ -148,7 +163,7 @@ export default defineComponent({
             this.accountStore.api.userManager.cached.signinPopup();
         },
         onClickClose() {
-            const { origin } = this.accountStore.config();
+            const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
             window.top?.postMessage({ message: 'thx.widget.close' }, origin);
         },
         onClickAccount() {

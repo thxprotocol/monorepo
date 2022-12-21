@@ -7,7 +7,8 @@ type TAccount = {
 
 type TAccountState = {
     api: THXClient | null;
-    config: () => TWidgetConfig;
+    getConfig: (id: string) => TWidgetConfig;
+    poolId: string;
     balance: number;
     isAuthenticated: boolean;
     isConnected: { [platform: number]: boolean };
@@ -19,4 +20,5 @@ type TWidgetConfig = {
     origin: string;
     chainId: number;
     theme: string;
+    ref?: string;
 };

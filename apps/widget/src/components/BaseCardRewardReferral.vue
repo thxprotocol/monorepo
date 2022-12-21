@@ -52,10 +52,10 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
         referralUrl() {
-            const { config, account } = useAccountStore();
-            if (!config || !account) return '';
+            const { getConfig, account, poolId } = useAccountStore();
+            if (!getConfig || !account) return '';
 
-            const { origin } = config();
+            const { origin } = getConfig(poolId);
             if (!origin || !account.sub) return '';
             return `${origin}?ref=${account.sub}`;
         },

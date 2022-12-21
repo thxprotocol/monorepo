@@ -8,11 +8,12 @@ import { useWalletStore } from './Wallet';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
-        config: (): TWidgetConfig => {
-            const data = sessionStorage.getItem('thx:widget:config');
+        getConfig: (id: string): TWidgetConfig => {
+            const data = sessionStorage.getItem(`thx:widget:${id}:config`);
             if (!data) return {} as TWidgetConfig;
             return JSON.parse(data);
         },
+        poolId: '',
         api: null,
         account: null,
         balance: 0,
@@ -23,20 +24,22 @@ export const useAccountStore = defineStore('account', {
         },
     }),
     actions: {
+        setConfig(id: string, config: TWidgetConfig) {
+            const data = { ...this.getConfig(id), ...config };
+            sessionStorage.setItem(`thx:widget:${id}:config`, JSON.stringify(data));
+        },
         async init({
             id,
             origin,
             chainId,
             theme,
         }: { origin: string; id: string; chainId: number; theme: string } & any) {
+            this.poolId = id;
             if (id && origin) {
-                const config = this.config();
-                sessionStorage.setItem(
-                    'thx:widget:config',
-                    JSON.stringify({ origin, poolId: id, chainId, theme: config.theme || theme }),
-                );
+                const config = this.getConfig(id);
+                this.setConfig(id, { origin, poolId: id, chainId, theme: config.theme || theme });
             }
-            const { poolId } = this.config();
+            const { poolId } = this.getConfig(id);
             if (!poolId) throw new Error('No poolId in settings.');
 
             this.api = new THXClient({
@@ -62,7 +65,7 @@ export const useAccountStore = defineStore('account', {
         updateLauncher() {
             const rewardsStore = useRewardStore();
             const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
-            const { origin } = this.config();
+            const { origin } = this.getConfig(this.poolId);
 
             // Send the amount of unclaimed rewards to the parent window and update the launcher
             window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
@@ -84,7 +87,7 @@ export const useAccountStore = defineStore('account', {
             this.isAuthenticated = !!(await this.api.userManager.getUser());
 
             rewardsStore.list().then(() => {
-                const { origin } = this.config();
+                const { origin } = this.getConfig(this.poolId);
                 const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
                 window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);

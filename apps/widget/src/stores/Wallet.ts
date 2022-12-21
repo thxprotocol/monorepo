@@ -9,10 +9,10 @@ export const useWalletStore = defineStore('wallet', {
     }),
     actions: {
         async getWallet() {
-            const { api, config, account } = useAccountStore();
+            const { api, getConfig, account, poolId } = useAccountStore();
             if (!account) return;
 
-            const wallets = await api.walletManager.list(config().chainId, account.sub);
+            const wallets = await api.walletManager.list(getConfig(poolId).chainId, account.sub);
             this.wallet = wallets[0];
         },
         async list() {
