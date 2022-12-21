@@ -35,21 +35,22 @@ export const useAccountStore = defineStore('account', {
             theme,
         }: { origin: string; id: string; chainId: number; theme: string } & any) {
             this.poolId = id;
-            if (id && origin) {
-                const config = this.getConfig(id);
-                this.setConfig(id, { origin, poolId: id, chainId, theme: config.theme || theme });
-            }
-            const { poolId } = this.getConfig(id);
-            if (!poolId) throw new Error('No poolId in settings.');
+
+            if (!this.poolId) throw new Error('No poolId in settings.');
+            if (!origin) throw new Error('No origin in settings.');
+            if (!chainId) throw new Error('No chainId in settings.');
+
+            const config = this.getConfig(id);
+            this.setConfig(id, { origin, poolId: id, chainId, theme: config.theme || theme });
 
             this.api = new THXClient({
                 env: PKG_ENV,
                 clientId: CLIENT_ID,
                 clientSecret: CLIENT_SECRET,
                 redirectUrl: WIDGET_URL + '/signin-popup.html',
-                post_logout_redirect_uri: WIDGET_URL,
+                popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
                 scopes: 'openid account:read erc20:read erc721:read point_balances:read referral_rewards:read point_rewards:read wallets:read',
-                poolId,
+                poolId: this.poolId,
             });
 
             this.api.userManager.cached.events.addAccessTokenExpired(this.onAccessTokenExpired);

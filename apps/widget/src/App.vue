@@ -44,7 +44,7 @@
                         </div>
                     </b-dropdown-item-button>
                     <b-dropdown-divider />
-                    <b-dropdown-item-button size="sm" @click="accountStore.api.signout()">
+                    <b-dropdown-item-button size="sm" @click="accountStore.api.userManager.cached.signoutPopup()">
                         <div class="d-flex align-items-center justify-content-between">
                             Signout
                             <i class="fas fa-sign-out-alt ml-auto"></i>
