@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { toNumber } from '../utils/rewards';
 import { useAccountStore } from './Account';
 
 export const usePerkStore = defineStore('perks', {
@@ -27,6 +28,9 @@ export const usePerkStore = defineStore('perks', {
         async list() {
             const { api } = useAccountStore();
             const { erc20Perks, erc721Perks } = await api.perksManager.list();
+            erc20Perks.sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
+            erc721Perks.sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
+            console.log({ erc20Perks, erc721Perks });
             this.perks = [
                 ...(erc20Perks
                     ? Object.values(erc20Perks).map((r: any) => {
