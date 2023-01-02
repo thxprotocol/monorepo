@@ -26,6 +26,12 @@
         <b-button v-else variant="primary" block class="w-100" @click="onClickClaim">
             Claim <strong>{{ reward.amount }} points</strong>
         </b-button>
+        <div
+            v-if="accountStore.isAuthenticated && referralUrl"
+            v-bind:data-url="referralUrl"
+            v-bind:data-title="reward.title"
+            class="sharethis-inline-share-buttons mt-3"
+        ></div>
     </b-card>
 </template>
 
@@ -37,6 +43,7 @@ import { useRewardStore } from '../stores/Reward';
 
 export default defineComponent({
     name: 'BaseCardRewardReferral',
+
     props: {
         reward: {
             type: Object as PropType<TReferralReward>,
@@ -60,6 +67,17 @@ export default defineComponent({
             return `${origin}?ref=${account.sub}`;
         },
     },
+    mounted() {
+        const scriptJs = document.createElement('script');
+        scriptJs.setAttribute('type', 'text/javascript');
+        scriptJs.setAttribute(
+            'src',
+            'https://platform-api.sharethis.com/js/sharethis.js#property=63b2d13f3d4c89001a1d4ca3&product=inline-share-buttons&source=platform',
+        );
+        scriptJs.setAttribute('async', 'async');
+        document.head.appendChild(scriptJs);
+    },
+
     methods: {
         onClickClaim() {
             this.accountStore.api.userManager.cached.signinPopup();
