@@ -72,7 +72,7 @@ export default defineComponent({
         scriptJs.setAttribute('type', 'text/javascript');
         scriptJs.setAttribute(
             'src',
-            'https://platform-api.sharethis.com/js/sharethis.js#property=63a573df4c319700156563bb&product=inline-share-buttons&source=platform',
+            'https://platform-api.sharethis.com/js/sharethis.js#property=63b2d13f3d4c89001a1d4ca3&product=inline-share-buttons&source=platform',
         );
         scriptJs.setAttribute('async', 'async');
         document.head.appendChild(scriptJs);
