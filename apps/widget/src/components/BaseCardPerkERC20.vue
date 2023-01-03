@@ -1,5 +1,5 @@
 <template>
-    <b-card class="m-2" v-bind:class="[perk.isPromoted ? 'card-promoted' : '']">
+    <b-card class="m-2" :class="{ 'card-promoted': perk.isPromoted }">
         <b-card-title class="d-flex">
             <div class="flex-grow-1">{{ perk.title }}</div>
             <div class="text-success fw-bold">{{ perk.pointPrice }}</div>
