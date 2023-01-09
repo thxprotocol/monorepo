@@ -83,7 +83,7 @@ export default defineComponent({
                 [RewardConditionPlatform.None]: '',
                 [RewardConditionPlatform.Google]: require('../assets/google-logo.png'),
                 [RewardConditionPlatform.Twitter]: require('../assets/twitter-logo.png'),
-                [RewardConditionPlatform.Discord]: require('../assets/twitter-logo.png'),
+                [RewardConditionPlatform.Discord]: require('../assets/discord-logo.png'),
             },
             interactionLabel: {
                 [RewardConditionInteraction.YouTubeLike]: 'Like a Youtube video.',
