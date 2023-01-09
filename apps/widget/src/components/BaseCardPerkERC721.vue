@@ -1,7 +1,7 @@
 <template>
     <b-card class="m-2" :class="{ 'card-promoted': perk.isPromoted }">
         <div class="mt-1">
-            <img :src="imgUrl" width="auto" class="img-fluid w-auto rounded-2 mb-3" />
+            <img :src="perk.image" width="auto" class="img-fluid w-auto rounded-2 mb-3" />
         </div>
         <b-card-title class="d-flex">
             <div class="flex-grow-1">{{ perk.title }}</div>
