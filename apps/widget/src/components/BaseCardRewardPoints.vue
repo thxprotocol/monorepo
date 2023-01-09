@@ -91,6 +91,7 @@ export default defineComponent({
                 [RewardConditionInteraction.TwitterLike]: 'Like a Twitter tweet.',
                 [RewardConditionInteraction.TwitterRetweet]: 'Retweet a Twitter tweet.',
                 [RewardConditionInteraction.TwitterFollow]: 'Follow a Twitter account.',
+                [RewardConditionInteraction.DiscordGuildJoined]: 'Join a Discord server.',
             },
             tooltipContent: 'Copy URL',
         };
@@ -129,6 +130,8 @@ export default defineComponent({
                     return { url: `https://www.twitter.com/twitter/status/${content}` };
                 case RewardConditionInteraction.TwitterFollow:
                     return { url: `https://www.twitter.com/i/user/${content}` };
+                case RewardConditionInteraction.DiscordGuildJoined:
+                    return { url: `${content}` }; // TODO We should ask for invite link in dashboard
                 default:
                     return '';
             }
