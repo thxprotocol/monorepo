@@ -3,6 +3,9 @@ type TAccount = {
     address: string;
     googleAccess: boolean;
     twitterAccess: boolean;
+    discordAccess: boolean;
+    twitchAccess: boolean;
+    githubAccess: boolean;
 };
 
 type TAccountState = {
@@ -11,7 +14,6 @@ type TAccountState = {
     poolId: string;
     balance: number;
     isAuthenticated: boolean;
-    isConnected: { [platform: number]: boolean };
     account: TAccount | null;
 };
 

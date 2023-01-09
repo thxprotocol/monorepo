@@ -1,7 +1,6 @@
 import { THXClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
 import { PKG_ENV, CLIENT_ID, CLIENT_SECRET, WIDGET_URL } from '../config/secrets';
-import { RewardConditionPlatform } from '../types/enums/rewards';
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
@@ -18,10 +17,6 @@ export const useAccountStore = defineStore('account', {
         account: null,
         balance: 0,
         isAuthenticated: false,
-        isConnected: {
-            [RewardConditionPlatform.Google]: false,
-            [RewardConditionPlatform.Twitter]: false,
-        },
     }),
     actions: {
         setConfig(id: string, config: TWidgetConfig) {

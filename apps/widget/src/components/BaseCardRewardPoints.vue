@@ -112,6 +112,12 @@ export default defineComponent({
                     return account.googleAccess;
                 case RewardConditionPlatform.Twitter:
                     return account.twitterAccess;
+                case RewardConditionPlatform.Discord:
+                    return account.discordAccess;
+                case RewardConditionPlatform.Github:
+                    return account.githubAccess;
+                case RewardConditionPlatform.Twitch:
+                    return account.twitchAccess;
                 default:
                     return true;
             }
