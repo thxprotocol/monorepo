@@ -81,7 +81,7 @@ export default defineComponent({
             RewardConditionPlatform,
             platformImg: {
                 [RewardConditionPlatform.None]: '',
-                [RewardConditionPlatform.Google]: require('../assets/google-logo.png'),
+                [RewardConditionPlatform.YouTube]: require('../assets/youtube-logo.png'),
                 [RewardConditionPlatform.Twitter]: require('../assets/twitter-logo.png'),
                 [RewardConditionPlatform.Discord]: require('../assets/discord-logo.png'),
             },
@@ -108,7 +108,7 @@ export default defineComponent({
             if (!account || !this.reward) return;
 
             switch (this.reward.platform) {
-                case RewardConditionPlatform.Google:
+                case RewardConditionPlatform.YouTube:
                     return account.googleAccess;
                 case RewardConditionPlatform.Twitter:
                     return account.twitterAccess;
