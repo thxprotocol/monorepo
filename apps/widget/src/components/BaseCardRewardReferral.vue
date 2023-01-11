@@ -26,12 +26,13 @@
         <b-button v-else variant="primary" block class="w-100" @click="onClickClaim">
             Claim <strong>{{ reward.amount }} points</strong>
         </b-button>
-        <div
-            v-if="accountStore.isAuthenticated && referralUrl"
-            v-bind:data-url="referralUrl"
-            v-bind:data-title="reward.title"
-            class="sharethis-inline-share-buttons mt-3"
-        ></div>
+        <div v-if="accountStore.isAuthenticated && referralUrl" class="pt-2">
+            <BaseBtnShareTwitter :url="referralUrl" text="Please have a look at this:" class="me-2" />
+            <BaseBtnShareLinkedin :url="referralUrl" class="me-2" />
+            <BaseBtnShareWhatsapp :url="referralUrl" class="me-2" />
+            <BaseBtnShareTelegram :url="referralUrl" text="Please have a look at this!" class="me-2" />
+            <BaseBtnShareEmail :url="referralUrl" subject="Please have a look at this!" class="me-2" />
+        </div>
     </b-card>
 </template>
 
@@ -40,10 +41,21 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
+import BaseBtnShareWhatsapp from '../components/BaseBtnShareWhatsapp.vue';
+import BaseBtnShareEmail from '../components/BaseBtnShareEmail.vue';
+import BaseBtnShareTwitter from '../components/BaseBtnShareTwitter.vue';
+import BaseBtnShareLinkedin from '../components/BaseBtnShareLinkedin.vue';
+import BaseBtnShareTelegram from '../components/BaseBtnShareTelegram.vue';
 
 export default defineComponent({
     name: 'BaseCardRewardReferral',
-
+    components: {
+        BaseBtnShareWhatsapp,
+        BaseBtnShareEmail,
+        BaseBtnShareTwitter,
+        BaseBtnShareLinkedin,
+        BaseBtnShareTelegram,
+    },
     props: {
         reward: {
             type: Object as PropType<TReferralReward>,
@@ -64,20 +76,10 @@ export default defineComponent({
 
             const { origin } = getConfig(poolId);
             if (!origin || !account.sub) return '';
+
             return `${origin}?ref=${account.sub}`;
         },
     },
-    mounted() {
-        const scriptJs = document.createElement('script');
-        scriptJs.setAttribute('type', 'text/javascript');
-        scriptJs.setAttribute(
-            'src',
-            'https://platform-api.sharethis.com/js/sharethis.js#property=63b2d13f3d4c89001a1d4ca3&product=inline-share-buttons&source=platform',
-        );
-        scriptJs.setAttribute('async', 'async');
-        document.head.appendChild(scriptJs);
-    },
-
     methods: {
         onClickClaim() {
             this.accountStore.api.userManager.cached.signinPopup();
