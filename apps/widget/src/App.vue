@@ -79,6 +79,7 @@ import { useAccountStore } from './stores/Account';
 import { useRewardStore } from './stores/Reward';
 import { useWalletStore } from './stores/Wallet';
 import { initGTM } from './utils/ga';
+import { url } from 'inspector';
 
 type TTheme = { class: string; name: string; label: string };
 
@@ -167,10 +168,18 @@ export default defineComponent({
             window.top?.postMessage({ message: 'thx.widget.close' }, origin);
         },
         onClickAccount() {
-            this.accountStore.api.userManager.cached.signinPopup({
+            const { poolId, origin, chainId, theme } = this.accountStore.getConfig(this.accountStore.poolId);
+            const url = new URL(window.location.origin);
+            url.pathname = window.location.pathname;
+            url.searchParams.append('id', poolId);
+            url.searchParams.append('origin', origin);
+            url.searchParams.append('chainId', String(chainId));
+            url.searchParams.append('theme', theme);
+
+            this.accountStore.api.userManager.cached.signinRedirect({
                 extraQueryParams: {
                     prompt: 'account-settings',
-                    return_url: window.location.href,
+                    return_url: url,
                 },
             });
         },
