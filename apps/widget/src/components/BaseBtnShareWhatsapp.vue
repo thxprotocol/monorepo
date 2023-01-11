@@ -1,5 +1,5 @@
 <template>
-    <b-button variant="light" size="sm" @click="openShareWindow">
+    <b-button size="sm" class="btn-share" @click="openShareWindow">
         <i class="fab fa-whatsapp"></i>
     </b-button>
 </template>
@@ -24,3 +24,11 @@ export default defineComponent({
     },
 });
 </script>
+<style scoped lang="scss">
+.btn {
+    background-color: #25d366;
+    &:hover {
+        background-color: darken(#25d366, 10%);
+    }
+}
+</style>

@@ -24,3 +24,14 @@
         }
     }
 }
+
+.btn-share {
+    width: 30px;
+    height: 30px;
+    color: white;
+    border: 0;
+
+    &:hover {
+        color: white;
+    }
+}

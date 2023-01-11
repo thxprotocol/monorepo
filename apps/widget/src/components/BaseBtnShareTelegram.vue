@@ -1,5 +1,5 @@
 <template>
-    <b-button variant="light" size="sm" @click="openShareWindow">
+    <b-button size="sm" class="btn-share" @click="openShareWindow">
         <i class="fab fa-telegram"></i>
     </b-button>
 </template>
@@ -31,3 +31,11 @@ export default defineComponent({
     },
 });
 </script>
+<style scoped lang="scss">
+.btn {
+    background-color: #0088cc;
+    &:hover {
+        background-color: darken(#0088cc, 10%);
+    }
+}
+</style>

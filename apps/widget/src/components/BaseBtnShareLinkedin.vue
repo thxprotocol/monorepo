@@ -1,5 +1,5 @@
 <template>
-    <b-button variant="light" size="sm" @click="openShareWindow">
+    <b-button size="sm" class="btn-share" @click="openShareWindow">
         <i class="fab fa-linkedin"></i>
     </b-button>
 </template>
@@ -27,3 +27,12 @@ export default defineComponent({
     },
 });
 </script>
+<style scoped lang="scss">
+.btn {
+    background-color: #0077b5;
+
+    &:hover {
+        background-color: darken(#1da1f2, 10%);
+    }
+}
+</style>
