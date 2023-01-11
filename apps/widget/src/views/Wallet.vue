@@ -20,7 +20,7 @@
             </ul>
             <b-button variant="primary" class="px-3" @click="onClickSignin">
                 Sign in
-                <i class="fas fa-sign-in-alt ms-2"></i>
+                <i class="fas fa-chevron-right ms-2"></i>
             </b-button>
             <b-button variant="link" @click="onClickSignup"> Sign up </b-button>
         </div>

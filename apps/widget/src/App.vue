@@ -167,7 +167,7 @@ export default defineComponent({
             window.top?.postMessage({ message: 'thx.widget.close' }, origin);
         },
         onClickAccount() {
-            this.accountStore.api.userManager.cached.signinRedirect({
+            this.accountStore.api.userManager.cached.signinPopup({
                 extraQueryParams: {
                     prompt: 'account-settings',
                     return_url: window.location.href,
