@@ -79,7 +79,7 @@ import { useAccountStore } from './stores/Account';
 import { useRewardStore } from './stores/Reward';
 import { useWalletStore } from './stores/Wallet';
 import { initGTM } from './utils/ga';
-import { url } from 'inspector';
+import { track } from './utils/mixpanel';
 
 type TTheme = { class: string; name: string; label: string };
 
@@ -139,6 +139,8 @@ export default defineComponent({
         ready() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
             window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
+
+            track.UserVisits(this.accountStore.account?.sub || '', 'page with widget', []);
         },
         async onMessage(event: MessageEvent) {
             const { getConfig, setConfig, poolId, api, getBalance } = this.accountStore;

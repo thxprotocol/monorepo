@@ -12,7 +12,7 @@ type TERC721 = {
     erc721: {
         name: string;
         symbol: string;
-        logoImg: string;
+        logoImgUrl: string;
         address: string;
     };
     logoImg: string;

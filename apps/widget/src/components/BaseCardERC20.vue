@@ -1,7 +1,7 @@
 <template>
     <b-card body-class="d-flex" class="m-2">
         <div class="pe-3">
-            <img height="25" :src="token.logoImg" />
+            <img height="25" :src="token.erc20.logoImgUrl" />
         </div>
         <div class="flex-grow-1">
             <strong>{{ token.erc20.name }}</strong>

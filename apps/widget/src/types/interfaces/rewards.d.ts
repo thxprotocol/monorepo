@@ -21,7 +21,7 @@ type TERC20 = {
     balance: number;
     symbol: string;
     name: string;
-    logoImg: string;
+    logoImgUrl: string;
 };
 type TPointReward = TBaseReward & {
     amount: number;
