@@ -1,6 +1,10 @@
 type TAccount = {
     sub: string;
+    firstName: string;
+    lastName: string;
+    email: string;
     address: string;
+    plan: number;
     googleAccess: boolean;
     twitterAccess: boolean;
     discordAccess: boolean;
