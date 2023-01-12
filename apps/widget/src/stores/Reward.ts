@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
+import { track } from '../utils/mixpanel';
 
 export const useRewardStore = defineStore('rewards', {
     state: (): TRewardState => ({
@@ -7,11 +8,13 @@ export const useRewardStore = defineStore('rewards', {
     }),
     actions: {
         async claim(uuid: string) {
-            const { api, getBalance } = useAccountStore();
+            const { api, account, getBalance } = useAccountStore();
             const claim = await api.rewardsManager.points.claim(uuid);
             if (claim.error) {
                 throw claim.error;
             } else {
+                track.UserCreates(account?.sub, 'conditional reward claim');
+
                 getBalance();
                 const index = this.rewards.findIndex((r) => r.uuid === uuid);
                 this.rewards[index].isClaimed = true;

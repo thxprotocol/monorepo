@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { toNumber } from '../utils/rewards';
 import { useAccountStore } from './Account';
+import { track } from '../utils/mixpanel';
 
 export const usePerkStore = defineStore('perks', {
     state: (): TPerkState => ({
@@ -8,14 +9,18 @@ export const usePerkStore = defineStore('perks', {
     }),
     actions: {
         async createERC20PerkPayment(uuid: string) {
-            const { api } = useAccountStore();
+            const { api, account } = useAccountStore();
             const { error } = await api.perksManager.erc20.payment.post(uuid);
             if (error) throw error;
+
+            track.UserCreates(account?.sub, 'coin perk payment');
         },
         async createERC721PerkPayment(uuid: string) {
-            const { api } = useAccountStore();
+            const { api, account } = useAccountStore();
             const { error } = await api.perksManager.erc721.payment.post(uuid);
             if (error) throw error;
+
+            track.UserCreates(account?.sub, 'coin perk payment');
         },
         async getERC20Perk(uuid: string) {
             const { api } = useAccountStore();

@@ -2,7 +2,6 @@ import mixpanel from 'mixpanel-browser';
 import { MIXPANEL_TOKEN } from '../config/secrets';
 
 const mixpanelClient = () => {
-    console.log(MIXPANEL_TOKEN);
     mixpanel.init(MIXPANEL_TOKEN);
     return mixpanel;
 };
@@ -22,7 +21,7 @@ export const track = {
     UserOpens: (sub: string, modal: string) => {
         mixpanelClient().track(`user opens ${modal}`, { distinct_id: sub });
     },
-    UserCreates: (sub: string, item: string) => {
+    UserCreates: (sub = '', item: string) => {
         mixpanelClient().track(`user creates ${item}`, { distinct_id: sub });
     },
 };
