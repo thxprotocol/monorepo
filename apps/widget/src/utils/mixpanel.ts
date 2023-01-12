@@ -2,6 +2,7 @@ import mixpanel from 'mixpanel-browser';
 import { MIXPANEL_TOKEN } from '../config/secrets';
 
 const mixpanelClient = () => {
+    console.log(MIXPANEL_TOKEN);
     mixpanel.init(MIXPANEL_TOKEN);
     return mixpanel;
 };
