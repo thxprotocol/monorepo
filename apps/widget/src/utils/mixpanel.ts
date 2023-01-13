@@ -8,6 +8,8 @@ const mixpanelClient = () => {
 
 export const track = {
     UserSignsIn: (account: TAccount) => {
+        if (!MIXPANEL_TOKEN) return;
+
         const mixpanel = mixpanelClient();
         mixpanel.identify(account.sub);
         mixpanel.people.set('$name', `${account.firstName} ${account.lastName}`);
@@ -16,12 +18,18 @@ export const track = {
         mixpanel.track('user signs in', { distinct_id: account.sub });
     },
     UserVisits: (sub: string, path: string, params: string[]) => {
+        if (!MIXPANEL_TOKEN) return;
+
         mixpanelClient().track(`user visits ${path}`, { distinct_id: sub, params });
     },
     UserOpens: (sub: string, modal: string) => {
+        if (!MIXPANEL_TOKEN) return;
+
         mixpanelClient().track(`user opens ${modal}`, { distinct_id: sub });
     },
     UserCreates: (sub = '', item: string) => {
+        if (!MIXPANEL_TOKEN) return;
+
         mixpanelClient().track(`user creates ${item}`, { distinct_id: sub });
     },
 };
