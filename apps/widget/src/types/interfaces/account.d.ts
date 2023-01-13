@@ -2,6 +2,8 @@ type TAccount = {
     sub: string;
     address: string;
     googleAccess: boolean;
+    youtubeViewAccess: boolean;
+    youtubeManageAccess: boolean;
     twitterAccess: boolean;
     discordAccess: boolean;
     twitchAccess: boolean;
