@@ -17,16 +17,17 @@ type TBaseReward = {
     claims?: any[];
 };
 
-type TERC20 = {
-    balance: number;
-    symbol: string;
-    name: string;
-    logoImgUrl: string;
-};
 type TPointReward = TBaseReward & {
     amount: number;
     component?: string;
     isClaimed?: boolean;
+};
+
+type TMilestoneReward = TBaseReward & {
+    amount: number;
+    component?: string;
+    isClaimed?: boolean;
+    claims: TMilestoneRewardClaim[];
 };
 
 type TReferralReward = TBaseReward & {
@@ -37,4 +38,12 @@ type TReferralReward = TBaseReward & {
 
 type TRewardState = {
     rewards: IReward[];
+};
+
+type TMilestoneRewardClaim = {
+    milestoneRewardId: string;
+    sub: string;
+    uuid: string;
+    amount: string;
+    isClaimed: boolean;
 };

@@ -11,7 +11,7 @@
     "private": true,
     "dependencies": {
         "@popperjs/core": "^2.11.6",
-        "@thxnetwork/sdk": "^1.0.12",
+        "@thxnetwork/sdk": "1.0.13",
         "bootstrap": "^5.2.3",
         "bootstrap-vue-3": "^0.4.15",
         "core-js": "^3.6.5",

@@ -7,7 +7,7 @@ export const useRewardStore = defineStore('rewards', {
         rewards: [],
     }),
     actions: {
-        async claim(uuid: string) {
+        async claimCondititonalReward(uuid: string) {
             const { api, account, getBalance } = useAccountStore();
             const claim = await api.rewardsManager.points.claim(uuid);
             if (claim.error) {
@@ -16,27 +16,51 @@ export const useRewardStore = defineStore('rewards', {
                 track.UserCreates(account?.sub, 'conditional reward claim');
 
                 getBalance();
+
                 const index = this.rewards.findIndex((r) => r.uuid === uuid);
                 this.rewards[index].isClaimed = true;
             }
         },
+        async claimMilestoneReward(reward: TMilestoneReward) {
+            const { api, account, getBalance } = useAccountStore();
+            const pendingClaims = reward.claims.filter((c) => !c.isClaimed);
+            if (!pendingClaims.length) return;
+
+            const uuid = pendingClaims[0].uuid;
+            const claim = await api.rewardsManager.milestones.claim(uuid);
+
+            if (claim.error) {
+                throw claim.error;
+            } else {
+                track.UserCreates(account?.sub, 'milestone reward claim');
+
+                getBalance();
+
+                const index = this.rewards.findIndex((r: TMilestoneReward) => r.uuid === reward.uuid);
+                const claimIndex = this.rewards[index].claims.findIndex((c: TMilestoneRewardClaim) => c.uuid === uuid);
+
+                this.rewards[index].claims[claimIndex] = claim;
+            }
+        },
         async list() {
-            const { api, isAuthenticated } = useAccountStore();
-            const { referralRewards, pointRewards } = await api.rewardsManager.list();
+            const { api } = useAccountStore();
+            const { referralRewards, pointRewards, milestoneRewards } = await api.rewardsManager.list();
             const referralRewardsList = Object.values(referralRewards).map((r: any) => {
                 r.component = 'BaseCardRewardReferral';
+                return r;
+            });
+            const milestoneRewardsList = Object.values(milestoneRewards).map((r: any) => {
+                r.component = 'BaseCardRewardMilestone';
                 return r;
             });
             const pointRewardsList = await Promise.all(
                 Object.values(pointRewards).map(async (r: any) => {
                     r.component = 'BaseCardRewardPoints';
-                    if (!isAuthenticated) return r;
-                    const pointReward = await api.pointRewardManager.get(r._id);
-                    return { ...r, ...pointReward };
+                    return r;
                 }),
             );
 
-            this.rewards = [...referralRewardsList, ...pointRewardsList];
+            this.rewards = [...referralRewardsList, ...milestoneRewardsList, ...pointRewardsList];
         },
     },
 });

@@ -150,7 +150,7 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
-                await this.rewardsStore.claim(this.reward.uuid);
+                await this.rewardsStore.claimConditionalReward(this.reward.uuid);
             } catch (error) {
                 this.error = error;
             } finally {

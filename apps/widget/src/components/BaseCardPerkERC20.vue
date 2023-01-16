@@ -1,6 +1,6 @@
 <template>
     <b-card class="m-2" :class="{ 'card-promoted': perk.isPromoted }">
-        <div class="mt-1">
+        <div class="mt-1" v-if="perk.image">
             <img :src="perk.image" width="auto" class="img-fluid w-auto rounded-2 mb-3" />
         </div>
         <b-card-title class="d-flex">
