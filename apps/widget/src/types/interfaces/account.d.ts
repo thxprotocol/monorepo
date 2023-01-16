@@ -6,6 +6,8 @@ type TAccount = {
     address: string;
     plan: number;
     googleAccess: boolean;
+    youtubeViewAccess: boolean;
+    youtubeManageAccess: boolean;
     twitterAccess: boolean;
     discordAccess: boolean;
     twitchAccess: boolean;

@@ -64,6 +64,7 @@ import { defineComponent, PropType } from 'vue';
 import { WIDGET_URL } from '../config/secrets';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
+import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { RewardConditionPlatform, RewardConditionInteraction } from '../types/enums/rewards';
 
 export default defineComponent({
@@ -109,7 +110,7 @@ export default defineComponent({
 
             switch (this.reward.platform) {
                 case RewardConditionPlatform.YouTube:
-                    return account.googleAccess;
+                    return account.youtubeManageAccess;
                 case RewardConditionPlatform.Twitter:
                     return account.twitterAccess;
                 case RewardConditionPlatform.Discord:
@@ -161,11 +162,28 @@ export default defineComponent({
                 this.error = '';
                 this.isSubmitting = true;
 
+                let access_token_kind = '';
+                switch (this.reward.platform) {
+                    case RewardConditionPlatform.YouTube: {
+                        access_token_kind = AccessTokenKind.YoutubeManage;
+                        break;
+                    }
+                    case RewardConditionPlatform.Twitter: {
+                        access_token_kind = AccessTokenKind.Twitter;
+                        break;
+                    }
+                    case RewardConditionPlatform.Discord: {
+                        access_token_kind = AccessTokenKind.Discord;
+                        break;
+                    }
+                }
+
                 await this.accountStore.api.userManager.cached.signinPopup({
                     extraQueryParams: {
                         channel: this.reward.platform,
                         prompt: 'connect',
                         return_url: WIDGET_URL + '/signin-popup.html',
+                        access_token_kind,
                     },
                 });
                 await this.accountStore.getAccount();
