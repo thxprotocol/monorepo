@@ -7,7 +7,7 @@ export const useRewardStore = defineStore('rewards', {
         rewards: [],
     }),
     actions: {
-        async claimCondititonalReward(uuid: string) {
+        async claimConditionalReward(uuid: string) {
             const { api, account, getBalance } = useAccountStore();
             const claim = await api.rewardsManager.points.claim(uuid);
             if (claim.error) {
