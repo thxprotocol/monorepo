@@ -6,6 +6,7 @@ type TPerk = {
     uuid: string;
     image: string;
     title: string;
+    amount: string;
     description: string;
     pointPrice: number;
     isOwned: boolean;
