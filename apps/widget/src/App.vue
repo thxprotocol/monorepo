@@ -139,25 +139,31 @@ export default defineComponent({
         ready() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
             window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
-
             track.UserVisits(this.accountStore.account?.sub || '', 'page with widget', []);
         },
         async onMessage(event: MessageEvent) {
             const { getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
             const config = getConfig(this.accountStore.poolId);
             if (!WIDGET_URL || event.origin !== new URL(config.origin).origin) return;
+
             switch (event.data.message) {
                 case 'thx.referral.claim.create': {
                     const { ref } = getConfig(poolId);
-                    if (ref) {
-                        await api.rewardsManager.referral.claim({ ...event.data, sub: ref });
-                        setConfig(poolId, { ref: '' } as TWidgetConfig);
-                        getBalance();
-                    }
+                    if (!ref) break;
+
+                    const { uuid, sub } = JSON.parse(atob(ref));
+                    // Detect if this conversion is related to ref stored in config
+                    if (event.data.uuid !== uuid) break;
+
+                    await api.rewardsManager.referral.claim({ uuid, sub });
+
+                    setConfig(poolId, { ref: '' } as TWidgetConfig);
+                    getBalance();
+
                     break;
                 }
                 case 'thx.config.ref': {
-                    setConfig(poolId, { ref: event.data.sub } as TWidgetConfig);
+                    setConfig(poolId, { ref: event.data.ref } as TWidgetConfig);
                     break;
                 }
             }

@@ -77,7 +77,8 @@ export default defineComponent({
             const { origin } = getConfig(poolId);
             if (!origin || !account.sub) return '';
 
-            return `${origin}?ref=${account.sub}`;
+            const hash = window.btoa(JSON.stringify({ sub: account.sub, uuid: this.reward.uuid }));
+            return `${origin}?ref=${hash}`;
         },
     },
     methods: {
