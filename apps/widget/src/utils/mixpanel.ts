@@ -1,8 +1,10 @@
 import mixpanel from 'mixpanel-browser';
-import { MIXPANEL_TOKEN } from '../config/secrets';
+import { API_URL, MIXPANEL_TOKEN } from '../config/secrets';
+
+const MIXPANEL_PROXY = `${API_URL}/v1/data`;
 
 const mixpanelClient = () => {
-    mixpanel.init(MIXPANEL_TOKEN);
+    mixpanel.init(MIXPANEL_TOKEN, { api_host: MIXPANEL_PROXY });
     return mixpanel;
 };
 
@@ -15,6 +17,7 @@ export const track = {
         mixpanel.people.set('$name', `${account.firstName} ${account.lastName}`);
         mixpanel.people.set('$email', account.email);
         mixpanel.people.set('plan', account.plan);
+        if (account.address) mixpanel.people.set('address', account.address);
         mixpanel.track('user signs in', { distinct_id: account.sub });
     },
     UserVisits: (sub: string, path: string, params: string[]) => {
