@@ -5,7 +5,7 @@
         </div>
         <b-card-title class="d-flex">
             <div class="flex-grow-1">{{ perk.title }}</div>
-            <div class="text-success fw-bold">{{ perk.pointPrice }}</div>
+            <div class="text-success fw-bold">{{ perk.erc721.symbol }}</div>
         </b-card-title>
         <b-card-text> {{ perk.description }} </b-card-text>
         <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" @click="onClickRedeem">

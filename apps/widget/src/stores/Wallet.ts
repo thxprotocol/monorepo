@@ -16,11 +16,12 @@ export const useWalletStore = defineStore('wallet', {
             this.wallet = wallets[0];
         },
         async list() {
-            const { api } = useAccountStore();
-            this.erc20 = (await api.erc20.list()).map((t: any) => {
+            const { api, getConfig, poolId } = useAccountStore();
+            const options = { chainId: getConfig(poolId).chainId };
+            this.erc20 = (await api.erc20.list(options)).map((t: any) => {
                 return { ...t, component: 'BaseCardERC20' };
             });
-            this.erc721 = (await api.erc721.list()).map((t: any) => {
+            this.erc721 = (await api.erc721.list(options)).map((t: any) => {
                 return { ...t, component: 'BaseCardERC721' };
             });
         },

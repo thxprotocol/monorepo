@@ -5,6 +5,7 @@ type TPerkState = {
 type TPerk = {
     uuid: string;
     image: string;
+    erc721: TERC721;
     title: string;
     amount: string;
     description: string;
