@@ -80,7 +80,7 @@ export default defineComponent({
                     walletStore.list();
                     this.isModalShown = false;
                 })
-                .catch((error) => {
+                .catch(({ error }) => {
                     this.error = error.message;
                 })
                 .finally(() => {

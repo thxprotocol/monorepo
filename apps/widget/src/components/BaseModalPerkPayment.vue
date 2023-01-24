@@ -27,7 +27,7 @@
             </p>
         </template>
         <template #footer>
-            <b-button variant="primary" class="w-100 rounded-pill" @click="$emit('submit')">
+            <b-button variant="primary" class="w-100 rounded-pill" :disabled="isLoading" @click="$emit('submit')">
                 Redeem for {{ perk.pointPrice }} points
             </b-button>
         </template>
