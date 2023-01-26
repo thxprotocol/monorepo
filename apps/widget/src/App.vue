@@ -154,7 +154,7 @@ export default defineComponent({
         ready() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
             window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
-            track.UserVisits(this.accountStore.account?.sub || '', 'page with widget', []);
+            track.UserVisits(this.accountStore.account?.sub || '', 'page with widget', [origin]);
         },
         async onMessage(event: MessageEvent) {
             const { getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
@@ -162,6 +162,10 @@ export default defineComponent({
             if (!WIDGET_URL || event.origin !== new URL(config.origin).origin) return;
 
             switch (event.data.message) {
+                case 'thx.iframe.show': {
+                    track.UserOpens(this.accountStore.account?.sub || '', `widget on ${config.origin}`);
+                    break;
+                }
                 case 'thx.referral.claim.create': {
                     const { ref } = getConfig(poolId);
                     if (!ref) break;
