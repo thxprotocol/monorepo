@@ -5,5 +5,5 @@
         "types": ["webpack-env", "node", "./views/**/*.d.ts"]
     },
     "exclude": ["**/*.spec.ts", "**/*.spec.tsx"],
-    "include": ["**/*.ts", "**/*.tsx", "**/*.vue"]
+    "include": ["**/*.ts", "**/*.tsx", "**/*.vue", "../../libs/common/**/*"]
 }

@@ -93,7 +93,7 @@ import { useAccountStore } from './stores/Account';
 import { useRewardStore } from './stores/Reward';
 import { useWalletStore } from './stores/Wallet';
 import { initGTM } from './utils/ga';
-import { track } from './utils/mixpanel';
+import { track } from '@thxnetwork/mixpanel';
 
 type TTheme = { class: string; name: string; label: string };
 
@@ -154,7 +154,8 @@ export default defineComponent({
         ready() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
             window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
-            track.UserVisits(this.accountStore.account?.sub || '', 'page with widget', [origin]);
+
+            track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', [origin]]);
         },
         async onMessage(event: MessageEvent) {
             const { getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
@@ -163,7 +164,12 @@ export default defineComponent({
 
             switch (event.data.message) {
                 case 'thx.iframe.show': {
-                    track.UserOpens(this.accountStore.account?.sub || '', `widget on ${config.origin}`);
+                    console.log(event.data);
+                    track('UserOpens', [
+                        this.accountStore.account?.sub || '',
+                        `widget iframe`,
+                        { origin: config.origin, isShown: event.data.isShown },
+                    ]);
                     break;
                 }
                 case 'thx.referral.claim.create': {

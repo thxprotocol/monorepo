@@ -4,7 +4,7 @@ import { PKG_ENV, CLIENT_ID, CLIENT_SECRET, WIDGET_URL } from '../config/secrets
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
-import { track } from '../utils/mixpanel';
+import { track } from '@thxnetwork/mixpanel';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -102,7 +102,7 @@ export const useAccountStore = defineStore('account', {
 
             this.isAuthenticated = true;
 
-            track.UserSignsIn(this.account as TAccount);
+            track('UserSignsIn', [this.account]);
         },
         onAccessTokenExpired() {
             this.api.signout();

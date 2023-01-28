@@ -17,7 +17,9 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@vue-3-monorepo/common": ["libs/common/src/index.ts"]
+            "@thxnetwork/widget": ["apps/widget/src*"],
+            "@thxnetwork/common": ["libs/common/src/index.ts"],
+            "@thxnetwork/mixpanel": ["libs/common/src/lib/mixpanel.ts"]
         }
     },
     "exclude": ["node_modules", "tmp"]

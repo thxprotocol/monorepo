@@ -6,6 +6,11 @@ import App from './App.vue';
 import router from './router';
 import { createPinia } from 'pinia';
 
+import { API_URL, MIXPANEL_TOKEN } from './config/secrets';
+import Mixpanel from '@thxnetwork/mixpanel';
+
+Mixpanel.init(MIXPANEL_TOKEN, API_URL);
+
 const pinia = createPinia();
 const app = createApp(App);
 

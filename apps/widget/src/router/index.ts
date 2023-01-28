@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { useAccountStore } from '../stores/Account';
-import { track } from '../utils/mixpanel';
+import { track } from '@thxnetwork/mixpanel';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -27,7 +27,16 @@ const router = createRouter({
 
 router.beforeEach((to) => {
     const { account } = useAccountStore();
-    if (account) track.UserVisits(account.sub, to.name ? String(to.name) : 'unknown', to.params as unknown as string[]);
+    if (account)
+        track('UserVisits', [
+            account.sub,
+            to.name,
+            {
+                redirectedFrom: to.redirectedFrom,
+                query: to.query,
+                params: to.params,
+            },
+        ]);
 });
 
 export default router;

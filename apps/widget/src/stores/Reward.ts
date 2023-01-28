@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
-import { track } from '../utils/mixpanel';
+import { track } from '@thxnetwork/mixpanel';
 
 export const useRewardStore = defineStore('rewards', {
     state: (): TRewardState => ({
@@ -13,7 +13,7 @@ export const useRewardStore = defineStore('rewards', {
             if (claim.error) {
                 throw claim.error;
             } else {
-                track.UserCreates(account?.sub, 'conditional reward claim');
+                track('UserCreates', [account?.sub, 'conditional reward claim']);
 
                 getBalance();
 
@@ -32,7 +32,7 @@ export const useRewardStore = defineStore('rewards', {
             if (claim.error) {
                 throw claim.error;
             } else {
-                track.UserCreates(account?.sub, 'milestone reward claim');
+                track('UserCreates', [account?.sub, 'milestone reward claim']);
 
                 getBalance();
 
