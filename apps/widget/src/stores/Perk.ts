@@ -20,7 +20,7 @@ export const usePerkStore = defineStore('perks', {
             const { error } = await api.perksManager.erc721.payment.post(uuid);
             if (error) throw error;
 
-            track('UserCreates', [account?.sub, 'coin perk payment']);
+            track('UserCreates', [account?.sub, 'nft perk payment']);
         },
         async getERC20Perk(uuid: string) {
             const { api } = useAccountStore();
