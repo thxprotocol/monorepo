@@ -47,3 +47,17 @@ type TMilestoneRewardClaim = {
     amount: string;
     isClaimed: boolean;
 };
+
+type TDailyRewardClaim = {
+    dailyRewardId: string;
+    sub: string;
+    uuid: string;
+    amount: string;
+    isClaimed?: boolean;
+};
+
+type TDailyReward = TBaseReward & {
+    uuid: string;
+    amount: number;
+    claims: TDailyRewardClaim[];
+};

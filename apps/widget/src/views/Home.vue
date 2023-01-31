@@ -19,6 +19,7 @@ import BaseCardRewardReferral from '../components/BaseCardRewardReferral.vue';
 import BaseCardRewardPoints from '../components/BaseCardRewardPoints.vue';
 import BaseCardRewardNFT from '../components/BaseCardPerkERC721.vue';
 import BaseCardRewardMilestone from '../components/BaseCardRewardMilestone.vue';
+import BaseCardRewardDaily from '../components/BaseCardRewardDaily.vue';
 import { useWalletStore } from '../stores/Wallet';
 
 export default defineComponent({
@@ -27,6 +28,7 @@ export default defineComponent({
         BaseCardRewardReferral,
         BaseCardRewardPoints,
         BaseCardRewardMilestone,
+        BaseCardRewardDaily,
         BaseCardRewardNFT,
     },
     computed: {
