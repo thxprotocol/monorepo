@@ -1,11 +1,6 @@
 <template>
     <div class="d-flex flex-column h-100">
-        <b-navbar
-            class="navbar-top pt-3"
-            :style="{
-                backgroundImage: activeTheme.class === 'thx-default' ? `url(${require('./assets/bg-planet.png')})` : '',
-            }"
-        >
+        <b-navbar class="navbar-top pt-3">
             <div style="width: 75px">
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
             </div>
@@ -164,7 +159,6 @@ export default defineComponent({
 
             switch (event.data.message) {
                 case 'thx.iframe.show': {
-                    console.log(event.data);
                     track('UserOpens', [
                         this.accountStore.account?.sub || '',
                         `widget iframe`,
