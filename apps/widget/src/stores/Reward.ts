@@ -42,17 +42,41 @@ export const useRewardStore = defineStore('rewards', {
                 this.rewards[index].claims[claimIndex] = claim;
             }
         },
+
+        async claimDailyReward(reward: TDailyReward) {
+            const { api, account, getBalance } = useAccountStore();
+            const claim = await api.rewardsManager.daily.claim({ uuid: reward.uuid, sub: account?.sub });
+
+            if (claim.error) {
+                throw claim.error;
+            } else {
+                track('UserCreates', [account?.sub, 'daily reward claim']);
+
+                getBalance();
+
+                const index = this.rewards.findIndex((r: TDailyReward) => r.uuid === reward.uuid);
+                this.rewards[index].isClaimed = true;
+            }
+        },
+
         async list() {
             const { api } = useAccountStore();
-            const { referralRewards, pointRewards, milestoneRewards } = await api.rewardsManager.list();
+            const { referralRewards, pointRewards, milestoneRewards, dailyRewards } = await api.rewardsManager.list();
+            const dailyRewardsList = Object.values(dailyRewards).map((r: any) => {
+                r.component = 'BaseCardRewardDaily';
+                return r;
+            });
+
             const referralRewardsList = Object.values(referralRewards).map((r: any) => {
                 r.component = 'BaseCardRewardReferral';
                 return r;
             });
+
             const milestoneRewardsList = Object.values(milestoneRewards).map((r: any) => {
                 r.component = 'BaseCardRewardMilestone';
                 return r;
             });
+
             const pointRewardsList = await Promise.all(
                 Object.values(pointRewards).map(async (r: any) => {
                     r.component = 'BaseCardRewardPoints';
@@ -60,7 +84,7 @@ export const useRewardStore = defineStore('rewards', {
                 }),
             );
 
-            this.rewards = [...referralRewardsList, ...milestoneRewardsList, ...pointRewardsList];
+            this.rewards = [...dailyRewardsList, ...referralRewardsList, ...milestoneRewardsList, ...pointRewardsList];
         },
     },
 });
