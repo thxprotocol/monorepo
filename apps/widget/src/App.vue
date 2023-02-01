@@ -171,6 +171,7 @@ export default defineComponent({
                     if (!ref) break;
 
                     const { uuid, sub } = JSON.parse(atob(ref));
+                    console.log(uuid, sub, ref);
                     // Detect if this conversion is related to ref stored in config
                     if (event.data.uuid !== uuid) break;
 
