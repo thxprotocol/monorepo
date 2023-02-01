@@ -32,9 +32,9 @@
             block
             class="w-100"
             @click="onClickClaim"
-            :disabled="isSubmitting || !reward.isAllowed"
+            :disabled="isSubmitting || reward.isDisabled"
         >
-            <template v-if="!reward.isAllowed">
+            <template v-if="reward.isDisabled && waitDuration">
                 Wait for {{ waitDuration.hours }}: {{ waitDuration.minutes }}:{{ waitDuration.seconds }}
             </template>
             <template v-else-if="isSubmitting"><b-spinner small></b-spinner> Adding points...</template>
@@ -67,7 +67,7 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
         waitDuration: function () {
-            if (!this.reward.isAllowed) return;
+            if (!this.reward.claimAgainTime) return;
 
             const claimAgainDate = sub(new Date(this.reward.claimAgainTime), { seconds: this.secondsToSubtract });
             const waitInMs = claimAgainDate.getTime() - Date.now();
@@ -81,7 +81,7 @@ export default defineComponent({
         },
     },
     mounted() {
-        setInterval(() => this.secondsToSub++, 1000);
+        setInterval(() => this.secondsToSubtract++, 1000);
     },
     methods: {
         onClickSignin: function () {
