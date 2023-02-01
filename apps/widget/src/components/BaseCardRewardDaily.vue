@@ -61,14 +61,15 @@ export default defineComponent({
         },
     },
     data: function (): any {
-        return { error: '', isSubmitting: false, secondsToSub: 0 };
+        return { error: '', isSubmitting: false, secondsToSubtract: 0 };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
         waitDuration: function () {
-            let claimAgainDate = new Date(this.reward.claimAgainTime);
-            claimAgainDate = sub(claimAgainDate, { seconds: this.secondsToSub });
+            if (!this.reward.isAllowed) return;
+
+            const claimAgainDate = sub(new Date(this.reward.claimAgainTime), { seconds: this.secondsToSubtract });
             const waitInMs = claimAgainDate.getTime() - Date.now();
             const { hours, minutes, seconds } = intervalToDuration({ start: 0, end: waitInMs });
 
@@ -80,9 +81,7 @@ export default defineComponent({
         },
     },
     mounted() {
-        setInterval(() => {
-            this.secondsToSub++;
-        }, 1000);
+        setInterval(() => this.secondsToSub++, 1000);
     },
     methods: {
         onClickSignin: function () {
