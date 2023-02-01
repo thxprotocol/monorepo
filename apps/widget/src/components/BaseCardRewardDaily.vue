@@ -13,29 +13,35 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
+        <b-progress
+            v-if="accountStore.isAuthenticated && reward.claims.length"
+            class="mb-3"
+            variant="success"
+            :value="reward.claims.length"
+            :max="7"
+            show-value
+        ></b-progress>
+
         <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
             Claim <strong>{{ reward.amount }} points</strong>
         </b-button>
 
         <b-button
-            v-if="accountStore.isAuthenticated && !reward.isClaimed"
+            v-if="accountStore.isAuthenticated"
             variant="primary"
             block
             class="w-100"
             @click="onClickClaim"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || !reward.isAllowed"
         >
-            <template v-if="isSubmitting">
-                <b-spinner small></b-spinner>
-                Adding points...
+            <template v-if="!reward.isAllowed">
+                Wait for {{ waitDuration.hours }}: {{ waitDuration.minutes }}:{{ waitDuration.seconds }}
             </template>
+            <template v-else-if="isSubmitting"><b-spinner small></b-spinner> Adding points...</template>
             <template v-else>
-                Claim
-                <strong>{{ reward.amount }} points </strong>
+                Claim <strong>{{ reward.amount }} points </strong>
             </template>
         </b-button>
-
-        <b-button v-else variant="primary" block class="w-100" disabled> Not available </b-button>
     </b-card>
 </template>
 
@@ -44,6 +50,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
+import { intervalToDuration, sub } from 'date-fns';
 
 export default defineComponent({
     name: 'BaseCardRewardDaily',
@@ -54,11 +61,28 @@ export default defineComponent({
         },
     },
     data: function (): any {
-        return { error: '', isSubmitting: false };
+        return { error: '', isSubmitting: false, secondsToSub: 0 };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
+        waitDuration: function () {
+            let claimAgainDate = new Date(this.reward.claimAgainTime);
+            claimAgainDate = sub(claimAgainDate, { seconds: this.secondsToSub });
+            const waitInMs = claimAgainDate.getTime() - Date.now();
+            const { hours, minutes, seconds } = intervalToDuration({ start: 0, end: waitInMs });
+
+            return {
+                hours: String(hours).padStart(2, '0'),
+                minutes: String(minutes).padStart(2, '0'),
+                seconds: String(seconds).padStart(2, '0'),
+            };
+        },
+    },
+    mounted() {
+        setInterval(() => {
+            this.secondsToSub++;
+        }, 1000);
     },
     methods: {
         onClickSignin: function () {
