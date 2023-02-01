@@ -159,6 +159,7 @@ export default defineComponent({
 
             switch (event.data.message) {
                 case 'thx.iframe.show': {
+                    debugger;
                     track('UserOpens', [
                         this.accountStore.account?.sub || '',
                         `widget iframe`,
@@ -167,7 +168,10 @@ export default defineComponent({
                     break;
                 }
                 case 'thx.referral.claim.create': {
+                    debugger;
+                    console.log(poolId);
                     const { ref } = getConfig(poolId);
+                    console.log(ref);
                     if (!ref) break;
 
                     const { uuid, sub } = JSON.parse(atob(ref));
