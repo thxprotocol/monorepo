@@ -89,6 +89,7 @@ import { useRewardStore } from './stores/Reward';
 import { useWalletStore } from './stores/Wallet';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
+import { getReturnUrl } from './utils/returnUrl';
 
 type TTheme = { class: string; name: string; label: string };
 
@@ -128,6 +129,7 @@ export default defineComponent({
     },
     async created() {
         if (GTM) initGTM();
+
         // this.$route is not yet available at this point so we use the browser location API
         // to obtain the query
         const params = new URLSearchParams(window.location.search);
@@ -153,32 +155,17 @@ export default defineComponent({
             track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', [origin]]);
         },
         async onMessage(event: MessageEvent) {
-            const { getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
+            const { getConfig, setConfig, poolId } = this.accountStore;
             const config = getConfig(this.accountStore.poolId);
             if (!WIDGET_URL || event.origin !== new URL(config.origin).origin) return;
 
             switch (event.data.message) {
                 case 'thx.iframe.show': {
-                    track('UserOpens', [
-                        this.accountStore.account?.sub || '',
-                        `widget iframe`,
-                        { origin: config.origin, isShown: event.data.isShown },
-                    ]);
+                    this.onShow(config.origin, event.data.isShown);
                     break;
                 }
                 case 'thx.referral.claim.create': {
-                    const { ref } = getConfig(poolId);
-                    if (!ref) break;
-
-                    const { uuid, sub } = JSON.parse(atob(ref));
-                    // Detect if this conversion is related to ref stored in config
-                    if (event.data.uuid !== uuid) break;
-
-                    await api.rewardsManager.referral.claim({ uuid, sub });
-
-                    setConfig(poolId, { ref: '' } as TWidgetConfig);
-                    getBalance();
-
+                    this.onReferralClaimCreate(event.data.uuid);
                     break;
                 }
                 case 'thx.config.ref': {
@@ -186,6 +173,30 @@ export default defineComponent({
                     break;
                 }
             }
+        },
+        async onReferralClaimCreate(uuid: string) {
+            const { getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
+
+            const { ref } = getConfig(poolId);
+            if (!ref) return;
+
+            // Detect if this conversion is related to ref stored in config
+            const parsedRef = JSON.parse(atob(ref));
+            if (parsedRef.uuid !== uuid) return;
+
+            await api.rewardsManager.referral.claim({ uuid, sub: parsedRef.sub });
+
+            setConfig(poolId, { ref: '' } as TWidgetConfig);
+            getBalance();
+        },
+        async onShow(origin: string, isShown: boolean) {
+            const user = await this.accountStore.api.userManager.cached.getUser();
+
+            if (isShown && user && user.expired) {
+                this.accountStore.api.userManager.cached.signinPopup();
+            }
+
+            track('UserOpens', [this.accountStore.account?.sub || '', `widget iframe`, { origin, isShown }]);
         },
         onClickSignin() {
             this.accountStore.api.userManager.cached.signinPopup();
@@ -196,12 +207,7 @@ export default defineComponent({
         },
         onClickAccount() {
             const { poolId, origin, chainId, theme } = this.accountStore.getConfig(this.accountStore.poolId);
-            const url = new URL(window.location.origin);
-            url.pathname = window.location.pathname;
-            url.searchParams.append('id', poolId);
-            url.searchParams.append('origin', origin);
-            url.searchParams.append('chainId', String(chainId));
-            url.searchParams.append('theme', theme);
+            const url = getReturnUrl(poolId, origin, chainId, theme);
 
             this.accountStore.api.userManager.cached.signinRedirect({
                 extraQueryParams: {

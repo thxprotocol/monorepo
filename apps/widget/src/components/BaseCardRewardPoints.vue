@@ -24,7 +24,7 @@
         </b-alert>
 
         <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
-            Claim <strong>{{ reward.amount }} points</strong>
+            Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
         </b-button>
 
         <b-button v-else-if="reward.isClaimed" variant="primary" block class="w-100" disabled> Reward claimed</b-button>

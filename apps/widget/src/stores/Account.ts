@@ -44,6 +44,8 @@ export const useAccountStore = defineStore('account', {
                 clientId: CLIENT_ID,
                 clientSecret: CLIENT_SECRET,
                 redirectUrl: WIDGET_URL + '/signin-popup.html',
+                // silent_redirect_uri: WIDGET_URL + '/signout-popup.html',
+                post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
                 popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
                 scopes: 'openid account:read erc20:read erc721:read point_balances:read referral_rewards:read point_rewards:read wallets:read',
                 poolId: this.poolId,
@@ -105,10 +107,10 @@ export const useAccountStore = defineStore('account', {
             track('UserSignsIn', [this.account]);
         },
         onAccessTokenExpired() {
-            this.api.signout();
+            this.api.userManager.cached.signoutPopup();
         },
         onAccessTokenExpiring() {
-            this.api.userManager.cached.signinSilent();
+            //
         },
         async getAccount() {
             this.account = await this.api.account.get();

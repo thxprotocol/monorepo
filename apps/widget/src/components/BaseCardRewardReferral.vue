@@ -24,7 +24,7 @@
             </b-input-group-append>
         </b-input-group>
         <b-button v-else variant="primary" block class="w-100" @click="onClickClaim">
-            Claim <strong>{{ reward.amount }} points</strong>
+            Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
         </b-button>
         <div v-if="accountStore.isAuthenticated && referralUrl" class="pt-2">
             <BaseBtnShareTwitter :url="referralUrl" text="Please have a look at this:" class="me-2" />

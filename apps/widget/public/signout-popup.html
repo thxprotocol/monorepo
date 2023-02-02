@@ -8,9 +8,8 @@
             integrity="sha512-v9YAXYIA7sZ48R0CuD5+nKrTrFfSQT4i7iRDSbAhZFYy6mkxom6wvNnkW6fiZ916YoovjrwDlUQLRS7xZuJddw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        const mgr = new window.oidc.UserManager({popup_redirect_uri: window.location.href});
+        const mgr = new window.oidc.UserManager({});
         mgr.signoutPopupCallback();
-        window.close()
     </script>
 </body>
 
