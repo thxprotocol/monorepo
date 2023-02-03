@@ -1,12 +1,65 @@
 <template>
     <div class="flex-grow-1 overflow-auto">
-        <component
-            v-for="(reward, key) of rewardsStore.rewards"
-            :key="key"
-            :is="reward.component"
-            :reward="reward"
-            class="mb-2"
-        />
+        <b-tabs justified content-class="pt-1">
+            <b-tab title="All" active>
+                <component
+                    v-for="(reward, key) of rewardsStore.rewards"
+                    :key="key"
+                    :is="reward.component"
+                    :visible="!key"
+                    :reward="reward"
+                    class="mb-2"
+                />
+            </b-tab>
+            <b-tab>
+                <template #title>
+                    <i class="fa fa-calendar"></i>
+                </template>
+                <BaseCardRewardDaily
+                    v-for="(reward, key) of rewardsStore.dailyRewards"
+                    :key="key"
+                    :visible="!key"
+                    :reward="reward"
+                    class="mb-2"
+                />
+            </b-tab>
+            <b-tab>
+                <template #title>
+                    <i class="fas fa-comments"></i>
+                </template>
+                <BaseCardRewardReferral
+                    v-for="(reward, key) of rewardsStore.referralRewards"
+                    :key="key"
+                    :visible="!key"
+                    :reward="reward"
+                    class="mb-2"
+                />
+            </b-tab>
+            <b-tab>
+                <template #title>
+                    <i class="fas fa-trophy"></i>
+                </template>
+                <BaseCardRewardPoints
+                    v-for="(reward, key) of rewardsStore.conditionalRewards"
+                    :key="key"
+                    :visible="!key"
+                    :reward="reward"
+                    class="mb-2"
+                />
+            </b-tab>
+            <b-tab>
+                <template #title>
+                    <i class="fas fa-flag"></i>
+                </template>
+                <BaseCardRewardMilestone
+                    v-for="(reward, key) of rewardsStore.milestoneRewards"
+                    :key="key"
+                    :visible="!key"
+                    :reward="reward"
+                    class="mb-2"
+                />
+            </b-tab>
+        </b-tabs>
     </div>
 </template>
 

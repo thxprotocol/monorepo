@@ -6,6 +6,14 @@ export const useRewardStore = defineStore('rewards', {
     state: (): TRewardState => ({
         rewards: [],
     }),
+    getters: {
+        dailyRewards: (state: TRewardState) => state.rewards.filter((r) => r.component === 'BaseCardRewardDaily'),
+        referralRewards: (state: TRewardState) => state.rewards.filter((r) => r.component === 'BaseCardRewardReferral'),
+        conditionalRewards: (state: TRewardState) =>
+            state.rewards.filter((r) => r.component === 'BaseCardRewardPoints'),
+        milestoneRewards: (state: TRewardState) =>
+            state.rewards.filter((r) => r.component === 'BaseCardRewardMilestone'),
+    },
     actions: {
         async claimConditionalReward(uuid: string) {
             const { api, account, getBalance } = useAccountStore();

@@ -1,12 +1,12 @@
 <template>
-    <b-card class="m-2 disabled">
-        <b-card-title class="d-flex">
+    <BaseCardCollapse>
+        <template #header>
             <div v-if="reward.platform" class="me-2">
                 <img height="20" :src="platformImg[reward.platform]" :alt="reward.platform" />
             </div>
             <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
             <div class="text-success fw-bold">{{ reward.amount }}</div>
-        </b-card-title>
+        </template>
 
         <b-card-text>
             {{ reward.description }}
@@ -55,7 +55,7 @@
                 Claim <strong>{{ reward.amount }} points</strong>
             </template>
         </b-button>
-    </b-card>
+    </BaseCardCollapse>
 </template>
 
 <script lang="ts">
@@ -66,9 +66,13 @@ import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { RewardConditionPlatform, RewardConditionInteraction } from '../types/enums/rewards';
+import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
 export default defineComponent({
     name: 'BaseCardRewardPoints',
+    components: {
+        BaseCardCollapse,
+    },
     props: {
         reward: {
             type: Object as PropType<TPointReward>,

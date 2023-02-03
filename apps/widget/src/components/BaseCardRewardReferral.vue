@@ -1,9 +1,9 @@
 <template>
-    <b-card class="m-2">
-        <b-card-title class="d-flex">
+    <BaseCardCollapse>
+        <template #header>
             <div class="flex-grow-1">{{ reward.title }}</div>
             <div class="text-success fw-bold">{{ reward.amount }}</div>
-        </b-card-title>
+        </template>
 
         <b-card-text>
             {{ reward.description }}
@@ -33,7 +33,7 @@
             <BaseBtnShareTelegram :url="referralUrl" text="Please have a look at this!" class="me-2" />
             <BaseBtnShareEmail :url="referralUrl" subject="Please have a look at this!" class="me-2" />
         </div>
-    </b-card>
+    </BaseCardCollapse>
 </template>
 
 <script lang="ts">
@@ -46,10 +46,12 @@ import BaseBtnShareEmail from '../components/BaseBtnShareEmail.vue';
 import BaseBtnShareTwitter from '../components/BaseBtnShareTwitter.vue';
 import BaseBtnShareLinkedin from '../components/BaseBtnShareLinkedin.vue';
 import BaseBtnShareTelegram from '../components/BaseBtnShareTelegram.vue';
+import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
 export default defineComponent({
     name: 'BaseCardRewardReferral',
     components: {
+        BaseCardCollapse,
         BaseBtnShareWhatsapp,
         BaseBtnShareEmail,
         BaseBtnShareTwitter,

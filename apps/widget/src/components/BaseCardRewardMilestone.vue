@@ -1,9 +1,9 @@
 <template>
-    <b-card class="m-2 disabled">
-        <b-card-title class="d-flex">
+    <BaseCardCollapse>
+        <template #header>
             <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
             <div class="text-success fw-bold">{{ reward.amount }}</div>
-        </b-card-title>
+        </template>
 
         <b-card-text>
             {{ reward.description }}
@@ -43,7 +43,7 @@
                 </strong>
             </template>
         </b-button>
-    </b-card>
+    </BaseCardCollapse>
 </template>
 
 <script lang="ts">
@@ -51,9 +51,13 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
+import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
 export default defineComponent({
     name: 'BaseCardRewardMilestone',
+    components: {
+        BaseCardCollapse,
+    },
     props: {
         reward: {
             type: Object as PropType<TMilestoneReward>,
