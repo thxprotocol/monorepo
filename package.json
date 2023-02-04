@@ -11,7 +11,8 @@
     "private": true,
     "dependencies": {
         "@popperjs/core": "^2.11.6",
-        "@thxnetwork/sdk": "1.0.14",
+        "@thxnetwork/sdk": "1.0.16",
+        "add": "^2.0.6",
         "bootstrap": "^5.2.3",
         "bootstrap-vue-3": "^0.4.15",
         "core-js": "^3.6.5",
@@ -21,7 +22,9 @@
         "tslib": "^2.3.0",
         "vue": "^3.0.0",
         "vue-router": "^4.0.0-0",
-        "vue3-clipboard": "^1.0.0"
+        "vue3-clipboard": "^1.0.0",
+        "web3-utils": "^1.8.2",
+        "yarn": "^1.22.19"
     },
     "devDependencies": {
         "@nrwl/cli": "14.8.6",

@@ -68,7 +68,7 @@ export default defineComponent({
         },
     },
     data: function (): any {
-        return { error: '', isSubmitting: false, secondsToSubtract: 0 };
+        return { interval: null, error: '', isSubmitting: false, secondsToSubtract: 0 };
     },
     computed: {
         ...mapStores(useAccountStore),
@@ -76,9 +76,9 @@ export default defineComponent({
         waitDuration: function () {
             if (!this.reward.claimAgainTime) return;
 
-            const claimAgainDate = sub(new Date(this.reward.claimAgainTime), { seconds: this.secondsToSubtract });
-            const waitInMs = claimAgainDate.getTime() - Date.now();
-            const { hours, minutes, seconds } = intervalToDuration({ start: 0, end: waitInMs });
+            const nextClaimDate = sub(new Date(this.reward.claimAgainTime), { seconds: this.secondsToSubtract });
+            const nextClaimDuration = Math.floor(nextClaimDate.getTime() - Date.now() / 1000); // Convert and floor to S
+            const { hours, minutes, seconds } = intervalToDuration({ start: 0, end: nextClaimDuration });
 
             return {
                 hours: String(hours).padStart(2, '0'),
@@ -87,8 +87,13 @@ export default defineComponent({
             };
         },
     },
-    mounted() {
-        setInterval(() => this.secondsToSubtract++, 1000);
+    created() {
+        this.interval = setInterval(() => {
+            this.secondsToSubtract = this.secondsToSubtract + 1;
+        }, 1000);
+    },
+    beforeUnmount() {
+        clearInterval(this.interval);
     },
     methods: {
         onClickSignin: function () {
