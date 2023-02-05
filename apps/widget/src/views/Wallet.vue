@@ -1,6 +1,5 @@
 <template>
     <div v-if="accountStore.isAuthenticated" class="flex-grow-1 overflow-auto">
-        <!-- {{ walletStore.wallet.address }} -->
         <b-alert v-if="!list.length" variant="info" show class="mx-2 mt-auto">
             <i class="fas fa-question-circle me-2"></i>
             No perks yet... Redeem <b-link to="/perks">perks</b-link> with <b-link to="/">points</b-link>!

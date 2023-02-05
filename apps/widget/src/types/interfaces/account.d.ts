@@ -5,6 +5,7 @@ type TAccount = {
     email: string;
     address: string;
     plan: number;
+    variant: AccountVariant;
     googleAccess: boolean;
     youtubeViewAccess: boolean;
     youtubeManageAccess: boolean;
