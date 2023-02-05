@@ -1,5 +1,7 @@
 type TWallet = {
+    _id: string;
     address: string;
+    isUpgradeAvailable: boolean;
 };
 
 type TWalletState = {
@@ -9,6 +11,7 @@ type TWalletState = {
 };
 
 type TERC20 = {
+    _id: string;
     balance: number;
     symbol: string;
     name: string;
@@ -24,4 +27,20 @@ type TERC721 = {
     };
     logoImg: string;
     tokenId: string;
+};
+
+type TERC20Token = {
+    name: string;
+    symbol: string;
+    balance: number;
+    walletBalance: number;
+    logoImg: string;
+    erc20: TERC20;
+};
+
+type TERC20TransferConfig = {
+    erc20Id: string;
+    to: string;
+    amount: string;
+    chainId: number;
 };

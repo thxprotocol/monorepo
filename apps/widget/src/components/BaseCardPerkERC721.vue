@@ -20,7 +20,6 @@
             :error="error"
             :perk="perk"
             :is-loading="isSubmitting"
-            :submit-handler="onSubmitPayment"
             @hidden="onModalHidden"
             @submit="onSubmitPayment"
         />
