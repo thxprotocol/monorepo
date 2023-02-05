@@ -78,6 +78,8 @@ export default defineComponent({
         async onSubmitTransfer(config: TERC20TransferConfig) {
             this.isSubmitting = true;
             await this.walletStore.transfer(config);
+            await this.walletStore.list();
+            this.isModalTransferShown = false;
             this.isSubmitting = false;
         },
         async onSubmitUpgrade() {

@@ -47,7 +47,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
-import { isAddress } from 'web3-utils';
+import { isAddress, toWei } from 'web3-utils';
 import { AccountVariant } from '../types/enums/accountVariant';
 
 export default defineComponent({
@@ -101,7 +101,7 @@ export default defineComponent({
             const config: TERC20TransferConfig = {
                 erc20Id: this.token.erc20._id,
                 to: this.receiver,
-                amount: String(this.amount),
+                amount: toWei(String(this.amount), 'ether'),
                 chainId,
             };
             this.$emit('submit', config);
