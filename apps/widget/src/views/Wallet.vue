@@ -6,7 +6,9 @@
             v-if="walletStore.wallet?.version !== walletStore.wallet?.latestVersion"
             class="mx-2 p-1 px-2 align-items-center d-flex"
         >
-            An upgrade is available for your Smart Contract Wallet (v{{ walletStore.wallet?.version }}).
+            An upgrade is available for your Smart Contract Wallet{{
+                walletStore.wallet?.version ? ` (v${walletStore.wallet?.version})` : ''
+            }}.
             <b-button class="ms-auto" size="sm" variant="primary" @click="onClickUpgrade">
                 <b-spinner v-if="isSubmitting" small variant="light" />
                 <template v-else>Upgrade to v{{ walletStore.wallet?.latestVersion }} </template>
