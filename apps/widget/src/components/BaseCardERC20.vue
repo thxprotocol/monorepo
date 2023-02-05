@@ -13,25 +13,11 @@
                     <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                 </template>
                 <b-dropdown-item
-                    :disabled="!walletStore.wallet?.isUpgradeAvailable"
-                    @click="isModalUpgradeShown = true"
-                >
-                    Upgrade
-                </b-dropdown-item>
-                <b-dropdown-item
-                    :disabled="walletStore.wallet?.isUpgradeAvailable"
+                    :disabled="walletStore.wallet?.version !== walletStore.wallet?.latestVersion"
                     @click="isModalTransferShown = true"
                 >
                     Transfer
                 </b-dropdown-item>
-                <BaseModalWalletUpgrade
-                    :id="`modalWalletUpgrade${walletStore.wallet?._id}`"
-                    :show="isModalUpgradeShown"
-                    :error="error"
-                    :is-loading="isSubmitting"
-                    @hidden="onModalTransferHidden"
-                    @submit="onSubmitUpgrade"
-                />
                 <BaseModalERC20Transfer
                     :id="`modalERC20Transfer${token.erc20._id}`"
                     :show="isModalTransferShown"
@@ -49,7 +35,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import BaseModalERC20Transfer from '../components/BaseModalERC20Transfer.vue';
-import BaseModalWalletUpgrade from '../components/BaseModalWalletUpgrade.vue';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../stores/Wallet';
 
@@ -57,7 +42,6 @@ export default defineComponent({
     name: 'BaseCardERC20',
     components: {
         BaseModalERC20Transfer,
-        BaseModalWalletUpgrade,
     },
     props: {
         token: {
@@ -80,11 +64,6 @@ export default defineComponent({
             await this.walletStore.transfer(config);
             await this.walletStore.list();
             this.isModalTransferShown = false;
-            this.isSubmitting = false;
-        },
-        async onSubmitUpgrade() {
-            this.isSubmitting = true;
-            await this.walletStore.upgrade();
             this.isSubmitting = false;
         },
     },

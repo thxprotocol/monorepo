@@ -1,7 +1,8 @@
 type TWallet = {
     _id: string;
     address: string;
-    isUpgradeAvailable: boolean;
+    version: string;
+    latestVersion: string;
 };
 
 type TWalletState = {
