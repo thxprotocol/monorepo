@@ -27,11 +27,11 @@ export const useWalletStore = defineStore('wallet', {
         },
         async transfer(config: TERC20TransferConfig) {
             const { api } = useAccountStore();
-            api.erc20.transfer(config);
+            await api.erc20.transfer(config);
         },
         async upgrade() {
             const { api } = useAccountStore();
-            api.walletManager.upgrade(this.wallet?._id);
+            await api.walletManager.upgrade(this.wallet?._id);
         },
     },
 });
