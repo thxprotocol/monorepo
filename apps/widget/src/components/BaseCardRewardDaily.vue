@@ -68,17 +68,25 @@ export default defineComponent({
         },
     },
     data: function (): any {
-        return { interval: null, error: '', isSubmitting: false, secondsToSubtract: 0 };
+        return {
+            interval: null,
+            error: '',
+            isSubmitting: false,
+            secondsToSubtract: 0,
+            now: Math.floor(Date.now() / 1000),
+        };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
         waitDuration: function () {
-            if (!this.reward.claimAgainTime) return;
+            if (!this.reward.claimAgainDuration) return;
 
-            const nextClaimDate = sub(new Date(this.reward.claimAgainTime), { seconds: this.secondsToSubtract });
-            const nextClaimDuration = Math.floor(nextClaimDate.getTime() - Date.now() / 1000); // Convert and floor to S
-            const { hours, minutes, seconds } = intervalToDuration({ start: 0, end: nextClaimDuration });
+            const end = Date.now() + this.reward.claimAgainDuration * 1000;
+            const { hours, minutes, seconds } = intervalToDuration({
+                start: Math.floor(Date.now() / 1000) * 1000, // Convert to s, round down and convert back to ms
+                end: sub(end, { seconds: this.secondsToSubtract }),
+            });
 
             return {
                 hours: String(hours).padStart(2, '0'),
