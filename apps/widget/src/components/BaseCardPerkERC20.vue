@@ -71,7 +71,7 @@ export default defineComponent({
         onSubmitPayment() {
             this.isSubmitting = true;
             this.perksStore
-                .createERC20PerkPayment(this.perk.uuid)
+                .createERC20Redemption(this.perk.uuid)
                 .then(async () => {
                     const walletStore = useWalletStore();
                     await this.accountStore.getBalance();

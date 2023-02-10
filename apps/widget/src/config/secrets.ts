@@ -6,3 +6,4 @@ export const CLIENT_SECRET = process.env.VUE_APP_CLIENT_SECRET || '';
 export const PKG_ENV = process.env.VUE_APP_PKG_ENV || 'prod';
 export const GTM = process.env.VUE_APP_GTM || '';
 export const MIXPANEL_TOKEN = process.env.VUE_APP_MIXPANEL_TOKEN || '';
+export const STRIPE_PUBLISHABLE_TEST_KEY = process.env.VUE_APP_STRIPE_PUBLISHABLE_TEST_KEY || '';
