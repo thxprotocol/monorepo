@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
+import { track } from '@thxnetwork/mixpanel';
 
 export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
@@ -26,12 +27,14 @@ export const useWalletStore = defineStore('wallet', {
             });
         },
         async transfer(config: TERC20TransferConfig) {
-            const { api } = useAccountStore();
+            const { api, account } = useAccountStore();
             await api.erc20.transfer(config);
+            track('UserCreates', [account?.sub, 'erc20 transfer']);
         },
         async upgrade() {
-            const { api } = useAccountStore();
+            const { api, account } = useAccountStore();
             await api.walletManager.upgrade(this.wallet?._id);
+            track('UserCreates', [account?.sub, 'wallet upgrade']);
         },
     },
 });
