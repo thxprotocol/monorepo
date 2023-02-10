@@ -21,23 +21,14 @@
                 {{ error }}
             </b-alert>
             <p class="m-0">
-                You are about to purchase <strong>{{ perk.title }}</strong>
+                You are about to redeem <strong>{{ perk.pointPrice }} points</strong> for
+                <strong>{{ perk.title }}</strong>
                 . Are you sure?
             </p>
-            <div id="payment-element"></div>
         </template>
         <template #footer>
-            <b-button variant="success" class="w-100 rounded-pill" :disabled="isLoading" @click="onClickPayment">
-                <b-spinner small variant="primary" v-if="isSubmitting" />
-                Pay {{ perk.price }} {{ perk.priceCurrency }}
-            </b-button>
-            <b-button
-                variant="link"
-                class="w-100 rounded-pill"
-                :disabled="isLoading"
-                @click="$emit('submit-redemption')"
-            >
-                Redeem for {{ perk.pointPrice }} pts
+            <b-button variant="primary" class="w-100 rounded-pill" :disabled="isLoading" @click="$emit('submit')">
+                Redeem for {{ perk.pointPrice }} points
             </b-button>
         </template>
     </b-modal>
@@ -45,13 +36,11 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { mapStores } from 'pinia';
-import { usePerkStore } from '../stores/Perk';
 
 export default defineComponent({
     name: 'BaseCardPerkPayment',
     data() {
-        return { isShown: false, isSubmitting: false };
+        return { isShown: false };
     },
     props: {
         id: {
@@ -75,26 +64,6 @@ export default defineComponent({
     watch: {
         show(value) {
             this.isShown = value;
-        },
-    },
-    computed: {
-        ...mapStores(usePerkStore),
-    },
-    methods: {
-        onClickPayment() {
-            this.isSubmitting = true;
-            this.perksStore
-                .createERC721Payment(this.perk.uuid)
-                .then(async (r) => {
-                    window.open(r.paymentLink.url, '_blank');
-                })
-                .catch((r) => {
-                    console.log(r);
-                    debugger;
-                })
-                .finally(() => {
-                    this.isSubmitting = false;
-                });
         },
     },
 });
