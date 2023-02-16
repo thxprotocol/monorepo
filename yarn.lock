@@ -3009,10 +3009,15 @@
     vue-loader "^16.4.1"
     webpack ">=4.0.0 <6.0.0"
 
-"@thxnetwork/sdk@1.0.17":
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.0.17.tgz#bac93858bc65635cda57019c28cae879bc4d568d"
-  integrity sha512-xuTnfYyVDxROUmJ+Rt5EB0Rt90tNC9kp6DjAAfO7NWV0UZazDW6jgVCVwriW++x9z6hWRaQDuy9f6Sd96xjyUA==
+"@stripe/stripe-js@^1.46.0":
+  version "1.46.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.46.0.tgz#2b9acca0dfa7b90aaecd909e678a049f799a27d6"
+  integrity sha512-dkm0zCEoRLu5rTnsIgwDf/QG2DKcalOT2dk1IVgMySOHWTChLyOvQwMYhEduGgLvyYWTwNhAUV4WOLPQvjwLwA==
+
+"@thxnetwork/sdk@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.1.0.tgz#652869736934a71363c5b11a4ce4d9b6424fd452"
+  integrity sha512-coVrUwd2MQjw63g8MGKAoUKs3qY9uIm0W01bRpg3gEKQ1lNRv10qbw+XQDzSnw9FyanthRsMeKZgKg4Y2WrejA==
   dependencies:
     oidc-client-ts "2.1.0"
 
@@ -3296,6 +3301,11 @@
   version "16.11.7"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.7.tgz#36820945061326978c42a01e56b61cd223dfdc42"
   integrity sha512-QB5D2sqfSjCmTuWcBWyJ+/44bcjO7VbjSbOE0ucoVbAsSNQc4Lt6QkgkVXkTDwkL4z/beecZNDvVX15D4P8Jbw==
+
+"@types/node@>=8.1.0":
+  version "18.13.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.13.0.tgz#0400d1e6ce87e9d3032c19eb6c58205b0d3f7850"
+  integrity sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==
 
 "@types/node@^14.0.10 || ^16.0.0", "@types/node@^14.14.20 || ^16.0.0":
   version "16.18.3"
@@ -13531,7 +13541,7 @@ q@^1.1.2:
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
   integrity sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==
 
-qs@6.11.0, qs@^6.10.0:
+qs@6.11.0, qs@^6.10.0, qs@^6.11.0:
   version "6.11.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.11.0.tgz#fd0d963446f7a65e1367e01abd85429453f0c37a"
   integrity sha512-MvjoMCJwEarSbUYk5O+nmoSzSutSsTwF85zcHPQ9OrlFoZOYIjaqBAJIqIXjptyD5vThxGq52Xu/MaJzRkIk4Q==
@@ -15061,6 +15071,14 @@ strip-literal@^1.0.0:
   integrity sha512-5o4LsH1lzBzO9UFH63AJ2ad2/S2AVx6NtjOcaz+VTT2h1RiRvbipW72z8M/lxEhcPHDBQwpDrnTF7sXy/7OwCQ==
   dependencies:
     acorn "^8.8.1"
+
+stripe@^11.9.1:
+  version "11.9.1"
+  resolved "https://registry.yarnpkg.com/stripe/-/stripe-11.9.1.tgz#32e3f36cebe3a3fca0ce541221463624e5bc8b24"
+  integrity sha512-obmTRAUC1UKlb3pOlF1tBA31Zo+FBMjnG69aGGTAeq35NlzffxjMjVgh3a55f9jK98FhHkIvY5z0W1FfQymNlQ==
+  dependencies:
+    "@types/node" ">=8.1.0"
+    qs "^6.11.0"
 
 strong-log-transformer@^2.1.0:
   version "2.1.0"

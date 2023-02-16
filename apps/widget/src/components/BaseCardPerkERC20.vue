@@ -21,7 +21,7 @@
             :show="isModalShown"
             :is-loading="isSubmitting"
             @hidden="onModalHidden"
-            @submit="onSubmitPayment"
+            @submit-redemption="onSubmitRedemption"
         />
     </b-card>
 </template>
@@ -68,10 +68,10 @@ export default defineComponent({
             }
             this.isModalShown = true;
         },
-        onSubmitPayment() {
+        onSubmitRedemption() {
             this.isSubmitting = true;
             this.perksStore
-                .createERC20PerkPayment(this.perk.uuid)
+                .createERC20Redemption(this.perk.uuid)
                 .then(async () => {
                     const walletStore = useWalletStore();
                     await this.accountStore.getBalance();

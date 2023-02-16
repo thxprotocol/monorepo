@@ -20,12 +20,10 @@ type TERC20 = {
 };
 
 type TERC721 = {
-    erc721: {
-        name: string;
-        symbol: string;
-        logoImgUrl: string;
-        address: string;
-    };
+    name: string;
+    symbol: string;
+    logoImgUrl: string;
+    address: string;
     logoImg: string;
     tokenId: string;
 };

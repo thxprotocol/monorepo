@@ -10,6 +10,10 @@
         <b-card-text> {{ perk.description }} </b-card-text>
         <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" @click="onClickRedeem">
             <template v-if="perk.isOwned"> Claimed </template>
+            <template v-else-if="perk.price > 0">
+                Pay <strong>{{ perk.price }} {{ perk.priceCurrency }}</strong>
+                <small> / {{ perk.pointPrice }} pts</small>
+            </template>
             <template v-else>
                 Redeem for <strong>{{ perk.pointPrice }} points</strong>
             </template>
@@ -21,7 +25,7 @@
             :perk="perk"
             :is-loading="isSubmitting"
             @hidden="onModalHidden"
-            @submit="onSubmitPayment"
+            @submit-redemption="onSubmitRedemption"
         />
     </b-card>
 </template>
@@ -69,18 +73,19 @@ export default defineComponent({
             }
             this.isModalShown = true;
         },
-        onSubmitPayment() {
+        onSubmitRedemption() {
             this.isSubmitting = true;
             this.perksStore
-                .createERC721PerkPayment(this.perk.uuid)
+                .createERC721Redemption(this.perk.uuid)
                 .then(async () => {
                     const walletStore = useWalletStore();
                     await this.accountStore.getBalance();
                     walletStore.list();
                     this.isModalShown = false;
                 })
-                .catch(({ error }) => {
-                    this.error = error.message;
+                .catch((r) => {
+                    debugger;
+                    this.error = r && r.error && r.error.message;
                 })
                 .finally(() => {
                     this.isSubmitting = false;
