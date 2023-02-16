@@ -11,7 +11,8 @@ export const usePerkStore = defineStore('perks', {
     actions: {
         createERC20Redemption: async (uuid: string) => {
             const { api, account } = useAccountStore();
-            const { error } = await api.perksManager.erc20.payment.post(uuid);
+            debugger;
+            const { error } = await api.perksManager.erc20.redemption.post(uuid);
             if (error) throw error;
 
             track('UserCreates', [account?.sub, 'coin perk payment']);

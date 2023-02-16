@@ -21,7 +21,7 @@
             :show="isModalShown"
             :is-loading="isSubmitting"
             @hidden="onModalHidden"
-            @submit="onSubmitPayment"
+            @submit-redemption="onSubmitRedemption"
         />
     </b-card>
 </template>
@@ -68,7 +68,7 @@ export default defineComponent({
             }
             this.isModalShown = true;
         },
-        onSubmitPayment() {
+        onSubmitRedemption() {
             this.isSubmitting = true;
             this.perksStore
                 .createERC20Redemption(this.perk.uuid)

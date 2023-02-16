@@ -18,6 +18,16 @@ const routes: Array<RouteRecordRaw> = [
         name: 'wallet',
         component: () => import(/* webpackChunkName: "wallet" */ '../views/Wallet.vue'),
     },
+    {
+        path: '/checkout/:uuid',
+        name: 'checkout',
+        component: () => import(/* webpackChunkName: "wallet" */ '../views/Checkout.vue'),
+    },
+    {
+        path: '/checkout/:uuid/complete',
+        name: 'checkout_complete',
+        component: () => import(/* webpackChunkName: "wallet" */ '../views/CheckoutComplete.vue'),
+    },
 ];
 
 const router = createRouter({

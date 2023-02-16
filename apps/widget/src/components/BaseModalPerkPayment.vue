@@ -27,16 +27,33 @@
             <div id="payment-element"></div>
         </template>
         <template #footer>
-            <b-button variant="success" class="w-100 rounded-pill" :disabled="isLoading" @click="onClickPayment">
-                <b-spinner small variant="primary" v-if="isSubmitting" />
-                Pay {{ perk.price }} {{ perk.priceCurrency }}
-            </b-button>
+            <template v-if="perk.price > 0">
+                <b-button
+                    variant="success"
+                    class="w-100 rounded-pill"
+                    :disabled="isLoading"
+                    :to="`/checkout/${perk.uuid}`"
+                >
+                    <b-spinner small variant="primary" v-if="isSubmitting" />
+                    Pay {{ perk.price }} {{ perk.priceCurrency }}
+                </b-button>
+                <b-button
+                    variant="primary"
+                    class="w-100 rounded-pill"
+                    :disabled="isLoading"
+                    @click="$emit('submit-redemption')"
+                >
+                    Redeem for {{ perk.pointPrice }} pts
+                </b-button>
+            </template>
             <b-button
-                variant="link"
+                v-else
+                variant="success"
                 class="w-100 rounded-pill"
                 :disabled="isLoading"
                 @click="$emit('submit-redemption')"
             >
+                <b-spinner small variant="primary" v-if="isSubmitting" />
                 Redeem for {{ perk.pointPrice }} pts
             </b-button>
         </template>

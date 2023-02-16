@@ -10,9 +10,12 @@
         <b-card-text> {{ perk.description }} </b-card-text>
         <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" @click="onClickRedeem">
             <template v-if="perk.isOwned"> Claimed </template>
-            <template v-else>
+            <template v-else-if="perk.price > 0">
                 Pay <strong>{{ perk.price }} {{ perk.priceCurrency }}</strong>
                 <small> / {{ perk.pointPrice }} pts</small>
+            </template>
+            <template v-else>
+                Redeem for <strong>{{ perk.pointPrice }} points</strong>
             </template>
         </b-button>
         <BaseModalPerkPayment
