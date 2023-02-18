@@ -21,8 +21,8 @@
                 {{ error }}
             </b-alert>
             <p class="m-0">
-                You are about to purchase <strong>{{ perk.title }}</strong>
-                . Are you sure?
+                Do you want to purchase <strong>{{ perk.title }}</strong> with {{ perk.priceCurrency }} or would you
+                like to use your loyalty points?
             </p>
             <div id="payment-element"></div>
         </template>
@@ -35,7 +35,7 @@
                     :to="`/checkout/${perk.uuid}`"
                 >
                     <b-spinner small variant="primary" v-if="isSubmitting" />
-                    Pay {{ perk.price }} {{ perk.priceCurrency }}
+                    {{ perk.price }} {{ perk.priceCurrency }}
                 </b-button>
                 <b-button
                     variant="primary"
@@ -43,7 +43,7 @@
                     :disabled="isLoading"
                     @click="$emit('submit-redemption')"
                 >
-                    Redeem for {{ perk.pointPrice }} pts
+                    {{ perk.pointPrice }} points
                 </b-button>
             </template>
             <b-button
@@ -54,7 +54,7 @@
                 @click="$emit('submit-redemption')"
             >
                 <b-spinner small variant="primary" v-if="isSubmitting" />
-                Redeem for {{ perk.pointPrice }} pts
+                {{ perk.pointPrice }} points
             </b-button>
         </template>
     </b-modal>

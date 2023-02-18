@@ -1,10 +1,16 @@
 <template>
-    <div v-if="accountStore.isAuthenticated" class="flex-grow-1 overflow-auto px-5">
-        <div class="w-100 h-100 d-flex align-items-center justify-content-center flex-column">
+    <div v-if="accountStore.isAuthenticated" class="flex-grow-1 overflow-auto">
+        <div class="w-100 h-100 d-flex align-items-center justify-content-center flex-column px-5">
+            <b-alert variant="danger" show v-if="error" class="px-2 p-1">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                {{ error }}
+            </b-alert>
             <div id="payment-element"></div>
-            <div id="error-message"></div>
             <b-spinner v-if="isLoading" variant="primary" />
-            <b-button v-else variant="primary" class="mt-3 w-100" @click="onClickPay">Pay</b-button>
+            <b-button v-else variant="primary" class="mt-3 w-100" :disabled="isLoadingPayment" @click="onClickPay">
+                <b-spinner v-if="isLoadingPayment" variant="light" small />
+                Pay {{ perk.price }} {{ perk.priceCurrency }}
+            </b-button>
         </div>
     </div>
 </template>
@@ -23,10 +29,11 @@ export default defineComponent({
     data: function (): {
         error: string;
         isLoading: boolean;
+        isLoadingPayment: boolean;
         stripe: Stripe | null;
         elements: StripeElements | null;
     } {
-        return { error: '', isLoading: false, stripe: null, elements: null };
+        return { error: '', isLoading: false, isLoadingPayment: false, stripe: null, elements: null };
     },
     async mounted() {
         const uuid = this.$route.params.uuid as string;
@@ -60,10 +67,15 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(usePerkStore),
+        perk: function (): TPerk {
+            const uuid = this.$route.params.uuid as string;
+            return this.perksStore.perks.filter((p) => p.uuid === uuid)[0];
+        },
     },
     methods: {
         async onClickPay() {
             if (!this.stripe) return;
+            this.isLoadingPayment = true;
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
             const { error } = await this.stripe.confirmPayment({
                 elements: this.elements as StripeElements,
@@ -78,6 +90,7 @@ export default defineComponent({
             } else {
                 this.$router.push('/checkout/' + this.$route.params.uuid + '/complete');
             }
+            this.isLoadingPayment = false;
         },
     },
 });
