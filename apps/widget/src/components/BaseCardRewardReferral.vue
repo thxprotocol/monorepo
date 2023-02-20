@@ -85,7 +85,7 @@ export default defineComponent({
     },
     methods: {
         onClickClaim() {
-            this.accountStore.api.userManager.cached.signinPopup();
+            this.accountStore.signin();
         },
         onCopySuccess() {
             this.isCopied = true;

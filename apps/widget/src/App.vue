@@ -53,7 +53,7 @@
                         </div>
                     </b-dropdown-item-button>
                     <b-dropdown-divider />
-                    <b-dropdown-item-button size="sm" @click="accountStore.api.userManager.cached.signoutPopup()">
+                    <b-dropdown-item-button size="sm" @click="accountStore.signout()">
                         <div class="d-flex align-items-center justify-content-between">
                             Signout
                             <i class="fas fa-sign-out-alt ml-auto"></i>
@@ -193,13 +193,13 @@ export default defineComponent({
             const user = await this.accountStore.api.userManager.cached.getUser();
 
             if (isShown && user && user.expired) {
-                this.accountStore.api.userManager.cached.signinPopup();
+                this.accountStore.signin();
             }
 
             track('UserOpens', [this.accountStore.account?.sub || '', `widget iframe`, { origin, isShown }]);
         },
         onClickSignin() {
-            this.accountStore.api.userManager.cached.signinPopup();
+            this.accountStore.signin();
         },
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);

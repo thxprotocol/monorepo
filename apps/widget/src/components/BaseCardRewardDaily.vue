@@ -105,7 +105,7 @@ export default defineComponent({
     },
     methods: {
         onClickSignin: function () {
-            this.accountStore.api.userManager.cached.signinPopup();
+            this.accountStore.signin();
         },
         onClickClaim: async function () {
             try {

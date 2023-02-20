@@ -22,7 +22,7 @@
     </div>
     <div v-else class="d-flex flex-grow-1 align-items-center justify-content-center flex-column">
         <div class="px-3 w-100">
-            <b-alert variant="info" show>
+            <b-alert variant="info" show class="p-1 px-2">
                 <i class="fas fa-gift me-2"></i>
                 Sign in and view the perks you own!
             </b-alert>
@@ -35,7 +35,6 @@
                 Sign in
                 <i class="fas fa-chevron-right ms-2"></i>
             </b-button>
-            <b-button variant="link" @click="onClickSignup"> Sign up </b-button>
         </div>
     </div>
 </template>
@@ -74,14 +73,7 @@ export default defineComponent({
             this.isSubmitting = false;
         },
         onClickSignin() {
-            this.accountStore.api.userManager.cached.signinPopup();
-        },
-        onClickSignup() {
-            this.accountStore.api.userManager.cached.signinPopup({
-                extraQueryParams: {
-                    prompt: 'create',
-                },
-            });
+            this.accountStore.signin();
         },
     },
 });

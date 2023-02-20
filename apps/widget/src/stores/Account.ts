@@ -69,6 +69,17 @@ export const useAccountStore = defineStore('account', {
             // Send the amount of unclaimed rewards to the parent window and update the launcher
             window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
         },
+        signin() {
+            const { poolId } = this.getConfig(this.poolId);
+            this.api.userManager.cached.signinPopup({
+                extraQueryParams: {
+                    pool_id: poolId,
+                },
+            });
+        },
+        signout() {
+            this.api.userManager.cached.signoutPopup();
+        },
         async onLoad() {
             this.isAuthenticated = !!(await this.api.userManager.getUser());
         },
