@@ -64,7 +64,7 @@ export default defineComponent({
         },
         onClickRedeem() {
             if (!this.accountStore.isAuthenticated) {
-                return this.accountStore.api.userManager.cached.signinPopup();
+                return this.accountStore.signin();
             }
             this.isModalShown = true;
         },
