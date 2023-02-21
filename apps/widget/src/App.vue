@@ -90,6 +90,7 @@ import { useWalletStore } from './stores/Wallet';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from './utils/returnUrl';
+import { COMPARISON_BINARY_OPERATORS } from '@babel/types';
 
 type TTheme = { class: string; name: string; label: string };
 
@@ -160,6 +161,10 @@ export default defineComponent({
             if (!WIDGET_URL || event.origin !== new URL(config.origin).origin) return;
 
             switch (event.data.message) {
+                case 'thx.iframe.navigate': {
+                    this.$router.push(event.data.path);
+                    break;
+                }
                 case 'thx.iframe.show': {
                     this.onShow(config.origin, event.data.isShown);
                     break;
@@ -203,7 +208,7 @@ export default defineComponent({
         },
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
-            window.top?.postMessage({ message: 'thx.widget.close' }, origin);
+            window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
         },
         onClickAccount() {
             const { poolId, origin, chainId, theme } = this.accountStore.getConfig(this.accountStore.poolId);

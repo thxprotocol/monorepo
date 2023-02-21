@@ -81,7 +81,7 @@ export default defineComponent({
                 elements: this.elements as StripeElements,
                 redirect: 'if_required',
                 confirmParams: {
-                    return_url: origin,
+                    return_url: `${origin}?thx_widget_path=${this.$route.fullPath}/complete`,
                 },
             });
 

@@ -1,19 +1,29 @@
 <template>
     <div v-if="accountStore.isAuthenticated" class="flex-grow-1 overflow-auto">
-        <b-alert show variant="success" class="m-2 px-2 p-1">
-            <i class="fas fa-check-circle mr-2"></i>
-            Your payment has been received!
-        </b-alert>
         <b-card class="m-2">
-            <div class="mt-1" v-if="perk.image">
-                <img :src="perk.image" width="auto" class="img-fluid w-auto rounded-2 mb-3" />
-            </div>
-            <b-card-title class="d-flex">
-                <div class="flex-grow-1">{{ perk.title }}</div>
-                <div class="text-success fw-bold">{{ perk.erc721.symbol }}</div>
-            </b-card-title>
-            <b-card-text> {{ perk.description }} </b-card-text>
-            <b-button variant="success" block class="w-100" to="/wallet">View Wallet</b-button>
+            <template v-if="error">
+                <b-alert show variant="danger" class="px-2 p-1">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    {{ error }}
+                </b-alert>
+                <p>Something went wrong during your checkout process and you were redirected to this page.</p>
+                <b-button variant="success" block class="w-100" :to="`/checkout/${uuid}`">Try again</b-button>
+            </template>
+            <template v-if="perk && !error">
+                <b-alert show variant="success" class="px-2 p-1">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Your payment has been received!
+                </b-alert>
+                <div class="mt-1" v-if="perk.image">
+                    <img :src="perk.image" width="auto" class="img-fluid w-auto rounded-2 mb-3" />
+                </div>
+                <b-card-title class="d-flex">
+                    <div class="flex-grow-1">{{ perk.title }}</div>
+                    <div class="text-success fw-bold">{{ perk.erc721.symbol }}</div>
+                </b-card-title>
+                <b-card-text> {{ perk.description }} </b-card-text>
+                <b-button variant="success" block class="w-100" to="/wallet">View Wallet</b-button>
+            </template>
         </b-card>
     </div>
 </template>
@@ -28,23 +38,25 @@ export default defineComponent({
     name: 'Checkout',
     components: {},
     data: function (): {
+        uuid: string;
         error: string;
         isLoading: boolean;
     } {
-        return { error: '', isLoading: true };
+        return { uuid: '', error: '', isLoading: true };
     },
     async mounted() {
-        const uuid = this.$route.params.uuid as string;
-        await this.perksStore.getERC721Perk(uuid);
-        // Start polling the payment intent for its status
+        const status = this.$route.query.status as string;
+        if (status === 'failed') {
+            this.error = 'Your payment has failed.';
+        }
+        this.uuid = this.$route.params.uuid as string;
         this.isLoading = false;
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(usePerkStore),
         perk: function (): TPerk {
-            const uuid = this.$route.params.uuid as string;
-            return this.perksStore.perks.filter((p) => p.uuid === uuid)[0];
+            return this.perksStore.perks.filter((p) => p.uuid === this.uuid)[0];
         },
     },
 });
