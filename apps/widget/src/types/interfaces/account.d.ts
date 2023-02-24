@@ -1,3 +1,5 @@
+declare module 'color';
+
 type TAccount = {
     sub: string;
     firstName: string;

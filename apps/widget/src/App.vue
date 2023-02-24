@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex flex-column h-100">
+    <div id="main" class="d-flex flex-column h-100">
         <b-navbar class="navbar-top pt-3">
             <div style="width: 75px">
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
@@ -12,23 +12,15 @@
                 <div class="text-success h1 m-0">
                     <strong>{{ accountStore.balance }}</strong>
                 </div>
-                <div :class="activeTheme.class === 'thx-light' ? 'text-dark' : 'text-white'">
+                <div class="points">
                     points
                     <span class="ml-2" style="font-size: 16px !important">
-                        <b-spinner
-                            v-if="isRefreshing"
-                            small
-                            :variant="activeTheme.class === 'thx-light' ? 'dark' : 'white'"
-                        />
-                        <i v-else class="fas fa-sync-alt"></i>
+                        <b-spinner v-if="isRefreshing" small variant="white" />
+                        <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
                     </span>
                 </div>
             </b-link>
             <div>
-                <b-button variant="link" size="sm" @click="onClickTheme">
-                    <i v-if="activeTheme.class === 'thx-light'" class="fas fa-moon"></i>
-                    <i v-if="activeTheme.class === 'thx-default'" class="fas fa-sun"></i>
-                </b-button>
                 <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin">
                     Sign in
                 </b-button>
@@ -79,7 +71,6 @@
         </b-navbar>
     </div>
 </template>
-
 <script lang="ts">
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -90,29 +81,38 @@ import { useWalletStore } from './stores/Wallet';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from './utils/returnUrl';
-import { COMPARISON_BINARY_OPERATORS } from '@babel/types';
+import './scss/main.scss';
+import Color from 'color';
 
-type TTheme = { class: string; name: string; label: string };
+// const primary = '#5942C1';
+const primary = 'orange';
 
-const themeList = [
-    {
-        label: 'Light',
-        name: 'light',
-        class: 'thx-light',
-    },
-    {
-        label: 'Dark',
-        name: 'dark',
-        class: 'thx-default',
-    },
-];
+const btnBg = primary;
+const text = 'white';
+const bodyBg = Color(primary).darken(0.6);
+const navbarBg = Color(primary).darken(0.4);
+const cardBg = Color(primary).darken(0.4);
+const success = 'green';
+const danger = 'red';
+const info = 'blue';
 
 export default defineComponent({
     data() {
         return {
-            themes: themeList,
-            activeTheme: themeList[0],
             isRefreshing: false,
+            theme: {
+                btnBg,
+                btnBgDark: Color(btnBg).darken(0.4),
+                btnBgDarker: Color(btnBg).darken(0.6),
+                text,
+                bodyBg,
+                navbarBg,
+                navbarBgDarker: Color(navbarBg).darken(0.4),
+                cardBg,
+                success,
+                danger,
+                info,
+            },
         };
     },
     computed: {
@@ -146,8 +146,7 @@ export default defineComponent({
     methods: {
         setTheme() {
             const { theme } = this.accountStore.getConfig(this.accountStore.poolId);
-            this.activeTheme = themeList.find((t) => t.name === theme) as TTheme;
-            document.body.classList.add(this.activeTheme.class);
+            console.log(theme);
         },
         ready() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
@@ -221,21 +220,6 @@ export default defineComponent({
                 },
             });
         },
-        onClickTheme() {
-            switch (this.activeTheme.class) {
-                case themeList[0].class:
-                    document.body.classList.remove(this.activeTheme.class);
-                    document.body.classList.add(themeList[1].class);
-                    this.activeTheme = themeList[1];
-                    break;
-                case themeList[1].class:
-                    document.body.classList.remove(this.activeTheme.class);
-                    document.body.classList.add(themeList[0].class);
-                    this.activeTheme = themeList[0];
-                    break;
-            }
-            this.accountStore.setTheme(this.activeTheme.name);
-        },
         async onClickRefresh() {
             this.isRefreshing = true;
             await this.walletStore.list();
@@ -246,5 +230,24 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" src="./scss/default/default.theme.scss"></style>
-<style lang="scss" src="./scss/light/light.theme.scss"></style>
+<style>
+#main {
+    --bs-body-bg: v-bind('theme.bodyBg');
+    --bs-text-opacity: 1;
+}
+.card {
+    --bs-card-bg: v-bind('theme.cardBg');
+}
+.btn-primary {
+    --bs-btn-bg: v-bind('theme.btnBg');
+    --bs-btn-border-color: v-bind('theme.btnBg');
+    --bs-btn-hover-bg: v-bind('theme.btnBgDark');
+    --bs-btn-disabled-bg: v-bind('theme.btnBg');
+    --bs-btn-disabled-border-color: v-bind('theme.btnBg');
+}
+.navbar {
+    --thx-navbar-bg: v-bind('theme.navbarBg');
+    --thx-navbar-btn-active-bg: v-bind('theme.btnBg');
+    --txh-navbar-bottom-border-color: v-bind('theme.navbarBgDarker');
+}
+</style>

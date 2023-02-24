@@ -15,12 +15,20 @@
             content: unset;
         }
     }
+
+    .points {
+        color: var(--bs-body-color);
+    }
 }
 
 .navbar-bottom {
+    --thx-navbar-bg: $navbar-bottom-bg;
+    --thx-navbar-btn-active-bg: $navbar-bottom-bg-active;
+    --txh-navbar-bottom-border-color: $navbar-bottom-border-color;
+
     padding: 0.5rem;
-    border-top: 1px solid $navbar-bottom-border-color;
-    background-color: $navbar-bottom-bg;
+    border-top: 1px solid var(--txh-navbar-bottom-border-color);
+    background-color: var(--thx-navbar-bg);
 
     .container-fluid {
         padding: 0;
@@ -51,7 +59,7 @@
         }
 
         &.router-link-active {
-            background-color: $navbar-bottom-bg-active;
+            background-color: var(--thx-navbar-btn-active-bg);
             i {
                 opacity: 1;
             }                

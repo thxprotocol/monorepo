@@ -1,10 +1,9 @@
 import { BootstrapVue3 } from 'bootstrap-vue-3';
-import VueClipboard from 'vue3-clipboard';
 import { createApp } from 'vue';
-
+import { createPinia } from 'pinia';
+import VueClipboard from 'vue3-clipboard';
 import App from './App.vue';
 import router from './router';
-import { createPinia } from 'pinia';
 
 import { API_URL, MIXPANEL_TOKEN } from './config/secrets';
 import Mixpanel from '@thxnetwork/mixpanel';
