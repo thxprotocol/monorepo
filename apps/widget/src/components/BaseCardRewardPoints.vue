@@ -89,6 +89,7 @@ export default defineComponent({
                 [RewardConditionPlatform.YouTube]: require('../assets/youtube-logo.png'),
                 [RewardConditionPlatform.Twitter]: require('../assets/twitter-logo.png'),
                 [RewardConditionPlatform.Discord]: require('../assets/discord-logo.png'),
+                [RewardConditionPlatform.Shopify]: require('../assets/shopify-logo.png'),
             },
             interactionLabel: {
                 [RewardConditionInteraction.YouTubeLike]: 'Like a Youtube video.',
@@ -97,6 +98,7 @@ export default defineComponent({
                 [RewardConditionInteraction.TwitterRetweet]: 'Retweet a Twitter tweet.',
                 [RewardConditionInteraction.TwitterFollow]: 'Follow a Twitter account.',
                 [RewardConditionInteraction.DiscordGuildJoined]: 'Join a Discord server.',
+                [RewardConditionInteraction.ShopifyPurchase]: 'Purchase a product on our store',
             },
             tooltipContent: 'Copy URL',
         };
@@ -123,6 +125,8 @@ export default defineComponent({
                     return account.githubAccess;
                 case RewardConditionPlatform.Twitch:
                     return account.twitchAccess;
+                case RewardConditionPlatform.Shopify:
+                    return account.shopifyAccess;
                 default:
                     return true;
             }
@@ -143,6 +147,8 @@ export default defineComponent({
                     return { url: `https://www.twitter.com/i/user/${content}` };
                 case RewardConditionInteraction.DiscordGuildJoined:
                     return { url: `${content}` }; // TODO We should ask for invite link in dashboard
+                case RewardConditionInteraction.ShopifyPurchase:
+                    return { url: `${content}` };
                 default:
                     return '';
             }

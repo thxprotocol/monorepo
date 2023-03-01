@@ -6,6 +6,7 @@ export enum RewardConditionPlatform {
     Github = 4,
     Discord = 5,
     Twitch = 6,
+    Shopify = 7,
 }
 
 export enum RewardConditionInteraction {
@@ -16,4 +17,5 @@ export enum RewardConditionInteraction {
     TwitterRetweet = 3,
     TwitterFollow = 4,
     DiscordGuildJoined = 5,
+    ShopifyPurchase = 6,
 }
