@@ -149,10 +149,10 @@ export default defineComponent({
             document.body.classList.add(this.activeTheme.class);
         },
         ready() {
-            const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
+            const { origin, poolId } = this.accountStore.getConfig(this.accountStore.poolId);
             window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
 
-            track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', { origin }]);
+            track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', { origin, poolId }]);
         },
         async onMessage(event: MessageEvent) {
             const { getConfig, setConfig, poolId } = this.accountStore;
