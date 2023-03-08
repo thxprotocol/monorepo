@@ -90,7 +90,6 @@ import { useWalletStore } from './stores/Wallet';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from './utils/returnUrl';
-import { COMPARISON_BINARY_OPERATORS } from '@babel/types';
 
 type TTheme = { class: string; name: string; label: string };
 
@@ -153,7 +152,7 @@ export default defineComponent({
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
             window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
 
-            track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', [origin]]);
+            track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', { origin }]);
         },
         async onMessage(event: MessageEvent) {
             const { getConfig, setConfig, poolId } = this.accountStore;
@@ -180,7 +179,7 @@ export default defineComponent({
             }
         },
         async onReferralClaimCreate(uuid: string) {
-            const { getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
+            const { account, getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
 
             const { ref } = getConfig(poolId);
             if (!ref) return;
@@ -193,6 +192,8 @@ export default defineComponent({
 
             setConfig(poolId, { ref: '' } as TWidgetConfig);
             getBalance();
+
+            track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: getConfig(poolId).origin }]);
         },
         async onShow(origin: string, isShown: boolean) {
             const user = await this.accountStore.api.userManager.cached.getUser();
