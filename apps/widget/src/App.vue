@@ -196,13 +196,14 @@ export default defineComponent({
             track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: getConfig(poolId).origin }]);
         },
         async onShow(origin: string, isShown: boolean) {
-            const user = await this.accountStore.api.userManager.cached.getUser();
+            const { api, signin, account, poolId } = this.accountStore;
+            const user = await api.userManager.cached.getUser();
 
             if (isShown && user && user.expired) {
-                this.accountStore.signin();
+                signin();
             }
 
-            track('UserOpens', [this.accountStore.account?.sub || '', `widget iframe`, { origin, isShown }]);
+            track('UserOpens', [account?.sub || '', `widget iframe`, { origin, poolId, isShown }]);
         },
         onClickSignin() {
             this.accountStore.signin();
