@@ -32,6 +32,17 @@ export const usePerkStore = defineStore('perks', {
 
             return r;
         },
+        createShopifyRedemption: async (uuid: string) => {
+            const { api, account, poolId, getConfig } = useAccountStore();
+            const { error } = await api.perksManager.shopify.redemption.post(uuid);
+            if (error) throw error;
+
+            track('UserCreates', [
+                account?.sub,
+                'shopify perk redemption',
+                { poolId, origin: getConfig(poolId).origin },
+            ]);
+        },
         async getERC20Perk(uuid: string) {
             const { api } = useAccountStore();
             await api.perksManager.erc20.get(uuid);
@@ -40,11 +51,16 @@ export const usePerkStore = defineStore('perks', {
             const { api } = useAccountStore();
             await api.perksManager.erc721.get(uuid);
         },
+        async getShopifyPerk(uuid: string) {
+            const { api } = useAccountStore();
+            await api.perksManager.shopify.get(uuid);
+        },
         async list() {
             const { api } = useAccountStore();
-            const { erc20Perks, erc721Perks } = await api.perksManager.list();
+            const { erc20Perks, erc721Perks, shopifyPerks } = await api.perksManager.list();
             erc20Perks.sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
             erc721Perks.sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
+            shopifyPerks.sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
 
             this.perks = [
                 ...(erc20Perks
@@ -56,6 +72,13 @@ export const usePerkStore = defineStore('perks', {
                 ...(erc721Perks
                     ? Object.values(erc721Perks).map((r: any) => {
                           r.component = 'BaseCardPerkERC721';
+                          r.price = parseUnitAmount(r.price);
+                          return r;
+                      })
+                    : []),
+                ...(shopifyPerks
+                    ? Object.values(shopifyPerks).map((r: any) => {
+                          r.component = 'BaseCardPerkShopify';
                           r.price = parseUnitAmount(r.price);
                           return r;
                       })
