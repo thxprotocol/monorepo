@@ -10,25 +10,25 @@ export const usePerkStore = defineStore('perks', {
     }),
     actions: {
         createERC20Redemption: async (uuid: string) => {
-            const { api, account } = useAccountStore();
+            const { api, account, poolId, getConfig } = useAccountStore();
             const { error } = await api.perksManager.erc20.redemption.post(uuid);
             if (error) throw error;
 
-            track('UserCreates', [account?.sub, 'coin perk payment']);
+            track('UserCreates', [account?.sub, 'coin perk payment', { poolId, origin: getConfig(poolId).origin }]);
         },
         createERC721Redemption: async (uuid: string) => {
-            const { api, account } = useAccountStore();
+            const { api, account, poolId, getConfig } = useAccountStore();
             const { error } = await api.perksManager.erc721.redemption.post(uuid);
             if (error) throw error;
 
-            track('UserCreates', [account?.sub, 'nft perk redemption']);
+            track('UserCreates', [account?.sub, 'nft perk redemption', { poolId, origin: getConfig(poolId).origin }]);
         },
         createERC721Payment: async (uuid: string) => {
-            const { api, account } = useAccountStore();
+            const { api, account, poolId, getConfig } = useAccountStore();
             const r = await api.perksManager.erc721.payment.post(uuid);
             if (r.error) throw r.error;
 
-            track('UserCreates', [account?.sub, 'nft perk payment']);
+            track('UserCreates', [account?.sub, 'nft perk payment', { poolId, origin: getConfig(poolId).origin }]);
 
             return r;
         },

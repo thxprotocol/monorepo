@@ -115,7 +115,7 @@ export const useAccountStore = defineStore('account', {
 
             this.isAuthenticated = true;
 
-            track('UserSignsIn', [this.account]);
+            track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
         },
         onAccessTokenExpired() {
             this.api.userManager.cached.signoutPopup();

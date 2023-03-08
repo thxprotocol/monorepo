@@ -35,18 +35,4 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach((to) => {
-    const { account } = useAccountStore();
-    if (account)
-        track('UserVisits', [
-            account.sub,
-            to.name,
-            {
-                redirectedFrom: to.redirectedFrom,
-                query: to.query,
-                params: to.params,
-            },
-        ]);
-});
-
 export default router;
