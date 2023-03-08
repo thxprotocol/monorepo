@@ -167,33 +167,30 @@ export default defineComponent({
                 this.isSubmitting = false;
             }
         },
+        getAccessTokenKindForPlatform(platform: RewardConditionPlatform) {
+            switch (platform) {
+                case RewardConditionPlatform.YouTube: {
+                    return AccessTokenKind.YoutubeManage;
+                }
+                case RewardConditionPlatform.Twitter: {
+                    return AccessTokenKind.Twitter;
+                }
+                case RewardConditionPlatform.Discord: {
+                    return AccessTokenKind.Discord;
+                }
+            }
+        },
         onClickConnect: async function () {
             try {
                 this.error = '';
                 this.isSubmitting = true;
-
-                let access_token_kind = '';
-                switch (this.reward.platform) {
-                    case RewardConditionPlatform.YouTube: {
-                        access_token_kind = AccessTokenKind.YoutubeManage;
-                        break;
-                    }
-                    case RewardConditionPlatform.Twitter: {
-                        access_token_kind = AccessTokenKind.Twitter;
-                        break;
-                    }
-                    case RewardConditionPlatform.Discord: {
-                        access_token_kind = AccessTokenKind.Discord;
-                        break;
-                    }
-                }
 
                 await this.accountStore.api.userManager.cached.signinPopup({
                     extraQueryParams: {
                         channel: this.reward.platform,
                         prompt: 'connect',
                         return_url: WIDGET_URL + '/signin-popup.html',
-                        access_token_kind,
+                        access_token_kind: this.getAccessTokenKindForPlatform(this.reward.platform),
                     },
                 });
                 await this.accountStore.getAccount();
