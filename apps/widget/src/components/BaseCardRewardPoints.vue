@@ -14,6 +14,7 @@
 
         <blockquote class="d-flex" v-if="reward.platform && interactionLabel[reward.interaction]">
             {{ interactionLabel[reward.interaction] }}
+            <strong class="ms-1" v-if="content.amount">{{ content.amount }}</strong>
             <b-link v-if="content" :href="content.url" target="_blank" class="text-muted ms-auto">
                 <i class="fas fa-external-link-alt"></i>
             </b-link>
@@ -98,7 +99,8 @@ export default defineComponent({
                 [RewardConditionInteraction.TwitterRetweet]: 'Retweet a Twitter tweet.',
                 [RewardConditionInteraction.TwitterFollow]: 'Follow a Twitter account.',
                 [RewardConditionInteraction.DiscordGuildJoined]: 'Join a Discord server.',
-                [RewardConditionInteraction.ShopifyPurchase]: 'Purchase a product on our store',
+                [RewardConditionInteraction.ShopifyOrderAmount]: 'Minimal order amount of ',
+                [RewardConditionInteraction.ShopifyTotalSpent]: 'Minimal total spent of ',
             },
             tooltipContent: 'Copy URL',
         };
@@ -126,7 +128,7 @@ export default defineComponent({
                 case RewardConditionPlatform.Twitch:
                     return account.twitchAccess;
                 case RewardConditionPlatform.Shopify:
-                    return account.shopifyAccess;
+                    return account.email;
                 default:
                     return true;
             }
@@ -147,8 +149,10 @@ export default defineComponent({
                     return { url: `https://www.twitter.com/i/user/${content}` };
                 case RewardConditionInteraction.DiscordGuildJoined:
                     return { url: `${content}` }; // TODO We should ask for invite link in dashboard
-                case RewardConditionInteraction.ShopifyPurchase:
-                    return { url: `${content}` };
+                case RewardConditionInteraction.ShopifyOrderAmount:
+                    return { url: JSON.parse(content).shopifyStoreUrl, amount: JSON.parse(content).amount };
+                case RewardConditionInteraction.ShopifyTotalSpent:
+                    return { url: JSON.parse(content).shopifyStoreUrl, amount: `${JSON.parse(content).amount},-` };
                 default:
                     return '';
             }
