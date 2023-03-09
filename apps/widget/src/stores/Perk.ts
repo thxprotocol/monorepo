@@ -34,6 +34,7 @@ export const usePerkStore = defineStore('perks', {
         },
         createShopifyRedemption: async (uuid: string) => {
             const { api, account, poolId, getConfig } = useAccountStore();
+            console.log('api.perksManager.shopify', api.perksManager.shopify);
             const { error } = await api.perksManager.shopify.redemption.post(uuid);
             if (error) throw error;
 
