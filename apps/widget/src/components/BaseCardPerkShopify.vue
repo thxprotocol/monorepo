@@ -79,7 +79,6 @@ export default defineComponent({
                     this.isModalShown = false;
                 })
                 .catch((error) => {
-                    console.log('reason', error);
                     this.error = error.message;
                 })
                 .finally(() => {
