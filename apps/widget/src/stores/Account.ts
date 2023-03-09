@@ -47,7 +47,7 @@ export const useAccountStore = defineStore('account', {
                 // silent_redirect_uri: WIDGET_URL + '/signout-popup.html',
                 post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
                 popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-                scopes: 'openid account:read erc20:read erc721:read point_balances:read referral_rewards:read point_rewards:read wallets:read wallets:write',
+                scopes: 'openid account:read erc20:read erc721:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write',
                 poolId: this.poolId,
             });
 

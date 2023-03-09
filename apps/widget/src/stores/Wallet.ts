@@ -7,6 +7,7 @@ export const useWalletStore = defineStore('wallet', {
         wallet: null,
         erc20: [],
         erc721: [],
+        shopifyDiscountCode: [],
     }),
     actions: {
         async getWallet() {
@@ -24,6 +25,9 @@ export const useWalletStore = defineStore('wallet', {
             });
             this.erc721 = (await api.erc721.list(options)).map((t: any) => {
                 return { ...t, component: 'BaseCardERC721' };
+            });
+            this.shopifyDiscountCode = (await api.perksManager.shopify.discountCodes(options)).map((t: any) => {
+                return { ...t, component: 'BaseCardShopifyDiscountCode' };
             });
         },
         async transfer(config: TERC20TransferConfig) {
