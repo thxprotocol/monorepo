@@ -13,6 +13,7 @@ type TAccount = {
     discordAccess: boolean;
     twitchAccess: boolean;
     githubAccess: boolean;
+    shopifyAccess: boolean;
 };
 
 type TAccountState = {
