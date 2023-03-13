@@ -26,7 +26,7 @@ export const useWalletStore = defineStore('wallet', {
             this.erc721 = (await api.erc721.list(options)).map((t: any) => {
                 return { ...t, component: 'BaseCardERC721' };
             });
-            this.shopifyDiscountCode = (await api.perksManager.shopify.discountCodes(options)).map((t: any) => {
+            this.shopifyDiscountCode = (await api.perksManager.shopify.discountCodes()).map((t: any) => {
                 return { ...t, component: 'BaseCardShopifyDiscountCode' };
             });
         },
