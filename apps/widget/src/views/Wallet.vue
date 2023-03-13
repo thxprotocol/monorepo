@@ -46,12 +46,14 @@ import { useWalletStore } from '../stores/Wallet';
 import { useAccountStore } from '../stores/Account';
 import BaseCardERC20 from '../components/BaseCardERC20.vue';
 import BaseCardERC721 from '../components/BaseCardERC721.vue';
+import BaseCardShopifyDiscountCode from '../components/BaseCardShopifyDiscountCode.vue';
 
 export default defineComponent({
     name: 'Wallet',
     components: {
         BaseCardERC20,
         BaseCardERC721,
+        BaseCardShopifyDiscountCode,
     },
     data: function () {
         return { error: '', isSubmitting: false, isModalUpgradeShown: false };
