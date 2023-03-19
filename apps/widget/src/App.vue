@@ -81,8 +81,9 @@ import { useWalletStore } from './stores/Wallet';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from './utils/returnUrl';
-import './scss/main.scss';
 import Color from 'color';
+
+import './scss/main.scss';
 
 // const primary = '#5942C1';
 const primary = 'orange';
@@ -149,10 +150,10 @@ export default defineComponent({
             console.log(theme);
         },
         ready() {
-            const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
+            const { origin, poolId } = this.accountStore.getConfig(this.accountStore.poolId);
             window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
 
-            track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', [origin]]);
+            track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', { origin, poolId }]);
         },
         async onMessage(event: MessageEvent) {
             const { getConfig, setConfig, poolId } = this.accountStore;
@@ -179,7 +180,7 @@ export default defineComponent({
             }
         },
         async onReferralClaimCreate(uuid: string) {
-            const { getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
+            const { account, getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
 
             const { ref } = getConfig(poolId);
             if (!ref) return;
@@ -192,15 +193,18 @@ export default defineComponent({
 
             setConfig(poolId, { ref: '' } as TWidgetConfig);
             getBalance();
+
+            track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: getConfig(poolId).origin }]);
         },
         async onShow(origin: string, isShown: boolean) {
-            const user = await this.accountStore.api.userManager.cached.getUser();
+            const { api, signin, account, poolId } = this.accountStore;
+            const user = await api.userManager.cached.getUser();
 
             if (isShown && user && user.expired) {
-                this.accountStore.signin();
+                signin();
             }
 
-            track('UserOpens', [this.accountStore.account?.sub || '', `widget iframe`, { origin, isShown }]);
+            track('UserOpens', [account?.sub || '', `widget iframe`, { origin, poolId, isShown }]);
         },
         onClickSignin() {
             this.accountStore.signin();

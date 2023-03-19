@@ -26,9 +26,9 @@ const trackers: { [event: string]: (param1?: any, param2?: any, param3?: any) =>
     UserIdentify: (account) => {
         identify(account);
     },
-    UserSignsIn: (account) => {
+    UserSignsIn: (account, props: { [key: string]: any }) => {
         identify(account);
-        mixpanel.track('user signs in', { distinct_id: account.sub });
+        mixpanel.track('user signs in', { distinct_id: account.sub, ...props });
     },
     UserVisits: (sub: string, route: string, props: { [key: string]: any }) => {
         mixpanel.track('user visits', { distinct_id: sub, route, ...props });

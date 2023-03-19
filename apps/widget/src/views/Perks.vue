@@ -11,10 +11,11 @@ import { usePerkStore } from '../stores/Perk';
 import { useAccountStore } from '../stores/Account';
 import BaseCardPerkERC20 from '../components/BaseCardPerkERC20.vue';
 import BaseCardPerkERC721 from '../components/BaseCardPerkERC721.vue';
+import BaseCardPerkShopify from '../components/BaseCardPerkShopify.vue';
 
 export default defineComponent({
     name: 'Perks',
-    components: { BaseCardPerkERC20, BaseCardPerkERC721 },
+    components: { BaseCardPerkERC20, BaseCardPerkERC721, BaseCardPerkShopify },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(usePerkStore),

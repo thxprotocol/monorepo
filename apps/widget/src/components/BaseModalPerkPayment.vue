@@ -97,22 +97,5 @@ export default defineComponent({
     computed: {
         ...mapStores(usePerkStore),
     },
-    methods: {
-        onClickPayment() {
-            this.isSubmitting = true;
-            this.perksStore
-                .createERC721Payment(this.perk.uuid)
-                .then(async (r) => {
-                    window.open(r.paymentLink.url, '_blank');
-                })
-                .catch((r) => {
-                    console.log(r);
-                    debugger;
-                })
-                .finally(() => {
-                    this.isSubmitting = false;
-                });
-        },
-    },
 });
 </script>

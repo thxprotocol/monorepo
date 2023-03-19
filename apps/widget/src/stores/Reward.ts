@@ -16,12 +16,16 @@ export const useRewardStore = defineStore('rewards', {
     },
     actions: {
         async claimConditionalReward(uuid: string) {
-            const { api, account, getBalance } = useAccountStore();
+            const { api, account, getBalance, poolId, getConfig } = useAccountStore();
             const claim = await api.rewardsManager.points.claim(uuid);
             if (claim.error) {
                 throw claim.error;
             } else {
-                track('UserCreates', [account?.sub, 'conditional reward claim']);
+                track('UserCreates', [
+                    account?.sub,
+                    'conditional reward claim',
+                    { poolId, origin: getConfig(poolId).origin },
+                ]);
 
                 getBalance();
 
@@ -30,7 +34,7 @@ export const useRewardStore = defineStore('rewards', {
             }
         },
         async claimMilestoneReward(reward: TMilestoneReward) {
-            const { api, account, getBalance } = useAccountStore();
+            const { api, account, getBalance, poolId, getConfig } = useAccountStore();
             const pendingClaims = reward.claims.filter((c) => !c.isClaimed);
             if (!pendingClaims.length) return;
 
@@ -40,7 +44,11 @@ export const useRewardStore = defineStore('rewards', {
             if (claim.error) {
                 throw claim.error;
             } else {
-                track('UserCreates', [account?.sub, 'milestone reward claim']);
+                track('UserCreates', [
+                    account?.sub,
+                    'milestone reward claim',
+                    { poolId, origin: getConfig(poolId).origin },
+                ]);
 
                 getBalance();
 
@@ -51,13 +59,17 @@ export const useRewardStore = defineStore('rewards', {
             }
         },
         async claimDailyReward(reward: TDailyReward) {
-            const { api, account, getBalance } = useAccountStore();
+            const { api, account, getBalance, poolId, getConfig } = useAccountStore();
             const claim = await api.rewardsManager.daily.claim({ uuid: reward.uuid, sub: account?.sub });
 
             if (claim.error) {
                 throw claim.error;
             } else {
-                track('UserCreates', [account?.sub, 'daily reward claim']);
+                track('UserCreates', [
+                    account?.sub,
+                    'daily reward claim',
+                    { poolId, origin: getConfig(poolId).origin },
+                ]);
 
                 getBalance();
 
