@@ -68,7 +68,10 @@ import { usePerkStore } from '../stores/Perk';
 export default defineComponent({
     name: 'BaseCardPerkPayment',
     data() {
-        return { isShown: false, isSubmitting: false };
+        return {
+            isShown: false,
+            isSubmitting: false,
+        };
     },
     props: {
         id: {

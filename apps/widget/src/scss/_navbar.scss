@@ -24,10 +24,10 @@
 .navbar-bottom {
     --thx-navbar-bg: $navbar-bottom-bg;
     --thx-navbar-btn-active-bg: $navbar-bottom-bg-active;
-    --txh-navbar-bottom-border-color: $navbar-bottom-border-color;
+    --thx-navbar-bottom-border-color: $navbar-bottom-border-color;
 
     padding: 0.5rem;
-    border-top: 1px solid var(--txh-navbar-bottom-border-color);
+    border-top: 1px solid var(--thx-navbar-bottom-border-color);
     background-color: var(--thx-navbar-bg);
 
     .container-fluid {
@@ -60,6 +60,8 @@
 
         &.router-link-active {
             background-color: var(--thx-navbar-btn-active-bg);
+            color: var(--thx-navbar-btn-color);
+            
             i {
                 opacity: 1;
             }                
