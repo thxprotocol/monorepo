@@ -26,6 +26,11 @@ const styles = {
         '--bs-body-bg': theme.elements.bodyBg,
         '--bs-text-opacity': 1,
     },
+    'blockquote': {
+        '--thx-blockquote-bg': theme.elements.btnBgDarker,
+        '--thx-blockquote-border-color': theme.elements.btnBg,
+        '--thx-blockquote-link-hover': theme.elements.text,
+    },
     '.modal': {
         '--bs-modal-bg': theme.elements.navbarBg,
         '--bs-modal-color': theme.elements.text,
