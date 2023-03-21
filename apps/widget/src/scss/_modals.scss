@@ -1,9 +1,21 @@
-.modal .modal-header .btn-close {
-    background: transparent;
-    color: var(--bs-modal-color);
-}
+.modal  {
+    .modal-content {
+        border: 0;
+    }
 
-.modal-header,
-.modal-footer {
-    border-color: var(--bs-modal-border-color);
+    .modal-header,
+    .modal-footer {
+        border-color: var(--bs-modal-border-color);
+    }
+
+    .modal-header  {
+        .modal-title {
+            color: var(--bs-success);
+        }
+    
+        .btn-close {
+            background: transparent;
+            color: var(--bs-modal-color);
+        }   
+    }       
 }
