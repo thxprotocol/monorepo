@@ -14,7 +14,6 @@
                 Redeem for <strong>{{ perk.pointPrice }} points</strong>
             </template>
         </b-button>
-        {{ perk }}
         <BaseModalPerkPayment
             :id="id"
             :perk="perk"

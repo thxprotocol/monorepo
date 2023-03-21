@@ -26,6 +26,9 @@ const styles = {
         '--bs-body-bg': theme.elements.bodyBg,
         '--bs-text-opacity': 1,
     },
+    'body': {
+        '--bs-body-color': theme.elements.text,
+    },
     'blockquote': {
         '--thx-blockquote-bg': theme.elements.btnBgDarker,
         '--thx-blockquote-border-color': theme.elements.btnBg,
@@ -49,6 +52,7 @@ const styles = {
     },
     '.card': {
         '--bs-card-bg': theme.elements.cardBg,
+        '--bs-card-color': theme.elements.text,
     },
     '.btn-primary': {
         '--bs-btn-color': theme.elements.btnText,
