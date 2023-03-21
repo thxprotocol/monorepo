@@ -4,13 +4,13 @@
         v-model="isShown"
         @hidden="$emit('hidden')"
         :title="perk.title"
-        no-close-on-backdrop
         centered
+        no-close-on-backdrop
         no-close-on-esc
     >
-        <template #title>
-            <i class="fas fa-gift me-2"></i>
-            {{ perk.title }}
+        <template #header>
+            <h5 class="modal-title"><i class="fas fa-gift me-2"></i> {{ perk.title }}</h5>
+            <b-link class="btn-close" @click="isShown = false"><i class="fas fa-times"></i></b-link>
         </template>
         <div v-if="isLoading" class="text-center">
             <b-spinner show size="sm" />

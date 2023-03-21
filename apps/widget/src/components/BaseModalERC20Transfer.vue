@@ -1,6 +1,9 @@
 <template>
     <b-modal :id="id" v-model="isShown" @hidden="$emit('hidden')" no-close-on-backdrop centered no-close-on-esc>
-        <template #title><i class="fas fa-exchange-alt me-2"></i> Transfer {{ token.erc20.symbol }}</template>
+        <template #header>
+            <h5 class="modal-title"><i class="fas fa-exchange-alt me-2"></i> Transfer {{ token.erc20.symbol }}</h5>
+            <b-link class="btn-close" @click="isShown = false"> <i class="fas fa-times"></i> </b-link>
+        </template>
         <div v-if="isLoading" class="text-center">
             <b-spinner show size="sm" />
         </div>

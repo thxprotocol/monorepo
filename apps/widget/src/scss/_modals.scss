@@ -1,22 +1,9 @@
-.modal { 
-    .modal-header,
-    .modal-footer {
-        border-top-color: var(--bs-modal-border-color);
-        border-bottom-color: var(--bs-modal-border-color);
-        background-color: var(--bs-modal-bg);
-        color: var(--bs-modal-color);
-    }
+.modal .modal-header .btn-close {
+    background: transparent;
+    color: var(--bs-modal-color);
+}
 
-    .modal-body {
-        background-color: var(--bs-modal-bg);
-        color: var(--bs-modal-color);
-    }
-
-    .modal-header {
-        color: var(--success);
-        
-        .btn-close {
-            background: var(--bs-modal-bg);
-        }
-    }
+.modal-header,
+.modal-footer {
+    border-color: var(--bs-modal-border-color);
 }

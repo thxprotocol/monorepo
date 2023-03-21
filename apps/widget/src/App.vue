@@ -81,7 +81,6 @@ import { useWalletStore } from './stores/Wallet';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from './utils/returnUrl';
-import { parseThemeData } from './utils/colors';
 
 import './scss/main.scss';
 
@@ -89,7 +88,6 @@ export default defineComponent({
     data() {
         return {
             isRefreshing: false,
-            theme: parseThemeData(new URLSearchParams(window.location.search).get('theme') as string),
         };
     },
     computed: {
@@ -114,7 +112,9 @@ export default defineComponent({
         const [id, origin, chainId, theme] = ['id', 'origin', 'chainId', 'theme'].map((key) => params.get(key));
 
         this.accountStore.init({ id, origin, chainId, theme });
+
         window.onmessage = this.onMessage;
+
         this.ready();
     },
     methods: {
@@ -202,56 +202,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style>
-#main {
-    --bs-body-bg: v-bind('theme.elements.bodyBg');
-    --bs-text-opacity: 1;
-}
-.modal {
-    --bs-modal-bg: v-bind('theme.elements.cardBg');
-    --bs-modal-border-color: v-bind('theme.elements.navbarBgDarker');
-}
-.card {
-    --bs-card-bg: v-bind('theme.elements.cardBg');
-}
-.btn-primary {
-    --bs-btn-color: v-bind('theme.elements.btnText');
-    --bs-btn-bg: v-bind('theme.elements.btnBg');
-    --bs-btn-border-color: v-bind('theme.elements.btnBg');
-
-    --bs-btn-hover-bg: v-bind('theme.elements.btnBgDark');
-    --bs-btn-hover-color: v-bind('theme.elements.btnText');
-    --bs-btn-hover-border-color: v-bind('theme.elements.btnBgDarker');
-
-    --bs-btn-focus-bg: v-bind('theme.elements.btnBgDark');
-    --bs-btn-focus-color: v-bind('theme.elements.btnText');
-    --bs-btn-focus-border-color: v-bind('theme.elements.btnBgDarker');
-
-    --bs-btn-active-bg: v-bind('theme.elements.btnBgDarker');
-    --bs-btn-active-color: v-bind('theme.elements.btnText');
-    --bs-btn-active-border-color: v-bind('theme.elements.btnBgDarker');
-
-    --bs-btn-disabled-bg: v-bind('theme.elements.btnBg');
-    --bs-btn-disabled-border-color: v-bind('theme.elements.btnBg');
-    --bs-btn-disabled-color: v-bind('theme.elements.btnText');
-}
-.navbar {
-    --thx-navbar-bg: v-bind('theme.elements.navbarBg');
-    --thx-navbar-btn-color: v-bind('theme.elements.btnText');
-    --thx-navbar-btn-active-bg: v-bind('theme.elements.btnBg');
-    --txh-navbar-bottom-border-color: v-bind('theme.elements.navbarBgDarker');
-}
-.nav-tabs {
-    --bs-nav-tabs-border-color: v-bind('theme.elements.btnBg');
-    --bs-nav-link-color: v-bind('theme.elements.btnBgDark');
-    --bs-nav-link-hover-color: v-bind('theme.elements.btnBg');
-}
-.nav-tabs .nav-link.active,
-.nav-tabs .nav-item.show .nav-link,
-.nav-tabs .nav-item .nav-link:hover {
-    --bs-nav-tabs-link-active-color: v-bind('theme.elements.text');
-    --bs-nav-tabs-link-active-bg: v-bind('theme.elements.bodyBg');
-    --bs-nav-tabs-link-active-border-color: v-bind('theme.elements.btnBg');
-}
-</style>
