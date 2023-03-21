@@ -1,3 +1,5 @@
+declare module 'color';
+
 type TAccount = {
     sub: string;
     firstName: string;
@@ -18,11 +20,16 @@ type TAccount = {
 
 type TAccountState = {
     api: THXClient | null;
-    getConfig: (id: string) => TWidgetConfig;
     poolId: string;
     balance: number;
     isAuthenticated: boolean;
     account: TAccount | null;
+    getConfig: (id: string) => TWidgetConfig;
+};
+
+type TWidgetTheme = {
+    elements: { [key]: { color: string; label: string } };
+    colors: { [key]: { color: string; label: string } };
 };
 
 type TWidgetConfig = {

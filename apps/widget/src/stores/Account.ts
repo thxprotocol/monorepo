@@ -24,27 +24,20 @@ export const useAccountStore = defineStore('account', {
             const data = { ...this.getConfig(id), ...config };
             sessionStorage.setItem(`thx:widget:${id}:config`, JSON.stringify(data));
         },
-        async init({
-            id,
-            origin,
-            chainId,
-            theme,
-        }: { origin: string; id: string; chainId: number; theme: string } & any) {
+        init({ id, origin, chainId, theme }: { origin: string; id: string; chainId: number; theme: string } & any) {
             this.poolId = id;
 
             if (!this.poolId) throw new Error('No poolId in settings.');
             if (!origin) throw new Error('No origin in settings.');
             if (!chainId) throw new Error('No chainId in settings.');
 
-            const config = this.getConfig(id);
-            this.setConfig(id, { origin, poolId: id, chainId, theme: config.theme || theme });
+            this.setConfig(id, { origin, poolId: id, chainId, theme });
 
             this.api = new THXClient({
                 env: PKG_ENV,
                 clientId: CLIENT_ID,
                 clientSecret: CLIENT_SECRET,
                 redirectUrl: WIDGET_URL + '/signin-popup.html',
-                // silent_redirect_uri: WIDGET_URL + '/signout-popup.html',
                 post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
                 popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
                 scopes: 'openid account:read erc20:read erc721:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write',
@@ -56,10 +49,6 @@ export const useAccountStore = defineStore('account', {
             this.api.userManager.cached.events.addUserLoaded(this.onUserLoaded);
             this.api.userManager.cached.events.addUserUnloaded(this.onUserLoaded);
             this.api.userManager.cached.events.load(this.onLoad);
-        },
-        setTheme(theme: string) {
-            const data = JSON.parse(sessionStorage.getItem('thx:widget:config') as string);
-            sessionStorage.setItem('thx:widget:config', JSON.stringify({ ...data, theme }));
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();

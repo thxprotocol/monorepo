@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex flex-column h-100">
+    <div id="main" class="d-flex flex-column h-100">
         <b-navbar class="navbar-top pt-3">
             <div style="width: 75px">
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
@@ -12,23 +12,15 @@
                 <div class="text-success h1 m-0">
                     <strong>{{ accountStore.balance }}</strong>
                 </div>
-                <div :class="activeTheme.class === 'thx-light' ? 'text-dark' : 'text-white'">
+                <div class="points">
                     points
                     <span class="ml-2" style="font-size: 16px !important">
-                        <b-spinner
-                            v-if="isRefreshing"
-                            small
-                            :variant="activeTheme.class === 'thx-light' ? 'dark' : 'white'"
-                        />
-                        <i v-else class="fas fa-sync-alt"></i>
+                        <b-spinner v-if="isRefreshing" small variant="white" />
+                        <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
                     </span>
                 </div>
             </b-link>
             <div>
-                <b-button variant="link" size="sm" @click="onClickTheme">
-                    <i v-if="activeTheme.class === 'thx-light'" class="fas fa-moon"></i>
-                    <i v-if="activeTheme.class === 'thx-default'" class="fas fa-sun"></i>
-                </b-button>
                 <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin">
                     Sign in
                 </b-button>
@@ -79,7 +71,6 @@
         </b-navbar>
     </div>
 </template>
-
 <script lang="ts">
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -91,26 +82,11 @@ import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from './utils/returnUrl';
 
-type TTheme = { class: string; name: string; label: string };
-
-const themeList = [
-    {
-        label: 'Light',
-        name: 'light',
-        class: 'thx-light',
-    },
-    {
-        label: 'Dark',
-        name: 'dark',
-        class: 'thx-default',
-    },
-];
+import './scss/main.scss';
 
 export default defineComponent({
     data() {
         return {
-            themes: themeList,
-            activeTheme: themeList[0],
             isRefreshing: false,
         };
     },
@@ -135,19 +111,13 @@ export default defineComponent({
         const params = new URLSearchParams(window.location.search);
         const [id, origin, chainId, theme] = ['id', 'origin', 'chainId', 'theme'].map((key) => params.get(key));
 
-        await this.accountStore.init({ id, origin, chainId, theme });
+        this.accountStore.init({ id, origin, chainId, theme });
 
         window.onmessage = this.onMessage;
 
-        this.setTheme();
         this.ready();
     },
     methods: {
-        setTheme() {
-            const { theme } = this.accountStore.getConfig(this.accountStore.poolId);
-            this.activeTheme = themeList.find((t) => t.name === theme) as TTheme;
-            document.body.classList.add(this.activeTheme.class);
-        },
         ready() {
             const { origin, poolId } = this.accountStore.getConfig(this.accountStore.poolId);
             window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
@@ -223,21 +193,6 @@ export default defineComponent({
                 },
             });
         },
-        onClickTheme() {
-            switch (this.activeTheme.class) {
-                case themeList[0].class:
-                    document.body.classList.remove(this.activeTheme.class);
-                    document.body.classList.add(themeList[1].class);
-                    this.activeTheme = themeList[1];
-                    break;
-                case themeList[1].class:
-                    document.body.classList.remove(this.activeTheme.class);
-                    document.body.classList.add(themeList[0].class);
-                    this.activeTheme = themeList[0];
-                    break;
-            }
-            this.accountStore.setTheme(this.activeTheme.name);
-        },
         async onClickRefresh() {
             this.isRefreshing = true;
             await this.walletStore.list();
@@ -247,6 +202,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style lang="scss" src="./scss/default/default.theme.scss"></style>
-<style lang="scss" src="./scss/light/light.theme.scss"></style>

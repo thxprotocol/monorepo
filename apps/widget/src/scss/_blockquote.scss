@@ -1,13 +1,17 @@
 blockquote {
-    border-left: 3px solid $blockquote-border-color;
-    background-color: $blockquote-bg;
+    --thx-blockquote-bg: $blockquote-bg;
+    --thx-blockquote-border-color: $blockquote-border-color;
+    --thx-blockquote-link-hover: $blockquote-link-hover;
+
+    border-left: 3px solid var(--thx-blockquote-border-color);
+    background-color: var(--thx-blockquote-bg);
     padding: 0.5rem;
 
     a {
         transition: color 0.2s ease;
 
         &:hover {
-            color: $blockquote-link-hover !important;
+            color: var(--thx-blockquote-link-hover) !important;
         }
     }
 }

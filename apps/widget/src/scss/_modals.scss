@@ -1,20 +1,21 @@
-.modal-header,
-.modal-footer {
-    border-top-color: $modal-border-color;
-    border-bottom-color: $modal-border-color;
-    background-color: $modal-bg-color;
-    color: $modal-color;
-}
-
-.modal-body {
-    background-color: $modal-bg-color;
-    color: $modal-color;
-}
-
-.modal-header {
-    color: $success;
-    
-    .btn-close {
-        background: $modal-close-bg;
+.modal  {
+    .modal-content {
+        border: 0;
     }
+
+    .modal-header,
+    .modal-footer {
+        border-color: var(--bs-modal-border-color);
+    }
+
+    .modal-header  {
+        .modal-title {
+            color: var(--bs-success);
+        }
+    
+        .btn-close {
+            background: transparent;
+            color: var(--bs-modal-color);
+        }   
+    }       
 }
