@@ -1,29 +1,28 @@
 <template>
-    <b-card class="m-2" :class="{ 'card-promoted': perk.isPromoted }">
-        <div class="mt-1" v-if="perk.image">
-            <img :src="perk.image" width="auto" class="img-fluid w-auto rounded-2 mb-3" />
-        </div>
-        <b-card-title class="d-flex">
+    <BaseCardPerk
+        :isPromoted="perk.isPromoted"
+        :image="perk.image"
+        :title="perk.title"
+        :description="perk.description"
+        :point-price="perk.pointPrice"
+        :progress="perk.progress"
+        :expiry="perk.expiry"
+        @submit="onClickRedeem"
+    >
+        <template #title>
             <div class="flex-grow-1">{{ perk.title }}</div>
-            <div class="text-success fw-bold">{{ perk.amount }}</div>
-        </b-card-title>
-        <b-card-text> {{ perk.description }} </b-card-text>
-        <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" @click="onClickRedeem">
-            <template v-if="perk.isOwned"> Claimed </template>
-            <template v-else>
-                Redeem for <strong>{{ perk.pointPrice }} points</strong>
-            </template>
-        </b-button>
-        <BaseModalPerkPayment
-            :id="id"
-            :perk="perk"
-            :error="error"
-            :show="isModalShown"
-            :is-loading="isSubmitting"
-            @hidden="onModalHidden"
-            @submit-redemption="onSubmitRedemption"
-        />
-    </b-card>
+            <div class="text-accent fw-bold">{{ perk.amount }} {{ perk.symbol }}</div>
+        </template>
+    </BaseCardPerk>
+    <BaseModalPerkPayment
+        :id="id"
+        :perk="perk"
+        :error="error"
+        :show="isModalShown"
+        :is-loading="isSubmitting"
+        @hidden="onModalHidden"
+        @submit-redemption="onSubmitRedemption"
+    />
 </template>
 
 <script lang="ts">
@@ -32,11 +31,13 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
+import BaseCardPerk from './BaseCardPerk.vue';
 import BaseModalPerkPayment from './BaseModalPerkPayment.vue';
 
 export default defineComponent({
     name: 'BaseCardPerkERC721',
     components: {
+        BaseCardPerk,
         BaseModalPerkPayment,
     },
     data() {

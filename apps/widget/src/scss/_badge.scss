@@ -1,8 +1,14 @@
-// .badge-point-price {
-//     padding: 1rem;
-//     font-size: 1.1rem;
-//     background-color: $badge-point-price-bg !important;
-//     position: absolute;
-//     top: 0;
-//     right: 0;
-// }
+.badge.bg-primary {
+    padding: .5rem !important;
+    background-color: var(--bs-body-bg) !important;
+    display: inline-block;
+    font-weight: bold;
+
+    span {
+        font-size: 1rem;
+    }
+    
+    i {
+        margin-right: .5rem
+    }
+}

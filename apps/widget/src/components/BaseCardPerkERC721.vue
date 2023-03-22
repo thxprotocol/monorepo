@@ -1,33 +1,30 @@
 <template>
-    <b-card class="m-2" :class="{ 'card-promoted': perk.isPromoted }">
-        <div class="mt-1" v-if="perk.image">
-            <img :src="perk.image" width="auto" class="img-fluid w-auto rounded-2 mb-3" />
-        </div>
-        <b-card-title class="d-flex">
+    <BaseCardPerk
+        :isPromoted="perk.isPromoted"
+        :image="perk.image"
+        :title="perk.title"
+        :description="perk.description"
+        :price="perk.price"
+        :price-currency="perk.priceCurrency"
+        :point-price="perk.pointPrice"
+        :progress="perk.progress"
+        :expiry="perk.expiry"
+        @submit="onClickRedeem"
+    >
+        <template #title>
             <div class="flex-grow-1">{{ perk.title }}</div>
             <div class="text-success fw-bold">{{ perk.erc721.symbol }}</div>
-        </b-card-title>
-        <b-card-text> {{ perk.description }} </b-card-text>
-        <b-button variant="primary" block class="w-100" :disabled="perk.isOwned" @click="onClickRedeem">
-            <template v-if="perk.isOwned"> Claimed </template>
-            <template v-else-if="perk.price > 0">
-                <strong>{{ perk.price }} {{ perk.priceCurrency }}</strong>
-                <small> / {{ perk.pointPrice }} pts</small>
-            </template>
-            <template v-else>
-                <strong>{{ perk.pointPrice }} points</strong>
-            </template>
-        </b-button>
-        <BaseModalPerkPayment
-            :id="`${id}${perk.uuid}`"
-            :show="isModalShown"
-            :error="error"
-            :perk="perk"
-            :is-loading="isSubmitting"
-            @hidden="onModalHidden"
-            @submit-redemption="onSubmitRedemption"
-        />
-    </b-card>
+        </template>
+    </BaseCardPerk>
+    <BaseModalPerkPayment
+        :id="`${id}${perk.uuid}`"
+        :show="isModalShown"
+        :error="error"
+        :perk="perk"
+        :is-loading="isSubmitting"
+        @hidden="onModalHidden"
+        @submit-redemption="onSubmitRedemption"
+    />
 </template>
 
 <script lang="ts">
@@ -37,14 +34,17 @@ import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
 import BaseModalPerkPayment from './BaseModalPerkPayment.vue';
+import BaseCardPerk from './BaseCardPerk.vue';
+import { format, formatDistance } from 'date-fns';
 
 export default defineComponent({
     name: 'BaseCardPerkERC721',
     components: {
         BaseModalPerkPayment,
+        BaseCardPerk,
     },
     data() {
-        return { id: 'modalERC721PerkPayment', error: '', isModalShown: false, isSubmitting: false };
+        return { format, id: 'modalERC721PerkPayment', error: '', isModalShown: false, isSubmitting: false };
     },
     props: {
         perk: {
@@ -60,6 +60,16 @@ export default defineComponent({
             const attr = this.perk.metadata.attributes.find((attr) => attr.key === 'image');
             if (!attr) return '';
             return attr.value;
+        },
+        isExpired: function () {
+            return this.perk.expiry.now - this.perk.expiry.date > 0;
+        },
+        expiryDate: function () {
+            return !this.isExpired
+                ? formatDistance(new Date(this.perk.expiry.date), new Date(this.perk.expiry.now), {
+                      addSuffix: false,
+                  })
+                : 'expired';
         },
     },
     methods: {

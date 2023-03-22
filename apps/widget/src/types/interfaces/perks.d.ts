@@ -15,4 +15,12 @@ type TPerk = {
     isOwned: boolean;
     isPromoted: boolean;
     metadata: { attributes: { key: string; value: string }[] };
+    progress: {
+        limit: number;
+        count: number;
+    };
+    expiry: {
+        date: number;
+        now: number;
+    };
 };
