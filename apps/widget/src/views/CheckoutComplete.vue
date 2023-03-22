@@ -22,7 +22,7 @@
                     <div class="text-success fw-bold">{{ perk.erc721.symbol }}</div>
                 </b-card-title>
                 <b-card-text> {{ perk.description }} </b-card-text>
-                <b-button variant="success" block class="w-100" to="/wallet">View Wallet</b-button>
+                <b-button variant="success" block class="w-100" @click="toWallet">View Wallet</b-button>
             </template>
         </b-card>
     </div>
@@ -33,6 +33,7 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { usePerkStore } from '../stores/Perk';
 import { useAccountStore } from '../stores/Account';
+import { useWalletStore } from '../stores/Wallet';
 
 export default defineComponent({
     name: 'Checkout',
@@ -55,8 +56,15 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(usePerkStore),
+        ...mapStores(useWalletStore),
         perk: function (): TPerk {
             return this.perksStore.perks.filter((p) => p.uuid === this.uuid)[0];
+        },
+    },
+    methods: {
+        toWallet() {
+            this.walletStore.list();
+            this.$router.push('/wallet');
         },
     },
 });
