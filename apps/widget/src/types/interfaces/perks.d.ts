@@ -15,6 +15,7 @@ type TPerk = {
     isOwned: boolean;
     isPromoted: boolean;
     metadata: { attributes: { key: string; value: string }[] };
+    erc20: TERC20;
     progress: {
         limit: number;
         count: number;

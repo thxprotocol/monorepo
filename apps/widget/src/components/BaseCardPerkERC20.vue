@@ -11,7 +11,7 @@
     >
         <template #title>
             <div class="flex-grow-1">{{ perk.title }}</div>
-            <div class="text-accent fw-bold">{{ perk.amount }} {{ perk.symbol }}</div>
+            <div class="text-accent fw-bold">{{ perk.amount }} {{ perk.erc20.symbol }}</div>
         </template>
     </BaseCardPerk>
     <BaseModalPerkPayment
