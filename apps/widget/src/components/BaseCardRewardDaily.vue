@@ -2,7 +2,7 @@
     <BaseCardCollapse :visible="visible">
         <template #header>
             <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
-            <div class="text-success fw-bold">{{ reward.amount }}</div>
+            <div class="text-accent fw-bold">{{ reward.amount }}</div>
         </template>
 
         <b-card-text>

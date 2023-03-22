@@ -4,17 +4,19 @@ const sheet = new CSSStyleSheet();
 const { elements, colors } = JSON.parse(new URLSearchParams(window.location.search).get('theme'));
 const theme = {
     elements: {
-        btnText: elements['btnText'].color,
+        bodyBg: elements['bodyBg'].color,
+        text: elements['text'].color,
         btnBg: elements['btnBg'].color,
         btnBgDark: Color(elements['btnBg'].color).darken(0.2),
         btnBgDarker: Color(elements['btnBg'].color).darken(0.3),
-        text: elements['text'].color,
-        bodyBg: elements['bodyBg'].color,
+        btnText: elements['btnText'].color,
         cardBg: elements['cardBg'].color,
+        cardText: elements['cardText'].color,
         navbarBg: elements['navbarBg'].color,
         navbarBgDarker: Color(elements['navbarBg'].color).darken(0.4),
     },
     colors: {
+        accent: colors['accent'].color,
         success: colors['success'].color,
         warning: colors['warning'].color,
         danger: colors['danger'].color,
@@ -22,21 +24,21 @@ const theme = {
     },
 };
 const styles = {
-    '#main': {
-        '--bs-body-bg': theme.elements.bodyBg,
-        '--bs-text-opacity': 1,
+    '.text-accent': {
+        '--thx-accent': theme.colors.accent,
     },
     'body': {
+        '--bs-body-bg': theme.elements.bodyBg,
         '--bs-body-color': theme.elements.text,
     },
     'blockquote': {
-        '--thx-blockquote-bg': theme.elements.btnBgDarker,
+        '--thx-blockquote-bg': theme.elements.bodyBg,
         '--thx-blockquote-border-color': theme.elements.btnBg,
         '--thx-blockquote-link-hover': theme.elements.text,
     },
     '.modal': {
         '--bs-modal-bg': theme.elements.navbarBg,
-        '--bs-modal-color': theme.elements.text,
+        '--bs-modal-color': theme.elements.btnText,
         '--bs-modal-border-color': theme.elements.btnBg,
     },
     '.form-control,.form-control:focus': {
@@ -44,15 +46,16 @@ const styles = {
         '--bs-btn-bg': theme.elements.btnBg,
     },
     '.dropdown-menu': {
-        '--bs-dropdown-bg': theme.elements.navbarBg,
-        '--bs-dropdown-link-hover-bg': theme.elements.navbarBgDarker,
-        '--bs-dropdown-link-hover-color': theme.elements.text,
-        '--bs-dropdown-link-active-bg': theme.elements.navbarBgDarker,
-        '--bs-dropdown-link-active-color': theme.elements.text,
+        '--bs-dropdown-bg': theme.elements.btnBg,
+        '--bs-dropdown-link-hover-bg': theme.elements.btnBgDarker,
+        '--bs-dropdown-link-hover-color': theme.elements.btnText,
+        '--bs-dropdown-link-active-bg': theme.elements.btnBgDarker,
+        '--bs-dropdown-link-active-color': theme.elements.btnText,
     },
     '.card': {
         '--bs-card-bg': theme.elements.cardBg,
-        '--bs-card-color': theme.elements.text,
+        '--bs-card-color': theme.elements.cardText,
+        '--bs-card-cap-color': theme.elements.cardText,
     },
     '.btn-primary': {
         '--bs-btn-color': theme.elements.btnText,

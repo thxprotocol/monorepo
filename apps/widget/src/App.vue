@@ -9,7 +9,7 @@
                 class="pl-3 py-2 text-center text-decoration-none"
                 v-if="accountStore.isAuthenticated"
             >
-                <div class="text-success h1 m-0">
+                <div class="text-accent h1 m-0">
                     <strong>{{ accountStore.balance }}</strong>
                 </div>
                 <div class="points">

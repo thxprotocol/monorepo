@@ -6,6 +6,7 @@ blockquote {
     border-left: 3px solid var(--thx-blockquote-border-color);
     background-color: var(--thx-blockquote-bg);
     padding: 0.5rem;
+    color: var(--bs-body-color);
 
     a {
         transition: color 0.2s ease;
@@ -14,4 +15,10 @@ blockquote {
             color: var(--thx-blockquote-link-hover) !important;
         }
     }
+}
+
+.text-accent {
+    --thx-accent: $success;
+    
+     color: var(--thx-accent) !important;
 }
