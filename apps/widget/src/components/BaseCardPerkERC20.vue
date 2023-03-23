@@ -1,5 +1,6 @@
 <template>
     <BaseCardPerk
+        :isDisabled="perk.isDisabled"
         :isPromoted="perk.isPromoted"
         :image="perk.image"
         :title="perk.title"
