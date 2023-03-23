@@ -12,12 +12,20 @@
             {{ reward.description }}
         </b-card-text>
 
-        <blockquote class="d-flex" v-if="reward.platform && interactionLabel[reward.interaction] && content">
-            {{ interactionLabel[reward.interaction] }}
-            <strong class="ms-1" v-if="content.amount">{{ content.amount }}</strong>
-            <b-link v-if="content.url" :href="content.url" target="_blank" class="text-muted ms-auto">
-                <i class="fas fa-external-link-alt"></i>
-            </b-link>
+        <blockquote v-if="reward.platform && interactionLabel[reward.interaction] && content">
+            <div class="d-flex">
+                <div>{{ interactionLabel[reward.interaction] }}</div>
+                <b-link v-if="content.url" :href="content.url" target="_blank" class="text-muted ms-auto">
+                    <i class="fas fa-external-link-alt"></i>
+                </b-link>
+            </div>
+
+            <div class="mt-3" v-if="reward.platform == RewardConditionPlatform.Twitter && contentMetadata">
+                <strong>@{{ contentMetadata.twitterUsername }}</strong> - {{ contentMetadata.tweetContent }}
+            </div>
+            <div class="mt-3">
+                <strong class="ms-1" v-if="content.amount">{{ content.amount }}</strong>
+            </div>
         </blockquote>
 
         <b-alert class="p-2" v-if="error && !isSubmitting" variant="danger" show>
@@ -111,6 +119,12 @@ export default defineComponent({
         content() {
             if (!this.interactionLabel[this.reward.interaction] || !this.reward.content) return;
             return this.getChannelActionURL(this.reward.interaction, this.reward.content);
+        },
+        contentMetadata() {
+            if (this.reward.contentMedatata) {
+                return JSON.parse(this.reward.contentMedatata);
+            }
+            return undefined;
         },
         isConnected() {
             const { account } = useAccountStore();
