@@ -7,7 +7,7 @@
             <div class="flex-grow-1">
                 <strong>{{ token.metadata.name }}</strong>
             </div>
-            <div class="text-success fw-bold">{{ token.erc721.symbol }} #{{ token.tokenId }}</div>
+            <div class="text-accent fw-bold">#{{ token.tokenId }}</div>
             <!-- <div>
                 <b-dropdown variant="link" size="sm" no-caret>
                     <template #button-content>
@@ -23,7 +23,9 @@
         </b-link>
         <b-card-text>
             {{ token.metadata.description }}
-            <hr />
+        </b-card-text>
+        <hr />
+        <b-card-text style="font-size: smaller">
             <p class="d-flex align-items-center">
                 <span>Contract</span>
                 <b-link
@@ -53,6 +55,10 @@
             <p class="d-flex align-items-center">
                 <span>Token Standard</span>
                 <strong class="ms-auto">ERC-721</strong>
+            </p>
+            <p class="d-flex align-items-center">
+                <span>Symbol</span>
+                <strong class="ms-auto">{{ token.erc721.symbol }}</strong>
             </p>
         </b-card-text>
     </BaseCardCollapse>

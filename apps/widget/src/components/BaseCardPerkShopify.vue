@@ -13,7 +13,6 @@
     >
         <template #title>
             <div class="flex-grow-1">{{ perk.title }}</div>
-            <div class="text-success fw-bold">{{ perk.erc721.symbol }}</div>
         </template>
     </BaseCardPerk>
     <BaseModalPerkPayment
@@ -34,11 +33,13 @@ import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
 import BaseModalPerkPayment from './BaseModalPerkPayment.vue';
+import BaseCardPerk from './BaseCardPerk.vue';
 
 export default defineComponent({
     name: 'BaseCardPerkShopify',
     components: {
         BaseModalPerkPayment,
+        BaseCardPerk,
     },
     data() {
         return {
@@ -79,8 +80,8 @@ export default defineComponent({
                     walletStore.list();
                     this.isModalShown = false;
                 })
-                .catch((error) => {
-                    this.error = error.message;
+                .catch(({ error }) => {
+                    this.error = error && error.message;
                 })
                 .finally(() => {
                     this.isSubmitting = false;

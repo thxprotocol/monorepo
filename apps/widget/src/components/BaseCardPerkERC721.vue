@@ -93,9 +93,8 @@ export default defineComponent({
                     walletStore.list();
                     this.isModalShown = false;
                 })
-                .catch((r) => {
-                    debugger;
-                    this.error = r && r.error && r.error.message;
+                .catch(({ error }) => {
+                    this.error = error && error.message;
                 })
                 .finally(() => {
                     this.isSubmitting = false;

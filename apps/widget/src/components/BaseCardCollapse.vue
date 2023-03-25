@@ -1,7 +1,16 @@
 <template>
-    <b-card header-class="p-0" body-class="d-flex flex-column p-0" class="m-2" :class="{ 'card-promoted': isPromoted }">
+    <b-card
+        header-class="p-0"
+        body-class="d-flex flex-column p-0"
+        class="m-2"
+        :class="{ 'card-collapsed': isVisible, 'card-promoted': isPromoted }"
+    >
         <template #header>
-            <b-card-title @click="isVisible = !isVisible" class="d-flex p-3 m-0" style="cursor: pointer">
+            <b-card-title
+                @click="isVisible = !isVisible"
+                class="d-flex p-3 m-0 align-items-center"
+                style="cursor: pointer"
+            >
                 <slot name="header"></slot>
             </b-card-title>
         </template>

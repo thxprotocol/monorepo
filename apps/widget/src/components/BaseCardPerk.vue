@@ -43,7 +43,7 @@
                                 'text-accent': progressPercentage >= 0 && progressPercentage <= 0.75,
                             }"
                         >
-                            {{ progress.limit - progress.count }}
+                            {{ progressCount }}
                         </span>
                         <span class="card-text">/{{ progress.limit }}</span>
                     </b-badge>
@@ -89,6 +89,10 @@ export default defineComponent({
         },
     },
     computed: {
+        progressCount: function () {
+            if (!this.progress) return 0;
+            return this.progress.limit - this.progress.count;
+        },
         progressPercentage: function () {
             if (!this.progress) return 100;
             return this.progress.count / this.progress.limit;
