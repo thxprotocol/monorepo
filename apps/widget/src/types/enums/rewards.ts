@@ -19,4 +19,5 @@ export enum RewardConditionInteraction {
     DiscordGuildJoined = 5,
     ShopifyOrderAmount = 6,
     ShopifyTotalSpent = 7,
+    ShopifyNewsletterSubscription = 8,
 }
