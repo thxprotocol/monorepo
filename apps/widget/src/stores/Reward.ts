@@ -95,12 +95,11 @@ export const useRewardStore = defineStore('rewards', {
                 return r;
             });
 
-            const pointRewardsList = await Promise.all(
-                Object.values(pointRewards).map(async (r: any) => {
-                    r.component = 'BaseCardRewardPoints';
-                    return r;
-                }),
-            );
+            const pointRewardsList = pointRewards.map((r: any) => {
+                r.component = 'BaseCardRewardPoints';
+                r.contentMetadata = r.contentMetadata && JSON.parse(r.contentMetadata);
+                return r;
+            });
 
             this.rewards = [...dailyRewardsList, ...referralRewardsList, ...milestoneRewardsList, ...pointRewardsList];
         },
