@@ -12,43 +12,7 @@
             {{ reward.description }}
         </b-card-text>
 
-        <BaseBlockquoteTwitterTweet
-            v-if="
-                [RewardConditionInteraction.TwitterRetweet, RewardConditionInteraction.TwitterLike].includes(
-                    reward.interaction,
-                )
-            "
-            :reward="reward"
-        />
-        <BaseBlockquoteTwitterUser
-            v-else-if="[RewardConditionInteraction.TwitterFollow].includes(reward.interaction)"
-            :reward="reward"
-        />
-        <BaseBlockquoteVideo
-            v-else-if="[RewardConditionInteraction.YouTubeLike].includes(reward.interaction)"
-            :reward="reward"
-        />
-        <BaseBlockquoteDiscordServerJoin
-            v-else-if="[RewardConditionInteraction.DiscordGuildJoined].includes(reward.interaction)"
-            :reward="reward"
-        />
-
-        <BaseBlockquoteShopifyNewsletterSubscription
-            v-else-if="[RewardConditionInteraction.ShopifyNewsletterSubscription].includes(reward.interaction)"
-            :reward="reward"
-        />
-
-        <BaseBlockquoteShopifyOrderAmount
-            v-else-if="[RewardConditionInteraction.ShopifyOrderAmount].includes(reward.interaction)"
-            :reward="reward"
-        />
-
-        <BaseBlockquoteShopifyTotalSpent
-            v-else-if="[RewardConditionInteraction.ShopifyTotalSpent].includes(reward.interaction)"
-            :reward="reward"
-        />
-
-        <BaseBlockquote v-else :reward="reward" />
+        <component :is="getInteractionComponent(reward.interaction)" :reward="reward" />
 
         <b-alert class="p-2" v-if="error && !isSubmitting" variant="danger" show>
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
@@ -100,7 +64,7 @@ import { RewardConditionPlatform, RewardConditionInteraction } from '../types/en
 import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 import BaseBlockquoteTwitterTweet from './blockquote/BaseBlockquoteTwitterTweet.vue';
 import BaseBlockquoteTwitterUser from './blockquote/BaseBlockquoteTwitterUser.vue';
-import BaseBlockquote from '../components/blockquote/BaseBlockquote.vue';
+import BaseBlockquoteYoutubeChannelSubscription from '../components/blockquote/BaseBlockquoteYoutubeChannelSubscription.vue';
 import BaseBlockquoteVideo from '../components/blockquote/BaseBlockquoteVideo.vue';
 import BaseBlockquoteDiscordServerJoin from '../components/blockquote/BaseBlockquoteDiscordServerJoin.vue';
 import BaseBlockquoteShopifyNewsletterSubscription from '../components/blockquote/BaseBlockquoteShopifyNewsletterSubscription.vue';
@@ -111,7 +75,7 @@ export default defineComponent({
     name: 'BaseCardRewardPoints',
     components: {
         BaseCardCollapse,
-        BaseBlockquote,
+        BaseBlockquoteYoutubeChannelSubscription,
         BaseBlockquoteVideo,
         BaseBlockquoteTwitterTweet,
         BaseBlockquoteTwitterUser,
@@ -180,6 +144,27 @@ export default defineComponent({
                 this.error = error;
             } finally {
                 this.isSubmitting = false;
+            }
+        },
+        getInteractionComponent(interaction: RewardConditionInteraction) {
+            switch (interaction) {
+                case RewardConditionInteraction.YouTubeLike:
+                    return 'BaseBlockquoteVideo';
+                case RewardConditionInteraction.YouTubeSubscribe:
+                    return 'BaseBlockquoteYoutubeChannelSubscription';
+                case RewardConditionInteraction.TwitterLike:
+                case RewardConditionInteraction.TwitterRetweet:
+                    return 'BaseBlockquoteTwitterTweet';
+                case RewardConditionInteraction.TwitterFollow:
+                    return 'BaseBlockquoteTwitterUser';
+                case RewardConditionInteraction.DiscordGuildJoined:
+                    return 'BaseBlockquoteDiscordServerJoin';
+                case RewardConditionInteraction.ShopifyOrderAmount:
+                    return 'BaseBlockquoteShopifyOrderAmount';
+                case RewardConditionInteraction.ShopifyTotalSpent:
+                    return 'BaseBlockquoteShopifyTotalSpent';
+                case RewardConditionInteraction.ShopifyNewsletterSubscription:
+                    return 'BaseBlockquoteShopifyNewsletterSubscription';
             }
         },
         getAccessTokenKindForPlatform(platform: RewardConditionPlatform) {
