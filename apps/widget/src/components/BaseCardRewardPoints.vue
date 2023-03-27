@@ -8,7 +8,7 @@
             <div class="text-accent fw-bold">{{ reward.amount }}</div>
         </template>
 
-        <b-card-text>
+        <b-card-text v-if="reward.description">
             {{ reward.description }}
         </b-card-text>
 
