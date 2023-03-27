@@ -10,7 +10,7 @@ type TBaseReward = {
     platform: RewardConditionPlatform;
     interaction?: RewardConditionInteraction;
     content?: string;
-    contentMetadata?: string;
+    contentMetadata?: any;
     createdAt?: string;
     updatedAt?: string;
     progress?: number;

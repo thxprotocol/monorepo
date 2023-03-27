@@ -12,21 +12,43 @@
             {{ reward.description }}
         </b-card-text>
 
-        <blockquote v-if="reward.platform && interactionLabel[reward.interaction] && content">
-            <div class="d-flex">
-                <div>{{ interactionLabel[reward.interaction] }}</div>
-                <b-link v-if="content.url" :href="content.url" target="_blank" class="text-muted ms-auto">
-                    <i class="fas fa-external-link-alt"></i>
-                </b-link>
-            </div>
+        <BaseBlockquoteTwitterTweet
+            v-if="
+                [RewardConditionInteraction.TwitterRetweet, RewardConditionInteraction.TwitterLike].includes(
+                    reward.interaction,
+                )
+            "
+            :reward="reward"
+        />
+        <BaseBlockquoteTwitterUser
+            v-else-if="[RewardConditionInteraction.TwitterFollow].includes(reward.interaction)"
+            :reward="reward"
+        />
+        <BaseBlockquoteVideo
+            v-else-if="[RewardConditionInteraction.YouTubeLike].includes(reward.interaction)"
+            :reward="reward"
+        />
+        <BaseBlockquoteDiscordServerJoin
+            v-else-if="[RewardConditionInteraction.DiscordGuildJoined].includes(reward.interaction)"
+            :reward="reward"
+        />
 
-            <div class="mt-3" v-if="reward.platform == RewardConditionPlatform.Twitter && contentMetadata">
-                <strong>@{{ contentMetadata.twitterUsername }}</strong> - {{ contentMetadata.tweetContent }}
-            </div>
-            <div class="mt-3">
-                <strong class="ms-1" v-if="content.amount">{{ content.amount }}</strong>
-            </div>
-        </blockquote>
+        <BaseBlockquoteShopifyNewsletterSubscription
+            v-else-if="[RewardConditionInteraction.ShopifyNewsletterSubscription].includes(reward.interaction)"
+            :reward="reward"
+        />
+
+        <BaseBlockquoteShopifyOrderAmount
+            v-else-if="[RewardConditionInteraction.ShopifyOrderAmount].includes(reward.interaction)"
+            :reward="reward"
+        />
+
+        <BaseBlockquoteShopifyTotalSpent
+            v-else-if="[RewardConditionInteraction.ShopifyTotalSpent].includes(reward.interaction)"
+            :reward="reward"
+        />
+
+        <BaseBlockquote v-else :reward="reward" />
 
         <b-alert class="p-2" v-if="error && !isSubmitting" variant="danger" show>
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
@@ -76,11 +98,27 @@ import { useRewardStore } from '../stores/Reward';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { RewardConditionPlatform, RewardConditionInteraction } from '../types/enums/rewards';
 import BaseCardCollapse from '../components/BaseCardCollapse.vue';
+import BaseBlockquoteTwitterTweet from './blockquote/BaseBlockquoteTwitterTweet.vue';
+import BaseBlockquoteTwitterUser from './blockquote/BaseBlockquoteTwitterUser.vue';
+import BaseBlockquote from '../components/blockquote/BaseBlockquote.vue';
+import BaseBlockquoteVideo from '../components/blockquote/BaseBlockquoteVideo.vue';
+import BaseBlockquoteDiscordServerJoin from '../components/blockquote/BaseBlockquoteDiscordServerJoin.vue';
+import BaseBlockquoteShopifyNewsletterSubscription from '../components/blockquote/BaseBlockquoteShopifyNewsletterSubscription.vue';
+import BaseBlockquoteShopifyOrderAmount from '../components/blockquote/BaseBlockquoteShopifyOrderAmount.vue';
+import BaseBlockquoteShopifyTotalSpent from '../components/blockquote/BaseBlockquoteShopifyTotalSpent.vue';
 
 export default defineComponent({
     name: 'BaseCardRewardPoints',
     components: {
         BaseCardCollapse,
+        BaseBlockquote,
+        BaseBlockquoteVideo,
+        BaseBlockquoteTwitterTweet,
+        BaseBlockquoteTwitterUser,
+        BaseBlockquoteDiscordServerJoin,
+        BaseBlockquoteShopifyNewsletterSubscription,
+        BaseBlockquoteShopifyOrderAmount,
+        BaseBlockquoteShopifyTotalSpent,
     },
     props: {
         reward: {
@@ -93,6 +131,7 @@ export default defineComponent({
             error: '',
             isSubmitting: false,
             RewardConditionPlatform,
+            RewardConditionInteraction,
             platformImg: {
                 [RewardConditionPlatform.None]: '',
                 [RewardConditionPlatform.YouTube]: require('../assets/youtube-logo.png'),
@@ -100,32 +139,12 @@ export default defineComponent({
                 [RewardConditionPlatform.Discord]: require('../assets/discord-logo.png'),
                 [RewardConditionPlatform.Shopify]: require('../assets/shopify-logo.png'),
             },
-            interactionLabel: {
-                [RewardConditionInteraction.YouTubeLike]: 'Like a Youtube video.',
-                [RewardConditionInteraction.YouTubeSubscribe]: 'Subscribe to a Youtube channel.',
-                [RewardConditionInteraction.TwitterLike]: 'Like a Twitter tweet.',
-                [RewardConditionInteraction.TwitterRetweet]: 'Retweet a Twitter tweet.',
-                [RewardConditionInteraction.TwitterFollow]: 'Follow a Twitter account.',
-                [RewardConditionInteraction.DiscordGuildJoined]: 'Join a Discord server.',
-                [RewardConditionInteraction.ShopifyOrderAmount]: 'Minimal order amount of ',
-                [RewardConditionInteraction.ShopifyTotalSpent]: 'Minimal total spent of ',
-            },
             tooltipContent: 'Copy URL',
         };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
-        content() {
-            if (!this.interactionLabel[this.reward.interaction] || !this.reward.content) return;
-            return this.getChannelActionURL(this.reward.interaction, this.reward.content);
-        },
-        contentMetadata() {
-            if (this.reward.contentMedatata) {
-                return JSON.parse(this.reward.contentMedatata);
-            }
-            return undefined;
-        },
         isConnected() {
             const { account } = useAccountStore();
             if (!account || !this.reward) return;
@@ -149,28 +168,6 @@ export default defineComponent({
         },
     },
     methods: {
-        getChannelActionURL(interaction: RewardConditionInteraction, content: string) {
-            switch (interaction) {
-                case RewardConditionInteraction.YouTubeLike:
-                    return { url: `https://youtu.be/${content}` };
-                case RewardConditionInteraction.YouTubeSubscribe:
-                    return { url: `https://youtube.com/channel/${content}` };
-                case RewardConditionInteraction.TwitterLike:
-                    return { url: `https://www.twitter.com/twitter/status/${content}` };
-                case RewardConditionInteraction.TwitterRetweet:
-                    return { url: `https://www.twitter.com/twitter/status/${content}` };
-                case RewardConditionInteraction.TwitterFollow:
-                    return { url: `https://www.twitter.com/i/user/${content}` };
-                case RewardConditionInteraction.DiscordGuildJoined:
-                    return { url: `${content}` }; // TODO We should ask for invite link in dashboard
-                case RewardConditionInteraction.ShopifyOrderAmount:
-                    return { url: JSON.parse(content).shopifyStoreUrl, amount: JSON.parse(content).amount };
-                case RewardConditionInteraction.ShopifyTotalSpent:
-                    return { url: JSON.parse(content).shopifyStoreUrl, amount: `${JSON.parse(content).amount},-` };
-                default:
-                    return '';
-            }
-        },
         onClickSignin: function () {
             this.accountStore.signin();
         },
