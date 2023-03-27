@@ -1,5 +1,6 @@
 <template>
     <BaseCardPerk
+        :isDisabled="perk.isDisabled"
         :isPromoted="perk.isPromoted"
         :image="perk.image"
         :title="perk.title"
@@ -80,7 +81,7 @@ export default defineComponent({
                     this.isModalShown = false;
                 })
                 .catch(({ error }) => {
-                    this.error = error.message;
+                    this.error = error && error.message;
                 })
                 .finally(() => {
                     this.isSubmitting = false;

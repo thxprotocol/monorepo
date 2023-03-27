@@ -1,3 +1,18 @@
+.card-header {
+    transition: background-color ease .15s;
+    border: 0;
+    border-radius: var(--bs-card-inner-border-radius) !important;
+
+    &:hover {
+        background-color: var(--thx-card-header-hover-bg);
+    }
+}
+
+.card-collapsed .card-header {
+    border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0 !important;
+    border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);
+}
+
 .card-title {
     font-size: 1rem;
 

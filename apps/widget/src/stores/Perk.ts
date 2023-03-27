@@ -9,33 +9,45 @@ export const usePerkStore = defineStore('perks', {
         perks: [],
     }),
     actions: {
-        createERC20Redemption: async (uuid: string) => {
+        updateSupply: function (uuid: string) {
+            const index = this.perks.findIndex((perk) => perk.uuid === uuid);
+            this.perks[index].progress.count = this.perks[index].progress.count + 1;
+        },
+        createERC20Redemption: async function (uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
             const { error } = await api.perksManager.erc20.redemption.post(uuid);
             if (error) throw error;
 
+            this.updateSupply(uuid);
+
             track('UserCreates', [account?.sub, 'coin perk payment', { poolId, origin: getConfig(poolId).origin }]);
         },
-        createERC721Redemption: async (uuid: string) => {
+        createERC721Redemption: async function (uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
             const { error } = await api.perksManager.erc721.redemption.post(uuid);
             if (error) throw error;
 
+            this.updateSupply(uuid);
+
             track('UserCreates', [account?.sub, 'nft perk redemption', { poolId, origin: getConfig(poolId).origin }]);
         },
-        createERC721Payment: async (uuid: string) => {
+        createERC721Payment: async function (uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
             const r = await api.perksManager.erc721.payment.post(uuid);
             if (r.error) throw r.error;
+
+            this.updateSupply(uuid);
 
             track('UserCreates', [account?.sub, 'nft perk payment', { poolId, origin: getConfig(poolId).origin }]);
 
             return r;
         },
-        createShopifyRedemption: async (uuid: string) => {
+        createShopifyRedemption: async function (uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
             const { error } = await api.perksManager.shopify.redemption.post(uuid);
             if (error) throw error;
+
+            this.updateSupply(uuid);
 
             track('UserCreates', [
                 account?.sub,

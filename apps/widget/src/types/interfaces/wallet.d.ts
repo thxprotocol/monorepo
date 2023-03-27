@@ -20,13 +20,27 @@ type TERC20 = {
     logoImgUrl: string;
 };
 
+type TERC721Token = {
+    sub: string;
+    tokenId: string;
+    erc721: TERC721;
+    metadata: TERC721Metadata;
+    tokenUri: string;
+};
+
+type TERC721Metadata = {
+    name: string;
+    description: string;
+    imageUrl: string;
+    externalUrl: string;
+};
+
 type TERC721 = {
     name: string;
     symbol: string;
+    description: string;
     logoImgUrl: string;
     address: string;
-    logoImg: string;
-    tokenId: string;
 };
 
 type TERC20Token = {

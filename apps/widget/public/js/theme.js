@@ -11,6 +11,7 @@ const theme = {
         btnBgDarker: Color(elements['btnBg'].color).darken(0.3),
         btnText: elements['btnText'].color,
         cardBg: elements['cardBg'].color,
+        cardHeaderHoverBg: Color(elements['cardBg'].color).lighten(0.2),
         cardText: elements['cardText'].color,
         navbarBg: elements['navbarBg'].color,
         navbarBgDarker: Color(elements['navbarBg'].color).darken(0.4),
@@ -56,6 +57,7 @@ const styles = {
         '--bs-card-bg': theme.elements.cardBg,
         '--bs-card-color': theme.elements.cardText,
         '--bs-card-cap-color': theme.elements.cardText,
+        '--thx-card-header-hover-bg': theme.elements.cardHeaderHoverBg,
     },
     '.btn-primary': {
         '--bs-btn-color': theme.elements.btnText,
