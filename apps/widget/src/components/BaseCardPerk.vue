@@ -53,10 +53,12 @@
             <b-button variant="primary" block class="w-100" @click="$emit('submit')">
                 <template v-if="price && price > 0">
                     <strong>{{ price }} {{ priceCurrency }}</strong>
-                    <small> / {{ pointPrice }} points</small>
+                    <small v-if="pointPrice">
+                        / {{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}
+                    </small>
                 </template>
                 <template v-else>
-                    <strong>{{ pointPrice }} points</strong>
+                    <strong>{{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}</strong>
                 </template>
             </b-button>
         </template>
