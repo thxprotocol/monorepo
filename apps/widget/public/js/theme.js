@@ -1,6 +1,5 @@
 import Color from 'https://cdn.jsdelivr.net/npm/color@4.2.3/+esm';
 
-const sheet = new CSSStyleSheet();
 const { elements, colors } = JSON.parse(new URLSearchParams(window.location.search).get('theme'));
 const theme = {
     elements: {
@@ -11,7 +10,7 @@ const theme = {
         btnBgDarker: Color(elements['btnBg'].color).darken(0.3),
         btnText: elements['btnText'].color,
         cardBg: elements['cardBg'].color,
-        cardHeaderHoverBg: Color(elements['cardBg'].color).lighten(0.2),
+        cardHeaderHoverBg: Color(elements['cardBg'].color).lighten(0.1),
         cardText: elements['cardText'].color,
         navbarBg: elements['navbarBg'].color,
         navbarBgDarker: Color(elements['navbarBg'].color).darken(0.4),
@@ -76,7 +75,7 @@ const styles = {
         '--bs-btn-disabled-bg': theme.elements.btnBg,
         '--bs-btn-disabled-border-color': theme.elements.btnBg,
     },
-    '.navbar': {
+    '.navbar-bottom': {
         '--thx-navbar-bg': theme.elements.navbarBg,
         '--thx-navbar-btn-color': theme.elements.btnText,
         '--thx-navbar-btn-active-bg': theme.elements.btnBg,
@@ -94,13 +93,14 @@ const styles = {
     },
 };
 
+const sheet = document.createElement('style');
 for (const selector in styles) {
     let rule = `${selector} { `;
     for (const name in styles[selector]) {
         rule += `${name}: ${styles[selector][name]};`;
     }
     rule += '}';
-    sheet.insertRule(rule);
+    sheet.innerText += rule;
 }
 
-document.adoptedStyleSheets = [sheet];
+document.head.appendChild(sheet);
