@@ -17,6 +17,7 @@ export const useAccountStore = defineStore('account', {
         api: null,
         account: null,
         balance: 0,
+        subscription: null,
         isAuthenticated: false,
     }),
     actions: {
@@ -40,7 +41,7 @@ export const useAccountStore = defineStore('account', {
                 redirectUrl: WIDGET_URL + '/signin-popup.html',
                 post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
                 popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-                scopes: 'openid account:read erc20:read erc721:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write',
+                scopes: 'openid account:read erc20:read erc721:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write',
                 poolId: this.poolId,
             });
 
@@ -57,6 +58,15 @@ export const useAccountStore = defineStore('account', {
 
             // Send the amount of unclaimed rewards to the parent window and update the launcher
             window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+        },
+        async subscribe() {
+            this.subscription = await this.api.pools.subscription.post(this.poolId);
+        },
+        async unsubscribe() {
+            this.subscription = await this.api.pools.subscription.delete(this.poolId);
+        },
+        async getSubscription() {
+            this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
         signin() {
             const { poolId } = this.getConfig(this.poolId);
@@ -96,11 +106,12 @@ export const useAccountStore = defineStore('account', {
             if (!this.isAuthenticated) return;
 
             await this.getAccount();
-            await this.getBalance();
+            this.getBalance();
+            this.getSubscription();
 
-            await perksStore.list();
-            await walletStore.list();
-            await walletStore.getWallet();
+            perksStore.list();
+            walletStore.list();
+            walletStore.getWallet();
 
             this.isAuthenticated = true;
 

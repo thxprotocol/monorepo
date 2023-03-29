@@ -4,3 +4,7 @@
     border-color: var(--bs-btn-bg);
     color: var(--bs-body-color);
 }
+.form-control:disabled {
+    background-color: var(--bs-body-bg);
+    opacity: .75;
+}
