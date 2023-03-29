@@ -1,5 +1,10 @@
 declare module 'color';
 
+type TSubscription = {
+    sub: string;
+    poolId: string;
+};
+
 type TAccount = {
     sub: string;
     firstName: string;
@@ -24,6 +29,7 @@ type TAccountState = {
     balance: number;
     isAuthenticated: boolean;
     account: TAccount | null;
+    subscription: TSubscription | null;
     getConfig: (id: string) => TWidgetConfig;
 };
 

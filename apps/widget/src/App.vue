@@ -1,7 +1,7 @@
 <template>
     <div id="main" class="d-flex flex-column h-100">
         <b-navbar class="navbar-top pt-3">
-            <div style="width: 75px">
+            <div style="width: 84px">
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
             </div>
             <b-link
@@ -21,37 +21,49 @@
                 </div>
             </b-link>
             <div>
+                <b-button variant="link" @click="isModalPoolSubscriptionShown = true">
+                    <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>
+                    <BaseModalPoolSubscription
+                        id="pool-subscription"
+                        @subscribe="onSubmitSubscription"
+                        @unsubscribe="onSubmitUnsubscription"
+                        @hidden="isModalPoolSubscriptionShown = false"
+                        :show="isModalPoolSubscriptionShown"
+                    />
+                </b-button>
                 <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin">
                     Sign in
                 </b-button>
-                <b-dropdown variant="link" v-else no-caret right>
-                    <template #button-content>
-                        <i class="fas fa-bars"></i>
-                    </template>
-                    <b-dropdown-item-button
-                        v-if="walletStore.wallet"
-                        size="sm"
-                        v-clipboard:copy="walletStore.wallet.address"
-                    >
-                        <div class="d-flex align-items-center justify-content-between">
-                            {{ walletAddress }}
-                            <i class="fas fa-clipboard ml-auto"></i>
-                        </div>
-                    </b-dropdown-item-button>
-                    <b-dropdown-item-button size="sm" @click="onClickAccount">
-                        <div class="d-flex align-items-center justify-content-between">
-                            Account
-                            <i class="fas fa-user ml-auto"></i>
-                        </div>
-                    </b-dropdown-item-button>
-                    <b-dropdown-divider />
-                    <b-dropdown-item-button size="sm" @click="accountStore.signout()">
-                        <div class="d-flex align-items-center justify-content-between">
-                            Signout
-                            <i class="fas fa-sign-out-alt ml-auto"></i>
-                        </div>
-                    </b-dropdown-item-button>
-                </b-dropdown>
+                <template v-else>
+                    <b-dropdown variant="link" no-caret right>
+                        <template #button-content>
+                            <i class="fas fa-bars"></i>
+                        </template>
+                        <b-dropdown-item-button
+                            v-if="walletStore.wallet"
+                            size="sm"
+                            v-clipboard:copy="walletStore.wallet.address"
+                        >
+                            <div class="d-flex align-items-center justify-content-between">
+                                {{ walletAddress }}
+                                <i class="fas fa-clipboard ml-auto"></i>
+                            </div>
+                        </b-dropdown-item-button>
+                        <b-dropdown-item-button size="sm" @click="onClickAccount">
+                            <div class="d-flex align-items-center justify-content-between">
+                                Account
+                                <i class="fas fa-user ml-auto"></i>
+                            </div>
+                        </b-dropdown-item-button>
+                        <b-dropdown-divider />
+                        <b-dropdown-item-button size="sm" @click="accountStore.signout()">
+                            <div class="d-flex align-items-center justify-content-between">
+                                Signout
+                                <i class="fas fa-sign-out-alt ml-auto"></i>
+                            </div>
+                        </b-dropdown-item-button>
+                    </b-dropdown>
+                </template>
             </div>
         </b-navbar>
         <router-view />
@@ -81,12 +93,17 @@ import { useWalletStore } from './stores/Wallet';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from './utils/returnUrl';
+import BaseModalPoolSubscription from './components/BaseModalPoolSubscription.vue';
 
 import './scss/main.scss';
 
 export default defineComponent({
+    components: {
+        BaseModalPoolSubscription,
+    },
     data() {
         return {
+            isModalPoolSubscriptionShown: false,
             isRefreshing: false,
         };
     },
@@ -94,6 +111,10 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
         ...mapStores(useWalletStore),
+        isSubscribed() {
+            const { subscription } = useAccountStore();
+            return !!subscription;
+        },
         walletAddress() {
             const { wallet } = useWalletStore();
             if (!wallet) return '';
@@ -174,6 +195,14 @@ export default defineComponent({
             }
 
             track('UserOpens', [account?.sub || '', `widget iframe`, { origin, poolId, isShown }]);
+        },
+        async onSubmitSubscription() {
+            await this.accountStore.subscribe();
+            this.isModalPoolSubscriptionShown = false;
+        },
+        async onSubmitUnsubscription() {
+            await this.accountStore.unsubscribe();
+            this.isModalPoolSubscriptionShown = false;
         },
         onClickSignin() {
             this.accountStore.signin();
