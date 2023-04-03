@@ -61,9 +61,15 @@ export const useAccountStore = defineStore('account', {
         },
         async subscribe() {
             this.subscription = await this.api.pools.subscription.post(this.poolId);
+
+            const { origin } = this.getConfig(this.poolId);
+            track('UserCreates', [this.account?.sub, 'pool subscription', { poolId: this.poolId, origin }]);
         },
         async unsubscribe() {
             this.subscription = await this.api.pools.subscription.delete(this.poolId);
+
+            const { origin } = this.getConfig(this.poolId);
+            track('UserCreates', [this.account?.sub, 'pool unsubscription', { poolId: this.poolId, origin }]);
         },
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
