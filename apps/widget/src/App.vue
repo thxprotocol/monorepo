@@ -9,16 +9,14 @@
                 class="pl-3 py-2 text-center text-decoration-none"
                 v-if="accountStore.isAuthenticated"
             >
-                <div class="text-accent h1 m-0">
+                <div class="text-accent h1 m-0 d-flex align-items-center">
                     <strong>{{ accountStore.balance }}</strong>
-                </div>
-                <div class="points">
-                    points
-                    <span class="ml-2" style="font-size: 16px !important">
+                    <span class="ms-2 text-white" style="font-size: 16px !important">
                         <b-spinner v-if="isRefreshing" small variant="white" />
                         <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
                     </span>
                 </div>
+                <div class="points">points</div>
             </b-link>
             <div>
                 <b-button variant="link" @click="isModalPoolSubscriptionShown = true">

@@ -21,6 +21,7 @@ type TERC20 = {
 };
 
 type TERC721Token = {
+    _id: string;
     sub: string;
     tokenId: string;
     erc721: TERC721;

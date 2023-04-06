@@ -30,13 +30,18 @@
                 <i class="fas fa-exclamation-circle me-2"></i>
                 {{ error }}
             </b-alert>
-            <p>
-                {{
-                    !isSubscribed
-                        ? `We will notify ${email} when new rewards become available!`
-                        : `We will no longer send notifications to ${email}.`
-                }}
+
+            <p class="mb-0">
+                <template v-if="!isSubscribed">
+                    Subscribe now and we will notify <strong class="text-accent">{{ email }}</strong> when new rewards
+                    are available!
+                </template>
+                <template v-else>
+                    We will stop sending reward notifications to <strong class="text-accent">{{ email }}</strong
+                    >.
+                </template>
             </p>
+
             <b-form-group v-if="!accountStore.account?.email" label="E-mail" :state="isEmailValid">
                 <b-form-input v-model="email" type="email" :state="isEmailValid" />
             </b-form-group>

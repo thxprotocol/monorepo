@@ -50,8 +50,10 @@
                 </div>
             </div>
 
-            <b-button variant="primary" block class="w-100" @click="$emit('submit')">
-                <template v-if="price && price > 0">
+            <b-button variant="primary" block class="w-100" :disabled="isSoldOut || isExpired" @click="$emit('submit')">
+                <template v-if="isSoldOut">Sold out</template>
+                <template v-else-if="isExpired">Expired</template>
+                <template v-else-if="price && price > 0">
                     <strong>{{ price }} {{ priceCurrency }}</strong>
                     <small v-if="pointPrice">
                         / {{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}
@@ -84,9 +86,11 @@ export default defineComponent({
         priceCurrency: String,
         pointPrice: Number,
         progress: {
+            required: true,
             type: Object as PropType<{ count: number; limit: number }>,
         },
         expiry: {
+            required: true,
             type: Object as PropType<{ date: number; now: number }>,
         },
     },
@@ -99,8 +103,11 @@ export default defineComponent({
             if (!this.progress) return 100;
             return this.progress.count / this.progress.limit;
         },
+        isSoldOut: function () {
+            return this.progress.limit > 0 ? this.progress.count >= this.progress.limit : false;
+        },
         isExpired: function () {
-            return this.expiry && this.expiry.now - this.expiry.date > 0;
+            return this.expiry.date ? this.expiry.now - this.expiry.date > 0 : false;
         },
         expiryDate: function () {
             return !this.isExpired && this.expiry

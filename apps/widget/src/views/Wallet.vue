@@ -62,11 +62,9 @@ export default defineComponent({
         ...mapStores(useWalletStore),
         ...mapStores(useAccountStore),
         list: function (): any {
-            return [
-                ...this.walletStore.erc20,
-                ...this.walletStore.erc721,
-                ...this.walletStore.shopifyDiscountCode,
-            ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            return [...this.walletStore.erc20, ...this.walletStore.erc721, ...this.walletStore.shopifyDiscountCode]
+                .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+                .reverse();
         },
     },
     methods: {

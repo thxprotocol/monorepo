@@ -7,7 +7,8 @@
             <div class="flex-grow-1">
                 <strong>{{ token.metadata.name }}</strong>
             </div>
-            <div class="text-accent fw-bold">#{{ token.tokenId }}</div>
+            <b-spinner small variant="primary" v-if="!token.tokenId" />
+            <div v-else class="text-accent fw-bold">#{{ token.tokenId }}</div>
             <!-- <div>
                 <b-dropdown variant="link" size="sm" no-caret>
                     <template #button-content>
@@ -48,7 +49,8 @@
             </p>
             <p class="d-flex align-items-center">
                 <span>Token ID</span>
-                <b-link class="ms-auto text-accent" :href="token.tokenUri" target="_blank">
+                <b-spinner class="ms-auto" small variant="primary" v-if="!token.tokenId" />
+                <b-link v-else class="ms-auto text-accent" :href="token.tokenUri" target="_blank">
                     <strong>{{ token.tokenId }}</strong>
                 </b-link>
             </p>
@@ -69,6 +71,7 @@ import { defineComponent, PropType } from 'vue';
 import { useWalletStore } from '../stores/Wallet';
 import { mapStores } from 'pinia';
 import BaseCardCollapse from './BaseCardCollapse.vue';
+import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseCardERC721',
@@ -86,6 +89,25 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useWalletStore),
+    },
+    mounted() {
+        if (!this.token.tokenId) {
+            this.waitForMinted();
+        }
+    },
+    methods: {
+        waitForMinted() {
+            const taskFn = async () => {
+                this.walletStore.getERC721Token(this.token);
+                if (this.token.tokenId) {
+                    return Promise.resolve();
+                } else {
+                    return Promise.reject('Could not find tokenID');
+                }
+            };
+
+            return poll({ taskFn, interval: 3000, retries: 10 });
+        },
     },
 });
 </script>

@@ -17,6 +17,13 @@ export const useWalletStore = defineStore('wallet', {
             const wallets = await api.walletManager.list(getConfig(poolId).chainId, account.sub);
             this.wallet = wallets[0];
         },
+        async getERC721Token({ _id }: TERC721Token) {
+            const { api } = useAccountStore();
+            const token = await api.erc721.get(_id);
+            const index = this.erc721.findIndex((t) => t._id === token._id);
+
+            this.erc721[index] = { ...token, component: 'BaseCardERC721' };
+        },
         async list() {
             const { api, getConfig, poolId } = useAccountStore();
             const options = { chainId: getConfig(poolId).chainId };
