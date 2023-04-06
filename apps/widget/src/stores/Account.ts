@@ -59,8 +59,8 @@ export const useAccountStore = defineStore('account', {
             // Send the amount of unclaimed rewards to the parent window and update the launcher
             window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
         },
-        async subscribe() {
-            this.subscription = await this.api.pools.subscription.post(this.poolId);
+        async subscribe(email: string) {
+            this.subscription = await this.api.pools.subscription.post({ poolId: this.poolId, email });
 
             const { origin } = this.getConfig(this.poolId);
             track('UserCreates', [this.account?.sub, 'pool subscription', { poolId: this.poolId, origin }]);

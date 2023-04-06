@@ -25,10 +25,11 @@
                     <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>
                     <BaseModalPoolSubscription
                         id="pool-subscription"
-                        @subscribe="onSubmitSubscription"
+                        @subscribe="onSubmitSubscription($event)"
                         @unsubscribe="onSubmitUnsubscription"
                         @hidden="isModalPoolSubscriptionShown = false"
                         :show="isModalPoolSubscriptionShown"
+                        :error="error"
                     />
                 </b-button>
                 <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin">
@@ -105,6 +106,7 @@ export default defineComponent({
         return {
             isModalPoolSubscriptionShown: false,
             isRefreshing: false,
+            error: '',
         };
     },
     computed: {
@@ -196,9 +198,14 @@ export default defineComponent({
 
             track('UserOpens', [account?.sub || '', `widget iframe`, { origin, poolId, isShown }]);
         },
-        async onSubmitSubscription() {
-            await this.accountStore.subscribe();
-            this.isModalPoolSubscriptionShown = false;
+        async onSubmitSubscription(email: string) {
+            try {
+                await this.accountStore.subscribe(email);
+                debugger;
+                this.isModalPoolSubscriptionShown = false;
+            } catch (error) {
+                this.error = 'This e-mail is used by someone else.';
+            }
         },
         async onSubmitUnsubscription() {
             await this.accountStore.unsubscribe();

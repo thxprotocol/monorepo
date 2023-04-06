@@ -16,6 +16,11 @@
             <b-spinner show size="sm" />
         </div>
         <template v-else>
+            <b-alert variant="warning" show class="py-1 px-2" v-if="!accountStore.isAuthenticated">
+                <i class="fas fa-exclamation-circle me-1"></i>
+                Please sign in first!
+            </b-alert>
+
             <b-alert variant="warning" show class="py-1 px-2" v-if="isSubscribed">
                 <i class="fas fa-exclamation-circle me-1"></i>
                 You are removing your reward notification subscription.
@@ -25,16 +30,14 @@
                 <i class="fas fa-exclamation-circle me-2"></i>
                 {{ error }}
             </b-alert>
-
-            <b-form-group
-                label="E-mail"
-                :state="isEmailValid"
-                :description="
+            <p>
+                {{
                     !isSubscribed
-                        ? 'We will notify you when new rewards become available!'
-                        : 'We will stop sending you reward notifications.'
-                "
-            >
+                        ? `We will notify ${email} when new rewards become available!`
+                        : `We will no longer send notifications to ${email}.`
+                }}
+            </p>
+            <b-form-group v-if="!accountStore.account?.email" label="E-mail" :state="isEmailValid">
                 <b-form-input v-model="email" type="email" :state="isEmailValid" />
             </b-form-group>
         </template>
@@ -97,9 +100,7 @@ export default defineComponent({
             this.email = email;
         },
         onClickSubmit() {
-            this.$emit(this.isSubscribed ? 'unsubscribe' : 'subscribe', {
-                email: this.email,
-            });
+            this.$emit(this.isSubscribed ? 'unsubscribe' : 'subscribe', this.email);
         },
     },
 });
