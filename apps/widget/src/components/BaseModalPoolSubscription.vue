@@ -16,11 +16,6 @@
             <b-spinner show size="sm" />
         </div>
         <template v-else>
-            <b-alert variant="warning" show class="py-1 px-2" v-if="!accountStore.account?.email">
-                <i class="fas fa-exclamation-circle me-1"></i>
-                Your e-mail address is missing.
-            </b-alert>
-
             <b-alert variant="warning" show class="py-1 px-2" v-if="isSubscribed">
                 <i class="fas fa-exclamation-circle me-1"></i>
                 You are removing your reward notification subscription.
@@ -40,13 +35,7 @@
                         : 'We will stop sending you reward notifications.'
                 "
             >
-                <b-form-input
-                    v-model="email"
-                    type="email"
-                    :readonly="isEmailValid"
-                    :disabled="true"
-                    :state="isEmailValid"
-                />
+                <b-form-input v-model="email" type="email" :state="isEmailValid" />
             </b-form-group>
         </template>
         <template #footer>
