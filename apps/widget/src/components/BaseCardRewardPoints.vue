@@ -67,6 +67,7 @@ import BaseBlockquoteTwitterUser from './blockquote/BaseBlockquoteTwitterUser.vu
 import BaseBlockquoteYoutubeChannelSubscription from '../components/blockquote/BaseBlockquoteYoutubeChannelSubscription.vue';
 import BaseBlockquoteVideo from '../components/blockquote/BaseBlockquoteVideo.vue';
 import BaseBlockquoteDiscordServerJoin from '../components/blockquote/BaseBlockquoteDiscordServerJoin.vue';
+import BaseBlockquoteDiscordInviteUsed from '../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
 import BaseBlockquoteShopifyNewsletterSubscription from '../components/blockquote/BaseBlockquoteShopifyNewsletterSubscription.vue';
 import BaseBlockquoteShopifyOrderAmount from '../components/blockquote/BaseBlockquoteShopifyOrderAmount.vue';
 import BaseBlockquoteShopifyTotalSpent from '../components/blockquote/BaseBlockquoteShopifyTotalSpent.vue';
@@ -83,6 +84,7 @@ export default defineComponent({
         BaseBlockquoteShopifyNewsletterSubscription,
         BaseBlockquoteShopifyOrderAmount,
         BaseBlockquoteShopifyTotalSpent,
+        BaseBlockquoteDiscordInviteUsed,
     },
     props: {
         reward: {
@@ -159,6 +161,8 @@ export default defineComponent({
                     return 'BaseBlockquoteTwitterUser';
                 case RewardConditionInteraction.DiscordGuildJoined:
                     return 'BaseBlockquoteDiscordServerJoin';
+                case RewardConditionInteraction.DiscordInviteUsed:
+                    return 'BaseBlockquoteDiscordInviteUsed';
                 case RewardConditionInteraction.ShopifyOrderAmount:
                     return 'BaseBlockquoteShopifyOrderAmount';
                 case RewardConditionInteraction.ShopifyTotalSpent:
