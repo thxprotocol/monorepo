@@ -1,12 +1,15 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import { useAccountStore } from '../stores/Account';
-import { track } from '@thxnetwork/mixpanel';
 
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         name: 'home',
         component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue'),
+    },
+    {
+        path: '/c/:uuid',
+        name: 'collect',
+        component: () => import(/* webpackChunkName: "wallet" */ '../views/Collect.vue'),
     },
     {
         path: '/perks',
