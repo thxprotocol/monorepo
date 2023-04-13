@@ -4,7 +4,6 @@ import { createPinia } from 'pinia';
 import VueClipboard from 'vue3-clipboard';
 import App from './App.vue';
 import router from './router';
-
 import { API_URL, MIXPANEL_TOKEN } from './config/secrets';
 import Mixpanel from '@thxnetwork/mixpanel';
 
@@ -20,5 +19,4 @@ app.use(VueClipboard, {
     autoSetContainer: true,
     appendToBody: true,
 });
-
 app.mount('#app');

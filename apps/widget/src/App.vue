@@ -7,7 +7,7 @@
             <b-link
                 @click="onClickRefresh"
                 class="pl-3 py-2 text-center text-decoration-none"
-                v-if="accountStore.isAuthenticated"
+                v-if="accountStore.isAuthenticated && rewardsStore.rewards.length"
             >
                 <div class="text-accent h1 m-0 d-flex align-items-center">
                     <strong>{{ accountStore.balance }}</strong>
@@ -19,7 +19,11 @@
                 <div class="points">points</div>
             </b-link>
             <div>
-                <b-button variant="link" @click="isModalPoolSubscriptionShown = true">
+                <b-button
+                    v-if="accountStore.isAuthenticated && rewardsStore.rewards.length"
+                    variant="link"
+                    @click="isModalPoolSubscriptionShown = true"
+                >
                     <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>
                     <BaseModalPoolSubscription
                         id="pool-subscription"
@@ -38,20 +42,10 @@
                         <template #button-content>
                             <i class="fas fa-bars"></i>
                         </template>
-                        <b-dropdown-item-button
-                            v-if="walletStore.wallet"
-                            size="sm"
-                            v-clipboard:copy="walletStore.wallet.address"
-                        >
+                        <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="$router.push('/wallet')">
                             <div class="d-flex align-items-center justify-content-between">
                                 {{ walletAddress }}
                                 <i class="fas fa-clipboard ml-auto"></i>
-                            </div>
-                        </b-dropdown-item-button>
-                        <b-dropdown-item-button size="sm" @click="onClickAccount">
-                            <div class="d-flex align-items-center justify-content-between">
-                                Account
-                                <i class="fas fa-user ml-auto"></i>
                             </div>
                         </b-dropdown-item-button>
                         <b-dropdown-divider />
@@ -66,14 +60,22 @@
             </div>
         </b-navbar>
         <router-view />
-        <b-navbar class="navbar-bottom">
-            <router-link to="/" class="d-flex flex-column justify-content-center align-items-center">
+        <b-navbar v-if="rewardsStore.rewards.length || perksStore.perks.length" class="navbar-bottom">
+            <router-link
+                v-if="rewardsStore.rewards.length"
+                to="/"
+                class="d-flex flex-column justify-content-center align-items-center"
+            >
                 <i class="fas fa-trophy"></i>
-                Points
+                Earn
             </router-link>
-            <router-link to="/perks" class="d-flex flex-column justify-content-center align-items-center">
+            <router-link
+                v-if="perksStore.perks.length"
+                to="/perks"
+                class="d-flex flex-column justify-content-center align-items-center"
+            >
                 <i class="fas fa-store"></i>
-                Perks
+                Store
             </router-link>
             <router-link to="/wallet" class="d-flex flex-column justify-content-center align-items-center">
                 <i class="fas fa-wallet"></i>
@@ -89,6 +91,7 @@ import { WIDGET_URL, GTM } from './config/secrets';
 import { useAccountStore } from './stores/Account';
 import { useRewardStore } from './stores/Reward';
 import { useWalletStore } from './stores/Wallet';
+import { usePerkStore } from './stores/Perk';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from './utils/returnUrl';
@@ -110,6 +113,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
+        ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
         isSubscribed() {
             const { subscription } = useAccountStore();
@@ -199,7 +203,6 @@ export default defineComponent({
         async onSubmitSubscription(email: string) {
             try {
                 await this.accountStore.subscribe(email);
-                debugger;
                 this.isModalPoolSubscriptionShown = false;
             } catch (error) {
                 this.error = 'This e-mail is used by someone else.';

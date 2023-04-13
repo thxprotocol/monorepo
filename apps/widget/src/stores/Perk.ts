@@ -70,9 +70,6 @@ export const usePerkStore = defineStore('perks', {
         async list() {
             const { api } = useAccountStore();
             const { erc20Perks, erc721Perks, shopifyPerks } = await api.perksManager.list();
-            erc20Perks.sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
-            erc721Perks.sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
-            shopifyPerks.sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
 
             this.perks = [
                 ...(erc20Perks
@@ -95,7 +92,9 @@ export const usePerkStore = defineStore('perks', {
                           return r;
                       })
                     : []),
-            ];
+            ]
+                .sort((a: any, b: any) => toNumber(b.createdAt) - toNumber(a.createdAt))
+                .sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
         },
     },
 });
