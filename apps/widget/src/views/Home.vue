@@ -1,6 +1,6 @@
 <template>
     <div>
-        <BaseModalCampaignExpired :id="'modalCampaignExpiredRewards'" :show="true" />
+        <BaseModalCampaignExpired :id="'modalCampaignExpiredRewards'" />
     </div>
     <div class="flex-grow-1 overflow-auto">
         <b-tabs justified content-class="pt-1">

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <BaseModalCampaignExpired :show="true" :id="'modalCampaignExpiredPerks'" />
+        <BaseModalCampaignExpired :id="'modalCampaignExpiredPerks'" />
     </div>
     <div class="flex-grow-1 overflow-auto">
         <component v-for="(perk, key) of perksStore.perks" :key="key" :is="perk.component" :perk="perk" class="mb-2" />

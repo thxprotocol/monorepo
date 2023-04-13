@@ -25,16 +25,10 @@ export default defineComponent({
             type: String,
             required: true,
         },
-        show: {
-            type: Boolean,
-            required: true,
-        },
     },
-    watch: {
-        show(value) {
-            console.log('this.isShown', this.isShown);
-            this.isShown = value; //this.accountStore.getConfig(this.accountStore.poolId).expired;
-        },
+    mounted() {
+        this.isShown = this.accountStore.getConfig(this.accountStore.poolId).expired;
+        console.log('this.isShown----------------------', this.isShown);
     },
 });
 </script>
