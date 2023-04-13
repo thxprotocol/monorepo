@@ -4,6 +4,7 @@ import { useAccountStore } from './Account';
 
 export const useClaimStore = defineStore('claims', {
     state: (): TClaimState => ({
+        error: '',
         claim: null,
         metadata: null,
         erc721: null,
@@ -11,7 +12,8 @@ export const useClaimStore = defineStore('claims', {
     actions: {
         async getClaim(uuid: string) {
             const { api } = useAccountStore();
-            const { claim, erc721, metadata } = await api.claims.get(uuid);
+            const { error, claim, erc721, metadata } = await api.claims.get(uuid);
+            this.error = error;
             this.claim = claim;
             this.metadata = metadata;
             this.erc721 = erc721;

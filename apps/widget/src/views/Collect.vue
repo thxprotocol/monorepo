@@ -1,22 +1,14 @@
 <template>
     <div class="flex-grow-1 overflow-auto">
-        <b-alert v-if="accountStore.isAuthenticated" variant="success" show class="m-2 p-2">
-            <i class="fas fa-gift me-1"></i>
-            You are able to collect your NFT!
-        </b-alert>
-        <b-alert v-else variant="info" show class="m-2 p-2">
+        <b-alert v-if="!accountStore.isAuthenticated" variant="info" show class="m-2 p-2">
             <i class="fas fa-gift me-1"></i>
             Sign in to collect your NFT
         </b-alert>
-        <b-alert v-if="error" variant="danger" show class="m-2 p-2">
+        <b-alert v-if="error || claimsStore.error" variant="danger" show class="m-2 p-2">
             <i class="fas fa-exclamation-circle me-1"></i>
-            {{ error }}
+            {{ error || claimsStore.error }}
         </b-alert>
-        <b-card
-            v-if="claimsStore.claim && claimsStore.metadata && claimsStore.erc721"
-            class="m-2"
-            :img-src="claimsStore.metadata.imageUrl"
-        >
+        <b-card v-if="claimsStore.claim && claimsStore.metadata && claimsStore.erc721" class="m-2">
             <div class="d-flex justify-content-center">
                 <ConfettiExplosion
                     v-if="isLoadingCollectComplete"
@@ -28,10 +20,26 @@
                     :force="0.5"
                 />
             </div>
-            <b-card-title> {{ claimsStore.metadata.name }}</b-card-title>
-            <p>{{ claimsStore.metadata.description }}</p>
+            <div class="d-flex">
+                <div class="d-flex justify-content-center align-items-center" style="width: 75px">
+                    <div>
+                        <b-spinner v-if="isLoadingImage" small variant="light" />
+                        <b-img
+                            :src="claimsStore.metadata.imageUrl"
+                            width="60"
+                            class="me-3 rounded shadow-sm"
+                            :class="{ 'd-none': isLoadingImage }"
+                            @load="isLoadingImage = false"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <b-card-title> {{ claimsStore.metadata.name }}</b-card-title>
+                    <p class="m-0">{{ claimsStore.metadata.description }}</p>
+                </div>
+            </div>
             <hr />
-            <p class="d-flex align-items-center">
+            <p class="d-flex align-items-center small">
                 <span>Contract</span>
                 <b-link
                     class="ms-auto text-accent"
@@ -43,7 +51,7 @@
                     </strong>
                 </b-link>
             </p>
-            <p class="d-flex align-items-center">
+            <p class="d-flex align-items-center small">
                 <span>Website</span>
                 <b-link class="ms-auto text-accent" :href="claimsStore.metadata.externalUrl" target="_blank">
                     <strong>
@@ -51,15 +59,21 @@
                     </strong>
                 </b-link>
             </p>
-            <p class="d-flex align-items-center">
+            <p class="d-flex align-items-center small">
                 <span>Token Standard</span>
                 <strong class="ms-auto">ERC-721</strong>
             </p>
-            <p class="d-flex align-items-center">
+            <p class="d-flex align-items-center small">
                 <span>Symbol</span>
                 <strong class="ms-auto">{{ claimsStore.erc721.symbol }}</strong>
             </p>
-            <b-button v-if="accountStore.isAuthenticated" @click="onClickCollect" variant="success" class="w-100">
+            <b-button
+                v-if="accountStore.isAuthenticated"
+                @click="onClickCollect"
+                variant="success"
+                class="w-100"
+                :disabled="!!error || !!claimsStore.error"
+            >
                 <b-spinner v-if="isLoadingCollect" small variant="dark" />
                 Collect
             </b-button>
@@ -85,7 +99,7 @@ export default defineComponent({
         ...mapStores(useWalletStore),
     },
     data() {
-        return { uuid: '', error: '', isLoadingCollect: false, isLoadingCollectComplete: false };
+        return { uuid: '', error: '', isLoadingImage: true, isLoadingCollect: false, isLoadingCollectComplete: false };
     },
     async mounted() {
         this.uuid = this.$route.params.uuid as string;
@@ -113,7 +127,7 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.card {
+/* .card {
     min-height: calc(100% - 65px) !important;
-}
+} */
 </style>
