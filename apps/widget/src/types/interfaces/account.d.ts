@@ -44,4 +44,5 @@ type TWidgetConfig = {
     chainId: number;
     theme: string;
     ref?: string;
+    expired: boolean;
 };

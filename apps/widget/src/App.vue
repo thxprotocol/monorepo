@@ -130,9 +130,10 @@ export default defineComponent({
         // this.$route is not yet available at this point so we use the browser location API
         // to obtain the query
         const params = new URLSearchParams(window.location.search);
-        const [id, origin, chainId, theme] = ['id', 'origin', 'chainId', 'theme'].map((key) => params.get(key));
-
-        this.accountStore.init({ id, origin, chainId, theme });
+        const [id, origin, chainId, theme, expired] = ['id', 'origin', 'chainId', 'theme', 'expired'].map((key) =>
+            params.get(key),
+        );
+        this.accountStore.init({ id, origin, chainId, theme, expired: Boolean(expired) });
 
         window.onmessage = this.onMessage;
 
@@ -217,8 +218,8 @@ export default defineComponent({
             window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
         },
         onClickAccount() {
-            const { poolId, origin, chainId, theme } = this.accountStore.getConfig(this.accountStore.poolId);
-            const url = getReturnUrl(poolId, origin, chainId, theme);
+            const { poolId, origin, chainId, theme, expired } = this.accountStore.getConfig(this.accountStore.poolId);
+            const url = getReturnUrl(poolId, origin, chainId, theme, expired);
 
             this.accountStore.api.userManager.cached.signinRedirect({
                 extraQueryParams: {

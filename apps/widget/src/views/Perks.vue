@@ -1,4 +1,7 @@
 <template>
+    <div>
+        <BaseModalCampaignExpired :show="true" :id="'modalCampaignExpiredPerks'" />
+    </div>
     <div class="flex-grow-1 overflow-auto">
         <component v-for="(perk, key) of perksStore.perks" :key="key" :is="perk.component" :perk="perk" class="mb-2" />
     </div>
@@ -12,10 +15,10 @@ import { useAccountStore } from '../stores/Account';
 import BaseCardPerkERC20 from '../components/BaseCardPerkERC20.vue';
 import BaseCardPerkERC721 from '../components/BaseCardPerkERC721.vue';
 import BaseCardPerkShopify from '../components/BaseCardPerkShopify.vue';
-
+import BaseModalCampaignExpired from '../components/BaseModalCampaignExpired.vue';
 export default defineComponent({
     name: 'Perks',
-    components: { BaseCardPerkERC20, BaseCardPerkERC721, BaseCardPerkShopify },
+    components: { BaseCardPerkERC20, BaseCardPerkERC721, BaseCardPerkShopify, BaseModalCampaignExpired },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(usePerkStore),
