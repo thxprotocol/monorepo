@@ -13,7 +13,9 @@
                     <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                 </template>
                 <b-dropdown-item
-                    :disabled="walletStore.wallet?.version !== walletStore.wallet?.latestVersion"
+                    :disabled="
+                        walletStore.wallet?.version && walletStore.wallet?.version !== walletStore.wallet?.latestVersion
+                    "
                     @click="isModalTransferShown = true"
                 >
                     Transfer
