@@ -42,11 +42,7 @@
                         <template #button-content>
                             <i class="fas fa-bars"></i>
                         </template>
-                        <b-dropdown-item-button
-                            v-if="walletStore.wallet"
-                            size="sm"
-                            v-clipboard:copy="walletStore.wallet.address"
-                        >
+                        <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="$router.push('/wallet')">
                             <div class="d-flex align-items-center justify-content-between">
                                 {{ walletAddress }}
                                 <i class="fas fa-clipboard ml-auto"></i>

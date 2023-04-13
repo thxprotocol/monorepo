@@ -1,12 +1,8 @@
 <template>
-    <div class="flex-grow-1 overflow-auto">
+    <div class="d-flex flex-grow-1 justify-content-center flex-column align-items-center overflow-auto">
         <b-alert v-if="!accountStore.isAuthenticated" variant="info" show class="m-2 p-2">
             <i class="fas fa-gift me-1"></i>
             Sign in to collect your NFT
-        </b-alert>
-        <b-alert v-if="error || claimsStore.error" variant="danger" show class="m-2 p-2">
-            <i class="fas fa-exclamation-circle me-1"></i>
-            {{ error || claimsStore.error }}
         </b-alert>
         <b-card v-if="claimsStore.claim && claimsStore.metadata && claimsStore.erc721" class="m-2">
             <div class="d-flex justify-content-center">
@@ -67,8 +63,15 @@
                 <span>Symbol</span>
                 <strong class="ms-auto">{{ claimsStore.erc721.symbol }}</strong>
             </p>
+            <b-alert v-if="error || claimsStore.error" variant="danger" show class="p-2 w-100">
+                <i class="fas fa-exclamation-circle me-1"></i>
+                {{ error || claimsStore.error }}
+            </b-alert>
+            <b-button v-if="isLoadingCollectComplete" variant="primary" to="/wallet" class="w-100">
+                Go to wallet
+            </b-button>
             <b-button
-                v-if="accountStore.isAuthenticated"
+                v-if="accountStore.isAuthenticated && !isLoadingCollectComplete"
                 @click="onClickCollect"
                 variant="success"
                 class="w-100"
@@ -114,12 +117,12 @@ export default defineComponent({
             try {
                 await this.claimsStore.collect(this.uuid);
                 await this.walletStore.list();
-                this.$router.push('/wallet');
+
+                this.isLoadingCollectComplete = true;
             } catch (res) {
                 const { error } = res as { error: { message: string } };
                 this.error = error.message;
             } finally {
-                this.isLoadingCollectComplete = true;
                 this.isLoadingCollect = false;
             }
         },
@@ -127,7 +130,7 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-/* .card {
-    min-height: calc(100% - 65px) !important;
-} */
+.card {
+    margin-top: -65px !important;
+}
 </style>
