@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse>
+    <BaseCardCollapse :visible="pendingClaims > 0">
         <template #header>
             <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
             <div class="text-accent fw-bold">{{ reward.amount }}</div>

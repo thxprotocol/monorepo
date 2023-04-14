@@ -6,7 +6,6 @@
                     v-for="(reward, key) of rewardsStore.rewards"
                     :key="key"
                     :is="reward.component"
-                    :visible="!key"
                     :reward="reward"
                     class="mb-2"
                 />

@@ -90,10 +90,14 @@ export const useRewardStore = defineStore('rewards', {
                 return r;
             });
 
-            const milestoneRewardsList = Object.values(milestoneRewards).map((r: any) => {
-                r.component = 'BaseCardRewardMilestone';
-                return r;
-            });
+            const milestoneRewardsList = Object.values(milestoneRewards)
+                .map((r: any) => {
+                    r.component = 'BaseCardRewardMilestone';
+                    return r;
+                })
+                .sort((a, b) => {
+                    return b.claims.length - a.claims.length;
+                });
 
             const pointRewardsList = pointRewards.map((r: any) => {
                 r.component = 'BaseCardRewardPoints';
