@@ -150,17 +150,17 @@ export default defineComponent({
             track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', { origin, poolId }]);
         },
         async onMessage(event: MessageEvent) {
-            const { getConfig, setConfig, poolId } = this.accountStore;
-            const config = getConfig(this.accountStore.poolId);
-            if (!WIDGET_URL || event.origin !== new URL(config.origin).origin) return;
+            const { getConfig, poolId } = this.accountStore;
+            const { origin } = getConfig(poolId);
+            if (!WIDGET_URL || event.origin !== new URL(origin).origin) return;
 
             switch (event.data.message) {
                 case 'thx.iframe.navigate': {
-                    this.$router.push(event.data.path);
+                    this.onIframeNavigate(event.data.path);
                     break;
                 }
                 case 'thx.iframe.show': {
-                    this.onShow(config.origin, event.data.isShown);
+                    this.onIframeShow(origin, event.data.isShown);
                     break;
                 }
                 case 'thx.referral.claim.create': {
@@ -168,10 +168,17 @@ export default defineComponent({
                     break;
                 }
                 case 'thx.config.ref': {
-                    setConfig(poolId, { ref: event.data.ref } as TWidgetConfig);
+                    this.onReferralConfigUpdate(event.data.ref);
                     break;
                 }
             }
+        },
+        onReferralConfigUpdate(ref: string) {
+            const { setConfig, poolId } = this.accountStore;
+            setConfig(poolId, { ref } as TWidgetConfig);
+        },
+        onIframeNavigate(path: string) {
+            this.$router.push(path);
         },
         async onReferralClaimCreate(uuid: string) {
             const { account, getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
@@ -190,7 +197,7 @@ export default defineComponent({
 
             track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: getConfig(poolId).origin }]);
         },
-        async onShow(origin: string, isShown: boolean) {
+        async onIframeShow(origin: string, isShown: boolean) {
             const { api, signin, account, poolId } = this.accountStore;
             const user = await api.userManager.cached.getUser();
 

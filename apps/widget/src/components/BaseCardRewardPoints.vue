@@ -1,8 +1,8 @@
 <template>
     <BaseCardCollapse :visible="!reward.isClaimed">
         <template #header>
-            <div v-if="reward.platform" class="me-2">
-                <img height="20" :src="platformImg[reward.platform]" :alt="reward.platform" />
+            <div v-if="reward.platform" class="d-flex align-items-center justify-content-center" style="width: 25px">
+                <i :class="platformIconMap[reward.platform]" class="me-2 text-primary"></i>
             </div>
             <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
             <div class="text-accent fw-bold">{{ reward.amount }}</div>
@@ -98,12 +98,12 @@ export default defineComponent({
             isSubmitting: false,
             RewardConditionPlatform,
             RewardConditionInteraction,
-            platformImg: {
+            platformIconMap: {
                 [RewardConditionPlatform.None]: '',
-                [RewardConditionPlatform.YouTube]: require('../assets/youtube-logo.png'),
-                [RewardConditionPlatform.Twitter]: require('../assets/twitter-logo.png'),
-                [RewardConditionPlatform.Discord]: require('../assets/discord-logo.png'),
-                [RewardConditionPlatform.Shopify]: require('../assets/shopify-logo.png'),
+                [RewardConditionPlatform.YouTube]: 'fab fa-youtube',
+                [RewardConditionPlatform.Twitter]: 'fab fa-twitter',
+                [RewardConditionPlatform.Discord]: 'fab fa-discord',
+                [RewardConditionPlatform.Shopify]: 'fab fa-shopify',
             },
             tooltipContent: 'Copy URL',
         };

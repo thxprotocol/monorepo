@@ -3,7 +3,7 @@
         <b-tabs justified content-class="pt-1">
             <b-tab title="All" active>
                 <component
-                    v-for="(reward, key) of rewardsStore.rewards"
+                    v-for="(reward, key) of rewardsStore.all"
                     :key="key"
                     :is="reward.component"
                     :reward="reward"
@@ -79,10 +79,17 @@ export default defineComponent({
         BaseCardRewardDaily,
         BaseCardRewardNFT,
     },
+    data() {
+        return { filter: '' };
+    },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
         ...mapStores(useWalletStore),
+        // rewards: function (): TBaseReward[] {
+        //     const { all } = useRewardStore();
+        //     return all.filter((r) => (this.filter.length ? r.component === this.filter : true)).sort();
+        // },
     },
 });
 </script>
