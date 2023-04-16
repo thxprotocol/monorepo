@@ -17,7 +17,6 @@
                 <BaseCardRewardDaily
                     v-for="(reward, key) of rewardsStore.dailyRewards"
                     :key="key"
-                    :visible="!key"
                     :reward="reward"
                     class="mb-2"
                 />
@@ -29,7 +28,6 @@
                 <BaseCardRewardReferral
                     v-for="(reward, key) of rewardsStore.referralRewards"
                     :key="key"
-                    :visible="!key"
                     :reward="reward"
                     class="mb-2"
                 />
@@ -41,7 +39,6 @@
                 <BaseCardRewardPoints
                     v-for="(reward, key) of rewardsStore.conditionalRewards"
                     :key="key"
-                    :visible="!key"
                     :reward="reward"
                     class="mb-2"
                 />
@@ -53,7 +50,6 @@
                 <BaseCardRewardMilestone
                     v-for="(reward, key) of rewardsStore.milestoneRewards"
                     :key="key"
-                    :visible="!key"
                     :reward="reward"
                     class="mb-2"
                 />

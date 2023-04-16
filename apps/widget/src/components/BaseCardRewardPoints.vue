@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse>
+    <BaseCardCollapse :visible="!reward.isClaimed">
         <template #header>
             <div v-if="reward.platform" class="me-2">
                 <img height="20" :src="platformImg[reward.platform]" :alt="reward.platform" />
