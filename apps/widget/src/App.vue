@@ -246,3 +246,34 @@ export default defineComponent({
     },
 });
 </script>
+
+<style>
+.fa-bell {
+    animation: shake 10s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(0px, 0px) rotate(0deg);
+    }
+    95% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+    96% {
+        transform: translate(-2px, 1px) rotate(0deg);
+    }
+    97% {
+        transform: translate(2px, 1px) rotate(-1deg);
+    }
+    98% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+    99% {
+        transform: translate(1px, 2px) rotate(-1deg);
+    }
+    100% {
+        transform: translate(0px, 0px) rotate(0deg);
+    }
+}
+</style>
