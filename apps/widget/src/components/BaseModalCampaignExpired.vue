@@ -1,9 +1,18 @@
 <template>
-    modalCampaignExpired
-    <b-modal :id="id" :v-model="isShown" no-close-on-backdrop centered no-close-on-esc class="show">
+    <b-modal
+        :id="id"
+        v-model="isShown"
+        centered
+        hide-footer
+        no-close-on-backdrop
+        no-close-on-esc
+        :class="{ show: isShown }"
+    >
         <template #header>
-            <h5 class="modal-title">This campaign has ended.</h5>
+            <h5 class="modal-title"><i class="fas fa-clock me-2"></i> This campaign has ended...</h5>
         </template>
+        <p>Keep an eye on our site and stay tuned for more information about loyalty offerings.</p>
+        <p>Thanks for joining us during the campaign!</p>
     </b-modal>
 </template>
 
@@ -21,14 +30,11 @@ export default defineComponent({
         return { isShown: false };
     },
     props: {
-        id: {
-            type: String,
-            required: true,
-        },
+        id: { type: String, required: true },
+        show: { type: Boolean },
     },
     mounted() {
         this.isShown = this.accountStore.getConfig(this.accountStore.poolId).expired;
-        console.log('this.isShown----------------------', this.isShown);
     },
 });
 </script>

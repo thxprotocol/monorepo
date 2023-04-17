@@ -33,7 +33,6 @@ export const useAccountStore = defineStore('account', {
             theme,
             expired,
         }: { origin: string; id: string; chainId: number; theme: string; expired: boolean } & any) {
-            console.log('EXPIRD------------------------------------', { origin, id, chainId, theme, expired });
             this.poolId = id;
 
             if (!this.poolId) throw new Error('No poolId in settings.');

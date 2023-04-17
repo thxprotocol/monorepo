@@ -137,7 +137,7 @@ export default defineComponent({
         const [id, origin, chainId, theme, expired] = ['id', 'origin', 'chainId', 'theme', 'expired'].map((key) =>
             params.get(key),
         );
-        this.accountStore.init({ id, origin, chainId, theme, expired: Boolean(expired) });
+        this.accountStore.init({ id, origin, chainId, theme, expired: JSON.parse(expired as string) });
 
         window.onmessage = this.onMessage;
 
