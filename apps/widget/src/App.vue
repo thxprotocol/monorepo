@@ -7,7 +7,7 @@
             <b-link
                 @click="onClickRefresh"
                 class="pl-3 py-2 text-center text-decoration-none"
-                v-if="accountStore.isAuthenticated"
+                v-if="accountStore.isAuthenticated && rewardsStore.rewards.length"
             >
                 <div class="text-accent h1 m-0 d-flex align-items-center">
                     <strong>{{ accountStore.balance }}</strong>
@@ -19,7 +19,11 @@
                 <div class="points">points</div>
             </b-link>
             <div>
-                <b-button variant="link" @click="isModalPoolSubscriptionShown = true">
+                <b-button
+                    v-if="accountStore.isAuthenticated && rewardsStore.rewards.length"
+                    variant="link"
+                    @click="isModalPoolSubscriptionShown = true"
+                >
                     <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>
                     <BaseModalPoolSubscription
                         id="pool-subscription"
@@ -38,20 +42,10 @@
                         <template #button-content>
                             <i class="fas fa-bars"></i>
                         </template>
-                        <b-dropdown-item-button
-                            v-if="walletStore.wallet"
-                            size="sm"
-                            v-clipboard:copy="walletStore.wallet.address"
-                        >
+                        <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="$router.push('/wallet')">
                             <div class="d-flex align-items-center justify-content-between">
                                 {{ walletAddress }}
                                 <i class="fas fa-clipboard ml-auto"></i>
-                            </div>
-                        </b-dropdown-item-button>
-                        <b-dropdown-item-button size="sm" @click="onClickAccount">
-                            <div class="d-flex align-items-center justify-content-between">
-                                Account
-                                <i class="fas fa-user ml-auto"></i>
                             </div>
                         </b-dropdown-item-button>
                         <b-dropdown-divider />
@@ -66,14 +60,22 @@
             </div>
         </b-navbar>
         <router-view />
-        <b-navbar class="navbar-bottom">
-            <router-link to="/" class="d-flex flex-column justify-content-center align-items-center">
+        <b-navbar v-if="rewardsStore.rewards.length || perksStore.perks.length" class="navbar-bottom">
+            <router-link
+                v-if="rewardsStore.rewards.length"
+                to="/"
+                class="d-flex flex-column justify-content-center align-items-center"
+            >
                 <i class="fas fa-trophy"></i>
-                Points
+                Earn
             </router-link>
-            <router-link to="/perks" class="d-flex flex-column justify-content-center align-items-center">
+            <router-link
+                v-if="perksStore.perks.length"
+                to="/perks"
+                class="d-flex flex-column justify-content-center align-items-center"
+            >
                 <i class="fas fa-store"></i>
-                Perks
+                Store
             </router-link>
             <router-link to="/wallet" class="d-flex flex-column justify-content-center align-items-center">
                 <i class="fas fa-wallet"></i>
@@ -89,6 +91,7 @@ import { WIDGET_URL, GTM } from './config/secrets';
 import { useAccountStore } from './stores/Account';
 import { useRewardStore } from './stores/Reward';
 import { useWalletStore } from './stores/Wallet';
+import { usePerkStore } from './stores/Perk';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from './utils/returnUrl';
@@ -110,6 +113,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
+        ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
         isSubscribed() {
             const { subscription } = useAccountStore();
@@ -147,17 +151,17 @@ export default defineComponent({
             track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', { origin, poolId }]);
         },
         async onMessage(event: MessageEvent) {
-            const { getConfig, setConfig, poolId } = this.accountStore;
-            const config = getConfig(this.accountStore.poolId);
-            if (!WIDGET_URL || event.origin !== new URL(config.origin).origin) return;
+            const { getConfig, poolId } = this.accountStore;
+            const { origin } = getConfig(poolId);
+            if (!WIDGET_URL || event.origin !== new URL(origin).origin) return;
 
             switch (event.data.message) {
                 case 'thx.iframe.navigate': {
-                    this.$router.push(event.data.path);
+                    this.onIframeNavigate(event.data.path);
                     break;
                 }
                 case 'thx.iframe.show': {
-                    this.onShow(config.origin, event.data.isShown);
+                    this.onIframeShow(origin, event.data.isShown);
                     break;
                 }
                 case 'thx.referral.claim.create': {
@@ -165,10 +169,17 @@ export default defineComponent({
                     break;
                 }
                 case 'thx.config.ref': {
-                    setConfig(poolId, { ref: event.data.ref } as TWidgetConfig);
+                    this.onReferralConfigUpdate(event.data.ref);
                     break;
                 }
             }
+        },
+        onReferralConfigUpdate(ref: string) {
+            const { setConfig, poolId } = this.accountStore;
+            setConfig(poolId, { ref } as TWidgetConfig);
+        },
+        onIframeNavigate(path: string) {
+            this.$router.push(path);
         },
         async onReferralClaimCreate(uuid: string) {
             const { account, getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
@@ -187,7 +198,7 @@ export default defineComponent({
 
             track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: getConfig(poolId).origin }]);
         },
-        async onShow(origin: string, isShown: boolean) {
+        async onIframeShow(origin: string, isShown: boolean) {
             const { api, signin, account, poolId } = this.accountStore;
             const user = await api.userManager.cached.getUser();
 
@@ -200,7 +211,6 @@ export default defineComponent({
         async onSubmitSubscription(email: string) {
             try {
                 await this.accountStore.subscribe(email);
-                debugger;
                 this.isModalPoolSubscriptionShown = false;
             } catch (error) {
                 this.error = 'This e-mail is used by someone else.';
@@ -237,3 +247,34 @@ export default defineComponent({
     },
 });
 </script>
+
+<style>
+.fa-bell {
+    animation: shake 10s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(0px, 0px) rotate(0deg);
+    }
+    95% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+    96% {
+        transform: translate(-2px, 1px) rotate(0deg);
+    }
+    97% {
+        transform: translate(2px, 1px) rotate(-1deg);
+    }
+    98% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+    99% {
+        transform: translate(1px, 2px) rotate(-1deg);
+    }
+    100% {
+        transform: translate(0px, 0px) rotate(0deg);
+    }
+}
+</style>

@@ -16342,6 +16342,11 @@ void-elements@^3.1.0:
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-3.1.0.tgz#614f7fbf8d801f0bb5f0661f5b2f5785750e4f09"
   integrity sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==
 
+vue-confetti-explosion@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/vue-confetti-explosion/-/vue-confetti-explosion-1.0.2.tgz#84b873d400cf0301814bdd71329daa1ac741fd86"
+  integrity sha512-80OboM3/6BItIoZ6DpNcZFqGpF607kjIVc5af56oKgtFmt5yWehvJeoYhkzYlqxrqdBe0Ko4Ie3bWrmLau+dJw==
+
 vue-demi@*:
   version "0.13.11"
   resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.13.11.tgz#7d90369bdae8974d87b1973564ad390182410d99"

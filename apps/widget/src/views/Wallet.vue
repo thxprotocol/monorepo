@@ -3,7 +3,7 @@
         <b-alert
             variant="danger"
             show
-            v-if="walletStore.wallet?.version !== walletStore.wallet?.latestVersion"
+            v-if="walletStore.wallet?.version && walletStore.wallet?.version !== walletStore.wallet?.latestVersion"
             class="mx-2 p-1 px-2 align-items-center d-flex"
         >
             <i class="fas fa-tools me-2"></i>

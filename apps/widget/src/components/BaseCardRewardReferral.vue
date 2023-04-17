@@ -1,6 +1,9 @@
 <template>
-    <BaseCardCollapse>
+    <BaseCardCollapse :visible="true">
         <template #header>
+            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
+                <i class="fas fa-comments me-2 text-primary"></i>
+            </div>
             <div class="flex-grow-1">{{ reward.title }}</div>
             <div class="text-accent fw-bold">{{ reward.amount }}</div>
         </template>

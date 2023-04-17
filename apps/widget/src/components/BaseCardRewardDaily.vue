@@ -1,6 +1,9 @@
 <template>
-    <BaseCardCollapse :visible="visible">
+    <BaseCardCollapse :visible="!waitDuration">
         <template #header>
+            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
+                <i class="fa fa-calendar me-2 text-primary"></i>
+            </div>
             <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
             <div class="text-accent fw-bold">{{ reward.amount }}</div>
         </template>

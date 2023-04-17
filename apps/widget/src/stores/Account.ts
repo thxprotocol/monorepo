@@ -4,6 +4,7 @@ import { PKG_ENV, CLIENT_ID, CLIENT_SECRET, WIDGET_URL } from '../config/secrets
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
+import { useClaimStore } from './Claim';
 import { track } from '@thxnetwork/mixpanel';
 
 export const useAccountStore = defineStore('account', {
@@ -48,7 +49,7 @@ export const useAccountStore = defineStore('account', {
                 redirectUrl: WIDGET_URL + '/signin-popup.html',
                 post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
                 popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-                scopes: 'openid account:read erc20:read erc721:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write',
+                scopes: 'openid account:read erc20:read erc721:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
                 poolId: this.poolId,
             });
 
@@ -81,11 +82,15 @@ export const useAccountStore = defineStore('account', {
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
-        signin() {
+        async signin(extraQueryParams = {}) {
             const { poolId } = this.getConfig(this.poolId);
-            this.api.userManager.cached.signinPopup({
+            const { claim } = useClaimStore();
+
+            await this.api.userManager.cached.signinPopup({
                 extraQueryParams: {
                     pool_id: poolId,
+                    claim_id: claim?.uuid,
+                    ...extraQueryParams,
                 },
             });
         },
@@ -97,7 +102,10 @@ export const useAccountStore = defineStore('account', {
         },
         async onUserUnloaded() {
             const rewardsStore = useRewardStore();
+            const perksStore = usePerkStore();
+
             rewardsStore.list().then(this.updateLauncher);
+            perksStore.list();
 
             this.isAuthenticated = false;
         },
@@ -111,9 +119,11 @@ export const useAccountStore = defineStore('account', {
             rewardsStore.list().then(() => {
                 const { origin } = this.getConfig(this.poolId);
                 const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
+
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
                 window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
             });
+            perksStore.list();
 
             // Guard HTTP requests that do require auth
             if (!this.isAuthenticated) return;
@@ -122,7 +132,6 @@ export const useAccountStore = defineStore('account', {
             this.getBalance();
             this.getSubscription();
 
-            perksStore.list();
             walletStore.list();
             walletStore.getWallet();
 

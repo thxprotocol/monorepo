@@ -1,18 +1,35 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
+import { sortDailyRewards, sortConditionalRewards, sortMilestoneRewards } from '../utils/sort';
 
 export const useRewardStore = defineStore('rewards', {
     state: (): TRewardState => ({
         rewards: [],
     }),
     getters: {
-        dailyRewards: (state: TRewardState) => state.rewards.filter((r) => r.component === 'BaseCardRewardDaily'),
+        all: (state: TRewardState) =>
+            state.rewards.sort((a: any, b: any): any => {
+                switch (a.component) {
+                    case 'BaseCardRewardDaily':
+                        return sortDailyRewards(a, b);
+                    case 'BaseCardRewardReferral':
+                        return -1;
+                    case 'BaseCardRewardPoints':
+                        return sortConditionalRewards(a, b);
+                    case 'BaseCardRewardMilestone':
+                        return sortMilestoneRewards(a, b);
+                    default:
+                        return 0;
+                }
+            }),
+        dailyRewards: (state: TRewardState) =>
+            state.rewards.filter((r) => r.component === 'BaseCardRewardDaily').sort(sortDailyRewards),
         referralRewards: (state: TRewardState) => state.rewards.filter((r) => r.component === 'BaseCardRewardReferral'),
         conditionalRewards: (state: TRewardState) =>
-            state.rewards.filter((r) => r.component === 'BaseCardRewardPoints'),
+            state.rewards.filter((r) => r.component === 'BaseCardRewardPoints').sort(sortConditionalRewards),
         milestoneRewards: (state: TRewardState) =>
-            state.rewards.filter((r) => r.component === 'BaseCardRewardMilestone'),
+            state.rewards.filter((r) => r.component === 'BaseCardRewardMilestone').sort(sortMilestoneRewards),
     },
     actions: {
         async claimConditionalReward(uuid: string) {
@@ -80,9 +97,11 @@ export const useRewardStore = defineStore('rewards', {
         async list() {
             const { api } = useAccountStore();
             const { referralRewards, pointRewards, milestoneRewards, dailyRewards } = await api.rewardsManager.list();
-            const dailyRewardsList = Object.values(dailyRewards).map((r: any) => {
-                r.component = 'BaseCardRewardDaily';
-                return r;
+
+            const dailyRewardsArray = Object.values(dailyRewards);
+            const dailyRewardsList = dailyRewardsArray.map((a: any) => {
+                a.component = 'BaseCardRewardDaily';
+                return a;
             });
 
             const referralRewardsList = Object.values(referralRewards).map((r: any) => {
@@ -90,18 +109,20 @@ export const useRewardStore = defineStore('rewards', {
                 return r;
             });
 
-            const milestoneRewardsList = Object.values(milestoneRewards).map((r: any) => {
-                r.component = 'BaseCardRewardMilestone';
-                return r;
+            const pointRewardsArray = Object.values(pointRewards);
+            const pointRewardsList = pointRewardsArray.map((a: any): TPointReward => {
+                a.component = 'BaseCardRewardPoints';
+                a.contentMetadata = a.contentMetadata && JSON.parse(a.contentMetadata);
+                return a;
             });
 
-            const pointRewardsList = pointRewards.map((r: any) => {
-                r.component = 'BaseCardRewardPoints';
-                r.contentMetadata = r.contentMetadata && JSON.parse(r.contentMetadata);
-                return r;
+            const milestoneRewardsArray = Object.values(milestoneRewards);
+            const milestoneRewardsList = milestoneRewardsArray.map((a: any): TMilestoneReward => {
+                a.component = 'BaseCardRewardMilestone';
+                return a;
             });
 
-            this.rewards = [...dailyRewardsList, ...referralRewardsList, ...milestoneRewardsList, ...pointRewardsList];
+            this.rewards = [...milestoneRewardsList, ...pointRewardsList, ...dailyRewardsList, ...referralRewardsList];
         },
     },
 });

@@ -6,10 +6,9 @@
         <b-tabs justified content-class="pt-1">
             <b-tab title="All" active>
                 <component
-                    v-for="(reward, key) of rewardsStore.rewards"
+                    v-for="(reward, key) of rewardsStore.all"
                     :key="key"
                     :is="reward.component"
-                    :visible="!key"
                     :reward="reward"
                     class="mb-2"
                 />
@@ -21,7 +20,6 @@
                 <BaseCardRewardDaily
                     v-for="(reward, key) of rewardsStore.dailyRewards"
                     :key="key"
-                    :visible="!key"
                     :reward="reward"
                     class="mb-2"
                 />
@@ -33,7 +31,6 @@
                 <BaseCardRewardReferral
                     v-for="(reward, key) of rewardsStore.referralRewards"
                     :key="key"
-                    :visible="!key"
                     :reward="reward"
                     class="mb-2"
                 />
@@ -45,7 +42,6 @@
                 <BaseCardRewardPoints
                     v-for="(reward, key) of rewardsStore.conditionalRewards"
                     :key="key"
-                    :visible="!key"
                     :reward="reward"
                     class="mb-2"
                 />
@@ -57,7 +53,6 @@
                 <BaseCardRewardMilestone
                     v-for="(reward, key) of rewardsStore.milestoneRewards"
                     :key="key"
-                    :visible="!key"
                     :reward="reward"
                     class="mb-2"
                 />
@@ -89,10 +84,17 @@ export default defineComponent({
         BaseCardRewardNFT,
         BaseModalCampaignExpired,
     },
+    data() {
+        return { filter: '' };
+    },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
         ...mapStores(useWalletStore),
+        // rewards: function (): TBaseReward[] {
+        //     const { all } = useRewardStore();
+        //     return all.filter((r) => (this.filter.length ? r.component === this.filter : true)).sort();
+        // },
     },
 });
 </script>
