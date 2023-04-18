@@ -26,14 +26,20 @@ export const useAccountStore = defineStore('account', {
             const data = { ...this.getConfig(id), ...config };
             sessionStorage.setItem(`thx:widget:${id}:config`, JSON.stringify(data));
         },
-        init({ id, origin, chainId, theme }: { origin: string; id: string; chainId: number; theme: string } & any) {
+        init({
+            id,
+            origin,
+            chainId,
+            theme,
+            expired,
+        }: { origin: string; id: string; chainId: number; theme: string; expired: boolean } & any) {
             this.poolId = id;
 
             if (!this.poolId) throw new Error('No poolId in settings.');
             if (!origin) throw new Error('No origin in settings.');
             if (!chainId) throw new Error('No chainId in settings.');
 
-            this.setConfig(id, { origin, poolId: id, chainId, theme });
+            this.setConfig(id, { origin, poolId: id, chainId, theme, expired });
 
             this.api = new THXClient({
                 env: PKG_ENV,

@@ -1,4 +1,7 @@
 <template>
+    <div>
+        <BaseModalCampaignExpired :id="'modalCampaignExpiredRewards'" />
+    </div>
     <div class="flex-grow-1 overflow-auto">
         <b-tabs justified content-class="pt-1">
             <b-tab title="All" active>
@@ -68,6 +71,7 @@ import BaseCardRewardPoints from '../components/BaseCardRewardPoints.vue';
 import BaseCardRewardNFT from '../components/BaseCardPerkERC721.vue';
 import BaseCardRewardMilestone from '../components/BaseCardRewardMilestone.vue';
 import BaseCardRewardDaily from '../components/BaseCardRewardDaily.vue';
+import BaseModalCampaignExpired from '../components/BaseModalCampaignExpired.vue';
 import { useWalletStore } from '../stores/Wallet';
 
 export default defineComponent({
@@ -78,6 +82,7 @@ export default defineComponent({
         BaseCardRewardMilestone,
         BaseCardRewardDaily,
         BaseCardRewardNFT,
+        BaseModalCampaignExpired,
     },
     data() {
         return { filter: '' };
