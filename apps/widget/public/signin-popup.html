@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
 
-<head></head>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+</head>
 
-<body>
-    <button onclick="() => window.close()">Close window</button>
-
+<body style="text-align: center; font-family: Arial">
+    <p>You can now close this window!</p>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client-ts/2.1.0/browser/oidc-client-ts.min.js"
             integrity="sha512-v9YAXYIA7sZ48R0CuD5+nKrTrFfSQT4i7iRDSbAhZFYy6mkxom6wvNnkW6fiZ916YoovjrwDlUQLRS7xZuJddw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -14,7 +17,11 @@
         const mgr = new window.oidc.UserManager({response_mode: "query"});
 
         if (code) {
-            mgr.signinPopupCallback().catch(function (err) {
+            mgr.signinPopupCallback().then(() => {
+                if (window.opener) {
+                    window.close()
+                }
+            }).catch(function (err) {
                 console.error("error: " + err && err.message);
             });
         }
