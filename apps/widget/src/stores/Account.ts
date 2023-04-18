@@ -6,6 +6,7 @@ import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
 import { useClaimStore } from './Claim';
 import { track } from '@thxnetwork/mixpanel';
+import { getReturnUrl } from '../utils/returnUrl';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -82,11 +83,13 @@ export const useAccountStore = defineStore('account', {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
         async signin(extraQueryParams = {}) {
-            const { poolId } = this.getConfig(this.poolId);
+            const { poolId, origin, chainId, theme, expired } = this.getConfig(this.poolId);
             const { claim } = useClaimStore();
+            const url = getReturnUrl(poolId, origin, chainId, theme, expired);
 
             await this.api.userManager.cached.signinPopup({
                 extraQueryParams: {
+                    return_url: url,
                     pool_id: poolId,
                     claim_id: claim?.uuid,
                     ...extraQueryParams,

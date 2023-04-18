@@ -94,7 +94,6 @@ import { useWalletStore } from './stores/Wallet';
 import { usePerkStore } from './stores/Perk';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
-import { getReturnUrl } from './utils/returnUrl';
 import BaseModalPoolSubscription from './components/BaseModalPoolSubscription.vue';
 
 import './scss/main.scss';
@@ -226,17 +225,6 @@ export default defineComponent({
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
             window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
-        },
-        onClickAccount() {
-            const { poolId, origin, chainId, theme, expired } = this.accountStore.getConfig(this.accountStore.poolId);
-            const url = getReturnUrl(poolId, origin, chainId, theme, expired);
-
-            this.accountStore.api.userManager.cached.signinRedirect({
-                extraQueryParams: {
-                    prompt: 'account-settings',
-                    return_url: url,
-                },
-            });
         },
         async onClickRefresh() {
             this.isRefreshing = true;
