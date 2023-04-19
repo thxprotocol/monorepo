@@ -49,7 +49,7 @@
                             </div>
                         </b-dropdown-item-button>
                         <b-dropdown-divider />
-                        <b-dropdown-item-button size="sm" @click="accountStore.signout()">
+                        <b-dropdown-item-button size="sm" @click="onClickSignout">
                             <div class="d-flex align-items-center justify-content-between">
                                 Signout
                                 <i class="fas fa-sign-out-alt ml-auto"></i>
@@ -221,6 +221,9 @@ export default defineComponent({
         },
         onClickSignin() {
             this.accountStore.signin();
+        },
+        onClickSignout() {
+            this.accountStore.signout();
         },
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);

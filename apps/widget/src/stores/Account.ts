@@ -15,6 +15,7 @@ export const useAccountStore = defineStore('account', {
             if (!data) return {} as TWidgetConfig;
             return JSON.parse(data);
         },
+        isMobile: window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
         poolId: '',
         api: null,
         account: null,
@@ -86,8 +87,7 @@ export const useAccountStore = defineStore('account', {
             const { poolId, origin, chainId, theme, expired } = this.getConfig(this.poolId);
             const { claim } = useClaimStore();
             const url = getReturnUrl(poolId, origin, chainId, theme, expired);
-            const isMobile = window.matchMedia('(pointer:coarse)').matches;
-            const method = window.ethereum && isMobile ? 'signinRedirect' : 'signinPopup';
+            const method = window.ethereum && this.isMobile ? 'signinRedirect' : 'signinPopup';
 
             await this.api.userManager.cached[method]({
                 state: {
@@ -103,7 +103,13 @@ export const useAccountStore = defineStore('account', {
             });
         },
         signout() {
-            this.api.userManager.cached.signoutPopup();
+            const { origin } = this.getConfig(this.poolId);
+            const method = window.ethereum && this.isMobile ? 'signoutRedirect' : 'signoutPopup';
+            this.api.userManager.cached[method]({
+                extraQueryParams: {
+                    return_url: origin,
+                },
+            });
         },
         async onLoad() {
             this.isAuthenticated = !!(await this.api.userManager.getUser());

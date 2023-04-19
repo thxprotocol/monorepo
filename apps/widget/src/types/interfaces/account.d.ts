@@ -24,6 +24,7 @@ type TAccount = {
 };
 
 type TAccountState = {
+    isMobile: boolean;
     api: THXClient | null;
     poolId: string;
     balance: number;
