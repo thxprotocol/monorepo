@@ -86,8 +86,15 @@ export const useAccountStore = defineStore('account', {
             const { poolId, origin, chainId, theme, expired } = this.getConfig(this.poolId);
             const { claim } = useClaimStore();
             const url = getReturnUrl(poolId, origin, chainId, theme, expired);
+            const { ethereum } = window as any;
+            const isMobile = window.matchMedia('(pointer:coarse)').matches;
+            const method = ethereum && isMobile ? 'signinRedirect' : 'signinPopup';
 
-            await this.api.userManager.cached.signinPopup({
+            await this.api.userManager.cached[method]({
+                state: {
+                    url,
+                    clientId: CLIENT_ID,
+                },
                 extraQueryParams: {
                     return_url: url,
                     pool_id: poolId,
