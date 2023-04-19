@@ -224,7 +224,13 @@ export default defineComponent({
         },
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
-            window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
+            const isMobile = window.matchMedia('(pointer:coarse)').matches;
+
+            if (window.ethereum && isMobile) {
+                window.open(origin, '_self');
+            } else {
+                window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
+            }
         },
         async onClickRefresh() {
             this.isRefreshing = true;

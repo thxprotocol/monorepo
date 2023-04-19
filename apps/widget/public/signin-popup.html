@@ -26,17 +26,13 @@
         if (window.ethereum && isMobile) {
             mgr.signinRedirectCallback().then(async (user) => {
                 window.location.href = state.data.url;
-            }).catch(function (err) {
-                console.error("error: " + err && err.message);
-            });
+            }).catch(console.error);
         } else {
             mgr.signinPopupCallback().then(() => {
                 if (window.opener) {
                     window.close()
                 }
-            }).catch(function (err) {
-                console.error("error: " + err && err.message);
-            });
+            }).catch(console.error);
         }
     </script>
 </body>

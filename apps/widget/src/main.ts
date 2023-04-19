@@ -7,6 +7,12 @@ import router from './router';
 import { API_URL, MIXPANEL_TOKEN } from './config/secrets';
 import Mixpanel from '@thxnetwork/mixpanel';
 
+declare global {
+    interface Window {
+        ethereum: any;
+    }
+}
+
 Mixpanel.init(MIXPANEL_TOKEN, API_URL);
 
 const pinia = createPinia();
