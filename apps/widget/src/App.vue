@@ -63,7 +63,7 @@
         <b-navbar v-if="rewardsStore.rewards.length || perksStore.perks.length" class="navbar-bottom">
             <router-link
                 v-if="rewardsStore.rewards.length"
-                to="/"
+                :to="`/${accountStore.poolId}/earn`"
                 class="d-flex flex-column justify-content-center align-items-center"
             >
                 <i class="fas fa-trophy"></i>
@@ -71,13 +71,16 @@
             </router-link>
             <router-link
                 v-if="perksStore.perks.length"
-                to="/perks"
+                :to="`/${accountStore.poolId}/store`"
                 class="d-flex flex-column justify-content-center align-items-center"
             >
                 <i class="fas fa-store"></i>
                 Store
             </router-link>
-            <router-link to="/wallet" class="d-flex flex-column justify-content-center align-items-center">
+            <router-link
+                :to="`/${accountStore.poolId}/wallet`"
+                class="d-flex flex-column justify-content-center align-items-center"
+            >
                 <i class="fas fa-wallet"></i>
                 Wallet
             </router-link>
@@ -130,17 +133,7 @@ export default defineComponent({
     },
     async created() {
         if (GTM) initGTM();
-
-        // this.$route is not yet available at this point so we use the browser location API
-        // to obtain the query
-        const params = new URLSearchParams(window.location.search);
-        const [id, origin, chainId, theme, expired] = ['id', 'origin', 'chainId', 'theme', 'expired'].map((key) =>
-            params.get(key),
-        );
-        this.accountStore.init({ id, origin, chainId, theme, expired: JSON.parse(expired as string) });
-
         window.onmessage = this.onMessage;
-
         this.ready();
     },
     methods: {
