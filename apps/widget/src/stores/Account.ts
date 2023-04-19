@@ -7,6 +7,7 @@ import { useWalletStore } from './Wallet';
 import { useClaimStore } from './Claim';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from '../utils/returnUrl';
+import detectEthereumProvider from '@metamask/detect-provider';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -86,11 +87,13 @@ export const useAccountStore = defineStore('account', {
             const { poolId, origin, chainId, theme, expired } = this.getConfig(this.poolId);
             const { claim } = useClaimStore();
             const url = getReturnUrl(poolId, origin, chainId, theme, expired);
-            const { ethereum } = window as any;
-            alert(ethereum ? JSON.stringify(ethereum) : 'no ethereum');
+
+            // This returns the provider, or null if it wasn't detected.
+            const provider = await detectEthereumProvider();
+            alert(provider);
             const isMobile = window.matchMedia('(pointer:coarse)').matches;
             alert(isMobile);
-            const method = !ethereum && isMobile ? 'signinRedirect' : 'signinPopup';
+            const method = provider && isMobile ? 'signinRedirect' : 'signinPopup';
             alert(method);
 
             await this.api.userManager.cached[method]({

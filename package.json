@@ -10,6 +10,7 @@
     },
     "private": true,
     "dependencies": {
+        "@metamask/detect-provider": "^2.0.0",
         "@popperjs/core": "^2.11.6",
         "@stripe/stripe-js": "^1.46.0",
         "@thxnetwork/sdk": "1.1.6",
