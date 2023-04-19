@@ -87,8 +87,11 @@ export const useAccountStore = defineStore('account', {
             const { claim } = useClaimStore();
             const url = getReturnUrl(poolId, origin, chainId, theme, expired);
             const { ethereum } = window as any;
+            alert(ethereum ? JSON.stringify(ethereum) : 'no ethereum');
             const isMobile = window.matchMedia('(pointer:coarse)').matches;
-            const method = ethereum && isMobile ? 'signinRedirect' : 'signinPopup';
+            alert(isMobile);
+            const method = !ethereum && isMobile ? 'signinRedirect' : 'signinPopup';
+            alert(method);
 
             await this.api.userManager.cached[method]({
                 state: {
