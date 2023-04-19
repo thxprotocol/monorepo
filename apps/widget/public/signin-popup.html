@@ -7,8 +7,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 </head>
 
-<body style="text-align: center; font-family: Arial">
-    <!-- <p>You can now close this window!</p> -->
+<body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client-ts/2.1.0/browser/oidc-client-ts.min.js"
             integrity="sha512-v9YAXYIA7sZ48R0CuD5+nKrTrFfSQT4i7iRDSbAhZFYy6mkxom6wvNnkW6fiZ916YoovjrwDlUQLRS7xZuJddw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -25,7 +24,7 @@
 
         if (window.ethereum && isMobile) {
             mgr.signinRedirectCallback().then(async (user) => {
-                window.location.href = state.data.url;
+                window.open(state.data.url, '_self')
             }).catch(console.error);
         } else {
             mgr.signinPopupCallback().then(() => {

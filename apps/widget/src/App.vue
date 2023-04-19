@@ -104,6 +104,7 @@ export default defineComponent({
     },
     data() {
         return {
+            isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
             isModalPoolSubscriptionShown: false,
             isRefreshing: false,
             error: '',
@@ -227,10 +228,9 @@ export default defineComponent({
         },
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
-            const isMobile = window.matchMedia('(pointer:coarse)').matches;
 
-            if (window.ethereum && isMobile) {
-                window.open(origin, '_self');
+            if (this.isEthereumBrowser) {
+                window.close();
             } else {
                 window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
             }
