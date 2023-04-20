@@ -55,10 +55,6 @@ export const useAccountStore = defineStore('account', {
         }: { origin: string; id: string; chainId: number; theme: string; expired: boolean } & any) {
             this.poolId = id;
 
-            if (!this.poolId) throw new Error('No poolId in settings.');
-            if (!origin) throw new Error('No origin in settings.');
-            if (!chainId) throw new Error('No chainId in settings.');
-
             this.setConfig(id, { origin, poolId: id, chainId, theme, expired });
             this.setTheme();
 
@@ -109,10 +105,7 @@ export const useAccountStore = defineStore('account', {
             const method = this.isEthereumBrowser ? 'signinRedirect' : 'signinPopup';
 
             await this.api.userManager.cached[method]({
-                state: {
-                    url,
-                    clientId: CLIENT_ID,
-                },
+                state: { url, clientId: CLIENT_ID },
                 extraQueryParams: {
                     return_url: url,
                     pool_id: poolId,

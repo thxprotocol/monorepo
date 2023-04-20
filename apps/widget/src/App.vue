@@ -134,15 +134,8 @@ export default defineComponent({
     async created() {
         if (GTM) initGTM();
         window.onmessage = this.onMessage;
-        this.ready();
     },
     methods: {
-        ready() {
-            const { origin, poolId } = this.accountStore.getConfig(this.accountStore.poolId);
-            window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
-
-            track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', { origin, poolId }]);
-        },
         async onMessage(event: MessageEvent) {
             const { getConfig, poolId } = this.accountStore;
             const { origin } = getConfig(poolId);
@@ -221,9 +214,12 @@ export default defineComponent({
         },
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
-
             if (this.isEthereumBrowser) {
-                window.close();
+                if (window.opener) {
+                    window.close();
+                } else {
+                    window.open(origin, '_self');
+                }
             } else {
                 window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
             }

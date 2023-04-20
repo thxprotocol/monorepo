@@ -107,7 +107,7 @@ export default defineComponent({
     },
     async mounted() {
         this.uuid = this.$route.params.uuid as string;
-        await this.claimsStore.getClaim(this.uuid);
+        this.claimsStore.getClaim(this.uuid);
     },
     methods: {
         onClickSignin() {

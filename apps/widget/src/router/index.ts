@@ -1,19 +1,24 @@
+import { track } from '@thxnetwork/mixpanel';
 import { useAccountStore } from '../stores/Account';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 function beforeEnter(to: any, from: any, next: any) {
-    const { poolId, init, getConfig } = useAccountStore();
-    if (poolId) next();
-
-    const { id, origin, chainId, theme, expired } = to.query;
-    if (id && origin && chainId && theme && expired) {
-        init({ id, origin, chainId, theme, expired: JSON.parse(expired as string) });
+    const { poolId, init, getConfig, account } = useAccountStore();
+    if (poolId) {
+        next();
     } else {
-        const { poolId, origin, chainId, theme, expired } = getConfig(to.params.poolId);
-        init({ id: poolId, origin, chainId, theme, expired });
-    }
+        // If there is no poolId we need to init and grab data either from query or storage
+        const { id, origin, chainId, theme, expired } = to.query;
+        if (id && origin && chainId && theme && expired) {
+            init({ id, origin, chainId, theme, expired: JSON.parse(expired as string) });
+        } else {
+            const { poolId, origin, chainId, theme, expired } = getConfig(to.params.poolId);
+            init({ id: poolId, origin, chainId, theme, expired });
+        }
 
-    next();
+        track('UserVisits', [account?.sub || '', 'page with widget', { origin, poolId }]);
+        next();
+    }
 }
 
 const routes: Array<RouteRecordRaw> = [
@@ -42,7 +47,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "wallet" */ '../views/Wallet.vue'),
     },
     {
-        path: '/:poolId/collect/:uuid',
+        path: '/:poolId/c/:uuid',
         name: 'collect',
         beforeEnter,
         component: () => import(/* webpackChunkName: "collect" */ '../views/Collect.vue'),
