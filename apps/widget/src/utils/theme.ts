@@ -1,9 +1,6 @@
-import Color from 'https://cdn.jsdelivr.net/npm/color@4.2.3/+esm';
-const params = new URLSearchParams(window.location.search);
-const param = params.get('theme');
+import Color from 'color';
 
-if (param) {
-    const { elements, colors } = JSON.parse(param);
+export function getStyles(elements: any, colors: any) {
     const theme = {
         elements: {
             bodyBg: elements['bodyBg'].color,
@@ -26,7 +23,7 @@ if (param) {
             info: colors['info'].color,
         },
     };
-    const styles = {
+    return {
         '.text-accent': {
             '--thx-accent': theme.colors.accent,
         },
@@ -95,16 +92,4 @@ if (param) {
             '--bs-nav-tabs-link-active-border-color': theme.elements.btnBgDark,
         },
     };
-
-    const sheet = document.createElement('style');
-    for (const selector in styles) {
-        let rule = `${selector} { `;
-        for (const name in styles[selector]) {
-            rule += `${name}: ${styles[selector][name]};`;
-        }
-        rule += '}';
-        sheet.innerText += rule;
-    }
-
-    document.head.appendChild(sheet);
 }

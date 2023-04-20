@@ -7,6 +7,7 @@ import { useWalletStore } from './Wallet';
 import { useClaimStore } from './Claim';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from '../utils/returnUrl';
+import { getStyles } from '../utils/theme';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -28,6 +29,23 @@ export const useAccountStore = defineStore('account', {
             const data = { ...this.getConfig(id), ...config };
             sessionStorage.setItem(`thx:widget:${id}:config`, JSON.stringify(data));
         },
+        setTheme() {
+            const { theme } = this.getConfig(this.poolId);
+            const { elements, colors } = JSON.parse(theme);
+            const styles: any = getStyles(elements, colors);
+            const sheet = document.createElement('style');
+
+            for (const selector in styles) {
+                let rule = `${selector} { `;
+                for (const name in styles[selector]) {
+                    rule += `${name}: ${styles[selector][name]};`;
+                }
+                rule += '}';
+                sheet.innerText += rule;
+            }
+
+            document.head.appendChild(sheet);
+        },
         init({
             id,
             origin,
@@ -42,6 +60,7 @@ export const useAccountStore = defineStore('account', {
             if (!chainId) throw new Error('No chainId in settings.');
 
             this.setConfig(id, { origin, poolId: id, chainId, theme, expired });
+            this.setTheme();
 
             this.api = new THXClient({
                 env: PKG_ENV,

@@ -12,6 +12,7 @@ function beforeEnter(to: any, from: any, next: any) {
         const { poolId, origin, chainId, theme, expired } = getConfig(to.params.poolId);
         init({ id: poolId, origin, chainId, theme, expired });
     }
+
     next();
 }
 
