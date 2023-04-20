@@ -50,7 +50,13 @@
                 </div>
             </div>
 
-            <b-button variant="primary" block class="w-100" :disabled="isSoldOut || isExpired" @click="$emit('submit')">
+            <b-button
+                variant="primary"
+                block
+                class="w-100"
+                :disabled="isSoldOut || isExpired || isLocked"
+                @click="$emit('submit')"
+            >
                 <template v-if="isSoldOut">Sold out</template>
                 <template v-else-if="isExpired">Expired</template>
                 <template v-else-if="price && price > 0">
@@ -59,6 +65,7 @@
                         / {{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}
                     </small>
                 </template>
+                <template v-else-if="isLocked"> <i class="fas fa-lock"></i></template>
                 <template v-else>
                     <strong>{{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}</strong>
                 </template>
@@ -85,6 +92,7 @@ export default defineComponent({
         price: Number,
         priceCurrency: String,
         pointPrice: Number,
+        isLocked: Boolean,
         progress: {
             required: true,
             type: Object as PropType<{ count: number; limit: number }>,

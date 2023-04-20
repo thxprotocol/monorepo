@@ -25,4 +25,5 @@ type TPerk = {
         date: number;
         now: number;
     };
+    isLocked: boolean;
 };

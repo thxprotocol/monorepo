@@ -50,11 +50,13 @@
                 v-else
                 variant="success"
                 class="w-100 rounded-pill"
-                :disabled="isLoading"
+                :disabled="isLoading || perk.isLocked"
                 @click="$emit('submit-redemption')"
             >
                 <b-spinner small variant="primary" v-if="isSubmitting" />
-                {{ perk.pointPrice }} points
+                <template v-else-if="perk.isLocked"> <i class="fas fa-lock"></i></template>
+
+                <template v-else> {{ perk.pointPrice }} points</template>
             </b-button>
         </template>
     </b-modal>

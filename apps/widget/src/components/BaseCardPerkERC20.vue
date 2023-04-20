@@ -8,6 +8,7 @@
         :point-price="perk.pointPrice"
         :progress="perk.progress"
         :expiry="perk.expiry"
+        :isLocked="perk.isLocked"
         @submit="onClickRedeem"
     >
         <template #title>
