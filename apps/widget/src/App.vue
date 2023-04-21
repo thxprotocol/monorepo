@@ -42,7 +42,7 @@
                         <template #button-content>
                             <i class="fas fa-bars"></i>
                         </template>
-                        <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="$router.push('/wallet')">
+                        <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="onClickWallet">
                             <div class="d-flex align-items-center justify-content-between">
                                 {{ walletAddress }}
                                 <i class="fas fa-clipboard ml-auto"></i>
@@ -138,8 +138,9 @@ export default defineComponent({
     methods: {
         async onMessage(event: MessageEvent) {
             const { getConfig, poolId } = this.accountStore;
-            const { origin } = getConfig(poolId);
-            if (!WIDGET_URL || event.origin !== new URL(origin).origin) return;
+            const origin = getConfig(poolId).origin;
+            const localOrigin = new URL(origin).origin;
+            if (!WIDGET_URL || event.origin !== localOrigin) return;
 
             switch (event.data.message) {
                 case 'thx.iframe.navigate': {
@@ -223,6 +224,9 @@ export default defineComponent({
             } else {
                 window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
             }
+        },
+        onClickWallet() {
+            this.$router.push(`/${this.accountStore.poolId}/wallet`);
         },
         async onClickRefresh() {
             this.isRefreshing = true;
