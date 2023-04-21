@@ -216,11 +216,11 @@ export default defineComponent({
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
             if (this.isEthereumBrowser) {
-                if (window.opener) {
-                    window.close();
-                } else {
-                    window.open(origin, '_self');
-                }
+                // if (window.opener) {
+                //     window.close();
+                // } else {
+                // }
+                window.open(origin, '_self');
             } else {
                 window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
             }
