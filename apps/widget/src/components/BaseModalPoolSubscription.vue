@@ -31,19 +31,16 @@
                 {{ error }}
             </b-alert>
 
-            <p class="mb-0">
+            <p>
                 <template v-if="!isSubscribed">
-                    Subscribe now and we will notify <strong class="text-accent">{{ email }}</strong> when new rewards
-                    are available!
+                    Subscribe now and we will notify you when new rewards are available!
                 </template>
                 <template v-else>
-                    We will stop sending reward notifications to <strong class="text-accent">{{ email }}</strong
-                    >.
+                    We will stop sending reward notifications to <strong class="text-accent">{{ email }} </strong>.
                 </template>
             </p>
-
-            <b-form-group v-if="!accountStore.account?.email" label="E-mail" :state="isEmailValid">
-                <b-form-input v-model="email" type="email" :state="isEmailValid" />
+            <b-form-group v-if="!accountStore.account?.email" :state="isEmailValid">
+                <b-form-input v-model="email" type="email" :state="isEmailValid" placeholder="E-mail" />
             </b-form-group>
         </template>
         <template #footer>
@@ -98,7 +95,8 @@ export default defineComponent({
         },
     },
     methods: {
-        onShow() {
+        async onShow() {
+            await this.accountStore.getAccount();
             this.email = this.accountStore.account?.email || '';
         },
         onChangeEmail(email: string) {

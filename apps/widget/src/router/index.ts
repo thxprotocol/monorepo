@@ -1,9 +1,8 @@
-import { track } from '@thxnetwork/mixpanel';
 import { useAccountStore } from '../stores/Account';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 function beforeEnter(to: any, from: any, next: any) {
-    const { poolId, init, getConfig, account } = useAccountStore();
+    const { poolId, init, getConfig } = useAccountStore();
     if (poolId) {
         next();
     } else {
@@ -16,7 +15,6 @@ function beforeEnter(to: any, from: any, next: any) {
             init({ id: poolId, origin, chainId, theme, expired });
         }
 
-        track('UserVisits', [account?.sub || '', 'page with widget', { origin, poolId }]);
         next();
     }
 }

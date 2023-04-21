@@ -28,6 +28,7 @@ export const useAccountStore = defineStore('account', {
         setConfig(id: string, config: TWidgetConfig) {
             const data = { ...this.getConfig(id), ...config };
             sessionStorage.setItem(`thx:widget:${id}:config`, JSON.stringify(data));
+            this.poolId = id;
         },
         setTheme() {
             const { theme } = this.getConfig(this.poolId);
@@ -53,8 +54,6 @@ export const useAccountStore = defineStore('account', {
             theme,
             expired,
         }: { origin: string; id: string; chainId: number; theme: string; expired: boolean } & any) {
-            this.poolId = id;
-
             this.setConfig(id, { origin, poolId: id, chainId, theme, expired });
             this.setTheme();
 
@@ -74,6 +73,8 @@ export const useAccountStore = defineStore('account', {
             this.api.userManager.cached.events.addUserLoaded(this.onUserLoaded);
             this.api.userManager.cached.events.addUserUnloaded(this.onUserLoaded);
             this.api.userManager.cached.events.load(this.onLoad);
+
+            track('UserVisits', [this.account?.sub || '', 'page with widget', { origin, poolId: this.poolId }]);
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();
