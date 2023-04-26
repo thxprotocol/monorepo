@@ -52,7 +52,7 @@ export default defineComponent({
         },
     },
     data: function () {
-        return { isModalTransferShown: false, isModalUpgradeShown: false, error: '', isSubmitting: false };
+        return { isModalTransferShown: false, error: '', isSubmitting: false };
     },
     computed: {
         ...mapStores(useWalletStore),
@@ -63,7 +63,7 @@ export default defineComponent({
         },
         async onSubmitTransfer(config: TERC20TransferConfig) {
             this.isSubmitting = true;
-            await this.walletStore.transfer(config);
+            await this.walletStore.transferERC20(config);
             await this.walletStore.list();
             this.isModalTransferShown = false;
             this.isSubmitting = false;

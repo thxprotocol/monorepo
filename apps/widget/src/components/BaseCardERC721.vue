@@ -9,14 +9,14 @@
             </div>
             <b-spinner small variant="primary" v-if="!token.tokenId" />
             <div v-else class="text-accent fw-bold">#{{ token.tokenId }}</div>
-            <!-- <div>
+            <div>
                 <b-dropdown variant="link" size="sm" no-caret>
                     <template #button-content>
                         <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                     </template>
-                    <b-dropdown-item> Transfer </b-dropdown-item>
+                    <b-dropdown-item disabled @click="isModalTransferShown = true"> Transfer </b-dropdown-item>
                 </b-dropdown>
-            </div> -->
+            </div>
         </template>
 
         <b-link :href="token.metadata.imageUrl">
@@ -85,7 +85,7 @@ export default defineComponent({
         },
     },
     data: function () {
-        return { isVisible: false, isModalUpgradeShown: false, error: '', isSubmitting: false };
+        return { isVisible: false, isModalTransferShown: false, error: '', isSubmitting: false };
     },
     computed: {
         ...mapStores(useWalletStore),
@@ -96,6 +96,16 @@ export default defineComponent({
         }
     },
     methods: {
+        onModalTransferHidden() {
+            this.isModalTransferShown = false;
+        },
+        async onSubmitTransfer(config: TERC721TransferConfig) {
+            this.isSubmitting = true;
+            await this.walletStore.transferERC721(config);
+            await this.walletStore.list();
+            this.isModalTransferShown = false;
+            this.isSubmitting = false;
+        },
         waitForMinted() {
             const taskFn = async () => {
                 this.walletStore.getERC721Token(this.token);

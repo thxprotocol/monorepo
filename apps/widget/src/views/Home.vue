@@ -73,6 +73,7 @@ import BaseCardRewardMilestone from '../components/BaseCardRewardMilestone.vue';
 import BaseCardRewardDaily from '../components/BaseCardRewardDaily.vue';
 import BaseModalCampaignExpired from '../components/BaseModalCampaignExpired.vue';
 import { useWalletStore } from '../stores/Wallet';
+import { usePerkStore } from '../stores/Perk';
 
 export default defineComponent({
     name: 'Home',
@@ -90,11 +91,14 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
+        ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
-        // rewards: function (): TBaseReward[] {
-        //     const { all } = useRewardStore();
-        //     return all.filter((r) => (this.filter.length ? r.component === this.filter : true)).sort();
-        // },
+    },
+    mounted() {
+        // This redirects the user to the wallet of there are no rewards and perks
+        if (!this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
+            this.$router.push(`/${this.accountStore.poolId}/wallet`);
+        }
     },
 });
 </script>
