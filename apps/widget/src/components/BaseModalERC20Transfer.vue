@@ -60,7 +60,9 @@ export default defineComponent({
     },
     computed: {
         isAmountValid: function () {
-            return !this.amount ? undefined : this.amount > 0 && this.amount <= this.token.walletBalance;
+            return !this.amount
+                ? undefined
+                : Number(this.amount) > 0 && Number(this.amount) <= this.token.walletBalance;
         },
         isSubmitDisabled: function () {
             return this.isLoading || !this.isReceiverValid || !this.isAmountValid || this.isVariantMetamask;
