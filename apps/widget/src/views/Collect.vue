@@ -9,7 +9,7 @@
                 <b-spinner small class="me-1" />
                 Preparing your smart wallet...
             </b-alert>
-            <div class="d-flex justify-content-center overflow-hidden">
+            <div class="d-flex justify-content-center">
                 <ConfettiExplosion
                     v-if="isLoadingCollectComplete"
                     :stageHeight="400"
