@@ -14,8 +14,25 @@
                     <template #button-content>
                         <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                     </template>
-                    <b-dropdown-item disabled @click="isModalTransferShown = true"> Transfer </b-dropdown-item>
+                    <b-dropdown-item
+                        :disabled="
+                            walletStore.wallet?.version &&
+                            walletStore.wallet?.version !== walletStore.wallet?.latestVersion
+                        "
+                        @click.stop="isModalTransferShown = true"
+                    >
+                        Transfer
+                    </b-dropdown-item>
                 </b-dropdown>
+                <BaseModalERC721Transfer
+                    :id="`modalERC721Transfer${token.erc721._id}`"
+                    :show="isModalTransferShown"
+                    :error="error"
+                    :token="token"
+                    :is-loading="isSubmitting"
+                    @hidden="onModalTransferHidden"
+                    @submit="onSubmitTransfer"
+                />
             </div>
         </template>
 
@@ -71,12 +88,14 @@ import { defineComponent, PropType } from 'vue';
 import { useWalletStore } from '../stores/Wallet';
 import { mapStores } from 'pinia';
 import BaseCardCollapse from './BaseCardCollapse.vue';
+import BaseModalERC721Transfer from './BaseModalERC721Transfer.vue';
 import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseCardERC721',
     components: {
         BaseCardCollapse,
+        BaseModalERC721Transfer,
     },
     props: {
         token: {

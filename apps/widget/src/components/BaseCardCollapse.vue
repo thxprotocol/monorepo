@@ -7,7 +7,7 @@
     >
         <template #header>
             <b-card-title
-                @click="isVisible = !isVisible"
+                @click.stop="isVisible = !isVisible"
                 class="d-flex p-3 m-0 align-items-center"
                 style="cursor: pointer"
             >

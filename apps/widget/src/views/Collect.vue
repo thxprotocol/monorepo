@@ -68,7 +68,7 @@
                 {{ error || claimsStore.error }}
             </b-alert>
 
-            <b-button v-if="isLoadingCollectComplete" variant="primary" to="/wallet" class="w-100">
+            <b-button v-if="isLoadingCollectComplete" variant="primary" @click="onClickGoToWallet" class="w-100">
                 Go to wallet
             </b-button>
             <b-button
@@ -112,6 +112,10 @@ export default defineComponent({
     methods: {
         onClickSignin() {
             this.accountStore.signin();
+        },
+        onClickGoToWallet() {
+            const { poolId } = this.accountStore;
+            this.$router.push(`/${poolId}/wallet`);
         },
         async onClickCollect() {
             this.isLoadingCollect = true;

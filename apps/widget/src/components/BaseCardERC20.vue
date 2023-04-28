@@ -20,16 +20,16 @@
                 >
                     Transfer
                 </b-dropdown-item>
-                <BaseModalERC20Transfer
-                    :id="`modalERC20Transfer${token.erc20._id}`"
-                    :show="isModalTransferShown"
-                    :error="error"
-                    :token="token"
-                    :is-loading="isSubmitting"
-                    @hidden="onModalTransferHidden"
-                    @submit="onSubmitTransfer"
-                />
             </b-dropdown>
+            <BaseModalERC20Transfer
+                :id="`modalERC20Transfer${token.erc20._id}`"
+                :show="isModalTransferShown"
+                :error="error"
+                :token="token"
+                :is-loading="isSubmitting"
+                @hidden="onModalTransferHidden"
+                @submit="onSubmitTransfer"
+            />
         </div>
     </b-card>
 </template>

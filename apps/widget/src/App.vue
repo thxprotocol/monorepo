@@ -45,7 +45,7 @@
                         <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="onClickWallet">
                             <div class="d-flex align-items-center justify-content-between">
                                 {{ walletAddress }}
-                                <i class="fas fa-clipboard ml-auto"></i>
+                                <i class="fas fa-clipboard ml-auto" v-clipboard:copy="walletStore.wallet.address"></i>
                             </div>
                         </b-dropdown-item-button>
                         <b-dropdown-divider />

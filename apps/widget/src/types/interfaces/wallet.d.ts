@@ -37,6 +37,7 @@ type TERC721Metadata = {
 };
 
 type TERC721 = {
+    _id: string;
     name: string;
     symbol: string;
     description: string;
@@ -64,5 +65,4 @@ type TERC721TransferConfig = {
     erc721Id: string;
     erc721TokenId: string;
     to: string;
-    chainId: number;
 };
