@@ -5,7 +5,11 @@
                 <i class="fas fa-gift me-1"></i>
                 Sign in to collect your NFT
             </b-alert>
-            <div class="d-flex justify-content-center">
+            <b-alert v-if="accountStore.isAuthenticated && !walletStore.wallet" variant="info" show class="p-2">
+                <b-spinner small class="me-1" />
+                Preparing your smart wallet...
+            </b-alert>
+            <div class="d-flex justify-content-center overflow-hidden">
                 <ConfettiExplosion
                     v-if="isLoadingCollectComplete"
                     :stageHeight="400"
@@ -76,7 +80,7 @@
                 @click="onClickCollect"
                 variant="success"
                 class="w-100"
-                :disabled="!!error || !!claimsStore.error"
+                :disabled="!!error || !!claimsStore.error || !walletStore.wallet"
             >
                 <b-spinner v-if="isLoadingCollect" small variant="dark" />
                 Collect
@@ -93,6 +97,7 @@ import { useAccountStore } from '../stores/Account';
 import { useClaimStore } from '../stores/Claim';
 import { useWalletStore } from '../stores/Wallet';
 import ConfettiExplosion from 'vue-confetti-explosion';
+import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'Home',
@@ -110,6 +115,18 @@ export default defineComponent({
         this.claimsStore.getClaim(this.uuid);
     },
     methods: {
+        waitForWallet() {
+            const taskFn = async () => {
+                await this.walletStore.getWallet();
+                if (this.walletStore.wallet) {
+                    return Promise.resolve();
+                } else {
+                    return Promise.reject('Could not find wallet');
+                }
+            };
+
+            return poll({ taskFn, interval: 3000, retries: 20 });
+        },
         onClickSignin() {
             this.accountStore.signin();
         },

@@ -135,7 +135,7 @@ export default defineComponent({
                 }
             };
 
-            return poll({ taskFn, interval: 3000, retries: 10 });
+            return poll({ taskFn, interval: 3000, retries: 20 });
         },
     },
 });
