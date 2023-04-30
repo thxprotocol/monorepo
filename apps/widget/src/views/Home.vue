@@ -2,8 +2,24 @@
     <div>
         <BaseModalCampaignExpired :id="'modalCampaignExpiredRewards'" />
     </div>
+    <b-dropdown small variant="primary" id="dropdown-1" text="Dropdown Button">
+        <b-dropdown-item>First Action</b-dropdown-item>
+        <b-dropdown-item>Second Action</b-dropdown-item>
+        <b-dropdown-item>Third Action</b-dropdown-item>
+        <b-dropdown-divider></b-dropdown-divider>
+        <b-dropdown-item active>Active action</b-dropdown-item>
+        <b-dropdown-item disabled>Disabled action</b-dropdown-item>
+    </b-dropdown>
+    <hr />
     <div class="flex-grow-1 overflow-auto">
-        <b-tabs justified content-class="pt-1">
+        <component
+            v-for="(reward, key) of rewardsStore.all"
+            :key="key"
+            :is="reward.component"
+            :reward="reward"
+            class="mb-2"
+        />
+        <!-- <b-tabs justified content-class="pt-1">
             <b-tab title="All" active>
                 <component
                     v-for="(reward, key) of rewardsStore.all"
@@ -57,7 +73,7 @@
                     class="mb-2"
                 />
             </b-tab>
-        </b-tabs>
+        </b-tabs> -->
     </div>
 </template>
 
@@ -94,11 +110,13 @@ export default defineComponent({
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
     },
-    mounted() {
+    watch: {
         // This redirects the user to the wallet of there are no rewards and perks
-        if (!this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
-            this.$router.push(`/${this.accountStore.poolId}/wallet`);
-        }
+        'accountStore.isRewardsLoaded'(n, o) {
+            if (!this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
+                this.$router.push(`/${this.accountStore.poolId}/wallet`);
+            }
+        },
     },
 });
 </script>

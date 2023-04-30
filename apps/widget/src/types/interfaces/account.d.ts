@@ -25,6 +25,7 @@ type TAccount = {
 
 type TAccountState = {
     isEthereumBrowser: boolean;
+    isRewardsLoaded: boolean;
     api: THXClient | null;
     poolId: string;
     balance: number;
