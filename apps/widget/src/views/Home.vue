@@ -94,11 +94,13 @@ export default defineComponent({
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
     },
-    mounted() {
+    watch: {
         // This redirects the user to the wallet of there are no rewards and perks
-        if (!this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
-            this.$router.push(`/${this.accountStore.poolId}/wallet`);
-        }
+        'accountStore.isRewardsLoaded'(isRewardsLoaded) {
+            if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
+                this.$router.push(`/${this.accountStore.poolId}/wallet`);
+            }
+        },
     },
 });
 </script>

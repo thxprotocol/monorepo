@@ -22,6 +22,7 @@ export const useAccountStore = defineStore('account', {
         balance: 0,
         subscription: null,
         isAuthenticated: false,
+        isRewardsLoaded: false,
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
@@ -71,7 +72,7 @@ export const useAccountStore = defineStore('account', {
             this.api.userManager.cached.events.addAccessTokenExpired(this.onAccessTokenExpired);
             this.api.userManager.cached.events.addAccessTokenExpiring(this.onAccessTokenExpiring);
             this.api.userManager.cached.events.addUserLoaded(this.onUserLoaded);
-            this.api.userManager.cached.events.addUserUnloaded(this.onUserLoaded);
+            this.api.userManager.cached.events.addUserUnloaded(this.onUserUnloaded);
             this.api.userManager.cached.events.load(this.onLoad);
 
             track('UserVisits', [this.account?.sub || '', 'page with widget', { origin, poolId: this.poolId }]);
@@ -148,6 +149,7 @@ export const useAccountStore = defineStore('account', {
 
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
                 window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+                this.isRewardsLoaded = true;
             });
             perksStore.list();
 
