@@ -1,3 +1,16 @@
+export enum RewardSortVariant {
+    Available = 0,
+    Created = 1,
+    Amount = 2,
+}
+
+export enum RewardVariant {
+    Daily = 0,
+    Referral = 1,
+    Conditional = 2,
+    Milestone = 3,
+}
+
 export enum RewardConditionPlatform {
     None = 0,
     YouTube = 1,

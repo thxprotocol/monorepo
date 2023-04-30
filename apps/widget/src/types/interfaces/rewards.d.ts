@@ -16,6 +16,7 @@ type TBaseReward = {
     progress?: number;
     page?: number;
     claims?: any[];
+    variant: RewardVariant;
 };
 
 type TPointReward = TBaseReward & {
@@ -61,4 +62,15 @@ type TDailyReward = TBaseReward & {
     uuid: string;
     amount: number;
     claims: TDailyRewardClaim[];
+};
+
+type TRewardFilter = {
+    label: string;
+    key: RewardVariant;
+    icon: string;
+};
+
+type TRewardSort = {
+    label: string;
+    key: RewardVariant;
 };

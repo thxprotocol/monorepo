@@ -1,36 +1,12 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
-import { sortDailyRewards, sortConditionalRewards, sortMilestoneRewards } from '../utils/sort';
+import { RewardVariant } from '../types/enums/rewards';
 
 export const useRewardStore = defineStore('rewards', {
     state: (): TRewardState => ({
         rewards: [],
     }),
-    getters: {
-        all: (state: TRewardState) =>
-            state.rewards.sort((a: any, b: any): any => {
-                switch (a.component) {
-                    case 'BaseCardRewardDaily':
-                        return sortDailyRewards(a, b);
-                    case 'BaseCardRewardReferral':
-                        return -1;
-                    case 'BaseCardRewardPoints':
-                        return sortConditionalRewards(a, b);
-                    case 'BaseCardRewardMilestone':
-                        return sortMilestoneRewards(a, b);
-                    default:
-                        return 0;
-                }
-            }),
-        dailyRewards: (state: TRewardState) =>
-            state.rewards.filter((r) => r.component === 'BaseCardRewardDaily').sort(sortDailyRewards),
-        referralRewards: (state: TRewardState) => state.rewards.filter((r) => r.component === 'BaseCardRewardReferral'),
-        conditionalRewards: (state: TRewardState) =>
-            state.rewards.filter((r) => r.component === 'BaseCardRewardPoints').sort(sortConditionalRewards),
-        milestoneRewards: (state: TRewardState) =>
-            state.rewards.filter((r) => r.component === 'BaseCardRewardMilestone').sort(sortMilestoneRewards),
-    },
     actions: {
         async claimConditionalReward(uuid: string) {
             const { api, account, getBalance, poolId, getConfig } = useAccountStore();
@@ -100,25 +76,25 @@ export const useRewardStore = defineStore('rewards', {
 
             const dailyRewardsArray = Object.values(dailyRewards);
             const dailyRewardsList = dailyRewardsArray.map((a: any) => {
-                a.component = 'BaseCardRewardDaily';
+                a.variant = RewardVariant.Daily;
                 return a;
             });
 
             const referralRewardsList = Object.values(referralRewards).map((r: any) => {
-                r.component = 'BaseCardRewardReferral';
+                r.variant = RewardVariant.Referral;
                 return r;
             });
 
             const pointRewardsArray = Object.values(pointRewards);
             const pointRewardsList = pointRewardsArray.map((a: any): TPointReward => {
-                a.component = 'BaseCardRewardPoints';
                 a.contentMetadata = a.contentMetadata && JSON.parse(a.contentMetadata);
+                a.variant = RewardVariant.Conditional;
                 return a;
             });
 
             const milestoneRewardsArray = Object.values(milestoneRewards);
             const milestoneRewardsList = milestoneRewardsArray.map((a: any): TMilestoneReward => {
-                a.component = 'BaseCardRewardMilestone';
+                a.variant = RewardVariant.Milestone;
                 return a;
             });
 
