@@ -4,6 +4,9 @@
             <div style="width: 84px">
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
             </div>
+            <div class="pl-3 py-2 text-center text-decoration-none" v-if="!accountStore.isAuthenticated && config">
+                <b-img :src="config.logoUrl" height="50" v-b-tooltip.hover.bottom :title="config.title" />
+            </div>
             <b-link
                 @click="onClickRefresh"
                 class="pl-3 py-2 text-center text-decoration-none"
@@ -129,6 +132,11 @@ export default defineComponent({
                 wallet.address.length - 4,
                 wallet.address.length,
             )}`;
+        },
+        config() {
+            const { poolId, getConfig } = useAccountStore();
+            if (!poolId) return;
+            return getConfig(poolId);
         },
     },
     async created() {

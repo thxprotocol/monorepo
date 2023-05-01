@@ -45,6 +45,8 @@ type TWidgetConfig = {
     origin: string;
     chainId: number;
     theme: string;
+    title: string;
+    logoUrl: string;
     ref?: string;
     expired: boolean;
 };

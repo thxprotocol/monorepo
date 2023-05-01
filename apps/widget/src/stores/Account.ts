@@ -26,10 +26,10 @@ export const useAccountStore = defineStore('account', {
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
-        setConfig(id: string, config: TWidgetConfig) {
-            const data = { ...this.getConfig(id), ...config };
-            sessionStorage.setItem(`thx:widget:${id}:config`, JSON.stringify(data));
-            this.poolId = id;
+        setConfig(poolId: string, config: TWidgetConfig) {
+            const data = { ...this.getConfig(poolId), ...config };
+            sessionStorage.setItem(`thx:widget:${poolId}:config`, JSON.stringify(data));
+            this.poolId = poolId;
         },
         setTheme() {
             const { theme } = this.getConfig(this.poolId);
@@ -48,14 +48,8 @@ export const useAccountStore = defineStore('account', {
 
             document.head.appendChild(sheet);
         },
-        init({
-            id,
-            origin,
-            chainId,
-            theme,
-            expired,
-        }: { origin: string; id: string; chainId: number; theme: string; expired: boolean } & any) {
-            this.setConfig(id, { origin, poolId: id, chainId, theme, expired });
+        init(config: TWidgetConfig) {
+            this.setConfig(config.poolId, config);
             this.setTheme();
 
             this.api = new THXClient({
