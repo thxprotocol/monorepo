@@ -13,7 +13,7 @@
                 <b-dropdown-item-btn @click.stop="" class="dropdown-item-filter" :key="key" v-for="(f, key) of filters">
                     <b-form-checkbox v-model="activeFilters" :value="f" class="d-block">
                         <div class="d-inline-flex justify-content-center align-items-center" style="width: 20px">
-                            <i :class="f.icon" />
+                            <i :class="f.icon" class="text-opaque me-1" />
                         </div>
                         {{ f.label }}
                     </b-form-checkbox>
@@ -117,8 +117,11 @@ export default defineComponent({
 <style lang="scss">
 .dropdown-item-filter {
     .form-check {
-        padding: 0;
+        padding: 0.15rem 0;
         padding-right: 1.5rem;
+        &:hover {
+            background-color: var(--bs-dropdown-link-hover-bg) !important;
+        }
     }
     .form-check-input {
         float: right;
