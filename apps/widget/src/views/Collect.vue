@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex flex-grow-1 justify-content-center flex-column align-items-center overflow-auto">
-        <b-card v-if="claimsStore.claim && claimsStore.metadata && claimsStore.erc721" class="m-2">
+        <b-card v-if="claimsStore.claim && claimsStore.metadata && claimsStore.erc721" class="m-2 w-75">
             <b-alert v-if="!accountStore.isAuthenticated" variant="info" show class="p-2">
                 <i class="fas fa-gift me-1"></i>
                 Sign in to collect your NFT

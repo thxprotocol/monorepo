@@ -36,7 +36,7 @@
             </div>
         </template>
 
-        <b-link :href="token.metadata.imageUrl">
+        <b-link :href="token.metadata.imageUrl" target="_blank">
             <b-img lazy :src="token.metadata.imageUrl" class="mb-3" fluid rounded />
         </b-link>
         <b-card-text>
