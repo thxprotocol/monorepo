@@ -4,6 +4,9 @@
             <div style="width: 84px">
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
             </div>
+            <div class="pl-3 py-2 text-center text-decoration-none" v-if="!accountStore.isAuthenticated && config">
+                <b-img :src="config.logoUrl" height="50" v-b-tooltip.hover.bottom :title="config.title" />
+            </div>
             <b-link
                 @click="onClickRefresh"
                 class="pl-3 py-2 text-center text-decoration-none"
@@ -42,10 +45,10 @@
                         <template #button-content>
                             <i class="fas fa-bars"></i>
                         </template>
-                        <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="$router.push('/wallet')">
+                        <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="onClickWallet">
                             <div class="d-flex align-items-center justify-content-between">
                                 {{ walletAddress }}
-                                <i class="fas fa-clipboard ml-auto"></i>
+                                <i class="fas fa-clipboard ml-auto" v-clipboard:copy="walletStore.wallet.address"></i>
                             </div>
                         </b-dropdown-item-button>
                         <b-dropdown-divider />
@@ -130,23 +133,22 @@ export default defineComponent({
                 wallet.address.length,
             )}`;
         },
+        config() {
+            const { poolId, getConfig } = useAccountStore();
+            if (!poolId) return;
+            return getConfig(poolId);
+        },
     },
     async created() {
         if (GTM) initGTM();
         window.onmessage = this.onMessage;
-        this.ready();
     },
     methods: {
-        ready() {
-            const { origin, poolId } = this.accountStore.getConfig(this.accountStore.poolId);
-            window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
-
-            track('UserVisits', [this.accountStore.account?.sub || '', 'page with widget', { origin, poolId }]);
-        },
         async onMessage(event: MessageEvent) {
             const { getConfig, poolId } = this.accountStore;
-            const { origin } = getConfig(poolId);
-            if (!WIDGET_URL || event.origin !== new URL(origin).origin) return;
+            const origin = getConfig(poolId).origin;
+            const localOrigin = new URL(origin).origin;
+            if (!WIDGET_URL || event.origin !== localOrigin) return;
 
             switch (event.data.message) {
                 case 'thx.iframe.navigate': {
@@ -221,12 +223,18 @@ export default defineComponent({
         },
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
-
             if (this.isEthereumBrowser) {
-                window.close();
+                // if (window.opener) {
+                //     window.close();
+                // } else {
+                // }
+                window.open(origin, '_self');
             } else {
                 window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
             }
+        },
+        onClickWallet() {
+            this.$router.push(`/${this.accountStore.poolId}/wallet`);
         },
         async onClickRefresh() {
             this.isRefreshing = true;

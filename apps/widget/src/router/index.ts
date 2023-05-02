@@ -3,16 +3,20 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 function beforeEnter(to: any, from: any, next: any) {
     const { poolId, init, getConfig } = useAccountStore();
-    if (poolId) next();
-
-    const { id, origin, chainId, theme, expired } = to.query;
-    if (id && origin && chainId && theme && expired) {
-        init({ id, origin, chainId, theme, expired: JSON.parse(expired as string) });
+    if (poolId) {
+        next();
     } else {
-        const { poolId, origin, chainId, theme, expired } = getConfig(to.params.poolId);
-        init({ id: poolId, origin, chainId, theme, expired });
+        // If there is no poolId we need to init and grab data either from query or storage
+        const { id, origin, chainId, theme, expired, logoUrl, title } = to.query;
+        if (id && origin && chainId && theme && expired && logoUrl) {
+            init({ poolId: id, origin, chainId, theme, logoUrl, title, expired: JSON.parse(expired as string) });
+        } else {
+            const { poolId, origin, chainId, theme, expired, logoUrl, title } = getConfig(to.params.poolId);
+            init({ poolId, origin, chainId, theme, logoUrl, expired, title });
+        }
+
+        next();
     }
-    next();
 }
 
 const routes: Array<RouteRecordRaw> = [
@@ -41,7 +45,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "wallet" */ '../views/Wallet.vue'),
     },
     {
-        path: '/:poolId/collect/:uuid',
+        path: '/:poolId/c/:uuid',
         name: 'collect',
         beforeEnter,
         component: () => import(/* webpackChunkName: "collect" */ '../views/Collect.vue'),

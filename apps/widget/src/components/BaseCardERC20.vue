@@ -20,16 +20,16 @@
                 >
                     Transfer
                 </b-dropdown-item>
-                <BaseModalERC20Transfer
-                    :id="`modalERC20Transfer${token.erc20._id}`"
-                    :show="isModalTransferShown"
-                    :error="error"
-                    :token="token"
-                    :is-loading="isSubmitting"
-                    @hidden="onModalTransferHidden"
-                    @submit="onSubmitTransfer"
-                />
             </b-dropdown>
+            <BaseModalERC20Transfer
+                :id="`modalERC20Transfer${token.erc20._id}`"
+                :show="isModalTransferShown"
+                :error="error"
+                :token="token"
+                :is-loading="isSubmitting"
+                @hidden="onModalTransferHidden"
+                @submit="onSubmitTransfer"
+            />
         </div>
     </b-card>
 </template>
@@ -52,7 +52,7 @@ export default defineComponent({
         },
     },
     data: function () {
-        return { isModalTransferShown: false, isModalUpgradeShown: false, error: '', isSubmitting: false };
+        return { isModalTransferShown: false, error: '', isSubmitting: false };
     },
     computed: {
         ...mapStores(useWalletStore),
@@ -63,7 +63,7 @@ export default defineComponent({
         },
         async onSubmitTransfer(config: TERC20TransferConfig) {
             this.isSubmitting = true;
-            await this.walletStore.transfer(config);
+            await this.walletStore.transferERC20(config);
             await this.walletStore.list();
             this.isModalTransferShown = false;
             this.isSubmitting = false;

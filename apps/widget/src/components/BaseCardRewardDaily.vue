@@ -40,6 +40,7 @@
             <template v-if="reward.isDisabled && waitDuration">
                 Wait for {{ waitDuration.hours }}: {{ waitDuration.minutes }}:{{ waitDuration.seconds }}
             </template>
+            <template v-else-if="reward.isDisabled && !waitDuration"> Not available </template>
             <template v-else-if="isSubmitting"><b-spinner small></b-spinner> Adding points...</template>
             <template v-else>
                 Claim <strong>{{ reward.amount }} points </strong>

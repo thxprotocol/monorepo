@@ -5,3 +5,7 @@ body,
     height: 100%;
     background-color: var(--bs-body-bg);
 }
+
+.text-opaque {
+    opacity: .5 !important;
+}

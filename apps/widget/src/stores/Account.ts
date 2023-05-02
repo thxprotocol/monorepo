@@ -7,6 +7,7 @@ import { useWalletStore } from './Wallet';
 import { useClaimStore } from './Claim';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from '../utils/returnUrl';
+import { getStyles } from '../utils/theme';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -21,27 +22,35 @@ export const useAccountStore = defineStore('account', {
         balance: 0,
         subscription: null,
         isAuthenticated: false,
+        isRewardsLoaded: false,
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
-        setConfig(id: string, config: TWidgetConfig) {
-            const data = { ...this.getConfig(id), ...config };
-            sessionStorage.setItem(`thx:widget:${id}:config`, JSON.stringify(data));
+        setConfig(poolId: string, config: TWidgetConfig) {
+            const data = { ...this.getConfig(poolId), ...config };
+            sessionStorage.setItem(`thx:widget:${poolId}:config`, JSON.stringify(data));
+            this.poolId = poolId;
         },
-        init({
-            id,
-            origin,
-            chainId,
-            theme,
-            expired,
-        }: { origin: string; id: string; chainId: number; theme: string; expired: boolean } & any) {
-            this.poolId = id;
+        setTheme() {
+            const { theme } = this.getConfig(this.poolId);
+            const { elements, colors } = JSON.parse(theme);
+            const styles: any = getStyles(elements, colors);
+            const sheet = document.createElement('style');
 
-            if (!this.poolId) throw new Error('No poolId in settings.');
-            if (!origin) throw new Error('No origin in settings.');
-            if (!chainId) throw new Error('No chainId in settings.');
+            for (const selector in styles) {
+                let rule = `${selector} { `;
+                for (const name in styles[selector]) {
+                    rule += `${name}: ${styles[selector][name]};`;
+                }
+                rule += '}';
+                sheet.innerText += rule;
+            }
 
-            this.setConfig(id, { origin, poolId: id, chainId, theme, expired });
+            document.head.appendChild(sheet);
+        },
+        init(config: TWidgetConfig) {
+            this.setConfig(config.poolId, config);
+            this.setTheme();
 
             this.api = new THXClient({
                 env: PKG_ENV,
@@ -57,8 +66,10 @@ export const useAccountStore = defineStore('account', {
             this.api.userManager.cached.events.addAccessTokenExpired(this.onAccessTokenExpired);
             this.api.userManager.cached.events.addAccessTokenExpiring(this.onAccessTokenExpiring);
             this.api.userManager.cached.events.addUserLoaded(this.onUserLoaded);
-            this.api.userManager.cached.events.addUserUnloaded(this.onUserLoaded);
+            this.api.userManager.cached.events.addUserUnloaded(this.onUserUnloaded);
             this.api.userManager.cached.events.load(this.onLoad);
+
+            track('UserVisits', [this.account?.sub || '', 'page with widget', { origin, poolId: this.poolId }]);
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();
@@ -90,10 +101,7 @@ export const useAccountStore = defineStore('account', {
             const method = this.isEthereumBrowser ? 'signinRedirect' : 'signinPopup';
 
             await this.api.userManager.cached[method]({
-                state: {
-                    url,
-                    clientId: CLIENT_ID,
-                },
+                state: { url, clientId: CLIENT_ID },
                 extraQueryParams: {
                     return_url: url,
                     pool_id: poolId,
@@ -135,6 +143,7 @@ export const useAccountStore = defineStore('account', {
 
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
                 window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+                this.isRewardsLoaded = true;
             });
             perksStore.list();
 

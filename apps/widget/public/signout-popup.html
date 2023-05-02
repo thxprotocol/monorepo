@@ -19,8 +19,11 @@
 
         if (window.ethereum && isMobile) {
             mgr.signoutRedirectCallback().then(() => {
-                window.close();
-                // window.open(state.data.origin, '_self');
+                if (window.opener) {
+                    window.close();
+                } else {
+                    window.open(state.data.origin, '_self');
+                }
             }).catch(console.error);
         } else {
             mgr.signoutPopupCallback().then(() => {

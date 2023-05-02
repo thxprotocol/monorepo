@@ -37,10 +37,15 @@ export const useWalletStore = defineStore('wallet', {
                 return { ...t, component: 'BaseCardShopifyDiscountCode' };
             });
         },
-        async transfer(config: TERC20TransferConfig) {
+        async transferERC20(config: TERC20TransferConfig) {
             const { api, account } = useAccountStore();
             await api.erc20.transfer(config);
             track('UserCreates', [account?.sub, 'erc20 transfer']);
+        },
+        async transferERC721(config: TERC721TransferConfig) {
+            const { api, account } = useAccountStore();
+            await api.erc721.transfer(config);
+            track('UserCreates', [account?.sub, 'erc721 transfer']);
         },
         async upgrade() {
             const { api, account } = useAccountStore();

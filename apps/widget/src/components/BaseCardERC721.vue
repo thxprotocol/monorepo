@@ -9,17 +9,34 @@
             </div>
             <b-spinner small variant="primary" v-if="!token.tokenId" />
             <div v-else class="text-accent fw-bold">#{{ token.tokenId }}</div>
-            <!-- <div>
+            <div>
                 <b-dropdown variant="link" size="sm" no-caret>
                     <template #button-content>
                         <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                     </template>
-                    <b-dropdown-item> Transfer </b-dropdown-item>
+                    <b-dropdown-item
+                        :disabled="
+                            walletStore.wallet?.version &&
+                            walletStore.wallet?.version !== walletStore.wallet?.latestVersion
+                        "
+                        @click.stop="isModalTransferShown = true"
+                    >
+                        Transfer
+                    </b-dropdown-item>
                 </b-dropdown>
-            </div> -->
+                <BaseModalERC721Transfer
+                    :id="`modalERC721Transfer${token.erc721._id}`"
+                    :show="isModalTransferShown"
+                    :error="error"
+                    :token="token"
+                    :is-loading="isSubmitting"
+                    @hidden="onModalTransferHidden"
+                    @submit="onSubmitTransfer"
+                />
+            </div>
         </template>
 
-        <b-link :href="token.metadata.imageUrl">
+        <b-link :href="token.metadata.imageUrl" target="_blank">
             <b-img lazy :src="token.metadata.imageUrl" class="mb-3" fluid rounded />
         </b-link>
         <b-card-text>
@@ -71,12 +88,14 @@ import { defineComponent, PropType } from 'vue';
 import { useWalletStore } from '../stores/Wallet';
 import { mapStores } from 'pinia';
 import BaseCardCollapse from './BaseCardCollapse.vue';
+import BaseModalERC721Transfer from './BaseModalERC721Transfer.vue';
 import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseCardERC721',
     components: {
         BaseCardCollapse,
+        BaseModalERC721Transfer,
     },
     props: {
         token: {
@@ -85,7 +104,7 @@ export default defineComponent({
         },
     },
     data: function () {
-        return { isVisible: false, isModalUpgradeShown: false, error: '', isSubmitting: false };
+        return { isVisible: false, isModalTransferShown: false, error: '', isSubmitting: false };
     },
     computed: {
         ...mapStores(useWalletStore),
@@ -96,6 +115,16 @@ export default defineComponent({
         }
     },
     methods: {
+        onModalTransferHidden() {
+            this.isModalTransferShown = false;
+        },
+        async onSubmitTransfer(config: TERC721TransferConfig) {
+            this.isSubmitting = true;
+            await this.walletStore.transferERC721(config);
+            await this.walletStore.list();
+            this.isModalTransferShown = false;
+            this.isSubmitting = false;
+        },
         waitForMinted() {
             const taskFn = async () => {
                 this.walletStore.getERC721Token(this.token);
@@ -106,7 +135,7 @@ export default defineComponent({
                 }
             };
 
-            return poll({ taskFn, interval: 3000, retries: 10 });
+            return poll({ taskFn, interval: 3000, retries: 20 });
         },
     },
 });
