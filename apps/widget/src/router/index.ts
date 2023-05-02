@@ -8,7 +8,7 @@ function beforeEnter(to: any, from: any, next: any) {
     } else {
         // If there is no poolId we need to init and grab data either from query or storage
         const { id, origin, chainId, theme, expired, logoUrl, title } = to.query;
-        if (id && origin && chainId && theme && expired && logoUrl && title) {
+        if (id && origin && chainId && theme && expired && logoUrl) {
             init({ poolId: id, origin, chainId, theme, logoUrl, title, expired: JSON.parse(expired as string) });
         } else {
             const { poolId, origin, chainId, theme, expired, logoUrl, title } = getConfig(to.params.poolId);
