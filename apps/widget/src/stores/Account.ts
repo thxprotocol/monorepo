@@ -32,7 +32,7 @@ export const useAccountStore = defineStore('account', {
             this.poolId = poolId;
         },
         setTheme() {
-            const { theme } = this.getConfig(this.poolId);
+            const { title, theme } = this.getConfig(this.poolId);
             const { elements, colors } = JSON.parse(theme);
             const styles: any = getStyles(elements, colors);
             const sheet = document.createElement('style');
@@ -46,6 +46,7 @@ export const useAccountStore = defineStore('account', {
                 sheet.innerText += rule;
             }
 
+            document.title = title;
             document.head.appendChild(sheet);
         },
         init(config: TWidgetConfig) {
