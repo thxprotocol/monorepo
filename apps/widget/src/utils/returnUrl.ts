@@ -1,4 +1,4 @@
-export function getReturnUrl(poolId: string, origin: string, chainId: number, theme: string, expired: boolean) {
+export function getReturnUrl({ poolId, origin, chainId, theme, expired, title, logoUrl }: TWidgetConfig) {
     const url = new URL(window.location.origin);
     url.pathname = window.location.pathname;
     url.searchParams.append('id', poolId);
@@ -6,5 +6,7 @@ export function getReturnUrl(poolId: string, origin: string, chainId: number, th
     url.searchParams.append('chainId', String(chainId));
     url.searchParams.append('theme', theme);
     url.searchParams.append('expired', String(expired));
+    url.searchParams.append('logoUrl', String(logoUrl));
+    url.searchParams.append('title', String(title));
     return url.href;
 }

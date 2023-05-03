@@ -95,16 +95,16 @@ export const useAccountStore = defineStore('account', {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
         async signin(extraQueryParams = {}) {
-            const { poolId, origin, chainId, theme, expired } = this.getConfig(this.poolId);
+            const config = this.getConfig(this.poolId);
             const { claim } = useClaimStore();
-            const url = getReturnUrl(poolId, origin, chainId, theme, expired);
-            const method = this.isEthereumBrowser ? 'signinRedirect' : 'signinPopup';
+            const url = getReturnUrl(config);
+            const method = this.isEthereumBrowser || (window as any).Cypress ? 'signinRedirect' : 'signinPopup';
 
             await this.api.userManager.cached[method]({
                 state: { url, clientId: CLIENT_ID },
                 extraQueryParams: {
                     return_url: url,
-                    pool_id: poolId,
+                    pool_id: config.poolId,
                     claim_id: claim?.uuid,
                     ...extraQueryParams,
                 },
