@@ -78,7 +78,7 @@
                 class="d-flex flex-column justify-content-center align-items-center"
             >
                 <i class="fas fa-store"></i>
-                Store
+                Shop
             </router-link>
             <router-link
                 :to="`/${accountStore.poolId}/wallet`"
