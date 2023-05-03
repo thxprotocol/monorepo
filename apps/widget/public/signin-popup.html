@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <title>THX Network</title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
@@ -21,8 +22,9 @@
             userStore: new window.oidc.WebStorageStateStore({store: window.localStorage}),
         });
         const isMobile = window.matchMedia('(pointer:coarse)').matches;
+        const isCypress = window.Cypress;
 
-        if (window.ethereum && isMobile) {
+        if ((window.ethereum && isMobile) || isCypress) {
             mgr.signinRedirectCallback().then(async (user) => {
                 window.open(state.data.url, '_self')
             }).catch(console.error);
