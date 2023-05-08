@@ -14,24 +14,26 @@
                 <template v-else>Upgrade to v{{ walletStore.wallet?.latestVersion }} </template>
             </b-button>
         </b-alert>
-        <b-alert v-if="!list.length" variant="info" show class="mx-2 p-1 px-2">
-            <i class="fas fa-question-circle me-2"></i>
-            No perks yet... Redeem <b-link to="/perks">perks</b-link> with <b-link to="/">points</b-link>!
+
+        <b-alert v-if="list.length" variant="info" show class="mx-2 p-2 px-3">
+            <i class="fas fa-question-circle me-2"></i> No tokens found for your account...
         </b-alert>
+
         <component :key="key" v-for="(token, key) of list" :is="token.component" :token="token" />
     </div>
     <div v-else class="d-flex flex-grow-1 align-items-center justify-content-center flex-column">
-        <div class="px-3 w-100">
-            <b-alert variant="info" show class="p-1 px-2">
-                <i class="fas fa-gift me-2"></i>
-                Sign in and view the perks you own!
+        <div class="px-5 w-100">
+            <b-alert variant="info" show class="p-2 px-3">
+                <i class="fas fa-gift me-2"></i> Sign in to list your tokens!
             </b-alert>
+
             <ul class="list list-unstyled">
-                <li><i class="fas fa-check text-success me-2"></i> Earn points rewards</li>
-                <li><i class="fas fa-check text-success me-2"></i> Redeem crypto perks</li>
-                <li><i class="fas fa-check text-success me-2"></i> Get exclusive deals</li>
+                <li><i class="fas fa-check text-success me-2"></i> Access your smart contract wallet</li>
+                <li><i class="fas fa-check text-success me-2"></i> Profit from free web3 transactions</li>
+                <li><i class="fas fa-check text-success me-2"></i> Opt-in for a self-custody wallet</li>
             </ul>
-            <b-button variant="primary" class="px-3" @click="onClickSignin">
+
+            <b-button variant="primary" class="px-3 w-100" @click="onClickSignin">
                 Sign in
                 <i class="fas fa-chevron-right ms-2"></i>
             </b-button>

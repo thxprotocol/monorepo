@@ -37,6 +37,14 @@
                         :error="error"
                     />
                 </b-button>
+                <b-button
+                    v-if="accountStore.isAuthenticated && !rewardsStore.rewards.length"
+                    variant="link"
+                    @click="onClickRefresh"
+                >
+                    <b-spinner v-if="isRefreshing" small variant="white" />
+                    <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
+                </b-button>
                 <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin">
                     Sign in
                 </b-button>
