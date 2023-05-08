@@ -27,6 +27,7 @@ type TERC721Token = {
     erc721: TERC721;
     metadata: TERC721Metadata;
     tokenUri: string;
+    owner: string;
 };
 
 type TERC721Metadata = {

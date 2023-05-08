@@ -10,6 +10,7 @@
         :progress="perk.progress"
         :expiry="perk.expiry"
         :isLocked="perk.isLocked"
+        :tokenGatingContractAddress="perk.tokenGatingContractAddress"
         @submit="onClickRedeem"
     >
         <template #title>

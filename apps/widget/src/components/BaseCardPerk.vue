@@ -3,7 +3,7 @@
         class="m-2"
         body-class="d-flex align-items-start justify-content-start"
         footer-class="py-3"
-        :no-body="!expiry && !image"
+        :no-body="!expiry.date && !image"
         :img-src="image"
         :overlay="!!image"
         :class="{ 'card-promoted': isPromoted }"
@@ -49,27 +49,39 @@
                     </b-badge>
                 </div>
             </div>
-
-            <b-button
-                variant="primary"
-                block
-                class="w-100"
-                :disabled="isSoldOut || isExpired || isLocked"
-                @click="$emit('submit')"
-            >
-                <template v-if="isSoldOut">Sold out</template>
-                <template v-else-if="isExpired">Expired</template>
-                <template v-else-if="price && price > 0">
-                    <strong>{{ price }} {{ priceCurrency }}</strong>
-                    <small v-if="pointPrice">
-                        / {{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}
-                    </small>
-                </template>
-                <template v-else-if="isLocked"> <i class="fas fa-lock"></i></template>
-                <template v-else>
-                    <strong>{{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}</strong>
-                </template>
-            </b-button>
+            <span id="disabled-wrapper" class="d-block" tabindex="0">
+                <b-button
+                    variant="primary"
+                    block
+                    class="w-100"
+                    :disabled="isSoldOut || isExpired || isLocked"
+                    @click="$emit('submit')"
+                >
+                    <template v-if="isSoldOut">Sold out</template>
+                    <template v-else-if="isExpired">Expired</template>
+                    <template v-else-if="price && price > 0">
+                        <strong>{{ price }} {{ priceCurrency }}</strong>
+                        <small v-if="pointPrice">
+                            / {{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}
+                        </small>
+                    </template>
+                    <template v-else-if="isLocked"> <i class="fas fa-lock me-1"></i> Locked </template>
+                    <template v-else>
+                        <strong>{{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}</strong>
+                    </template>
+                </b-button>
+            </span>
+            <div class="text-center" v-if="isLocked">
+                <b-link
+                    target="_blank"
+                    :href="`https://polygonscan.com/token/${tokenGatingContractAddress}`"
+                    v-b-tooltip.top
+                    :title="`Contract: ${tokenGatingContractAddress}`"
+                    class="text-white text-opaque"
+                >
+                    This perk is exclusive to token holders
+                </b-link>
+            </div>
         </template>
     </b-card>
 </template>
@@ -93,6 +105,7 @@ export default defineComponent({
         priceCurrency: String,
         pointPrice: Number,
         isLocked: Boolean,
+        tokenGatingContractAddress: String,
         progress: {
             required: true,
             type: Object as PropType<{ count: number; limit: number }>,

@@ -5,7 +5,9 @@
                 <img height="25" :src="token.erc721.logoImgUrl" />
             </div>
             <div class="flex-grow-1">
-                <strong>{{ token.metadata.name }}</strong>
+                <strong>{{ token.metadata.name }}</strong
+                ><br />
+                <small>{{ token.owner }}</small>
             </div>
             <b-spinner small variant="primary" v-if="!token.tokenId" />
             <div v-else class="text-accent fw-bold">#{{ token.tokenId }}</div>

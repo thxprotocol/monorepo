@@ -26,4 +26,6 @@ type TPerk = {
         now: number;
     };
     isLocked: boolean;
+    isOwner: boolean;
+    tokenGatingContractAddress: string;
 };
