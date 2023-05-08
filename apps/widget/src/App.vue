@@ -5,7 +5,7 @@
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
             </div>
             <div class="pl-3 py-2 text-center text-decoration-none" v-if="!accountStore.isAuthenticated && config">
-                <b-img :src="config.logoUrl" height="50" v-b-tooltip.hover.bottom :title="config.title" />
+                <b-img :src="config.logoUrl" class="navbar-logo" v-b-tooltip.hover.bottom :title="config.title" />
             </div>
             <b-link
                 @click="onClickRefresh"
@@ -274,5 +274,11 @@ export default defineComponent({
     100% {
         transform: translate(0px, 0px) rotate(0deg);
     }
+}
+
+.navbar-logo {
+    height: auto;
+    max-height: 50px;
+    max-width: 100px;
 }
 </style>
