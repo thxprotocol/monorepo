@@ -15,7 +15,7 @@
             </b-button>
         </b-alert>
 
-        <b-alert v-if="list.length" variant="info" show class="mx-2 p-2 px-3">
+        <b-alert v-if="!list.length" variant="info" show class="mx-2 p-2 px-3">
             <i class="fas fa-question-circle me-2"></i> No tokens found for your account...
         </b-alert>
 
