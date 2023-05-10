@@ -25,7 +25,7 @@
                     </template>
                     <b-dropdown-item
                         :disabled="
-                            token.nft.variant === NFTVariant.ERC721 ||
+                            token.nft.variant === NFTVariant.ERC1155 ||
                             (walletStore.wallet?.version &&
                                 walletStore.wallet?.version !== walletStore.wallet?.latestVersion)
                         "
