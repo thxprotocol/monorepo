@@ -2,15 +2,22 @@
     <BaseCardCollapse :visible="isVisible">
         <template #header>
             <div class="pe-3">
-                <img height="25" :src="token.erc721.logoImgUrl" />
+                <img height="25" :src="token.nft.logoImgUrl" />
             </div>
             <div class="flex-grow-1">
-                <strong>{{ token.metadata.name }}</strong
-                ><br />
+                <strong>{{ token.metadata.name }}</strong>
+                <br />
                 <small>{{ token.owner }}</small>
             </div>
+
             <b-spinner small variant="primary" v-if="!token.tokenId" />
-            <div v-else class="text-accent fw-bold">#{{ token.tokenId }}</div>
+            <div v-else-if="token.nft.variant === NFTVariant.ERC721" class="text-accent fw-bold">
+                #{{ token.tokenId }}
+            </div>
+            <div v-else-if="token.nft.variant === NFTVariant.ERC1155" class="text-accent fw-bold">
+                {{ Number(balance).toFixed(2) }}
+            </div>
+
             <div>
                 <b-dropdown variant="link" size="sm" no-caret>
                     <template #button-content>
@@ -18,8 +25,9 @@
                     </template>
                     <b-dropdown-item
                         :disabled="
-                            walletStore.wallet?.version &&
-                            walletStore.wallet?.version !== walletStore.wallet?.latestVersion
+                            token.nft.variant === NFTVariant.ERC721 ||
+                            (walletStore.wallet?.version &&
+                                walletStore.wallet?.version !== walletStore.wallet?.latestVersion)
                         "
                         @click.stop="isModalTransferShown = true"
                     >
@@ -27,7 +35,8 @@
                     </b-dropdown-item>
                 </b-dropdown>
                 <BaseModalERC721Transfer
-                    :id="`modalERC721Transfer${token.erc721._id}`"
+                    v-if="token.nft.variant === NFTVariant.ERC721"
+                    :id="`modalERC721Transfer${token.nft._id}`"
                     :show="isModalTransferShown"
                     :error="error"
                     :token="token"
@@ -50,11 +59,11 @@
                 <span>Contract</span>
                 <b-link
                     class="ms-auto text-accent"
-                    :href="`https://polygonscan.com/address/${token.erc721.address}`"
+                    :href="`https://polygonscan.com/address/${token.nft.address}`"
                     target="_blank"
                 >
-                    <strong v-b-tooltip :title="token.erc721.description" class="ms-auto">
-                        {{ token.erc721.name }}
+                    <strong v-b-tooltip :title="token.nft.description" class="ms-auto">
+                        {{ token.nft.name }}
                     </strong>
                 </b-link>
             </p>
@@ -75,11 +84,15 @@
             </p>
             <p class="d-flex align-items-center">
                 <span>Token Standard</span>
-                <strong class="ms-auto">ERC-721</strong>
+                <strong class="ms-auto">{{ token.nft.variant.toUpperCase() }}</strong>
             </p>
-            <p class="d-flex align-items-center">
+            <p class="d-flex align-items-center" v-if="token.nft.variant === NFTVariant.ERC1155">
+                <span>Balance</span>
+                <strong class="ms-auto">{{ balance }}</strong>
+            </p>
+            <p class="d-flex align-items-center" v-if="token.nft && token.nft.symbol">
                 <span>Symbol</span>
-                <strong class="ms-auto">{{ token.erc721.symbol }}</strong>
+                <strong class="ms-auto">{{ token.nft.symbol }}</strong>
             </p>
         </b-card-text>
     </BaseCardCollapse>
@@ -92,6 +105,8 @@ import { mapStores } from 'pinia';
 import BaseCardCollapse from './BaseCardCollapse.vue';
 import BaseModalERC721Transfer from './BaseModalERC721Transfer.vue';
 import poll from 'promise-poller';
+import { NFTVariant } from '../types/enums/nft';
+import { useAccountStore } from '../stores/Account';
 
 export default defineComponent({
     name: 'BaseCardERC721',
@@ -106,14 +121,28 @@ export default defineComponent({
         },
     },
     data: function () {
-        return { isVisible: false, isModalTransferShown: false, error: '', isSubmitting: false };
+        return {
+            NFTVariant,
+            balance: '',
+            isVisible: false,
+            isModalTransferShown: false,
+            error: '',
+            isSubmitting: false,
+        };
     },
     computed: {
         ...mapStores(useWalletStore),
     },
-    mounted() {
+    async mounted() {
         if (!this.token.tokenId) {
             this.waitForMinted();
+        } else {
+            if (this.token.nft.variant === NFTVariant.ERC1155) {
+                const { api } = useAccountStore();
+                api.erc1155.get(this.token._id).then(({ balance }: TERC721Token) => {
+                    this.balance = balance;
+                });
+            }
         }
     },
     methods: {

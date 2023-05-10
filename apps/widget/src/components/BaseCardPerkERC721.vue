@@ -15,7 +15,7 @@
     >
         <template #title>
             <div class="flex-grow-1">{{ perk.title }}</div>
-            <div class="text-success fw-bold">{{ perk.erc721.symbol }}</div>
+            <!-- <div class="text-success fw-bold">{{ perk.nft }}</div> -->
         </template>
     </BaseCardPerk>
     <BaseModalPerkPayment

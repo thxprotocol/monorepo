@@ -1,7 +1,7 @@
 <template>
     <b-modal :id="id" v-model="isShown" @hidden="$emit('hidden')" no-close-on-backdrop centered no-close-on-esc>
         <template #header>
-            <h5 class="modal-title"><i class="fas fa-exchange-alt me-2"></i> Transfer {{ token.erc721.symbol }}</h5>
+            <h5 class="modal-title"><i class="fas fa-exchange-alt me-2"></i> Transfer {{ token.nft.symbol }}</h5>
             <b-link class="btn-close" @click="isShown = false"> <i class="fas fa-times"></i> </b-link>
         </template>
         <div v-if="isLoading" class="text-center">
@@ -82,7 +82,7 @@ export default defineComponent({
     methods: {
         onClickSubmit() {
             const config: TERC721TransferConfig = {
-                erc721Id: this.token.erc721._id,
+                erc721Id: this.token.nft._id,
                 erc721TokenId: this.token._id,
                 to: this.receiver,
             };

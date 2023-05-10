@@ -7,6 +7,7 @@ export const useWalletStore = defineStore('wallet', {
         wallet: null,
         erc20: [],
         erc721: [],
+        erc1155: [],
         shopifyDiscountCode: [],
     }),
     actions: {
@@ -31,6 +32,9 @@ export const useWalletStore = defineStore('wallet', {
                 return { ...t, component: 'BaseCardERC20' };
             });
             this.erc721 = (await api.erc721.list(options)).map((t: any) => {
+                return { ...t, component: 'BaseCardERC721' };
+            });
+            this.erc1155 = (await api.erc1155.list(options)).map((t: any) => {
                 return { ...t, component: 'BaseCardERC721' };
             });
             this.shopifyDiscountCode = (await api.perksManager.shopify.discountCodes()).map((t: any) => {

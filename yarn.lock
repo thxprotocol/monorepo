@@ -3014,10 +3014,10 @@
   resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.46.0.tgz#2b9acca0dfa7b90aaecd909e678a049f799a27d6"
   integrity sha512-dkm0zCEoRLu5rTnsIgwDf/QG2DKcalOT2dk1IVgMySOHWTChLyOvQwMYhEduGgLvyYWTwNhAUV4WOLPQvjwLwA==
 
-"@thxnetwork/sdk@1.1.7":
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.1.7.tgz#1d3c11c85868b51a5c3c6f4bdf72e676c4389eeb"
-  integrity sha512-xsa0Ca0+iiyS/50qv7Ok0Xmu1oAjl/jXhZEqSIV/DK8QCZTQE5i5BF1cORBfTxgpI7jiHq/m5mRfK+sdwU+PDA==
+"@thxnetwork/sdk@1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.1.8.tgz#d2211a82af9ebcbe33a125e23a6af8532bd406e6"
+  integrity sha512-cSYUsoTuRd9SWagw8OGFFATRHj7+SrbuLOJB1p3KYyVtpa+NnPuFvWQsHK2OCex9egyC+ZYVhJLQsS68tcbYoQ==
   dependencies:
     oidc-client-ts "2.1.0"
 

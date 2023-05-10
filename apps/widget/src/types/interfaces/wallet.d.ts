@@ -9,6 +9,7 @@ type TWalletState = {
     wallet: TWallet | null;
     erc20: any[];
     erc721: any[];
+    erc1155: any[];
     shopifyDiscountCode: any[];
 };
 
@@ -23,14 +24,15 @@ type TERC20 = {
 type TERC721Token = {
     _id: string;
     sub: string;
-    tokenId: string;
-    erc721: TERC721;
-    metadata: TERC721Metadata;
+    nft: TERC721 | TERC1155;
+    metadata: TNFTMetadata;
     tokenUri: string;
+    tokenId: string;
     owner: string;
+    balance: string;
 };
 
-type TERC721Metadata = {
+type TNFTMetadata = {
     name: string;
     description: string;
     imageUrl: string;
@@ -39,6 +41,17 @@ type TERC721Metadata = {
 
 type TERC721 = {
     _id: string;
+    variant: NFTVariant;
+    name: string;
+    symbol: string;
+    description: string;
+    logoImgUrl: string;
+    address: string;
+};
+
+type TERC1155 = {
+    _id: string;
+    variant: NFTVariant;
     name: string;
     symbol: string;
     description: string;
