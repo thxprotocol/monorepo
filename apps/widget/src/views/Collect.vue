@@ -5,7 +5,7 @@
                 <i class="fas fa-gift me-1"></i>
                 Sign in to collect your NFT
             </b-alert>
-            <b-alert v-if="accountStore.isAuthenticated && !walletStore.wallet" variant="info" show class="p-2">
+            <b-alert v-if="accountStore.isAuthenticated && isWaitingForWalletAddress" variant="info" show class="p-2">
                 <b-spinner small class="me-1" />
                 Preparing your smart wallet...
             </b-alert>
@@ -106,6 +106,10 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useClaimStore),
         ...mapStores(useWalletStore),
+        isWaitingForWalletAddress() {
+            const { wallet } = useWalletStore();
+            return !wallet || !wallet.address;
+        },
     },
     data() {
         return { uuid: '', error: '', isLoadingImage: true, isLoadingCollect: false, isLoadingCollectComplete: false };
@@ -113,6 +117,12 @@ export default defineComponent({
     async mounted() {
         this.uuid = this.$route.params.uuid as string;
         this.claimsStore.getClaim(this.uuid);
+
+        await this.walletStore.getWallet();
+
+        if (this.isWaitingForWalletAddress) {
+            this.waitForWallet();
+        }
     },
     methods: {
         waitForWallet() {
