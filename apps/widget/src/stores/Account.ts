@@ -70,7 +70,11 @@ export const useAccountStore = defineStore('account', {
             this.api.userManager.cached.events.addUserUnloaded(this.onUserUnloaded);
             this.api.userManager.cached.events.load(this.onLoad);
 
-            track('UserVisits', [this.account?.sub || '', 'page with widget', { origin, poolId: this.poolId }]);
+            track('UserVisits', [
+                this.account?.sub || '',
+                'page with widget',
+                { origin: config.origin, poolId: this.poolId },
+            ]);
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();
