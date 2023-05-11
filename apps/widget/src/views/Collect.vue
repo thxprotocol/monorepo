@@ -5,10 +5,7 @@
                 <i class="fas fa-gift me-1"></i>
                 Sign in to collect your NFT
             </b-alert>
-            <b-alert v-if="accountStore.isAuthenticated && isWaitingForWalletAddress" variant="info" show class="p-2">
-                <b-spinner small class="me-1" />
-                Preparing your smart wallet...
-            </b-alert>
+            <BaseAlertWalletAddress />
             <div class="d-flex justify-content-center">
                 <ConfettiExplosion
                     v-if="isLoadingCollectComplete"
@@ -80,7 +77,7 @@
                 @click="onClickCollect"
                 variant="success"
                 class="w-100"
-                :disabled="!!error || !!claimsStore.error || !walletStore.wallet"
+                :disabled="!!error || !!claimsStore.error || isWaitingForWalletAddress"
             >
                 <b-spinner v-if="isLoadingCollect" small variant="dark" />
                 Collect
@@ -97,11 +94,11 @@ import { useAccountStore } from '../stores/Account';
 import { useClaimStore } from '../stores/Claim';
 import { useWalletStore } from '../stores/Wallet';
 import ConfettiExplosion from 'vue-confetti-explosion';
-import poll from 'promise-poller';
+import BaseAlertWalletAddress from '../components/BaseAlertWalletAddress.vue';
 
 export default defineComponent({
     name: 'Home',
-    components: { ConfettiExplosion },
+    components: { ConfettiExplosion, BaseAlertWalletAddress },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useClaimStore),
@@ -112,31 +109,19 @@ export default defineComponent({
         },
     },
     data() {
-        return { uuid: '', error: '', isLoadingImage: true, isLoadingCollect: false, isLoadingCollectComplete: false };
+        return {
+            uuid: '',
+            error: '',
+            isLoadingImage: true,
+            isLoadingCollect: false,
+            isLoadingCollectComplete: false,
+        };
     },
     async mounted() {
         this.uuid = this.$route.params.uuid as string;
         this.claimsStore.getClaim(this.uuid);
-
-        await this.walletStore.getWallet();
-
-        if (this.isWaitingForWalletAddress) {
-            this.waitForWallet();
-        }
     },
     methods: {
-        waitForWallet() {
-            const taskFn = async () => {
-                await this.walletStore.getWallet();
-                if (this.walletStore.wallet) {
-                    return Promise.resolve();
-                } else {
-                    return Promise.reject('Could not find wallet');
-                }
-            };
-
-            return poll({ taskFn, interval: 3000, retries: 20 });
-        },
         onClickSignin() {
             this.accountStore.signin();
         },
