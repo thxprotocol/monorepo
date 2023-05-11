@@ -135,7 +135,7 @@ export default defineComponent({
         },
         walletAddress() {
             const { wallet } = useWalletStore();
-            if (!wallet) return '';
+            if (!wallet || !wallet.address) return '';
             return `${wallet.address.substring(0, 6)}...${wallet.address.substring(
                 wallet.address.length - 4,
                 wallet.address.length,
