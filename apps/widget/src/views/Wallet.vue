@@ -8,10 +8,9 @@
         >
             <i class="fas fa-tools me-2"></i>
             Your Wallet{{ walletStore.wallet?.version ? ` (v${walletStore.wallet?.version})` : '' }} is out of date.
-            Please upgrade.
             <b-button class="ms-auto" size="sm" variant="primary" @click="onClickUpgrade">
                 <b-spinner v-if="isSubmitting" small variant="light" />
-                <template v-else>Upgrade to v{{ walletStore.wallet?.latestVersion }} </template>
+                <template v-else>Upgrade</template>
             </b-button>
         </b-alert>
 

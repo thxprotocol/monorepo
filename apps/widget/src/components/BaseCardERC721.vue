@@ -77,10 +77,10 @@
             </p>
             <p class="d-flex align-items-center">
                 <span>Token ID</span>
-                <b-spinner class="ms-auto" small variant="primary" v-if="!token.tokenId" />
-                <b-link v-else class="ms-auto text-accent" :href="token.tokenUri" target="_blank">
+                <b-link v-if="token.tokenId" class="ms-auto text-accent" :href="token.tokenUri" target="_blank">
                     <strong>{{ token.tokenId }}</strong>
                 </b-link>
+                <b-spinner v-else class="ms-auto" small variant="primary" />
             </p>
             <p class="d-flex align-items-center">
                 <span>Token Standard</span>
@@ -159,11 +159,7 @@ export default defineComponent({
         waitForMinted() {
             const taskFn = async () => {
                 this.walletStore.getERC721Token(this.token);
-                if (this.token.tokenId) {
-                    return Promise.resolve();
-                } else {
-                    return Promise.reject('Could not find tokenID');
-                }
+                return this.token.tokenId ? Promise.resolve() : Promise.reject('Could not find token for ID');
             };
 
             return poll({ taskFn, interval: 3000, retries: 20 });
