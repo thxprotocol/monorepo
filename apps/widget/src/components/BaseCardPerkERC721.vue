@@ -15,7 +15,7 @@
     >
         <template #title>
             <div class="flex-grow-1">{{ perk.title }}</div>
-            <!-- <div class="text-success fw-bold">{{ perk.nft }}</div> -->
+            <div class="text-success fw-bold" v-if="erc1155Amount">{{ erc1155Amount }}x</div>
         </template>
     </BaseCardPerk>
     <BaseModalPerkPayment
@@ -38,6 +38,8 @@ import { useWalletStore } from '../stores/Wallet';
 import BaseModalPerkPayment from './BaseModalPerkPayment.vue';
 import BaseCardPerk from './BaseCardPerk.vue';
 import { format, formatDistance } from 'date-fns';
+import { fromWei } from 'web3-utils';
+import { NFTVariant } from '../types/enums/nft';
 
 export default defineComponent({
     name: 'BaseCardPerkERC721',
@@ -62,6 +64,10 @@ export default defineComponent({
             const attr = this.perk.metadata.attributes.find((attr) => attr.key === 'image');
             if (!attr) return '';
             return attr.value;
+        },
+        erc1155Amount: function () {
+            if ((this.perk.nft && this.perk.nft.variant !== NFTVariant.ERC1155) || !this.perk.erc1155Amount) return '';
+            return fromWei(String(this.perk.erc1155Amount), 'ether');
         },
         isExpired: function () {
             return this.perk.expiry.now - this.perk.expiry.date > 0;

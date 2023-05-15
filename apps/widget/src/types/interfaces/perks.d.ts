@@ -6,6 +6,7 @@ type TPerk = {
     uuid: string;
     image: string;
     nft: TERC721 | TERC1155;
+    erc20: TERC20;
     title: string;
     amount: string;
     description: string;
@@ -16,7 +17,7 @@ type TPerk = {
     isPromoted: boolean;
     isDisabled: boolean;
     metadata: { attributes: { key: string; value: string }[] };
-    erc20: TERC20;
+    erc1155Amount: number;
     progress: {
         limit: number;
         count: number;
