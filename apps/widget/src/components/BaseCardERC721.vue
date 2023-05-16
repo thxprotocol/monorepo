@@ -15,7 +15,7 @@
                 #{{ token.tokenId }}
             </div>
             <div v-else-if="token.nft.variant === NFTVariant.ERC1155" class="text-accent fw-bold">
-                {{ Number(balance).toFixed(2) }}
+                {{ Number(balance) }}
             </div>
 
             <div>
