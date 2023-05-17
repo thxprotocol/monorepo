@@ -35,6 +35,7 @@ type TERC721Token = {
 type TNFTMetadata = {
     name: string;
     description: string;
+    image: string;
     imageUrl: string;
     externalUrl: string;
 };

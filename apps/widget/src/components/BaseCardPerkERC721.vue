@@ -1,7 +1,7 @@
 <template>
     <BaseCardPerk
         :isPromoted="perk.isPromoted"
-        :image="perk.image"
+        :image="imgUrl"
         :title="perk.title"
         :description="perk.description"
         :price="perk.price"
@@ -38,7 +38,6 @@ import { useWalletStore } from '../stores/Wallet';
 import BaseModalPerkPayment from './BaseModalPerkPayment.vue';
 import BaseCardPerk from './BaseCardPerk.vue';
 import { format, formatDistance } from 'date-fns';
-import { NFTVariant } from '../types/enums/nft';
 
 export default defineComponent({
     name: 'BaseCardPerkERC721',
@@ -58,11 +57,8 @@ export default defineComponent({
     computed: {
         ...mapStores(usePerkStore),
         ...mapStores(useAccountStore),
-        imgUrl: function () {
-            if (!this.perk.metadata) return;
-            const attr = this.perk.metadata.attributes.find((attr) => attr.key === 'image');
-            if (!attr) return '';
-            return attr.value;
+        imgUrl() {
+            return this.perk.image || (this.perk.metadata && this.perk.metadata.imageUrl);
         },
         isExpired: function () {
             return this.perk.expiry.now - this.perk.expiry.date > 0;
