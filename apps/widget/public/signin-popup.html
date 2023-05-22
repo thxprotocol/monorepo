@@ -30,7 +30,8 @@
             }).catch(console.error);
         } else {
             mgr.signinPopupCallback().then(() => {
-                if (window.opener) {
+                // If there is no opener we need to close it ourselves
+                if (!window.opener) {
                     window.close()
                 }
             }).catch(console.error);
