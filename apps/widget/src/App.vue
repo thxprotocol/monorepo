@@ -34,7 +34,11 @@
                             :error="error"
                         />
                     </b-button>
-                    <b-button variant="link" v-b-toggle.collapse-filters>
+                    <b-button
+                        v-if="['home', 'earn'].includes(String($route.name))"
+                        variant="link"
+                        v-b-toggle.collapse-filters
+                    >
                         <i class="fas fa-sliders-h"></i>
                     </b-button>
                 </template>
