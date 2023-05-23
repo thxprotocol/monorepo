@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse :visible="true">
+    <BaseCardCollapse :visible="accountStore.isAuthenticated">
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fas fa-comments me-2 text-primary"></i>

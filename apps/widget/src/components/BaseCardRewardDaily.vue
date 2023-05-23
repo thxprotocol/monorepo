@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse :visible="!waitDuration">
+    <BaseCardCollapse :visible="accountStore.isAuthenticated && !waitDuration">
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fa fa-calendar me-2 text-primary"></i>

@@ -3,32 +3,39 @@
         <BaseModalCampaignExpired :id="'modalCampaignExpiredRewards'" />
     </div>
     <div class="d-flex justify-content-between">
-        <div class="w-100 m-2 align-items-center d-flex">
-            <i class="fas fa-filter text-primary me-2"></i>
-            <b-dropdown size="sm" variant="primary" class="w-100" no-caret>
-                <template #button-content v-if="!activeFilters.length"> No filter </template>
-                <template #button-content v-else>
-                    <i :class="f.icon" class="me-2" :key="key" v-for="(f, key) of activeFilters"></i>
-                </template>
-                <b-dropdown-item-btn @click.stop="" class="dropdown-item-filter" :key="key" v-for="(f, key) of filters">
-                    <b-form-checkbox v-model="activeFilters" :value="f" class="d-block">
-                        <div class="d-inline-flex justify-content-center align-items-center" style="width: 20px">
-                            <i :class="f.icon" class="text-opaque me-1" />
-                        </div>
-                        {{ f.label }}
-                    </b-form-checkbox>
-                </b-dropdown-item-btn>
-            </b-dropdown>
-        </div>
-        <div class="w-100 m-2 align-items-center d-flex">
-            <i class="fas fa-sort text-primary me-2"></i>
-            <b-dropdown size="sm" variant="primary" class="w-100" no-caret>
-                <template #button-content> {{ selectedSort.label }} </template>
-                <b-dropdown-item @click="selectedSort = s" :key="key" v-for="(s, key) of sorts">
-                    {{ s.label }}
-                </b-dropdown-item>
-            </b-dropdown>
-        </div>
+        <b-collapse id="collapse-filters" class="me-2 flex-grow-1">
+            <div class="w-100 m-2 align-items-center d-flex">
+                <i class="fas fa-filter text-primary me-2"></i>
+                <b-dropdown size="sm" variant="primary" class="w-100" no-caret>
+                    <template #button-content v-if="!activeFilters.length"> No filter </template>
+                    <template #button-content v-else>
+                        <i :class="f.icon" class="me-2" :key="key" v-for="(f, key) of activeFilters"></i>
+                    </template>
+                    <b-dropdown-item-btn
+                        @click.stop=""
+                        class="dropdown-item-filter"
+                        :key="key"
+                        v-for="(f, key) of filters"
+                    >
+                        <b-form-checkbox v-model="activeFilters" :value="f" class="d-block">
+                            <div class="d-inline-flex justify-content-center align-items-center" style="width: 20px">
+                                <i :class="f.icon" class="text-opaque me-1" />
+                            </div>
+                            {{ f.label }}
+                        </b-form-checkbox>
+                    </b-dropdown-item-btn>
+                </b-dropdown>
+                <div class="w-100 m-2 align-items-center d-flex">
+                    <i class="fas fa-sort text-primary me-2"></i>
+                    <b-dropdown size="sm" variant="primary" class="w-100" no-caret>
+                        <template #button-content> {{ selectedSort.label }} </template>
+                        <b-dropdown-item @click="selectedSort = s" :key="key" v-for="(s, key) of sorts">
+                            {{ s.label }}
+                        </b-dropdown-item>
+                    </b-dropdown>
+                </div>
+            </div>
+        </b-collapse>
     </div>
     <div class="flex-grow-1 overflow-auto">
         <component
@@ -90,9 +97,6 @@ export default defineComponent({
         ...mapStores(useRewardStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
-        activeSort() {
-            return sortMap[this.selectedSort.key];
-        },
         rewards() {
             const { rewards } = useRewardStore();
             return rewards
@@ -101,7 +105,7 @@ export default defineComponent({
                         ? this.activeFilters.map((f: TRewardFilter) => f.key).includes(r.variant)
                         : true,
                 )
-                .sort(this.activeSort);
+                .sort(sortMap[this.selectedSort.key]);
         },
     },
     watch: {
