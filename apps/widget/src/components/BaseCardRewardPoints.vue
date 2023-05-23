@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse :visible="!reward.isClaimed">
+    <BaseCardCollapse :visible="accountStore.isAuthenticated && !reward.isClaimed">
         <template #header>
             <div v-if="reward.platform" class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i :class="platformIconMap[reward.platform]" class="me-2 text-primary"></i>

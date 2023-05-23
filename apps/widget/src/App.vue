@@ -22,21 +22,22 @@
                 <div class="points">points</div>
             </b-link>
             <div>
-                <b-button
-                    v-if="accountStore.isAuthenticated && rewardsStore.rewards.length"
-                    variant="link"
-                    @click="isModalPoolSubscriptionShown = true"
-                >
-                    <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>
-                    <BaseModalPoolSubscription
-                        id="pool-subscription"
-                        @subscribe="onSubmitSubscription($event)"
-                        @unsubscribe="onSubmitUnsubscription"
-                        @hidden="isModalPoolSubscriptionShown = false"
-                        :show="isModalPoolSubscriptionShown"
-                        :error="error"
-                    />
-                </b-button>
+                <template v-if="accountStore.isAuthenticated && rewardsStore.rewards.length">
+                    <b-button variant="link" @click="isModalPoolSubscriptionShown = true">
+                        <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>
+                        <BaseModalPoolSubscription
+                            id="pool-subscription"
+                            @subscribe="onSubmitSubscription($event)"
+                            @unsubscribe="onSubmitUnsubscription"
+                            @hidden="isModalPoolSubscriptionShown = false"
+                            :show="isModalPoolSubscriptionShown"
+                            :error="error"
+                        />
+                    </b-button>
+                    <b-button variant="link" v-b-toggle.collapse-filters>
+                        <i class="fas fa-sliders-h"></i>
+                    </b-button>
+                </template>
                 <b-button
                     v-if="accountStore.isAuthenticated && !rewardsStore.rewards.length"
                     variant="link"
@@ -51,7 +52,7 @@
                 <template v-else>
                     <b-dropdown variant="link" no-caret right>
                         <template #button-content>
-                            <i class="fas fa-bars"></i>
+                            <i class="fas fa-ellipsis-v"></i>
                         </template>
                         <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="onClickWallet">
                             <div class="d-flex align-items-center justify-content-between">
