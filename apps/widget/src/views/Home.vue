@@ -97,9 +97,6 @@ export default defineComponent({
         ...mapStores(useRewardStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
-        activeSort() {
-            return sortMap[this.selectedSort.key];
-        },
         rewards() {
             const { rewards } = useRewardStore();
             return rewards
@@ -108,7 +105,7 @@ export default defineComponent({
                         ? this.activeFilters.map((f: TRewardFilter) => f.key).includes(r.variant)
                         : true,
                 )
-                .sort(this.activeSort);
+                .sort(sortMap[this.selectedSort.key]);
         },
     },
     watch: {
