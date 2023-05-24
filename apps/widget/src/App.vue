@@ -1,7 +1,7 @@
 <template>
     <div id="main" class="d-flex flex-column h-100">
         <b-navbar class="navbar-top pt-3">
-            <div style="width: 110px">
+            <div style="width: 120px">
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
             </div>
             <div class="pl-3 py-2 text-center text-decoration-none" v-if="!accountStore.isAuthenticated && config">
@@ -21,7 +21,7 @@
                 </div>
                 <div class="points">points</div>
             </b-link>
-            <div>
+            <div style="width: 120px; text-align: right">
                 <template v-if="accountStore.isAuthenticated && rewardsStore.rewards.length">
                     <b-button variant="link" @click="isModalPoolSubscriptionShown = true">
                         <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>

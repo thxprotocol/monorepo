@@ -2,15 +2,19 @@ type TWallet = {
     _id: string;
     address: string;
     version: string;
+    token?: string;
     latestVersion: string;
 };
 
 type TWalletState = {
     wallet: TWallet | null;
+    walletTransfer: TWallet | null;
+    wallets: TWallet[];
     erc20: any[];
     erc721: any[];
     erc1155: any[];
     shopifyDiscountCode: any[];
+    pendingPoints: number;
 };
 
 type TERC20 = {
