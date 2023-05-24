@@ -5,7 +5,13 @@
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
             </div>
             <div class="pl-3 py-2 text-center text-decoration-none" v-if="!accountStore.isAuthenticated && config">
-                <b-img :src="config.logoUrl" class="navbar-logo" v-b-tooltip.hover.bottom :title="config.title" />
+                <!-- <b-img :src="config.logoUrl" class="navbar-logo" v-b-tooltip.hover.bottom :title="config.title" /> -->
+                <b-img
+                    :src="config.logoUrl"
+                    class="navbar-logo"
+                    :title="decodeHTML(config.title)"
+                    v-b-tooltip.hover.bottom
+                />
             </div>
             <b-link
                 @click="onClickRefresh"
@@ -118,9 +124,7 @@ import BaseModalPoolSubscription from './components/BaseModalPoolSubscription.vu
 import './scss/main.scss';
 
 export default defineComponent({
-    components: {
-        BaseModalPoolSubscription,
-    },
+    components: { BaseModalPoolSubscription },
     data() {
         return {
             isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
@@ -157,6 +161,10 @@ export default defineComponent({
         window.onmessage = this.onMessage;
     },
     methods: {
+        decodeHTML(input: string) {
+            var doc = new DOMParser().parseFromString(input, 'text/html');
+            return doc.documentElement.textContent;
+        },
         async onMessage(event: MessageEvent) {
             const { getConfig, poolId } = this.accountStore;
             const origin = getConfig(poolId).origin;
