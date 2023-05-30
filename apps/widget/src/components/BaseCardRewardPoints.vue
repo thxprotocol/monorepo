@@ -141,7 +141,7 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
-                await this.rewardsStore.claimConditionalReward(this.reward.uuid);
+                await this.rewardsStore.claimConditionalReward(this.reward._id);
             } catch (error) {
                 this.error = error;
             } finally {

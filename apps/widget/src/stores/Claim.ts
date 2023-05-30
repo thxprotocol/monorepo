@@ -22,6 +22,7 @@ export const useClaimStore = defineStore('claims', {
         async collect(uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
             if (!this.claim) this.getClaim(uuid);
+
             await api.claims.collect({ poolId, claimUuid: uuid });
 
             track('UserCreates', [account?.sub, 'nft perk claim', { poolId, origin: getConfig(poolId).origin }]);

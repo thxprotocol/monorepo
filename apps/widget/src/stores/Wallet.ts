@@ -1,22 +1,33 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
+import { API_URL } from '../config/secrets';
 
 export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
         wallet: null,
+        walletTransfer: null,
         erc20: [],
         erc721: [],
         erc1155: [],
         shopifyDiscountCode: [],
+        pendingPoints: 0,
+        wallets: [],
     }),
     actions: {
+        async getTransfer(uuid: string) {
+            const r = await fetch(API_URL + '/v1/webhook/wallet/' + uuid);
+            const { wallet, pointBalance } = await r.json();
+            this.pendingPoints = pointBalance;
+            this.walletTransfer = wallet;
+        },
         async getWallet() {
             const { api, getConfig, account, poolId } = useAccountStore();
             if (!account) return;
 
-            const wallets = await api.walletManager.list(getConfig(poolId).chainId, account.sub);
-            this.wallet = wallets[0];
+            this.wallets = await api.walletManager.list(getConfig(poolId).chainId, account.sub);
+            const primaryWallet = this.wallets.find((wallet) => wallet.address);
+            if (primaryWallet) this.wallet = primaryWallet;
         },
         async getERC721Token({ _id }: TERC721Token) {
             const { api } = useAccountStore();

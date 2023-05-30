@@ -1,11 +1,17 @@
 <template>
     <div id="main" class="d-flex flex-column h-100">
         <b-navbar class="navbar-top pt-3">
-            <div style="width: 110px">
+            <div style="width: 120px">
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
             </div>
             <div class="pl-3 py-2 text-center text-decoration-none" v-if="!accountStore.isAuthenticated && config">
-                <b-img :src="config.logoUrl" class="navbar-logo" v-b-tooltip.hover.bottom :title="config.title" />
+                <!-- <b-img :src="config.logoUrl" class="navbar-logo" v-b-tooltip.hover.bottom :title="config.title" /> -->
+                <b-img
+                    :src="config.logoUrl"
+                    class="navbar-logo"
+                    :title="decodeHTML(config.title)"
+                    v-b-tooltip.hover.bottom
+                />
             </div>
             <b-link
                 @click="onClickRefresh"
@@ -21,7 +27,7 @@
                 </div>
                 <div class="points">points</div>
             </b-link>
-            <div>
+            <div style="width: 120px; text-align: right">
                 <template v-if="accountStore.isAuthenticated && rewardsStore.rewards.length">
                     <b-button variant="link" @click="isModalPoolSubscriptionShown = true">
                         <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>
@@ -118,9 +124,7 @@ import BaseModalPoolSubscription from './components/BaseModalPoolSubscription.vu
 import './scss/main.scss';
 
 export default defineComponent({
-    components: {
-        BaseModalPoolSubscription,
-    },
+    components: { BaseModalPoolSubscription },
     data() {
         return {
             isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
@@ -157,6 +161,10 @@ export default defineComponent({
         window.onmessage = this.onMessage;
     },
     methods: {
+        decodeHTML(input: string) {
+            var doc = new DOMParser().parseFromString(input, 'text/html');
+            return doc.documentElement.textContent;
+        },
         async onMessage(event: MessageEvent) {
             const { getConfig, poolId } = this.accountStore;
             const origin = getConfig(poolId).origin;
