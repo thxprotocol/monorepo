@@ -85,7 +85,7 @@ export default defineComponent({
         async onClickCollect() {
             try {
                 await this.accountStore.api.request.patch('/v1/account/wallet', {
-                    body: JSON.stringify({ token: this.uuid }),
+                    body: JSON.stringify({ code: this.uuid }),
                 });
                 await this.rewardsStore.list();
                 this.$router.push(`/${this.accountStore.poolId}/earn`);
