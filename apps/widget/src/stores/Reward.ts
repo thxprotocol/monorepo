@@ -53,7 +53,7 @@ export const useRewardStore = defineStore('rewards', {
         },
         async claimDailyReward(reward: TDailyReward) {
             const { api, account, getBalance, poolId, getConfig } = useAccountStore();
-            const claim = await api.rewardsManager.daily.claim({ uuid: reward._id });
+            const claim = await api.rewardsManager.daily.claim(reward._id);
 
             if (claim.error) {
                 throw claim.error;
