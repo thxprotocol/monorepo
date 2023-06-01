@@ -79,9 +79,9 @@ export function getStyles(elements: any, colors: any) {
         },
         '.navbar-bottom': {
             '--thx-navbar-bg': theme.elements.navbarBg,
-            '--thx-navbar-btn-bg': theme.elements.navbarBtnBg,
-            '--thx-navbar-btn-color': theme.elements.navbarBtnText,
-            '--thx-navbar-bottom-border-color': theme.elements.navbarBgDarker,
+            '--thx-navbar-btn-bg': theme.elements.navbarBtnBg || theme.elements.btnBg,
+            '--thx-navbar-btn-color': theme.elements.navbarBtnText || theme.elements.btnText,
+            '--thx-navbar-border-color': theme.elements.navbarBgDarker,
         },
         '.nav-tabs': {
             '--bs-nav-tabs-border-color': theme.elements.btnBgDark,
