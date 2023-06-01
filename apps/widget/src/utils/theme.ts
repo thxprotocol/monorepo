@@ -14,8 +14,8 @@ export function getStyles(elements: any, colors: any) {
             cardText: elements['cardText'].color,
             navbarBg: elements['navbarBg'].color,
             navbarBgDarker: Color(elements['navbarBg'].color).darken(0.4),
-            navbarBtnBg: elements['navbarBtnBg'].color,
-            navbarBtnText: elements['navbarBtnText'].color,
+            navbarBtnBg: elements['navbarBtnBg'] ? elements['navbarBtnBg'].color : elements['btnBg'].color,
+            navbarBtnText: elements['navbarBtnText'] ? elements['navbarBtnText'].color : elements['btnText'].color,
         },
         colors: {
             accent: colors['accent'].color,
@@ -79,8 +79,8 @@ export function getStyles(elements: any, colors: any) {
         },
         '.navbar-bottom': {
             '--thx-navbar-bg': theme.elements.navbarBg,
-            '--thx-navbar-btn-bg': theme.elements.navbarBtnBg || theme.elements.btnBg,
-            '--thx-navbar-btn-color': theme.elements.navbarBtnText || theme.elements.btnText,
+            '--thx-navbar-btn-bg': theme.elements.navbarBtnBg,
+            '--thx-navbar-btn-color': theme.elements.navbarBtnText,
             '--thx-navbar-border-color': theme.elements.navbarBgDarker,
         },
         '.nav-tabs': {
