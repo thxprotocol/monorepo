@@ -1,3 +1,8 @@
+type TInfoLink = {
+    label: string;
+    url: string;
+};
+
 type TBaseReward = {
     _id?: string;
     uuid: string;
@@ -17,6 +22,7 @@ type TBaseReward = {
     page?: number;
     claims?: any[];
     variant: RewardVariant;
+    infoLinks: TInfoLink[];
 };
 
 type TPointReward = TBaseReward & {

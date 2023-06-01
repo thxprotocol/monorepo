@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse :visible="accountStore.isAuthenticated && pendingClaims > 0">
+    <BaseCardCollapse :info-links="reward.infoLinks" :visible="accountStore.isAuthenticated && pendingClaims > 0">
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fas fa-flag me-2 text-primary"></i>
@@ -25,27 +25,35 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
-            Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
-        </b-button>
+        <template #button>
+            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
+                Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
+            </b-button>
 
-        <b-button v-else-if="!reward.claims.length || !pendingClaims" variant="primary" block class="w-100" disabled>
-            Not available
-        </b-button>
+            <b-button
+                v-else-if="!reward.claims.length || !pendingClaims"
+                variant="primary"
+                block
+                class="w-100"
+                disabled
+            >
+                Not available
+            </b-button>
 
-        <b-button v-else variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
-            <template v-if="isSubmitting">
-                <b-spinner small></b-spinner>
-                Adding points...
-            </template>
-            <template v-else>
-                Claim
-                <strong>
-                    {{ pendingClaims > 1 ? `${reward.claims.length - claimedAmount} x` : '' }}
-                    {{ reward.amount }} points
-                </strong>
-            </template>
-        </b-button>
+            <b-button v-else variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
+                <template v-if="isSubmitting">
+                    <b-spinner small></b-spinner>
+                    Adding points...
+                </template>
+                <template v-else>
+                    Claim
+                    <strong>
+                        {{ pendingClaims > 1 ? `${reward.claims.length - claimedAmount} x` : '' }}
+                        {{ reward.amount }} points
+                    </strong>
+                </template>
+            </b-button>
+        </template>
     </BaseCardCollapse>
 </template>
 

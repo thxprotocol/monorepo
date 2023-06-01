@@ -1,5 +1,9 @@
 <template>
-    <BaseCardCollapse :visible="accountStore.isAuthenticated && !waitDuration">
+    <BaseCardCollapse
+        :info-links="reward.infoLinks"
+        :visible="accountStore.isAuthenticated && !waitDuration"
+        :info-url="reward.infoUrl || 'https://example.com'"
+    >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fa fa-calendar me-2 text-primary"></i>
@@ -25,27 +29,28 @@
             show-value
         ></b-progress>
 
-        <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
-            Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
-        </b-button>
-
-        <b-button
-            v-if="accountStore.isAuthenticated"
-            variant="primary"
-            block
-            class="w-100"
-            @click="onClickClaim"
-            :disabled="isSubmitting || reward.isDisabled"
-        >
-            <template v-if="reward.isDisabled && waitDuration">
-                Wait for {{ waitDuration.hours }}: {{ waitDuration.minutes }}:{{ waitDuration.seconds }}
-            </template>
-            <template v-else-if="reward.isDisabled && !waitDuration"> Not available </template>
-            <template v-else-if="isSubmitting"><b-spinner small></b-spinner> Adding points...</template>
-            <template v-else>
-                Claim <strong>{{ reward.amount }} points </strong>
-            </template>
-        </b-button>
+        <template #button>
+            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" class="w-100" block>
+                Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
+            </b-button>
+            <b-button
+                v-if="accountStore.isAuthenticated"
+                class="w-100"
+                block
+                variant="primary"
+                @click="onClickClaim"
+                :disabled="isSubmitting || reward.isDisabled"
+            >
+                <template v-if="reward.isDisabled && waitDuration">
+                    Wait for {{ waitDuration.hours }}: {{ waitDuration.minutes }}:{{ waitDuration.seconds }}
+                </template>
+                <template v-else-if="reward.isDisabled && !waitDuration"> Not available </template>
+                <template v-else-if="isSubmitting"><b-spinner small></b-spinner> Adding points...</template>
+                <template v-else>
+                    Claim <strong>{{ reward.amount }} points </strong>
+                </template>
+            </b-button>
+        </template>
     </BaseCardCollapse>
 </template>
 
