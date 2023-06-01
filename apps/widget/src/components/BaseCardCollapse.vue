@@ -14,24 +14,46 @@
                 <slot name="header"></slot>
             </b-card-title>
         </template>
-        <b-collapse v-model="isVisible" class="p-3"> <slot></slot> </b-collapse>
+        <b-collapse v-model="isVisible" class="p-3">
+            <slot></slot>
+
+            <b-button-group class="w-100" block v-if="infoLinks && infoLinks.length">
+                <slot name="button"></slot>
+
+                <b-dropdown right variant="primary" no-caret toggle-class="pe-3">
+                    <template #button-content>
+                        <i class="fas fa-caret-down"></i>
+                    </template>
+                    <b-dropdown-item @click="onClickLink(link.url)" :key="key" v-for="(link, key) of infoLinks">
+                        {{ link.label }}
+                    </b-dropdown-item>
+                </b-dropdown>
+            </b-button-group>
+            <slot v-else name="button"></slot>
+        </b-collapse>
     </b-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { PropType, defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'BaseCardCollapse',
     props: {
         visible: { type: Boolean },
         isPromoted: { type: Boolean },
+        infoLinks: { type: Object as PropType<{ label: string; url: string }[]>, required: true },
     },
     data: function () {
         return { isVisible: false };
     },
     mounted() {
         this.isVisible = this.visible;
+    },
+    methods: {
+        onClickLink(url: string) {
+            window.open(url, '_blank');
+        },
     },
 });
 </script>

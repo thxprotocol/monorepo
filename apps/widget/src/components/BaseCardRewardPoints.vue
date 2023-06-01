@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse :visible="accountStore.isAuthenticated && !reward.isClaimed">
+    <BaseCardCollapse :info-links="reward.infoLinks" :visible="accountStore.isAuthenticated && !reward.isClaimed">
         <template #header>
             <div v-if="reward.platform" class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i :class="platformIconMap[reward.platform]" class="me-2 text-primary"></i>
@@ -18,38 +18,42 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
-            Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
-        </b-button>
+        <template #button>
+            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
+                Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
+            </b-button>
 
-        <b-button v-else-if="reward.isClaimed" variant="primary" block class="w-100" disabled> Reward claimed</b-button>
+            <b-button v-else-if="reward.isClaimed" variant="primary" block class="w-100" disabled>
+                Reward claimed
+            </b-button>
 
-        <b-button
-            v-else-if="reward.platform && !isConnected"
-            variant="primary"
-            block
-            class="w-100"
-            @click="onClickConnect"
-            :disabled="isSubmitting"
-        >
-            <template v-if="isSubmitting">
-                <b-spinner small></b-spinner>
-                Connecting platform
-            </template>
-            <template v-else>
-                Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
-            </template>
-        </b-button>
+            <b-button
+                v-else-if="reward.platform && !isConnected"
+                variant="primary"
+                block
+                class="w-100"
+                @click="onClickConnect"
+                :disabled="isSubmitting"
+            >
+                <template v-if="isSubmitting">
+                    <b-spinner small></b-spinner>
+                    Connecting platform
+                </template>
+                <template v-else>
+                    Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
+                </template>
+            </b-button>
 
-        <b-button v-else variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
-            <template v-if="isSubmitting">
-                <b-spinner small></b-spinner>
-                Adding points...
-            </template>
-            <template v-else>
-                Claim <strong>{{ reward.amount }} points</strong>
-            </template>
-        </b-button>
+            <b-button v-else variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
+                <template v-if="isSubmitting">
+                    <b-spinner small></b-spinner>
+                    Adding points...
+                </template>
+                <template v-else>
+                    Claim <strong>{{ reward.amount }} points</strong>
+                </template>
+            </b-button>
+        </template>
     </BaseCardCollapse>
 </template>
 
