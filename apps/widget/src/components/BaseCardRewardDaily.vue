@@ -20,14 +20,17 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <b-progress
-            v-if="accountStore.isAuthenticated && reward.claims.length"
-            class="mb-3"
-            variant="success"
-            :value="reward.claims.length"
-            :max="7"
-            show-value
-        ></b-progress>
+        <div class="d-flex flex-wrap pb-3" v-if="accountStore.isAuthenticated && reward.claims.length">
+            <b-badge
+                class="m-1 d-block"
+                :variant="key < reward.claims.length ? 'success' : 'white'"
+                :class="key < reward.claims.length ? 'text-white' : 'text-primary'"
+                :key="key"
+                v-for="(amount, key) of reward.amounts"
+            >
+                {{ amount }}
+            </b-badge>
+        </div>
 
         <template #button>
             <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" class="w-100" block>

@@ -67,6 +67,7 @@ type TDailyRewardClaim = {
 type TDailyReward = TBaseReward & {
     uuid: string;
     amount: number;
+    amounts: number[];
     claims: TDailyRewardClaim[];
 };
 
