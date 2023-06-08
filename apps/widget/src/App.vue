@@ -5,7 +5,6 @@
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
             </div>
             <div class="pl-3 py-2 text-center text-decoration-none" v-if="!accountStore.isAuthenticated && config">
-                <!-- <b-img :src="config.logoUrl" class="navbar-logo" v-b-tooltip.hover.bottom :title="config.title" /> -->
                 <b-img
                     :src="config.logoUrl"
                     class="navbar-logo"
@@ -89,7 +88,7 @@
                 class="d-flex flex-column justify-content-center align-items-center"
             >
                 <i class="fas fa-trophy"></i>
-                Earn
+                Quests
             </router-link>
             <router-link
                 v-if="perksStore.perks.length"
@@ -97,7 +96,7 @@
                 class="d-flex flex-column justify-content-center align-items-center"
             >
                 <i class="fas fa-store"></i>
-                Shop
+                Rewards
             </router-link>
             <router-link
                 :to="`/${accountStore.poolId}/wallet`"

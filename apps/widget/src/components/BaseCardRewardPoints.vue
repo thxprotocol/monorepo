@@ -24,7 +24,7 @@
             </b-button>
 
             <b-button v-else-if="reward.isClaimed" variant="primary" block class="w-100" disabled>
-                Reward claimed
+                Quest Completed
             </b-button>
 
             <b-button
