@@ -180,12 +180,10 @@ export default defineComponent({
                     break;
                 }
                 case 'thx.referral.claim.create': {
-                    debugger;
                     this.onReferralClaimCreate(event.data.uuid);
                     break;
                 }
                 case 'thx.config.ref': {
-                    debugger;
                     this.onReferralConfigUpdate(event.data.ref);
                     break;
                 }
