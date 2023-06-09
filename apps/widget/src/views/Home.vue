@@ -114,6 +114,8 @@ export default defineComponent({
             if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
                 this.$router.push(`/${this.accountStore.poolId}/wallet`);
             }
+            const { poolId, getConfig } = this.accountStore;
+            window.top?.postMessage({ message: 'thx.widget.ready' }, getConfig(poolId).origin);
         },
     },
 });

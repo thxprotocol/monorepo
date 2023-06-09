@@ -180,10 +180,12 @@ export default defineComponent({
                     break;
                 }
                 case 'thx.referral.claim.create': {
+                    debugger;
                     this.onReferralClaimCreate(event.data.uuid);
                     break;
                 }
                 case 'thx.config.ref': {
+                    debugger;
                     this.onReferralConfigUpdate(event.data.ref);
                     break;
                 }
@@ -198,15 +200,11 @@ export default defineComponent({
         },
         async onReferralClaimCreate(uuid: string) {
             const { account, getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
-
             const { ref } = getConfig(poolId);
             if (!ref) return;
 
-            // Detect if this conversion is related to ref stored in config
-            const parsedRef = JSON.parse(atob(ref));
-            if (parsedRef.uuid !== uuid) return;
-
-            await api.rewardsManager.referral.claim({ uuid, sub: parsedRef.sub });
+            const { sub } = JSON.parse(atob(ref));
+            await api.rewardsManager.referral.claim({ uuid, sub });
 
             setConfig(poolId, { ref: '' } as TWidgetConfig);
             getBalance();
