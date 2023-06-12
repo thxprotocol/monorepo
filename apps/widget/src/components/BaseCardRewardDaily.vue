@@ -20,7 +20,7 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <div class="d-flex flex-wrap pb-3" v-if="accountStore.isAuthenticated && reward.claims.length">
+        <div class="d-flex flex-wrap pb-3">
             <b-badge
                 class="m-1 d-block"
                 :variant="key < reward.claims.length ? 'success' : 'white'"
