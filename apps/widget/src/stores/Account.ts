@@ -12,7 +12,7 @@ import { getStyles } from '../utils/theme';
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
         getConfig: (id: string): TWidgetConfig => {
-            const data = sessionStorage.getItem(`thx:widget:${id}:config`);
+            const data = localStorage.getItem(`thx:widget:${id}:config`);
             if (!data) return {} as TWidgetConfig;
             return JSON.parse(data);
         },
@@ -28,7 +28,7 @@ export const useAccountStore = defineStore('account', {
     actions: {
         setConfig(poolId: string, config: TWidgetConfig) {
             const data = { ...this.getConfig(poolId), ...config };
-            sessionStorage.setItem(`thx:widget:${poolId}:config`, JSON.stringify(data));
+            localStorage.setItem(`thx:widget:${poolId}:config`, JSON.stringify(data));
             this.poolId = poolId;
         },
         setTheme() {

@@ -190,6 +190,7 @@ export default defineComponent({
             }
         },
         onReferralConfigUpdate(ref: string) {
+            if (!ref) return;
             const { setConfig, poolId } = this.accountStore;
             setConfig(poolId, { ref } as TWidgetConfig);
         },
