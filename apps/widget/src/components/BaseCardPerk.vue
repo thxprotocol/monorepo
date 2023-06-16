@@ -1,6 +1,5 @@
 <template>
     <b-card
-        class="m-2"
         body-class="d-flex align-items-start justify-content-start"
         footer-class="py-3"
         :no-body="!expiry.date && !image"

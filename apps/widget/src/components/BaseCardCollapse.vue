@@ -2,7 +2,6 @@
     <b-card
         header-class="p-0"
         body-class="d-flex flex-column p-0"
-        class="m-2"
         :class="{ 'card-collapsed': isVisible, 'card-promoted': isPromoted }"
     >
         <template #header>

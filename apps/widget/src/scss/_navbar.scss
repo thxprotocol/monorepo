@@ -19,6 +19,18 @@
     .points {
         color: var(--bs-body-color);
     }
+
+    @media (min-width: map-get($grid-breakpoints, 'md')) {
+        border-radius: 10px;
+        background-color: var(--thx-navbar-bg) !important;
+        margin-top: 200px;
+    }
+}
+
+.navbar-logo {
+    height: auto;
+    max-height: 50px;
+    max-width: 100px;
 }
 
 .navbar-bottom {
@@ -62,5 +74,38 @@
                 opacity: 1;
             }                
         }
+    }
+    
+    @media (min-width: map-get($grid-breakpoints, 'md')) {
+        flex-direction: row;
+        border-radius: 10px;
+        
+        .container-fluid {
+            justify-content: end;
+        }
+
+        a {
+            width: auto;
+            height: 60px;
+            margin: .5rem;
+            padding: 0 1rem;
+            align-items: center;
+
+            i {
+                opacity: .5 !important;
+                margin: 0;
+                margin-right: .5rem !important;
+            }
+            div {
+                font-size: 1.2rem;
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+.flex-grow-1.overflow-auto  {
+    @media (min-width: map-get($grid-breakpoints, 'md')) {
+        flex-grow: 0 !important;
     }
 }

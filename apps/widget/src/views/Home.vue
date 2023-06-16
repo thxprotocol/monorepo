@@ -2,7 +2,7 @@
     <div>
         <BaseModalCampaignExpired :id="'modalCampaignExpiredRewards'" />
     </div>
-    <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between order-md-3">
         <b-collapse id="collapse-filters" class="me-2 flex-grow-1">
             <div class="w-100 m-2 align-items-center d-flex">
                 <i class="fas fa-filter text-primary me-2"></i>
@@ -37,15 +37,11 @@
             </div>
         </b-collapse>
     </div>
-    <div class="flex-grow-1 overflow-auto">
-        <component
-            v-for="(reward, key) of rewards"
-            :key="key"
-            :is="rewardComponentMap[reward.variant]"
-            :reward="reward"
-            class="mb-2"
-        />
-    </div>
+    <b-row class="flex-grow-1 overflow-auto order-md-4">
+        <b-col md="4" :key="key" v-for="(reward, key) of rewards">
+            <component :is="rewardComponentMap[reward.variant]" :reward="reward" class="m-2 mx-md-0 my-md-3" />
+        </b-col>
+    </b-row>
 </template>
 
 <script lang="ts">

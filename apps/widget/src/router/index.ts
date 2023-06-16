@@ -7,12 +7,23 @@ function beforeEnter(to: any, from: any, next: any) {
         next();
     } else {
         // If there is no poolId we need to init and grab data either from query or storage
-        const { id, origin, chainId, theme, expired, logoUrl, title } = to.query;
+        const { id, origin, chainId, theme, expired, logoUrl, title, backgroundUrl } = to.query;
         if (id && origin && chainId && theme && expired && logoUrl) {
-            init({ poolId: id, origin, chainId, theme, logoUrl, title, expired: JSON.parse(expired as string) });
+            init({
+                poolId: id,
+                origin,
+                chainId,
+                theme,
+                logoUrl,
+                backgroundUrl,
+                title,
+                expired: JSON.parse(expired as string),
+            });
         } else {
-            const { poolId, origin, chainId, theme, expired, logoUrl, title } = getConfig(to.params.poolId);
-            init({ poolId, origin, chainId, theme, logoUrl, expired, title });
+            const { poolId, origin, chainId, theme, expired, logoUrl, backgroundUrl, title } = getConfig(
+                to.params.poolId,
+            );
+            init({ poolId, origin, chainId, theme, logoUrl, backgroundUrl, expired, title });
         }
 
         next();

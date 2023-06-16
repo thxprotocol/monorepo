@@ -1,10 +1,18 @@
 <template>
-    <div id="main" class="d-flex flex-column h-100">
-        <b-navbar class="navbar-top pt-3">
-            <div style="width: 120px">
+    <div
+        class="bg-danger order-md-1 d-none d-md-block"
+        style="height: 400px; width: 100%; position: absolute; top: 0"
+    ></div>
+    <div id="main" class="d-flex flex-column h-100 container-md my-md-3">
+        <b-navbar class="navbar-top pt-3 order-md-2">
+            <div style="width: 120px" class="d-md-none">
                 <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
             </div>
-            <div class="pl-3 py-2 text-center text-decoration-none" v-if="!accountStore.isAuthenticated && config">
+            <h2 class="d-none d-md-block" style="text-transform: capitalize">{{ $route.name }}</h2>
+            <div
+                v-if="accountStore.isAuthenticated && config"
+                class="pl-3 py-2 text-center text-decoration-none d-md-none"
+            >
                 <b-img
                     :src="config.logoUrl"
                     class="navbar-logo"
@@ -81,29 +89,33 @@
             </div>
         </b-navbar>
         <router-view />
-        <b-navbar v-if="rewardsStore.rewards.length || perksStore.perks.length" class="navbar-bottom">
+        <b-navbar
+            v-if="rewardsStore.rewards.length || perksStore.perks.length"
+            class="navbar-bottom order-md-0 my-md-3 px-md-3"
+        >
+            <div v-if="config" class="pl-3 py-2 text-center text-decoration-none d-none d-md-block me-auto">
+                <b-img
+                    :src="config.logoUrl"
+                    class="navbar-logo"
+                    :title="decodeHTML(config.title)"
+                    v-b-tooltip.hover.bottom
+                />
+            </div>
             <router-link
                 v-if="rewardsStore.rewards.length"
                 :to="`/${accountStore.poolId}/earn`"
-                class="d-flex flex-column justify-content-center align-items-center"
+                class="btn-navbar-bottom"
             >
-                <i class="fas fa-trophy"></i>
-                Quests
+                <i class="fas fa-trophy me-md-3"></i>
+                <div>Quests</div>
             </router-link>
-            <router-link
-                v-if="perksStore.perks.length"
-                :to="`/${accountStore.poolId}/store`"
-                class="d-flex flex-column justify-content-center align-items-center"
-            >
-                <i class="fas fa-store"></i>
-                Rewards
+            <router-link v-if="perksStore.perks.length" :to="`/${accountStore.poolId}/store`" class="btn-navbar-bottom">
+                <i class="fas fa-store me-md-3"></i>
+                <div>Rewards</div>
             </router-link>
-            <router-link
-                :to="`/${accountStore.poolId}/wallet`"
-                class="d-flex flex-column justify-content-center align-items-center"
-            >
-                <i class="fas fa-wallet"></i>
-                Wallet
+            <router-link :to="`/${accountStore.poolId}/wallet`" class="btn-navbar-bottom">
+                <i class="fas fa-wallet mr-md-3"></i>
+                <div>Wallet</div>
             </router-link>
         </b-navbar>
     </div>
@@ -263,7 +275,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style lang="scss">
 .fa-bell {
     animation: shake 10s;
     animation-iteration-count: infinite;
@@ -291,11 +303,5 @@ export default defineComponent({
     100% {
         transform: translate(0px, 0px) rotate(0deg);
     }
-}
-
-.navbar-logo {
-    height: auto;
-    max-height: 50px;
-    max-width: 100px;
 }
 </style>
