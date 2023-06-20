@@ -9,8 +9,8 @@
             <template v-else>
                 <BaseAlertWalletAddress />
                 <b-alert variant="info" show class="p-2" v-if="walletStore.pendingPoints">
-                    <i class="fas fa-flag me-1"></i> You have earned
-                    <strong>{{ walletStore.pendingPoints }}</strong> points with milestone rewards!
+                    <i class="fas fa-flag me-1"></i> Complete Quests and earn
+                    <strong>{{ walletStore.pendingPoints }}</strong> points!
                 </b-alert>
             </template>
 
