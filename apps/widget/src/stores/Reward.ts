@@ -45,9 +45,7 @@ export const useRewardStore = defineStore('rewards', {
 
                 getBalance();
 
-                const index = this.rewards.findIndex((r: TMilestoneReward) => r.uuid === reward.uuid);
-                const claimIndex = this.rewards[index].claims.findIndex((c: TMilestoneRewardClaim) => c.uuid === uuid);
-                this.rewards[index].claims[claimIndex].isClaimed = true;
+                this.list();
             }
         },
         async claimDailyReward(reward: TDailyReward) {
