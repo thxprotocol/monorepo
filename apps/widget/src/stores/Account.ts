@@ -1,6 +1,6 @@
 import { THXClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
-import { PKG_ENV, CLIENT_ID, CLIENT_SECRET, WIDGET_URL } from '../config/secrets';
+import { PKG_ENV, CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL } from '../config/secrets';
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
@@ -8,6 +8,9 @@ import { useClaimStore } from './Claim';
 import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from '../utils/returnUrl';
 import { getStyles } from '../utils/theme';
+import { getUxMode, tKey } from '../utils/tkey';
+
+const VERIFIER_NAME = 'thx-custom-sapphire-devnet-local';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -16,6 +19,9 @@ export const useAccountStore = defineStore('account', {
             if (!data) return {} as TWidgetConfig;
             return JSON.parse(data);
         },
+        user: null,
+        oAuthShare: '',
+        privateKey: '',
         poolId: '',
         api: null,
         account: null,
@@ -64,11 +70,7 @@ export const useAccountStore = defineStore('account', {
                 poolId: this.poolId,
             });
 
-            this.api.userManager.cached.events.addAccessTokenExpired(this.onAccessTokenExpired);
-            this.api.userManager.cached.events.addAccessTokenExpiring(this.onAccessTokenExpiring);
-            this.api.userManager.cached.events.addUserLoaded(this.onUserLoaded);
-            this.api.userManager.cached.events.addUserUnloaded(this.onUserUnloaded);
-            this.api.userManager.cached.events.load(this.onLoad);
+            this.onUserLoaded();
 
             track('UserVisits', [
                 this.account?.sub || '',
@@ -99,48 +101,152 @@ export const useAccountStore = defineStore('account', {
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
-        async signin(extraQueryParams = {}) {
+        async signin(extraQueryParams?: { [key: string]: string }) {
+            await (tKey.serviceProvider as any).init({ skipSw: true });
+            await tKey.modules.securityQuestions.initialize();
+
             const config = this.getConfig(this.poolId);
             const { claim } = useClaimStore();
             const url = getReturnUrl(config);
-            const method = this.isEthereumBrowser || (window as any).Cypress ? 'signinRedirect' : 'signinPopup';
-
-            await this.api.userManager.cached[method]({
-                state: { url, clientId: CLIENT_ID },
-                extraQueryParams: {
+            const uxMode = getUxMode();
+            const loginResponse = await (tKey.serviceProvider as any).triggerLogin({
+                verifier: VERIFIER_NAME,
+                typeOfLogin: 'jwt',
+                clientId: CLIENT_ID,
+                enableLogging: true,
+                uxMode,
+                customState: {
+                    clientId: CLIENT_ID,
+                    clientSecret: CLIENT_SECRET,
+                },
+                jwtParams: {
+                    domain: AUTH_URL,
+                    prompt: 'login',
+                    redirect_uri: WIDGET_URL + '/signin-popup.html',
+                    response_type: 'code',
+                    scope: 'openid account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
                     return_url: url,
                     pool_id: config.poolId,
                     claim_id: claim?.uuid,
                     ...extraQueryParams,
                 },
             });
+
+            localStorage.setItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`, JSON.stringify(loginResponse.userInfo));
+
+            this.user = loginResponse.userInfo;
+            this.oAuthShare = loginResponse.privateKey;
+
+            await tKey.initialize(); // 1/2 flow
+
+            // Gets the deviceShare
+            try {
+                await (tKey.modules.webStorage as any).inputShareFromWebStorage(); // 2/2 flow
+            } catch (e) {
+                console.log(e);
+            }
+
+            // Checks the requiredShares to reconstruct the tKey,
+            // starts from 2 by default and each of the above share reduce it by one.
+            const { requiredShares } = tKey.getKeyDetails();
+            if (requiredShares <= 0) {
+                const reconstructedKey = await tKey.reconstructKey();
+                this.privateKey = reconstructedKey?.privKey.toString('hex');
+                this.isAuthenticated = true;
+                this.onUserLoaded();
+            }
         },
         signout() {
-            const { origin } = this.getConfig(this.poolId);
-            const method = this.isEthereumBrowser ? 'signoutRedirect' : 'signoutPopup';
-
-            this.api.userManager.cached[method]({
-                state: { origin },
-            });
+            // TODO (not supported in tKey)
+            // call /session/end potentially with hint
         },
-        async onLoad() {
-            this.isAuthenticated = !!(await this.api.userManager.getUser());
+        async createDeviceShare(value: string) {
+            if (value.length > 10) {
+                try {
+                    await (tKey.modules.securityQuestions as any).generateNewShareWithSecurityQuestions(
+                        value,
+                        'what is your password?',
+                    );
+                    console.log('Successfully generated new share with password.');
+                } catch (error) {
+                    console.log('Error', (error as any)?.message.toString(), 'error');
+                }
+            } else {
+                console.log('Error', 'Password must be >= 11 characters', 'error');
+            }
         },
-        async onUserUnloaded() {
-            const rewardsStore = useRewardStore();
-            const perksStore = usePerkStore();
-
-            rewardsStore.list().then(this.updateLauncher);
-            perksStore.list();
-
-            this.isAuthenticated = false;
+        async updateDeviceShare(value: string) {
+            if (value.length > 10) {
+                await (tKey.modules.securityQuestions as any).changeSecurityQuestionAndAnswer(
+                    value,
+                    'whats your password?',
+                );
+                console.log('Successfully changed new share with password.');
+            } else {
+                console.log('Error', 'Password must be >= 11 characters', 'error');
+            }
         },
+        async recoverDeviceShare(value: string) {
+            if (value.length > 10) {
+                await (tKey.modules.securityQuestions as any).inputShareFromSecurityQuestions(value); // 2/2 flow
+
+                const { requiredShares } = tKey.getKeyDetails();
+                if (requiredShares <= 0) {
+                    const reconstructedKey = await tKey.reconstructKey();
+                    this.privateKey = reconstructedKey?.privKey.toString('hex');
+                    console.log('Private Key: ' + reconstructedKey.privKey.toString('hex'));
+                }
+                const newShare = await tKey.generateNewShare();
+                const shareStore = await tKey.outputShareStore(newShare.newShareIndex);
+
+                await (tKey.modules.webStorage as any).storeDeviceShare(shareStore);
+
+                console.log('Successfully logged you in with the recovery password.');
+            } else {
+                console.error('Password must be >= 11 characters');
+            }
+        },
+
+        // async signin(extraQueryParams = {}) {
+        //     const config = this.getConfig(this.poolId);
+        //     const { claim } = useClaimStore();
+        //     const url = getReturnUrl(config);
+        //     const method = this.isEthereumBrowser || (window as any).Cypress ? 'signinRedirect' : 'signinPopup';
+
+        //     await this.api.userManager.cached[method]({
+        //         state: { url, clientId: CLIENT_ID },
+        //         extraQueryParams: {
+        //             return_url: url,
+        //             pool_id: config.poolId,
+        //             claim_id: claim?.uuid,
+        //             ...extraQueryParams,
+        //         },
+        //     });
+        // },
+        // signout() {
+        //     const { origin } = this.getConfig(this.poolId);
+        //     const method = this.isEthereumBrowser ? 'signoutRedirect' : 'signoutPopup';
+
+        //     this.api.userManager.cached[method]({
+        //         state: { origin },
+        //     });
+        // },
+        // async onLoad() {
+        //     this.isAuthenticated = !!(await this.api.userManager.getUser());
+        // },
+        // async onUserUnloaded() {
+        //     const rewardsStore = useRewardStore();
+        //     const perksStore = usePerkStore();
+
+        //     rewardsStore.list().then(this.updateLauncher);
+        //     perksStore.list();
+
+        //     this.isAuthenticated = false;
+        // },
         async onUserLoaded() {
             const rewardsStore = useRewardStore();
             const perksStore = usePerkStore();
             const walletStore = useWalletStore();
-
-            this.isAuthenticated = !!(await this.api.userManager.getUser());
 
             rewardsStore.list().then(() => {
                 const { origin } = this.getConfig(this.poolId);
@@ -166,12 +272,12 @@ export const useAccountStore = defineStore('account', {
 
             track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
         },
-        onAccessTokenExpired() {
-            this.api.userManager.cached.signoutPopup();
-        },
-        onAccessTokenExpiring() {
-            //
-        },
+        // onAccessTokenExpired() {
+        //     this.api.userManager.cached.signoutPopup();
+        // },
+        // onAccessTokenExpiring() {
+        //     //
+        // },
         async getAccount() {
             this.account = await this.api.account.get();
         },

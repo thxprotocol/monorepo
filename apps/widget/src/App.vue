@@ -63,11 +63,17 @@
                         <template #button-content>
                             <i class="fas fa-ellipsis-v"></i>
                         </template>
-                        <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="onClickWallet">
+                        <b-dropdown-item-button size="sm" @click="onClickWallet">
                             <div class="d-flex align-items-center justify-content-between">
-                                {{ walletAddress }}
-                                <i class="fas fa-clipboard ml-auto" v-clipboard:copy="walletStore.wallet.address"></i>
+                                Config
+                                <!-- <i class="fas fa-clipboard ml-auto" v-clipboard:copy="walletStore.wallet.address"></i> -->
                             </div>
+                            <BaseModalWalletAccess
+                                id="wallet-access"
+                                @hidden="isModalWalletAccessShown = false"
+                                :show="isModalWalletAccessShown"
+                                :error="error"
+                            />
                         </b-dropdown-item-button>
                         <b-dropdown-divider />
                         <b-dropdown-item-button size="sm" @click="onClickSignout">
@@ -119,15 +125,17 @@ import { usePerkStore } from './stores/Perk';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
 import BaseModalPoolSubscription from './components/BaseModalPoolSubscription.vue';
+import BaseModalWalletAccess from './components/BaseModalWalletAccess.vue';
 
 import './scss/main.scss';
 
 export default defineComponent({
-    components: { BaseModalPoolSubscription },
+    components: { BaseModalPoolSubscription, BaseModalWalletAccess },
     data() {
         return {
             isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
             isModalPoolSubscriptionShown: false,
+            isModalWalletAccessShown: false,
             isRefreshing: false,
             error: '',
         };
@@ -251,7 +259,8 @@ export default defineComponent({
             }
         },
         onClickWallet() {
-            this.$router.push(`/${this.accountStore.poolId}/wallet`);
+            // this.$router.push(`/${this.accountStore.poolId}/wallet`);
+            this.isModalWalletAccessShown = true;
         },
         async onClickRefresh() {
             this.isRefreshing = true;
