@@ -1,5 +1,5 @@
 <template>
-    <b-card class="my-2 mx-lg-0 my-lg-3" header-class="p-0" body-class="d-flex flex-column">
+    <b-card class="d-none d-lg-block my-2 mx-lg-0 my-lg-3" header-class="p-0" body-class="d-flex flex-column">
         <template #header>
             <b-card-title class="d-flex px-3 py-1 m-0 align-items-center">
                 <div class="d-flex align-items-center justify-content-center" style="width: 25px">
