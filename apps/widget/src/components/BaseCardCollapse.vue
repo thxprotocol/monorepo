@@ -47,7 +47,7 @@ export default defineComponent({
         return { isVisible: false };
     },
     mounted() {
-        this.isVisible = this.visible;
+        this.isVisible = window.innerWidth > 768 || this.visible;
     },
     methods: {
         onClickLink(url: string) {

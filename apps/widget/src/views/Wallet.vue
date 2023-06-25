@@ -1,5 +1,5 @@
 <template>
-    <div v-if="accountStore.isAuthenticated" class="flex-grow-1 overflow-auto">
+    <div v-if="accountStore.isAuthenticated" class="flex-grow-1 overflow-auto order-lg-3">
         <b-alert
             variant="danger"
             show
@@ -20,7 +20,7 @@
 
         <component :key="key" v-for="(token, key) of list" :is="token.component" :token="token" />
     </div>
-    <div v-else class="d-flex flex-grow-1 align-items-center justify-content-center flex-column">
+    <div v-else class="d-flex flex-grow-1 align-items-center justify-content-center flex-column order-lg-3">
         <div class="px-5 w-100">
             <b-alert variant="info" show class="p-2 px-3">
                 <i class="fas fa-gift me-2"></i> Sign in to list your tokens!
@@ -47,14 +47,12 @@ import { useWalletStore } from '../stores/Wallet';
 import { useAccountStore } from '../stores/Account';
 import BaseCardERC20 from '../components/BaseCardERC20.vue';
 import BaseCardERC721 from '../components/BaseCardERC721.vue';
-import BaseCardShopifyDiscountCode from '../components/BaseCardShopifyDiscountCode.vue';
 
 export default defineComponent({
     name: 'Wallet',
     components: {
         BaseCardERC20,
         BaseCardERC721,
-        BaseCardShopifyDiscountCode,
     },
     data: function () {
         return { error: '', isSubmitting: false, isModalUpgradeShown: false };
@@ -63,12 +61,7 @@ export default defineComponent({
         ...mapStores(useWalletStore),
         ...mapStores(useAccountStore),
         list: function (): any {
-            return [
-                ...this.walletStore.erc20,
-                ...this.walletStore.erc721,
-                ...this.walletStore.erc1155,
-                ...this.walletStore.shopifyDiscountCode,
-            ]
+            return [...this.walletStore.erc20, ...this.walletStore.erc721, ...this.walletStore.erc1155]
                 .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
                 .reverse();
         },
