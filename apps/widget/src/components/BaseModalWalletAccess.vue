@@ -19,13 +19,14 @@
         <template v-else>
             <b-tabs justified content-class="mt-3">
                 <b-tab title="User">
+                    0x{{ accountStore.privateKey }}
                     <pre>{{ accountStore.user }}</pre>
                 </b-tab>
                 <b-tab title="Password" active>
                     <b-form-group>
                         <b-form-input v-model="password" type="password" placeholder="Password" />
                     </b-form-group>
-                    <pre>{{ accountStore.oAuthShare }}</pre>
+                    <pre>OAuthShare: {{ accountStore.oAuthShare }}</pre>
                     <b-button class="w-100" variant="primary" @click="onSubmitChangeDeviceSharePassword">
                         <b-spinner variant="light" v-if="isLoadingPasswordChange" />
                         <template v-else>Change Password</template>

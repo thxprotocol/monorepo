@@ -64,9 +64,9 @@
                         <i class="fas fa-ellipsis-v"></i>
                     </template>
                     <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="onClickWallet">
-                        <div class="d-flex align-items-center justify-content-between">
-                            Config
-                        </div>
+                    </b-dropdown-item-button>
+                    <b-dropdown-item-button size="sm" v-b-modal="'wallet-access'">
+                        <div class="d-flex align-items-center justify-content-between">Config</div>
                         <BaseModalWalletAccess
                             id="wallet-access"
                             @hidden="isModalWalletAccessShown = false"
