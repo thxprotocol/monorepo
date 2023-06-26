@@ -60,7 +60,7 @@ export default defineComponent({
         return {
             rewardComponentMap,
             isLgScreen: window.innerWidth > 1000,
-            selectedSort: { label: 'Available', key: RewardSortVariant.Available },
+            selectedSort: { label: 'Default', key: RewardSortVariant.Default },
             activeFilters: [],
         };
     },
@@ -82,10 +82,6 @@ export default defineComponent({
         },
     },
     watch: {
-        'window.innerWidth'(width) {
-            debugger;
-            this.isLgScreen = width > 1000;
-        },
         // This redirects the user to the wallet of there are no rewards and perks
         'accountStore.isRewardsLoaded'(isRewardsLoaded) {
             if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {

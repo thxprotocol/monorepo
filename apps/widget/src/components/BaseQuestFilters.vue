@@ -46,6 +46,7 @@ export default defineComponent({
         return {
             activeFilters: [],
             sorts: [
+                { label: 'Default', key: RewardSortVariant.Default },
                 { label: 'Available', key: RewardSortVariant.Available },
                 { label: 'Created', key: RewardSortVariant.Created },
                 { label: 'Amount', key: RewardSortVariant.Amount },

@@ -5,6 +5,7 @@
         :no-body="!expiry.date && !image"
         :img-src="image"
         :overlay="!!image"
+        class="my-2 mx-lg-0 my-lg-3"
         :class="{ 'card-promoted': isPromoted }"
     >
         <b-badge

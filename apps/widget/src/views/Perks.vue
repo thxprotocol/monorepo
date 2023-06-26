@@ -1,11 +1,11 @@
 <template>
     <BaseModalCampaignExpired :id="'modalCampaignExpiredPerks'" />
-    <b-container class="flex-grow-1 overflow-auto order-md-4">
+    <b-container class="flex-grow-1 overflow-auto order-lg-1">
         <b-row>
             <b-col lg="11" offset-xl="1">
                 <b-row>
-                    <b-col md="4" :key="key" v-for="(perk, key) of perksStore.perks">
-                        <component :is="perk.component" :perk="perk" class="m-2 mx-md-0 my-md-3" />
+                    <b-col lg="4" :key="key" v-for="(perk, key) of perksStore.perks">
+                        <component :is="perk.component" :perk="perk" />
                     </b-col>
                 </b-row>
             </b-col>

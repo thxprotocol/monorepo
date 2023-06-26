@@ -13,6 +13,9 @@ export const rewardComponentMap = {
 };
 
 export const sortMap: { [k: number]: any } = {
+    [RewardSortVariant.Default]: (a: any, b: any): any => {
+        return a.index - b.index;
+    },
     [RewardSortVariant.Available]: (a: any, b: any): any => {
         switch (a.component) {
             case 'BaseCardRewardDaily':
