@@ -72,9 +72,6 @@ import BaseBlockquoteYoutubeChannelSubscription from '../components/blockquote/B
 import BaseBlockquoteVideo from '../components/blockquote/BaseBlockquoteVideo.vue';
 import BaseBlockquoteDiscordServerJoin from '../components/blockquote/BaseBlockquoteDiscordServerJoin.vue';
 import BaseBlockquoteDiscordInviteUsed from '../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
-import BaseBlockquoteShopifyNewsletterSubscription from '../components/blockquote/BaseBlockquoteShopifyNewsletterSubscription.vue';
-import BaseBlockquoteShopifyOrderAmount from '../components/blockquote/BaseBlockquoteShopifyOrderAmount.vue';
-import BaseBlockquoteShopifyTotalSpent from '../components/blockquote/BaseBlockquoteShopifyTotalSpent.vue';
 
 export default defineComponent({
     name: 'BaseCardRewardPoints',
@@ -85,9 +82,6 @@ export default defineComponent({
         BaseBlockquoteTwitterTweet,
         BaseBlockquoteTwitterUser,
         BaseBlockquoteDiscordServerJoin,
-        BaseBlockquoteShopifyNewsletterSubscription,
-        BaseBlockquoteShopifyOrderAmount,
-        BaseBlockquoteShopifyTotalSpent,
         BaseBlockquoteDiscordInviteUsed,
     },
     props: {
@@ -107,7 +101,6 @@ export default defineComponent({
                 [RewardConditionPlatform.YouTube]: 'fab fa-youtube',
                 [RewardConditionPlatform.Twitter]: 'fab fa-twitter',
                 [RewardConditionPlatform.Discord]: 'fab fa-discord',
-                [RewardConditionPlatform.Shopify]: 'fab fa-shopify',
             },
             tooltipContent: 'Copy URL',
         };
@@ -130,8 +123,6 @@ export default defineComponent({
                     return account.githubAccess;
                 case RewardConditionPlatform.Twitch:
                     return account.twitchAccess;
-                case RewardConditionPlatform.Shopify:
-                    return account.email;
                 default:
                     return true;
             }
@@ -167,12 +158,6 @@ export default defineComponent({
                     return 'BaseBlockquoteDiscordServerJoin';
                 case RewardConditionInteraction.DiscordInviteUsed:
                     return 'BaseBlockquoteDiscordInviteUsed';
-                case RewardConditionInteraction.ShopifyOrderAmount:
-                    return 'BaseBlockquoteShopifyOrderAmount';
-                case RewardConditionInteraction.ShopifyTotalSpent:
-                    return 'BaseBlockquoteShopifyTotalSpent';
-                case RewardConditionInteraction.ShopifyNewsletterSubscription:
-                    return 'BaseBlockquoteShopifyNewsletterSubscription';
             }
         },
         getAccessTokenKindForPlatform(platform: RewardConditionPlatform) {

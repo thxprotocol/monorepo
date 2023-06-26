@@ -13,7 +13,6 @@ type TWalletState = {
     erc20: any[];
     erc721: any[];
     erc1155: any[];
-    shopifyDiscountCode: any[];
     pendingPoints: number;
 };
 

@@ -1,51 +1,29 @@
 <template>
-    <div>
-        <BaseModalCampaignExpired :id="'modalCampaignExpiredRewards'" />
-    </div>
+    <BaseModalCampaignExpired :id="'modalCampaignExpiredRewards'" />
     <div class="d-flex justify-content-between">
-        <b-collapse id="collapse-filters" class="me-2 flex-grow-1">
-            <div class="w-100 m-2 align-items-center d-flex">
-                <i class="fas fa-filter text-primary me-2"></i>
-                <b-dropdown size="sm" variant="primary" class="w-100" no-caret>
-                    <template #button-content v-if="!activeFilters.length"> No filter </template>
-                    <template #button-content v-else>
-                        <i :class="f.icon" class="me-2" :key="key" v-for="(f, key) of activeFilters"></i>
-                    </template>
-                    <b-dropdown-item-btn
-                        @click.stop=""
-                        class="dropdown-item-filter"
-                        :key="key"
-                        v-for="(f, key) of filters"
-                    >
-                        <b-form-checkbox v-model="activeFilters" :value="f" class="d-block">
-                            <div class="d-inline-flex justify-content-center align-items-center" style="width: 20px">
-                                <i :class="f.icon" class="text-opaque me-1" />
-                            </div>
-                            {{ f.label }}
-                        </b-form-checkbox>
-                    </b-dropdown-item-btn>
-                </b-dropdown>
-                <div class="w-100 m-2 align-items-center d-flex">
-                    <i class="fas fa-sort text-primary me-2"></i>
-                    <b-dropdown size="sm" variant="primary" class="w-100" no-caret>
-                        <template #button-content> {{ selectedSort.label }} </template>
-                        <b-dropdown-item @click="selectedSort = s" :key="key" v-for="(s, key) of sorts">
-                            {{ s.label }}
-                        </b-dropdown-item>
-                    </b-dropdown>
-                </div>
-            </div>
-        </b-collapse>
-    </div>
-    <div class="flex-grow-1 overflow-auto">
-        <component
-            v-for="(reward, key) of rewards"
-            :key="key"
-            :is="rewardComponentMap[reward.variant]"
-            :reward="reward"
-            class="mb-2"
+        <BaseQuestFilters
+            :filter="activeFilters"
+            :sort="selectedSort"
+            @change-filter="onChangeFilter"
+            @change-sort="onChangeSort"
         />
     </div>
+    <b-container class="flex-grow-1 overflow-auto order-lg-1">
+        <b-row>
+            <b-col lg="7" xl="6" offset-xl="1">
+                <component
+                    :key="key"
+                    v-for="(reward, key) of rewards"
+                    :is="rewardComponentMap[reward.variant]"
+                    :reward="reward"
+                    class="my-2 mx-lg-0 my-lg-3"
+                />
+            </b-col>
+            <b-col lg="5" xl="4">
+                <BaseQuestLeaderboard />
+            </b-col>
+        </b-row>
+    </b-container>
 </template>
 
 <script lang="ts">
@@ -59,14 +37,18 @@ import BaseCardRewardNFT from '../components/BaseCardPerkERC721.vue';
 import BaseCardRewardMilestone from '../components/BaseCardRewardMilestone.vue';
 import BaseCardRewardDaily from '../components/BaseCardRewardDaily.vue';
 import BaseModalCampaignExpired from '../components/BaseModalCampaignExpired.vue';
+import BaseQuestFilters from '../components/BaseQuestFilters.vue';
+import BaseQuestLeaderboard from '../components/BaseQuestLeaderboard.vue';
 import { useWalletStore } from '../stores/Wallet';
 import { usePerkStore } from '../stores/Perk';
-import { RewardSortVariant, RewardVariant } from '../types/enums/rewards';
+import { RewardSortVariant } from '../types/enums/rewards';
 import { rewardComponentMap, sortMap } from '../utils/rewards';
 
 export default defineComponent({
     name: 'Home',
     components: {
+        BaseQuestFilters,
+        BaseQuestLeaderboard,
         BaseCardRewardReferral,
         BaseCardRewardPoints,
         BaseCardRewardMilestone,
@@ -77,19 +59,9 @@ export default defineComponent({
     data(): any {
         return {
             rewardComponentMap,
-            selectedSort: { label: 'Available', key: RewardSortVariant.Available },
+            isLgScreen: window.innerWidth > 1000,
+            selectedSort: { label: 'Default', key: RewardSortVariant.Default },
             activeFilters: [],
-            sorts: [
-                { label: 'Available', key: RewardSortVariant.Available },
-                { label: 'Created', key: RewardSortVariant.Created },
-                { label: 'Amount', key: RewardSortVariant.Amount },
-            ],
-            filters: [
-                { label: 'Daily', key: RewardVariant.Daily, icon: 'fa fa-calendar' },
-                { label: 'Referral', key: RewardVariant.Referral, icon: 'fas fa-comments' },
-                { label: 'Conditional', key: RewardVariant.Conditional, icon: 'fas fa-trophy' },
-                { label: 'Milestone', key: RewardVariant.Milestone, icon: 'fas fa-flag' },
-            ],
         };
     },
     computed: {
@@ -97,6 +69,7 @@ export default defineComponent({
         ...mapStores(useRewardStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
+
         rewards() {
             const { rewards } = useRewardStore();
             return rewards
@@ -116,6 +89,14 @@ export default defineComponent({
             }
             const { poolId, getConfig } = this.accountStore;
             window.top?.postMessage({ message: 'thx.widget.ready' }, getConfig(poolId).origin);
+        },
+    },
+    methods: {
+        onChangeFilter(filter: any) {
+            this.activeFilters = filter;
+        },
+        onChangeSort(sort: any) {
+            this.selectedSort = sort;
         },
     },
 });

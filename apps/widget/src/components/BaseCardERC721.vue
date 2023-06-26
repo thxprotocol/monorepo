@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse :visible="isVisible">
+    <BaseCardCollapse :visible="isVisible" :info-links="[]" class="m-2">
         <template #header>
             <div class="pe-3">
                 <img height="25" :src="token.nft.logoImgUrl" />

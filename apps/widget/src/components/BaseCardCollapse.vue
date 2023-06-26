@@ -2,7 +2,6 @@
     <b-card
         header-class="p-0"
         body-class="d-flex flex-column p-0"
-        class="m-2"
         :class="{ 'card-collapsed': isVisible, 'card-promoted': isPromoted }"
     >
         <template #header>
@@ -48,7 +47,7 @@ export default defineComponent({
         return { isVisible: false };
     },
     mounted() {
-        this.isVisible = this.visible;
+        this.isVisible = window.innerWidth > 768 || this.visible;
     },
     methods: {
         onClickLink(url: string) {

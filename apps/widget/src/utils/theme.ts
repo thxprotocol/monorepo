@@ -29,7 +29,7 @@ export function getStyles(elements: any, colors: any) {
         '.text-accent': {
             '--thx-accent': theme.colors.accent,
         },
-        'body': {
+        'body,.bg-splash': {
             '--bs-body-bg': theme.elements.bodyBg,
             '--bs-body-color': theme.elements.text,
         },
@@ -77,7 +77,7 @@ export function getStyles(elements: any, colors: any) {
             '--bs-btn-disabled-bg': theme.elements.btnBg,
             '--bs-btn-disabled-border-color': theme.elements.btnBg,
         },
-        '.navbar-bottom': {
+        '.navbar-top,.navbar-bottom': {
             '--thx-navbar-bg': theme.elements.navbarBg,
             '--thx-navbar-btn-bg': theme.elements.navbarBtnBg,
             '--thx-navbar-btn-color': theme.elements.navbarBtnText,

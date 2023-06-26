@@ -1,117 +1,16 @@
 <template>
-    <div id="main" class="d-flex flex-column h-100">
-        <b-navbar class="navbar-top pt-3">
-            <div style="width: 120px">
-                <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
-            </div>
-            <div class="pl-3 py-2 text-center text-decoration-none" v-if="!accountStore.isAuthenticated && config">
-                <b-img
-                    :src="config.logoUrl"
-                    class="navbar-logo"
-                    :title="decodeHTML(config.title)"
-                    v-b-tooltip.hover.bottom
-                />
-            </div>
-            <b-link
-                @click="onClickRefresh"
-                class="pl-3 py-2 text-center text-decoration-none"
-                v-if="accountStore.isAuthenticated && rewardsStore.rewards.length"
-            >
-                <div class="text-accent h1 m-0 d-flex align-items-center">
-                    <strong>{{ accountStore.balance }}</strong>
-                    <span class="ms-2 text-white" style="font-size: 16px !important">
-                        <b-spinner v-if="isRefreshing" small variant="white" />
-                        <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
-                    </span>
-                </div>
-                <div class="points">points</div>
-            </b-link>
-            <div style="width: 120px; text-align: right">
-                <template v-if="accountStore.isAuthenticated && rewardsStore.rewards.length">
-                    <b-button variant="link" @click="isModalPoolSubscriptionShown = true">
-                        <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>
-                        <BaseModalPoolSubscription
-                            id="pool-subscription"
-                            @subscribe="onSubmitSubscription($event)"
-                            @unsubscribe="onSubmitUnsubscription"
-                            @hidden="isModalPoolSubscriptionShown = false"
-                            :show="isModalPoolSubscriptionShown"
-                            :error="error"
-                        />
-                    </b-button>
-                    <b-button
-                        v-if="['home', 'earn'].includes(String($route.name))"
-                        variant="link"
-                        v-b-toggle.collapse-filters
-                    >
-                        <i class="fas fa-sliders-h"></i>
-                    </b-button>
-                </template>
-                <b-button
-                    v-if="accountStore.isAuthenticated && !rewardsStore.rewards.length"
-                    variant="link"
-                    @click="onClickRefresh"
-                >
-                    <b-spinner v-if="isRefreshing" small variant="white" />
-                    <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
-                </b-button>
-                <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin">
-                    Sign in
-                </b-button>
-                <template v-else>
-                    <b-dropdown variant="link" no-caret right>
-                        <template #button-content>
-                            <i class="fas fa-ellipsis-v"></i>
-                        </template>
-                        <b-dropdown-item-button size="sm" @click="onClickWallet">
-                            <div class="d-flex align-items-center justify-content-between">
-                                Config
-                                <!-- <i class="fas fa-clipboard ml-auto" v-clipboard:copy="walletStore.wallet.address"></i> -->
-                            </div>
-                            <BaseModalWalletAccess
-                                id="wallet-access"
-                                @hidden="isModalWalletAccessShown = false"
-                                :show="isModalWalletAccessShown"
-                                :error="error"
-                            />
-                        </b-dropdown-item-button>
-                        <b-dropdown-divider />
-                        <b-dropdown-item-button size="sm" @click="onClickSignout">
-                            <div class="d-flex align-items-center justify-content-between">
-                                Signout
-                                <i class="fas fa-sign-out-alt ml-auto"></i>
-                            </div>
-                        </b-dropdown-item-button>
-                    </b-dropdown>
-                </template>
-            </div>
-        </b-navbar>
+    <div
+        v-if="config"
+        class="d-none d-lg-block bg-splash"
+        :style="{ backgroundImage: `url(${config?.backgroundUrl})` }"
+    ></div>
+    <div id="main" class="d-flex flex-column h-100 container-lg my-lg-3 p-0">
+        <BaseNavbarSecondary class="d-flex d-lg-none" />
+        <h2 class="d-none d-lg-block order-lg-1" style="text-transform: capitalize">
+            {{ $route.name }}
+        </h2>
         <router-view />
-        <b-navbar v-if="rewardsStore.rewards.length || perksStore.perks.length" class="navbar-bottom">
-            <router-link
-                v-if="rewardsStore.rewards.length"
-                :to="`/${accountStore.poolId}/earn`"
-                class="d-flex flex-column justify-content-center align-items-center"
-            >
-                <i class="fas fa-trophy"></i>
-                Quests
-            </router-link>
-            <router-link
-                v-if="perksStore.perks.length"
-                :to="`/${accountStore.poolId}/store`"
-                class="d-flex flex-column justify-content-center align-items-center"
-            >
-                <i class="fas fa-store"></i>
-                Rewards
-            </router-link>
-            <router-link
-                :to="`/${accountStore.poolId}/wallet`"
-                class="d-flex flex-column justify-content-center align-items-center"
-            >
-                <i class="fas fa-wallet"></i>
-                Wallet
-            </router-link>
-        </b-navbar>
+        <BaseNavbarPrimary />
     </div>
 </template>
 <script lang="ts">
@@ -124,13 +23,16 @@ import { useWalletStore } from './stores/Wallet';
 import { usePerkStore } from './stores/Perk';
 import { initGTM } from './utils/ga';
 import { track } from '@thxnetwork/mixpanel';
-import BaseModalPoolSubscription from './components/BaseModalPoolSubscription.vue';
-import BaseModalWalletAccess from './components/BaseModalWalletAccess.vue';
+import BaseNavbarPrimary from './components/BaseNavbarPrimary.vue';
+import BaseNavbarSecondary from './components/BaseNavbarSecondary.vue';
 
 import './scss/main.scss';
 
 export default defineComponent({
-    components: { BaseModalPoolSubscription, BaseModalWalletAccess },
+    components: {
+        BaseNavbarPrimary,
+        BaseNavbarSecondary,
+    },
     data() {
         return {
             isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
@@ -168,10 +70,6 @@ export default defineComponent({
         window.onmessage = this.onMessage;
     },
     methods: {
-        decodeHTML(input: string) {
-            var doc = new DOMParser().parseFromString(input, 'text/html');
-            return doc.documentElement.textContent;
-        },
         async onMessage(event: MessageEvent) {
             const { getConfig, poolId } = this.accountStore;
             const origin = getConfig(poolId).origin;
@@ -228,83 +126,6 @@ export default defineComponent({
 
             track('UserOpens', [account?.sub || '', `widget iframe`, { origin, poolId, isShown }]);
         },
-        async onSubmitSubscription(email: string) {
-            try {
-                await this.accountStore.subscribe(email);
-                this.isModalPoolSubscriptionShown = false;
-            } catch (error) {
-                this.error = 'This e-mail is used by someone else.';
-            }
-        },
-        async onSubmitUnsubscription() {
-            await this.accountStore.unsubscribe();
-            this.isModalPoolSubscriptionShown = false;
-        },
-        onClickSignin() {
-            this.accountStore.signin();
-        },
-        onClickSignout() {
-            this.accountStore.signout();
-        },
-        onClickClose() {
-            const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
-            if (this.isEthereumBrowser) {
-                // if (window.opener) {
-                //     window.close();
-                // } else {
-                // }
-                window.open(origin, '_self');
-            } else {
-                window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
-            }
-        },
-        onClickWallet() {
-            // this.$router.push(`/${this.accountStore.poolId}/wallet`);
-            this.isModalWalletAccessShown = true;
-        },
-        async onClickRefresh() {
-            this.isRefreshing = true;
-            await this.walletStore.list();
-            await this.accountStore.getBalance();
-            this.isRefreshing = false;
-        },
     },
 });
 </script>
-
-<style>
-.fa-bell {
-    animation: shake 10s;
-    animation-iteration-count: infinite;
-}
-
-@keyframes shake {
-    0% {
-        transform: translate(0px, 0px) rotate(0deg);
-    }
-    95% {
-        transform: translate(-1px, 2px) rotate(-1deg);
-    }
-    96% {
-        transform: translate(-2px, 1px) rotate(0deg);
-    }
-    97% {
-        transform: translate(2px, 1px) rotate(-1deg);
-    }
-    98% {
-        transform: translate(-1px, -1px) rotate(1deg);
-    }
-    99% {
-        transform: translate(1px, 2px) rotate(-1deg);
-    }
-    100% {
-        transform: translate(0px, 0px) rotate(0deg);
-    }
-}
-
-.navbar-logo {
-    height: auto;
-    max-height: 50px;
-    max-width: 100px;
-}
-</style>

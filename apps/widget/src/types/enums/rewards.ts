@@ -1,7 +1,8 @@
 export enum RewardSortVariant {
-    Available = 0,
-    Created = 1,
-    Amount = 2,
+    Default = 0,
+    Available = 1,
+    Created = 2,
+    Amount = 3,
 }
 
 export enum RewardVariant {

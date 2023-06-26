@@ -50,6 +50,7 @@ type TWidgetConfig = {
     theme: string;
     title: string;
     logoUrl: string;
+    backgroundUrl: string;
     ref?: string;
     expired: boolean;
 };

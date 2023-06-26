@@ -1,11 +1,11 @@
 <template>
     <b-card
-        class="m-2"
         body-class="d-flex align-items-start justify-content-start"
         footer-class="py-3"
         :no-body="!expiry.date && !image"
         :img-src="image"
         :overlay="!!image"
+        class="my-2 mx-lg-0 my-lg-3"
         :class="{ 'card-promoted': isPromoted }"
     >
         <b-badge
