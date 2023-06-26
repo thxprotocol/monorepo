@@ -6,6 +6,7 @@ import { RewardVariant } from '../types/enums/rewards';
 export const useRewardStore = defineStore('rewards', {
     state: (): TRewardState => ({
         rewards: [],
+        leaderboard: [],
     }),
     actions: {
         async claimConditionalReward(id: string) {
@@ -69,7 +70,10 @@ export const useRewardStore = defineStore('rewards', {
 
         async list() {
             const { api } = useAccountStore();
-            const { referralRewards, pointRewards, milestoneRewards, dailyRewards } = await api.rewardsManager.list();
+            const { leaderboard, referralRewards, pointRewards, milestoneRewards, dailyRewards } =
+                await api.rewardsManager.list();
+
+            this.leaderboard = leaderboard;
 
             const dailyRewardsArray = Object.values(dailyRewards);
             const dailyRewardsList = dailyRewardsArray.map((a: any) => {

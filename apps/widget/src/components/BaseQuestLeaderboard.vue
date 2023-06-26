@@ -7,11 +7,22 @@
                 </div>
                 <div class="flex-grow-1 pe-2">Leaderboard</div>
                 <div class="text-accent fw-bold">
-                    <b-button variant="link">Refresh</b-button>
+                    <b-button variant="link">.</b-button>
                 </div>
             </b-card-title>
         </template>
-        <p>Lorem ipsum</p>
+        <b-list-group>
+            <b-list-group-item
+                class="bg-primary text-white d-flex"
+                :key="key"
+                v-for="(entry, key) of rewardsStore.leaderboard"
+            >
+                <span class="bg-dark px-2 rounded-pill small d-flex align-items-center">{{ key + 1 }}</span>
+                <span class="flex-grow-1 ps-2">{{ entry.address.substring(0, 8) }}...</span>
+                <span class="flex-grow-1 text-opaque pe-3">{{ entry.questsCompleted }} quests</span>
+                <strong>{{ entry.score }}</strong>
+            </b-list-group-item>
+        </b-list-group>
     </b-card>
 </template>
 
@@ -19,38 +30,16 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
-import { RewardSortVariant, RewardVariant } from '../types/enums/rewards';
+import { useRewardStore } from '../stores/Reward';
 
 export default defineComponent({
     name: 'Home',
     data(): any {
-        return {
-            activeFilters: [],
-            sorts: [
-                { label: 'Available', key: RewardSortVariant.Available },
-                { label: 'Created', key: RewardSortVariant.Created },
-                { label: 'Amount', key: RewardSortVariant.Amount },
-            ],
-            filters: [
-                { label: 'Daily', key: RewardVariant.Daily, icon: 'fa fa-calendar' },
-                { label: 'Referral', key: RewardVariant.Referral, icon: 'fas fa-comments' },
-                { label: 'Conditional', key: RewardVariant.Conditional, icon: 'fas fa-trophy' },
-                { label: 'Milestone', key: RewardVariant.Milestone, icon: 'fas fa-flag' },
-            ],
-        };
-    },
-    props: {
-        filter: {
-            type: Array,
-            required: true,
-        },
-        sort: {
-            type: String,
-            required: true,
-        },
+        return {};
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useRewardStore),
     },
 });
 </script>

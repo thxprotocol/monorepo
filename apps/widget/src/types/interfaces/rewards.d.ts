@@ -46,6 +46,7 @@ type TReferralReward = TBaseReward & {
 
 type TRewardState = {
     rewards: IReward[];
+    leaderboard: { score; wallet; questsCompleted }[];
 };
 
 type TMilestoneRewardClaim = {
