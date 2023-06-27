@@ -14,7 +14,9 @@
                 </b-alert>
             </template>
 
-            <b-form-group description="Claim wallet ownership with this code.">
+            <b-card-title>Virtual Wallet</b-card-title>
+            <hr />
+            <b-form-group description="Provide a wallet code to connect it and complete your quests.">
                 <b-form-input :state="isValidUUID" v-model="uuid" placeholder="Code" />
             </b-form-group>
 
@@ -26,7 +28,7 @@
                 :disabled="!!error || isWaitingForWalletAddress || isLoadingCollect"
             >
                 <b-spinner v-if="isLoadingCollect" small variant="dark" />
-                Collect rewards
+                Connect Virtual Wallet
             </b-button>
             <b-button v-else @click="onClickSignin" variant="primary" class="w-100"> Sign in &amp; Collect </b-button>
         </b-card>
@@ -88,7 +90,7 @@ export default defineComponent({
                     body: JSON.stringify({ code: this.uuid }),
                 });
                 await this.rewardsStore.list();
-                this.$router.push(`/${this.accountStore.poolId}/earn`);
+                this.$router.push(`/${this.accountStore.poolId}/quests`);
             } catch (error) {
                 this.error = (error as Error).message || 'Something went wrong..';
             }

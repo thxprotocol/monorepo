@@ -6,9 +6,15 @@
     ></div>
     <div id="main" class="d-flex flex-column h-100 container-lg my-lg-3 p-0">
         <BaseNavbarSecondary class="d-flex d-lg-none" />
-        <h2 class="d-none d-lg-block order-lg-1" style="text-transform: capitalize">
-            {{ $route.name }}
-        </h2>
+        <b-container class="order-lg-1 d-none d-lg-block">
+            <b-row>
+                <b-col lg="10" offset-lg="1">
+                    <h2 style="text-transform: capitalize">
+                        {{ $route.name }}
+                    </h2>
+                </b-col>
+            </b-row>
+        </b-container>
         <router-view />
         <BaseNavbarPrimary />
     </div>

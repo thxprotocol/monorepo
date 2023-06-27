@@ -32,20 +32,21 @@ function beforeEnter(to: any, from: any, next: any) {
 
 const routes: Array<RouteRecordRaw> = [
     {
-        path: '/',
+        path: '/:poolId',
         name: 'home',
+        redirect: (route) => {
+            return `/${route.params.poolId}/quests`;
+        },
+    },
+    {
+        path: '/:poolId/quests',
+        name: 'quests',
         beforeEnter,
         component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue'),
     },
     {
-        path: '/:poolId/earn',
-        name: 'earn',
-        beforeEnter,
-        component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue'),
-    },
-    {
-        path: '/:poolId/store',
-        name: 'store',
+        path: '/:poolId/rewards',
+        name: 'rewards',
         beforeEnter,
         component: () => import(/* webpackChunkName: "perks" */ '../views/Perks.vue'),
     },

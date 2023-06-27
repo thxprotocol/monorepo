@@ -1,16 +1,14 @@
 <template>
     <BaseModalCampaignExpired :id="'modalCampaignExpiredRewards'" />
-    <div class="d-flex justify-content-between">
-        <BaseQuestFilters
-            :filter="activeFilters"
-            :sort="selectedSort"
-            @change-filter="onChangeFilter"
-            @change-sort="onChangeSort"
-        />
-    </div>
-    <b-container class="flex-grow-1 overflow-auto order-lg-1">
+    <b-container class="flex-grow-1 overflow-auto order-lg-2">
         <b-row>
             <b-col lg="7" xl="6" offset-xl="1">
+                <BaseQuestFilters
+                    :filter="activeFilters"
+                    :sort="selectedSort"
+                    @change-filter="onChangeFilter"
+                    @change-sort="onChangeSort"
+                />
                 <component
                     :key="key"
                     v-for="(reward, key) of rewards"

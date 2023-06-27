@@ -7,7 +7,9 @@
                 </div>
                 <div class="flex-grow-1 pe-2">Leaderboard</div>
                 <div class="text-accent fw-bold">
-                    <b-button variant="link">.</b-button>
+                    <b-button variant="link" class="text-opaque" @click="rewardsStore.list()">
+                        <i class="fas fa-sync-alt"></i>
+                    </b-button>
                 </div>
             </b-card-title>
         </template>
@@ -17,10 +19,12 @@
                 :key="key"
                 v-for="(entry, key) of rewardsStore.leaderboard"
             >
-                <span class="bg-dark px-2 rounded-pill small d-flex align-items-center">{{ key + 1 }}</span>
-                <span class="flex-grow-1 ps-2">{{ entry.address.substring(0, 8) }}...</span>
-                <span class="flex-grow-1 text-opaque pe-3">{{ entry.questsCompleted }} quests</span>
-                <strong>{{ entry.score }}</strong>
+                <span class="list-item-field-rank">{{ key + 1 }}</span>
+                <span class="list-item-field-address flex-grow-1 ps-2">{{ entry.address.substring(0, 8) }}...</span>
+                <span class="list-item-field-questcount flex-grow-1 text-opaque pe-3">
+                    {{ entry.questsCompleted }} {{ entry.questsCompleted > 1 ? 'quests' : 'quest' }}
+                </span>
+                <strong class="list-item-field-score">{{ entry.score }}</strong>
             </b-list-group-item>
         </b-list-group>
     </b-card>
@@ -46,5 +50,26 @@ export default defineComponent({
 <style lang="scss" scoped>
 .card-header {
     border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);
+}
+.list-item-field-rank {
+    background-color: var(--bs-purple-darker);
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+.list-item-field-address {
+    flex-grow: 1;
+}
+.list-item-field-questcount {
+    width: 50px;
+    text-align: right;
+}
+.list-item-field-score {
+    width: 50px;
+    text-align: right;
 }
 </style>
