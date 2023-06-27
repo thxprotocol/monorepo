@@ -11,11 +11,11 @@
                 v-b-tooltip.hover.bottom
             />
         </div>
-        <router-link v-if="rewardsStore.rewards.length" :to="`/${accountStore.poolId}/earn`">
+        <router-link v-if="rewardsStore.rewards.length" :to="`/${accountStore.poolId}/quests`">
             <i class="fas fa-trophy me-lg-3"></i>
             <div>Quests</div>
         </router-link>
-        <router-link v-if="perksStore.perks.length" :to="`/${accountStore.poolId}/store`">
+        <router-link v-if="perksStore.perks.length" :to="`/${accountStore.poolId}/rewards`">
             <i class="fas fa-store me-lg-3"></i>
             <div>Rewards</div>
         </router-link>
