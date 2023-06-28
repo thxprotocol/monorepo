@@ -25,7 +25,7 @@ export function getStyles(elements: any, colors: any) {
             info: colors['info'].color,
         },
     };
-    return {
+    const styles: any = {
         '.text-accent': {
             '--thx-accent': theme.colors.accent,
         },
@@ -94,4 +94,17 @@ export function getStyles(elements: any, colors: any) {
             '--bs-nav-tabs-link-active-border-color': theme.elements.btnBgDark,
         },
     };
+
+    const sheet = document.createElement('style');
+
+    for (const selector in styles) {
+        let rule = `${selector} { `;
+        for (const name in styles[selector]) {
+            rule += `${name}: ${styles[selector][name]};`;
+        }
+        rule += '}';
+        sheet.innerText += rule;
+    }
+
+    return sheet;
 }

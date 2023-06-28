@@ -67,7 +67,6 @@ export default defineComponent({
         ...mapStores(useRewardStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
-
         rewards() {
             const { rewards } = useRewardStore();
             return rewards

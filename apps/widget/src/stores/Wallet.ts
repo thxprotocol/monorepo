@@ -24,7 +24,8 @@ export const useWalletStore = defineStore('wallet', {
             const { api, getConfig, account, poolId } = useAccountStore();
             if (!account) return;
 
-            this.wallets = await api.walletManager.list(getConfig(poolId).chainId, account.sub);
+            this.wallets = await api.wallets.list(getConfig(poolId).chainId, account.sub);
+
             const primaryWallet = this.wallets.find((wallet) => wallet.address);
             if (primaryWallet) this.wallet = primaryWallet;
         },

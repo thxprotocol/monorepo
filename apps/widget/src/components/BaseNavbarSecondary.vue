@@ -57,20 +57,24 @@
                 <b-spinner v-if="isRefreshing" small variant="white" />
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
             </b-button>
-            <b-button variant="link" v-if="!accountStore.isAuthenticated" @click="onClickSignin"> Sign in </b-button>
+            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="link">
+                <b-spinner v-if="isLoadingSignin" small variant="white" />
+                <template v-else>Sign in</template>
+            </b-button>
             <template v-else>
                 <b-dropdown variant="link" no-caret right>
                     <template #button-content>
                         <i class="fas fa-ellipsis-v"></i>
                     </template>
                     <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="onClickWallet">
+                        {{ walletStore.wallet.address }}
                     </b-dropdown-item-button>
                     <b-dropdown-item-button size="sm" v-b-modal="'wallet-access'">
                         <div class="d-flex align-items-center justify-content-between">Config</div>
-                        <BaseModalWalletAccess
+                        <BaseModalWalletConfig
                             id="wallet-access"
-                            @hidden="isModalWalletAccessShown = false"
-                            :show="isModalWalletAccessShown"
+                            @hidden="isModalWalletConfigShown = false"
+                            :show="isModalWalletConfigShown"
                             :error="error"
                         />
                     </b-dropdown-item-button>
@@ -96,20 +100,23 @@ import { useWalletStore } from '../stores/Wallet';
 import { usePerkStore } from '../stores/Perk';
 import { decodeHTML } from '../utils/decode-html';
 import BaseModalPoolSubscription from '../components/BaseModalPoolSubscription.vue';
-import BaseModalWalletAccess from '../components/BaseModalWalletAccess.vue';
+import BaseModalWalletConfig from '../components/BaseModalWalletConfig.vue';
 
 export default defineComponent({
     name: 'Home',
     components: {
-        BaseModalWalletAccess,
+        BaseModalWalletConfig,
         BaseModalPoolSubscription,
     },
     data(): any {
         return {
             decodeHTML,
+            isModalWalletConfigShown: false,
+            isModalWalletRecoveryShown: false,
             isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
             isModalPoolSubscriptionShown: false,
             isRefreshing: false,
+            isLoadingSignin: false,
             error: '',
         };
     },
@@ -150,8 +157,14 @@ export default defineComponent({
             await this.accountStore.unsubscribe();
             this.isModalPoolSubscriptionShown = false;
         },
-        onClickSignin() {
-            this.accountStore.signin();
+        async onClickSignin() {
+            this.isLoadingSignin = true;
+            await this.accountStore.signin();
+            this.isLoadingSignin = false;
+            if (this.accountStore.isAuthenticated && !this.accountStore.isDeviceShareAvailable) {
+                this.isModalWalletConfigShown = true;
+                this.isModalWalletRecoveryShown = true;
+            }
         },
         onClickSignout() {
             this.accountStore.signout();

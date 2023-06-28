@@ -1,6 +1,6 @@
 import { THXClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
-import { PKG_ENV, CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL } from '../config/secrets';
+import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL, API_URL } from '../config/secrets';
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
@@ -9,16 +9,12 @@ import { track } from '@thxnetwork/mixpanel';
 import { getReturnUrl } from '../utils/returnUrl';
 import { getStyles } from '../utils/theme';
 import { getUxMode, tKey } from '../utils/tkey';
+import * as jose from 'jose';
 
 const VERIFIER_NAME = 'thx-custom-sapphire-devnet-local';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
-        getConfig: (id: string): TWidgetConfig => {
-            const data = localStorage.getItem(`thx:widget:${id}:config`);
-            if (!data) return {} as TWidgetConfig;
-            return JSON.parse(data);
-        },
         user: null,
         oAuthShare: '',
         privateKey: '',
@@ -27,30 +23,32 @@ export const useAccountStore = defineStore('account', {
         account: null,
         balance: 0,
         subscription: null,
+        securityQuestion: '',
         isAuthenticated: false,
         isRewardsLoaded: false,
+        isDeviceShareAvailable: false,
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
+        getConfig: (id: string): TWidgetConfig => {
+            const data = localStorage.getItem(`thx:widget:${id}:config`);
+            if (!data) return {} as TWidgetConfig;
+            return JSON.parse(data);
+        },
         setConfig(poolId: string, config: TWidgetConfig) {
             const data = { ...this.getConfig(poolId), ...config };
             localStorage.setItem(`thx:widget:${poolId}:config`, JSON.stringify(data));
             this.poolId = poolId;
+            this.api = new THXClient({
+                url: API_URL,
+                accessToken: '',
+                poolId: this.poolId,
+            });
         },
         setTheme() {
             const { title, theme } = this.getConfig(this.poolId);
             const { elements, colors } = JSON.parse(theme);
-            const styles: any = getStyles(elements, colors);
-            const sheet = document.createElement('style');
-
-            for (const selector in styles) {
-                let rule = `${selector} { `;
-                for (const name in styles[selector]) {
-                    rule += `${name}: ${styles[selector][name]};`;
-                }
-                rule += '}';
-                sheet.innerText += rule;
-            }
+            const sheet = getStyles(elements, colors);
 
             document.title = title;
             document.head.appendChild(sheet);
@@ -58,19 +56,7 @@ export const useAccountStore = defineStore('account', {
         init(config: TWidgetConfig) {
             this.setConfig(config.poolId, config);
             this.setTheme();
-
-            this.api = new THXClient({
-                env: PKG_ENV,
-                clientId: CLIENT_ID,
-                clientSecret: CLIENT_SECRET,
-                redirectUrl: WIDGET_URL + '/signin-popup.html',
-                post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-                popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-                scopes: 'openid account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
-                poolId: this.poolId,
-            });
-
-            this.onUserLoaded();
+            this.getUser().then(() => this.getUserData());
 
             track('UserVisits', [
                 this.account?.sub || '',
@@ -85,6 +71,13 @@ export const useAccountStore = defineStore('account', {
 
             // Send the amount of unclaimed rewards to the parent window and update the launcher
             window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+        },
+        async getAccount() {
+            this.account = await this.api.account.get();
+        },
+        async getBalance() {
+            const { balance } = await this.api.pointBalance.list();
+            this.balance = balance;
         },
         async subscribe(email: string) {
             this.subscription = await this.api.pools.subscription.post({ poolId: this.poolId, email });
@@ -101,20 +94,15 @@ export const useAccountStore = defineStore('account', {
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
-        async signin(extraQueryParams?: { [key: string]: string }) {
-            await (tKey.serviceProvider as any).init({ skipSw: true });
-            await tKey.modules.securityQuestions.initialize();
-
+        async getOAuthShare(extraQueryParams?: { [key: string]: string }) {
             const config = this.getConfig(this.poolId);
             const { claim } = useClaimStore();
-            const url = getReturnUrl(config);
-            const uxMode = getUxMode();
-            const loginResponse = await (tKey.serviceProvider as any).triggerLogin({
+            const loginResponse = await tKey.serviceProvider.triggerLogin({
                 verifier: VERIFIER_NAME,
                 typeOfLogin: 'jwt',
                 clientId: CLIENT_ID,
                 enableLogging: true,
-                uxMode,
+                uxMode: getUxMode(),
                 customState: {
                     clientId: CLIENT_ID,
                     clientSecret: CLIENT_SECRET,
@@ -125,125 +113,148 @@ export const useAccountStore = defineStore('account', {
                     redirect_uri: WIDGET_URL + '/signin-popup.html',
                     response_type: 'code',
                     scope: 'openid account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
-                    return_url: url,
+                    return_url: getReturnUrl(config),
                     pool_id: config.poolId,
                     claim_id: claim?.uuid,
                     ...extraQueryParams,
                 },
             });
 
-            localStorage.setItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`, JSON.stringify(loginResponse.userInfo));
-
-            this.user = loginResponse.userInfo;
+            this.setUser(loginResponse.userInfo);
             this.oAuthShare = loginResponse.privateKey;
+            this.isAuthenticated = true;
 
-            await tKey.initialize(); // 1/2 flow
+            await tKey.initialize();
+        },
+        async signin(extraQueryParams?: { [key: string]: string }) {
+            await tKey.serviceProvider.init({ skipSw: true });
+            await tKey.modules.securityQuestions.initialize();
+            await this.getOAuthShare(extraQueryParams);
+            await this.getDeviceShare();
 
-            // Gets the deviceShare
+            this.getUserData();
+            this.reconstructKey();
+            this.getSecurityQuestion();
+        },
+        async validateToken(accessToken: string) {
             try {
-                await (tKey.modules.webStorage as any).inputShareFromWebStorage(); // 2/2 flow
-            } catch (e) {
-                console.log(e);
+                const jwks = jose.createRemoteJWKSet(new URL(AUTH_URL + '/jwks'));
+                const { payload } = await jose.jwtVerify(accessToken, jwks, {
+                    issuer: AUTH_URL,
+                    audience: CLIENT_ID,
+                });
+                if (Date.now() > Number(payload.exp) * 1000) {
+                    throw new Error('token expired');
+                }
+            } catch (error) {
+                await this.signin();
+            }
+        },
+        async getUser() {
+            const storageKey = `thx.user:${AUTH_URL}:${CLIENT_ID}`;
+            const item = localStorage.getItem(storageKey) as string;
+
+            // Set user on storage hit
+            if (item) {
+                this.user = JSON.parse(item);
             }
 
+            // Validate user token expiry
+            if (this.user) {
+                await this.validateToken(this.user.accessToken);
+                this.isAuthenticated = true;
+            }
+
+            // Set API client
+            this.api = new THXClient({
+                url: API_URL,
+                accessToken: this.user ? this.user.accessToken : '',
+                poolId: this.poolId,
+            });
+        },
+        setUser(userInfo: THXAuthUser) {
+            localStorage.setItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`, JSON.stringify(userInfo));
+            this.user = userInfo;
+        },
+        async signout() {
+            try {
+                await fetch(AUTH_URL + '/session/end');
+                localStorage.removeItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`);
+                this.isAuthenticated = false;
+            } catch (error) {
+                //
+            }
+        },
+        validatePassword(value: string) {
+            if (value.length <= 10) {
+                throw new Error('Error: Password must be >= 11 characters');
+            }
+        },
+        async reset() {
+            // WARNING Irrevertible
+            await tKey.storageLayer.setMetadata({
+                privKey: this.oAuthShare as any,
+                input: { message: 'KEY_NOT_FOUND' },
+            });
+        },
+        async reconstructKey() {
             // Checks the requiredShares to reconstruct the tKey,
             // starts from 2 by default and each of the above share reduce it by one.
             const { requiredShares } = tKey.getKeyDetails();
             if (requiredShares <= 0) {
                 const reconstructedKey = await tKey.reconstructKey();
                 this.privateKey = reconstructedKey?.privKey.toString('hex');
-                this.isAuthenticated = true;
-                this.onUserLoaded();
+                console.log('Successfully reconstructed private key.');
             }
         },
-        signout() {
-            // TODO (not supported in tKey)
-            // call /session/end potentially with hint
-        },
-        async createDeviceShare(value: string) {
-            if (value.length > 10) {
-                try {
-                    await (tKey.modules.securityQuestions as any).generateNewShareWithSecurityQuestions(
-                        value,
-                        'what is your password?',
-                    );
-                    console.log('Successfully generated new share with password.');
-                } catch (error) {
-                    console.log('Error', (error as any)?.message.toString(), 'error');
-                }
-            } else {
-                console.log('Error', 'Password must be >= 11 characters', 'error');
+        async getDeviceShare() {
+            try {
+                await tKey.modules.webStorage.inputShareFromWebStorage(); // 2/2 flow
+                this.isDeviceShareAvailable = true;
+                console.log('Successfully asserted device share.');
+            } catch (e) {
+                console.log(e);
             }
         },
-        async updateDeviceShare(value: string) {
-            if (value.length > 10) {
-                await (tKey.modules.securityQuestions as any).changeSecurityQuestionAndAnswer(
-                    value,
-                    'whats your password?',
-                );
-                console.log('Successfully changed new share with password.');
-            } else {
-                console.log('Error', 'Password must be >= 11 characters', 'error');
+        async getSecurityQuestion() {
+            try {
+                this.securityQuestion = await tKey.modules.securityQuestions.getSecurityQuestions();
+                console.log('Successfully got security question.');
+            } catch (error) {
+                console.error(error);
             }
+        },
+        async createDeviceShare(question: string, answer: string) {
+            this.validatePassword(answer);
+
+            try {
+                await tKey.modules.securityQuestions.generateNewShareWithSecurityQuestions(answer, question);
+                console.log('Successfully generated new share with password.');
+            } catch (error) {
+                console.log('Error', (error as any)?.message.toString(), 'error');
+            }
+        },
+        async updateDeviceShare(answer: string) {
+            this.validatePassword(answer);
+
+            await tKey.modules.securityQuestions.changeSecurityQuestionAndAnswer(answer, this.securityQuestion);
+            console.log('Successfully changed new share with password.');
         },
         async recoverDeviceShare(value: string) {
-            if (value.length > 10) {
-                await (tKey.modules.securityQuestions as any).inputShareFromSecurityQuestions(value); // 2/2 flow
+            this.validatePassword(value);
 
-                const { requiredShares } = tKey.getKeyDetails();
-                if (requiredShares <= 0) {
-                    const reconstructedKey = await tKey.reconstructKey();
-                    this.privateKey = reconstructedKey?.privKey.toString('hex');
-                    console.log('Private Key: ' + reconstructedKey.privKey.toString('hex'));
-                }
-                const newShare = await tKey.generateNewShare();
-                const shareStore = await tKey.outputShareStore(newShare.newShareIndex);
+            await tKey.modules.securityQuestions.inputShareFromSecurityQuestions(value); // 2/2 flow
+            await this.reconstructKey();
 
-                await (tKey.modules.webStorage as any).storeDeviceShare(shareStore);
+            const newShare = await tKey.generateNewShare();
+            const shareStore = tKey.outputShareStore(newShare.newShareIndex);
 
-                console.log('Successfully logged you in with the recovery password.');
-            } else {
-                console.error('Password must be >= 11 characters');
-            }
+            await tKey.modules.webStorage.storeDeviceShare(shareStore);
+            await this.getDeviceShare();
+
+            console.log('Successfully logged you in with the recovery password.');
         },
-
-        // async signin(extraQueryParams = {}) {
-        //     const config = this.getConfig(this.poolId);
-        //     const { claim } = useClaimStore();
-        //     const url = getReturnUrl(config);
-        //     const method = this.isEthereumBrowser || (window as any).Cypress ? 'signinRedirect' : 'signinPopup';
-
-        //     await this.api.userManager.cached[method]({
-        //         state: { url, clientId: CLIENT_ID },
-        //         extraQueryParams: {
-        //             return_url: url,
-        //             pool_id: config.poolId,
-        //             claim_id: claim?.uuid,
-        //             ...extraQueryParams,
-        //         },
-        //     });
-        // },
-        // signout() {
-        //     const { origin } = this.getConfig(this.poolId);
-        //     const method = this.isEthereumBrowser ? 'signoutRedirect' : 'signoutPopup';
-
-        //     this.api.userManager.cached[method]({
-        //         state: { origin },
-        //     });
-        // },
-        // async onLoad() {
-        //     this.isAuthenticated = !!(await this.api.userManager.getUser());
-        // },
-        // async onUserUnloaded() {
-        //     const rewardsStore = useRewardStore();
-        //     const perksStore = usePerkStore();
-
-        //     rewardsStore.list().then(this.updateLauncher);
-        //     perksStore.list();
-
-        //     this.isAuthenticated = false;
-        // },
-        async onUserLoaded() {
+        async getUserData() {
             const rewardsStore = useRewardStore();
             const perksStore = usePerkStore();
             const walletStore = useWalletStore();
@@ -268,22 +279,7 @@ export const useAccountStore = defineStore('account', {
             walletStore.list();
             walletStore.getWallet();
 
-            this.isAuthenticated = true;
-
             track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
-        },
-        // onAccessTokenExpired() {
-        //     this.api.userManager.cached.signoutPopup();
-        // },
-        // onAccessTokenExpiring() {
-        //     //
-        // },
-        async getAccount() {
-            this.account = await this.api.account.get();
-        },
-        async getBalance() {
-            const { balance } = await this.api.pointBalanceManager.list();
-            this.balance = balance;
         },
     },
 });

@@ -15,7 +15,7 @@ export const usePerkStore = defineStore('perks', {
         },
         createERC20Redemption: async function (uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
-            const { error } = await api.perksManager.erc20.redemption.post(uuid);
+            const { error } = await api.rewards.erc20.redemption.post(uuid);
             if (error) throw error;
 
             this.updateSupply(uuid);
@@ -24,7 +24,7 @@ export const usePerkStore = defineStore('perks', {
         },
         createERC721Redemption: async function (uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
-            const { error } = await api.perksManager.erc721.redemption.post(uuid);
+            const { error } = await api.rewards.erc721.redemption.post(uuid);
             if (error) throw error;
 
             this.updateSupply(uuid);
@@ -33,7 +33,7 @@ export const usePerkStore = defineStore('perks', {
         },
         createERC721Payment: async function (uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
-            const r = await api.perksManager.erc721.payment.post(uuid);
+            const r = await api.rewards.erc721.payment.post(uuid);
             if (r.error) throw r.error;
 
             this.updateSupply(uuid);
@@ -44,15 +44,15 @@ export const usePerkStore = defineStore('perks', {
         },
         async getERC20Perk(uuid: string) {
             const { api } = useAccountStore();
-            await api.perksManager.erc20.get(uuid);
+            await api.rewards.erc20.get(uuid);
         },
         async getERC721Perk(uuid: string) {
             const { api } = useAccountStore();
-            await api.perksManager.erc721.get(uuid);
+            await api.rewards.erc721.get(uuid);
         },
         async list() {
             const { api } = useAccountStore();
-            const { erc20Perks, erc721Perks } = await api.perksManager.list();
+            const { erc20Perks, erc721Perks } = await api.rewards.list();
 
             this.perks = [
                 ...(erc20Perks

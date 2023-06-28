@@ -16,13 +16,14 @@ const customAuthArgs = {
     metadataUrl: AUTH_URL + '/.well-known/openid-configuration',
 } as any;
 
-const tKey = new ThresholdKey({
-    modules: {
-        webStorage: webStorageModule,
-        securityQuestions: securityQuestionsModule,
-    },
-    customAuthArgs,
-});
+const tKey: ThresholdKey & { serviceProvider?: any; modules?: { securityQuestions?: any; webStorage?: any } } =
+    new ThresholdKey({
+        modules: {
+            webStorage: webStorageModule,
+            securityQuestions: securityQuestionsModule,
+        },
+        customAuthArgs,
+    });
 
 function getUxMode() {
     const isMobile = window.matchMedia('(pointer:coarse)').matches;

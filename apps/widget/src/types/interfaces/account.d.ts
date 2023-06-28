@@ -23,19 +23,27 @@ type TAccount = {
     shopifyAccess: boolean;
 };
 
+type THXAuthUser = {
+    accessToken: string;
+    idToken: string;
+    expiresIn: number;
+    expiresAt: number;
+};
+
 type TAccountState = {
     isEthereumBrowser: boolean;
     isRewardsLoaded: boolean;
-    user: { id_token: string; access_token: string } | null;
+    isDeviceShareAvailable: boolean;
+    user: THXAuthUser | null;
     privateKey: string;
     oAuthShare: string;
+    securityQuestion: string;
     api: THXClient | null;
     poolId: string;
     balance: number;
     isAuthenticated: boolean;
     account: TAccount | null;
     subscription: TSubscription | null;
-    getConfig: (id: string) => TWidgetConfig;
 };
 
 type TWidgetTheme = {

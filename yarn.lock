@@ -3247,12 +3247,10 @@
   resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.46.0.tgz#2b9acca0dfa7b90aaecd909e678a049f799a27d6"
   integrity sha512-dkm0zCEoRLu5rTnsIgwDf/QG2DKcalOT2dk1IVgMySOHWTChLyOvQwMYhEduGgLvyYWTwNhAUV4WOLPQvjwLwA==
 
-"@thxnetwork/sdk@1.1.10":
-  version "1.1.10"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.1.10.tgz#58154b9e94217a466db00d74a99b55cda3d1c3e3"
-  integrity sha512-0lEBVcjQKJ9bsbSxEG+oTauxLNQ8i8HanWLP9arXvPpmaHflSBk5LSGtlQLJPNnfKmbUogQN9OYvoITshBEpPw==
-  dependencies:
-    oidc-client-ts "2.1.0"
+"@thxnetwork/sdk@1.1.11":
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.1.11.tgz#f726a42129bdf4e7f22e7920da50a698012b4ce2"
+  integrity sha512-FsOsiTV+ytv1fK+UX+U3iRXb3Ts4FM1evEcgrXLEwIQA9OH8hznOdpd+sI4ZrrZEYAa9a1n3W43CbtskN3/Qag==
 
 "@tkey/common-types@^8.1.0-alpha.0":
   version "8.1.0-alpha.0"
@@ -7003,11 +7001,6 @@ crypto-browserify@^3.11.0:
     public-encrypt "^4.0.0"
     randombytes "^2.0.0"
     randomfill "^1.0.3"
-
-crypto-js@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
-  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 css-color-names@0.0.4, css-color-names@^0.0.4:
   version "0.0.4"
@@ -11308,6 +11301,11 @@ jiti@^1.16.0:
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-1.16.0.tgz#f72065954446ad1866fa8d6bcc3bed3cc1cebdaa"
   integrity sha512-L3BJStEf5NAqNuzrpfbN71dp43mYIcBUlCRea/vdyv5dW/AYa1d4bpelko4SHdY3I6eN9Wzyasxirj1/vv5kmg==
 
+jose@^4.14.4:
+  version "4.14.4"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-4.14.4.tgz#59e09204e2670c3164ee24cbfe7115c6f8bff9ca"
+  integrity sha512-j8GhLiKmUAh+dsFXlX1aJCbt5KMibuKb+d7j1JaOJG6s2UjX1PQlW+OKB/sD4a/5ZYF4RcmYmLSndOoU3Lt/3g==
+
 js-beautify@^1.6.12:
   version "1.14.7"
   resolved "https://registry.yarnpkg.com/js-beautify/-/js-beautify-1.14.7.tgz#9206296de33f86dc106d3e50a35b7cf8729703b2"
@@ -12933,14 +12931,6 @@ obuf@^1.0.0, obuf@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"
   integrity sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==
-
-oidc-client-ts@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/oidc-client-ts/-/oidc-client-ts-2.1.0.tgz#903b6d9c94a45f6f6eaa3c0aac7c6953a0f3905b"
-  integrity sha512-Rmfl/10g7tTLy8cXezn0Ek+Wa3bKwNnW7oRzLB/hU5EK/DC1D/W1d0GCjGf23WYd6b4Ifa8ud/NzgsMOnbNp8Q==
-  dependencies:
-    crypto-js "^4.1.1"
-    jwt-decode "^3.1.2"
 
 on-finished@2.4.1:
   version "2.4.1"
