@@ -8,7 +8,11 @@
         </iframe>
         <hr class="my-2" />
         <div class="text-center card-text">
-            <b-link :href="`https://youtu.be/${content}`" target="_blank" class="text-muted ms-auto">
+            <b-link
+                :href="`https://youtu.be/${reward.contentMetadata.videoId}`"
+                target="_blank"
+                class="text-muted ms-auto"
+            >
                 Like this Youtube video
                 <i class="fas fa-external-link-alt"></i>
             </b-link>
