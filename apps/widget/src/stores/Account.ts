@@ -112,6 +112,7 @@ export const useAccountStore = defineStore('account', {
                     prompt: 'login',
                     redirect_uri: WIDGET_URL + '/signin-popup.html',
                     response_type: 'code',
+                    grant_type: 'authorization_code',
                     scope: 'openid account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
                     return_url: getReturnUrl(config),
                     pool_id: config.poolId,

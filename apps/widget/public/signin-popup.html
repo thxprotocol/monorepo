@@ -20,6 +20,9 @@
             const hashParams = {
                 accessToken: user.access_token,
                 idToken: user.id_token,
+                expiresAt: Date.now() + (user.expires_in * 1000),
+                tokenType: user.token_type,
+                scope: user.scope,
             }
             const queryParams = {};
             for (var key of url.searchParams.keys()) {
