@@ -30,8 +30,8 @@ export const useAccountStore = defineStore('account', {
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
-        getConfig: (id: string): TWidgetConfig => {
-            const data = localStorage.getItem(`thx:widget:${id}:config`);
+        getConfig: (poolId: string): TWidgetConfig => {
+            const data = localStorage.getItem(`thx:widget:${poolId}:config`);
             if (!data) return {} as TWidgetConfig;
             return JSON.parse(data);
         },
@@ -39,14 +39,9 @@ export const useAccountStore = defineStore('account', {
             const data = { ...this.getConfig(poolId), ...config };
             localStorage.setItem(`thx:widget:${poolId}:config`, JSON.stringify(data));
             this.poolId = poolId;
-            this.api = new THXClient({
-                url: API_URL,
-                accessToken: '',
-                poolId: this.poolId,
-            });
         },
-        setTheme() {
-            const { title, theme } = this.getConfig(this.poolId);
+        setTheme(config: TWidgetConfig) {
+            const { title, theme } = config;
             const { elements, colors } = JSON.parse(theme);
             const sheet = getStyles(elements, colors);
 
@@ -54,15 +49,22 @@ export const useAccountStore = defineStore('account', {
             document.head.appendChild(sheet);
         },
         init(config: TWidgetConfig) {
-            this.setConfig(config.poolId, config);
-            this.setTheme();
-            this.getUser().then(() => this.getUserData());
+            this.api = new THXClient({
+                url: API_URL,
+                accessToken: '',
+                poolId: config.poolId,
+            });
+            this.api.request.get('/v1/widget/' + this.poolId).then((data: any) => {
+                this.setConfig(this.poolId, data);
+                this.setTheme(data);
+                this.getUser().then(() => this.getUserData());
 
-            track('UserVisits', [
-                this.account?.sub || '',
-                'page with widget',
-                { origin: config.origin, poolId: this.poolId },
-            ]);
+                track('UserVisits', [
+                    this.account?.sub || '',
+                    'page with widget',
+                    { origin: config.origin, poolId: this.poolId },
+                ]);
+            });
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();

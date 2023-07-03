@@ -2,30 +2,12 @@ import { useAccountStore } from '../stores/Account';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 function beforeEnter(to: any, from: any, next: any) {
-    const { poolId, init, getConfig } = useAccountStore();
+    const { poolId, init } = useAccountStore();
     if (poolId) {
         next();
     } else {
         // If there is no poolId we need to init and grab data either from query or storage
-        const { id, origin, chainId, theme, expired, logoUrl, title, backgroundUrl } = to.query;
-        if (id && origin && chainId && theme && expired && logoUrl) {
-            init({
-                poolId: id,
-                origin,
-                chainId,
-                theme,
-                logoUrl,
-                backgroundUrl,
-                title,
-                expired: JSON.parse(expired as string),
-            });
-        } else {
-            const { poolId, origin, chainId, theme, expired, logoUrl, backgroundUrl, title } = getConfig(
-                to.params.poolId,
-            );
-            init({ poolId, origin, chainId, theme, logoUrl, backgroundUrl, expired, title });
-        }
-
+        init({ poolId: to.params.poolId } as any);
         next();
     }
 }
