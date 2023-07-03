@@ -6,9 +6,7 @@ function beforeEnter(to: any, from: any, next: any) {
     if (poolId) {
         next();
     } else {
-        // If there is no poolId we need to init and grab data either from query or storage
-        init({ poolId: to.params.poolId } as any);
-        next();
+        init({ poolId: to.params.poolId } as any).then(() => next());
     }
 }
 

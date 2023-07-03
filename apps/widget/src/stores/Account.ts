@@ -48,23 +48,25 @@ export const useAccountStore = defineStore('account', {
             document.title = title;
             document.head.appendChild(sheet);
         },
-        init(config: TWidgetConfig) {
+        async init(config: TWidgetConfig) {
             this.api = new THXClient({
                 url: API_URL,
                 accessToken: '',
                 poolId: config.poolId,
             });
-            this.api.request.get('/v1/widget/' + this.poolId).then((data: any) => {
-                this.setConfig(this.poolId, data);
-                this.setTheme(data);
-                this.getUser().then(() => this.getUserData());
+            this.poolId = config.poolId;
 
-                track('UserVisits', [
-                    this.account?.sub || '',
-                    'page with widget',
-                    { origin: config.origin, poolId: this.poolId },
-                ]);
-            });
+            const data = await this.api.request.get('/v1/widget/' + config.poolId);
+
+            this.setConfig(this.poolId, data);
+            this.setTheme(data);
+            this.getUser().then(() => this.getUserData());
+
+            track('UserVisits', [
+                this.account?.sub || '',
+                'page with widget',
+                { origin: config.origin, poolId: this.poolId },
+            ]);
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();
@@ -182,10 +184,11 @@ export const useAccountStore = defineStore('account', {
         async signout() {
             try {
                 await fetch(AUTH_URL + '/session/end');
+            } catch (error) {
+                console.error(error);
+            } finally {
                 localStorage.removeItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`);
                 this.isAuthenticated = false;
-            } catch (error) {
-                //
             }
         },
         validatePassword(value: string) {
@@ -194,7 +197,7 @@ export const useAccountStore = defineStore('account', {
             }
         },
         async reset() {
-            // WARNING Irrevertible
+            // WARNING Irreversible
             await tKey.storageLayer.setMetadata({
                 privKey: this.oAuthShare as any,
                 input: { message: 'KEY_NOT_FOUND' },
