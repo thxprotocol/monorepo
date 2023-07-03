@@ -32,7 +32,6 @@ type TAccountState = {
     isAuthenticated: boolean;
     account: TAccount | null;
     subscription: TSubscription | null;
-    getConfig: (id: string) => TWidgetConfig;
 };
 
 type TWidgetTheme = {

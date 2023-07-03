@@ -11,11 +11,6 @@ import { getStyles } from '../utils/theme';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
-        getConfig: (id: string): TWidgetConfig => {
-            const data = localStorage.getItem(`thx:widget:${id}:config`);
-            if (!data) return {} as TWidgetConfig;
-            return JSON.parse(data);
-        },
         poolId: '',
         api: null,
         account: null,
@@ -26,13 +21,18 @@ export const useAccountStore = defineStore('account', {
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
+        getConfig: (poolId: string): TWidgetConfig => {
+            const data = localStorage.getItem(`thx:widget:${poolId}:config`);
+            if (!data) return {} as TWidgetConfig;
+            return JSON.parse(data);
+        },
         setConfig(poolId: string, config: TWidgetConfig) {
             const data = { ...this.getConfig(poolId), ...config };
             localStorage.setItem(`thx:widget:${poolId}:config`, JSON.stringify(data));
             this.poolId = poolId;
         },
-        setTheme() {
-            const { title, theme } = this.getConfig(this.poolId);
+        setTheme(config: TWidgetConfig) {
+            const { title, theme } = config;
             const { elements, colors } = JSON.parse(theme);
             const styles: any = getStyles(elements, colors);
             const sheet = document.createElement('style');
@@ -50,9 +50,7 @@ export const useAccountStore = defineStore('account', {
             document.head.appendChild(sheet);
         },
         init(config: TWidgetConfig) {
-            this.setConfig(config.poolId, config);
-            this.setTheme();
-
+            this.poolId = config.poolId;
             this.api = new THXClient({
                 env: PKG_ENV,
                 clientId: CLIENT_ID,
@@ -64,17 +62,22 @@ export const useAccountStore = defineStore('account', {
                 poolId: this.poolId,
             });
 
+            this.api.request.get('/v1/widget/' + this.poolId).then((data: any) => {
+                this.setConfig(this.poolId, data);
+                this.setTheme(data);
+
+                track('UserVisits', [
+                    this.account?.sub || '',
+                    'page with widget',
+                    { origin: config.origin, poolId: this.poolId },
+                ]);
+            });
+
             this.api.userManager.cached.events.addAccessTokenExpired(this.onAccessTokenExpired);
             this.api.userManager.cached.events.addAccessTokenExpiring(this.onAccessTokenExpiring);
             this.api.userManager.cached.events.addUserLoaded(this.onUserLoaded);
             this.api.userManager.cached.events.addUserUnloaded(this.onUserUnloaded);
             this.api.userManager.cached.events.load(this.onLoad);
-
-            track('UserVisits', [
-                this.account?.sub || '',
-                'page with widget',
-                { origin: config.origin, poolId: this.poolId },
-            ]);
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();
