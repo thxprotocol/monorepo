@@ -6,7 +6,7 @@
                     <b-col v-if="!campaigns.length" class="justify-content-center d-flex">
                         <b-spinner variant="light" />
                     </b-col>
-                    <b-col lg="3" :key="key" v-for="(campaign, key) of campaigns">
+                    <b-col lg="4" xl="3" :key="key" v-for="(campaign, key) of campaigns">
                         <BaseCardCampaign :campaign="campaign" @clicked="onClickCampaign" />
                     </b-col>
                 </b-row>

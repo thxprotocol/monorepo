@@ -39,39 +39,35 @@
                 </div>
             </div>
         </template>
-        <b-progress v-if="campaign.progress > 0" style="height: 10px; border-radius: 0">
+        <b-progress
+            v-if="campaign.progress > 0"
+            style="height: 10px; border-radius: 0"
+            v-b-tooltip
+            :title="`Expires at ${format(new Date(campaign.expiryDate), 'dd-MM-yyyy HH:mm')}`"
+        >
             <b-progress-bar :value="campaign.progress" :max="100" variant="primary" />
         </b-progress>
-        <div class="d-flex flex-column p-3">
-            <div class="mb-2">
+        <div class="d-flex align-items-start p-3">
+            <div class="flex-grow-1">
                 <strong>
                     {{ campaign.title }}
                     <i
                         class="fas fa-check-circle"
                         :class="{ 'text-success': campaign.active, 'text-gray': !campaign.active }"
-                    ></i>
+                    />
                 </strong>
             </div>
+            <b-badge variant="dark" class="ms-2 p-2">
+                <i class="fas fa-users me-1"></i> {{ campaign.participants }}
+            </b-badge>
         </div>
         <template #footer>
             <div class="flex-grow-1">
-                <b-badge variant="dark" class="me-2 p-2">
-                    <i class="fas fa-users me-1"></i> {{ campaign.participants }}
-                </b-badge>
                 <b-badge variant="dark" class="me-2 p-2">
                     <i class="fas fa-trophy me-1"></i> {{ campaign.quests.length }}
                 </b-badge>
                 <b-badge variant="dark" class="me-2 p-2">
                     <i class="fas fa-gift me-1"></i> {{ campaign.rewards.length }}
-                </b-badge>
-                <b-badge
-                    v-if="campaign.progress > 0"
-                    variant="dark"
-                    class="me-2 p-2"
-                    v-b-tooltip
-                    :title="`Expires at ${format(new Date(campaign.expiryDate), 'dd-MM-yyyy HH:mm')}`"
-                >
-                    <i class="fas fa-clock me-1"></i> {{ campaign.rewards.length }}
                 </b-badge>
             </div>
             <b-button
