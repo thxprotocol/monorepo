@@ -21,10 +21,10 @@
         const isCypress = window.Cypress;
 
         // If uxMode is redirect, redirect with searchParams to client app
-        if (state.uxMode === 'redirect') {
-            const url = new URL(state.returnUrl);
+        if (session.uxMode === 'redirect') {
+            const url = new URL(session.returnUrl);
             url.search = window.location.search;
-            url.pathname = `/${state.poolId}/redirect`;
+            url.pathname = `/${session.poolId}/redirect`;
             window.open(url, '_self')
         }
         // If uxMode is popup, fetch token, postMessage and close popup
@@ -32,6 +32,7 @@
             const tokenRequestHandler = (user) => {
                 const hashParams = {
                     accessToken: user.access_token,
+                    refreshToken: user.refresh_token,
                     idToken: user.id_token,
                     expiresAt: Date.now() + (user.expires_in * 1000),
                     tokenType: user.token_type,
@@ -77,29 +78,13 @@
                     code,
                     redirect_uri: session.redirectUri,
                     code_verifier: session.codeVerifier,
-                    client_id: state.clientId,
-                    client_secret: state.clientSecret,
+                    client_id: session.clientId,
+                    client_secret: session.clientSecret,
                 })
             })
                 .then(response => response.json())
                 .then(tokenRequestHandler)
-                .catch(async (error) => {
-                    // In case we encounter an error during authentication we sign out the user server side
-                    // const userStateKey = `thx.user:${iss}:${state.clientId}`;
-                    // const user = JSON.parse(localStorage.getItem(userStateKey));
-
-                    // if (user) {
-                    //     const url = new URL(iss + '/session/end')
-
-                    //     url.searchParams.append('id_token_hint', user.idToken);
-                    //     url.searchParams.append('post_logout_redirect_uri', state.postLogoutRedirectUri);
-                    //     url.searchParams.append('state', user.state);
-
-                    //     await fetch(url)
-                    // }
-
-                    console.error(error)
-                });
+                .catch(console.error);
         }
 
 

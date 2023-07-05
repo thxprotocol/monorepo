@@ -1,7 +1,7 @@
 <template>
     <div class="d-flex flex-grow-1 justify-content-center flex-column align-items-center overflow-auto">
         <b-card class="m-2 w-75">
-            <b-alert v-if="!accountStore.isAuthenticated" variant="info" show class="p-2">
+            <b-alert v-if="!authStore.oAuthShare" variant="info" show class="p-2">
                 <i class="fas fa-gift me-1"></i>
                 Sign in and collect <strong>{{ walletStore.pendingPoints }}</strong> points!
             </b-alert>
@@ -21,7 +21,7 @@
             </b-form-group>
 
             <b-button
-                v-if="accountStore.isAuthenticated"
+                v-if="authStore.oAuthShare"
                 @click="onClickCollect"
                 variant="success"
                 class="w-100"
@@ -39,6 +39,7 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
+import { useAuthStore } from '../stores/Auth';
 import { useWalletStore } from '../stores/Wallet';
 import { useRewardStore } from '../stores/Reward';
 import BaseAlertWalletAddress from '../components/BaseAlertWalletAddress.vue';
@@ -57,6 +58,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
         ...mapStores(useWalletStore),
         isWaitingForWalletAddress() {
@@ -76,7 +78,7 @@ export default defineComponent({
         });
     },
     watch: {
-        'accountStore.isAuthenticated'() {
+        'authStore.oAuthShare'() {
             this.isLoadingCollect = true;
             this.walletStore.getTransfer(this.uuid).then(() => {
                 this.isLoadingCollect = false;

@@ -35,6 +35,7 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
+import { useAuthStore } from '../stores/Auth';
 import BaseModalPerkPayment from './BaseModalPerkPayment.vue';
 import BaseCardPerk from './BaseCardPerk.vue';
 import { format, formatDistance } from 'date-fns';
@@ -57,6 +58,7 @@ export default defineComponent({
     computed: {
         ...mapStores(usePerkStore),
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         imgUrl() {
             return this.perk.image || (this.perk.metadata && this.perk.metadata.imageUrl);
         },
@@ -77,7 +79,7 @@ export default defineComponent({
             this.error = '';
         },
         onClickRedeem() {
-            if (!this.accountStore.isAuthenticated) {
+            if (!this.authStore.oAuthShare) {
                 return this.accountStore.signin();
             }
             this.isModalShown = true;

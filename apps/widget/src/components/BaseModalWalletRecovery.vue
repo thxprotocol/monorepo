@@ -19,35 +19,46 @@
         <template v-else>
             <b-tabs justified content-class="mt-3">
                 <b-tab title="Security Question">
+                    <p>This question will be asked when you sign in on a different device.</p>
                     <b-form-group>
                         <b-form-input v-model="question" placeholder="Question" />
                     </b-form-group>
-                    <b-form-group>
-                        <b-form-input v-model="password" type="password" placeholder="Answer" />
+                    <b-form-group :state="isPasswordValid">
+                        <b-form-input
+                            :state="isPasswordValid"
+                            v-model="password"
+                            type="password"
+                            placeholder="Answer"
+                        />
+                    </b-form-group>
+                    <b-form-group :state="isPasswordValid">
+                        <b-form-input
+                            :state="isPasswordValid"
+                            v-model="passwordCheck"
+                            type="password"
+                            placeholder="Answer again"
+                        />
                     </b-form-group>
                     <b-button
-                        :disabled="!password.length"
+                        :disabled="!password.length || !authStore.isDeviceShareAvailable"
                         class="w-100"
                         variant="primary"
                         @click="onSubmitDeviceSharePasswordCreate"
                     >
-                        <b-spinner variant="light" v-if="isLoadingPasswordCreate" />
+                        <b-spinner small variant="light" v-if="isLoadingPasswordCreate" />
                         <template v-else> Set Security Question </template>
                     </b-button>
                 </b-tab>
                 <b-tab title="Export Key">
-                    <p>
-                        Store the twelve word sequence somewhere safe and use it to recover access to your wallet
-                        access.
-                    </p>
-                    <b-card bg-variant="dark">
+                    <p>Store the twelve word sequence somewhere safe and use it to recover wallet access.</p>
+                    <b-card bg-variant="dark" class="mb-3">
                         <strong v-if="mnemonic" style="font-size: 1.3rem">{{ mnemonic }}</strong>
                         <strong v-else>...</strong>
                     </b-card>
                     <b-alert v-if="mnemonic" variant="warning">Do not store your mnemonic on this device!</b-alert>
                     <b-button class="w-100" variant="primary" @click="onSubmitCreateMnemonic">
-                        <b-spinner variant="light" v-if="isLoadingMnemonic" />
-                        <template v-else>Generate Backup</template>
+                        <b-spinner small variant="light" v-if="isLoadingMnemonic" />
+                        <template v-else>Create Backup</template>
                     </b-button>
                 </b-tab>
             </b-tabs>
@@ -57,6 +68,7 @@
 
 <script lang="ts">
 import { useAccountStore } from '../stores/Account';
+import { useAuthStore } from '../stores/Auth';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { tKey } from '../utils/tkey';
@@ -68,6 +80,7 @@ export default defineComponent({
             isShown: false,
             question: '',
             password: '',
+            passwordCheck: '',
             mnemonic: '',
             isLoadingMnemonic: false,
             isLoadingPasswordCreate: false,
@@ -75,8 +88,13 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         isSubmitDisabled: function () {
             return this.isLoading;
+        },
+        isPasswordValid: function () {
+            if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
+            return undefined;
         },
     },
     props: {
@@ -103,12 +121,11 @@ export default defineComponent({
         async onShow() {
             this.password = '';
             this.mnemonic = '';
-
-            this.question = this.accountStore.securityQuestion;
+            this.question = this.authStore.securityQuestion;
         },
         async onSubmitDeviceSharePasswordCreate() {
-            const { isAuthenticated, isDeviceShareAvailable, createDeviceShare } = this.accountStore;
-            if (!isAuthenticated || !isDeviceShareAvailable) return;
+            const { oAuthShare, isDeviceShareAvailable, createDeviceShare } = this.authStore;
+            if (!oAuthShare || !isDeviceShareAvailable) return;
 
             this.isLoadingPasswordCreate = true;
             await createDeviceShare(this.question, this.password);

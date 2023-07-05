@@ -7,3 +7,5 @@ export const PKG_ENV = process.env.VUE_APP_PKG_ENV || 'prod';
 export const GTM = process.env.VUE_APP_GTM || '';
 export const MIXPANEL_TOKEN = process.env.VUE_APP_MIXPANEL_TOKEN || '';
 export const STRIPE_PUBLISHABLE_KEY = process.env.VUE_APP_STRIPE_PUBLISHABLE_KEY || '';
+export const VERIFIER_ID = process.env.VUE_APP_VERIFIER_ID || '';
+export const VERIFIER_NETWORK = process.env.VUE_APP_VERIFIER_NETWORK || '';

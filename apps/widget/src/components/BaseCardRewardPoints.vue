@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse :info-links="reward.infoLinks" :visible="accountStore.isAuthenticated && !reward.isClaimed">
+    <BaseCardCollapse :info-links="reward.infoLinks" :visible="authStore.oAuthShare && !reward.isClaimed">
         <template #header>
             <div v-if="reward.platform" class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i :class="platformIconMap[reward.platform]" class="me-2 text-primary"></i>
@@ -19,7 +19,7 @@
         </b-alert>
 
         <template #button>
-            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
+            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
                 Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
             </b-button>
 
@@ -62,6 +62,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { WIDGET_URL } from '../config/secrets';
 import { useAccountStore } from '../stores/Account';
+import { useAuthStore } from '../stores/Auth';
 import { useRewardStore } from '../stores/Reward';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { RewardConditionPlatform, RewardConditionInteraction } from '../types/enums/rewards';
@@ -107,6 +108,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
         isConnected() {
             const { account } = useAccountStore();

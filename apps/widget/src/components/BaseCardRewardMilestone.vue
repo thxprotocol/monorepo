@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse :info-links="reward.infoLinks" :visible="accountStore.isAuthenticated && pendingClaims > 0">
+    <BaseCardCollapse :info-links="reward.infoLinks" :visible="authStore.oAuthShare && pendingClaims > 0">
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fas fa-flag me-2 text-primary"></i>
@@ -13,7 +13,7 @@
         </b-card-text>
 
         <b-progress
-            v-if="accountStore.isAuthenticated && reward.claims.length"
+            v-if="authStore.oAuthShare && reward.claims.length"
             class="mb-3"
             variant="success"
             :value="claimedAmount"
@@ -26,7 +26,7 @@
         </b-alert>
 
         <template #button>
-            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
+            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
                 Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
             </b-button>
 
@@ -62,6 +62,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
+import { useAuthStore } from '../stores/Auth';
 import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
 export default defineComponent({
@@ -80,6 +81,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
         claimedAmount: function () {
             return this.reward.claims.filter((c: TMilestoneRewardClaim) => c.isClaimed).length;

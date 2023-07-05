@@ -3,21 +3,10 @@
         <div style="width: 120px" class="d-lg-none">
             <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
         </div>
-        <div
-            v-if="!accountStore.isAuthenticated && config"
-            class="pl-3 py-2 text-center text-decoration-none d-lg-none"
-        >
-            <b-img
-                :src="config.logoUrl"
-                class="navbar-logo"
-                :title="decodeHTML(config.title)"
-                v-b-tooltip.hover.bottom
-            />
-        </div>
         <b-link
             @click="onClickRefresh"
             class="pl-3 py-2 p-lg-0 m-lg-0 text-center text-decoration-none"
-            v-if="accountStore.isAuthenticated && rewardsStore.rewards.length"
+            v-if="authStore.oAuthShare && rewardsStore.rewards.length"
         >
             <div class="text-accent h1 m-0 d-flex align-items-center">
                 <strong>{{ accountStore.balance }}</strong>
@@ -28,8 +17,23 @@
             </div>
             <div class="points d-block d-lg-none">points</div>
         </b-link>
+        <div v-else class="pl-3 py-2 text-center text-decoration-none d-lg-none">
+            <b-img
+                v-if="config"
+                class="navbar-logo"
+                :src="config.logoUrl"
+                :title="decodeHTML(config.title)"
+                v-b-tooltip.hover.bottom
+            />
+        </div>
         <div style="width: 120px; text-align: right">
-            <template v-if="accountStore.isAuthenticated && rewardsStore.rewards.length">
+            <template
+                v-if="
+                    authStore.oAuthShare &&
+                    rewardsStore.rewards.length &&
+                    ['home', 'quests'].includes(String($route.name))
+                "
+            >
                 <b-button variant="link" @click="isModalPoolSubscriptionShown = true">
                     <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>
                     <BaseModalPoolSubscription
@@ -41,23 +45,19 @@
                         :error="error"
                     />
                 </b-button>
-                <b-button
-                    v-if="['home', 'quests'].includes(String($route.name))"
-                    variant="link"
-                    v-b-toggle.collapse-filters
-                >
+                <b-button variant="link" v-b-toggle.collapse-filters>
                     <i class="fas fa-sliders-h"></i>
                 </b-button>
             </template>
             <b-button
-                v-if="accountStore.isAuthenticated && !rewardsStore.rewards.length"
+                v-if="authStore.oAuthShare && !rewardsStore.rewards.length"
                 variant="link"
                 @click="onClickRefresh"
             >
                 <b-spinner v-if="isRefreshing" small variant="white" />
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
             </b-button>
-            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="link">
+            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="link">
                 <b-spinner v-if="isLoadingSignin" small variant="white" />
                 <template v-else>Sign in</template>
             </b-button>
@@ -66,34 +66,43 @@
                     <template #button-content>
                         <i class="fas fa-ellipsis-v"></i>
                     </template>
-                    <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="onClickWallet">
-                        {{ walletStore.wallet.address }}
+
+                    <b-dropdown-item-button v-if="walletAddress" size="sm" @click="onClickWallet">
+                        {{ walletAddress }}
                     </b-dropdown-item-button>
+
+                    <b-dropdown-item-button
+                        v-if="authStore.isDeviceShareAvailable && !authStore.isSecurityQuestionAvailable"
+                        @click="isModalWalletRecoveryShown = true"
+                        size="sm"
+                    >
+                        <div class="d-flex align-items-center justify-content-between">Install</div>
+                        <BaseModalWalletRecovery
+                            id="wallet-recovery"
+                            @hidden="isModalWalletRecoveryShown = false"
+                            :show="isModalWalletRecoveryShown"
+                        />
+                    </b-dropdown-item-button>
+
                     <b-dropdown-item-button size="sm" @click="isModalWalletConfigShown = true">
-                        <div class="d-flex align-items-center justify-content-between">Config</div>
+                        <div class="d-flex align-items-center justify-content-between">Settings</div>
                         <BaseModalWalletConfig
                             id="wallet-config"
                             @hidden="isModalWalletConfigShown = false"
                             :show="isModalWalletConfigShown"
-                            :error="error"
                         />
                     </b-dropdown-item-button>
+
                     <b-dropdown-divider />
                     <b-dropdown-item-button size="sm" @click="onClickSignout">
                         <div class="d-flex align-items-center justify-content-between">
-                            Signout
+                            Sign out
                             <i class="fas fa-sign-out-alt ml-auto"></i>
                         </div>
                     </b-dropdown-item-button>
                 </b-dropdown>
             </template>
         </div>
-        <BaseModalWalletRecovery
-            id="wallet-recovery"
-            @hidden="isModalWalletRecoveryShown = false"
-            :show="isModalWalletRecoveryShown"
-            :error="error"
-        />
     </b-navbar>
 </template>
 
@@ -101,6 +110,7 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
+import { useAuthStore } from '../stores/Auth';
 import { useRewardStore } from '../stores/Reward';
 import { useWalletStore } from '../stores/Wallet';
 import { usePerkStore } from '../stores/Perk';
@@ -131,6 +141,7 @@ export default defineComponent({
     props: {},
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
@@ -164,14 +175,13 @@ export default defineComponent({
             window.top?.postMessage({ message: 'thx.widget.ready' }, getConfig(poolId).origin);
         },
         // OAuthshare retrieved but device share and security quesiton not found
-        'accountStore.isSecurityQuestionAvailable'(isSecurityQuestionAvailable) {
-            if (!this.accountStore.oAuthShare) return;
-
-            if (!this.accountStore.isDeviceShareAvailable && isSecurityQuestionAvailable) {
+        'authStore.isSecurityQuestionAvailable'(isSecurityQuestionAvailable) {
+            const { oAuthShare, isDeviceShareAvailable } = this.authStore;
+            if (!oAuthShare) return;
+            if (!isDeviceShareAvailable && isSecurityQuestionAvailable) {
                 this.isModalWalletConfigShown = true;
             }
-
-            if (this.accountStore.isDeviceShareAvailable && !isSecurityQuestionAvailable) {
+            if (isDeviceShareAvailable && !isSecurityQuestionAvailable) {
                 this.isModalWalletRecoveryShown = true;
             }
         },

@@ -2,7 +2,7 @@
     <b-container class="flex-grow-1 overflow-auto order-lg-1">
         <b-row>
             <b-col lg="10" offset-xl="1">
-                <template v-if="accountStore.isAuthenticated">
+                <template v-if="authStore.oAuthShare">
                     <b-alert
                         variant="danger"
                         show
@@ -57,6 +57,7 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../stores/Wallet';
+import { useAuthStore } from '../stores/Auth';
 import { useAccountStore } from '../stores/Account';
 import BaseCardERC20 from '../components/BaseCardERC20.vue';
 import BaseCardERC721 from '../components/BaseCardERC721.vue';
@@ -72,6 +73,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useWalletStore),
+        ...mapStores(useAuthStore),
         ...mapStores(useAccountStore),
         list: function (): any {
             return [...this.walletStore.erc20, ...this.walletStore.erc721, ...this.walletStore.erc1155]

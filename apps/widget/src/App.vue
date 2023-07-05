@@ -8,10 +8,8 @@
         <BaseNavbarSecondary class="d-flex d-lg-none" />
         <b-container class="order-lg-1 d-none d-lg-block mt-lg-5" style="max-width: none">
             <b-row>
-                <b-col lg="10" offset-lg="1">
-                    <h2 style="text-transform: capitalize">
-                        {{ $route.name }}
-                    </h2>
+                <b-col xl="10" offset-xl="1">
+                    <h2 style="text-transform: capitalize">{{ $route.name }}</h2>
                 </b-col>
             </b-row>
         </b-container>

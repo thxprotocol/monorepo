@@ -10,32 +10,45 @@
         no-close-on-esc
     >
         <template #header>
-            <h5 class="modal-title"><i class="fas fa-bell me-2"></i> Wallet Config</h5>
+            <h5 class="modal-title"><i class="fas fa-key me-2"></i> Wallet Settings</h5>
             <b-link class="btn-close" @click="$emit('hidden')"> <i class="fas fa-times"></i> </b-link>
         </template>
         <div v-if="isLoading" class="text-center">
             <b-spinner show size="sm" />
         </div>
         <template v-else>
-            OAuthShare: {{ !!accountStore.oAuthShare }}<br />
-            Device Share: {{ accountStore.isDeviceShareAvailable }} <br />
-            <b-input-group>
-                <b-form-input :value="`0x${accountStore.privateKey}`" />
-                <b-input-group-append>
-                    <b-button
-                        size="sm"
-                        variant="primary"
-                        v-clipboard:copy="`0x${accountStore.privateKey}`"
-                        v-clipboard:success="onCopySuccess"
-                    >
-                        <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
-                        <i v-else class="fas fa-clipboard px-2"></i>
-                    </b-button>
-                </b-input-group-append>
-            </b-input-group>
-            <hr />
+            <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
             <b-tabs justified content-class="mt-3">
-                <b-tab title="Security Question" v-if="accountStore.securityQuestion">
+                <b-tab title="Key">
+                    <b-form-group
+                        :label="`Private Key`"
+                        :description="`This self-custody key is reconstructed from Login, Device and Backup key shares. (${currentKeyTreshold})`"
+                    >
+                        <b-input-group>
+                            <b-form-input :value="privateKey" />
+                            <b-input-group-append>
+                                <b-button size="sm" variant="primary" @click="isPrivateKeyHidden = !isPrivateKeyHidden">
+                                    <i v-if="isPrivateKeyHidden" class="fas fa-eye px-2"></i>
+                                    <i v-else class="fas fa-eye-slash px-2"></i>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    variant="primary"
+                                    v-clipboard:copy="`0x${authStore.privateKey}`"
+                                    v-clipboard:success="onCopySuccess"
+                                >
+                                    <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
+                                    <i v-else class="fas fa-clipboard px-2"></i>
+                                </b-button>
+                            </b-input-group-append>
+                        </b-input-group>
+                    </b-form-group>
+                    <b-button class="w-100 text-danger" variant="link" @click="onSubmitResetAccount">
+                        <b-spinner small variant="light" v-if="isLoadingReset" />
+                        <template v-else> Reset Key </template>
+                    </b-button>
+                </b-tab>
+                <b-tab title="Security" v-if="authStore.securityQuestion">
                     <b-form-group>
                         <b-form-input v-model="question" placeholder="Question" />
                     </b-form-group>
@@ -56,39 +69,36 @@
                         />
                     </b-form-group>
                     <b-button
-                        :disabled="!password.length || !accountStore.isDeviceShareAvailable"
+                        :disabled="!password.length || !authStore.isDeviceShareAvailable"
                         class="w-100"
                         variant="primary"
                         @click="onSubmitDeviceSharePasswordUpdate"
                     >
-                        <b-spinner size="sm" variant="light" v-if="isLoadingPasswordChange" />
+                        <b-spinner small variant="light" v-if="isLoadingPasswordChange" />
                         <template v-else> Change Security Question </template>
                     </b-button>
                 </b-tab>
-                <b-tab title="Recover Key" active v-if="accountStore.securityQuestion">
-                    <b-form-group :label="accountStore.securityQuestion">
+                <b-tab title="Recovery" active v-if="authStore.securityQuestion">
+                    <b-form-group :label="authStore.securityQuestion">
                         <b-form-input v-model="passwordRecovery" type="password" placeholder="Answer" />
                     </b-form-group>
                     <b-button
                         class="w-100"
                         variant="primary"
                         @click="onSubmitDeviceShareRecovery"
-                        :disabled="!!accountStore.isDeviceShareAvailable"
+                        :disabled="!!authStore.isDeviceShareAvailable"
                     >
-                        <b-spinner size="sm" variant="light" v-if="isLoadingPasswordRecovery" />
+                        <b-spinner small variant="light" v-if="isLoadingPasswordRecovery" />
                         <template v-else> Recover Key </template>
                     </b-button>
                 </b-tab>
             </b-tabs>
-            <b-button class="w-100 text-danger" variant="link" @click="onSubmitResetAccount">
-                <b-spinner size="sm" variant="light" v-if="isLoadingReset" />
-                <template v-else> Reset Key </template>
-            </b-button>
         </template>
     </b-modal>
 </template>
 
 <script lang="ts">
+import { useAuthStore } from '../stores/Auth';
 import { useAccountStore } from '../stores/Account';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -97,8 +107,10 @@ export default defineComponent({
     name: 'BaseModalWalletAccess',
     data() {
         return {
+            error: '',
             isShown: false,
             isCopied: false,
+            isPrivateKeyHidden: true,
             question: '',
             password: '',
             passwordCheck: '',
@@ -110,6 +122,21 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
+        privateKey() {
+            const key = `0x${this.authStore.privateKey}`;
+            if (this.isPrivateKeyHidden) return key.replace(/./g, '•');
+            return key;
+        },
+        currentKeyTreshold() {
+            const { oAuthShare, isDeviceShareAvailable } = useAuthStore();
+
+            let i = 0;
+            if (oAuthShare) i++;
+            if (isDeviceShareAvailable) i++;
+
+            return `${i}/3`;
+        },
         isSubmitDisabled: function () {
             return this.isLoading;
         },
@@ -122,9 +149,6 @@ export default defineComponent({
         id: {
             type: String,
             required: true,
-        },
-        error: {
-            type: String,
         },
         show: {
             type: Boolean,
@@ -145,11 +169,11 @@ export default defineComponent({
         async onShow() {
             this.password = '';
             this.passwordRecovery = '';
-            this.question = this.accountStore.securityQuestion;
+            this.question = this.authStore.securityQuestion;
         },
         async onSubmitDeviceSharePasswordUpdate() {
-            const { isAuthenticated, isDeviceShareAvailable, updateDeviceShare } = this.accountStore;
-            if (!isAuthenticated || !isDeviceShareAvailable) return;
+            const { oAuthShare, isDeviceShareAvailable, updateDeviceShare } = this.authStore;
+            if (!oAuthShare || !isDeviceShareAvailable) return;
 
             this.isLoadingPasswordChange = true;
             await updateDeviceShare(this.password, this.question);
@@ -157,14 +181,20 @@ export default defineComponent({
             this.password = '';
         },
         async onSubmitDeviceShareRecovery() {
+            this.error = '';
             this.isLoadingPasswordRecovery = true;
-            await this.accountStore.recoverDeviceShare(this.passwordRecovery);
-            this.isLoadingPasswordRecovery = false;
-            this.passwordRecovery = '';
+            try {
+                await this.authStore.recoverDeviceShare(this.passwordRecovery);
+                this.passwordRecovery = '';
+            } catch (error) {
+                this.error = (error as Error).message;
+            } finally {
+                this.isLoadingPasswordRecovery = false;
+            }
         },
         async onSubmitResetAccount() {
             this.isLoadingReset = true;
-            await this.accountStore.reset();
+            await this.authStore.reset();
             this.isLoadingReset = false;
             this.passwordRecovery = '';
         },
