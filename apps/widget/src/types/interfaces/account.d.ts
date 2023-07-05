@@ -28,12 +28,14 @@ type THXAuthUser = {
     idToken: string;
     expiresIn: number;
     expiresAt: number;
+    state: string;
 };
 
 type TAccountState = {
     isEthereumBrowser: boolean;
     isRewardsLoaded: boolean;
-    isDeviceShareAvailable: boolean;
+    isDeviceShareAvailable: boolean | null;
+    isSecurityQuestionAvailable: boolean | null;
     user: THXAuthUser | null;
     privateKey: string;
     oAuthShare: string;

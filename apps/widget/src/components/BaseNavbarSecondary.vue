@@ -42,7 +42,7 @@
                     />
                 </b-button>
                 <b-button
-                    v-if="['home', 'earn'].includes(String($route.name))"
+                    v-if="['home', 'quests'].includes(String($route.name))"
                     variant="link"
                     v-b-toggle.collapse-filters
                 >
@@ -69,10 +69,10 @@
                     <b-dropdown-item-button v-if="walletStore.wallet" size="sm" @click="onClickWallet">
                         {{ walletStore.wallet.address }}
                     </b-dropdown-item-button>
-                    <b-dropdown-item-button size="sm" v-b-modal="'wallet-access'">
+                    <b-dropdown-item-button size="sm" @click="isModalWalletConfigShown = true">
                         <div class="d-flex align-items-center justify-content-between">Config</div>
                         <BaseModalWalletConfig
-                            id="wallet-access"
+                            id="wallet-config"
                             @hidden="isModalWalletConfigShown = false"
                             :show="isModalWalletConfigShown"
                             :error="error"
@@ -88,6 +88,12 @@
                 </b-dropdown>
             </template>
         </div>
+        <BaseModalWalletRecovery
+            id="wallet-recovery"
+            @hidden="isModalWalletRecoveryShown = false"
+            :show="isModalWalletRecoveryShown"
+            :error="error"
+        />
     </b-navbar>
 </template>
 
@@ -101,11 +107,13 @@ import { usePerkStore } from '../stores/Perk';
 import { decodeHTML } from '../utils/decode-html';
 import BaseModalPoolSubscription from '../components/BaseModalPoolSubscription.vue';
 import BaseModalWalletConfig from '../components/BaseModalWalletConfig.vue';
+import BaseModalWalletRecovery from '../components/BaseModalWalletRecovery.vue';
 
 export default defineComponent({
     name: 'Home',
     components: {
         BaseModalWalletConfig,
+        BaseModalWalletRecovery,
         BaseModalPoolSubscription,
     },
     data(): any {
@@ -144,6 +152,30 @@ export default defineComponent({
             return getConfig(poolId);
         },
     },
+    watch: {
+        // This redirects the user to the wallet of there are no rewards and perks
+        'accountStore.isRewardsLoaded'(isRewardsLoaded) {
+            if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
+                this.$router.push(`/${this.accountStore.poolId}/wallet`);
+            }
+            // Return if not in iframe
+            if (window.top === window.self) return;
+            const { poolId, getConfig } = this.accountStore;
+            window.top?.postMessage({ message: 'thx.widget.ready' }, getConfig(poolId).origin);
+        },
+        // OAuthshare retrieved but device share and security quesiton not found
+        'accountStore.isSecurityQuestionAvailable'(isSecurityQuestionAvailable) {
+            if (!this.accountStore.oAuthShare) return;
+
+            if (!this.accountStore.isDeviceShareAvailable && isSecurityQuestionAvailable) {
+                this.isModalWalletConfigShown = true;
+            }
+
+            if (this.accountStore.isDeviceShareAvailable && !isSecurityQuestionAvailable) {
+                this.isModalWalletRecoveryShown = true;
+            }
+        },
+    },
     methods: {
         async onSubmitSubscription(email: string) {
             try {
@@ -161,10 +193,6 @@ export default defineComponent({
             this.isLoadingSignin = true;
             await this.accountStore.signin();
             this.isLoadingSignin = false;
-            if (this.accountStore.isAuthenticated && !this.accountStore.isDeviceShareAvailable) {
-                this.isModalWalletConfigShown = true;
-                this.isModalWalletRecoveryShown = true;
-            }
         },
         onClickSignout() {
             this.accountStore.signout();

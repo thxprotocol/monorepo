@@ -15,60 +15,92 @@
         const code = url.searchParams.get('code')
         const iss = url.searchParams.get('iss')
         const state = JSON.parse(window.atob(url.searchParams.get('state').split('%')[0]));
+        const sessionStateKey = `thx.${state.id}`;
+        const session = JSON.parse(localStorage.getItem(sessionStateKey));
+        const isMobile = window.matchMedia('(pointer:coarse)').matches;
+        const isCypress = window.Cypress;
 
-        const tokenRequestHandler = (user) => {
-            const hashParams = {
-                accessToken: user.access_token,
-                idToken: user.id_token,
-                expiresAt: Date.now() + (user.expires_in * 1000),
-                tokenType: user.token_type,
-                scope: user.scope,
-            }
-            const queryParams = {};
-            for (var key of url.searchParams.keys()) {
-                queryParams[key] = url.searchParams.get(key);
-            }
-
-            let error = "";
-            try {
-                if (Object.keys(hashParams).length > 0 && hashParams.state) {
-                    instanceParams = JSON.parse(window.atob(decodeURIComponent(decodeURIComponent(hashParams.state)))) || {};
-                    if (hashParams.error) error = hashParams.error;
-                } else if (Object.keys(queryParams).length > 0 && queryParams.state) {
-                    instanceParams = JSON.parse(window.atob(decodeURIComponent(decodeURIComponent(queryParams.state)))) || {};
-                    if (queryParams.error) error = queryParams.error;
-                }
-            } catch (e) {
-                console.error(e);
-            }
-
-            window.opener.postMessage(
-                {
-                    channel: "redirect_channel_" + instanceParams.instanceId,
-                    data: {instanceParams, hashParams, queryParams},
-                    error: error,
-                },
-                window.location.origin
-            );
+        // If uxMode is redirect, redirect with searchParams to client app
+        if (state.uxMode === 'redirect') {
+            const url = new URL(state.returnUrl);
+            url.search = window.location.search;
+            url.pathname = `/${state.poolId}/redirect`;
+            window.open(url, '_self')
         }
+        // If uxMode is popup, fetch token, postMessage and close popup
+        else {
+            const tokenRequestHandler = (user) => {
+                const hashParams = {
+                    accessToken: user.access_token,
+                    idToken: user.id_token,
+                    expiresAt: Date.now() + (user.expires_in * 1000),
+                    tokenType: user.token_type,
+                    scope: user.scope,
+                }
+                const queryParams = {};
+                for (var key of url.searchParams.keys()) {
+                    queryParams[key] = url.searchParams.get(key);
+                }
 
-        fetch(iss + '/token', {
-            method: 'post',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                grant_type: 'authorization_code',
-                redirect_uri: window.location.origin + window.location.pathname,
-                code,
-                client_id: state.clientId,
-                client_secret: state.clientSecret,
+                let error = "";
+                try {
+                    if (Object.keys(hashParams).length > 0 && hashParams.state) {
+                        instanceParams = JSON.parse(window.atob(decodeURIComponent(decodeURIComponent(hashParams.state)))) || {};
+                        if (hashParams.error) error = hashParams.error;
+                    } else if (Object.keys(queryParams).length > 0 && queryParams.state) {
+                        instanceParams = JSON.parse(window.atob(decodeURIComponent(decodeURIComponent(queryParams.state)))) || {};
+                        if (queryParams.error) error = queryParams.error;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+
+                const loginResponse = {instanceParams, hashParams, queryParams};
+                window.opener.postMessage(
+                    {
+                        channel: "redirect_channel_" + instanceParams.instanceId,
+                        data: loginResponse,
+                        error: error,
+                    },
+                    window.location.origin
+                );
+            }
+
+            fetch(iss + '/token', {
+                method: 'post',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    grant_type: 'authorization_code',
+                    code,
+                    redirect_uri: session.redirectUri,
+                    code_verifier: session.codeVerifier,
+                    client_id: state.clientId,
+                    client_secret: state.clientSecret,
+                })
             })
-        })
-            .then(response => response.json())
-            .then(tokenRequestHandler)
-            .catch(console.error)
+                .then(response => response.json())
+                .then(tokenRequestHandler)
+                .catch(async (error) => {
+                    // In case we encounter an error during authentication we sign out the user server side
+                    // const userStateKey = `thx.user:${iss}:${state.clientId}`;
+                    // const user = JSON.parse(localStorage.getItem(userStateKey));
+
+                    // if (user) {
+                    //     const url = new URL(iss + '/session/end')
+
+                    //     url.searchParams.append('id_token_hint', user.idToken);
+                    //     url.searchParams.append('post_logout_redirect_uri', state.postLogoutRedirectUri);
+                    //     url.searchParams.append('state', user.state);
+
+                    //     await fetch(url)
+                    // }
+
+                    console.error(error)
+                });
+        }
 
 
     </script>

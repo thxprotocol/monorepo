@@ -6,10 +6,11 @@ import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
 import { useClaimStore } from './Claim';
 import { track } from '@thxnetwork/mixpanel';
-import { getReturnUrl } from '../utils/returnUrl';
 import { getStyles } from '../utils/theme';
 import { getUxMode, tKey } from '../utils/tkey';
 import * as jose from 'jose';
+import { randHex } from '../utils/rand-hex';
+import { generateCodeChallenge } from '../utils/pkce';
 
 const VERIFIER_NAME = 'thx-custom-sapphire-devnet-local';
 
@@ -26,7 +27,8 @@ export const useAccountStore = defineStore('account', {
         securityQuestion: '',
         isAuthenticated: false,
         isRewardsLoaded: false,
-        isDeviceShareAvailable: false,
+        isDeviceShareAvailable: null,
+        isSecurityQuestionAvailable: null,
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
@@ -60,7 +62,9 @@ export const useAccountStore = defineStore('account', {
 
             this.setConfig(this.poolId, data);
             this.setTheme(data);
-            this.getUser().then(() => this.getUserData());
+
+            await this.getUser();
+            await this.signinCallback();
 
             track('UserVisits', [
                 this.account?.sub || '',
@@ -72,6 +76,9 @@ export const useAccountStore = defineStore('account', {
             const rewardsStore = useRewardStore();
             const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
             const { origin } = this.getConfig(this.poolId);
+
+            // Return if not in iframe
+            if (window.top === window.self) return;
 
             // Send the amount of unclaimed rewards to the parent window and update the launcher
             window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
@@ -98,48 +105,197 @@ export const useAccountStore = defineStore('account', {
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
-        async getOAuthShare(extraQueryParams?: { [key: string]: string }) {
-            const config = this.getConfig(this.poolId);
-            const { claim } = useClaimStore();
-            const loginResponse = await tKey.serviceProvider.triggerLogin({
+        async signin(extraQueryParams?: { [key: string]: string }) {
+            await this.requestOAuthShare(extraQueryParams);
+            await this.getUser();
+            await this.signinCallback();
+        },
+        async signinCallback() {
+            this.getUserData();
+            if (this.oAuthShare) {
+                await this.getDeviceShare();
+                this.reconstructKey();
+                this.getSecurityQuestion();
+            }
+        },
+        getRequestConfig(sessionId: string, jwtParams?: { [key: string]: string | undefined }) {
+            const uxMode = getUxMode();
+            return {
                 verifier: VERIFIER_NAME,
                 typeOfLogin: 'jwt',
                 clientId: CLIENT_ID,
                 enableLogging: true,
-                uxMode: getUxMode(),
+                uxMode,
                 customState: {
+                    id: sessionId,
+                    poolId: this.poolId,
+                    uxMode,
                     clientId: CLIENT_ID,
                     clientSecret: CLIENT_SECRET,
+                    returnUrl: window.location.href,
+                    postLogoutRedirectUri: WIDGET_URL + '/signout-popup.html',
                 },
-                jwtParams: {
-                    domain: AUTH_URL,
-                    prompt: 'login',
-                    redirect_uri: WIDGET_URL + '/signin-popup.html',
-                    response_type: 'code',
-                    grant_type: 'authorization_code',
-                    scope: 'openid account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
-                    return_url: getReturnUrl(config),
-                    pool_id: config.poolId,
-                    claim_id: claim?.uuid,
-                    ...extraQueryParams,
-                },
+                jwtParams,
+            };
+        },
+        async requestOAuthShare(extraQueryParams?: { [key: string]: string }) {
+            const config = this.getConfig(this.poolId);
+            const { claim } = useClaimStore();
+            const { codeVerifier, codeChallenge } = await generateCodeChallenge();
+            const sessionId = randHex(32);
+            const redirectUri = WIDGET_URL + '/signin-popup.html';
+
+            this.setSessionState(sessionId, {
+                redirectUri,
+                codeVerifier,
+                returnUrl: window.location.href,
+                clientId: CLIENT_ID,
+                clientSecret: CLIENT_SECRET,
             });
 
+            const requestConfig = this.getRequestConfig(sessionId, {
+                code_challenge: codeChallenge,
+                code_challenge_method: 'S256',
+                domain: AUTH_URL,
+                resource: API_URL,
+                redirect_uri: redirectUri,
+                response_type: 'code',
+                response_mode: 'query',
+                prompt: '', // Should be an empty string to avoid default 'login' prompt
+                grant_type: 'authorization_code',
+                scope: 'openid account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
+                return_url: window.location.href,
+                pool_id: config.poolId,
+                claim_id: claim?.uuid,
+                ...extraQueryParams,
+            });
+
+            await tKey.serviceProvider.init({ skipSw: true });
+            await tKey.modules.securityQuestions.initialize();
+
+            const loginResponse = await tKey.serviceProvider.triggerLogin(requestConfig);
+
+            // Only popup flow continues here
             this.setUser(loginResponse.userInfo);
             this.oAuthShare = loginResponse.privateKey;
             this.isAuthenticated = true;
 
             await tKey.initialize();
         },
-        async signin(extraQueryParams?: { [key: string]: string }) {
+        async requestOAuthShareRedirectCallback() {
+            const url = new URL(window.location.href);
+            const stateString = url.searchParams.get('state');
+            if (!stateString) return;
+
+            const state = JSON.parse(window.atob(stateString.split('%')[0]));
+            const sessionStateKey = `thx.${state.id}`;
+            const session = JSON.parse(localStorage.getItem(sessionStateKey) as string);
+
             await tKey.serviceProvider.init({ skipSw: true });
             await tKey.modules.securityQuestions.initialize();
-            await this.getOAuthShare(extraQueryParams);
-            await this.getDeviceShare();
 
-            this.getUserData();
-            this.reconstructKey();
-            this.getSecurityQuestion();
+            const redirectUri = WIDGET_URL + '/signin-popup.html';
+            const user = await this.getToken(url, sessionStateKey, session);
+
+            const requestConfig = {
+                verifier: VERIFIER_NAME,
+                typeOfLogin: 'jwt',
+                clientId: CLIENT_ID,
+                enableLogging: true,
+                uxMode: getUxMode(),
+                redirect_uri: redirectUri,
+                hash: `#state=${stateString}&access_token=${user.access_token}&id_token=${user.id_token}`,
+                queryParameters: window.location.search,
+                jwtParams: {
+                    domain: AUTH_URL,
+                    accessToken: user.access_token,
+                    idToken: user.id_token,
+                },
+            };
+            // Trigger login with access and id token hash
+            const loginResponse = await tKey.serviceProvider.triggerLogin(requestConfig);
+
+            // Override empty state object in order to do proper removal of session state post sign out
+            loginResponse.userInfo.state = { id: state.id };
+
+            this.setUser(loginResponse.userInfo);
+            this.api.setAccessToken(this.user ? this.user.accessToken : '');
+            this.oAuthShare = loginResponse.privateKey;
+            this.isAuthenticated = true;
+
+            await tKey.initialize();
+        },
+        async getUser() {
+            const url = new URL(window.location.href);
+            if (url && url.searchParams.has('code')) {
+                await this.requestOAuthShareRedirectCallback();
+            } else {
+                // Set user on storage hit
+                const storageKey = `thx.user:${AUTH_URL}:${CLIENT_ID}`;
+                const item = localStorage.getItem(storageKey) as string;
+                if (item) {
+                    const user = JSON.parse(item);
+                    // Validate user token expiry
+                    await this.validateToken(user.accessToken);
+
+                    this.user = user;
+                    this.api.setAccessToken(this.user ? this.user.accessToken : '');
+                    this.isAuthenticated = true;
+
+                    if (!this.oAuthShare) {
+                        this.signin();
+                    }
+                }
+            }
+        },
+        setUser(userInfo: THXAuthUser) {
+            localStorage.setItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`, JSON.stringify(userInfo));
+            this.user = userInfo;
+        },
+        async getToken(url: any, sessionStateKey: string, session: any) {
+            const code = url.searchParams.get('code');
+            const iss = url.searchParams.get('iss');
+            const response = await fetch(iss + '/token', {
+                method: 'post',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    grant_type: 'authorization_code',
+                    code,
+                    redirect_uri: session.redirectUri,
+                    code_verifier: session.codeVerifier,
+                    client_id: session.clientId,
+                    client_secret: session.clientSecret,
+                }),
+            });
+
+            localStorage.removeItem(sessionStateKey);
+
+            return await response.json();
+        },
+        async signout() {
+            if (!this.user) return;
+            localStorage.removeItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`);
+
+            try {
+                const url = new URL(AUTH_URL + '/session/end');
+                const params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=600,height=300,left=100,top=100`;
+                const { id } = this.user.state as any;
+
+                url.searchParams.append('id_token_hint', this.user.idToken);
+                url.searchParams.append('post_logout_redirect_uri', WIDGET_URL + '/signout-popup.html');
+                url.searchParams.append('state', id);
+
+                this.setSessionState(id, { returnUrl: window.location.href });
+
+                window.open(url, '', params);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                this.isAuthenticated = false;
+            }
         },
         async validateToken(accessToken: string) {
             try {
@@ -155,41 +311,11 @@ export const useAccountStore = defineStore('account', {
                 await this.signin();
             }
         },
-        async getUser() {
-            const storageKey = `thx.user:${AUTH_URL}:${CLIENT_ID}`;
-            const item = localStorage.getItem(storageKey) as string;
-
-            // Set user on storage hit
-            if (item) {
-                this.user = JSON.parse(item);
-            }
-
-            // Validate user token expiry
-            if (this.user) {
-                await this.validateToken(this.user.accessToken);
-                this.isAuthenticated = true;
-            }
-
-            // Set API client
-            this.api = new THXClient({
-                url: API_URL,
-                accessToken: this.user ? this.user.accessToken : '',
-                poolId: this.poolId,
-            });
-        },
-        setUser(userInfo: THXAuthUser) {
-            localStorage.setItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`, JSON.stringify(userInfo));
-            this.user = userInfo;
-        },
-        async signout() {
-            try {
-                await fetch(AUTH_URL + '/session/end');
-            } catch (error) {
-                console.error(error);
-            } finally {
-                localStorage.removeItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`);
-                this.isAuthenticated = false;
-            }
+        setSessionState(id: string, state: any) {
+            const storageKey = `thx.${id}`;
+            const current = localStorage.getItem(storageKey);
+            const storage = current && JSON.parse(current);
+            localStorage.setItem(storageKey, JSON.stringify({ ...storage, ...state }));
         },
         validatePassword(value: string) {
             if (value.length <= 10) {
@@ -202,6 +328,7 @@ export const useAccountStore = defineStore('account', {
                 privKey: this.oAuthShare as any,
                 input: { message: 'KEY_NOT_FOUND' },
             });
+            await this.signout();
         },
         async reconstructKey() {
             // Checks the requiredShares to reconstruct the tKey,
@@ -214,19 +341,23 @@ export const useAccountStore = defineStore('account', {
             }
         },
         async getDeviceShare() {
+            // Setting the bool will trigger a watcher that displays the recovery modal
             try {
                 await tKey.modules.webStorage.inputShareFromWebStorage(); // 2/2 flow
                 this.isDeviceShareAvailable = true;
                 console.log('Successfully asserted device share.');
             } catch (e) {
-                console.log(e);
+                this.isDeviceShareAvailable = false;
+                console.error(e);
             }
         },
         async getSecurityQuestion() {
             try {
                 this.securityQuestion = await tKey.modules.securityQuestions.getSecurityQuestions();
+                this.isSecurityQuestionAvailable = true;
                 console.log('Successfully got security question.');
             } catch (error) {
+                this.isSecurityQuestionAvailable = false;
                 console.error(error);
             }
         },
@@ -236,14 +367,16 @@ export const useAccountStore = defineStore('account', {
             try {
                 await tKey.modules.securityQuestions.generateNewShareWithSecurityQuestions(answer, question);
                 console.log('Successfully generated new share with password.');
+                await this.getSecurityQuestion();
             } catch (error) {
                 console.log('Error', (error as any)?.message.toString(), 'error');
             }
         },
-        async updateDeviceShare(answer: string) {
+        async updateDeviceShare(answer: string, question: string) {
             this.validatePassword(answer);
 
-            await tKey.modules.securityQuestions.changeSecurityQuestionAndAnswer(answer, this.securityQuestion);
+            await tKey.modules.securityQuestions.changeSecurityQuestionAndAnswer(answer, question);
+            await this.getSecurityQuestion();
             console.log('Successfully changed new share with password.');
         },
         async recoverDeviceShare(value: string) {
@@ -270,7 +403,10 @@ export const useAccountStore = defineStore('account', {
                 const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
 
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
-                window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+                if (window.self !== window.top) {
+                    window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+                }
+
                 this.isRewardsLoaded = true;
             });
             perksStore.list();
@@ -279,6 +415,7 @@ export const useAccountStore = defineStore('account', {
             if (!this.isAuthenticated) return;
 
             await this.getAccount();
+
             this.getBalance();
             this.getSubscription();
 

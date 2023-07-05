@@ -17,82 +17,73 @@
             <b-spinner show size="sm" />
         </div>
         <template v-else>
-            <b-tabs justified content-class="mt-3">
-                <b-tab title="User">
-                    OAuthShare: {{ accountStore.isAuthenticated }}<br />
-                    Device Share: {{ accountStore.isDeviceShareAvailable }} <br />
-                    Security Q: {{ accountStore.securityQuestion }} <br />
-                    Private Key: <code>0x{{ accountStore.privateKey }}</code>
+            OAuthShare: {{ !!accountStore.oAuthShare }}<br />
+            Device Share: {{ accountStore.isDeviceShareAvailable }} <br />
+            <b-input-group>
+                <b-form-input :value="`0x${accountStore.privateKey}`" />
+                <b-input-group-append>
                     <b-button
-                        class="w-100"
-                        variant="danger"
-                        @click="onSubmitResetAccount"
-                        v-if="accountStore.oAuthShare"
+                        size="sm"
+                        variant="primary"
+                        v-clipboard:copy="`0x${accountStore.privateKey}`"
+                        v-clipboard:success="onCopySuccess"
                     >
-                        <b-spinner variant="light" v-if="isLoadingPasswordChange" />
-                        <template v-else> Reset Account </template>
+                        <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
+                        <i v-else class="fas fa-clipboard px-2"></i>
                     </b-button>
-                </b-tab>
-                <b-tab title="Create Q&A" v-if="!accountStore.securityQuestion && accountStore.isDeviceShareAvailable">
+                </b-input-group-append>
+            </b-input-group>
+            <hr />
+            <b-tabs justified content-class="mt-3">
+                <b-tab title="Security Question" v-if="accountStore.securityQuestion">
                     <b-form-group>
                         <b-form-input v-model="question" placeholder="Question" />
                     </b-form-group>
-                    <b-form-group>
-                        <b-form-input v-model="password" type="password" placeholder="Answer" />
+                    <b-form-group :state="isPasswordValid">
+                        <b-form-input
+                            :state="isPasswordValid"
+                            v-model="password"
+                            type="password"
+                            placeholder="New answer"
+                        />
+                    </b-form-group>
+                    <b-form-group :state="isPasswordValid">
+                        <b-form-input
+                            :state="isPasswordValid"
+                            v-model="passwordCheck"
+                            type="password"
+                            placeholder="New answer again"
+                        />
                     </b-form-group>
                     <b-button
-                        :disabled="!accountStore.securityQuestion.length"
+                        :disabled="!password.length || !accountStore.isDeviceShareAvailable"
                         class="w-100"
                         variant="primary"
-                        @click="onSubmitDeviceSharePasswordCreate"
+                        @click="onSubmitDeviceSharePasswordUpdate"
                     >
-                        <b-spinner variant="light" v-if="isLoadingPasswordChange" />
-                        <template v-else> Create Password </template>
+                        <b-spinner size="sm" variant="light" v-if="isLoadingPasswordChange" />
+                        <template v-else> Change Security Question </template>
                     </b-button>
                 </b-tab>
-                <b-tab title="Update Q&A" v-if="accountStore.securityQuestion && accountStore.isDeviceShareAvailable">
+                <b-tab title="Recover Key" active v-if="accountStore.securityQuestion">
                     <b-form-group :label="accountStore.securityQuestion">
-                        <b-form-input v-model="password" type="password" placeholder="Answer" />
-                    </b-form-group>
-                    <b-button class="w-100" variant="primary" @click="onSubmitDeviceSharePasswordUpdate">
-                        <b-spinner variant="light" v-if="isLoadingPasswordChange" />
-                        <template v-else> Update Password </template>
-                    </b-button>
-                </b-tab>
-                <b-tab
-                    title="Recover"
-                    active
-                    v-if="accountStore.securityQuestion && !accountStore.isDeviceShareAvailable"
-                >
-                    <b-form-group :label="accountStore.securityQuestion">
-                        <b-form-input v-model="passwordRecovery" type="password" placeholder="Password Recovery" />
+                        <b-form-input v-model="passwordRecovery" type="password" placeholder="Answer" />
                     </b-form-group>
                     <b-button
                         class="w-100"
                         variant="primary"
                         @click="onSubmitDeviceShareRecovery"
-                        :disabled="accountStore.isDeviceShareAvailable"
+                        :disabled="!!accountStore.isDeviceShareAvailable"
                     >
-                        <b-spinner variant="light" v-if="isLoadingPasswordChange" />
-                        <template v-else> Recover Password </template>
+                        <b-spinner size="sm" variant="light" v-if="isLoadingPasswordRecovery" />
+                        <template v-else> Recover Key </template>
                     </b-button>
                 </b-tab>
-                <!-- <b-tab title="Mnemonic">
-                    <p>
-                        Store the twelve word sequence somewhere safe and use it to recover access to your wallet
-                        access.
-                    </p>
-                    <b-card bg-variant="dark">
-                        <strong v-if="mnemonic" style="font-size: 1.3rem">{{ mnemonic }}</strong>
-                        <strong v-else>...</strong>
-                    </b-card>
-                    <b-alert v-if="mnemonic" variant="warning">Do not store your mnemonic on this device!</b-alert>
-                    <b-button class="w-100" variant="primary" @click="onSubmitCreateMnemonic">
-                        <b-spinner variant="light" v-if="isLoadingMnemonic" />
-                        <template v-else>Generate Backup</template>
-                    </b-button>
-                </b-tab> -->
             </b-tabs>
+            <b-button class="w-100 text-danger" variant="link" @click="onSubmitResetAccount">
+                <b-spinner size="sm" variant="light" v-if="isLoadingReset" />
+                <template v-else> Reset Key </template>
+            </b-button>
         </template>
     </b-modal>
 </template>
@@ -101,21 +92,19 @@
 import { useAccountStore } from '../stores/Account';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-import { tKey } from '../utils/tkey';
 
 export default defineComponent({
     name: 'BaseModalWalletAccess',
     data() {
         return {
             isShown: false,
-            question: 'test',
+            isCopied: false,
+            question: '',
             password: '',
+            passwordCheck: '',
             passwordRecovery: '',
-            mnemonic: '',
-            isLoadingMnemonic: false,
             isLoadingReset: false,
             isLoadingPasswordRecovery: false,
-            isLoadingPasswordCreate: false,
             isLoadingPasswordChange: false,
         };
     },
@@ -123,6 +112,10 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         isSubmitDisabled: function () {
             return this.isLoading;
+        },
+        isPasswordValid: function () {
+            if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
+            return undefined;
         },
     },
     props: {
@@ -146,44 +139,35 @@ export default defineComponent({
         },
     },
     methods: {
+        onCopySuccess() {
+            this.isCopied = true;
+        },
         async onShow() {
             this.password = '';
-            this.mnemonic = '';
-
+            this.passwordRecovery = '';
             this.question = this.accountStore.securityQuestion;
-        },
-        async onSubmitResetAccount() {
-            this.isLoadingReset = true;
-            await this.accountStore.reset();
-            this.isLoadingReset = false;
-        },
-        async onSubmitDeviceShareRecovery() {
-            this.isLoadingPasswordRecovery = true;
-            await this.accountStore.recoverDeviceShare(this.passwordRecovery);
-            this.isLoadingPasswordRecovery = false;
-        },
-        async onSubmitDeviceSharePasswordCreate() {
-            const { isAuthenticated, isDeviceShareAvailable, createDeviceShare } = this.accountStore;
-            if (!isAuthenticated || !isDeviceShareAvailable) return;
-
-            this.isLoadingPasswordCreate = true;
-            await createDeviceShare(this.question, this.password);
-            this.isLoadingPasswordCreate = false;
         },
         async onSubmitDeviceSharePasswordUpdate() {
             const { isAuthenticated, isDeviceShareAvailable, updateDeviceShare } = this.accountStore;
             if (!isAuthenticated || !isDeviceShareAvailable) return;
 
             this.isLoadingPasswordChange = true;
-            await updateDeviceShare(this.password);
+            await updateDeviceShare(this.password, this.question);
             this.isLoadingPasswordChange = false;
+            this.password = '';
         },
-        // async onSubmitCreateMnemonic() {
-        //     this.isLoadingMnemonic = true;
-        //     const newShare = await tKey.generateNewShare();
-        //     this.mnemonic = (await tKey.outputShare(newShare.newShareIndex, 'mnemonic')) as string;
-        //     this.isLoadingMnemonic = false;
-        // },
+        async onSubmitDeviceShareRecovery() {
+            this.isLoadingPasswordRecovery = true;
+            await this.accountStore.recoverDeviceShare(this.passwordRecovery);
+            this.isLoadingPasswordRecovery = false;
+            this.passwordRecovery = '';
+        },
+        async onSubmitResetAccount() {
+            this.isLoadingReset = true;
+            await this.accountStore.reset();
+            this.isLoadingReset = false;
+            this.passwordRecovery = '';
+        },
     },
 });
 </script>

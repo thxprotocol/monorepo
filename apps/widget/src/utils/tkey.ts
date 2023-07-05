@@ -14,6 +14,7 @@ const customAuthArgs = {
     network: 'sapphire_devnet',
     redirectToOpener: true,
     metadataUrl: AUTH_URL + '/.well-known/openid-configuration',
+    uxMode: getUxMode(),
 } as any;
 
 const tKey: ThresholdKey & { serviceProvider?: any; modules?: { securityQuestions?: any; webStorage?: any } } =
