@@ -7,6 +7,7 @@ import { useWalletStore } from './Wallet';
 import { track } from '@thxnetwork/mixpanel';
 import { getStyles } from '../utils/theme';
 import { useAuthStore } from './Auth';
+import { setSessionState } from '../utils/pkce';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -121,7 +122,7 @@ export const useAccountStore = defineStore('account', {
                 url.searchParams.append('post_logout_redirect_uri', WIDGET_URL + '/signout-popup.html');
                 url.searchParams.append('state', id);
 
-                authStore.setSessionState(id, { returnUrl: window.location.href });
+                setSessionState(id, { returnUrl: window.location.href });
 
                 window.open(url, '', params);
             } catch (error) {

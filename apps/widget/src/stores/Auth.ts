@@ -3,7 +3,7 @@ import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL, API_URL, VERIFIER_ID } 
 import { useClaimStore } from './Claim';
 import { getRequestConfig, getUxMode, tKey } from '../utils/tkey';
 import * as jose from 'jose';
-import { generateCodeChallenge } from '../utils/pkce';
+import { generateCodeChallenge, getSessionState, setSessionState } from '../utils/pkce';
 import { useAccountStore } from './Account';
 
 export const useAuthStore = defineStore('auth', {
@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', {
                 ...extraQueryParams,
             });
 
-            this.setSessionState(requestConfig.customState.id, {
+            setSessionState(requestConfig.customState.id, {
                 redirectUri,
                 codeVerifier,
                 poolId,
@@ -49,11 +49,9 @@ export const useAuthStore = defineStore('auth', {
             const stateString = url.searchParams.get('state');
             if (!stateString) return;
 
-            const state = JSON.parse(window.atob(stateString.split('%')[0]));
-            const sessionStateKey = `thx.${state.id}`;
-            const session = JSON.parse(localStorage.getItem(sessionStateKey) as string);
-
-            const user = await this.getToken(url, sessionStateKey, session);
+            const { id } = JSON.parse(window.atob(stateString.split('%')[0]));
+            const session = getSessionState(id);
+            const user = await this.getToken(url, session);
             const redirectUri = WIDGET_URL + '/signin-popup.html';
 
             const requestConfig = {
@@ -73,7 +71,7 @@ export const useAuthStore = defineStore('auth', {
                 },
             };
 
-            await this.triggerLogin(requestConfig, { state: { id: state.id }, refreshToken: user.refresh_token });
+            await this.triggerLogin(requestConfig, { state: { id }, refreshToken: user.refresh_token });
         },
         async requestOAuthShareRefresh() {
             if (!this.user || !this.user.refreshToken) return;
@@ -157,7 +155,6 @@ export const useAuthStore = defineStore('auth', {
                     body: new URLSearchParams({
                         grant_type: 'refresh_token',
                         refresh_token: refreshToken,
-                        // code_verifier: session.codeVerifier,
                         client_id: CLIENT_ID,
                         client_secret: CLIENT_SECRET,
                     }),
@@ -165,11 +162,9 @@ export const useAuthStore = defineStore('auth', {
                 return await response.json();
             } catch (error) {
                 console.error(error);
-            } finally {
-                // localStorage.removeItem(session.id); // TODO implement session.id
             }
         },
-        async getToken(url: any, sessionStateKey: string, session: any) {
+        async getToken(url: any, session: any) {
             const code = url.searchParams.get('code');
             const iss = url.searchParams.get('iss');
             try {
@@ -191,8 +186,6 @@ export const useAuthStore = defineStore('auth', {
                 return await response.json();
             } catch (error) {
                 console.error(error);
-            } finally {
-                localStorage.removeItem(sessionStateKey);
             }
         },
         async validateToken(accessToken: string) {
@@ -204,12 +197,6 @@ export const useAuthStore = defineStore('auth', {
             if (Date.now() > Number(payload.exp) * 1000) {
                 throw new Error('token expired');
             }
-        },
-        setSessionState(id: string, state: any) {
-            const storageKey = `thx.${id}`;
-            const current = localStorage.getItem(storageKey);
-            const storage = current && JSON.parse(current);
-            localStorage.setItem(storageKey, JSON.stringify({ ...storage, ...state }));
         },
         async reset() {
             // WARNING Irreversible

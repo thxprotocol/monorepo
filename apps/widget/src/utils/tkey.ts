@@ -1,8 +1,7 @@
 import ThresholdKey from '@tkey/default';
 import WebStorageModule from '@tkey/web-storage';
 import SecurityQuestionsModule from '@tkey/security-questions';
-import { API_URL, AUTH_URL, CLIENT_ID, VERIFIER_ID, VERIFIER_NETWORK, WIDGET_URL } from '../config/secrets';
-import { generateCodeChallenge } from './pkce';
+import { API_URL, AUTH_URL, CLIENT_ID, VERIFIER_ID, VERIFIER_NETWORK } from '../config/secrets';
 import { randHex } from './rand-hex';
 
 const WEB3AUTHCLIENTID = 'BJ6l3_kIQiy6YVL7zDlCcEAvGpGukwFgp-C_0WvNI_fAEeIaoVRLDrV5OjtbZr_zJxbyXFsXMT-yhQiUNYvZWpo';

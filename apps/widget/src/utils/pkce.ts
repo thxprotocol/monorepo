@@ -1,3 +1,16 @@
+function setSessionState(sessionId: string, update: any) {
+    const sessionStateKey = `thx.${sessionId}`;
+    const currentState = sessionStorage.getItem(sessionStateKey);
+    const state = currentState && JSON.parse(currentState);
+    sessionStorage.setItem(sessionStateKey, JSON.stringify({ ...state, ...update }));
+}
+
+function getSessionState(sessionId: string) {
+    const sessionStateKey = `thx.${sessionId}`;
+    const item = sessionStorage.getItem(sessionStateKey) as string;
+    return JSON.parse(item);
+}
+
 function generateCodeVerifier() {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
     const verifierLength = 128;
@@ -20,7 +33,7 @@ function base64UrlEncode(arrayBuffer: any) {
     return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-export async function generateCodeChallenge() {
+async function generateCodeChallenge() {
     const codeVerifier = generateCodeVerifier();
     const sha = await sha256(codeVerifier);
     const codeChallenge = base64UrlEncode(sha);
@@ -29,3 +42,5 @@ export async function generateCodeChallenge() {
         codeChallenge,
     };
 }
+
+export { generateCodeChallenge, getSessionState, setSessionState };
