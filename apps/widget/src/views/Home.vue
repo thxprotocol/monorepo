@@ -1,15 +1,11 @@
 <template>
     <b-container class="flex-grow-1 overflow-auto order-lg-1 py-5">
         <b-row>
-            <b-col lg="11" offset-xl="1">
-                <b-row>
-                    <b-col v-if="!campaigns.length" class="justify-content-center d-flex">
-                        <b-spinner variant="light" />
-                    </b-col>
-                    <b-col lg="4" xl="3" :key="key" v-for="(campaign, key) of campaigns">
-                        <BaseCardCampaign :campaign="campaign" @clicked="onClickCampaign" />
-                    </b-col>
-                </b-row>
+            <b-col v-if="!campaigns.length" class="justify-content-center d-flex">
+                <b-spinner variant="light" />
+            </b-col>
+            <b-col lg="4" xl="3" :key="key" v-for="(campaign, key) of campaigns">
+                <BaseCardCampaign :campaign="campaign" @clicked="onClickCampaign" />
             </b-col>
         </b-row>
     </b-container>

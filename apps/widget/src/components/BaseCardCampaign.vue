@@ -1,7 +1,7 @@
 <template>
     <b-card
         bg-variant="darker"
-        class="text-white mb-4 cursor-pointer"
+        class="text-white mb-4 cursor-pointer mb-2"
         style="cursor: pointer"
         header-class="p-0 card-header-campaign"
         body-class="p-0"
