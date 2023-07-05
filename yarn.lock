@@ -3247,14 +3247,10 @@
   resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.46.0.tgz#2b9acca0dfa7b90aaecd909e678a049f799a27d6"
   integrity sha512-dkm0zCEoRLu5rTnsIgwDf/QG2DKcalOT2dk1IVgMySOHWTChLyOvQwMYhEduGgLvyYWTwNhAUV4WOLPQvjwLwA==
 
-"@thxnetwork/sdk@/Users/peterpolman/Sites/monorepo/dist/libs/sdk/thxnetwork-sdk-1.1.11.tgz":
-  version "1.1.11"
-  resolved "/Users/peterpolman/Sites/monorepo/dist/libs/sdk/thxnetwork-sdk-1.1.11.tgz#bd3f3057a0b29210a380afad5f794d36b2a1f22b"
-
-"@thxnetwork/sdk@1.1.11":
-  version "1.1.11"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.1.11.tgz#f726a42129bdf4e7f22e7920da50a698012b4ce2"
-  integrity sha512-FsOsiTV+ytv1fK+UX+U3iRXb3Ts4FM1evEcgrXLEwIQA9OH8hznOdpd+sI4ZrrZEYAa9a1n3W43CbtskN3/Qag==
+"@thxnetwork/sdk@^1.1.12":
+  version "1.1.12"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.1.12.tgz#72029169b98947ca46c9382825a894f1088a9258"
+  integrity sha512-1kAaKvkTfB5JU8vbIRBIPoWw92NudaKnlgTQIPskKZSq9bhXyWA4kazMCQpZJxprcf9ZOiFE8HGziH+eOPXQkw==
 
 "@tkey/common-types@^8.1.0-alpha.0":
   version "8.1.0-alpha.0"

@@ -12,7 +12,7 @@
     "dependencies": {
         "@popperjs/core": "^2.11.6",
         "@stripe/stripe-js": "^1.46.0",
-        "@thxnetwork/sdk": "/Users/peterpolman/Sites/monorepo/dist/libs/sdk/thxnetwork-sdk-1.1.11.tgz",
+        "@thxnetwork/sdk": "^1.1.12",
         "@tkey/default": "^8.1.0-alpha.0",
         "@tkey/security-questions": "^8.1.0-alpha.0",
         "@tkey/web-storage": "^8.1.0-alpha.0",
