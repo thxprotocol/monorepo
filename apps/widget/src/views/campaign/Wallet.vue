@@ -56,11 +56,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useWalletStore } from '../stores/Wallet';
-import { useAuthStore } from '../stores/Auth';
-import { useAccountStore } from '../stores/Account';
-import BaseCardERC20 from '../components/BaseCardERC20.vue';
-import BaseCardERC721 from '../components/BaseCardERC721.vue';
+import { useWalletStore } from '../../stores/Wallet';
+import { useAuthStore } from '../../stores/Auth';
+import { useAccountStore } from '../../stores/Account';
+import BaseCardERC20 from '../../components/BaseCardERC20.vue';
+import BaseCardERC721 from '../../components/BaseCardERC721.vue';
 
 export default defineComponent({
     name: 'Wallet',

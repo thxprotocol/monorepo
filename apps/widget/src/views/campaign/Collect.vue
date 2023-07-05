@@ -90,12 +90,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useAccountStore } from '../stores/Account';
-import { useAuthStore } from '../stores/Auth';
-import { useClaimStore } from '../stores/Claim';
-import { useWalletStore } from '../stores/Wallet';
+import { useAccountStore } from '../../stores/Account';
+import { useAuthStore } from '../../stores/Auth';
+import { useClaimStore } from '../../stores/Claim';
+import { useWalletStore } from '../../stores/Wallet';
 import ConfettiExplosion from 'vue-confetti-explosion';
-import BaseAlertWalletAddress from '../components/BaseAlertWalletAddress.vue';
+import BaseAlertWalletAddress from '../../components/BaseAlertWalletAddress.vue';
 
 export default defineComponent({
     name: 'Home',
@@ -129,7 +129,7 @@ export default defineComponent({
         },
         onClickGoToWallet() {
             const { poolId } = this.accountStore;
-            this.$router.push(`/${poolId}/wallet`);
+            this.$router.push(`/c/${poolId}/wallet`);
         },
         async onClickCollect() {
             this.isLoadingCollect = true;

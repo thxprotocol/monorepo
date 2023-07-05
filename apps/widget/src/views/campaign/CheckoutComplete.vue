@@ -7,7 +7,9 @@
                     {{ error }}
                 </b-alert>
                 <p>Something went wrong during your checkout process and you were redirected to this page.</p>
-                <b-button variant="success" block class="w-100" :to="`/checkout/${uuid}`">Try again</b-button>
+                <b-button variant="success" block class="w-100" :to="`/c/${perk.poolId}checkout/${uuid}`">
+                    Try again
+                </b-button>
             </template>
             <template v-if="perk && !error">
                 <b-alert show variant="success" class="px-2 p-1">
@@ -31,10 +33,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { usePerkStore } from '../stores/Perk';
-import { useAccountStore } from '../stores/Account';
-import { useWalletStore } from '../stores/Wallet';
-import { useAuthStore } from '../stores/Auth';
+import { usePerkStore } from '../../stores/Perk';
+import { useAccountStore } from '../../stores/Account';
+import { useWalletStore } from '../../stores/Wallet';
+import { useAuthStore } from '../../stores/Auth';
 
 export default defineComponent({
     name: 'Checkout',
@@ -66,7 +68,7 @@ export default defineComponent({
     methods: {
         toWallet() {
             this.walletStore.list();
-            this.$router.push('/wallet');
+            this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
         },
     },
 });

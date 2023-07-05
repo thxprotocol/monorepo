@@ -38,11 +38,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useAccountStore } from '../stores/Account';
-import { useAuthStore } from '../stores/Auth';
-import { useWalletStore } from '../stores/Wallet';
-import { useRewardStore } from '../stores/Reward';
-import BaseAlertWalletAddress from '../components/BaseAlertWalletAddress.vue';
+import { useAccountStore } from '../../stores/Account';
+import { useAuthStore } from '../../stores/Auth';
+import { useWalletStore } from '../../stores/Wallet';
+import { useRewardStore } from '../../stores/Reward';
+import BaseAlertWalletAddress from '../../components/BaseAlertWalletAddress.vue';
 import { validate } from 'uuid';
 
 export default defineComponent({
@@ -92,7 +92,7 @@ export default defineComponent({
                     body: JSON.stringify({ code: this.uuid }),
                 });
                 await this.rewardsStore.list();
-                this.$router.push(`/${this.accountStore.poolId}/quests`);
+                this.$router.push(`/c/${this.accountStore.poolId}/quests`);
             } catch (error) {
                 this.error = (error as Error).message || 'Something went wrong..';
             }

@@ -38,17 +38,17 @@ export const useAccountStore = defineStore('account', {
             document.title = title;
             document.head.appendChild(sheet);
         },
-        async init(config: TWidgetConfig) {
+        async init(poolId: string) {
             const authStore = useAuthStore();
 
             this.api = new THXClient({
                 url: API_URL,
                 accessToken: '',
-                poolId: config.poolId,
+                poolId,
             });
-            this.poolId = config.poolId;
+            this.poolId = poolId;
 
-            const data = await this.api.request.get('/v1/widget/' + config.poolId);
+            const data = await this.api.request.get('/v1/widget/' + poolId);
 
             this.setConfig(this.poolId, data);
             this.setTheme(data);
@@ -63,7 +63,7 @@ export const useAccountStore = defineStore('account', {
             track('UserVisits', [
                 this.account?.sub || '',
                 'page with widget',
-                { origin: config.origin, poolId: this.poolId },
+                { origin: this.getConfig(poolId).origin, poolId },
             ]);
         },
         updateLauncher() {

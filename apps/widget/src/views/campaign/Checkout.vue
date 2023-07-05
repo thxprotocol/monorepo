@@ -18,11 +18,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { usePerkStore } from '../stores/Perk';
-import { useAccountStore } from '../stores/Account';
-import { useAuthStore } from '../stores/Auth';
+import { usePerkStore } from '../../stores/Perk';
+import { useAccountStore } from '../../stores/Account';
+import { useAuthStore } from '../../stores/Auth';
 import { Stripe, StripeElements, loadStripe } from '@stripe/stripe-js';
-import { STRIPE_PUBLISHABLE_KEY } from '../config/secrets';
+import { STRIPE_PUBLISHABLE_KEY } from '../../config/secrets';
 
 export default defineComponent({
     name: 'Checkout',

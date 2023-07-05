@@ -29,7 +29,7 @@ export function getStyles(elements: any, colors: any) {
         '.text-accent': {
             '--thx-accent': theme.colors.accent,
         },
-        'body,.bg-splash': {
+        'body,.bg-splash,.card-header-bg': {
             '--bs-body-bg': theme.elements.bodyBg,
             '--bs-body-color': theme.elements.text,
         },

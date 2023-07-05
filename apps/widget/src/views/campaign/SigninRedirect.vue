@@ -5,18 +5,12 @@
 </template>
 
 <script lang="ts">
-import { useAccountStore } from '../stores/Account';
+import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'SigninRedirect',
-    components: {},
-    data(): any {
-        return {
-            //
-        };
-    },
     computed: {
         ...mapStores(useAccountStore),
     },
@@ -28,9 +22,9 @@ export default defineComponent({
             const state = JSON.parse(window.atob(stateString.split('%')[0]));
             const sessionStateKey = `thx.${state.id}`;
             const session = JSON.parse(localStorage.getItem(sessionStateKey) as string);
-            const poolId = this.$route.params.poolId;
+            const poolId = this.$route.params.poolId as string;
 
-            this.accountStore.init({ poolId }).then(() => {
+            this.accountStore.init(poolId).then(() => {
                 const returnUrl = new URL(session.returnUrl);
                 this.$router.push({ path: returnUrl.pathname });
             });

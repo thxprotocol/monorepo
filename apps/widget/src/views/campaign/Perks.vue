@@ -16,11 +16,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { usePerkStore } from '../stores/Perk';
-import { useAccountStore } from '../stores/Account';
-import BaseCardPerkERC20 from '../components/BaseCardPerkERC20.vue';
-import BaseCardPerkERC721 from '../components/BaseCardPerkERC721.vue';
-import BaseModalCampaignExpired from '../components/BaseModalCampaignExpired.vue';
+import { usePerkStore } from '../../stores/Perk';
+import { useAccountStore } from '../../stores/Account';
+import BaseCardPerkERC20 from '../../components/BaseCardPerkERC20.vue';
+import BaseCardPerkERC721 from '../../components/BaseCardPerkERC721.vue';
+import BaseModalCampaignExpired from '../../components/BaseModalCampaignExpired.vue';
 
 export default defineComponent({
     name: 'Perks',

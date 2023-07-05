@@ -167,7 +167,7 @@ export default defineComponent({
         // This redirects the user to the wallet of there are no rewards and perks
         'accountStore.isRewardsLoaded'(isRewardsLoaded) {
             if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
-                this.$router.push(`/${this.accountStore.poolId}/wallet`);
+                this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
             }
             // Return if not in iframe
             if (window.top === window.self) return;
@@ -220,7 +220,7 @@ export default defineComponent({
             }
         },
         onClickWallet() {
-            this.$router.push(`/${this.accountStore.poolId}/wallet`);
+            this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
         },
         async onClickRefresh() {
             this.isRefreshing = true;

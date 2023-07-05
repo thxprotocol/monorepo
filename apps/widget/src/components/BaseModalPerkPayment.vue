@@ -32,7 +32,7 @@
                     variant="success"
                     class="w-100 rounded-pill"
                     :disabled="isLoading"
-                    :to="`/checkout/${perk.uuid}`"
+                    :to="`/c/${perk.poolId}/checkout/${perk.uuid}`"
                 >
                     <b-spinner small variant="primary" v-if="isSubmitting" />
                     {{ perk.price }} {{ perk.priceCurrency }}
