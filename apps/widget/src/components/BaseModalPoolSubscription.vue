@@ -16,7 +16,7 @@
             <b-spinner show size="sm" />
         </div>
         <template v-else>
-            <b-alert variant="warning" show class="py-1 px-2" v-if="!accountStore.isAuthenticated">
+            <b-alert variant="warning" show class="py-1 px-2" v-if="!authStore.oAuthShare">
                 <i class="fas fa-exclamation-circle me-1"></i>
                 Please sign in first!
             </b-alert>
@@ -53,6 +53,7 @@
 
 <script lang="ts">
 import { useAccountStore } from '../stores/Account';
+import { useAuthStore } from '../stores/Auth';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 
@@ -63,6 +64,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         isSubscribed: function () {
             const { subscription } = useAccountStore();
             return !!subscription;

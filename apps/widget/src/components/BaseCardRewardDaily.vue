@@ -1,7 +1,7 @@
 <template>
     <BaseCardCollapse
         :info-links="reward.infoLinks"
-        :visible="accountStore.isAuthenticated && !waitDuration"
+        :visible="authStore.oAuthShare && !waitDuration"
         :info-url="reward.infoUrl || 'https://example.com'"
     >
         <template #header>
@@ -33,11 +33,11 @@
         </div>
 
         <template #button>
-            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" class="w-100" block>
+            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" class="w-100" block>
                 Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
             </b-button>
             <b-button
-                v-if="accountStore.isAuthenticated"
+                v-if="authStore.oAuthShare"
                 class="w-100"
                 block
                 variant="primary"
@@ -62,6 +62,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
+import { useAuthStore } from '../stores/Auth';
 import { intervalToDuration, sub } from 'date-fns';
 import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
@@ -90,6 +91,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
         waitDuration: function () {
             if (!this.reward.claimAgainDuration) return;

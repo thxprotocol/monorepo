@@ -1,13 +1,12 @@
 import { THXClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
-import { PKG_ENV, CLIENT_ID, CLIENT_SECRET, WIDGET_URL } from '../config/secrets';
+import { CLIENT_ID, WIDGET_URL, AUTH_URL, API_URL } from '../config/secrets';
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
-import { useClaimStore } from './Claim';
 import { track } from '@thxnetwork/mixpanel';
-import { getReturnUrl } from '../utils/returnUrl';
 import { getStyles } from '../utils/theme';
+import { useAuthStore } from './Auth';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -16,7 +15,6 @@ export const useAccountStore = defineStore('account', {
         account: null,
         balance: 0,
         subscription: null,
-        isAuthenticated: false,
         isRewardsLoaded: false,
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
@@ -34,58 +32,56 @@ export const useAccountStore = defineStore('account', {
         setTheme(config: TWidgetConfig) {
             const { title, theme } = config;
             const { elements, colors } = JSON.parse(theme);
-            const styles: any = getStyles(elements, colors);
-            const sheet = document.createElement('style');
-
-            for (const selector in styles) {
-                let rule = `${selector} { `;
-                for (const name in styles[selector]) {
-                    rule += `${name}: ${styles[selector][name]};`;
-                }
-                rule += '}';
-                sheet.innerText += rule;
-            }
+            const sheet = getStyles(elements, colors);
 
             document.title = title;
             document.head.appendChild(sheet);
         },
-        init(config: TWidgetConfig) {
-            this.poolId = config.poolId;
+        async init(config: TWidgetConfig) {
+            const authStore = useAuthStore();
+
             this.api = new THXClient({
-                env: PKG_ENV,
-                clientId: CLIENT_ID,
-                clientSecret: CLIENT_SECRET,
-                redirectUrl: WIDGET_URL + '/signin-popup.html',
-                post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-                popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-                scopes: 'openid account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read shopify_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
-                poolId: this.poolId,
+                url: API_URL,
+                accessToken: '',
+                poolId: config.poolId,
             });
+            this.poolId = config.poolId;
 
-            this.api.request.get('/v1/widget/' + this.poolId).then((data: any) => {
-                this.setConfig(this.poolId, data);
-                this.setTheme(data);
+            const data = await this.api.request.get('/v1/widget/' + config.poolId);
 
-                track('UserVisits', [
-                    this.account?.sub || '',
-                    'page with widget',
-                    { origin: config.origin, poolId: this.poolId },
-                ]);
-            });
+            this.setConfig(this.poolId, data);
+            this.setTheme(data);
 
-            this.api.userManager.cached.events.addAccessTokenExpired(this.onAccessTokenExpired);
-            this.api.userManager.cached.events.addAccessTokenExpiring(this.onAccessTokenExpiring);
-            this.api.userManager.cached.events.addUserLoaded(this.onUserLoaded);
-            this.api.userManager.cached.events.addUserUnloaded(this.onUserUnloaded);
-            this.api.userManager.cached.events.load(this.onLoad);
+            // Handle redirect result if any
+            await authStore.requestOAuthShareRedirectCallback();
+            await authStore.getUser();
+            this.api.setAccessToken(authStore.user ? authStore.user.accessToken : '');
+            this.getUserData();
+            authStore.getPrivateKey();
+
+            track('UserVisits', [
+                this.account?.sub || '',
+                'page with widget',
+                { origin: config.origin, poolId: this.poolId },
+            ]);
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();
             const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
             const { origin } = this.getConfig(this.poolId);
 
+            // Return if not in iframe
+            if (window.top === window.self) return;
+
             // Send the amount of unclaimed rewards to the parent window and update the launcher
             window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+        },
+        async getAccount() {
+            this.account = await this.api.account.get();
+        },
+        async getBalance() {
+            const { balance } = await this.api.pointBalance.list();
+            this.balance = balance;
         },
         async subscribe(email: string) {
             this.subscription = await this.api.pools.subscription.post({ poolId: this.poolId, email });
@@ -102,85 +98,69 @@ export const useAccountStore = defineStore('account', {
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
-        async signin(extraQueryParams = {}) {
-            const config = this.getConfig(this.poolId);
-            const { claim } = useClaimStore();
-            const url = getReturnUrl(config);
-            const method = this.isEthereumBrowser || (window as any).Cypress ? 'signinRedirect' : 'signinPopup';
+        async signin(extraQueryParams?: { [key: string]: string }) {
+            const authStore = useAuthStore();
 
-            await this.api.userManager.cached[method]({
-                state: { url, clientId: CLIENT_ID },
-                extraQueryParams: {
-                    return_url: url,
-                    pool_id: config.poolId,
-                    claim_id: claim?.uuid,
-                    ...extraQueryParams,
-                },
-            });
+            await authStore.requestOAuthShare(extraQueryParams);
+            await authStore.getUser();
+            this.api.setAccessToken(authStore.user ? authStore.user.accessToken : '');
+            this.getUserData();
+            authStore.getPrivateKey();
         },
-        signout() {
-            const { origin } = this.getConfig(this.poolId);
-            const method = this.isEthereumBrowser ? 'signoutRedirect' : 'signoutPopup';
+        async signout() {
+            const authStore = useAuthStore();
+            if (!authStore.user) return;
+            localStorage.removeItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`);
 
-            this.api.userManager.cached[method]({
-                state: { origin },
-            });
-        },
-        async onLoad() {
-            this.isAuthenticated = !!(await this.api.userManager.getUser());
-        },
-        async onUserUnloaded() {
-            const rewardsStore = useRewardStore();
-            const perksStore = usePerkStore();
+            try {
+                const url = new URL(AUTH_URL + '/session/end');
+                const params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=600,height=300,left=100,top=100`;
+                const { id } = authStore.user.state as any;
 
-            rewardsStore.list().then(this.updateLauncher);
-            perksStore.list();
+                url.searchParams.append('id_token_hint', authStore.user.idToken);
+                url.searchParams.append('post_logout_redirect_uri', WIDGET_URL + '/signout-popup.html');
+                url.searchParams.append('state', id);
 
-            this.isAuthenticated = false;
+                authStore.setSessionState(id, { returnUrl: window.location.href });
+
+                window.open(url, '', params);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                authStore.oAuthShare = '';
+            }
         },
-        async onUserLoaded() {
+        async getUserData() {
             const rewardsStore = useRewardStore();
             const perksStore = usePerkStore();
             const walletStore = useWalletStore();
-
-            this.isAuthenticated = !!(await this.api.userManager.getUser());
+            const { oAuthShare } = useAuthStore();
 
             rewardsStore.list().then(() => {
                 const { origin } = this.getConfig(this.poolId);
                 const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
 
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
-                window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+                if (window.self !== window.top) {
+                    window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
+                }
+
                 this.isRewardsLoaded = true;
             });
             perksStore.list();
 
             // Guard HTTP requests that do require auth
-            if (!this.isAuthenticated) return;
+            if (!oAuthShare) return;
 
             await this.getAccount();
+
             this.getBalance();
             this.getSubscription();
 
             walletStore.list();
             walletStore.getWallet();
 
-            this.isAuthenticated = true;
-
             track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
-        },
-        onAccessTokenExpired() {
-            this.api.userManager.cached.signoutPopup();
-        },
-        onAccessTokenExpiring() {
-            //
-        },
-        async getAccount() {
-            this.account = await this.api.account.get();
-        },
-        async getBalance() {
-            const { balance } = await this.api.pointBalanceManager.list();
-            this.balance = balance;
         },
     },
 });

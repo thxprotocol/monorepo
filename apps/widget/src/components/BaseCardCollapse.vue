@@ -41,7 +41,7 @@ export default defineComponent({
     props: {
         visible: { type: Boolean },
         isPromoted: { type: Boolean },
-        infoLinks: { type: Object as PropType<{ label: string; url: string }[]>, required: true },
+        infoLinks: { type: Object as PropType<{ label: string; url: string }[]>, required: false },
     },
     data: function () {
         return { isVisible: false };

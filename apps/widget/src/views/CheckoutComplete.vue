@@ -1,5 +1,5 @@
 <template>
-    <div v-if="accountStore.isAuthenticated" class="flex-grow-1 overflow-auto">
+    <div v-if="authStore.oAuthShare" class="flex-grow-1 overflow-auto">
         <b-card class="m-2">
             <template v-if="error">
                 <b-alert show variant="danger" class="px-2 p-1">
@@ -34,6 +34,7 @@ import { mapStores } from 'pinia';
 import { usePerkStore } from '../stores/Perk';
 import { useAccountStore } from '../stores/Account';
 import { useWalletStore } from '../stores/Wallet';
+import { useAuthStore } from '../stores/Auth';
 
 export default defineComponent({
     name: 'Checkout',
@@ -55,6 +56,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
         perk: function (): TPerk {

@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse :visible="accountStore.isAuthenticated">
+    <BaseCardCollapse :visible="authStore.oAuthShare">
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fas fa-comments me-2 text-primary"></i>
@@ -12,7 +12,7 @@
             {{ reward.description }}
         </b-card-text>
 
-        <b-input-group v-if="accountStore.isAuthenticated && referralUrl">
+        <b-input-group v-if="authStore.oAuthShare && referralUrl">
             <b-form-input :model-value="referralUrl" />
             <b-input-group-append>
                 <b-button
@@ -31,7 +31,7 @@
             Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
         </b-button>
 
-        <div v-if="accountStore.isAuthenticated && referralUrl" class="pt-2">
+        <div v-if="authStore.oAuthShare && referralUrl" class="pt-2">
             <BaseBtnShareTwitter :url="referralUrl" text="Please have a look at this:" class="me-2" />
             <BaseBtnShareLinkedin :url="referralUrl" class="me-2" />
             <BaseBtnShareWhatsapp :url="referralUrl" class="me-2" />
@@ -46,6 +46,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
+import { useAuthStore } from '../stores/Auth';
 import BaseBtnShareWhatsapp from '../components/BaseBtnShareWhatsapp.vue';
 import BaseBtnShareEmail from '../components/BaseBtnShareEmail.vue';
 import BaseBtnShareTwitter from '../components/BaseBtnShareTwitter.vue';
@@ -76,6 +77,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
         referralUrl() {
             const { getConfig, account, poolId } = useAccountStore();

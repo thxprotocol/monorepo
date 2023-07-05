@@ -1,5 +1,5 @@
 <template>
-    <div v-if="accountStore.isAuthenticated" class="flex-grow-1 overflow-auto">
+    <div v-if="authStore.oAuthShare" class="flex-grow-1 overflow-auto">
         <div class="w-100 h-100 d-flex align-items-center justify-content-center flex-column px-5">
             <b-alert variant="danger" show v-if="error" class="px-2 p-1">
                 <i class="fas fa-exclamation-triangle mr-2"></i>
@@ -20,6 +20,7 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { usePerkStore } from '../stores/Perk';
 import { useAccountStore } from '../stores/Account';
+import { useAuthStore } from '../stores/Auth';
 import { Stripe, StripeElements, loadStripe } from '@stripe/stripe-js';
 import { STRIPE_PUBLISHABLE_KEY } from '../config/secrets';
 
@@ -66,6 +67,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         ...mapStores(usePerkStore),
         perk: function (): TPerk {
             const uuid = this.$route.params.uuid as string;

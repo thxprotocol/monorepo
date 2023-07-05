@@ -1,41 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>THX Network</title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Redirect</title>
 </head>
 
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client-ts/2.1.0/browser/oidc-client-ts.min.js"
-            integrity="sha512-v9YAXYIA7sZ48R0CuD5+nKrTrFfSQT4i7iRDSbAhZFYy6mkxom6wvNnkW6fiZ916YoovjrwDlUQLRS7xZuJddw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    Loading...
     <script>
-        const url = new URL(window.location);
-        const state = JSON.parse(localStorage.getItem(`oidc.${url.searchParams.get('state')}`));
-        const mgr = new window.oidc.UserManager({
-            authority: url.searchParams.get('iss'),
-            client_id: state && state.data.clientId,
-            redirect_uri: url.origin + '/singin-popup.html',
-            userStore: new window.oidc.WebStorageStateStore({store: window.localStorage}),
-        });
+        const url = new URL(location.href);
+        const code = url.searchParams.get('code')
+        const iss = url.searchParams.get('iss')
+        const state = JSON.parse(window.atob(url.searchParams.get('state').split('%')[0]));
+        const sessionStateKey = `thx.${state.id}`;
+        const session = JSON.parse(localStorage.getItem(sessionStateKey));
         const isMobile = window.matchMedia('(pointer:coarse)').matches;
         const isCypress = window.Cypress;
 
-        if ((window.ethereum && isMobile) || isCypress) {
-            mgr.signinRedirectCallback().then(async (user) => {
-                window.open(state.data.url, '_self')
-            }).catch(console.error);
-        } else {
-            mgr.signinPopupCallback().then(() => {
-                // If there is no opener we need to close it ourselves
-                if (!window.opener) {
-                    window.close()
-                }
-            }).catch(console.error);
+        // If uxMode is redirect, redirect with searchParams to client app
+        if (session.uxMode === 'redirect') {
+            const url = new URL(session.returnUrl);
+            url.search = window.location.search;
+            url.pathname = `/${session.poolId}/redirect`;
+            window.open(url, '_self')
         }
+        // If uxMode is popup, fetch token, postMessage and close popup
+        else {
+            const tokenRequestHandler = (user) => {
+                const hashParams = {
+                    accessToken: user.access_token,
+                    refreshToken: user.refresh_token,
+                    idToken: user.id_token,
+                    expiresAt: Date.now() + (user.expires_in * 1000),
+                    tokenType: user.token_type,
+                    scope: user.scope,
+                }
+                const queryParams = {};
+                for (var key of url.searchParams.keys()) {
+                    queryParams[key] = url.searchParams.get(key);
+                }
+
+                let error = "";
+                try {
+                    if (Object.keys(hashParams).length > 0 && hashParams.state) {
+                        instanceParams = JSON.parse(window.atob(decodeURIComponent(decodeURIComponent(hashParams.state)))) || {};
+                        if (hashParams.error) error = hashParams.error;
+                    } else if (Object.keys(queryParams).length > 0 && queryParams.state) {
+                        instanceParams = JSON.parse(window.atob(decodeURIComponent(decodeURIComponent(queryParams.state)))) || {};
+                        if (queryParams.error) error = queryParams.error;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+
+                const loginResponse = {instanceParams, hashParams, queryParams};
+                window.opener.postMessage(
+                    {
+                        channel: "redirect_channel_" + instanceParams.instanceId,
+                        data: loginResponse,
+                        error: error,
+                    },
+                    window.location.origin
+                );
+            }
+
+            fetch(iss + '/token', {
+                method: 'post',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    grant_type: 'authorization_code',
+                    code,
+                    redirect_uri: session.redirectUri,
+                    code_verifier: session.codeVerifier,
+                    client_id: session.clientId,
+                    client_secret: session.clientSecret,
+                })
+            })
+                .then(response => response.json())
+                .then(tokenRequestHandler)
+                .catch(console.error);
+        }
+
+
     </script>
 </body>
 

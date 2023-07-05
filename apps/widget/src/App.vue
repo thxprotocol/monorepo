@@ -6,12 +6,10 @@
     ></div>
     <div id="main" class="d-flex flex-column h-100 container-lg my-lg-3 p-0">
         <BaseNavbarSecondary class="d-flex d-lg-none" />
-        <b-container class="order-lg-1 d-none d-lg-block" style="max-width: none">
+        <b-container class="order-lg-1 d-none d-lg-block mt-lg-5" style="max-width: none">
             <b-row>
-                <b-col lg="10" offset-lg="1">
-                    <h2 style="text-transform: capitalize">
-                        {{ $route.name }}
-                    </h2>
+                <b-col xl="10" offset-xl="1">
+                    <h2 style="text-transform: capitalize">{{ $route.name }}</h2>
                 </b-col>
             </b-row>
         </b-container>
@@ -43,6 +41,7 @@ export default defineComponent({
         return {
             isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
             isModalPoolSubscriptionShown: false,
+            isModalWalletAccessShown: false,
             isRefreshing: false,
             error: '',
         };
@@ -122,13 +121,7 @@ export default defineComponent({
             track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: getConfig(poolId).origin }]);
         },
         async onIframeShow(origin: string, isShown: boolean) {
-            const { api, signin, account, poolId } = this.accountStore;
-            const user = await api.userManager.cached.getUser();
-
-            if (isShown && user && user.expired) {
-                signin();
-            }
-
+            const { account, poolId } = this.accountStore;
             track('UserOpens', [account?.sub || '', `widget iframe`, { origin, poolId, isShown }]);
         },
     },

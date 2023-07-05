@@ -1,5 +1,5 @@
 <template>
-    <b-alert v-if="accountStore.isAuthenticated && isWaitingForWalletAddress" variant="info" show class="p-2">
+    <b-alert v-if="authStore.oAuthShare && isWaitingForWalletAddress" variant="info" show class="p-2">
         <span>Preparing your smart wallet...</span>
         <div class="d-flex justify-content-between align-items-center">
             <b-progress
@@ -20,6 +20,7 @@
 import { defineComponent } from 'vue';
 import { useWalletStore } from '../stores/Wallet';
 import { useAccountStore } from '../stores/Account';
+import { useAuthStore } from '../stores/Auth';
 import { mapStores } from 'pinia';
 import poll from 'promise-poller';
 
@@ -27,6 +28,7 @@ export default defineComponent({
     name: 'BaseAlertWalletAddress',
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         ...mapStores(useWalletStore),
         isWaitingForWalletAddress() {
             const { wallet } = useWalletStore();

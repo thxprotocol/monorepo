@@ -23,13 +23,30 @@ type TAccount = {
     shopifyAccess: boolean;
 };
 
+type THXAuthUser = {
+    accessToken: string;
+    refreshToken: string;
+    idToken: string;
+    expiresIn: number;
+    expiresAt: number;
+    #state: string;
+    state: string;
+};
+type TAuthState = {
+    isDeviceShareAvailable: boolean | null;
+    isSecurityQuestionAvailable: boolean | null;
+    user: THXAuthUser | null;
+    privateKey: string;
+    oAuthShare: string;
+    securityQuestion: string;
+};
+
 type TAccountState = {
     isEthereumBrowser: boolean;
     isRewardsLoaded: boolean;
     api: THXClient | null;
     poolId: string;
     balance: number;
-    isAuthenticated: boolean;
     account: TAccount | null;
     subscription: TSubscription | null;
 };

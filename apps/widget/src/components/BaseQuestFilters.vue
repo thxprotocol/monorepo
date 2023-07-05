@@ -7,7 +7,7 @@
                 <template #button-content v-else>
                     <i :class="f.icon" class="me-2" :key="key" v-for="(f, key) of filter"></i>
                 </template>
-                <b-dropdown-item-btn @click.stop="" class="dropdown-item-filter" :key="key" v-for="(f, key) of filters">
+                <b-dropdown-item-button class="dropdown-item-filter" :key="key" v-for="(f, key) of filters">
                     <b-form-checkbox
                         v-model="activeFilters"
                         @change="$emit('change-filter', activeFilters)"
@@ -19,7 +19,7 @@
                         </div>
                         {{ f.label }}
                     </b-form-checkbox>
-                </b-dropdown-item-btn>
+                </b-dropdown-item-button>
             </b-dropdown>
             <div class="w-100 m-2 align-items-center d-flex">
                 <i class="fas fa-sort text-primary me-2"></i>

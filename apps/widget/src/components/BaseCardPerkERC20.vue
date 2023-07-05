@@ -34,6 +34,7 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
+import { useAuthStore } from '../stores/Auth';
 import BaseCardPerk from './BaseCardPerk.vue';
 import BaseModalPerkPayment from './BaseModalPerkPayment.vue';
 
@@ -60,6 +61,7 @@ export default defineComponent({
     computed: {
         ...mapStores(usePerkStore),
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
     },
     methods: {
         onModalHidden() {
@@ -67,7 +69,7 @@ export default defineComponent({
             this.error = '';
         },
         onClickRedeem() {
-            if (!this.accountStore.isAuthenticated) {
+            if (!this.authStore.oAuthShare) {
                 return this.accountStore.signin();
             }
             this.isModalShown = true;

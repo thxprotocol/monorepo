@@ -11,7 +11,7 @@ export const useRewardStore = defineStore('rewards', {
     actions: {
         async claimConditionalReward(id: string) {
             const { api, account, getBalance, poolId, getConfig } = useAccountStore();
-            const claim = await api.rewardsManager.points.claim(id);
+            const claim = await api.quests.points.claim(id);
             if (claim.error) {
                 throw claim.error;
             } else {
@@ -33,7 +33,7 @@ export const useRewardStore = defineStore('rewards', {
             if (!pendingClaims.length) return;
 
             const uuid = pendingClaims[0].uuid;
-            const claim = await api.rewardsManager.milestones.claim(uuid);
+            const claim = await api.quests.milestones.claim(uuid);
 
             if (claim.error) {
                 throw claim.error;
@@ -51,7 +51,7 @@ export const useRewardStore = defineStore('rewards', {
         },
         async claimDailyReward(reward: TDailyReward) {
             const { api, account, getBalance, poolId, getConfig } = useAccountStore();
-            const claim = await api.rewardsManager.daily.claim(reward._id);
+            const claim = await api.quests.daily.claim(reward._id);
 
             if (claim.error) {
                 throw claim.error;
@@ -71,7 +71,7 @@ export const useRewardStore = defineStore('rewards', {
         async list() {
             const { api } = useAccountStore();
             const { leaderboard, referralRewards, pointRewards, milestoneRewards, dailyRewards } =
-                await api.rewardsManager.list();
+                await api.quests.list();
 
             this.leaderboard = leaderboard;
 
