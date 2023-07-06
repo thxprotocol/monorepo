@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL, API_URL, VERIFIER_ID } from '../config/secrets';
+import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL, VERIFIER_ID } from '../config/secrets';
 import { useClaimStore } from './Claim';
 import { getRequestConfig, getUxMode, tKey } from '../utils/tkey';
 import * as jose from 'jose';

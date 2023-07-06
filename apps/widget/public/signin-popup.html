@@ -25,7 +25,7 @@
 
         const state = JSON.parse(window.atob(stateString.split('%')[0]));
         const sessionStateKey = `thx.${state.id}`;
-        const session = JSON.parse(sessionStorage.getItem(sessionStateKey));
+        const session = JSON.parse(localStorage.getItem(sessionStateKey));
 
         // If uxMode is redirect, redirect with searchParams to client app
         if (state.uxMode === 'redirect') {

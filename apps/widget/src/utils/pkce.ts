@@ -1,13 +1,13 @@
 function setSessionState(sessionId: string, update: any) {
     const sessionStateKey = `thx.${sessionId}`;
-    const currentState = sessionStorage.getItem(sessionStateKey);
+    const currentState = localStorage.getItem(sessionStateKey);
     const state = currentState && JSON.parse(currentState);
-    sessionStorage.setItem(sessionStateKey, JSON.stringify({ ...state, ...update }));
+    localStorage.setItem(sessionStateKey, JSON.stringify({ ...state, ...update }));
 }
 
 function getSessionState(sessionId: string) {
     const sessionStateKey = `thx.${sessionId}`;
-    const item = sessionStorage.getItem(sessionStateKey) as string;
+    const item = localStorage.getItem(sessionStateKey) as string;
     return JSON.parse(item);
 }
 

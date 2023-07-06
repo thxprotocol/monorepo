@@ -21,7 +21,7 @@ export default defineComponent({
             const stateString = url.searchParams.get('state') as string;
             const state = JSON.parse(window.atob(stateString.split('%')[0]));
             const sessionStateKey = `thx.${state.id}`;
-            const session = JSON.parse(sessionStorage.getItem(sessionStateKey) as string);
+            const session = JSON.parse(localStorage.getItem(sessionStateKey) as string);
             const poolId = this.$route.params.poolId as string;
 
             this.accountStore.init(poolId).then(() => {
