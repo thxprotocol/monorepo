@@ -31,13 +31,12 @@ export const useAuthStore = defineStore('auth', {
             });
 
             setSessionState(requestConfig.customState.id, {
-                redirectUri,
                 codeVerifier,
                 poolId,
+                redirectUri,
                 returnUrl: window.location.href,
                 clientId: CLIENT_ID,
                 clientSecret: CLIENT_SECRET,
-                uxMode: getUxMode(),
             });
 
             await this.triggerLogin(requestConfig);

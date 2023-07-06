@@ -60,12 +60,11 @@
 <script lang="ts">
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
-import { WIDGET_URL } from '../config/secrets';
 import { useAccountStore } from '../stores/Account';
 import { useAuthStore } from '../stores/Auth';
 import { useRewardStore } from '../stores/Reward';
-import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { RewardConditionPlatform, RewardConditionInteraction } from '../types/enums/rewards';
+import { getInteractionComponent, getConnectionStatus } from '../utils/social';
 import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 import BaseBlockquoteTwitterTweet from './blockquote/BaseBlockquoteTwitterTweet.vue';
 import BaseBlockquoteTwitterUser from './blockquote/BaseBlockquoteTwitterUser.vue';
@@ -97,6 +96,7 @@ export default defineComponent({
             isSubmitting: false,
             RewardConditionPlatform,
             RewardConditionInteraction,
+            getInteractionComponent,
             platformIconMap: {
                 [RewardConditionPlatform.None]: '',
                 [RewardConditionPlatform.YouTube]: 'fab fa-youtube',
@@ -114,20 +114,7 @@ export default defineComponent({
             const { account } = useAccountStore();
             if (!account || !this.reward) return;
 
-            switch (this.reward.platform) {
-                case RewardConditionPlatform.YouTube:
-                    return account.youtubeManageAccess;
-                case RewardConditionPlatform.Twitter:
-                    return account.twitterAccess;
-                case RewardConditionPlatform.Discord:
-                    return account.discordAccess;
-                case RewardConditionPlatform.Github:
-                    return account.githubAccess;
-                case RewardConditionPlatform.Twitch:
-                    return account.twitchAccess;
-                default:
-                    return true;
-            }
+            return getConnectionStatus(account, this.reward.platform);
         },
     },
     methods: {
@@ -145,60 +132,17 @@ export default defineComponent({
                 this.isSubmitting = false;
             }
         },
-        getInteractionComponent(interaction: RewardConditionInteraction) {
-            switch (interaction) {
-                case RewardConditionInteraction.YouTubeLike:
-                    return 'BaseBlockquoteVideo';
-                case RewardConditionInteraction.YouTubeSubscribe:
-                    return 'BaseBlockquoteYoutubeChannelSubscription';
-                case RewardConditionInteraction.TwitterLike:
-                case RewardConditionInteraction.TwitterRetweet:
-                    return 'BaseBlockquoteTwitterTweet';
-                case RewardConditionInteraction.TwitterFollow:
-                    return 'BaseBlockquoteTwitterUser';
-                case RewardConditionInteraction.DiscordGuildJoined:
-                    return 'BaseBlockquoteDiscordServerJoin';
-                case RewardConditionInteraction.DiscordInviteUsed:
-                    return 'BaseBlockquoteDiscordInviteUsed';
-            }
-        },
-        getAccessTokenKindForPlatform(platform: RewardConditionPlatform) {
-            switch (platform) {
-                case RewardConditionPlatform.YouTube: {
-                    return AccessTokenKind.YoutubeManage;
-                }
-                case RewardConditionPlatform.Twitter: {
-                    return AccessTokenKind.Twitter;
-                }
-                case RewardConditionPlatform.Discord: {
-                    return AccessTokenKind.Discord;
-                }
-            }
-        },
         onClickConnect: async function () {
             try {
                 this.error = '';
                 this.isSubmitting = true;
-
-                await this.accountStore.api.userManager.cached.signinPopup({
-                    extraQueryParams: {
-                        channel: this.reward.platform,
-                        prompt: 'connect',
-                        return_url: WIDGET_URL + '/signin-popup.html',
-                        access_token_kind: this.getAccessTokenKindForPlatform(this.reward.platform),
-                    },
-                });
-                await this.accountStore.getAccount();
+                this.accountStore.connect(this.reward.platform);
+                await this.accountStore.waitForConnectionStatus(this.reward.platform);
             } catch (error) {
                 this.error = error;
                 await this.accountStore.getAccount();
             } finally {
                 this.isSubmitting = false;
-                this.error = '';
-                // As window.opener is set to null right after redirect from auth.thx to Twitter
-                // we currently update account info on an error as this might be caused by the
-                // opener not being available in the popup. User will need to run the popup flow twice.
-                await this.accountStore.getAccount();
             }
         },
     },

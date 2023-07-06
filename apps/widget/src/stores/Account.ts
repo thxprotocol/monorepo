@@ -8,6 +8,10 @@ import { track } from '@thxnetwork/mixpanel';
 import { getStyles } from '../utils/theme';
 import { useAuthStore } from './Auth';
 import { setSessionState } from '../utils/pkce';
+import { getAccessTokenKindForPlatform, getConnectionStatus } from '../utils/social';
+import { RewardConditionPlatform } from '../types/enums/rewards';
+import { getUxMode } from '../utils/tkey';
+import poll from 'promise-poller';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -99,6 +103,29 @@ export const useAccountStore = defineStore('account', {
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
+        async connect(platform: RewardConditionPlatform) {
+            const authStore = useAuthStore();
+            await authStore.requestOAuthShare({
+                prompt: 'connect',
+                channel: String(platform),
+                access_token_kind: String(getAccessTokenKindForPlatform(platform)),
+            });
+        },
+        waitForConnectionStatus(platform: RewardConditionPlatform) {
+            const taskFn = async () => {
+                if (!this.account) return;
+                await this.getAccount();
+
+                return getConnectionStatus(this.account, platform)
+                    ? Promise.resolve()
+                    : Promise.reject('Could no validate connection status...');
+            };
+            return poll({
+                taskFn,
+                interval: 3000,
+                retries: 20, // 3s * 20 = 60s
+            });
+        },
         async signin(extraQueryParams?: { [key: string]: string }) {
             const authStore = useAuthStore();
 
@@ -114,17 +141,29 @@ export const useAccountStore = defineStore('account', {
             localStorage.removeItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`);
 
             try {
-                const url = new URL(AUTH_URL + '/session/end');
-                const params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=600,height=300,left=100,top=100`;
+                const uxMode = getUxMode();
                 const { id } = authStore.user.state as any;
-
+                const url = new URL(AUTH_URL + '/session/end');
                 url.searchParams.append('id_token_hint', authStore.user.idToken);
                 url.searchParams.append('post_logout_redirect_uri', WIDGET_URL + '/signout-popup.html');
                 url.searchParams.append('state', id);
 
-                setSessionState(id, { returnUrl: window.location.href });
+                setSessionState(id, { uxMode, returnUrl: window.location.href });
 
-                window.open(url, '', params);
+                switch (uxMode) {
+                    case 'redirect': {
+                        window.open(url, '_self');
+                        break;
+                    }
+                    case 'popup': {
+                        window.open(
+                            url,
+                            'THX Network - Sign out',
+                            `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=600,height=300,left=100,top=100`,
+                        );
+                        break;
+                    }
+                }
             } catch (error) {
                 console.error(error);
             } finally {

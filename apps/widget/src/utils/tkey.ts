@@ -39,6 +39,7 @@ function getUser(storageKey: string) {
 
 async function getRequestConfig(extraQueryParams: { [key: string]: string }) {
     const sessionId = randHex(32);
+    const uxMode = getUxMode();
     return {
         verifier: VERIFIER_ID,
         typeOfLogin: 'jwt',
@@ -46,6 +47,7 @@ async function getRequestConfig(extraQueryParams: { [key: string]: string }) {
         enableLogging: true,
         customState: {
             id: sessionId,
+            uxMode,
         },
         jwtParams: {
             code_challenge_method: 'S256',

@@ -1,7 +1,7 @@
 <template>
     <b-card
         bg-variant="darker"
-        class="text-white mb-4 cursor-pointer mb-2"
+        class="card-campaign text-white mb-4 cursor-pointer mb-2"
         style="cursor: pointer"
         header-class="p-0 card-header-campaign"
         body-class="p-0"
@@ -108,7 +108,17 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style lang="scss">
+.card-campaign {
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.5);
+    transform: scale(1);
+    transition: 0.25s box-shadow ease, 0.25s transform ease;
+
+    &:hover {
+        transform: scale(1.005);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    }
+}
 .card-header-campaign {
     overflow: hidden;
     position: relative;

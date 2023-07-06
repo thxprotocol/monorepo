@@ -13,9 +13,7 @@
         const url = new URL(window.location);
 
         const storageKey = `thx.${url.searchParams.get('state')}`;
-        const state = JSON.parse(localStorage.getItem(storageKey));
-
-        localStorage.removeItem(storageKey);
+        const state = JSON.parse(sessionStorage.getItem(storageKey));
 
         if (window.opener) {
             window.close();

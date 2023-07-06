@@ -14,21 +14,40 @@
         const url = new URL(location.href);
         const code = url.searchParams.get('code')
         const iss = url.searchParams.get('iss')
-        const state = JSON.parse(window.atob(url.searchParams.get('state').split('%')[0]));
+        const stateString = url.searchParams.get('state')
+
+        // Visit through the connect flow ends up here
+        // Closing popup with window.opener is not possible as it is 
+        // lost after running through external auth flows
+        if (!window.opener && (!code || !stateString)) {
+            window.close()
+        }
+
+        const state = JSON.parse(window.atob(stateString.split('%')[0]));
         const sessionStateKey = `thx.${state.id}`;
         const session = JSON.parse(sessionStorage.getItem(sessionStateKey));
-        const isMobile = window.matchMedia('(pointer:coarse)').matches;
-        const isCypress = window.Cypress;
 
         // If uxMode is redirect, redirect with searchParams to client app
-        if (session.uxMode === 'redirect') {
+        if (state.uxMode === 'redirect') {
             const url = new URL(session.returnUrl);
             url.search = window.location.search;
-            url.pathname = `/${session.poolId}/redirect`;
+            url.pathname = `/c/${session.poolId}/redirect`;
             window.open(url, '_self')
         }
+
         // If uxMode is popup, fetch token, postMessage and close popup
         else {
+            const postMessage = (loginResponse, error) => {
+                window.opener.postMessage(
+                    {
+                        channel: "redirect_channel_" + instanceParams.instanceId,
+                        data: loginResponse,
+                        error,
+                    },
+                    window.location.origin
+                );
+            }
+
             const tokenRequestHandler = (user) => {
                 const hashParams = {
                     accessToken: user.access_token,
@@ -57,37 +76,30 @@
                 }
 
                 const loginResponse = {instanceParams, hashParams, queryParams};
-                window.opener.postMessage(
-                    {
-                        channel: "redirect_channel_" + instanceParams.instanceId,
-                        data: loginResponse,
-                        error: error,
-                    },
-                    window.location.origin
-                );
+                postMessage(loginResponse, error)
             }
 
-            fetch(iss + '/token', {
-                method: 'post',
-                mode: 'cors',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    grant_type: 'authorization_code',
-                    code,
-                    redirect_uri: session.redirectUri,
-                    code_verifier: session.codeVerifier,
-                    client_id: session.clientId,
-                    client_secret: session.clientSecret,
+            if (code) {
+                fetch(iss + '/token', {
+                    method: 'post',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        grant_type: 'authorization_code',
+                        code,
+                        redirect_uri: session.redirectUri,
+                        code_verifier: session.codeVerifier,
+                        client_id: session.clientId,
+                        client_secret: session.clientSecret,
+                    })
                 })
-            })
-                .then(response => response.json())
-                .then(tokenRequestHandler)
-                .catch(console.error);
+                    .then(response => response.json())
+                    .then(tokenRequestHandler)
+                    .catch(console.error);
+            }
         }
-
-
     </script>
 </body>
 
