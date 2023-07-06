@@ -14,11 +14,12 @@
 
         const storageKey = `thx.${url.searchParams.get('state')}`;
         const state = JSON.parse(localStorage.getItem(storageKey));
+        const isMobile = window.matchMedia('(pointer:coarse)').matches;
 
-        if (window.opener) {
-            window.close();
-        } else {
+        if (isMobile) {
             window.open(state.returnUrl, '_self');
+        } else {
+            window.close();
         }
     </script>
 </body>

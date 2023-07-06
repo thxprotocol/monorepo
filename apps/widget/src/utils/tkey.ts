@@ -30,7 +30,7 @@ const tKey: ThresholdKey & { serviceProvider?: any; modules?: { securityQuestion
 function getUxMode() {
     const isMobile = window.matchMedia('(pointer:coarse)').matches;
     const isCypress = (window as any).Cypress;
-    return (window.ethereum && isMobile) || isCypress ? 'redirect' : 'popup';
+    return isMobile || isCypress ? 'redirect' : 'popup';
 }
 
 function getUser(storageKey: string) {
