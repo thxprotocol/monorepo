@@ -81,13 +81,13 @@ export default defineComponent({
         ...mapStores(useRewardStore),
         referralUrl() {
             const { getConfig, account, poolId } = useAccountStore();
-            if (!getConfig || !account) return '';
+            if (!getConfig || !account || !this.reward) return '';
 
             const { origin } = getConfig(poolId);
             if (!origin || !account.sub) return '';
 
             const hash = window.btoa(JSON.stringify({ sub: account.sub, poolId, uuid: this.reward.uuid }));
-            return `${origin}?ref=${hash}`;
+            return `${origin}${this.reward.pathname ? '/' + this.reward.pathname : ''}?ref=${hash}`;
         },
     },
     methods: {

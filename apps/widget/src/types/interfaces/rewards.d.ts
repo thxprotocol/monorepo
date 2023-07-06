@@ -39,6 +39,7 @@ type TMilestoneReward = TBaseReward & {
 };
 
 type TReferralReward = TBaseReward & {
+    pathname: string;
     amount: number;
     referralUrl?: string;
     component?: string;
