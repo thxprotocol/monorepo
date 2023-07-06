@@ -33,7 +33,7 @@ export const useRewardStore = defineStore('rewards', {
             if (!pendingClaims.length) return;
 
             const uuid = pendingClaims[0].uuid;
-            const claim = await api.quests.milestones.claim(uuid);
+            const claim = await api.quests.custom.claim(uuid);
 
             if (claim.error) {
                 throw claim.error;
