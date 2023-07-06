@@ -179,10 +179,10 @@ export default defineComponent({
             const { oAuthShare, isDeviceShareAvailable } = this.authStore;
             if (!oAuthShare) return;
             if (!isDeviceShareAvailable && isSecurityQuestionAvailable) {
-                this.isModalWalletConfigShown = true;
+                // this.isModalWalletConfigShown = true; // TODO Disabled for shadow release
             }
             if (isDeviceShareAvailable && !isSecurityQuestionAvailable) {
-                this.isModalWalletRecoveryShown = true;
+                // this.isModalWalletRecoveryShown = true; // TODO Disabled for shadow release
             }
         },
     },
