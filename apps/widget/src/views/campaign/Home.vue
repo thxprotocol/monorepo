@@ -78,6 +78,18 @@ export default defineComponent({
                 .sort(sortMap[this.selectedSort.key]);
         },
     },
+    watch: {
+        // This redirects the user to the wallet of there are no rewards and perks
+        'accountStore.isRewardsLoaded'(isRewardsLoaded) {
+            if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
+                this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
+            }
+            // Return if not in iframe
+            if (window.top === window.self) return;
+            const { poolId, getConfig } = this.accountStore;
+            window.top?.postMessage({ message: 'thx.widget.ready' }, getConfig(poolId).origin);
+        },
+    },
     methods: {
         onChangeFilter(filter: any) {
             this.activeFilters = filter;
