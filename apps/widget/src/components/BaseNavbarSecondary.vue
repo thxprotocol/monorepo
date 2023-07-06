@@ -170,7 +170,12 @@ export default defineComponent({
     watch: {
         // This redirects the user to the wallet of there are no rewards and perks
         'accountStore.isRewardsLoaded'(isRewardsLoaded) {
-            if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
+            if (
+                isRewardsLoaded &&
+                !this.rewardsStore.rewards.length &&
+                !this.perksStore.perks.length &&
+                !this.$route.params.uuid
+            ) {
                 this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
             }
             // Return if not in iframe
