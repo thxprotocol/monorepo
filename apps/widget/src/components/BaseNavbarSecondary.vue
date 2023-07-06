@@ -71,27 +71,29 @@
                         {{ walletAddress }}
                     </b-dropdown-item-button>
 
-                    <b-dropdown-item-button
-                        v-if="authStore.isDeviceShareAvailable && !authStore.isSecurityQuestionAvailable"
-                        @click="isModalWalletRecoveryShown = true"
-                        size="sm"
-                    >
-                        <div class="d-flex align-items-center justify-content-between">Install</div>
-                        <BaseModalWalletRecovery
-                            id="wallet-recovery"
-                            @hidden="isModalWalletRecoveryShown = false"
-                            :show="isModalWalletRecoveryShown"
-                        />
-                    </b-dropdown-item-button>
+                    <template v-if="accountStore.account && accountStore.account.variant !== AccountVariant.Metamask">
+                        <b-dropdown-item-button
+                            v-if="authStore.isDeviceShareAvailable && !authStore.isSecurityQuestionAvailable"
+                            @click="isModalWalletRecoveryShown = true"
+                            size="sm"
+                        >
+                            <div class="d-flex align-items-center justify-content-between">Install</div>
+                            <BaseModalWalletRecovery
+                                id="wallet-recovery"
+                                @hidden="isModalWalletRecoveryShown = false"
+                                :show="isModalWalletRecoveryShown"
+                            />
+                        </b-dropdown-item-button>
 
-                    <b-dropdown-item-button size="sm" @click="isModalWalletConfigShown = true">
-                        <div class="d-flex align-items-center justify-content-between">Settings</div>
-                        <BaseModalWalletConfig
-                            id="wallet-config"
-                            @hidden="isModalWalletConfigShown = false"
-                            :show="isModalWalletConfigShown"
-                        />
-                    </b-dropdown-item-button>
+                        <b-dropdown-item-button @click="isModalWalletConfigShown = true" size="sm">
+                            <div class="d-flex align-items-center justify-content-between">Settings</div>
+                            <BaseModalWalletConfig
+                                id="wallet-config"
+                                @hidden="isModalWalletConfigShown = false"
+                                :show="isModalWalletConfigShown"
+                            />
+                        </b-dropdown-item-button>
+                    </template>
 
                     <b-dropdown-divider />
                     <b-dropdown-item-button size="sm" @click="onClickSignout">
@@ -115,6 +117,7 @@ import { useRewardStore } from '../stores/Reward';
 import { useWalletStore } from '../stores/Wallet';
 import { usePerkStore } from '../stores/Perk';
 import { decodeHTML } from '../utils/decode-html';
+import { AccountVariant } from '../types/enums/accountVariant';
 import BaseModalPoolSubscription from '../components/BaseModalPoolSubscription.vue';
 import BaseModalWalletConfig from '../components/BaseModalWalletConfig.vue';
 import BaseModalWalletRecovery from '../components/BaseModalWalletRecovery.vue';
@@ -128,6 +131,7 @@ export default defineComponent({
     },
     data(): any {
         return {
+            AccountVariant,
             decodeHTML,
             isModalWalletConfigShown: false,
             isModalWalletRecoveryShown: false,
