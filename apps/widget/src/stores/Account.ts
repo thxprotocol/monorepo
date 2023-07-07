@@ -83,6 +83,8 @@ export const useAccountStore = defineStore('account', {
         },
         async getAccount() {
             this.account = await this.api.account.get();
+            const { origin, poolId } = this.getConfig(this.poolId);
+            track('UserIdentify', [this.account, { origin, poolId }]);
         },
         async getBalance() {
             const { balance } = await this.api.pointBalance.list();

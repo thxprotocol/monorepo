@@ -5,6 +5,7 @@ import { getRequestConfig, getUxMode, tKey } from '../utils/tkey';
 import * as jose from 'jose';
 import { generateCodeChallenge, getSessionState, setSessionState } from '../utils/pkce';
 import { useAccountStore } from './Account';
+import { track } from '@thxnetwork/mixpanel';
 
 export const useAuthStore = defineStore('auth', {
     state: (): TAuthState => ({
@@ -106,6 +107,9 @@ export const useAuthStore = defineStore('auth', {
             // Override empty state object in order to do proper removal of session state post sign out
             this.setUser({ ...loginResponse.userInfo, ...userInfo });
             this.oAuthShare = loginResponse.privateKey;
+
+            const { poolId, getConfig } = useAccountStore();
+            track('UserSignsIn', [{ sub: loginResponse.userInfo }, { origin: getConfig(poolId).origin, poolId }]);
 
             await tKey.initialize();
         },
