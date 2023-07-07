@@ -182,9 +182,9 @@ export const useAccountStore = defineStore('account', {
             const perksStore = usePerkStore();
             const walletStore = useWalletStore();
             const { oAuthShare } = useAuthStore();
+            const { origin } = this.getConfig(this.poolId);
 
             rewardsStore.list().then(() => {
-                const { origin } = this.getConfig(this.poolId);
                 const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
 
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
@@ -201,13 +201,13 @@ export const useAccountStore = defineStore('account', {
 
             await this.getAccount();
 
+            track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
+
             this.getBalance();
             this.getSubscription();
 
             walletStore.list();
             walletStore.getWallet();
-
-            track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
         },
     },
 });

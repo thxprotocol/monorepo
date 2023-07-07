@@ -108,9 +108,6 @@ export const useAuthStore = defineStore('auth', {
             this.setUser({ ...loginResponse.userInfo, ...userInfo });
             this.oAuthShare = loginResponse.privateKey;
 
-            const { poolId, getConfig } = useAccountStore();
-            track('UserSignsIn', [{ sub: loginResponse.userInfo }, { origin: getConfig(poolId).origin, poolId }]);
-
             await tKey.initialize();
         },
         async getUser() {
