@@ -111,12 +111,10 @@ export default defineComponent({
 <style lang="scss">
 .card-campaign {
     box-shadow: 0 0 0 rgba(0, 0, 0, 0.5);
-    transform: scale(1);
-    transition: 0.25s box-shadow ease, 0.25s transform ease;
 
-    &:hover {
-        transform: scale(1.005);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    &:hover .card-header-bg {
+        filter: none;
+        -webkit-filter: none;
     }
 }
 .card-header-campaign {
@@ -141,5 +139,6 @@ export default defineComponent({
     z-index: 0;
     filter: blur(8px);
     -webkit-filter: blur(8px);
+    transition: 0.2s filter ease, 0.2s -webkit-filter ease;
 }
 </style>

@@ -30,12 +30,12 @@ export default defineComponent({
     async mounted() {
         const res = await fetch(API_URL + '/v1/pools/public');
         const data = await res.json();
-        this.campaigns = data.sort((a: any, b: any) => b.active - a.active);
+        this.campaigns = data.sort((a: any, b: any) => b.participants - a.participants);
     },
     methods: {
         onClickCampaign(campaignId: string) {
             this.isLoading = true;
-            this.$router.push({ path: `/c/${campaignId}` });
+            this.$router.push({ path: `/c/${campaignId}`, query: { origin: window.location.origin } });
         },
     },
 });

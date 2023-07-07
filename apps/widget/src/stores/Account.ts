@@ -42,7 +42,7 @@ export const useAccountStore = defineStore('account', {
             document.title = title;
             document.head.appendChild(sheet);
         },
-        async init(poolId: string) {
+        async init(poolId: string, origin?: string) {
             const authStore = useAuthStore();
 
             this.api = new THXClient({
@@ -54,7 +54,7 @@ export const useAccountStore = defineStore('account', {
 
             const data = await this.api.request.get('/v1/widget/' + poolId);
 
-            this.setConfig(this.poolId, data);
+            this.setConfig(this.poolId, { ...data, origin });
             this.setTheme(data);
 
             // Handle redirect result if any

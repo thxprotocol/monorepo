@@ -135,7 +135,7 @@ export default defineComponent({
             decodeHTML,
             isModalWalletConfigShown: false,
             isModalWalletRecoveryShown: false,
-            isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
+            isMobileEthereum: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
             isModalPoolSubscriptionShown: false,
             isRefreshing: false,
             isLoadingSignin: false,
@@ -203,11 +203,7 @@ export default defineComponent({
         },
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
-            if (this.isEthereumBrowser) {
-                // if (window.opener) {
-                //     window.close();
-                // } else {
-                // }
+            if (this.isMobileEthereum) {
                 window.open(origin, '_self');
             } else {
                 window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);

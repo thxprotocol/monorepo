@@ -6,7 +6,7 @@ function beforeEnter(to: any, from: any, next: any) {
     if (poolId) {
         next();
     } else {
-        init(to.params.poolId).then(() => next());
+        init(to.params.poolId, to.query.origin).then(() => next());
     }
 }
 
