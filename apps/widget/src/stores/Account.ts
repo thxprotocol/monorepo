@@ -69,6 +69,11 @@ export const useAccountStore = defineStore('account', {
                 'page with widget',
                 { origin: this.getConfig(poolId).origin, poolId },
             ]);
+
+            if (window.top === window.self) {
+                const { origin } = this.getConfig(this.poolId);
+                track('UserOpens', [this.account?.sub || '', `widget iframe`, { origin, poolId, isShown: true }]);
+            }
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();
