@@ -54,7 +54,7 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import(/* webpackChunkName: "collect" */ '../views/campaign/Collect.vue'),
             },
             {
-                path: '/:poolId/w/:uuid',
+                path: '/c/:poolId/w/:uuid',
                 name: 'CollectWallet',
                 beforeEnter,
                 component: () => import(/* webpackChunkName: "collectwallet" */ '../views/campaign/CollectWallet.vue'),
