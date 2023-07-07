@@ -30,7 +30,7 @@ export default defineComponent({
     async mounted() {
         const res = await fetch(API_URL + '/v1/pools/public');
         const data = await res.json();
-        this.campaigns = data.sort((a: any, b: any) => b.active - a.active).filter((c: any) => c.participants > 0);
+        this.campaigns = data.sort((a: any, b: any) => b.active - a.active);
     },
     methods: {
         onClickCampaign(campaignId: string) {
