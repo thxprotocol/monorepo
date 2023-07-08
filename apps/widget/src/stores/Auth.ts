@@ -1,15 +1,32 @@
 import { defineStore } from 'pinia';
-import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL, VERIFIER_ID } from '../config/secrets';
+import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL, VERIFIER_ID, API_URL } from '../config/secrets';
 import { useClaimStore } from './Claim';
-import { getRequestConfig, getUxMode, tKey } from '../utils/tkey';
-import * as jose from 'jose';
-import { generateCodeChallenge, getSessionState, setSessionState } from '../utils/pkce';
+import { getUxMode, tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
-import { track } from '@thxnetwork/mixpanel';
+import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
+
+const userManager = new UserManager({
+    authority: AUTH_URL,
+    resource: API_URL,
+    response_type: 'code',
+    response_mode: 'query',
+    redirect_uri: WIDGET_URL + '/signin-popup.html',
+    silent_redirect_uri: WIDGET_URL + '/signin-popup.html',
+    post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
+    popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
+    client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
+    automaticSilentRenew: false,
+    loadUserInfo: false,
+    prompt: 'consent',
+    scope: 'openid offline_access account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
+    userStore: new WebStorageStateStore({ store: window.localStorage }),
+});
 
 export const useAuthStore = defineStore('auth', {
     state: (): TAuthState => ({
         user: null,
+        userManager: userManager as UserManager,
         privateKey: '',
         oAuthShare: '',
         securityQuestion: '',
@@ -17,87 +34,64 @@ export const useAuthStore = defineStore('auth', {
         isSecurityQuestionAvailable: null,
     }),
     actions: {
-        async requestOAuthShare(extraQueryParams?: { [key: string]: string }) {
-            const { poolId } = useAccountStore();
-            const { claim } = useClaimStore();
-            const { codeVerifier, codeChallenge } = await generateCodeChallenge();
-            const redirectUri = WIDGET_URL + '/signin-popup.html';
-            const requestConfig = await getRequestConfig({
-                code_challenge: codeChallenge,
-                redirect_uri: redirectUri,
-                return_url: window.location.href,
-                pool_id: poolId,
-                claim_id: claim ? claim.uuid : '',
-                ...extraQueryParams,
-            });
+        async onUserLoadedCallback(user: User) {
+            if (!user.access_token || !user.id_token) return;
 
-            setSessionState(requestConfig.customState.id, {
-                codeVerifier,
-                poolId,
-                redirectUri,
-                returnUrl: window.location.href,
+            const requestConfig = {
+                verifier: VERIFIER_ID,
                 clientId: CLIENT_ID,
-                clientSecret: CLIENT_SECRET,
-            });
+                typeOfLogin: 'jwt',
+                enableLogging: false,
+                hash: `#state=state&access_token=${user?.access_token}&id_token=${user?.id_token}`,
+                queryParameters: new URLSearchParams({ code: '', iss: AUTH_URL, state: 'state' } as any).toString(),
+                jwtParams: {
+                    domain: AUTH_URL,
+                    accessToken: user?.access_token,
+                    idToken: user?.id_token,
+                    user_info_route: 'me',
+                },
+            };
 
             await this.triggerLogin(requestConfig);
         },
-        async requestOAuthShareRedirectCallback() {
-            const url = new URL(window.location.href);
-            if (url && !url.searchParams.has('code')) return;
+        onUserUnloadedCallback() {
+            this.oAuthShare = '';
+        },
+        async requestOAuthShare(extraQueryParams?: { [key: string]: string }) {
+            const { poolId, getConfig } = useAccountStore();
+            const { origin } = getConfig(poolId);
+            const { claim } = useClaimStore();
+            const returnUrl = window.location.href;
+            const isMobile = window.matchMedia('(pointer:coarse)').matches;
 
-            const stateString = url.searchParams.get('state');
-            if (!stateString) return;
-
-            const { id } = JSON.parse(window.atob(stateString.split('%')[0]));
-            const session = getSessionState(id);
-            const user = await this.getToken(url, session);
-            const redirectUri = WIDGET_URL + '/signin-popup.html';
-
-            const requestConfig = {
-                verifier: VERIFIER_ID,
-                typeOfLogin: 'jwt',
-                clientId: CLIENT_ID,
-                enableLogging: true,
-                uxMode: getUxMode(),
-                hash: `#state=${stateString}&access_token=${user.access_token}&id_token=${user.id_token}`,
-                queryParameters: window.location.search,
-                redirect_uri: redirectUri,
-                idToken: user.id_token,
-                jwtParams: {
-                    domain: AUTH_URL,
-                    accessToken: user.access_token,
-                    user_info_route: 'me',
+            this.user = await this.userManager[isMobile ? 'signinRedirect' : 'signinPopup']({
+                state: {
+                    isMobile,
+                    returnUrl,
+                    client_id: CLIENT_ID,
+                    origin,
                 },
-            };
-
-            await this.triggerLogin(requestConfig, { state: { id }, refreshToken: user.refresh_token });
+                extraQueryParams: {
+                    return_url: returnUrl,
+                    pool_id: poolId,
+                    claim_id: claim ? claim.uuid : '',
+                    ...extraQueryParams,
+                },
+            });
         },
         async requestOAuthShareRefresh() {
-            if (!this.user || !this.user.refreshToken) return;
+            const { poolId, getConfig } = useAccountStore();
+            const { origin } = getConfig(poolId);
 
-            const user = await this.refreshToken(this.user.refreshToken);
-            const stateString = (this.user as any)['#state'];
-
-            const requestConfig = {
-                verifier: VERIFIER_ID,
-                typeOfLogin: 'jwt',
-                clientId: CLIENT_ID,
-                enableLogging: true,
-                uxMode: getUxMode(),
-                hash: `#state=${stateString}&access_token=${user.access_token}&id_token=${user.id_token}`,
-                queryParameters: new URLSearchParams({ code: '', iss: AUTH_URL, state: stateString } as any).toString(),
-                jwtParams: {
-                    domain: AUTH_URL,
-                    accessToken: user.access_token,
-                    idToken: user.id_token,
-                    user_info_route: 'me',
+            this.user = await this.userManager.signinSilent({
+                state: {
+                    returnUrl: window.location.href,
+                    client_id: CLIENT_ID,
+                    origin,
                 },
-            };
-
-            await this.triggerLogin(requestConfig, { refreshToken: user.refresh_token });
+            });
         },
-        async triggerLogin(requestConfig: any, userInfo?: any) {
+        async triggerLogin(requestConfig: any) {
             await tKey.serviceProvider.init({ skipSw: true });
             await tKey.modules.securityQuestions.initialize();
 
@@ -105,98 +99,23 @@ export const useAuthStore = defineStore('auth', {
             const loginResponse = await tKey.serviceProvider.triggerLogin(requestConfig);
 
             // Override empty state object in order to do proper removal of session state post sign out
-            this.setUser({ ...loginResponse.userInfo, ...userInfo });
             this.oAuthShare = loginResponse.privateKey;
 
             await tKey.initialize();
         },
         async getUser() {
-            // Set user on storage hit
-            const storageKey = `thx.user:${AUTH_URL}:${CLIENT_ID}`;
-            const item = localStorage.getItem(storageKey) as string;
-            if (!item) return;
-
             // Validate user token expiry
-            this.user = JSON.parse(item);
-
+            this.user = await this.userManager.getUser();
             if (!this.user) return;
-            if (!this.oAuthShare) {
-                try {
-                    await this.validateToken(this.user.accessToken);
-                    await this.requestOAuthShareRefresh();
-                } catch (error) {
-                    const { signin } = useAccountStore();
-                    await signin();
-                }
-            }
-        },
-        setUser(userInfo: THXAuthUser) {
-            localStorage.setItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`, JSON.stringify(userInfo));
-            this.user = userInfo;
+            if (this.oAuthShare) return;
+
+            await this.requestOAuthShareRefresh();
         },
         async getPrivateKey() {
-            const authStore = useAuthStore();
-
-            if (authStore.oAuthShare) {
-                await authStore.getDeviceShare();
-                authStore.reconstructKey();
-                authStore.getSecurityQuestion();
-            }
-        },
-
-        async refreshToken(refreshToken: string) {
-            try {
-                const response = await fetch(AUTH_URL + '/token', {
-                    method: 'post',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        grant_type: 'refresh_token',
-                        refresh_token: refreshToken,
-                        client_id: CLIENT_ID,
-                        client_secret: CLIENT_SECRET,
-                    }),
-                });
-                return await response.json();
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        async getToken(url: any, session: any) {
-            const code = url.searchParams.get('code');
-            const iss = url.searchParams.get('iss');
-            try {
-                const response = await fetch(iss + '/token', {
-                    method: 'post',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        grant_type: 'authorization_code',
-                        code,
-                        redirect_uri: session.redirectUri,
-                        code_verifier: session.codeVerifier,
-                        client_id: CLIENT_ID,
-                        client_secret: CLIENT_SECRET,
-                    }),
-                });
-                return await response.json();
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        async validateToken(accessToken: string) {
-            const jwks = jose.createRemoteJWKSet(new URL(AUTH_URL + '/jwks'));
-            const { payload } = await jose.jwtVerify(accessToken, jwks, {
-                issuer: AUTH_URL,
-                audience: CLIENT_ID,
-            });
-            if (Date.now() > Number(payload.exp) * 1000) {
-                throw new Error('token expired');
-            }
+            if (!this.oAuthShare) return;
+            await this.getDeviceShare();
+            this.reconstructKey();
+            this.getSecurityQuestion();
         },
         async reset() {
             // WARNING Irreversible

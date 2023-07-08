@@ -37,14 +37,14 @@ function getUser(storageKey: string) {
     return JSON.parse(localStorage.getItem(storageKey) as string);
 }
 
-async function getRequestConfig(extraQueryParams: { [key: string]: string }) {
+function getRequestConfig(extraQueryParams: { [key: string]: string }) {
     const sessionId = randHex(32);
     const uxMode = getUxMode();
     return {
         verifier: VERIFIER_ID,
         typeOfLogin: 'jwt',
         clientId: CLIENT_ID,
-        enableLogging: true,
+        enableLogging: false,
         customState: {
             id: sessionId,
             uxMode,

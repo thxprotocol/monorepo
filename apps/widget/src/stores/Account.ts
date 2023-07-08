@@ -1,16 +1,15 @@
 import { THXClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
-import { CLIENT_ID, WIDGET_URL, AUTH_URL, API_URL } from '../config/secrets';
+import { API_URL } from '../config/secrets';
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
 import { track } from '@thxnetwork/mixpanel';
 import { getStyles } from '../utils/theme';
 import { useAuthStore } from './Auth';
-import { setSessionState } from '../utils/pkce';
 import { getAccessTokenKindForPlatform, getConnectionStatus } from '../utils/social';
 import { RewardConditionPlatform } from '../types/enums/rewards';
-import { getUxMode } from '../utils/tkey';
+import { User } from 'oidc-client-ts';
 import poll from 'promise-poller';
 
 export const useAccountStore = defineStore('account', {
@@ -56,13 +55,12 @@ export const useAccountStore = defineStore('account', {
 
             this.setConfig(this.poolId, { ...data, origin });
             this.setTheme(data);
-
-            // Handle redirect result if any
-            await authStore.requestOAuthShareRedirectCallback();
-            await authStore.getUser();
-            this.api.setAccessToken(authStore.user ? authStore.user.accessToken : '');
             this.getUserData();
-            authStore.getPrivateKey();
+
+            authStore.userManager.events.addUserLoaded(this.onUserLoaded);
+            authStore.userManager.events.addUserUnloaded(this.onUserUnloaded);
+            authStore.userManager.events.load(this.onLoad);
+            authStore.getUser();
 
             track('UserVisits', [
                 this.account?.sub || '',
@@ -74,6 +72,20 @@ export const useAccountStore = defineStore('account', {
                 const { origin } = this.getConfig(this.poolId);
                 track('UserOpens', [this.account?.sub || '', `widget iframe`, { origin, poolId, isShown: true }]);
             }
+        },
+        onLoad() {
+            // debugger;
+        },
+        async onUserLoaded(user: User) {
+            const authStore = useAuthStore();
+            await authStore.onUserLoadedCallback(user);
+            authStore.getPrivateKey();
+
+            this.api.setAccessToken(user.access_token);
+            this.getUserData();
+        },
+        onUserUnloaded() {
+            return useAuthStore().onUserUnloadedCallback();
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();
@@ -88,8 +100,6 @@ export const useAccountStore = defineStore('account', {
         },
         async getAccount() {
             this.account = await this.api.account.get();
-            const { origin, poolId } = this.getConfig(this.poolId);
-            track('UserIdentify', [this.account, { origin, poolId }]);
         },
         async getBalance() {
             const { balance } = await this.api.pointBalance.list();
@@ -110,9 +120,8 @@ export const useAccountStore = defineStore('account', {
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
-        async connect(platform: RewardConditionPlatform) {
-            const authStore = useAuthStore();
-            await authStore.requestOAuthShare({
+        connect(platform: RewardConditionPlatform) {
+            return useAuthStore().requestOAuthShare({
                 prompt: 'connect',
                 channel: String(platform),
                 access_token_kind: String(getAccessTokenKindForPlatform(platform)),
@@ -133,49 +142,18 @@ export const useAccountStore = defineStore('account', {
                 retries: 20, // 3s * 20 = 60s
             });
         },
-        async signin(extraQueryParams?: { [key: string]: string }) {
-            const authStore = useAuthStore();
-
-            await authStore.requestOAuthShare(extraQueryParams);
-            await authStore.getUser();
-            this.api.setAccessToken(authStore.user ? authStore.user.accessToken : '');
-            this.getUserData();
-            authStore.getPrivateKey();
+        signin(extraQueryParams?: { [key: string]: string }) {
+            return useAuthStore().requestOAuthShare(extraQueryParams);
         },
         async signout() {
             const authStore = useAuthStore();
             if (!authStore.user) return;
-            localStorage.removeItem(`thx.user:${AUTH_URL}:${CLIENT_ID}`);
 
-            try {
-                const uxMode = getUxMode();
-                const { id } = authStore.user.state as any;
-                const url = new URL(AUTH_URL + '/session/end');
-                url.searchParams.append('id_token_hint', authStore.user.idToken);
-                url.searchParams.append('post_logout_redirect_uri', WIDGET_URL + '/signout-popup.html');
-                url.searchParams.append('state', id);
-
-                setSessionState(id, { uxMode, returnUrl: window.location.href });
-
-                switch (uxMode) {
-                    case 'redirect': {
-                        window.open(url, '_self');
-                        break;
-                    }
-                    case 'popup': {
-                        window.open(
-                            url,
-                            'THX Network - Sign out',
-                            `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=600,height=300,left=100,top=100`,
-                        );
-                        break;
-                    }
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                authStore.oAuthShare = '';
-            }
+            const isMobile = window.matchMedia('(pointer:coarse)').matches;
+            await authStore.userManager[isMobile ? 'signoutRedirect' : 'signoutPopup']({
+                state: { isMobile, origin: window.location.href },
+                id_token_hint: authStore.user.id_token,
+            });
         },
         async getUserData() {
             const rewardsStore = useRewardStore();
@@ -200,7 +178,6 @@ export const useAccountStore = defineStore('account', {
             if (!oAuthShare) return;
 
             await this.getAccount();
-
             track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
 
             this.getBalance();

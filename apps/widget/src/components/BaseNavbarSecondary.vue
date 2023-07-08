@@ -22,8 +22,7 @@
                 v-if="config"
                 class="navbar-logo"
                 :src="config.logoUrl"
-                :title="decodeHTML(config.title)"
-                v-b-tooltip.hover.bottom
+                v-b-tooltip.hover.bottom="{ title: decodeHTML(config.title) }"
             />
         </div>
         <div style="width: 120px; text-align: right">

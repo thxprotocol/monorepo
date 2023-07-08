@@ -23,6 +23,7 @@
         "date-fns": "^2.29.3",
         "jose": "^4.14.4",
         "mixpanel-browser": "^2.45.0",
+        "oidc-client-ts": "^2.2.4",
         "pinia": "^2.0.23",
         "promise-poller": "^1.9.1",
         "stripe": "^11.9.1",

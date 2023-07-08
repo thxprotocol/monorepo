@@ -23,19 +23,21 @@ type TAccount = {
     shopifyAccess: boolean;
 };
 
-type THXAuthUser = {
-    accessToken: string;
-    refreshToken: string;
-    idToken: string;
-    expiresIn: number;
-    expiresAt: number;
-    #state: string;
-    state: string;
-};
 type TAuthState = {
     isDeviceShareAvailable: boolean | null;
     isSecurityQuestionAvailable: boolean | null;
-    user: THXAuthUser | null;
+    userManager: UserManager;
+    user: {
+        id_token?: string;
+        session_state: string | null;
+        access_token: string;
+        refresh_token?: string;
+        token_type: string;
+        scope?: string;
+        profile: UserProfile;
+        expires_at?: number;
+        state: unknown;
+    } | null;
     privateKey: string;
     oAuthShare: string;
     securityQuestion: string;

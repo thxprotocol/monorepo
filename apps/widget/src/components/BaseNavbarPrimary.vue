@@ -7,8 +7,7 @@
             <b-img
                 :src="config.logoUrl"
                 class="navbar-logo"
-                :title="decodeHTML(config.title)"
-                v-b-tooltip.hover.bottom
+                v-b-tooltip.hover.bottom="{ title: decodeHTML(config.title) }"
             />
         </div>
         <router-link v-if="rewardsStore.rewards.length" :to="`/c/${accountStore.poolId}/quests`">
