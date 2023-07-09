@@ -102,6 +102,7 @@ export default defineComponent({
     },
     computed: {
         origin() {
+            if (!this.campaign.domain) return '';
             return new URL(this.campaign.domain).host;
         },
     },
