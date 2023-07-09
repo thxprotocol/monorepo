@@ -82,10 +82,8 @@ export default defineComponent({
         referralUrl() {
             const { getConfig, account, poolId } = useAccountStore();
             if (!getConfig || !account || !this.reward) return '';
-
             const { origin } = getConfig(poolId);
-            if (!origin || !account.sub) return '';
-
+            if (!origin) return '';
             const hash = window.btoa(JSON.stringify({ sub: account.sub, poolId, uuid: this.reward.uuid }));
             return `${origin}${this.reward.pathname ? '/' + this.reward.pathname : ''}?ref=${hash}`;
         },

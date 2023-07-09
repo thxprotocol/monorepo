@@ -44,11 +44,7 @@ export const useAccountStore = defineStore('account', {
         async init(poolId: string, origin?: string) {
             const authStore = useAuthStore();
 
-            this.api = new THXClient({
-                url: API_URL,
-                accessToken: '',
-                poolId,
-            });
+            this.api = new THXClient({ url: API_URL, accessToken: '', poolId });
             this.poolId = poolId;
 
             const data = await this.api.request.get('/v1/widget/' + poolId);

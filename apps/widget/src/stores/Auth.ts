@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL, VERIFIER_ID, API_URL } from '../config/secrets';
 import { useClaimStore } from './Claim';
-import { getUxMode, tKey } from '../utils/tkey';
+import { tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
 import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 
