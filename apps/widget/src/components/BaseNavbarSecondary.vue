@@ -120,6 +120,7 @@ import { AccountVariant } from '../types/enums/accountVariant';
 import BaseModalPoolSubscription from '../components/BaseModalPoolSubscription.vue';
 import BaseModalWalletConfig from '../components/BaseModalWalletConfig.vue';
 import BaseModalWalletRecovery from '../components/BaseModalWalletRecovery.vue';
+import { getIsMobile } from '../utils/user-agent';
 
 export default defineComponent({
     name: 'Home',
@@ -134,7 +135,6 @@ export default defineComponent({
             decodeHTML,
             isModalWalletConfigShown: false,
             isModalWalletRecoveryShown: false,
-            isMobileEthereum: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
             isModalPoolSubscriptionShown: false,
             isRefreshing: false,
             isLoadingSignin: false,
@@ -202,7 +202,7 @@ export default defineComponent({
         },
         onClickClose() {
             const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
-            if (this.isMobileEthereum) {
+            if (getIsMobile()) {
                 window.open(origin, '_self');
             } else {
                 window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);

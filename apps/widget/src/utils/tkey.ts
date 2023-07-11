@@ -15,7 +15,7 @@ const customAuthArgs = {
     network: VERIFIER_NETWORK,
     redirectToOpener: true,
     metadataUrl: AUTH_URL + '/.well-known/openid-configuration',
-    uxMode: getUxMode(),
+    uxMode: 'redirect',
 } as any;
 
 const tKey: ThresholdKey & { serviceProvider?: any; modules?: { securityQuestions?: any; webStorage?: any } } =
@@ -27,19 +27,12 @@ const tKey: ThresholdKey & { serviceProvider?: any; modules?: { securityQuestion
         customAuthArgs,
     });
 
-function getUxMode() {
-    const isMobile = window.matchMedia('(pointer:coarse)').matches;
-    const isCypress = (window as any).Cypress;
-    return isMobile || isCypress ? 'redirect' : 'popup';
-}
-
 function getUser(storageKey: string) {
     return JSON.parse(localStorage.getItem(storageKey) as string);
 }
 
 function getRequestConfig(extraQueryParams: { [key: string]: string }) {
     const sessionId = randHex(32);
-    const uxMode = getUxMode();
     return {
         verifier: VERIFIER_ID,
         typeOfLogin: 'jwt',
@@ -47,7 +40,6 @@ function getRequestConfig(extraQueryParams: { [key: string]: string }) {
         enableLogging: false,
         customState: {
             id: sessionId,
-            uxMode,
         },
         jwtParams: {
             code_challenge_method: 'S256',
@@ -64,4 +56,4 @@ function getRequestConfig(extraQueryParams: { [key: string]: string }) {
     };
 }
 
-export { tKey, getUxMode, getUser, getRequestConfig };
+export { tKey, getUser, getRequestConfig };

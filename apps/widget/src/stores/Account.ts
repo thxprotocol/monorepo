@@ -10,6 +10,7 @@ import { useAuthStore } from './Auth';
 import { getAccessTokenKindForPlatform, getConnectionStatus } from '../utils/social';
 import { RewardConditionPlatform } from '../types/enums/rewards';
 import { User } from 'oidc-client-ts';
+import { getIsMobile } from '../utils/user-agent';
 import poll from 'promise-poller';
 
 export const useAccountStore = defineStore('account', {
@@ -149,7 +150,7 @@ export const useAccountStore = defineStore('account', {
             const authStore = useAuthStore();
             if (!authStore.user) return;
 
-            const isMobile = window.matchMedia('(pointer:coarse)').matches;
+            const isMobile = getIsMobile();
             await authStore.userManager[isMobile ? 'signoutRedirect' : 'signoutPopup']({
                 state: { isMobile, origin: window.location.href },
                 id_token_hint: authStore.user.id_token,

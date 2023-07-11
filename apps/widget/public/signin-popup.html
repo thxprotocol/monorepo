@@ -25,7 +25,7 @@
         const isMobile = window.matchMedia('(pointer:coarse)').matches;
         const isCypress = window.Cypress;
 
-        if ((isMobile) || isCypress) {
+        if (isMobile || isCypress) {
             userManager.signinRedirectCallback().then(async (user) => {
                 window.open(state.data.returnUrl, '_self')
             }).catch(console.error);

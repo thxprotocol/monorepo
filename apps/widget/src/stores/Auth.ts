@@ -4,6 +4,7 @@ import { useClaimStore } from './Claim';
 import { tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
 import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
+import { getIsMobile } from '../utils/user-agent';
 
 const userManager = new UserManager({
     authority: AUTH_URL,
@@ -61,8 +62,8 @@ export const useAuthStore = defineStore('auth', {
             const { poolId, getConfig } = useAccountStore();
             const { origin } = getConfig(poolId);
             const { claim } = useClaimStore();
+            const isMobile = getIsMobile();
             const returnUrl = window.location.href;
-            const isMobile = window.matchMedia('(pointer:coarse)').matches;
 
             this.user = await this.userManager[isMobile ? 'signinRedirect' : 'signinPopup']({
                 state: {
