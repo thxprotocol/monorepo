@@ -3,14 +3,22 @@
         <b-row>
             <b-col offset-xl="1" xl="6">
                 <b-card v-if="claimsStore.claim && claimsStore.metadata && claimsStore.erc721" class="mx-auto my-2">
-                    <b-alert v-if="!authStore.oAuthShare" variant="info" show class="p-2">
+                    <b-alert v-if="!authStore.oAuthShare && !claimsStore.error" variant="info" show class="p-2">
                         <i class="fas fa-gift me-1"></i>
                         Sign in to collect your NFT
                     </b-alert>
+
+                    <b-alert v-if="error || claimsStore.error" variant="danger" show class="p-2">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        {{ error || claimsStore.error }}
+                    </b-alert>
+
                     <BaseAlertWalletAddress />
                     <div class="d-flex justify-content-center">
                         <ConfettiExplosion
                             v-if="isLoadingCollectComplete"
+                            class="position-fixed"
+                            style="pointer-events: none"
                             :stageHeight="400"
                             :stageWidth="500"
                             :particleCount="200"
@@ -66,10 +74,6 @@
                         <span>Symbol</span>
                         <strong class="ms-auto">{{ claimsStore.erc721.symbol }}</strong>
                     </p>
-                    <b-alert v-if="error || claimsStore.error" variant="danger" show class="p-2 w-100">
-                        <i class="fas fa-exclamation-circle me-1"></i>
-                        {{ error || claimsStore.error }}
-                    </b-alert>
 
                     <b-button
                         v-if="isLoadingCollectComplete"
@@ -89,7 +93,13 @@
                         <b-spinner v-if="isLoadingCollect" small variant="dark" />
                         Collect
                     </b-button>
-                    <b-button v-else @click="onClickSignin" variant="primary" class="w-100">
+                    <b-button
+                        v-else
+                        @click="onClickSignin"
+                        :disabled="!!claimsStore.error"
+                        variant="primary"
+                        class="w-100"
+                    >
                         Sign in &amp; Collect
                     </b-button>
                 </b-card>
