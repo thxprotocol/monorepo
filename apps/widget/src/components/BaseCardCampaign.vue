@@ -97,7 +97,6 @@ export default defineComponent({
     data() {
         return {
             format: format,
-            open: window.open,
         };
     },
     computed: {

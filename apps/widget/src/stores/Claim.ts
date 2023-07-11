@@ -13,11 +13,13 @@ export const useClaimStore = defineStore('claims', {
     actions: {
         async getClaim(uuid: string) {
             const { api } = useAccountStore();
-            const { error, claim, erc721, metadata } = await api.claims.get(uuid);
-            this.error = error;
-            this.claim = claim;
-            this.metadata = metadata;
-            this.erc721 = erc721;
+            const r = await api.claims.get(uuid);
+            this.error = r.error;
+            this.claim = r.claim;
+            this.metadata = r.metadata;
+            this.erc721 = r.erc721;
+
+            return r;
         },
         async collect(uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
@@ -25,7 +27,7 @@ export const useClaimStore = defineStore('claims', {
 
             await api.claims.collect({ poolId, claimUuid: uuid });
 
-            track('UserCreates', [account?.sub, 'nft perk claim', { poolId, origin: getConfig(poolId).origin }]);
+            track('UserCreates', [account?.sub, 'claim URL claim', { poolId, origin: getConfig(poolId).origin }]);
         },
     },
 });

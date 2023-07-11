@@ -68,6 +68,10 @@ export const useAccountStore = defineStore('account', {
                 const { origin } = this.getConfig(this.poolId);
                 track('UserOpens', [this.account?.sub || '', `widget iframe`, { origin, poolId, isShown: true }]);
             }
+
+            if (origin) {
+                window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
+            }
         },
         onLoad() {
             // debugger;
