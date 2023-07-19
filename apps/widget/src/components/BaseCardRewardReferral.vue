@@ -85,7 +85,9 @@ export default defineComponent({
             const { origin } = getConfig(poolId);
             if (!origin) return '';
             const hash = window.btoa(JSON.stringify({ sub: account.sub, poolId, uuid: this.reward.uuid }));
-            return `${origin}${this.reward.pathname ? '/' + this.reward.pathname : ''}?ref=${hash}`;
+            const url = new URL(`${origin}/${this.reward.pathname}`);
+            url.searchParams.append('ref', hash);
+            return url.toString();
         },
     },
     methods: {
