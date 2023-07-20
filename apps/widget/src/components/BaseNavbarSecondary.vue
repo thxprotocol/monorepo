@@ -57,7 +57,7 @@
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
             </b-button>
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="link">
-                <b-spinner v-if="isLoadingSignin" small variant="white" />
+                <b-spinner v-if="accountStore.isAuthenticated === false" small variant="white" />
                 <template v-else>Sign in</template>
             </b-button>
             <template v-else>
@@ -137,7 +137,6 @@ export default defineComponent({
             isModalWalletRecoveryShown: false,
             isModalPoolSubscriptionShown: false,
             isRefreshing: false,
-            isLoadingSignin: false,
             error: '',
         };
     },
@@ -193,9 +192,7 @@ export default defineComponent({
             this.isModalPoolSubscriptionShown = false;
         },
         async onClickSignin() {
-            this.isLoadingSignin = true;
-            await this.accountStore.signin();
-            this.isLoadingSignin = false;
+            this.accountStore.signin();
         },
         onClickSignout() {
             this.accountStore.signout();
@@ -213,8 +210,7 @@ export default defineComponent({
         },
         async onClickRefresh() {
             this.isRefreshing = true;
-            await this.walletStore.list();
-            await this.accountStore.getBalance();
+            await Promise.all([this.walletStore.list(), this.accountStore.getBalance()]);
             this.isRefreshing = false;
         },
     },

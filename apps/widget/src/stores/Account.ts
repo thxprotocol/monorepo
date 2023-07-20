@@ -20,6 +20,7 @@ export const useAccountStore = defineStore('account', {
         account: null,
         balance: 0,
         subscription: null,
+        isAuthenticated: null,
         isRewardsLoaded: false,
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
@@ -47,6 +48,7 @@ export const useAccountStore = defineStore('account', {
 
             this.api = new THXClient({ url: API_URL, accessToken: '', poolId });
             this.poolId = poolId;
+            this.isAuthenticated = false;
 
             const data = await this.api.request.get('/v1/widget/' + poolId);
 
@@ -57,7 +59,11 @@ export const useAccountStore = defineStore('account', {
             authStore.userManager.events.addUserLoaded(this.onUserLoaded);
             authStore.userManager.events.addUserUnloaded(this.onUserUnloaded);
             authStore.userManager.events.load(this.onLoad);
-            authStore.getUser();
+            authStore.getUser().then(() => {
+                if (!authStore.user) {
+                    this.isAuthenticated = null;
+                }
+            });
 
             track('UserVisits', [
                 this.account?.sub || '',
@@ -144,6 +150,7 @@ export const useAccountStore = defineStore('account', {
             });
         },
         signin(extraQueryParams?: { [key: string]: string }) {
+            this.isAuthenticated = false;
             return useAuthStore().requestOAuthShare(extraQueryParams);
         },
         async signout() {
@@ -178,14 +185,20 @@ export const useAccountStore = defineStore('account', {
             // Guard HTTP requests that do require auth
             if (!oAuthShare) return;
 
-            await this.getAccount();
+            await this.getAccount().then(async () => {
+                if (!this.account || this.account.address) return;
+
+                // Patch the account with the MPC address
+                const authRequestMessage = 'validate_account_address_ownership';
+                const authRequestSignature = await useAuthStore().sign(authRequestMessage);
+
+                await this.api.account.patch(JSON.stringify({ authRequestMessage, authRequestSignature }));
+            });
+
+            this.isAuthenticated = true;
             track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
 
-            this.getBalance();
-            this.getSubscription();
-
-            walletStore.list();
-            walletStore.getWallet();
+            await Promise.all([this.getBalance(), this.getSubscription(), walletStore.list(), walletStore.getWallet()]);
         },
     },
 });

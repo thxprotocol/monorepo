@@ -44,6 +44,7 @@ type TAuthState = {
 };
 
 type TAccountState = {
+    isAuthenticated: boolean | null;
     isEthereumBrowser: boolean;
     isRewardsLoaded: boolean;
     api: THXClient | null;

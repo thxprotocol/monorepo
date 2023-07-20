@@ -21,6 +21,9 @@
             <b-form>
                 <b-tabs justified content-class="mt-3">
                     <b-tab title="Key">
+                        <div v-if="accountStore.account">
+                            {{ accountStore.account.address }}
+                        </div>
                         <b-form-group
                             :label="`Private Key`"
                             :description="`This self-custody key is reconstructed from Login, Device and Backup key shares. (${currentKeyTreshold})`"

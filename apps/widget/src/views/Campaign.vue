@@ -79,7 +79,7 @@ export default defineComponent({
             const { getConfig, poolId } = this.accountStore;
             const origin = getConfig(poolId).origin;
             const localOrigin = origin && new URL(origin).origin;
-            if (!WIDGET_URL || event.origin !== localOrigin) return;
+            if (event.origin !== localOrigin) return;
 
             switch (event.data.message) {
                 case 'thx.iframe.navigate': {

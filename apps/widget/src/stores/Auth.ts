@@ -5,6 +5,7 @@ import { tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
 import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { getIsMobile } from '../utils/user-agent';
+import { Wallet } from '@ethersproject/wallet';
 
 const userManager = new UserManager({
     authority: AUTH_URL,
@@ -118,6 +119,10 @@ export const useAuthStore = defineStore('auth', {
             this.reconstructKey();
             this.getSecurityQuestion();
         },
+        async sign(message: string) {
+            const wallet = new Wallet(this.privateKey);
+            return await wallet.signMessage(message);
+        },
         async reset() {
             // WARNING Irreversible
             await tKey.storageLayer.setMetadata({
@@ -128,12 +133,10 @@ export const useAuthStore = defineStore('auth', {
             await signout();
         },
         async reconstructKey() {
-            // Checks the requiredShares to reconstruct the tKey,
-            // starts from 2 by default and each of the above share reduce it by one.
             const { requiredShares } = tKey.getKeyDetails();
             if (requiredShares <= 0) {
                 const reconstructedKey = await tKey.reconstructKey();
-                this.privateKey = reconstructedKey?.privKey.toString('hex');
+                this.privateKey = `0x${reconstructedKey?.privKey.toString('hex').padStart(64, '0')}`;
                 console.debug('Successfully reconstructed private key.');
             }
         },
