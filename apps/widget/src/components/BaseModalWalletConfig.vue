@@ -42,7 +42,7 @@
                                     <b-button
                                         size="sm"
                                         variant="primary"
-                                        v-clipboard:copy="`0x${authStore.privateKey}`"
+                                        v-clipboard:copy="authStore.privateKey"
                                         v-clipboard:success="onCopySuccess"
                                     >
                                         <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
