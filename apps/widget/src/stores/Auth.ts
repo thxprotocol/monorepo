@@ -99,9 +99,7 @@ export const useAuthStore = defineStore('auth', {
 
             // Trigger login with access and id token hash
             const loginResponse = await tKey.serviceProvider.triggerLogin(requestConfig);
-
-            // Override empty state object in order to do proper removal of session state post sign out
-            this.oAuthShare = loginResponse.privateKey;
+            this.oAuthShare = loginResponse.oAuthKeyData.privKey;
 
             await tKey.initialize();
         },
