@@ -142,7 +142,7 @@ export default defineComponent({
         privateKey() {
             if (!this.authStore.privateKey) return '';
 
-            const key = `0x${this.authStore.privateKey}`;
+            const key = this.authStore.privateKey;
             if (this.isPrivateKeyHidden) return key.replace(/./g, '•');
             return key;
         },
