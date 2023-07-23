@@ -42,7 +42,7 @@
                                     <b-button
                                         size="sm"
                                         variant="primary"
-                                        v-clipboard:copy="`0x${authStore.privateKey}`"
+                                        v-clipboard:copy="authStore.privateKey"
                                         v-clipboard:success="onCopySuccess"
                                     >
                                         <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
@@ -142,7 +142,7 @@ export default defineComponent({
         privateKey() {
             if (!this.authStore.privateKey) return '';
 
-            const key = `0x${this.authStore.privateKey}`;
+            const key = this.authStore.privateKey;
             if (this.isPrivateKeyHidden) return key.replace(/./g, '•');
             return key;
         },

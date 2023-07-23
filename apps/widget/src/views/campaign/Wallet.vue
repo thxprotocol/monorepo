@@ -30,6 +30,10 @@
                             <component :is="token.component" :token="token" />
                         </b-col>
                     </b-row>
+                    <pre>
+                    {{ walletStore.wallet }}
+                </pre
+                    >
                 </template>
 
                 <template v-else>

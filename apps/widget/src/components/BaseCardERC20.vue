@@ -26,7 +26,7 @@
                 :show="isModalTransferShown"
                 :error="error"
                 :token="token"
-                :is-loading="isSubmitting"
+                :is-loading="isPendingApproval || isPendingTransfer"
                 @hidden="onModalTransferHidden"
                 @submit="onSubmitTransfer"
             />
@@ -52,7 +52,7 @@ export default defineComponent({
         },
     },
     data: function () {
-        return { isModalTransferShown: false, error: '', isSubmitting: false };
+        return { isModalTransferShown: false, error: '', isPendingApproval: false, isPendingTransfer: false };
     },
     computed: {
         ...mapStores(useWalletStore),
@@ -62,11 +62,25 @@ export default defineComponent({
             this.isModalTransferShown = false;
         },
         async onSubmitTransfer(config: TERC20TransferConfig) {
-            this.isSubmitting = true;
-            await this.walletStore.transferERC20(config);
-            await this.walletStore.list();
-            this.isModalTransferShown = false;
-            this.isSubmitting = false;
+            try {
+                // Request approve TX
+                this.isPendingApproval = true;
+                await this.walletStore.approveERC20(config);
+                this.isPendingApproval = false;
+            } catch (error) {
+                this.error = (error as Error).message;
+            }
+
+            try {
+                // is waiting for approval
+                this.isPendingTransfer = true;
+                await this.walletStore.transferERC20(config);
+                this.isPendingTransfer = false;
+                await this.walletStore.list();
+                this.isModalTransferShown = false;
+            } catch (error) {
+                this.error = (error as Error).message;
+            }
         },
     },
 });

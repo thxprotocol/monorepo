@@ -59,11 +59,17 @@ export const useAccountStore = defineStore('account', {
             authStore.userManager.events.addUserLoaded(this.onUserLoaded);
             authStore.userManager.events.addUserUnloaded(this.onUserUnloaded);
             authStore.userManager.events.load(this.onLoad);
-            authStore.getUser().then(() => {
-                if (!authStore.user) {
+            authStore
+                .getUser()
+                .then(() => {
+                    if (!authStore.user) {
+                        this.isAuthenticated = null;
+                    }
+                })
+                .catch((error) => {
                     this.isAuthenticated = null;
-                }
-            });
+                    console.error(error);
+                });
 
             track('UserVisits', [
                 this.account?.sub || '',

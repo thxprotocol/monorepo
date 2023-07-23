@@ -2,6 +2,32 @@ import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
 import { API_URL } from '../config/secrets';
+import { useAuthStore } from './Auth';
+import { EthersAdapter } from '@safe-global/protocol-kit';
+import { ethers } from 'ethers';
+import Safe from '@safe-global/protocol-kit';
+import SafeApiKit from '@safe-global/api-kit';
+
+// Safe Contracts
+const GnosisSafeProxyFactoryAddress = '0x1122fD9eBB2a8E7c181Cc77705d2B4cA5D72988A';
+const CompatibilityFallbackHandlerAddress = '0x5D3D550Da6678C0444F5D77Ca086678D9CdeEecA';
+const CreateCallAddress = '0x40Efd8a16485213445E6d8b9a4266Fd2dFf7C69a';
+const MultiSendAddress = '0x7E4728eFfC9376CC7C0EfBCc779cC9833D83a984';
+const MultiSendCallOnlyAddress = '0x75Cbb6C4Db4Bb4f6F8D5F56072A6cF4Bf4C5413C';
+const SignMessageLibAddress = '0x658FAD2acB6d1E615f295E566ee9a6d32Cc97b10';
+const GnosisSafeL2Address = '0xC44951780f195Ed71145e3d0d2F25726A097C348';
+
+const contractNetworks: any = {
+    '31337': {
+        safeMasterCopyAddress: GnosisSafeL2Address,
+        safeProxyFactoryAddress: GnosisSafeProxyFactoryAddress,
+        multiSendAddress: MultiSendAddress,
+        multiSendCallOnlyAddress: MultiSendCallOnlyAddress,
+        fallbackHandlerAddress: CompatibilityFallbackHandlerAddress,
+        signMessageLibAddress: SignMessageLibAddress,
+        createCallAddress: CreateCallAddress,
+    },
+};
 
 export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
@@ -49,6 +75,15 @@ export const useWalletStore = defineStore('wallet', {
                 return { ...t, component: 'BaseCardERC721' };
             });
         },
+        async approveERC20(config: TERC20TransferConfig) {
+            const { api, account } = useAccountStore();
+            const r = await api.requests.post('/v1/erc20/' + config.erc20Id + '/approve', {
+                body: JSON.stringify(config),
+            });
+            console.log(r);
+            debugger;
+            track('UserCreates', [account?.sub, 'erc20 approval']);
+        },
         async transferERC20(config: TERC20TransferConfig) {
             const { api, account } = useAccountStore();
             await api.erc20.transfer(config);
@@ -63,6 +98,20 @@ export const useWalletStore = defineStore('wallet', {
             const { api, account } = useAccountStore();
             await api.walletManager.upgrade(this.wallet?._id);
             track('UserCreates', [account?.sub, 'wallet upgrade']);
+        },
+        async confirmTransaction(safeTxHash: string) {
+            // TODO Determine if metamask or not
+            const { privateKey } = useAuthStore();
+            if (!this.wallet || !privateKey) return;
+
+            const provider = new ethers.providers.JsonRpcProvider('https://localhost:8547');
+            const signer = new ethers.Wallet(privateKey, provider);
+            const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer }) as any;
+            const safeSDK = new SafeApiKit({ txServiceUrl: 'http://localhost:8000/txs', ethAdapter });
+            const safeSdkOwner = await Safe.create({ ethAdapter, safeAddress: this.wallet.address, contractNetworks });
+            const signature = await safeSdkOwner.signTransactionHash(safeTxHash);
+
+            return await safeSDK.confirmTransaction(safeTxHash, signature.data);
         },
     },
 });

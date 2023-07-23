@@ -12,6 +12,9 @@
     "dependencies": {
         "@ethersproject/wallet": "^5.7.0",
         "@popperjs/core": "^2.11.6",
+        "@safe-global/api-kit": "^1.1.0",
+        "@safe-global/protocol-kit": "^1.0.1",
+        "@safe-global/safe-core-sdk-types": "^1.9.2",
         "@stripe/stripe-js": "^1.46.0",
         "@thxnetwork/sdk": "^1.1.12",
         "@tkey/default": "^8.1.0-alpha.0",
@@ -22,6 +25,7 @@
         "color": "^4.2.3",
         "core-js": "^3.6.5",
         "date-fns": "^2.29.3",
+        "ethers": "^5.0.26",
         "jose": "^4.14.4",
         "mixpanel-browser": "^2.45.0",
         "oidc-client-ts": "^2.2.4",
