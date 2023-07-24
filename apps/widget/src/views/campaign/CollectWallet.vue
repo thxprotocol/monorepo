@@ -20,6 +20,10 @@
                 <b-form-input :state="isValidUUID" v-model="uuid" placeholder="Code" />
             </b-form-group>
 
+            {{ error }}
+            {{ !!error }}
+            {{ isWaitingForWalletAddress }}
+            {{ isLoadingCollect }}
             <b-button
                 v-if="authStore.oAuthShare"
                 @click="onClickCollect"
