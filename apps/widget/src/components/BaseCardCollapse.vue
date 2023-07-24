@@ -49,6 +49,11 @@ export default defineComponent({
     mounted() {
         this.isVisible = window.innerWidth > 768 || this.visible;
     },
+    watch: {
+        visible(value: boolean) {
+            this.isVisible = window.innerWidth > 768 || value;
+        },
+    },
     methods: {
         onClickLink(url: string) {
             window.open(url, '_blank');

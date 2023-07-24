@@ -1,7 +1,7 @@
 <template>
     <BaseCardCollapse
         :info-links="reward.infoLinks"
-        :visible="authStore.oAuthShare && !waitDuration"
+        :visible="!!authStore.oAuthShare && !waitDuration"
         :info-url="reward.infoUrl || 'https://example.com'"
     >
         <template #header>
