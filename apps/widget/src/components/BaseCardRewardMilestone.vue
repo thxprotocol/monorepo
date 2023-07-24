@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse :info-links="reward.infoLinks" :visible="authStore.oAuthShare && pendingClaims > 0">
+    <BaseCardCollapse :info-links="reward.infoLinks" :visible="!!authStore.oAuthShare && pendingClaims > 0">
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fas fa-flag me-2 text-primary"></i>
