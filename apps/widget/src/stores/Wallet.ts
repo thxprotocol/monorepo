@@ -7,6 +7,8 @@ import { EthersAdapter } from '@safe-global/protocol-kit';
 import { ethers } from 'ethers';
 import Safe from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
+import { SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types';
+import { toChecksumAddress } from 'web3-utils';
 
 // Safe Contracts
 const GnosisSafeProxyFactoryAddress = '0x1122fD9eBB2a8E7c181Cc77705d2B4cA5D72988A';
@@ -53,7 +55,13 @@ export const useWalletStore = defineStore('wallet', {
             this.wallets = await api.wallets.list(getConfig(poolId).chainId, account.sub);
 
             const primaryWallet = this.wallets.find((wallet) => wallet.address);
-            if (primaryWallet) this.wallet = primaryWallet;
+            if (!primaryWallet) return;
+
+            this.wallet = primaryWallet;
+
+            for (const tx of this.wallet.pendingTransactions) {
+                await this.confirmTransaction(tx.transactionHash);
+            }
         },
         async getERC721Token({ _id }: TERC721Token) {
             const { api } = useAccountStore();
@@ -77,16 +85,16 @@ export const useWalletStore = defineStore('wallet', {
         },
         async approveERC20(config: TERC20TransferConfig) {
             const { api, account } = useAccountStore();
-            const r = await api.requests.post('/v1/erc20/' + config.erc20Id + '/approve', {
+            const response = await api.request.post('/v1/erc20/approve', {
                 body: JSON.stringify(config),
             });
-            console.log(r);
-            debugger;
+            await this.confirmTransaction(response.transactionHash);
             track('UserCreates', [account?.sub, 'erc20 approval']);
         },
         async transferERC20(config: TERC20TransferConfig) {
             const { api, account } = useAccountStore();
-            await api.erc20.transfer(config);
+            const response = await api.erc20.transfer(config);
+            await this.confirmTransaction(response.transactionHash);
             track('UserCreates', [account?.sub, 'erc20 transfer']);
         },
         async transferERC721(config: TERC721TransferConfig) {
@@ -100,18 +108,19 @@ export const useWalletStore = defineStore('wallet', {
             track('UserCreates', [account?.sub, 'wallet upgrade']);
         },
         async confirmTransaction(safeTxHash: string) {
-            // TODO Determine if metamask or not
+            const { api } = useAccountStore();
             const { privateKey } = useAuthStore();
             if (!this.wallet || !privateKey) return;
 
             const provider = new ethers.providers.JsonRpcProvider('https://localhost:8547');
             const signer = new ethers.Wallet(privateKey, provider);
             const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer }) as any;
-            const safeSDK = new SafeApiKit({ txServiceUrl: 'http://localhost:8000/txs', ethAdapter });
-            const safeSdkOwner = await Safe.create({ ethAdapter, safeAddress: this.wallet.address, contractNetworks });
-            const signature = await safeSdkOwner.signTransactionHash(safeTxHash);
+            const safe = await Safe.create({ ethAdapter, safeAddress: this.wallet.address, contractNetworks });
+            const signature = await safe.signTransactionHash(safeTxHash);
 
-            return await safeSDK.confirmTransaction(safeTxHash, signature.data);
+            return await api.request.post(`/v1/wallets/${this.wallet._id}/confirm`, {
+                body: JSON.stringify({ safeTxHash, signature: signature.data }),
+            });
         },
     },
 });

@@ -2,8 +2,19 @@ type TWallet = {
     _id: string;
     address: string;
     version: string;
+    pendingTransactions: TTransaction[];
     token?: string;
     latestVersion: string;
+};
+
+type TTransaction = {
+    from: string;
+    to: string;
+    nonce: number;
+    gas: string;
+    chainId: ChainId;
+    walletId: string;
+    transactionHash: string;
 };
 
 type TWalletState = {

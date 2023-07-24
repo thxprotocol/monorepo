@@ -1,5 +1,6 @@
 <template>
     <b-card body-class="d-flex align-items-center" class="m-2">
+        {{ error }}
         <div class="pe-3">
             <img height="25" :src="token.erc20.logoImgUrl" />
         </div>

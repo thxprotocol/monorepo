@@ -11,6 +11,7 @@ import { getAccessTokenKindForPlatform, getConnectionStatus } from '../utils/soc
 import { RewardConditionPlatform } from '../types/enums/rewards';
 import { User } from 'oidc-client-ts';
 import { getIsMobile } from '../utils/user-agent';
+import { AccountVariant } from '../types/enums/accountVariant';
 import poll from 'promise-poller';
 
 export const useAccountStore = defineStore('account', {
@@ -192,7 +193,7 @@ export const useAccountStore = defineStore('account', {
             if (!oAuthShare) return;
 
             await this.getAccount().then(async () => {
-                if (!this.account || this.account.address) return;
+                if (!this.account || this.account.variant === AccountVariant.Metamask) return;
 
                 // Patch the account with the MPC address
                 const authRequestMessage = 'validate_account_address_ownership';
