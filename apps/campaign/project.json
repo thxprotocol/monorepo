@@ -1,0 +1,60 @@
+{
+    "name": "campaign",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/campaign/src",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "executor": "@nxext/vite:build",
+            "outputs": ["{options.outputPath}"],
+            "defaultConfiguration": "production",
+            "options": {
+                "outputPath": "dist/apps/campaign",
+                "baseHref": "/",
+                "configFile": "apps/campaign/vite.config.ts"
+            },
+            "configurations": {
+                "production": {
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/campaign/src/environments/environment.ts",
+                            "with": "apps/campaign/src/environments/environment.prod.ts"
+                        }
+                    ]
+                }
+            }
+        },
+        "serve": {
+            "executor": "@nxext/vite:dev",
+            "options": {
+                "outputPath": "dist/apps/campaign",
+                "baseHref": "/",
+                "configFile": "apps/campaign/vite.config.ts"
+            },
+            "configurations": {
+                "production": {
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/campaign/src/environments/environment.ts",
+                            "with": "apps/campaign/src/environments/environment.prod.ts"
+                        }
+                    ]
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["apps/campaign/**/*.{ts,js,tsx,jsx}"]
+            }
+        },
+        "test": {
+            "executor": "@nxext/vitest:vitest",
+            "options": {
+                "vitestConfig": "apps/campaign/vitest.config.ts"
+            }
+        }
+    },
+    "tags": []
+}

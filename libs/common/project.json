@@ -1,63 +1,32 @@
 {
-  "name": "common",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "library",
-  "sourceRoot": "libs/common/src",
-  "targets": {
-    "build": {
-      "executor": "@nx-plus/vue:library",
-      "options": {
-        "dest": "dist/libs/common",
-        "entry": "libs/common/src/index.ts",
-        "tsConfig": "libs/common/tsconfig.lib.json"
-      }
-    },
-    "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/common/**/*.{ts,tsx,vue}"]
-      }
-    },
-    "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/common"],
-      "options": {
-        "jestConfig": "libs/common/jest.config.ts",
-        "passWithNoTests": true
-      }
-    },
-    "storybook": {
-      "executor": "@nrwl/storybook:storybook",
-      "options": {
-        "uiFramework": "@storybook/vue3",
-        "port": 4400,
-        "config": {
-          "configFolder": "libs/common/.storybook"
+    "name": "common",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "libs/common/src",
+    "targets": {
+        "build": {
+            "executor": "@nx-plus/vue:library",
+            "options": {
+                "dest": "dist/libs/common",
+                "entry": "libs/common/src/index.ts",
+                "tsConfig": "libs/common/tsconfig.lib.json"
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["libs/common/**/*.{ts,tsx,vue}"]
+            }
+        },
+        "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": ["coverage/libs/common"],
+            "options": {
+                "jestConfig": "libs/common/jest.config.ts",
+                "passWithNoTests": true
+            }
         }
-      },
-      "configurations": {
-        "ci": {
-          "quiet": true
-        }
-      }
     },
-    "build-storybook": {
-      "executor": "@nrwl/storybook:build",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "uiFramework": "@storybook/vue3",
-        "outputPath": "dist/storybook/common",
-        "config": {
-          "configFolder": "libs/common/.storybook"
-        }
-      },
-      "configurations": {
-        "ci": {
-          "quiet": true
-        }
-      }
-    }
-  },
-  "tags": []
+    "tags": []
 }

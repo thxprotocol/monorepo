@@ -1,9 +1,0 @@
-{
-    "extends": "./tsconfig.json",
-    "compilerOptions": {
-        "outDir": "../../dist/out-tsc",
-        "types": ["webpack-env", "node", "./views/**/*.d.ts"]
-    },
-    "exclude": ["**/*.spec.ts", "**/*.spec.tsx"],
-    "include": ["**/*.ts", "**/*.tsx", "**/*.vue", "../../libs/common/**/*"]
-}
