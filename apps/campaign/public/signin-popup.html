@@ -30,12 +30,14 @@
                 window.open(state.data.returnUrl, '_self')
             }).catch(console.error);
         } else {
-            userManager.signinPopupCallback().then(() => {
-                // If there is no opener we need to close it ourselves
-                if (!window.opener) {
-                    window.close()
-                }
-            });
+            if (!window.opener) {
+                window.close()
+            } else {
+                userManager.signinPopupCallback().then(() => {
+                    // If there is no opener we need to close it ourselves
+
+                });
+            }
         }
     </script>
 </body>
