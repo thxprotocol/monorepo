@@ -1,7 +1,7 @@
 <template>
-    <b-button class="pe-3 rounded position-fixed d-none d-lg-block" variant="primary" to="/">
+    <!-- <b-button class="pe-3 rounded position-fixed d-none d-lg-block" variant="primary" to="/">
         <i class="fas fa-chevron-left me-1"> </i> Back</b-button
-    >
+    > -->
     <div
         v-if="config && config.backgroundUrl"
         class="d-none d-lg-block bg-splash"
@@ -24,7 +24,7 @@
 import { mapStores } from 'pinia';
 import { track } from '@thxnetwork/mixpanel';
 import { defineComponent } from 'vue';
-import { WIDGET_URL, GTM } from '../config/secrets';
+import { GTM } from '../config/secrets';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
 import { useWalletStore } from '../stores/Wallet';

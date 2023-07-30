@@ -22,22 +22,8 @@
             redirect_uri: url.origin + '/singin-popup.html',
             userStore: new window.oidc.WebStorageStateStore({store: window.localStorage}),
         });
-        const isMobile = window.matchMedia('(pointer:coarse)').matches;
-        const isCypress = window.Cypress;
 
-        if (isMobile || isCypress) {
-            userManager.signinRedirectCallback().then(async (user) => {
-                window.open(state.data.returnUrl, '_self')
-            }).catch(console.error);
-        } else {
-            throw new Error(window.location.href);
-            userManager.signinPopupCallback().then(() => {
-                // If there is no opener we need to close it ourselve
-                if (!window.opener) {
-                    window.close()
-                }
-            });
-        }
+        userManager.signinSilentCallback()
     </script>
 </body>
 

@@ -13,7 +13,7 @@ const userManager = new UserManager({
     response_type: 'code',
     response_mode: 'query',
     redirect_uri: WIDGET_URL + '/signin-popup.html',
-    silent_redirect_uri: WIDGET_URL + '/signin-popup.html',
+    silent_redirect_uri: WIDGET_URL + '/signin-silent.html',
     post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
     popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
     client_id: CLIENT_ID,
@@ -65,6 +65,7 @@ export const useAuthStore = defineStore('auth', {
             const { claim } = useClaimStore();
             const isMobile = getIsMobile();
             const returnUrl = window.location.href;
+            debugger;
 
             this.user = await this.userManager[isMobile ? 'signinRedirect' : 'signinPopup']({
                 state: {
