@@ -1,7 +1,4 @@
 <template>
-    <b-button class="pe-3 rounded position-fixed d-none d-lg-block" variant="primary" to="/">
-        <i class="fas fa-chevron-left me-1"> </i> Back</b-button
-    >
     <div
         v-if="config && config.backgroundUrl"
         class="d-none d-lg-block bg-splash"
