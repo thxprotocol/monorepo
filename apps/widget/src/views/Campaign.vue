@@ -21,7 +21,7 @@
 import { mapStores } from 'pinia';
 import { track } from '@thxnetwork/mixpanel';
 import { defineComponent } from 'vue';
-import { WIDGET_URL, GTM } from '../config/secrets';
+import { GTM } from '../config/secrets';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
 import { useWalletStore } from '../stores/Wallet';
