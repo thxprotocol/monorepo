@@ -29,6 +29,7 @@ export const useAuthStore = defineStore('auth', {
     state: (): TAuthState => ({
         user: null,
         userManager: userManager as UserManager,
+        wallet: null,
         privateKey: '',
         oAuthShare: '',
         securityQuestion: '',
@@ -65,7 +66,6 @@ export const useAuthStore = defineStore('auth', {
             const { claim } = useClaimStore();
             const isMobile = getIsMobile();
             const returnUrl = window.location.href;
-            debugger;
 
             this.user = await this.userManager[isMobile ? 'signinRedirect' : 'signinPopup']({
                 state: {
@@ -115,12 +115,13 @@ export const useAuthStore = defineStore('auth', {
         async getPrivateKey() {
             if (!this.oAuthShare) return;
             await this.getDeviceShare();
+            if (!this.isDeviceShareAvailable) return;
             this.reconstructKey();
             this.getSecurityQuestion();
         },
         async sign(message: string) {
-            const wallet = new Wallet(this.privateKey);
-            return await wallet.signMessage(message);
+            if (!this.wallet) return;
+            return await this.wallet.signMessage(message);
         },
         async reset() {
             // WARNING Irreversible
@@ -128,14 +129,14 @@ export const useAuthStore = defineStore('auth', {
                 privKey: this.oAuthShare as any,
                 input: { message: 'KEY_NOT_FOUND' },
             });
-            const { signout } = useAccountStore();
-            await signout();
+            await useAccountStore().signout();
         },
         async reconstructKey() {
             const { requiredShares } = tKey.getKeyDetails();
             if (requiredShares <= 0) {
                 const reconstructedKey = await tKey.reconstructKey();
                 this.privateKey = `0x${reconstructedKey?.privKey.toString('hex').padStart(64, '0')}`;
+                this.wallet = new Wallet(this.privateKey);
                 console.debug('Successfully reconstructed private key.');
             }
         },

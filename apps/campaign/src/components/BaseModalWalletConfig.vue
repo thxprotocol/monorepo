@@ -25,7 +25,8 @@
                             <code>{{ walletStore.wallet.address }}</code>
                         </b-form-group>
                         <b-form-group v-if="accountStore.account" :label="`MPC Address`">
-                            <code>{{ accountStore.account.address }}</code>
+                            <code>DB: {{ accountStore.account.address }}</code>
+                            <code v-if="authStore.wallet">W3: {{ authStore.wallet.address }}</code>
                         </b-form-group>
                         <b-form-group
                             :label="`MPC Private Key`"

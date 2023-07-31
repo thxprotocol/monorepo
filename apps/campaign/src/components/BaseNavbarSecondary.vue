@@ -76,12 +76,7 @@
                             @click="isModalWalletRecoveryShown = true"
                             size="sm"
                         >
-                            <div class="d-flex align-items-center justify-content-between">Install</div>
-                            <BaseModalWalletRecovery
-                                id="wallet-recovery"
-                                @hidden="isModalWalletRecoveryShown = false"
-                                :show="isModalWalletRecoveryShown"
-                            />
+                            <div class="d-flex align-items-center justify-content-between">Backup</div>
                         </b-dropdown-item-button>
 
                         <b-dropdown-item-button @click="isModalWalletConfigShown = true" size="sm">
@@ -102,6 +97,11 @@
                         </div>
                     </b-dropdown-item-button>
                 </b-dropdown>
+                <BaseModalWalletRecovery
+                    id="wallet-recovery"
+                    @hidden="isModalWalletRecoveryShown = false"
+                    :show="isModalWalletRecoveryShown"
+                />
             </template>
         </div>
     </b-navbar>
@@ -170,11 +170,11 @@ export default defineComponent({
         'authStore.isSecurityQuestionAvailable'(isSecurityQuestionAvailable) {
             const { oAuthShare, isDeviceShareAvailable } = this.authStore;
             if (!oAuthShare) return;
-            if (!isDeviceShareAvailable && isSecurityQuestionAvailable) {
-                // this.isModalWalletConfigShown = true; // TODO Disabled for shadow release
+            if (!isDeviceShareAvailable && isSecurityQuestionAvailable === true) {
+                this.isModalWalletConfigShown = true; // TODO Disabled for shadow release
             }
-            if (isDeviceShareAvailable && !isSecurityQuestionAvailable) {
-                // this.isModalWalletRecoveryShown = true; // TODO Disabled for shadow release
+            if (isDeviceShareAvailable && isSecurityQuestionAvailable === false) {
+                this.isModalWalletRecoveryShown = true; // TODO Disabled for shadow release
             }
         },
     },

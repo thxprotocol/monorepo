@@ -24,6 +24,7 @@ type TAccount = {
 };
 
 type TAuthState = {
+    wallet: Wallet;
     isDeviceShareAvailable: boolean | null;
     isSecurityQuestionAvailable: boolean | null;
     userManager: UserManager;
