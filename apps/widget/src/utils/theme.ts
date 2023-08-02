@@ -29,6 +29,9 @@ export function getStyles(elements: any, colors: any) {
         '.text-accent': {
             '--thx-accent': theme.colors.accent,
         },
+        '.text-primary': {
+            '--bs-primary-rgb': theme.elements.btnBg,
+        },
         'body,.bg-splash,.card-header-bg': {
             '--bs-body-bg': theme.elements.bodyBg,
             '--bs-body-color': theme.elements.text,

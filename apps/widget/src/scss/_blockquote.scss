@@ -22,3 +22,7 @@ blockquote {
     
      color: var(--thx-accent) !important;
 }
+.text-primary {
+    --thx-accent: $success;
+    color: var(--bs-primary-rgb) !important;
+}
