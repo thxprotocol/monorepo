@@ -29,6 +29,9 @@ export function getStyles(elements: any, colors: any) {
         '.text-accent': {
             '--thx-accent': theme.colors.accent,
         },
+        '.text-primary': {
+            '--bs-primary-rgb': theme.elements.btnBg,
+        },
         'body,.bg-splash,.card-header-bg': {
             '--bs-body-bg': theme.elements.bodyBg,
             '--bs-body-color': theme.elements.text,
@@ -54,10 +57,11 @@ export function getStyles(elements: any, colors: any) {
             '--bs-dropdown-link-active-bg': theme.elements.btnBgDarker,
             '--bs-dropdown-link-active-color': theme.elements.btnText,
         },
-        '.card': {
+        '.card, .card .badge': {
             '--bs-card-bg': theme.elements.cardBg,
             '--bs-card-color': theme.elements.cardText,
             '--bs-card-cap-color': theme.elements.cardText,
+            '--bs-badge-color': theme.elements.cardText,
             '--thx-card-header-hover-bg': theme.elements.cardHeaderHoverBg,
         },
         '.btn-primary': {
