@@ -4,6 +4,7 @@ type TWallet = {
     version: string;
     pendingTransactions: TTransaction[];
     token?: string;
+    safeVersion: string;
     latestVersion: string;
 };
 

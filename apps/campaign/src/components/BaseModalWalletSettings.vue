@@ -21,15 +21,56 @@
             <b-form>
                 <b-tabs justified content-class="mt-3">
                     <b-tab title="Key">
-                        <b-form-group v-if="walletStore.wallet" :label="`Safe Address`">
+                        <b-form-group v-if="walletStore.wallet">
+                            <template #label>
+                                <div class="d-flex align-items-center">
+                                    Wallet Address
+                                    <img
+                                        v-if="walletStore.wallet.safeVersion"
+                                        :src="imgSafeLogo"
+                                        v-b-tooltip
+                                        title="Secured by Safe (f.k.a. Gnosis Safe)"
+                                        width="15"
+                                        height="15"
+                                        style="border-radius: 3px"
+                                        class="ms-1"
+                                        alt="Safe Logo"
+                                    />
+                                </div>
+                            </template>
                             <code>{{ walletStore.wallet.address }}</code>
                         </b-form-group>
-                        <b-form-group v-if="accountStore.account" :label="`MPC Address`">
-                            <code>DB: {{ accountStore.account.address }}</code>
-                            <code v-if="authStore.wallet">W3: {{ authStore.wallet.address }}</code>
+                        <b-form-group v-if="accountStore.account" :label="`Account Address`">
+                            <template #label>
+                                Account Address
+                                <img
+                                    v-if="isMetamaskAccount"
+                                    :src="imgMetamaskLogo"
+                                    v-b-tooltip
+                                    title="Secured by Metamask"
+                                    width="15"
+                                    height="15"
+                                    style="border-radius: 3px"
+                                    class="ms-1"
+                                    alt="Metamask Logo"
+                                />
+                                <img
+                                    v-if="!isMetamaskAccount"
+                                    :src="imgWeb3AuthLogo"
+                                    v-b-tooltip
+                                    title="Secured by Web3Auth"
+                                    width="15"
+                                    height="15"
+                                    style="border-radius: 3px"
+                                    class="ms-1"
+                                    alt="Metamask Logo"
+                                />
+                            </template>
+                            <code>{{ accountStore.account.address }}</code>
                         </b-form-group>
                         <b-form-group
-                            :label="`MPC Private Key`"
+                            v-if="!isMetamaskAccount"
+                            :label="`Account Private Key`"
                             :description="`This self-custody key is reconstructed from Login, Device and Backup key shares. (${currentKeyTreshold})`"
                         >
                             <b-input-group>
@@ -92,25 +133,18 @@
                             <template v-else> Change Security Question </template>
                         </b-button>
                     </b-tab>
-                    <b-tab title="Recovery" active v-if="authStore.securityQuestion">
-                        <b-form-group :label="authStore.securityQuestion">
-                            <b-form-input
-                                v-model="passwordRecovery"
-                                type="password"
-                                placeholder="Answer"
-                                autocomplete="off"
-                            />
-                        </b-form-group>
-                        <b-button
-                            class="w-100"
-                            variant="primary"
-                            @click="onSubmitDeviceShareRecovery"
-                            :disabled="!!authStore.isDeviceShareAvailable"
-                        >
-                            <b-spinner small variant="light" v-if="isLoadingPasswordRecovery" />
-                            <template v-else> Recover Key </template>
+                    <!-- <b-tab title="Export">
+                        <p>Store the twelve word sequence somewhere safe and use it to recover wallet access.</p>
+                        <b-card bg-variant="dark" class="mb-3">
+                            <strong v-if="mnemonic" style="font-size: 1.3rem">{{ mnemonic }}</strong>
+                            <strong v-else>...</strong>
+                        </b-card>
+                        <b-alert v-if="mnemonic" variant="warning">Do not store your mnemonic on this device!</b-alert>
+                        <b-button class="w-100" variant="primary" @click="onSubmitCreateMnemonic">
+                            <b-spinner small variant="light" v-if="isLoadingMnemonic" />
+                            <template v-else>Create Backup</template>
                         </b-button>
-                    </b-tab>
+                    </b-tab> -->
                 </b-tabs>
             </b-form>
         </template>
@@ -123,11 +157,19 @@ import { useAccountStore } from '../stores/Account';
 import { useWalletStore } from '../stores/Wallet';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
+import { AccountVariant } from '../types/enums/accountVariant';
+import imgSafeLogo from '../assets/safe-logo.jpg';
+import imgMetamaskLogo from '../assets/metamask-logo.png';
+import imgWeb3AuthLogo from '../assets/web3auth-logo.jpeg';
+// import { tKey } from '../utils/tkey';
 
 export default defineComponent({
-    name: 'BaseModalWalletAccess',
+    name: 'BaseModalWalletSettings',
     data() {
         return {
+            imgSafeLogo,
+            imgMetamaskLogo,
+            imgWeb3AuthLogo,
             error: '',
             isShown: false,
             isCopied: false,
@@ -135,10 +177,10 @@ export default defineComponent({
             question: '',
             password: '',
             passwordCheck: '',
-            passwordRecovery: '',
+            // mnemonic: '',
             isLoadingReset: false,
-            isLoadingPasswordRecovery: false,
             isLoadingPasswordChange: false,
+            // isLoadingMnemonic: false,
         };
     },
     computed: {
@@ -147,10 +189,8 @@ export default defineComponent({
         ...mapStores(useWalletStore),
         privateKey() {
             if (!this.authStore.privateKey) return '';
-
-            const key = this.authStore.privateKey;
-            if (this.isPrivateKeyHidden) return key.replace(/./g, '•');
-            return key;
+            if (this.isPrivateKeyHidden) return this.authStore.privateKey.replace(/./g, '•');
+            return this.authStore.privateKey;
         },
         currentKeyTreshold() {
             const { oAuthShare, isDeviceShareAvailable } = useAuthStore();
@@ -160,6 +200,10 @@ export default defineComponent({
             if (isDeviceShareAvailable) i++;
 
             return `${i}/3`;
+        },
+        isMetamaskAccount() {
+            if (!this.accountStore.account) return false;
+            return this.accountStore.account.variant === AccountVariant.Metamask;
         },
         isSubmitDisabled: function () {
             return this.isLoading;
@@ -192,7 +236,7 @@ export default defineComponent({
         },
         async onShow() {
             this.password = '';
-            this.passwordRecovery = '';
+            this.passwordCheck = '';
             this.question = this.authStore.securityQuestion;
         },
         async onSubmitDeviceSharePasswordUpdate() {
@@ -203,26 +247,19 @@ export default defineComponent({
             await updateDeviceShare(this.password, this.question);
             this.isLoadingPasswordChange = false;
             this.password = '';
-        },
-        async onSubmitDeviceShareRecovery() {
-            this.error = '';
-            this.isLoadingPasswordRecovery = true;
-            try {
-                await this.authStore.recoverDeviceShare(this.passwordRecovery);
-                this.passwordRecovery = '';
-                this.$emit('hidden');
-            } catch (error) {
-                this.error = (error as Error).message;
-            } finally {
-                this.isLoadingPasswordRecovery = false;
-            }
+            this.passwordCheck = '';
         },
         async onSubmitResetAccount() {
             this.isLoadingReset = true;
             await this.authStore.reset();
             this.isLoadingReset = false;
-            this.passwordRecovery = '';
         },
+        // async onSubmitCreateMnemonic() {
+        //     this.isLoadingMnemonic = true;
+        //     const newShare = await tKey.generateNewShare();
+        //     this.mnemonic = (await tKey.outputShare(newShare.newShareIndex, 'mnemonic')) as string;
+        //     this.isLoadingMnemonic = false;
+        // },
     },
 });
 </script>

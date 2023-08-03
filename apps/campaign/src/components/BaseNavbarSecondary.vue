@@ -79,7 +79,7 @@
                             <div class="d-flex align-items-center justify-content-between">Backup</div>
                         </b-dropdown-item-button>
 
-                        <b-dropdown-item-button @click="isModalWalletConfigShown = true" size="sm">
+                        <b-dropdown-item-button @click="isModalWalletSettingsShown = true" size="sm">
                             <div class="d-flex align-items-center justify-content-between">Settings</div>
                         </b-dropdown-item-button>
                     </template>
@@ -92,10 +92,15 @@
                         </div>
                     </b-dropdown-item-button>
                 </b-dropdown>
-                <BaseModalWalletConfig
+                <BaseModalWalletSettings
+                    id="wallet-create"
+                    @hidden="isModalWalletCreateShown = false"
+                    :show="isModalWalletCreateShown"
+                />
+                <BaseModalWalletSettings
                     id="wallet-config"
-                    @hidden="isModalWalletConfigShown = false"
-                    :show="isModalWalletConfigShown"
+                    @hidden="isModalWalletSettingsShown = false"
+                    :show="isModalWalletSettingsShown"
                 />
                 <BaseModalWalletRecovery
                     id="wallet-recovery"
@@ -118,14 +123,16 @@ import { usePerkStore } from '../stores/Perk';
 import { decodeHTML } from '../utils/decode-html';
 import { AccountVariant } from '../types/enums/accountVariant';
 import BaseModalPoolSubscription from '../components/BaseModalPoolSubscription.vue';
-import BaseModalWalletConfig from '../components/BaseModalWalletConfig.vue';
+import BaseModalWalletCreate from '../components/BaseModalWalletCreate.vue';
+import BaseModalWalletSettings from '../components/BaseModalWalletSettings.vue';
 import BaseModalWalletRecovery from '../components/BaseModalWalletRecovery.vue';
 import { getIsMobile } from '../utils/user-agent';
 
 export default defineComponent({
-    name: 'Home',
+    name: 'BaseNavbarSecondary',
     components: {
-        BaseModalWalletConfig,
+        BaseModalWalletCreate,
+        BaseModalWalletSettings,
         BaseModalWalletRecovery,
         BaseModalPoolSubscription,
     },
@@ -133,11 +140,12 @@ export default defineComponent({
         return {
             AccountVariant,
             decodeHTML,
-            isModalWalletConfigShown: false,
+            error: '',
+            isRefreshing: false,
+            isModalWalletCreateShown: false,
+            isModalWalletSettingsShown: false,
             isModalWalletRecoveryShown: false,
             isModalPoolSubscriptionShown: false,
-            isRefreshing: false,
-            error: '',
         };
     },
     props: {},
@@ -170,12 +178,9 @@ export default defineComponent({
         'authStore.isSecurityQuestionAvailable'(isSecurityQuestionAvailable) {
             const { oAuthShare, isDeviceShareAvailable } = this.authStore;
             if (!oAuthShare) return;
-            if (!isDeviceShareAvailable && isSecurityQuestionAvailable === true) {
-                this.isModalWalletConfigShown = true;
-            }
-            if (isDeviceShareAvailable && isSecurityQuestionAvailable === false) {
-                this.isModalWalletRecoveryShown = true;
-            }
+
+            this.isModalWalletCreateShown = !isDeviceShareAvailable && !(isSecurityQuestionAvailable ?? false);
+            this.isModalWalletRecoveryShown = !isDeviceShareAvailable && (isSecurityQuestionAvailable ?? false);
         },
     },
     methods: {
