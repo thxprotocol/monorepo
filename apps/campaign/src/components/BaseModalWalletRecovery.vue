@@ -130,6 +130,7 @@ export default defineComponent({
             this.isLoadingPasswordCreate = true;
             await createDeviceShare(this.question, this.password);
             this.isLoadingPasswordCreate = false;
+            this.$emit('hidden');
         },
         async onSubmitCreateMnemonic() {
             this.isLoadingMnemonic = true;

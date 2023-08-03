@@ -22,7 +22,7 @@
             <i class="fas fa-wallet mr-lg-3"></i>
             <div>Wallet</div>
         </router-link>
-        <BaseNavbarSecondary class="ms-auto d-none d-lg-flex" />
+        <BaseNavbarSecondary v-if="isNavbarSecondaryShown" class="ms-auto d-none d-lg-flex" />
     </b-navbar>
 </template>
 
@@ -49,6 +49,9 @@ export default defineComponent({
         ...mapStores(useRewardStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
+        isNavbarSecondaryShown() {
+            return (() => window.innerWidth > 768)();
+        },
         config() {
             const { poolId, getConfig } = useAccountStore();
             if (!poolId) return;

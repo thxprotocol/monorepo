@@ -115,9 +115,10 @@ export const useAuthStore = defineStore('auth', {
         async getPrivateKey() {
             if (!this.oAuthShare) return;
             await this.getDeviceShare();
+            this.getSecurityQuestion();
+
             if (!this.isDeviceShareAvailable) return;
             this.reconstructKey();
-            this.getSecurityQuestion();
         },
         async sign(message: string) {
             if (!this.wallet) return;
@@ -146,9 +147,9 @@ export const useAuthStore = defineStore('auth', {
                 await tKey.modules.webStorage.inputShareFromWebStorage(); // 2/2 flow
                 this.isDeviceShareAvailable = true;
                 console.debug('Successfully asserted device share.');
-            } catch (e) {
+            } catch (error) {
                 this.isDeviceShareAvailable = false;
-                console.error(e);
+                console.error((error as Error).toString());
             }
         },
         async getSecurityQuestion() {
@@ -158,7 +159,7 @@ export const useAuthStore = defineStore('auth', {
                 console.debug('Successfully got security question.');
             } catch (error) {
                 this.isSecurityQuestionAvailable = false;
-                console.error(error);
+                console.error((error as Error).toString());
             }
         },
         async createDeviceShare(question: string, answer: string) {
@@ -167,7 +168,7 @@ export const useAuthStore = defineStore('auth', {
                 console.debug('Successfully generated new share with password.');
                 await this.getSecurityQuestion();
             } catch (error) {
-                console.debug('Error', (error as any)?.message.toString(), 'error');
+                console.error((error as Error).toString());
             }
         },
         async updateDeviceShare(answer: string, question: string) {

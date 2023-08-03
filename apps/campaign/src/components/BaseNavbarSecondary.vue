@@ -81,11 +81,6 @@
 
                         <b-dropdown-item-button @click="isModalWalletConfigShown = true" size="sm">
                             <div class="d-flex align-items-center justify-content-between">Settings</div>
-                            <BaseModalWalletConfig
-                                id="wallet-config"
-                                @hidden="isModalWalletConfigShown = false"
-                                :show="isModalWalletConfigShown"
-                            />
                         </b-dropdown-item-button>
                     </template>
 
@@ -97,6 +92,11 @@
                         </div>
                     </b-dropdown-item-button>
                 </b-dropdown>
+                <BaseModalWalletConfig
+                    id="wallet-config"
+                    @hidden="isModalWalletConfigShown = false"
+                    :show="isModalWalletConfigShown"
+                />
                 <BaseModalWalletRecovery
                     id="wallet-recovery"
                     @hidden="isModalWalletRecoveryShown = false"
@@ -171,10 +171,10 @@ export default defineComponent({
             const { oAuthShare, isDeviceShareAvailable } = this.authStore;
             if (!oAuthShare) return;
             if (!isDeviceShareAvailable && isSecurityQuestionAvailable === true) {
-                this.isModalWalletConfigShown = true; // TODO Disabled for shadow release
+                this.isModalWalletConfigShown = true;
             }
             if (isDeviceShareAvailable && isSecurityQuestionAvailable === false) {
-                this.isModalWalletRecoveryShown = true; // TODO Disabled for shadow release
+                this.isModalWalletRecoveryShown = true;
             }
         },
     },

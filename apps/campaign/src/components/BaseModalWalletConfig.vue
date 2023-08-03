@@ -210,6 +210,7 @@ export default defineComponent({
             try {
                 await this.authStore.recoverDeviceShare(this.passwordRecovery);
                 this.passwordRecovery = '';
+                this.$emit('hidden');
             } catch (error) {
                 this.error = (error as Error).message;
             } finally {
