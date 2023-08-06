@@ -2,9 +2,18 @@ import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import vue from '@vitejs/plugin-vue';
 import mkcert from 'vite-plugin-mkcert';
+import Components from 'unplugin-vue-components/vite';
+import { BootstrapVueNextResolver } from 'unplugin-vue-components/resolvers';
 
 export default defineConfig({
-    plugins: [mkcert(), vue(), nodePolyfills({ protocolImports: true })],
+    plugins: [
+        mkcert(),
+        vue(),
+        nodePolyfills({ protocolImports: true }),
+        Components({
+            resolvers: [BootstrapVueNextResolver()],
+        }),
+    ],
     server: {
         https: true,
         host: 'localhost',

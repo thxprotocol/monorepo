@@ -2,6 +2,7 @@ type TWallet = {
     _id: string;
     address: string;
     version: string;
+    chainId: number;
     pendingTransactions: TTransaction[];
     token?: string;
     safeVersion: string;

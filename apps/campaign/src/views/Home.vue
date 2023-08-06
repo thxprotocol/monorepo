@@ -1,5 +1,6 @@
 <template>
     <b-container class="flex-grow-1 overflow-auto order-lg-1 py-5">
+        <h2 class="mb-3">Campaign Discovery</h2>
         <b-row>
             <b-col v-if="isLoading || !campaigns.length" class="justify-content-center d-flex">
                 <b-spinner variant="light" />

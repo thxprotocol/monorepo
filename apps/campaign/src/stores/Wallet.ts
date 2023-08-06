@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
-import { API_URL } from '../config/secrets';
+import { API_URL, HARDHAT_RPC, POLYGON_RPC } from '../config/secrets';
 import { useAuthStore } from './Auth';
-import { EthersAdapter } from '@safe-global/protocol-kit';
+import { EthersAdapter, SafeConfig } from '@safe-global/protocol-kit';
 import { ethers } from 'ethers';
 import Safe from '@safe-global/protocol-kit';
+import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 
 // Safe Contracts
 const GnosisSafeProxyFactoryAddress = '0x1122fD9eBB2a8E7c181Cc77705d2B4cA5D72988A';
@@ -15,18 +16,6 @@ const MultiSendAddress = '0x7E4728eFfC9376CC7C0EfBCc779cC9833D83a984';
 const MultiSendCallOnlyAddress = '0x75Cbb6C4Db4Bb4f6F8D5F56072A6cF4Bf4C5413C';
 const SignMessageLibAddress = '0x658FAD2acB6d1E615f295E566ee9a6d32Cc97b10';
 const GnosisSafeL2Address = '0xC44951780f195Ed71145e3d0d2F25726A097C348';
-
-const contractNetworks: any = {
-    '31337': {
-        safeMasterCopyAddress: GnosisSafeL2Address,
-        safeProxyFactoryAddress: GnosisSafeProxyFactoryAddress,
-        multiSendAddress: MultiSendAddress,
-        multiSendCallOnlyAddress: MultiSendCallOnlyAddress,
-        fallbackHandlerAddress: CompatibilityFallbackHandlerAddress,
-        signMessageLibAddress: SignMessageLibAddress,
-        createCallAddress: CreateCallAddress,
-    },
-};
 
 export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
@@ -49,12 +38,9 @@ export const useWalletStore = defineStore('wallet', {
             const { api, getConfig, account, poolId } = useAccountStore();
             if (!account) return;
 
-            this.wallets = await api.wallets.list(getConfig(poolId).chainId, account.sub);
-
-            const primaryWallet = this.wallets.find((wallet) => wallet.address);
-            if (!primaryWallet) return;
-
-            this.wallet = primaryWallet;
+            this.wallets = await api.request.get(`/v1/account/wallet?chainId=${getConfig(poolId).chainId}`);
+            this.wallet = this.wallets.find((w) => w.address) as TWallet;
+            if (!this.wallet) return;
 
             for (const tx of this.wallet.pendingTransactions) {
                 await this.confirmTransaction(tx.transactionHash);
@@ -98,19 +84,48 @@ export const useWalletStore = defineStore('wallet', {
             await api.walletManager.upgrade(this.wallet?._id);
             track('UserCreates', [account?.sub, 'wallet upgrade']);
         },
+        getRPC(chainId: ChainId) {
+            switch (chainId) {
+                default:
+                case ChainId.Hardhat:
+                    return {
+                        url: HARDHAT_RPC,
+                        contractNetworks: {
+                            '31337': {
+                                safeMasterCopyAddress: GnosisSafeL2Address,
+                                safeProxyFactoryAddress: GnosisSafeProxyFactoryAddress,
+                                multiSendAddress: MultiSendAddress,
+                                multiSendCallOnlyAddress: MultiSendCallOnlyAddress,
+                                fallbackHandlerAddress: CompatibilityFallbackHandlerAddress,
+                                signMessageLibAddress: SignMessageLibAddress,
+                                createCallAddress: CreateCallAddress,
+                                simulateTxAccessorAddress: '0x',
+                            },
+                        },
+                    };
+                case ChainId.Polygon:
+                    return { url: POLYGON_RPC };
+            }
+        },
         async confirmTransaction(safeTxHash: string) {
             const { api } = useAccountStore();
             const { privateKey } = useAuthStore();
             if (!this.wallet || !privateKey) return;
 
-            const provider = new ethers.providers.JsonRpcProvider('https://localhost:8547');
+            const rpc = this.getRPC(this.wallet.chainId);
+            const provider = new ethers.providers.JsonRpcProvider(rpc.url);
             const signer = new ethers.Wallet(privateKey, provider);
             const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer }) as any;
-            const safe = await Safe.create({ ethAdapter, safeAddress: this.wallet.address, contractNetworks });
+            const config: SafeConfig = {
+                ethAdapter,
+                safeAddress: this.wallet.address,
+                contractNetworks: rpc.contractNetworks,
+            };
+            const safe = await Safe.create(config);
             const signature = await safe.signTransactionHash(safeTxHash);
 
-            return await api.request.post(`/v1/wallets/${this.wallet._id}/confirm`, {
-                body: JSON.stringify({ safeTxHash, signature: signature.data }),
+            return await api.request.post(`/v1/account/wallet/confirm`, {
+                body: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature: signature.data }),
             });
         },
     },

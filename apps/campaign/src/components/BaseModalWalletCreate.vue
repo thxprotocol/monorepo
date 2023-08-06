@@ -4,14 +4,14 @@
         v-model="isShown"
         @show="onShow"
         @hidden="$emit('hidden')"
-        no-close-on-backdrop
         centered
         hide-footer
+        no-close-on-backdrop
         no-close-on-esc
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-bell me-2"></i> Create Wallet</h5>
-            <b-link class="btn-close" @click="$emit('hidden')"> <i class="fas fa-times"></i> </b-link>
+            <!-- <b-link class="btn-close" @click="$emit('hidden')"> <i class="fas fa-times"></i> </b-link> -->
         </template>
         <div v-if="isLoading" class="text-center">
             <b-spinner show size="sm" />

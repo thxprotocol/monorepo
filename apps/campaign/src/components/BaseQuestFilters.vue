@@ -1,5 +1,5 @@
 <template>
-    <b-collapse id="collapse-filters" class="me-2 flex-grow-1">
+    <b-collapse id="collapse-filters" class="me-2 flex-grow-1" :is-nav="true">
         <div class="w-100 m-2 align-items-center d-flex">
             <i class="fas fa-filter text-primary me-2"></i>
             <b-dropdown size="sm" variant="primary" class="w-100" no-caret>

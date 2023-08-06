@@ -1,4 +1,4 @@
-import { BootstrapVue3 } from 'bootstrap-vue-3';
+import { BootstrapVueNext } from 'bootstrap-vue-next';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import { API_URL, MIXPANEL_TOKEN } from './config/secrets';
@@ -21,7 +21,7 @@ const app = createApp(App);
 
 app.use(pinia);
 app.use(router);
-app.use(BootstrapVue3);
+app.use(BootstrapVueNext);
 app.use(Vue3Toastify, {
     limit: 2,
 });

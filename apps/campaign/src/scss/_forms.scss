@@ -8,3 +8,15 @@
     background-color: var(--bs-body-bg);
     opacity: .75;
 }
+.was-validated .form-control:valid, .form-control.is-valid,
+.was-validated .form-control:invalid, .form-control.is-invalid {
+    background-size: calc(0.5em + 0.5rem) calc(0.5em + 0.5rem);
+}
+
+fieldset {
+    .col-form-label {
+        padding-bottom: .3rem;
+    }
+
+    margin-bottom: .7rem;
+}

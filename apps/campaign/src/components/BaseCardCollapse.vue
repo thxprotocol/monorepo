@@ -13,22 +13,24 @@
                 <slot name="header"></slot>
             </b-card-title>
         </template>
-        <b-collapse v-model="isVisible" class="p-3">
-            <slot></slot>
+        <b-collapse v-model="isVisible" class="px-3">
+            <div class="my-3">
+                <slot></slot>
 
-            <b-button-group class="w-100" block v-if="infoLinks && infoLinks.length">
-                <slot name="button"></slot>
+                <b-button-group class="w-100" block v-if="infoLinks && infoLinks.length">
+                    <slot name="button"></slot>
 
-                <b-dropdown right variant="primary" no-caret toggle-class="pe-3">
-                    <template #button-content>
-                        <i class="fas fa-caret-down"></i>
-                    </template>
-                    <b-dropdown-item @click="onClickLink(link.url)" :key="key" v-for="(link, key) of infoLinks">
-                        {{ link.label }}
-                    </b-dropdown-item>
-                </b-dropdown>
-            </b-button-group>
-            <slot v-else name="button"></slot>
+                    <b-dropdown right variant="primary" no-caret toggle-class="pe-3">
+                        <template #button-content>
+                            <i class="fas fa-caret-down"></i>
+                        </template>
+                        <b-dropdown-item @click="onClickLink(link.url)" :key="key" v-for="(link, key) of infoLinks">
+                            {{ link.label }}
+                        </b-dropdown-item>
+                    </b-dropdown>
+                </b-button-group>
+                <slot v-else name="button"></slot>
+            </div>
         </b-collapse>
     </b-card>
 </template>

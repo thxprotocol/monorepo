@@ -44,7 +44,7 @@
                         :error="error"
                     />
                 </b-button>
-                <b-button variant="link" v-b-toggle.collapse-filters>
+                <b-button variant="link" v-b-toggle.collapse-filters @click.prevent>
                     <i class="fas fa-sliders-h"></i>
                 </b-button>
             </template>
@@ -70,19 +70,9 @@
                         {{ walletAddress }}
                     </b-dropdown-item-button>
 
-                    <template v-if="accountStore.account && accountStore.account.variant !== AccountVariant.Metamask">
-                        <b-dropdown-item-button
-                            v-if="authStore.isDeviceShareAvailable && !authStore.isSecurityQuestionAvailable"
-                            @click="isModalWalletRecoveryShown = true"
-                            size="sm"
-                        >
-                            <div class="d-flex align-items-center justify-content-between">Backup</div>
-                        </b-dropdown-item-button>
-
-                        <b-dropdown-item-button @click="isModalWalletSettingsShown = true" size="sm">
-                            <div class="d-flex align-items-center justify-content-between">Settings</div>
-                        </b-dropdown-item-button>
-                    </template>
+                    <b-dropdown-item-button @click="isModalWalletSettingsShown = true" size="sm">
+                        <div class="d-flex align-items-center justify-content-between">Settings</div>
+                    </b-dropdown-item-button>
 
                     <b-dropdown-divider />
                     <b-dropdown-item-button size="sm" @click="onClickSignout">

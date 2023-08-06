@@ -6,7 +6,6 @@
         @hidden="$emit('hidden')"
         no-close-on-backdrop
         centered
-        hide-footer
         no-close-on-esc
     >
         <template #header>
@@ -20,57 +19,58 @@
             <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
             <b-form>
                 <b-tabs justified content-class="mt-3">
-                    <b-tab title="Key">
-                        <b-form-group v-if="walletStore.wallet">
+                    <b-tab title="About">
+                        <b-form-group v-if="walletStore.wallet?.safeVersion">
                             <template #label>
                                 <div class="d-flex align-items-center">
-                                    Wallet Address
                                     <img
-                                        v-if="walletStore.wallet.safeVersion"
-                                        :src="imgSafeLogo"
                                         v-b-tooltip
                                         title="Secured by Safe (f.k.a. Gnosis Safe)"
+                                        :src="imgSafeLogo"
                                         width="15"
                                         height="15"
                                         style="border-radius: 3px"
-                                        class="ms-1"
+                                        class="me-2"
                                         alt="Safe Logo"
                                     />
+                                    Wallet Address
                                 </div>
                             </template>
                             <code>{{ walletStore.wallet.address }}</code>
                         </b-form-group>
-                        <b-form-group v-if="accountStore.account" :label="`Account Address`">
+                        <b-form-group v-if="accountStore.account">
                             <template #label>
-                                Account Address
-                                <img
-                                    v-if="isMetamaskAccount"
-                                    :src="imgMetamaskLogo"
-                                    v-b-tooltip
-                                    title="Secured by Metamask"
-                                    width="15"
-                                    height="15"
-                                    style="border-radius: 3px"
-                                    class="ms-1"
-                                    alt="Metamask Logo"
-                                />
-                                <img
-                                    v-if="!isMetamaskAccount"
-                                    :src="imgWeb3AuthLogo"
-                                    v-b-tooltip
-                                    title="Secured by Web3Auth"
-                                    width="15"
-                                    height="15"
-                                    style="border-radius: 3px"
-                                    class="ms-1"
-                                    alt="Metamask Logo"
-                                />
+                                <div class="d-flex align-items-center">
+                                    <img
+                                        v-b-tooltip
+                                        title="Secured by Metamask"
+                                        v-if="isMetamaskAccount"
+                                        :src="imgMetamaskLogo"
+                                        width="15"
+                                        height="15"
+                                        style="border-radius: 3px"
+                                        class="me-2"
+                                        alt="Metamask Logo"
+                                    />
+                                    <img
+                                        v-b-tooltip
+                                        title="Secured by Web3Auth"
+                                        v-if="!isMetamaskAccount"
+                                        :src="imgWeb3AuthLogo"
+                                        width="15"
+                                        height="15"
+                                        style="border-radius: 3px"
+                                        class="me-2"
+                                        alt="Web3Auth Logo"
+                                    />
+                                    Account Address
+                                </div>
                             </template>
                             <code>{{ accountStore.account.address }}</code>
                         </b-form-group>
                         <b-form-group
                             v-if="!isMetamaskAccount"
-                            :label="`Account Private Key`"
+                            label="Account Private Key"
                             :description="`This self-custody key is reconstructed from Login, Device and Backup key shares. (${currentKeyTreshold})`"
                         >
                             <b-input-group>
@@ -96,12 +96,8 @@
                                 </b-input-group-append>
                             </b-input-group>
                         </b-form-group>
-                        <b-button class="w-100 text-danger" variant="link" @click="onSubmitResetAccount">
-                            <b-spinner small variant="light" v-if="isLoadingReset" />
-                            <template v-else> Reset Key </template>
-                        </b-button>
                     </b-tab>
-                    <b-tab title="Security" v-if="authStore.securityQuestion">
+                    <b-tab title="Security Question" v-if="authStore.securityQuestion">
                         <b-form-group>
                             <b-form-input v-model="question" placeholder="Question" />
                         </b-form-group>
@@ -147,6 +143,13 @@
                     </b-tab> -->
                 </b-tabs>
             </b-form>
+        </template>
+        <template #footer>
+            <!-- <b-button class="w-100 text-danger" variant="link" @click="onSubmitResetAccount">
+                <b-spinner small variant="light" v-if="isLoadingReset" />
+                <template v-else> Reset Account </template>
+            </b-button> -->
+            <b-button class="w-100" variant="primary" @click="$emit('hidden')">Close</b-button>
         </template>
     </b-modal>
 </template>

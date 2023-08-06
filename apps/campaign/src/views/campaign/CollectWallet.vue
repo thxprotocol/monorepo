@@ -87,7 +87,7 @@ export default defineComponent({
     methods: {
         async onClickCollect() {
             try {
-                await this.accountStore.api.request.patch('/v1/account/wallet', {
+                await this.accountStore.api.request.post('/v1/account/wallet/connect', {
                     body: JSON.stringify({ code: this.uuid }),
                 });
                 await this.rewardsStore.list();
