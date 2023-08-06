@@ -50,6 +50,11 @@ type TAccountState = {
     isRewardsLoaded: boolean;
     api: THXClient | null;
     poolId: string;
+    migration: {
+        wallet: TWallet;
+        erc20Tokens: { erc20: TERC20; balance: string }[];
+        erc721Tokens: TERC721Token[];
+    } | null;
     balance: number;
     account: TAccount | null;
     subscription: TSubscription | null;

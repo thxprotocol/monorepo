@@ -20,6 +20,7 @@ export const useAccountStore = defineStore('account', {
         api: null,
         account: null,
         balance: 0,
+        migration: null,
         subscription: null,
         isAuthenticated: null,
         isRewardsLoaded: false,
@@ -171,6 +172,12 @@ export const useAccountStore = defineStore('account', {
                 state: { isMobile, origin: window.location.href },
                 id_token_hint: authStore.user.id_token,
             });
+        },
+        async migrate() {
+            await this.api.request.post('/v1/account/wallet/migrate');
+        },
+        async getWalletMigration() {
+            this.migration = await this.api.request.get('/v1/account/wallet/migrate');
         },
         async getUserData() {
             const rewardsStore = useRewardStore();

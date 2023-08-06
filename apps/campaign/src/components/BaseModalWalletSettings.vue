@@ -4,8 +4,9 @@
         v-model="isShown"
         @show="onShow"
         @hidden="$emit('hidden')"
-        no-close-on-backdrop
         centered
+        hide-footer
+        no-close-on-backdrop
         no-close-on-esc
     >
         <template #header>
@@ -67,6 +68,68 @@
                                 </div>
                             </template>
                             <code>{{ accountStore.account.address }}</code>
+                        </b-form-group>
+                        <b-form-group
+                            v-if="
+                                accountStore.migration &&
+                                accountStore.migration.erc20Tokens.length + accountStore.migration.erc721Tokens.length >
+                                    -1
+                            "
+                        >
+                            <p>
+                                Smart Wallet (deprecated)
+                                <code>{{ accountStore.migration.wallet.address }}</code>
+                            </p>
+                            <p>
+                                Migrate
+                                <strong
+                                    >{{
+                                        accountStore.migration.erc20Tokens.length +
+                                        accountStore.migration.erc721Tokens.length
+                                    }}
+                                    tokens
+                                </strong>
+                                to your new Safe wallet.
+                            </p>
+                            <b-list-group class="mb-3">
+                                <b-list-group-item class="d-flex align-items-center bg-primary text-white">
+                                    <strong>ERC20</strong>
+                                    <b-badge variant="primary" class="ms-auto">{{
+                                        accountStore.migration.erc20Tokens.length
+                                    }}</b-badge>
+                                </b-list-group-item>
+                                <b-list-group-item
+                                    :key="key"
+                                    v-for="(token, key) of accountStore.migration.erc20Tokens"
+                                    class="bg-primary text-white"
+                                >
+                                    {{ token.balance }} {{ token.erc20.symbol }}
+                                </b-list-group-item>
+                                <b-list-group-item class="d-flex align-items-center bg-primary text-white">
+                                    <strong>ERC721</strong>
+                                    <b-badge variant="primary" class="ms-auto">{{
+                                        accountStore.migration.erc721Tokens.length
+                                    }}</b-badge>
+                                </b-list-group-item>
+                                <b-list-group-item
+                                    :key="key"
+                                    v-for="(token, key) of accountStore.migration.erc721Tokens"
+                                    class="bg-primary text-white"
+                                >
+                                    {{ token.metadata.name }}
+                                </b-list-group-item>
+                            </b-list-group>
+                            <b-button class="w-100" variant="primary" @click="onClickMigrate">
+                                <b-spinner v-if="isMigratingTokens" variant="light" small />
+                                Migrate
+                                <strong
+                                    >{{
+                                        accountStore.migration.erc20Tokens.length +
+                                        accountStore.migration.erc721Tokens.length
+                                    }}
+                                    tokens
+                                </strong>
+                            </b-button>
                         </b-form-group>
                         <b-form-group
                             v-if="!isMetamaskAccount"
@@ -145,11 +208,10 @@
             </b-form>
         </template>
         <template #footer>
-            <!-- <b-button class="w-100 text-danger" variant="link" @click="onSubmitResetAccount">
+            <b-button class="w-100 text-danger" variant="link" @click="onSubmitResetAccount">
                 <b-spinner small variant="light" v-if="isLoadingReset" />
                 <template v-else> Reset Account </template>
-            </b-button> -->
-            <b-button class="w-100" variant="primary" @click="$emit('hidden')">Close</b-button>
+            </b-button>
         </template>
     </b-modal>
 </template>
@@ -183,6 +245,7 @@ export default defineComponent({
             // mnemonic: '',
             isLoadingReset: false,
             isLoadingPasswordChange: false,
+            isMigratingTokens: false,
             // isLoadingMnemonic: false,
         };
     },
@@ -237,10 +300,16 @@ export default defineComponent({
         onCopySuccess() {
             this.isCopied = true;
         },
+        async onClickMigrate() {
+            this.isMigratingTokens = true;
+            await this.accountStore.migrate();
+            this.isMigratingTokens = false;
+        },
         async onShow() {
             this.password = '';
             this.passwordCheck = '';
             this.question = this.authStore.securityQuestion;
+            this.accountStore.getWalletMigration();
         },
         async onSubmitDeviceSharePasswordUpdate() {
             const { oAuthShare, isDeviceShareAvailable, updateDeviceShare } = this.authStore;

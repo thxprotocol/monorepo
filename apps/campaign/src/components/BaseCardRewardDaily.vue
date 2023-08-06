@@ -20,15 +20,17 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <div class="d-flex flex-wrap pb-3">
+        <div class="d-flex flex-wrap pb-3 justify-content-between">
             <b-badge
-                class="m-1 d-block"
+                class="m-1 d-block text-center"
                 :variant="key < reward.claims.length ? 'success' : 'white'"
                 :class="key < reward.claims.length ? 'text-white' : 'text-primary'"
                 :key="key"
                 v-for="(amount, key) of reward.amounts"
             >
-                {{ amount }}
+                <small>Day {{ key + 1 }}</small
+                ><br />
+                <strong class="h5">{{ amount }}</strong>
             </b-badge>
         </div>
 
