@@ -1,8 +1,7 @@
 import ThresholdKey from '@tkey/default';
 import WebStorageModule from '@tkey/web-storage';
 import SecurityQuestionsModule from '@tkey/security-questions';
-import { API_URL, AUTH_URL, CLIENT_ID, VERIFIER_ID, VERIFIER_NETWORK } from '../config/secrets';
-import { randHex } from './rand-hex';
+import { AUTH_URL, VERIFIER_NETWORK } from '../config/secrets';
 
 const WEB3AUTHCLIENTID = 'BJ6l3_kIQiy6YVL7zDlCcEAvGpGukwFgp-C_0WvNI_fAEeIaoVRLDrV5OjtbZr_zJxbyXFsXMT-yhQiUNYvZWpo';
 
@@ -11,6 +10,7 @@ const securityQuestionsModule = new SecurityQuestionsModule();
 const customAuthArgs = {
     web3AuthClientId: WEB3AUTHCLIENTID,
     baseUrl: `${window.location.origin}`,
+    redirectPathName: 'signin-silent.html',
     enableLogging: true,
     network: VERIFIER_NETWORK,
     redirectToOpener: true,
@@ -27,33 +27,4 @@ const tKey: ThresholdKey & { serviceProvider?: any; modules?: { securityQuestion
         customAuthArgs,
     });
 
-function getUser(storageKey: string) {
-    return JSON.parse(localStorage.getItem(storageKey) as string);
-}
-
-function getRequestConfig(extraQueryParams: { [key: string]: string }) {
-    const sessionId = randHex(32);
-    return {
-        verifier: VERIFIER_ID,
-        typeOfLogin: 'jwt',
-        clientId: CLIENT_ID,
-        enableLogging: false,
-        customState: {
-            id: sessionId,
-        },
-        jwtParams: {
-            code_challenge_method: 'S256',
-            domain: AUTH_URL,
-            resource: API_URL,
-            response_type: 'code',
-            response_mode: 'query',
-            prompt: 'consent', // Should be an empty string to avoid default 'login' prompt
-            grant_type: 'authorization_code',
-            scope: 'openid offline_access account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
-            user_info_route: 'me',
-            ...extraQueryParams,
-        },
-    };
-}
-
-export { tKey, getUser, getRequestConfig };
+export { tKey };
