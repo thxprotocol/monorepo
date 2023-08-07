@@ -39,7 +39,7 @@ export const useWalletStore = defineStore('wallet', {
             if (!account) return;
 
             this.wallets = await api.request.get(`/v1/account/wallet?chainId=${getConfig(poolId).chainId}`);
-            this.wallet = this.wallets.find((w) => w.address) as TWallet;
+            this.wallet = this.wallets.find((w) => w.safeVersion) as TWallet;
             if (!this.wallet) return;
 
             for (const tx of this.wallet.pendingTransactions) {

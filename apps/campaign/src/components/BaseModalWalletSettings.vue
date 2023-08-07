@@ -21,7 +21,7 @@
             <b-form>
                 <b-tabs justified content-class="mt-3">
                     <b-tab title="About">
-                        <b-form-group v-if="walletStore.wallet?.safeVersion">
+                        <b-form-group v-if="walletStore.wallet">
                             <template #label>
                                 <div class="d-flex align-items-center">
                                     <img
@@ -103,27 +103,27 @@
                                     v-for="(token, key) of accountStore.migration.erc20Tokens"
                                     class="bg-primary text-white"
                                 >
-                                    {{ token.balance }} {{ token.erc20.symbol }}
+                                    {{ fromWei(token.balance) }} {{ token.erc20.symbol }}
                                 </b-list-group-item>
                                 <b-list-group-item class="d-flex align-items-center bg-primary text-white">
                                     <strong>ERC721</strong>
-                                    <b-badge variant="primary" class="ms-auto">{{
-                                        accountStore.migration.erc721Tokens.length
-                                    }}</b-badge>
+                                    <b-badge variant="primary" class="ms-auto">
+                                        {{ accountStore.migration.erc721Tokens.length }}
+                                    </b-badge>
                                 </b-list-group-item>
                                 <b-list-group-item
                                     :key="key"
                                     v-for="(token, key) of accountStore.migration.erc721Tokens"
                                     class="bg-primary text-white"
                                 >
-                                    {{ token.metadata.name }}
+                                    {{ token.metadata ? token.metadata.name : 'Metadata not found' }}
                                 </b-list-group-item>
                             </b-list-group>
                             <b-button class="w-100" variant="primary" @click="onClickMigrate">
                                 <b-spinner v-if="isMigratingTokens" variant="light" small />
                                 Migrate
-                                <strong
-                                    >{{
+                                <strong>
+                                    {{
                                         accountStore.migration.erc20Tokens.length +
                                         accountStore.migration.erc721Tokens.length
                                     }}
@@ -226,6 +226,7 @@ import { AccountVariant } from '../types/enums/accountVariant';
 import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgMetamaskLogo from '../assets/metamask-logo.png';
 import imgWeb3AuthLogo from '../assets/web3auth-logo.jpeg';
+import { fromWei } from 'web3-utils';
 // import { tKey } from '../utils/tkey';
 
 export default defineComponent({
@@ -247,6 +248,7 @@ export default defineComponent({
             isLoadingPasswordChange: false,
             isMigratingTokens: false,
             // isLoadingMnemonic: false,
+            fromWei,
         };
     },
     computed: {
