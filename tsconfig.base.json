@@ -10,14 +10,14 @@
         "experimentalDecorators": true,
         "esModuleInterop": true,
         "importHelpers": true,
-        "target": "es2019",
+        "target": "ES2022",
         "module": "esnext",
-        "lib": ["es2019", "dom"],
+        "lib": ["ES2022", "dom"],
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@thxnetwork/widget": ["apps/widget/src*"],
+            "@thxnetwork/campaign": ["apps/campaign/src*"],
             "@thxnetwork/common": ["libs/common/src/index.ts"],
             "@thxnetwork/mixpanel": ["libs/common/src/lib/mixpanel.ts"]
         }

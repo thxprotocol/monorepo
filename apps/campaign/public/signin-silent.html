@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Redirect</title>
+</head>
+
+<body>
+    Loading...
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client-ts/2.1.0/browser/oidc-client-ts.min.js"
+            integrity="sha512-v9YAXYIA7sZ48R0CuD5+nKrTrFfSQT4i7iRDSbAhZFYy6mkxom6wvNnkW6fiZ916YoovjrwDlUQLRS7xZuJddw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const url = new URL(window.location);
+        const state = JSON.parse(localStorage.getItem(`oidc.${url.searchParams.get('state')}`));
+        const userManager = new window.oidc.UserManager({
+            authority: url.searchParams.get('iss'),
+            client_id: state && state.data.client_id,
+            redirect_uri: url.origin + '/singin-popup.html',
+            userStore: new window.oidc.WebStorageStateStore({store: window.localStorage}),
+        });
+
+        userManager.signinSilentCallback()
+    </script>
+</body>
+
+</html>

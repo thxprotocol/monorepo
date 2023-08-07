@@ -1,0 +1,9 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "types": ["node", "./views/**/*.d.ts"]
+    },
+    "exclude": ["**/*.spec.ts", "**/*.test.ts"],
+    "include": ["**/*.ts", "**/*.tsx", "**/*.vue", "../../libs/common/**/*"]
+}
