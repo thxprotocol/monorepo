@@ -82,7 +82,7 @@
                         </div>
                     </b-dropdown-item-button>
                 </b-dropdown>
-                <BaseModalWalletSettings
+                <BaseModalWalletCreate
                     id="wallet-create"
                     @hidden="isModalWalletCreateShown = false"
                     :show="isModalWalletCreateShown"

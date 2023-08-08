@@ -259,7 +259,6 @@ export default defineComponent({
             this.password = '';
             this.passwordCheck = '';
             this.question = this.authStore.securityQuestion;
-            this.accountStore.getWalletMigration();
         },
         async onSubmitDeviceSharePasswordUpdate() {
             const { oAuthShare, isDeviceShareAvailable, updateDeviceShare } = this.authStore;
