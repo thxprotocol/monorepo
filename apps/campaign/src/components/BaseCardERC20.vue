@@ -43,6 +43,7 @@ import { mapStores } from 'pinia';
 import { useWalletStore } from '../stores/Wallet';
 import { useAccountStore } from '../stores/Account';
 import { toast } from '../utils/toast';
+import { fromWei } from 'web3-utils';
 
 export default defineComponent({
     name: 'BaseCardERC20',
@@ -69,7 +70,7 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
         isMigrateAvailable() {
-            return this.accountStore.migration?.erc20Tokens.find((token: TERC20Token) => this.token._id === token._id);
+            return Number(fromWei(this.token.migrationBalance)) > 0;
         },
     },
     mounted() {},

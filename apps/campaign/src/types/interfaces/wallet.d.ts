@@ -41,6 +41,7 @@ type TERC721Token = {
     _id: string;
     sub: string;
     nft: TERC721 | TERC1155;
+    recipient: string;
     metadata: TNFTMetadata;
     tokenUri: string;
     tokenId: string;
@@ -82,6 +83,7 @@ type TERC20Token = {
     symbol: string;
     balance: number;
     walletBalance: number;
+    migrationBalance: string;
     logoImg: string;
     erc20: TERC20;
 };

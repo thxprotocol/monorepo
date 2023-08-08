@@ -137,9 +137,7 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
         isMigrateAvailable() {
-            return this.accountStore.migration?.erc721Tokens.find(
-                (token: TERC721Token) => this.token._id === token._id,
-            );
+            return this.token.recipient !== this.walletStore.wallet?.address;
         },
     },
     async mounted() {
