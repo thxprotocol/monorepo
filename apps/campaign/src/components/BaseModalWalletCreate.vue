@@ -5,34 +5,22 @@
         @show="onShow"
         @hidden="$emit('hidden')"
         centered
-        hide-footer
         no-close-on-backdrop
         no-close-on-esc
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-bell me-2"></i> Create Wallet</h5>
-            <!-- <b-link class="btn-close" @click="$emit('hidden')"> <i class="fas fa-times"></i> </b-link> -->
         </template>
-        <div v-if="isLoading" class="text-center">
-            <b-spinner show size="sm" />
-        </div>
-        <template v-else>
-            <p>This question will be asked when you sign in on a different device.</p>
-            <b-form-group>
-                <b-form-input v-model="question" placeholder="Question" />
-            </b-form-group>
-            <b-form-group :state="isPasswordValid">
-                <b-form-input :state="isPasswordValid" v-model="password" type="password" placeholder="Answer" />
-            </b-form-group>
-            <b-form-group :state="isPasswordValid">
-                <b-form-input
-                    :state="isPasswordValid"
-                    v-model="passwordCheck"
-                    type="password"
-                    placeholder="Answer again"
-                />
-            </b-form-group>
-        </template>
+        <p>This question will be asked when you sign in on another device.</p>
+        <b-form-group>
+            <b-form-input v-model="question" placeholder="Question" />
+        </b-form-group>
+        <b-form-group :state="isPasswordValid">
+            <b-form-input :state="isPasswordValid" v-model="password" type="password" placeholder="Answer" />
+        </b-form-group>
+        <b-form-group :state="isPasswordValid">
+            <b-form-input :state="isPasswordValid" v-model="passwordCheck" type="password" placeholder="Answer again" />
+        </b-form-group>
         <template #footer>
             <b-button
                 :disabled="!password.length || !!authStore.isDeviceShareAvailable"
@@ -67,9 +55,6 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
-        isSubmitDisabled: function () {
-            return this.isLoading;
-        },
         isPasswordValid: function () {
             if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
             return undefined;
@@ -84,9 +69,6 @@ export default defineComponent({
             type: String,
         },
         show: {
-            type: Boolean,
-        },
-        isLoading: {
             type: Boolean,
         },
     },
