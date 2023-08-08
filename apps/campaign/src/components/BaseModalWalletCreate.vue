@@ -23,7 +23,7 @@
         </b-form-group>
         <template #footer>
             <b-button
-                :disabled="!password.length || !!authStore.isDeviceShareAvailable"
+                :disabled="!isPasswordValid || !!authStore.isDeviceShareAvailable"
                 class="w-100"
                 variant="primary"
                 @click="onSubmitDeviceSharePasswordCreate"
