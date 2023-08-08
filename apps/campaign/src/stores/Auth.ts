@@ -165,6 +165,7 @@ export const useAuthStore = defineStore('auth', {
         async createDeviceShare(question: string, answer: string) {
             try {
                 await tKey.modules.securityQuestions.generateNewShareWithSecurityQuestions(answer, question);
+                await this.reconstructKey();
                 console.debug('Successfully generated new share with password.');
                 await this.getSecurityQuestion();
             } catch (error) {
