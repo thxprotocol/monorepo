@@ -32,8 +32,10 @@
                     placeholder="Answer again"
                 />
             </b-form-group>
+        </template>
+        <template #footer>
             <b-button
-                :disabled="!password.length || !authStore.isDeviceShareAvailable"
+                :disabled="!password.length || !!authStore.isDeviceShareAvailable"
                 class="w-100"
                 variant="primary"
                 @click="onSubmitDeviceSharePasswordCreate"
@@ -96,7 +98,6 @@ export default defineComponent({
     methods: {
         async onShow() {
             this.password = '';
-            this.mnemonic = '';
             this.question = this.authStore.securityQuestion;
         },
         async onSubmitDeviceSharePasswordCreate() {
