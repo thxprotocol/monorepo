@@ -9,7 +9,7 @@
         no-close-on-esc
     >
         <template #header>
-            <h5 class="modal-title"><i class="fas fa-key me-2"></i> Create Wallet</h5>
+            <h5 class="modal-title"><i class="fas fa-key me-2"></i> Create Self-Custodial Wallet</h5>
         </template>
         <p>
             This question will be asked when you sign in on another device.
