@@ -132,11 +132,7 @@ export default defineComponent({
         async onSubmitReset() {
             this.isLoadingReset = true;
             await this.authStore.resetKey();
-            this.isCreateFailed = false;
-            this.isLoadingReset = false;
-            this.question = '';
-            this.password = '';
-            this.passwordCheck = '';
+            window.location.reload();
         },
     },
 });
