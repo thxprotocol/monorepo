@@ -15,7 +15,7 @@
             This question will be asked when you sign in on another device.
             <strong>Store your answer safely!</strong>
         </p>
-        <b-alert v-model="isCreateFailed" variant="info" class="p-2 px-3">
+        <b-alert v-model="isAlertShown" variant="info" class="p-2 px-3">
             <i class="fas fa-exclamation-circle me-2"></i>Unable to submit your security question.
             <p class="mb-0">
                 <b-link @click="onSubmitReset">Reset recent attempts</b-link> or
@@ -88,6 +88,9 @@ export default defineComponent({
             if (this.password.length && this.password.length < 10) return false;
             return undefined;
         },
+        isAlertShown() {
+            return this.isCreateFailed || (this.isPasswordValid && !this.authStore.isDeviceShareAvailable);
+        },
     },
     props: {
         id: {
@@ -131,8 +134,9 @@ export default defineComponent({
             await this.authStore.resetKey();
             this.isCreateFailed = false;
             this.isLoadingReset = false;
-            this.password = '';
             this.question = '';
+            this.password = '';
+            this.passwordCheck = '';
         },
     },
 });
