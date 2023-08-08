@@ -5,7 +5,6 @@
         @show="onShow"
         @hidden="$emit('hidden')"
         centered
-        hide-footer
         no-close-on-backdrop
         no-close-on-esc
     >
@@ -69,11 +68,7 @@
                             </template>
                             <code>{{ accountStore.account.address }}</code>
                         </b-form-group>
-                        <b-form-group
-                            v-if="!isMetamaskAccount"
-                            label="Account Private Key"
-                            :description="`This self-custody key is reconstructed from Login, Device and Backup key shares. (${currentKeyTreshold})`"
-                        >
+                        <b-form-group v-if="!isMetamaskAccount" :label="`Account Private Key (${currentKeyTreshold})`">
                             <b-input-group>
                                 <b-form-input :value="privateKey" />
                                 <b-input-group-append>
@@ -102,26 +97,26 @@
                         <b-form-group>
                             <b-form-input v-model="question" placeholder="Question" />
                         </b-form-group>
-                        <b-form-group :state="isPasswordValid">
+                        <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
                             <b-form-input
                                 :state="isPasswordValid"
                                 v-model="password"
                                 type="password"
-                                placeholder="New answer"
+                                placeholder="Answer"
                                 autocomplete="off"
                             />
                         </b-form-group>
-                        <b-form-group :state="isPasswordValid">
+                        <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
                             <b-form-input
                                 :state="isPasswordValid"
                                 v-model="passwordCheck"
                                 type="password"
-                                placeholder="New answer again"
+                                placeholder="Answer again"
                                 autocomplete="off"
                             />
                         </b-form-group>
                         <b-button
-                            :disabled="!password.length || !authStore.isDeviceShareAvailable"
+                            :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable"
                             class="w-100"
                             variant="primary"
                             @click="onSubmitDeviceSharePasswordUpdate"
@@ -201,11 +196,12 @@ export default defineComponent({
             return this.authStore.privateKey;
         },
         currentKeyTreshold() {
-            const { oAuthShare, isDeviceShareAvailable } = useAuthStore();
+            const { oAuthShare, isDeviceShareAvailable, isSecurityQuestionAvailable } = useAuthStore();
 
             let i = 0;
             if (oAuthShare) i++;
             if (isDeviceShareAvailable) i++;
+            if (isSecurityQuestionAvailable) i++;
 
             return `${i}/3`;
         },
@@ -213,11 +209,9 @@ export default defineComponent({
             if (!this.accountStore.account) return false;
             return this.accountStore.account.variant === AccountVariant.Metamask;
         },
-        isSubmitDisabled: function () {
-            return this.isLoading;
-        },
         isPasswordValid: function () {
             if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
+            if (this.password.length && this.password.length < 10) return false;
             return undefined;
         },
     },
@@ -241,19 +235,6 @@ export default defineComponent({
     methods: {
         onCopySuccess() {
             this.isCopied = true;
-        },
-        async onClickMigrate() {
-            if (!this.accountStore.migration) return;
-            this.isMigratingTokens = true;
-            for (const token of this.accountStore.migration.erc20Tokens) {
-                await this.accountStore.migrate({ erc20Id: token.erc20._id });
-                this.erc20TokenMigrationCount++;
-            }
-            for (const token of this.accountStore.migration.erc721Tokens) {
-                await this.accountStore.migrate({ erc721TokenId: token._id });
-                this.erc721TokenMigrationCount++;
-            }
-            this.isMigratingTokens = false;
         },
         async onShow() {
             this.password = '';

@@ -17,7 +17,9 @@
             <b-spinner show size="sm" />
         </div>
         <template v-else>
-            <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
+            <b-alert v-model="isFailedRecovery" show variant="danger" class="p-2">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+            </b-alert>
             <b-form>
                 <b-form-group :label="authStore.securityQuestion">
                     <b-form-input v-model="passwordRecovery" type="password" placeholder="Answer" autocomplete="off" />
@@ -52,6 +54,7 @@ export default defineComponent({
             question: '',
             passwordRecovery: '',
             isLoadingPasswordRecovery: false,
+            isFailedRecovery: false,
         };
     },
     computed: {
@@ -95,12 +98,14 @@ export default defineComponent({
         async onSubmitDeviceShareRecovery() {
             this.error = '';
             this.isLoadingPasswordRecovery = true;
+            this.isFailedRecovery = false;
             try {
                 await this.authStore.recoverDeviceShare(this.passwordRecovery);
                 this.passwordRecovery = '';
                 this.$emit('hidden');
             } catch (error) {
                 this.error = (error as Error).message;
+                this.isFailedRecovery = true;
             } finally {
                 this.isLoadingPasswordRecovery = false;
             }

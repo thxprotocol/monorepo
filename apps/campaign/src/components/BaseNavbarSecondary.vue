@@ -169,7 +169,7 @@ export default defineComponent({
             const { oAuthShare, isDeviceShareAvailable } = this.authStore;
             if (!oAuthShare) return;
 
-            this.isModalWalletCreateShown = !isDeviceShareAvailable && !(isSecurityQuestionAvailable ?? false);
+            this.isModalWalletCreateShown = isDeviceShareAvailable && !(isSecurityQuestionAvailable ?? false);
             this.isModalWalletRecoveryShown = !isDeviceShareAvailable && (isSecurityQuestionAvailable ?? false);
         },
     },

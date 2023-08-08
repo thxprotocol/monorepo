@@ -117,7 +117,6 @@ export const useAccountStore = defineStore('account', {
             const { chainId } = this.getConfig(this.poolId);
             // this.account = await this.api.account.get(chainId);
             this.account = await this.api.request.get('/v1/account' + (chainId && `?chainId=${chainId}`));
-            this.migration = await this.api.request.get('/v1/account/wallet/migrate');
         },
         async getBalance() {
             const { balance } = await this.api.pointBalance.list();
@@ -173,6 +172,7 @@ export const useAccountStore = defineStore('account', {
                 state: { isMobile, origin: window.location.href },
                 id_token_hint: authStore.user.id_token,
             });
+            this.isAuthenticated = null;
         },
         async migrate(body: { erc20Id?: string; erc721Id?: string; erc721TokenId?: string }) {
             await this.api.request.post('/v1/account/wallet/migrate', { body: JSON.stringify(body) });

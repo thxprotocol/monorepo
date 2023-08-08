@@ -11,25 +11,51 @@
         <template #header>
             <h5 class="modal-title"><i class="fas fa-bell me-2"></i> Create Wallet</h5>
         </template>
-        <p>This question will be asked when you sign in on another device.</p>
+        <p>
+            This question will be asked when you sign in on another device.
+            <strong>Store your answer safely!</strong>
+        </p>
+        <b-alert v-model="isCreateFailed" variant="info" class="p-2 px-3">
+            <i class="fas fa-exclamation-circle me-2"></i>Unable to submit your security question.
+            <p class="mb-0">
+                <b-link @click="onSubmitReset">Reset recent attempts</b-link> or
+                <b-link href="" target="_blank">Contact support</b-link>
+            </p>
+        </b-alert>
         <b-form-group>
             <b-form-input v-model="question" placeholder="Question" />
         </b-form-group>
-        <b-form-group :state="isPasswordValid">
-            <b-form-input :state="isPasswordValid" v-model="password" type="password" placeholder="Answer" />
+        <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
+            <b-form-input
+                :state="isPasswordValid"
+                v-model="password"
+                type="password"
+                placeholder="Answer"
+                autocomplete="off"
+            />
         </b-form-group>
-        <b-form-group :state="isPasswordValid">
-            <b-form-input :state="isPasswordValid" v-model="passwordCheck" type="password" placeholder="Answer again" />
+        <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
+            <b-form-input
+                :state="isPasswordValid"
+                v-model="passwordCheck"
+                type="password"
+                placeholder="Answer again"
+                autocomplete="off"
+            />
         </b-form-group>
         <template #footer>
             <b-button
-                :disabled="!isPasswordValid || !!authStore.isDeviceShareAvailable"
+                :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable"
                 class="w-100"
                 variant="primary"
                 @click="onSubmitDeviceSharePasswordCreate"
             >
                 <b-spinner small variant="light" v-if="isLoadingPasswordCreate" />
                 <template v-else> Set Security Question </template>
+            </b-button>
+            <b-button variant="link" class="w-100 text-danger" @click="onSubmitReset">
+                <b-spinner small variant="light" v-if="isLoadingReset" />
+                <template v-else>Reset</template>
             </b-button>
         </template>
     </b-modal>
@@ -49,7 +75,9 @@ export default defineComponent({
             question: '',
             password: '',
             passwordCheck: '',
+            isCreateFailed: false,
             isLoadingPasswordCreate: false,
+            isLoadingReset: false,
         };
     },
     computed: {
@@ -57,6 +85,7 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         isPasswordValid: function () {
             if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
+            if (this.password.length && this.password.length < 10) return false;
             return undefined;
         },
     },
@@ -80,16 +109,30 @@ export default defineComponent({
     methods: {
         async onShow() {
             this.password = '';
-            this.question = this.authStore.securityQuestion;
+            this.question = '';
         },
         async onSubmitDeviceSharePasswordCreate() {
             const { oAuthShare, isDeviceShareAvailable, createDeviceShare } = this.authStore;
-            if (!oAuthShare || !!isDeviceShareAvailable) return;
+            if (!oAuthShare || !isDeviceShareAvailable) return;
 
             this.isLoadingPasswordCreate = true;
-            await createDeviceShare(this.question, this.password);
-            this.isLoadingPasswordCreate = false;
-            this.$emit('hidden');
+            try {
+                await createDeviceShare(this.question, this.password);
+                this.isLoadingPasswordCreate = false;
+                this.$emit('hidden');
+            } catch (error) {
+                this.isLoadingPasswordCreate = false;
+                this.isCreateFailed = true;
+                console.error(error);
+            }
+        },
+        async onSubmitReset() {
+            this.isLoadingReset = true;
+            await this.authStore.resetKey();
+            this.isCreateFailed = false;
+            this.isLoadingReset = false;
+            this.password = '';
+            this.question = '';
         },
     },
 });

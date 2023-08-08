@@ -125,12 +125,15 @@ export const useAuthStore = defineStore('auth', {
             return await this.wallet.signMessage(message);
         },
         async reset() {
+            await this.resetKey();
+            await useAccountStore().signout();
+        },
+        async resetKey() {
             // WARNING Irreversible
             await tKey.storageLayer.setMetadata({
                 privKey: this.oAuthShare as any,
                 input: { message: 'KEY_NOT_FOUND' },
             });
-            await useAccountStore().signout();
         },
         async reconstructKey() {
             const { requiredShares } = tKey.getKeyDetails();
@@ -165,7 +168,6 @@ export const useAuthStore = defineStore('auth', {
         async createDeviceShare(question: string, answer: string) {
             try {
                 await tKey.modules.securityQuestions.generateNewShareWithSecurityQuestions(answer, question);
-                await this.reconstructKey();
                 console.debug('Successfully generated new share with password.');
                 await this.getSecurityQuestion();
             } catch (error) {

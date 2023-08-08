@@ -188,7 +188,7 @@ export default defineComponent({
             toast(
                 'Transfer to Safe Wallet...',
                 15000,
-                async () => await this.accountStore.migrate({ erc20Id: this.token.erc20._id }),
+                async () => await this.accountStore.migrate({ erc721TokenId: this.token._id }),
                 async () => await this.walletStore.list(),
             );
 
