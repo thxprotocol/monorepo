@@ -70,69 +70,6 @@
                             <code>{{ accountStore.account.address }}</code>
                         </b-form-group>
                         <b-form-group
-                            v-if="
-                                accountStore.migration &&
-                                accountStore.migration.erc20Tokens.length + accountStore.migration.erc721Tokens.length >
-                                    -1
-                            "
-                        >
-                            <p>
-                                Smart Wallet (deprecated)
-                                <code>{{ accountStore.migration.wallet.address }}</code>
-                            </p>
-                            <p>
-                                Migrate
-                                <strong>
-                                    {{
-                                        accountStore.migration.erc20Tokens.length +
-                                        accountStore.migration.erc721Tokens.length
-                                    }}
-                                    tokens
-                                </strong>
-                                to your new Safe wallet.
-                            </p>
-                            <b-list-group class="mb-3">
-                                <b-list-group-item class="d-flex align-items-center bg-primary text-white">
-                                    <strong>ERC20</strong>
-                                    <b-badge variant="primary" class="ms-auto">{{
-                                        accountStore.migration.erc20Tokens.length
-                                    }}</b-badge>
-                                </b-list-group-item>
-                                <b-list-group-item class="bg-primary text-white">
-                                    <b-progress :max="accountStore.migration.erc20Tokens.length">
-                                        <b-progress-bar :value="erc721TokenMigrationCount" />
-                                    </b-progress>
-                                </b-list-group-item>
-                                <b-list-group-item class="d-flex align-items-center bg-primary text-white">
-                                    <strong>ERC721</strong>
-                                    <b-badge variant="primary" class="ms-auto">
-                                        {{ accountStore.migration.erc721Tokens.length }}
-                                    </b-badge>
-                                </b-list-group-item>
-                                <b-list-group-item class="bg-primary text-white">
-                                    <b-progress :max="accountStore.migration.erc721Tokens.length">
-                                        <b-progress-bar :value="erc721TokenMigrationCount" />
-                                    </b-progress>
-                                </b-list-group-item>
-                            </b-list-group>
-                            <b-button
-                                class="w-100"
-                                variant="primary"
-                                @click="onClickMigrate"
-                                :disabled="isMigratingTokens"
-                            >
-                                <b-spinner v-if="isMigratingTokens" variant="light" small />
-                                Migrate
-                                <strong>
-                                    {{
-                                        accountStore.migration.erc20Tokens.length +
-                                        accountStore.migration.erc721Tokens.length
-                                    }}
-                                    tokens
-                                </strong>
-                            </b-button>
-                        </b-form-group>
-                        <b-form-group
                             v-if="!isMetamaskAccount"
                             label="Account Private Key"
                             :description="`This self-custody key is reconstructed from Login, Device and Backup key shares. (${currentKeyTreshold})`"

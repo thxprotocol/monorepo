@@ -23,6 +23,7 @@
                     <template #button-content>
                         <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                     </template>
+                    <b-dropdown-item v-if="isMigrateAvailable" @click="onClickMigrate"> Migrate </b-dropdown-item>
                     <b-dropdown-item
                         :disabled="
                             token.nft.variant === NFTVariant.ERC1155 ||
@@ -127,12 +128,19 @@ export default defineComponent({
             balance: '',
             isVisible: false,
             isModalTransferShown: false,
+            isMigratingTokens: false,
             error: '',
             isSubmitting: false,
         };
     },
     computed: {
+        ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
+        isMigrateAvailable() {
+            return this.accountStore.migration?.erc721Tokens.find(
+                (token: TERC721Token) => this.token._id === token._id,
+            );
+        },
     },
     async mounted() {
         if (!this.token.tokenId) {
@@ -176,6 +184,17 @@ export default defineComponent({
             };
 
             return poll({ taskFn, interval: 3000, retries: 20 });
+        },
+        async onClickMigrate() {
+            this.isMigratingTokens = true;
+            toast(
+                'Transfer to Safe Wallet...',
+                15000,
+                async () => await this.accountStore.migrate({ erc20Id: this.token.erc20._id }),
+                async () => await this.walletStore.list(),
+            );
+
+            this.isMigratingTokens = false;
         },
     },
 });

@@ -77,6 +77,7 @@ type TERC1155 = {
 };
 
 type TERC20Token = {
+    _id: string;
     name: string;
     symbol: string;
     balance: number;

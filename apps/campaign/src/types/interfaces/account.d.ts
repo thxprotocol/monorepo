@@ -52,7 +52,7 @@ type TAccountState = {
     poolId: string;
     migration: {
         wallet: TWallet;
-        erc20Tokens: { erc20: TERC20; balance: string }[];
+        erc20Tokens: TERC20Token[];
         erc721Tokens: TERC721Token[];
     } | null;
     balance: number;

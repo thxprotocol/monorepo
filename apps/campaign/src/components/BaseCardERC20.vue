@@ -13,6 +13,7 @@
                 <template #button-content>
                     <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                 </template>
+                <b-dropdown-item @click="onClickMigrate"> Migrate </b-dropdown-item>
                 <b-dropdown-item
                     @click="isModalTransferShown = true"
                     :disabled="
@@ -40,6 +41,7 @@ import BaseModalERC20Transfer from '../components/BaseModalERC20Transfer.vue';
 import { defineComponent, PropType } from 'vue';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../stores/Wallet';
+import { useAccountStore } from '../stores/Account';
 import { toast } from '../utils/toast';
 
 export default defineComponent({
@@ -57,13 +59,18 @@ export default defineComponent({
         return {
             showToast: true,
             isModalTransferShown: false,
+            isMigratingTokens: false,
             error: '',
             isPendingApproval: false,
             isPendingTransfer: false,
         };
     },
     computed: {
+        ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
+        isMigrateAvailable() {
+            return this.accountStore.migration?.erc20Tokens.find((token: TERC20Token) => this.token._id === token._id);
+        },
     },
     mounted() {},
     methods: {
@@ -91,6 +98,17 @@ export default defineComponent({
                     await this.walletStore.list();
                 },
             );
+        },
+        async onClickMigrate() {
+            this.isMigratingTokens = true;
+            toast(
+                'Transfer to Safe Wallet...',
+                15000,
+                async () => await this.accountStore.migrate({ erc20Id: this.token.erc20._id }),
+                async () => await this.walletStore.list(),
+            );
+
+            this.isMigratingTokens = false;
         },
     },
 });
