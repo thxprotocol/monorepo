@@ -173,8 +173,8 @@ export const useAccountStore = defineStore('account', {
                 id_token_hint: authStore.user.id_token,
             });
         },
-        async migrate() {
-            await this.api.request.post('/v1/account/wallet/migrate');
+        async migrate(body: { erc20Id?: string; erc721Id?: string; erc721TokenId?: string }) {
+            await this.api.request.post('/v1/account/wallet/migrate', { body: JSON.stringify(body) });
         },
         async getWalletMigration() {
             this.migration = await this.api.request.get('/v1/account/wallet/migrate');

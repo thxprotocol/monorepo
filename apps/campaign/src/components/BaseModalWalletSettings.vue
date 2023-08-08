@@ -82,8 +82,8 @@
                             </p>
                             <p>
                                 Migrate
-                                <strong
-                                    >{{
+                                <strong>
+                                    {{
                                         accountStore.migration.erc20Tokens.length +
                                         accountStore.migration.erc721Tokens.length
                                     }}
@@ -98,12 +98,10 @@
                                         accountStore.migration.erc20Tokens.length
                                     }}</b-badge>
                                 </b-list-group-item>
-                                <b-list-group-item
-                                    :key="key"
-                                    v-for="(token, key) of accountStore.migration.erc20Tokens"
-                                    class="bg-primary text-white"
-                                >
-                                    {{ fromWei(token.balance) }} {{ token.erc20.symbol }}
+                                <b-list-group-item class="bg-primary text-white">
+                                    <b-progress :max="accountStore.migration.erc20Tokens.length">
+                                        <b-progress-bar :value="erc721TokenMigrationCount" />
+                                    </b-progress>
                                 </b-list-group-item>
                                 <b-list-group-item class="d-flex align-items-center bg-primary text-white">
                                     <strong>ERC721</strong>
@@ -111,15 +109,18 @@
                                         {{ accountStore.migration.erc721Tokens.length }}
                                     </b-badge>
                                 </b-list-group-item>
-                                <b-list-group-item
-                                    :key="key"
-                                    v-for="(token, key) of accountStore.migration.erc721Tokens"
-                                    class="bg-primary text-white"
-                                >
-                                    {{ token.metadata ? token.metadata.name : 'Metadata not found' }}
+                                <b-list-group-item class="bg-primary text-white">
+                                    <b-progress :max="accountStore.migration.erc721Tokens.length">
+                                        <b-progress-bar :value="erc721TokenMigrationCount" />
+                                    </b-progress>
                                 </b-list-group-item>
                             </b-list-group>
-                            <b-button class="w-100" variant="primary" @click="onClickMigrate">
+                            <b-button
+                                class="w-100"
+                                variant="primary"
+                                @click="onClickMigrate"
+                                :disabled="isMigratingTokens"
+                            >
                                 <b-spinner v-if="isMigratingTokens" variant="light" small />
                                 Migrate
                                 <strong>
@@ -248,6 +249,8 @@ export default defineComponent({
             isLoadingPasswordChange: false,
             isMigratingTokens: false,
             // isLoadingMnemonic: false,
+            erc20TokenMigrationCount: 0,
+            erc721TokenMigrationCount: 0,
             fromWei,
         };
     },
@@ -303,8 +306,16 @@ export default defineComponent({
             this.isCopied = true;
         },
         async onClickMigrate() {
+            if (!this.accountStore.migration) return;
             this.isMigratingTokens = true;
-            await this.accountStore.migrate();
+            for (const token of this.accountStore.migration.erc20Tokens) {
+                await this.accountStore.migrate({ erc20Id: token.erc20._id });
+                this.erc20TokenMigrationCount++;
+            }
+            for (const token of this.accountStore.migration.erc721Tokens) {
+                await this.accountStore.migrate({ erc721TokenId: token._id });
+                this.erc721TokenMigrationCount++;
+            }
             this.isMigratingTokens = false;
         },
         async onShow() {
