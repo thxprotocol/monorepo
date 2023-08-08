@@ -201,12 +201,13 @@ export const useAccountStore = defineStore('account', {
 
             await this.getAccount().then(async () => {
                 if (!this.account || this.account.variant === AccountVariant.Metamask) return;
-
+                const { sign, wallet } = useAuthStore();
                 // Patch the account with the MPC address
                 const authRequestMessage = 'validate_account_address_ownership';
-                const authRequestSignature = await useAuthStore().sign(authRequestMessage);
+                const authRequestSignature = await sign(authRequestMessage);
 
                 await this.api.account.patch(JSON.stringify({ authRequestMessage, authRequestSignature }));
+                this.account.address = wallet.address;
             });
 
             this.isAuthenticated = true;
