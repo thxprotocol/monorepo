@@ -84,7 +84,7 @@ export default defineComponent({
         },
         async onSubmitDeviceSharePasswordCreate() {
             const { oAuthShare, isDeviceShareAvailable, createDeviceShare } = this.authStore;
-            if (!oAuthShare || !isDeviceShareAvailable) return;
+            if (!oAuthShare || !!isDeviceShareAvailable) return;
 
             this.isLoadingPasswordCreate = true;
             await createDeviceShare(this.question, this.password);
