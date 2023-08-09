@@ -168,11 +168,18 @@ export default defineComponent({
         'authStore.isSecurityQuestionAvailable'(isSecurityQuestionAvailable) {
             const { oAuthShare, isDeviceShareAvailable } = this.authStore;
             if (!oAuthShare) return;
+
             console.debug({ isDeviceShareAvailable, isSecurityQuestionAvailable });
+
             this.isModalWalletCreateShown =
                 (isDeviceShareAvailable && !(isSecurityQuestionAvailable ?? false)) ||
                 (!isDeviceShareAvailable && !(isSecurityQuestionAvailable ?? false));
             this.isModalWalletRecoveryShown = !isDeviceShareAvailable && (isSecurityQuestionAvailable ?? false);
+
+            // Achieved 3/3, let's patch account address and deploy Safe!
+            if (isDeviceShareAvailable && isSecurityQuestionAvailable) {
+                this.accountStore.updateAccountAddress().then(() => this.walletStore.list());
+            }
         },
     },
     methods: {

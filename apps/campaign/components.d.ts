@@ -11,6 +11,7 @@ declare module 'vue' {
     BaseAlertWalletAddress: typeof import('./src/components/BaseAlertWalletAddress.vue')['default']
     BaseBlockquoteDiscordInviteUsed: typeof import('./src/components/blockquote/BaseBlockquoteDiscordInviteUsed.vue')['default']
     BaseBlockquoteDiscordServerJoin: typeof import('./src/components/blockquote/BaseBlockquoteDiscordServerJoin.vue')['default']
+    BaseBlockquoteTwitterMessage: typeof import('./src/components/blockquote/BaseBlockquoteTwitterMessage.vue')['default']
     BaseBlockquoteTwitterTweet: typeof import('./src/components/blockquote/BaseBlockquoteTwitterTweet.vue')['default']
     BaseBlockquoteTwitterUser: typeof import('./src/components/blockquote/BaseBlockquoteTwitterUser.vue')['default']
     BaseBlockquoteVideo: typeof import('./src/components/blockquote/BaseBlockquoteVideo.vue')['default']
@@ -75,6 +76,7 @@ declare module 'vue' {
     BSpinner: typeof import('bootstrap-vue-next')['BSpinner']
     BTab: typeof import('bootstrap-vue-next')['BTab']
     BTabs: typeof import('bootstrap-vue-next')['BTabs']
+    copy: typeof import('./src/components/blockquote/BaseBlockquoteTwitterTweet copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

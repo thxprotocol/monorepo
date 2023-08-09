@@ -52,10 +52,10 @@ export const useAccountStore = defineStore('account', {
             this.poolId = poolId;
             this.isAuthenticated = false;
 
-            const data = await this.api.request.get('/v1/widget/' + poolId);
+            const config = await this.api.request.get('/v1/widget/' + poolId);
 
-            this.setConfig(this.poolId, { ...data, origin });
-            this.setTheme(data);
+            this.setConfig(this.poolId, { ...config, origin });
+            this.setTheme(config);
             this.getUserData();
 
             authStore.userManager.events.addUserLoaded(this.onUserLoaded);
@@ -84,9 +84,7 @@ export const useAccountStore = defineStore('account', {
                 track('UserOpens', [this.account?.sub || '', `widget iframe`, { origin, poolId, isShown: true }]);
             }
 
-            if (origin) {
-                window.top?.postMessage({ message: 'thx.widget.ready' }, origin);
-            }
+            this.postMessage({ message: 'thx.widget.ready' });
         },
         onLoad() {
             // debugger;
@@ -182,17 +180,12 @@ export const useAccountStore = defineStore('account', {
             const perksStore = usePerkStore();
             const walletStore = useWalletStore();
             const { oAuthShare } = useAuthStore();
-            const { origin } = this.getConfig(this.poolId);
 
             rewardsStore.list().then(() => {
                 const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
 
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
-                if (window.self !== window.top) {
-                    console.log({ origin });
-                    window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
-                }
-
+                this.postMessage({ message: 'thx.reward.amount', amount });
                 this.isRewardsLoaded = true;
             });
             perksStore.list();
@@ -200,15 +193,26 @@ export const useAccountStore = defineStore('account', {
             // Guard HTTP requests that do require auth
             if (!oAuthShare) return;
 
-            await this.getAccount().then(this.updateAccountAddress);
+            await this.getAccount();
+            await Promise.all([this.getBalance(), this.getSubscription(), walletStore.list(), walletStore.getWallet()]);
 
             this.isAuthenticated = true;
-            track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
 
-            await Promise.all([this.getBalance(), this.getSubscription(), walletStore.list(), walletStore.getWallet()]);
+            track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
+        },
+        postMessage(payload: any) {
+            const { origin } = this.getConfig(this.poolId);
+            if (origin && window.self !== window.top) {
+                window.top?.postMessage(payload, origin);
+            }
         },
         async updateAccountAddress() {
-            if (!this.account || this.account.variant === AccountVariant.Metamask) return;
+            if (!this.account || this.account.address) return;
+
+            const isMetamask = this.account.variant === AccountVariant.Metamask;
+            const hasPrivateKey = useAuthStore().privateKey;
+            if (isMetamask || !hasPrivateKey) return;
+
             // Patch the account with the MPC address
             const authRequestMessage = 'validate_account_address_ownership';
             const authRequestSignature = await useAuthStore().sign(authRequestMessage);

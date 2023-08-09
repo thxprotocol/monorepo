@@ -31,8 +31,6 @@ export enum RewardConditionInteraction {
     TwitterRetweet = 3,
     TwitterFollow = 4,
     DiscordGuildJoined = 5,
-    ShopifyOrderAmount = 6,
-    ShopifyTotalSpent = 7,
-    ShopifyNewsletterSubscription = 8,
+    TwitterMessage = 6,
     DiscordInviteUsed = 9,
 }

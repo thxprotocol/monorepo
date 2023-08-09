@@ -67,6 +67,7 @@ import { RewardConditionPlatform, RewardConditionInteraction } from '../types/en
 import { getInteractionComponent, getConnectionStatus } from '../utils/social';
 import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 import BaseBlockquoteTwitterTweet from './blockquote/BaseBlockquoteTwitterTweet.vue';
+import BaseBlockquoteTwitterMessage from './blockquote/BaseBlockquoteTwitterMessage.vue';
 import BaseBlockquoteTwitterUser from './blockquote/BaseBlockquoteTwitterUser.vue';
 import BaseBlockquoteYoutubeChannelSubscription from '../components/blockquote/BaseBlockquoteYoutubeChannelSubscription.vue';
 import BaseBlockquoteVideo from '../components/blockquote/BaseBlockquoteVideo.vue';
@@ -80,6 +81,7 @@ export default defineComponent({
         BaseBlockquoteYoutubeChannelSubscription,
         BaseBlockquoteVideo,
         BaseBlockquoteTwitterTweet,
+        BaseBlockquoteTwitterMessage,
         BaseBlockquoteTwitterUser,
         BaseBlockquoteDiscordServerJoin,
         BaseBlockquoteDiscordInviteUsed,

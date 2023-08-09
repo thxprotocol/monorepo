@@ -29,6 +29,8 @@ function getInteractionComponent(interaction: RewardConditionInteraction) {
             return 'BaseBlockquoteTwitterTweet';
         case RewardConditionInteraction.TwitterFollow:
             return 'BaseBlockquoteTwitterUser';
+        case RewardConditionInteraction.TwitterMessage:
+            return 'BaseBlockquoteTwitterMessage';
         case RewardConditionInteraction.DiscordGuildJoined:
             return 'BaseBlockquoteDiscordServerJoin';
         case RewardConditionInteraction.DiscordInviteUsed:

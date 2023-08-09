@@ -25,6 +25,7 @@
                     </template>
                     <b-dropdown-item v-if="isMigrateAvailable" @click="onClickMigrate"> Migrate </b-dropdown-item>
                     <b-dropdown-item
+                        v-else
                         :disabled="
                             token.nft.variant === NFTVariant.ERC1155 ||
                             (walletStore.wallet?.version &&

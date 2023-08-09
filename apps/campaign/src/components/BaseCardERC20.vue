@@ -13,8 +13,9 @@
                 <template #button-content>
                     <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                 </template>
-                <b-dropdown-item @click="onClickMigrate"> Migrate </b-dropdown-item>
+                <b-dropdown-item @click="onClickMigrate" v-if="isMigrateAvailable"> Migrate </b-dropdown-item>
                 <b-dropdown-item
+                    v-else
                     @click="isModalTransferShown = true"
                     :disabled="
                         walletStore.wallet?.version && walletStore.wallet?.version !== walletStore.wallet?.latestVersion
