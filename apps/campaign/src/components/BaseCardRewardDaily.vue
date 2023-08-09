@@ -23,8 +23,8 @@
         <div class="d-flex flex-wrap pb-3 justify-content-between">
             <b-badge
                 class="m-1 d-block text-center"
-                :variant="key < reward.claims.length ? 'success' : 'white'"
-                :class="key < reward.claims.length ? 'text-white' : 'text-primary'"
+                :variant="key < reward.claims.length ? 'success' : 'primary'"
+                :class="key < reward.claims.length ? 'text-white' : 'text-white'"
                 :key="key"
                 v-for="(amount, key) of reward.amounts"
             >

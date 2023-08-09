@@ -25,11 +25,6 @@ const routes: Array<RouteRecordRaw> = [
         },
         children: [
             {
-                path: '/c/:poolId/redirect',
-                component: () =>
-                    import(/* webpackChunkName: "signinredirect" */ '../views/campaign/SigninRedirect.vue'),
-            },
-            {
                 path: '/c/:poolId/quests',
                 name: 'quests',
                 beforeEnter,

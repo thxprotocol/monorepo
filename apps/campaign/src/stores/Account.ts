@@ -189,6 +189,7 @@ export const useAccountStore = defineStore('account', {
 
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
                 if (window.self !== window.top) {
+                    console.log({ origin });
                     window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
                 }
 
@@ -199,21 +200,21 @@ export const useAccountStore = defineStore('account', {
             // Guard HTTP requests that do require auth
             if (!oAuthShare) return;
 
-            await this.getAccount().then(async () => {
-                if (!this.account || this.account.variant === AccountVariant.Metamask) return;
-                const { sign, wallet } = useAuthStore();
-                // Patch the account with the MPC address
-                const authRequestMessage = 'validate_account_address_ownership';
-                const authRequestSignature = await sign(authRequestMessage);
-
-                await this.api.account.patch(JSON.stringify({ authRequestMessage, authRequestSignature }));
-                this.account.address = wallet.address;
-            });
+            await this.getAccount().then(this.updateAccountAddress);
 
             this.isAuthenticated = true;
             track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
 
             await Promise.all([this.getBalance(), this.getSubscription(), walletStore.list(), walletStore.getWallet()]);
+        },
+        async updateAccountAddress() {
+            if (!this.account || this.account.variant === AccountVariant.Metamask) return;
+            // Patch the account with the MPC address
+            const authRequestMessage = 'validate_account_address_ownership';
+            const authRequestSignature = await useAuthStore().sign(authRequestMessage);
+
+            await this.api.account.patch(JSON.stringify({ authRequestMessage, authRequestSignature }));
+            this.account.address = useAuthStore().wallet.address;
         },
     },
 });
