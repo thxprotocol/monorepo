@@ -1,6 +1,6 @@
 import { THXClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
-import { API_URL } from '../config/secrets';
+import { API_URL, WIDGET_URL } from '../config/secrets';
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
@@ -40,6 +40,11 @@ export const useAccountStore = defineStore('account', {
             const data = { ...this.getConfig(poolId), ...config };
             localStorage.setItem(`thx:widget:${poolId}:config`, JSON.stringify(data));
             this.poolId = poolId;
+
+            // thx.network and dev-www.thx.network
+            if (['6286444ba9838bc5ed9fe117', '62f3cad8f838cc0640563e41', '64d499eb1651f15b76a56a0b'].includes(poolId)) {
+                window.location.href = WIDGET_URL + '/maintenance';
+            }
         },
         setTheme(config: TWidgetConfig) {
             const { title, theme } = config;
@@ -54,6 +59,7 @@ export const useAccountStore = defineStore('account', {
 
             this.api = new THXClient({ url: API_URL, accessToken: '', poolId });
             this.poolId = poolId;
+
             this.isAuthenticated = false;
 
             const config = await this.api.request.get('/v1/widget/' + poolId);
