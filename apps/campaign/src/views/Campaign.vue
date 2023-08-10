@@ -82,6 +82,11 @@ export default defineComponent({
             if (event.origin !== localOrigin) return;
 
             switch (event.data.message) {
+                case 'thx.iframe.debug': {
+                    debugger;
+                    this.accountStore.debug();
+                    break;
+                }
                 case 'thx.iframe.navigate': {
                     this.onIframeNavigate(event.data.path);
                     break;

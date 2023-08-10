@@ -53,10 +53,10 @@
                 <b-spinner small variant="light" v-if="isLoadingPasswordCreate" />
                 <template v-else> Set Security Question </template>
             </b-button>
-            <b-button variant="link" class="w-100 text-danger" @click="onSubmitReset">
+            <!-- <b-button variant="link" class="w-100 text-danger" @click="onSubmitReset">
                 <b-spinner small variant="light" v-if="isLoadingReset" />
                 <template v-else>Reset</template>
-            </b-button>
+            </b-button> -->
         </template>
     </b-modal>
 </template>

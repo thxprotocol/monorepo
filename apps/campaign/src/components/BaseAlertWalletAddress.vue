@@ -1,9 +1,9 @@
 <template>
-    <b-alert v-if="authStore.oAuthShare && isWaitingForWalletAddress" variant="info" show class="p-2">
+    <b-alert v-model="isAlertInfoShown" variant="info" show class="p-2">
         <span>Preparing your smart wallet...</span>
         <div class="d-flex justify-content-between align-items-center">
             <b-progress
-                class="w-100 my-2"
+                class="w-100 my-1"
                 style="height: 0.5rem"
                 :value="pollingProgress"
                 :max="100"
@@ -31,8 +31,10 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useWalletStore),
         isWaitingForWalletAddress() {
-            const { wallet } = useWalletStore();
-            return !wallet || !wallet.address;
+            return !this.walletStore.wallet?.address;
+        },
+        isAlertInfoShown() {
+            return !!this.authStore.oAuthShare && this.isWaitingForWalletAddress;
         },
     },
     data() {

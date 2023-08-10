@@ -16,6 +16,7 @@ import poll from 'promise-poller';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
+        debugger: null,
         poolId: '',
         api: null,
         account: null,
@@ -27,6 +28,9 @@ export const useAccountStore = defineStore('account', {
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
+        debug() {
+            this.debugger = true;
+        },
         getConfig: (poolId: string): TWidgetConfig => {
             const data = localStorage.getItem(`thx:widget:${poolId}:config`);
             if (!data) return {} as TWidgetConfig;
@@ -92,7 +96,6 @@ export const useAccountStore = defineStore('account', {
         async onUserLoaded(user: User) {
             const authStore = useAuthStore();
             await authStore.onUserLoadedCallback(user);
-            authStore.getPrivateKey();
 
             this.api.setAccessToken(user.access_token);
             this.getUserData();
@@ -179,7 +182,7 @@ export const useAccountStore = defineStore('account', {
             const rewardsStore = useRewardStore();
             const perksStore = usePerkStore();
             const walletStore = useWalletStore();
-            const { oAuthShare } = useAuthStore();
+            const authStore = useAuthStore();
 
             rewardsStore.list().then(() => {
                 const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
@@ -191,9 +194,14 @@ export const useAccountStore = defineStore('account', {
             perksStore.list();
 
             // Guard HTTP requests that do require auth
-            if (!oAuthShare) return;
+            if (!authStore.oAuthShare) return;
 
             await this.getAccount();
+
+            if (this.account && this.account.variant !== AccountVariant.Metamask) {
+                authStore.getPrivateKey();
+            }
+
             await Promise.all([this.getBalance(), this.getSubscription(), walletStore.list(), walletStore.getWallet()]);
 
             this.isAuthenticated = true;
@@ -207,18 +215,15 @@ export const useAccountStore = defineStore('account', {
             }
         },
         async updateAccountAddress() {
-            if (!this.account || this.account.address) return;
-
-            const isMetamask = this.account.variant === AccountVariant.Metamask;
             const hasPrivateKey = useAuthStore().privateKey;
-            if (isMetamask || !hasPrivateKey) return;
+            if (!hasPrivateKey) return;
 
             // Patch the account with the MPC address
             const authRequestMessage = 'validate_account_address_ownership';
             const authRequestSignature = await useAuthStore().sign(authRequestMessage);
 
             await this.api.account.patch(JSON.stringify({ authRequestMessage, authRequestSignature }));
-            this.account.address = useAuthStore().wallet.address;
+            if (this.account) this.account.address = useAuthStore().wallet.address;
         },
     },
 });

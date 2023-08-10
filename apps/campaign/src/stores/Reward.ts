@@ -13,7 +13,7 @@ export const useRewardStore = defineStore('rewards', {
             const { api, account, getBalance, poolId, getConfig } = useAccountStore();
             const claim = await api.quests.social.claim(id);
             if (claim.error) {
-                throw claim.error;
+                throw new Error(claim.error);
             } else {
                 track('UserCreates', [
                     account?.sub,

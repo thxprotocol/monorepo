@@ -8,15 +8,12 @@
             <b-spinner show size="sm" />
         </div>
         <template v-else>
-            <b-alert variant="success" show class="py-1 px-2" v-if="!isVariantMetamask">
-                <i class="fas fa-gift me-1"></i>
-                We cover your transaction fees!
-            </b-alert>
-            <b-alert variant="warning" show class="py-1 px-2" v-else>
+            <b-alert v-model="isVariantMetamask" variant="warning" class="py-1 px-2">
                 <i class="fas fa-exclamation-circle me-1"></i>
                 Please use Metamask to transfer this token.
             </b-alert>
-            <b-alert v-if="error" show variant="danger" class="p-2">
+
+            <b-alert v-model="isAlertErrorShown" variant="danger" class="p-2">
                 <i class="fas fa-exclamation-circle me-2"></i>
                 {{ error }}
             </b-alert>
@@ -52,6 +49,7 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { isAddress, toWei } from 'web3-utils';
 import { AccountVariant } from '../types/enums/accountVariant';
+import { mapStores } from 'pinia';
 
 export default defineComponent({
     name: 'BaseModalERC20Transfer',
@@ -59,6 +57,7 @@ export default defineComponent({
         return { isShown: false, amount: 0, receiver: '' };
     },
     computed: {
+        ...mapStores(useAccountStore),
         isAmountValid: function () {
             return !this.amount
                 ? undefined
@@ -70,9 +69,13 @@ export default defineComponent({
         isReceiverValid: function () {
             return this.receiver ? isAddress(this.receiver) : undefined;
         },
-        isVariantMetamask: function () {
-            const { account } = useAccountStore();
-            return account?.variant === AccountVariant.Metamask;
+        isVariantMetamask() {
+            const { account } = this.accountStore;
+            console.log(account && account.variant === AccountVariant.Metamask);
+            return account && account.variant === AccountVariant.Metamask ? true : false;
+        },
+        isAlertErrorShown() {
+            return !!this.error;
         },
     },
     props: {

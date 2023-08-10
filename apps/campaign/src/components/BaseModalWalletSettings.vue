@@ -20,7 +20,7 @@
             <b-form>
                 <b-tabs justified content-class="mt-3">
                     <b-tab title="About">
-                        <b-form-group v-if="walletStore.wallet">
+                        <b-form-group v-if="walletStore.wallet && !isMetamaskAccount">
                             <template #label>
                                 <div class="d-flex align-items-center">
                                     <img
@@ -141,7 +141,13 @@
             </b-form>
         </template>
         <template #footer>
-            <b-button class="w-100 text-danger" variant="link" @click="onSubmitResetAccount">
+            <b-button class="w-100" variant="primary" @click="$emit('hidden')"> Close </b-button>
+            <b-button
+                v-if="accountStore.debugger"
+                class="w-100 text-danger"
+                variant="link"
+                @click="onSubmitResetAccount"
+            >
                 <b-spinner small variant="light" v-if="isLoadingReset" />
                 <template v-else> Reset Account </template>
             </b-button>

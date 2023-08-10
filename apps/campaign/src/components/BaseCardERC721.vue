@@ -160,15 +160,18 @@ export default defineComponent({
         onSubmitTransfer(config: TERC721TransferConfig) {
             toast(
                 'Processing transaction...',
+                'dark',
                 15000,
                 async () => {
                     try {
-                        this.isModalTransferShown = false;
                         this.isSubmitting = true;
                         await this.walletStore.transferERC721(config);
-                        this.isSubmitting = false;
+                        this.isModalTransferShown = false;
                     } catch (error) {
-                        this.error = (error as Error).message;
+                        this.error = 'Transaction failed';
+                        console.error(error);
+                    } finally {
+                        this.isSubmitting = false;
                     }
                 },
                 async () => {
@@ -188,6 +191,7 @@ export default defineComponent({
             this.isMigratingTokens = true;
             toast(
                 'Transfer to Safe Wallet...',
+                'dark',
                 15000,
                 async () => await this.accountStore.migrate({ erc721TokenId: this.token._id }),
                 async () => await this.walletStore.list(),

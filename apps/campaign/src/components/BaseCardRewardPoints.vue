@@ -14,7 +14,7 @@
 
         <component :is="getInteractionComponent(reward.interaction)" :reward="reward" />
 
-        <b-alert class="p-2" v-if="error && !isSubmitting" variant="danger" show>
+        <b-alert class="p-2" v-model="isAlertDangerShown" variant="danger">
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
@@ -118,6 +118,9 @@ export default defineComponent({
 
             return getConnectionStatus(account, this.reward.platform);
         },
+        isAlertDangerShown() {
+            return !!this.error && !this.isSubmitting;
+        },
     },
     methods: {
         onClickSignin: function () {
@@ -130,6 +133,7 @@ export default defineComponent({
                 await this.rewardsStore.claimConditionalReward(this.reward._id);
             } catch (error) {
                 this.error = error;
+                debugger;
             } finally {
                 this.isSubmitting = false;
             }

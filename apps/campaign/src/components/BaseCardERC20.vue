@@ -1,6 +1,5 @@
 <template>
     <b-card body-class="d-flex align-items-center">
-        {{ error }}
         <div class="pe-3">
             <img height="25" :src="token.erc20.logoImgUrl" />
         </div>
@@ -71,7 +70,7 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
         isMigrateAvailable() {
-            return Number(fromWei(this.token.migrationBalance)) > 0;
+            return this.token.migrationBalance ? Number(fromWei(this.token.migrationBalance)) > 0 : false;
         },
     },
     mounted() {},
@@ -85,15 +84,18 @@ export default defineComponent({
         onSubmitTransfer(config: TERC20TransferConfig) {
             toast(
                 'Processing transaction...',
+                'dark',
                 15000,
                 async () => {
                     try {
-                        this.isModalTransferShown = false;
                         this.isPendingTransfer = true;
                         await this.walletStore.transferERC20(config);
-                        this.isPendingTransfer = false;
+                        this.isModalTransferShown = false;
                     } catch (error) {
-                        this.error = (error as Error).message;
+                        this.error = 'Transaction failed';
+                        console.error(error);
+                    } finally {
+                        this.isPendingTransfer = false;
                     }
                 },
                 async () => {
@@ -105,6 +107,7 @@ export default defineComponent({
             this.isMigratingTokens = true;
             toast(
                 'Transfer to Safe Wallet...',
+                'dark',
                 15000,
                 async () => await this.accountStore.migrate({ erc20Id: this.token.erc20._id }),
                 async () => await this.walletStore.list(),

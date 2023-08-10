@@ -178,7 +178,10 @@ export default defineComponent({
 
             // Achieved 3/3, let's patch account address and deploy Safe!
             if (isDeviceShareAvailable && isSecurityQuestionAvailable) {
-                this.accountStore.updateAccountAddress().then(() => this.walletStore.list());
+                this.accountStore
+                    .updateAccountAddress()
+                    .then(() => this.walletStore.getWallet())
+                    .catch(console.error);
             }
         },
     },

@@ -8,18 +8,16 @@
             <b-spinner show size="sm" />
         </div>
         <template v-else>
-            <b-alert variant="success" show class="py-1 px-2" v-if="!isVariantMetamask">
-                <i class="fas fa-gift me-1"></i>
-                We cover your transaction fees!
-            </b-alert>
-            <b-alert variant="warning" show class="py-1 px-2" v-else>
+            <b-alert v-model="isVariantMetamask" variant="warning" class="py-1 px-2">
                 <i class="fas fa-exclamation-circle me-1"></i>
                 Please use Metamask to transfer this token.
             </b-alert>
-            <b-alert v-if="error" show variant="danger" class="p-2">
+
+            <b-alert v-model="isAlertErrorShown" variant="danger" class="p-2">
                 <i class="fas fa-exclamation-circle me-2"></i>
                 {{ error }}
             </b-alert>
+
             <b-form-group label="Receiver" :state="isReceiverValid">
                 <b-form-input v-model="receiver" :state="isReceiverValid" placeholder="0x0" />
             </b-form-group>
@@ -53,6 +51,9 @@ export default defineComponent({
         isVariantMetamask: function () {
             const { account } = useAccountStore();
             return account?.variant === AccountVariant.Metamask;
+        },
+        isAlertErrorShown() {
+            return !!this.error;
         },
     },
     props: {

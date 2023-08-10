@@ -3,12 +3,12 @@
         <b-row>
             <b-col offset-xl="1" xl="6">
                 <b-card v-if="claimsStore.claim && claimsStore.metadata && claimsStore.erc721" class="mx-auto my-2">
-                    <b-alert v-if="!authStore.oAuthShare && !claimsStore.error" variant="info" show class="p-2">
+                    <b-alert v-model="isAlertInfoShown" variant="info" show class="p-2">
                         <i class="fas fa-gift me-1"></i>
                         Sign in to collect your NFT
                     </b-alert>
 
-                    <b-alert v-if="error || claimsStore.error" variant="danger" show class="p-2">
+                    <b-alert v-model="isAlertErrorShown" variant="danger" show class="p-2">
                         <i class="fas fa-exclamation-circle me-1"></i>
                         {{ error || claimsStore.error }}
                     </b-alert>
@@ -88,10 +88,10 @@
                         @click="onClickCollect"
                         variant="success"
                         class="w-100"
-                        :disabled="!!error || !!claimsStore.error || isWaitingForWalletAddress"
+                        :disabled="!!error || !!claimsStore.error || isWaitingForWalletAddress || isLoadingCollect"
                     >
                         <b-spinner v-if="isLoadingCollect" small variant="dark" />
-                        Collect
+                        <template v-else>Collect</template>
                     </b-button>
                     <b-button v-else @click="onClickSignin" variant="primary" class="w-100">
                         Sign in &amp; Collect
@@ -121,8 +121,13 @@ export default defineComponent({
         ...mapStores(useClaimStore),
         ...mapStores(useWalletStore),
         isWaitingForWalletAddress() {
-            const { wallet } = useWalletStore();
-            return !wallet || !wallet.address;
+            return !this.walletStore.wallet?.address;
+        },
+        isAlertInfoShown() {
+            return !this.authStore.oAuthShare && !this.claimsStore.error;
+        },
+        isAlertErrorShown() {
+            return !!this.error || !!this.claimsStore.error;
         },
     },
     data() {
