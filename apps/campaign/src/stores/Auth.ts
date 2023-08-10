@@ -6,6 +6,7 @@ import { useAccountStore } from './Account';
 import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { getIsMobile } from '../utils/user-agent';
 import { Wallet } from '@ethersproject/wallet';
+import { track } from '@thxnetwork/mixpanel';
 
 const userManager = new UserManager({
     authority: AUTH_URL,
@@ -170,6 +171,13 @@ export const useAuthStore = defineStore('auth', {
                 await tKey.modules.securityQuestions.generateNewShareWithSecurityQuestions(answer, question);
                 console.debug('Successfully generated new share with password.');
                 await this.getSecurityQuestion();
+
+                const { account, poolId } = useAccountStore();
+                track('UserCreates', [
+                    account?.sub || '',
+                    `security question`,
+                    { poolId, address: this.wallet.address, hasPrivateKey: !!this.privateKey },
+                ]);
             } catch (error) {
                 console.error((error as Error).toString());
             }
