@@ -1,37 +1,43 @@
 <template>
-    <div class="d-flex flex-grow-1 justify-content-center flex-column align-items-center overflow-auto">
-        <b-card class="m-2 w-75">
-            <b-alert v-if="!authStore.oAuthShare" variant="info" show class="p-2">
-                <i class="fas fa-gift me-1"></i>
-                Sign in and collect <strong>{{ walletStore.pendingPoints }}</strong> points!
-            </b-alert>
+    <b-container class="flex-grow-1 overflow-auto order-lg-1">
+        <b-row>
+            <b-col offset-xl="1" xl="6">
+                <b-card class="mx-auto my-2">
+                    <b-alert v-model="isAlertSigninShown" variant="info" show class="p-2">
+                        <i class="fas fa-gift me-1"></i>
+                        Sign in to connect your virtual wallet
+                    </b-alert>
 
-            <template v-else>
-                <BaseAlertWalletAddress />
-                <b-alert variant="info" show class="p-2" v-if="walletStore.pendingPoints">
-                    <i class="fas fa-flag me-1"></i> Complete Quests and earn
-                    <strong>{{ walletStore.pendingPoints }}</strong> points!
-                </b-alert>
-            </template>
+                    <template v-if="!isAlertSigninShown">
+                        <BaseAlertWalletAddress />
+                        <b-alert variant="info" show class="p-2" v-model="isAlertInfoShown">
+                            <i class="fas fa-flag me-1"></i> Complete Quests and earn
+                            <strong>{{ walletStore.pendingPoints }}</strong> points!
+                        </b-alert>
+                    </template>
 
-            <b-card-title>Virtual Wallet</b-card-title>
-            <hr />
-            <b-form-group description="Provide a wallet code to connect it and complete your quests.">
-                <b-form-input :state="isValidUUID" v-model="uuid" placeholder="Code" />
-            </b-form-group>
-            <b-button
-                v-if="authStore.oAuthShare"
-                @click="onClickCollect"
-                variant="success"
-                class="w-100"
-                :disabled="!!error || isWaitingForWalletAddress || isLoadingCollect"
-            >
-                <b-spinner v-if="isLoadingCollect" small variant="dark" />
-                Connect Virtual Wallet
-            </b-button>
-            <b-button v-else @click="onClickSignin" variant="primary" class="w-100"> Sign in &amp; Collect </b-button>
-        </b-card>
-    </div>
+                    <b-card-title>Virtual Wallet</b-card-title>
+                    <hr />
+                    <b-form-group description="Provide a wallet code to connect it and complete your quests.">
+                        <b-form-input :state="isValidUUID" v-model="uuid" placeholder="Code" />
+                    </b-form-group>
+                    <b-button
+                        v-if="authStore.oAuthShare"
+                        @click="onClickCollect"
+                        variant="success"
+                        class="w-100"
+                        :disabled="!!error || isWaitingForWalletAddress || isLoadingCollect"
+                    >
+                        <b-spinner v-if="isLoadingCollect" small variant="dark" />
+                        Connect Virtual Wallet
+                    </b-button>
+                    <b-button v-else @click="onClickSignin" variant="primary" class="w-100">
+                        Sign in &amp; Collect
+                    </b-button>
+                </b-card>
+            </b-col>
+        </b-row>
+    </b-container>
 </template>
 
 <script lang="ts">
@@ -67,6 +73,12 @@ export default defineComponent({
         isValidUUID() {
             if (!this.uuid) return null;
             return validate(this.uuid);
+        },
+        isAlertInfoShown() {
+            return !!this.walletStore.pendingPoints;
+        },
+        isAlertSigninShown() {
+            return !this.authStore.oAuthShare;
         },
     },
     mounted() {
@@ -104,8 +116,3 @@ export default defineComponent({
     },
 });
 </script>
-<style scoped>
-.card {
-    margin-top: -65px !important;
-}
-</style>
