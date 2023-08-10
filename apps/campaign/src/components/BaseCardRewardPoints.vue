@@ -133,7 +133,6 @@ export default defineComponent({
                 await this.rewardsStore.claimConditionalReward(this.reward._id);
             } catch (error) {
                 this.error = error;
-                debugger;
             } finally {
                 this.isSubmitting = false;
             }
