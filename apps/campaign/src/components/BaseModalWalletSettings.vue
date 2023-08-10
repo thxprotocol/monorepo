@@ -236,6 +236,8 @@ export default defineComponent({
     watch: {
         show(value) {
             this.isShown = value;
+            this.accountStore.getAccount();
+            this.walletStore.getWallet();
         },
     },
     methods: {

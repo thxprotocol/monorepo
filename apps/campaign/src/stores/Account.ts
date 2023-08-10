@@ -115,9 +115,7 @@ export const useAccountStore = defineStore('account', {
             window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
         },
         async getAccount() {
-            const { chainId } = this.getConfig(this.poolId);
-            // this.account = await this.api.account.get(chainId);
-            this.account = await this.api.request.get('/v1/account' + (chainId && `?chainId=${chainId}`));
+            this.account = await this.api.request.get('/v1/account');
         },
         async getBalance() {
             const { balance } = await this.api.pointBalance.list();

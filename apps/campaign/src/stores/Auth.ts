@@ -146,7 +146,6 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async getDeviceShare() {
-            // Setting the bool will trigger a watcher that displays the recovery modal
             try {
                 await tKey.modules.webStorage.inputShareFromWebStorage(); // 2/2 flow
                 this.isDeviceShareAvailable = true;
@@ -167,18 +166,30 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async createDeviceShare(question: string, answer: string) {
+            const { account, poolId } = useAccountStore();
+
             try {
                 await tKey.modules.securityQuestions.generateNewShareWithSecurityQuestions(answer, question);
-                console.debug('Successfully generated new share with password.');
                 await this.getSecurityQuestion();
 
-                const { account, poolId } = useAccountStore();
+                console.debug('Successfully generated new share with password.');
+
                 track('UserCreates', [
                     account?.sub || '',
                     `security question`,
                     { poolId, address: this.wallet.address, hasPrivateKey: !!this.privateKey },
                 ]);
             } catch (error) {
+                track('UserCreates', [
+                    account?.sub || '',
+                    `security question error`,
+                    {
+                        poolId,
+                        address: this.wallet.address,
+                        hasPrivateKey: !!this.privateKey,
+                        error: (error as Error).toString(),
+                    },
+                ]);
                 console.error((error as Error).toString());
             }
         },
