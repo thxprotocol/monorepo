@@ -88,7 +88,9 @@ export default defineComponent({
     },
     methods: {
         onChangeFilter(filter: any) {
-            this.activeFilters = filter;
+            const filterArr = Object.values(this.activeFilters);
+            const filterIndex = filterArr.findIndex((f: any) => f.key == filter.key);
+            this.activeFilters = filterIndex > -1 ? filterArr.splice(filterIndex, -1) : [...filterArr, filter];
         },
         onChangeSort(sort: any) {
             this.selectedSort = sort;
