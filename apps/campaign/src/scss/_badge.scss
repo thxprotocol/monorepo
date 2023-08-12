@@ -1,5 +1,7 @@
 .badge.bg-primary {
     padding: .5rem !important;
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
     display: inline-block;
     font-weight: bold;
 

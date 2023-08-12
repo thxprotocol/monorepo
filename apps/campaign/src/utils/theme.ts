@@ -61,7 +61,8 @@ export function getStyles(elements: any, colors: any) {
             '--bs-card-bg': theme.elements.cardBg,
             '--bs-card-color': theme.elements.cardText,
             '--bs-card-cap-color': theme.elements.cardText,
-            '--bs-badge-color': theme.elements.cardText,
+            '--bs-badge-bg': theme.elements.btnBg,
+            '--bs-badge-color': theme.elements.btnText,
             '--thx-card-header-hover-bg': theme.elements.cardHeaderHoverBg,
         },
         '.btn-primary': {

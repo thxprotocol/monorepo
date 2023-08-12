@@ -53,9 +53,9 @@ export default defineComponent({
             ],
             filters: [
                 { label: 'Daily', key: RewardVariant.Daily, icon: 'fa fa-calendar' },
-                { label: 'Referral', key: RewardVariant.Referral, icon: 'fas fa-comments' },
-                { label: 'Conditional', key: RewardVariant.Conditional, icon: 'fas fa-trophy' },
-                { label: 'Milestone', key: RewardVariant.Milestone, icon: 'fas fa-flag' },
+                { label: 'Invite', key: RewardVariant.Referral, icon: 'fas fa-comments' },
+                { label: 'Social', key: RewardVariant.Conditional, icon: 'fas fa-trophy' },
+                { label: 'Custom', key: RewardVariant.Milestone, icon: 'fas fa-flag' },
             ],
         };
     },

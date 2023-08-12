@@ -20,8 +20,9 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <div class="d-flex flex-wrap pb-3 justify-content-between">
+        <div class="d-flex flex-wrap pb-3 justify-content-start">
             <b-badge
+                style="width: 46px"
                 class="m-1 d-flex flex-column align-items-center justify-content-center"
                 :variant="key < reward.claims.length ? 'success' : 'primary'"
                 :class="key < reward.claims.length ? 'text-white' : 'text-white'"
