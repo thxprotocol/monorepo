@@ -71,7 +71,6 @@ export default defineComponent({
         },
         isVariantMetamask() {
             const { account } = this.accountStore;
-            console.log(account && account.variant === AccountVariant.Metamask);
             return account && account.variant === AccountVariant.Metamask ? true : false;
         },
         isAlertErrorShown() {

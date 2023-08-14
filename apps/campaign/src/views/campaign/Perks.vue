@@ -20,11 +20,12 @@ import { usePerkStore } from '../../stores/Perk';
 import { useAccountStore } from '../../stores/Account';
 import BaseCardPerkERC20 from '../../components/BaseCardPerkERC20.vue';
 import BaseCardPerkERC721 from '../../components/BaseCardPerkERC721.vue';
+import BaseCardPerkCustom from '../../components/BaseCardPerkCustom.vue';
 import BaseModalCampaignExpired from '../../components/BaseModalCampaignExpired.vue';
 
 export default defineComponent({
     name: 'Perks',
-    components: { BaseCardPerkERC20, BaseCardPerkERC721, BaseModalCampaignExpired },
+    components: { BaseCardPerkERC20, BaseCardPerkERC721, BaseCardPerkCustom, BaseModalCampaignExpired },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(usePerkStore),

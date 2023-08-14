@@ -20,7 +20,7 @@ export const usePerkStore = defineStore('perks', {
 
             this.updateSupply(uuid);
 
-            track('UserCreates', [account?.sub, 'coin perk payment', { poolId, origin: getConfig(poolId).origin }]);
+            track('UserCreates', [account?.sub, 'coin reward payment', { poolId, origin: getConfig(poolId).origin }]);
         },
         createERC721Redemption: async function (uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
@@ -29,7 +29,7 @@ export const usePerkStore = defineStore('perks', {
 
             this.updateSupply(uuid);
 
-            track('UserCreates', [account?.sub, 'nft perk redemption', { poolId, origin: getConfig(poolId).origin }]);
+            track('UserCreates', [account?.sub, 'nft reward redemption', { poolId, origin: getConfig(poolId).origin }]);
         },
         createERC721Payment: async function (uuid: string) {
             const { api, account, poolId, getConfig } = useAccountStore();
@@ -38,7 +38,22 @@ export const usePerkStore = defineStore('perks', {
 
             this.updateSupply(uuid);
 
-            track('UserCreates', [account?.sub, 'nft perk payment', { poolId, origin: getConfig(poolId).origin }]);
+            track('UserCreates', [account?.sub, 'nft reward payment', { poolId, origin: getConfig(poolId).origin }]);
+
+            return r;
+        },
+        createCustomRedemption: async function (uuid: string) {
+            const { api, account, poolId, getConfig } = useAccountStore();
+            const r = await api.rewards.custom.redemption.post(uuid);
+            if (r.error) throw r.error;
+
+            this.updateSupply(uuid);
+
+            track('UserCreates', [
+                account?.sub,
+                'custom reward redemption',
+                { poolId, origin: getConfig(poolId).origin },
+            ]);
 
             return r;
         },
@@ -52,7 +67,7 @@ export const usePerkStore = defineStore('perks', {
         },
         async list() {
             const { api } = useAccountStore();
-            const { erc20Perks, erc721Perks } = await api.rewards.list();
+            const { erc20Perks, erc721Perks, customRewards } = await api.rewards.list();
 
             this.perks = [
                 ...(erc20Perks
@@ -64,6 +79,13 @@ export const usePerkStore = defineStore('perks', {
                 ...(erc721Perks
                     ? Object.values(erc721Perks).map((r: any) => {
                           r.component = 'BaseCardPerkERC721';
+                          r.price = parseUnitAmount(r.price);
+                          return r;
+                      })
+                    : []),
+                ...(customRewards
+                    ? Object.values(customRewards).map((r: any) => {
+                          r.component = 'BaseCardPerkCustom';
                           r.price = parseUnitAmount(r.price);
                           return r;
                       })

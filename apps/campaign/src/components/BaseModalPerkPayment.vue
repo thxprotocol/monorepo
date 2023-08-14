@@ -20,9 +20,12 @@
                 <i class="fas fa-exclamation-circle me-2"></i>
                 {{ error }}
             </b-alert>
-            <p class="m-0">
+            <p class="m-0" v-if="perk.price > 0">
                 Do you want to purchase <strong>{{ perk.title }}</strong> with {{ perk.priceCurrency }} or would you
                 like to use your loyalty points?
+            </p>
+            <p class="m-0" v-else>
+                Do you want to redeem {{ perk.pointPrice }} points for <strong>{{ perk.title }} </strong>?
             </p>
             <div id="payment-element"></div>
         </template>

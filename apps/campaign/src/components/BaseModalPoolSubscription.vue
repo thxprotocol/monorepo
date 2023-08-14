@@ -33,7 +33,7 @@
 
             <p>
                 <template v-if="!isSubscribed">
-                    Subscribe now and we will notify you when new rewards are available!
+                    Subscribe now and we will notify you when new quests and rewards become available!
                 </template>
                 <template v-else>
                     We will stop sending reward notifications to <strong class="text-accent">{{ email }} </strong>.

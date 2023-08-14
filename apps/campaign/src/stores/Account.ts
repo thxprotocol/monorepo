@@ -218,8 +218,7 @@ export const useAccountStore = defineStore('account', {
             // Patch the account with the MPC address
             const authRequestMessage = 'validate_account_address_ownership';
             const authRequestSignature = await useAuthStore().sign(authRequestMessage);
-
-            await this.api.account.patch(JSON.stringify({ authRequestMessage, authRequestSignature }));
+            await this.api.account.patch({ authRequestMessage, authRequestSignature });
             if (this.account) this.account.address = useAuthStore().wallet.address;
         },
     },

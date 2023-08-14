@@ -4,6 +4,7 @@ type TPerkState = {
 
 type TPerk = {
     uuid: string;
+    poolId: string;
     image: string;
     erc20: TERC20;
     nft: TERC721 | TERC1155;
