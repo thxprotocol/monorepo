@@ -40,6 +40,11 @@
     }
 }
 
+.card .btn-group .btn-primary.dropdown-toggle {
+    border-top-right-radius: var(--bs-btn-border-radius);
+    border-bottom-right-radius: var(--bs-btn-border-radius);
+}
+
 .btn-share {
     width: 30px;
     height: 30px;
