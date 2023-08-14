@@ -12,7 +12,7 @@
             {{ reward.description }}
         </b-card-text>
 
-        <b-input-group v-if="authStore.oAuthShare && referralUrl">
+        <b-input-group v-if="authStore.oAuthShare">
             <b-form-input :model-value="referralUrl" />
             <b-input-group-append>
                 <b-button

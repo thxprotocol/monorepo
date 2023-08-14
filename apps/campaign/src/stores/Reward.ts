@@ -46,7 +46,7 @@ export const useRewardStore = defineStore('rewards', {
 
                 getBalance();
 
-                this.list();
+                await this.list();
             }
         },
         async claimDailyReward(reward: TDailyReward) {
@@ -64,7 +64,7 @@ export const useRewardStore = defineStore('rewards', {
 
                 getBalance();
 
-                this.list();
+                await this.list();
             }
         },
 

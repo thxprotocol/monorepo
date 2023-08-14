@@ -73,6 +73,7 @@ export default defineComponent({
     async created() {
         if (GTM) initGTM();
         window.onmessage = this.onMessage;
+        this.accountStore.postMessage({ message: 'thx.widget.ready' });
     },
     methods: {
         async onMessage(event: MessageEvent) {
@@ -83,7 +84,6 @@ export default defineComponent({
 
             switch (event.data.message) {
                 case 'thx.iframe.debug': {
-                    debugger;
                     this.accountStore.debug();
                     break;
                 }
@@ -119,7 +119,7 @@ export default defineComponent({
             if (!ref) return;
 
             const { sub } = JSON.parse(atob(ref));
-            await api.rewardsManager.referral.claim({ uuid, sub });
+            await api.quests.referral.claim({ uuid, sub });
 
             setConfig(poolId, { ref: '' } as TWidgetConfig);
             getBalance();
