@@ -54,10 +54,11 @@
                     variant="primary"
                     block
                     class="w-100"
-                    :disabled="isSoldOut || isExpired || isLocked"
+                    :disabled="isSoldOut || isExpired || isLocked || isDisabled"
                     @click="$emit('submit')"
                 >
                     <template v-if="isSoldOut">Sold out</template>
+                    <template v-else-if="isDisabled">Not available</template>
                     <template v-else-if="isExpired">Expired</template>
                     <template v-else-if="price && price > 0">
                         <strong>{{ price }} {{ priceCurrency }}</strong>
@@ -98,6 +99,7 @@ export default defineComponent({
     },
     props: {
         image: String,
+        isDisabled: Boolean,
         isPromoted: Boolean,
         title: String,
         description: String,
