@@ -5,11 +5,12 @@ export enum RewardSortVariant {
     Amount = 3,
 }
 
-export enum RewardVariant {
+export enum QuestVariant {
     Daily = 0,
-    Referral = 1,
-    Conditional = 2,
-    Milestone = 3,
+    Invite = 1,
+    Social = 2,
+    Custom = 3,
+    Web3 = 4,
 }
 
 export enum RewardConditionPlatform {

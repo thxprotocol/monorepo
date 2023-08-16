@@ -66,13 +66,13 @@ import { useAuthStore } from '../stores/Auth';
 import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
 export default defineComponent({
-    name: 'BaseCardRewardMilestone',
+    name: 'BaseCardQuestCustom',
     components: {
         BaseCardCollapse,
     },
     props: {
         reward: {
-            type: Object as PropType<TMilestoneReward>,
+            type: Object as PropType<TQuestCustom>,
             required: true,
         },
     },
@@ -84,7 +84,7 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
         claimedAmount: function () {
-            return this.reward.claims.filter((c: TMilestoneRewardClaim) => c.isClaimed).length;
+            return this.reward.claims.filter((c: TQuestCustomClaim) => c.isClaimed).length;
         },
         pendingClaims: function () {
             return this.reward.claims.length - this.claimedAmount;
@@ -98,7 +98,7 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
-                await this.rewardsStore.claimMilestoneReward(this.reward);
+                await this.rewardsStore.completeCustomQuest(this.reward);
             } catch (error) {
                 this.error = error;
             } finally {

@@ -83,52 +83,38 @@ export default defineComponent({
             if (event.origin !== localOrigin) return;
 
             switch (event.data.message) {
-                case 'thx.iframe.debug': {
-                    this.accountStore.debug();
-                    break;
-                }
                 case 'thx.iframe.navigate': {
-                    this.onIframeNavigate(event.data.path);
+                    this.onWidgetNavigate(event.data.path);
                     break;
                 }
                 case 'thx.iframe.show': {
-                    this.onIframeShow(origin, event.data.isShown);
-                    break;
-                }
-                case 'thx.referral.claim.create': {
-                    this.onReferralClaimCreate(event.data.uuid);
+                    this.onWidgetShow(origin, event.data.isShown);
                     break;
                 }
                 case 'thx.config.ref': {
-                    this.onReferralConfigUpdate(event.data.ref);
+                    this.onInviteQuestUpdate(event.data.ref);
+                    break;
+                }
+                case 'thx.referral.claim.create': {
+                    this.onInviteQuestComplete(event.data.uuid);
                     break;
                 }
             }
         },
-        onReferralConfigUpdate(ref: string) {
+        onInviteQuestUpdate(ref: string) {
             if (!ref) return;
             const { setConfig, poolId } = this.accountStore;
             setConfig(poolId, { ref } as TWidgetConfig);
         },
-        onIframeNavigate(path: string) {
-            this.$router.push(path);
+        onInviteQuestComplete(uuid: string) {
+            this.rewardsStore.completeInviteQuest(uuid);
         },
-        async onReferralClaimCreate(uuid: string) {
-            const { account, getConfig, setConfig, poolId, api, getBalance } = this.accountStore;
-            const { ref } = getConfig(poolId);
-            if (!ref) return;
-
-            const { sub } = JSON.parse(atob(ref));
-            await api.quests.referral.claim({ uuid, sub });
-
-            setConfig(poolId, { ref: '' } as TWidgetConfig);
-            getBalance();
-
-            track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: getConfig(poolId).origin }]);
-        },
-        async onIframeShow(origin: string, isShown: boolean) {
+        onWidgetShow(origin: string, isShown: boolean) {
             const { account, poolId } = this.accountStore;
             track('UserOpens', [account?.sub || '', `widget iframe`, { origin, poolId, isShown }]);
+        },
+        onWidgetNavigate(path: string) {
+            this.$router.push(path);
         },
     },
 });

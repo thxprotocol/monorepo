@@ -3,7 +3,18 @@ type TInfoLink = {
     url: string;
 };
 
-type TBaseReward = {
+type TQuestFilter = {
+    label: string;
+    key: QuestVariant;
+    icon: string;
+};
+
+type TQuestSort = {
+    label: string;
+    key: QuestVariant;
+};
+
+type TBaseQuest = {
     _id?: string;
     uuid: string;
     poolId: string;
@@ -21,36 +32,50 @@ type TBaseReward = {
     progress?: number;
     page?: number;
     claims?: any[];
-    variant: RewardVariant;
+    variant: QuestVariant;
     infoLinks: TInfoLink[];
 };
 
-type TPointReward = TBaseReward & {
+type TQuestState = {
+    rewards: IReward[];
+    leaderboard: { score; wallet; questsCompleted }[];
+};
+
+type TQuestSocial = TBaseQuest & {
     amount: number;
     component?: string;
     isClaimed?: boolean;
 };
 
-type TMilestoneReward = TBaseReward & {
+type TQuestCustom = TBaseQuest & {
     amount: number;
     component?: string;
     isClaimed?: boolean;
-    claims: TMilestoneRewardClaim[];
+    claims: TQuestCustomClaim[];
 };
 
-type TReferralReward = TBaseReward & {
+type TQuestInvite = TBaseQuest & {
     pathname: string;
     amount: number;
     referralUrl?: string;
     component?: string;
 };
 
-type TRewardState = {
-    rewards: IReward[];
-    leaderboard: { score; wallet; questsCompleted }[];
+type TQuestDaily = TBaseQuest & {
+    uuid: string;
+    amount: number;
+    amounts: number[];
+    claims: TDailyRewardClaim[];
 };
 
-type TMilestoneRewardClaim = {
+type TQuestWeb3 = TBaseQuest & {
+    amount: number;
+    contracts: { chainId: ChainId; address: string }[];
+    methodName: string;
+    threshold: number;
+};
+
+type TQuestCustomClaim = {
     milestoneRewardId: string;
     sub: string;
     uuid: string;
@@ -58,28 +83,10 @@ type TMilestoneRewardClaim = {
     isClaimed: boolean;
 };
 
-type TDailyRewardClaim = {
+type TQuestDailyClaim = {
     dailyRewardId: string;
     sub: string;
     uuid: string;
     amount: string;
     isClaimed?: boolean;
-};
-
-type TDailyReward = TBaseReward & {
-    uuid: string;
-    amount: number;
-    amounts: number[];
-    claims: TDailyRewardClaim[];
-};
-
-type TRewardFilter = {
-    label: string;
-    key: RewardVariant;
-    icon: string;
-};
-
-type TRewardSort = {
-    label: string;
-    key: RewardVariant;
 };

@@ -1,6 +1,6 @@
 import { THXClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
-import { API_URL, WIDGET_URL } from '../config/secrets';
+import { API_URL } from '../config/secrets';
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
@@ -104,7 +104,7 @@ export const useAccountStore = defineStore('account', {
         },
         updateLauncher() {
             const rewardsStore = useRewardStore();
-            const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
+            const amount = rewardsStore.rewards.filter((r: any) => !r.isClaimed).length;
             const { origin } = this.getConfig(this.poolId);
 
             // Return if not in iframe
@@ -182,7 +182,7 @@ export const useAccountStore = defineStore('account', {
             const authStore = useAuthStore();
 
             rewardsStore.list().then(() => {
-                const amount = rewardsStore.rewards.filter((r) => !r.isClaimed).length;
+                const amount = rewardsStore.rewards.filter((r: any) => !r.isClaimed).length;
 
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
                 this.postMessage({ message: 'thx.reward.amount', amount });

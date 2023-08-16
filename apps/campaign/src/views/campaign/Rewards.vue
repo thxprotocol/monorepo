@@ -24,7 +24,7 @@ import BaseCardPerkCustom from '../../components/BaseCardPerkCustom.vue';
 import BaseModalCampaignExpired from '../../components/BaseModalCampaignExpired.vue';
 
 export default defineComponent({
-    name: 'Perks',
+    name: 'Rewards',
     components: { BaseCardPerkERC20, BaseCardPerkERC721, BaseCardPerkCustom, BaseModalCampaignExpired },
     computed: {
         ...mapStores(useAccountStore),
