@@ -39,6 +39,7 @@ export function getStyles(elements: any, colors: any) {
         'blockquote': {
             '--thx-blockquote-bg': theme.elements.bodyBg,
             '--thx-blockquote-border-color': theme.elements.btnBg,
+            '--thx-blockquote-link': theme.elements.text,
             '--thx-blockquote-link-hover': theme.elements.text,
         },
         '.modal': {

@@ -5,7 +5,8 @@ import { WALLET_CONNECT_PROJECT_ID } from '../config/secrets';
 
 const projectId = WALLET_CONNECT_PROJECT_ID;
 
-const getModal = (defaultChain: Chain, chains: Chain[]) => {
+const getModal = (defaultChain: Chain, chains: Chain[], theme?: any) => {
+    console.log(theme);
     const { publicClient } = configureChains(chains, [w3mProvider({ projectId })]);
     const wagmiConfig = createConfig({
         autoConnect: false,
@@ -23,11 +24,16 @@ const getModal = (defaultChain: Chain, chains: Chain[]) => {
             privacyPolicyUrl: '',
             termsOfServiceUrl: '',
             themeVariables: {
-                '--w3m-accent-color': 'var(--thx-accent)',
+                '--w3m-font-family': '"Exo 2", sans-serif',
+                '--w3m-accent-color': theme.elements['btnBg'].color,
+                '--w3m-color-bg-1': theme.elements['bodyBg'].color,
+                '--w3m-color-fg-1': theme.elements['text'].color,
+                '--w3m-background-color': theme.elements['cardBg'].color,
+                '--w3m-accent-fill-color': theme.elements['cardText'].color,
                 '--w3m-container-border-radius': '0',
                 '--w3m-background-border-radius': '0',
-                '--w3m-background-color': 'var(--bs-primary)',
-            },
+                '--w3m-icon-button-border-radius': '5px',
+            } as any,
         },
         ethereumClient,
     );

@@ -18,7 +18,7 @@
 
         <blockquote>
             <b-form-group label="Available On">
-                <div class="d-flex align-items-center" v-for="contract of reward.contracts">
+                <div class="d-inline-flex ms-2 align-items-center" v-for="contract of reward.contracts">
                     <b-img
                         :src="chainList[contract.chainId].logo"
                         width="12"
@@ -171,8 +171,10 @@ export default defineComponent({
         },
     },
     mounted() {
+        if (this.reward.isClaimed) return;
         const chains = this.reward.contracts.map((contract: { chainId: ChainId }) => chainList[contract.chainId].chain);
-        this.modal = getModal(chainList[this.chainId].chain, chains);
+        const theme = this.accountStore.getTheme();
+        this.modal = getModal(chainList[this.chainId].chain, chains, theme);
         this.unsubscribe = this.modal.subscribeModal(this.onModalStateChange);
     },
     methods: {

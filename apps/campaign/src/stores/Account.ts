@@ -49,6 +49,10 @@ export const useAccountStore = defineStore('account', {
             document.title = title;
             document.head.appendChild(sheet);
         },
+        getTheme() {
+            const { theme } = this.getConfig(this.poolId);
+            return JSON.parse(theme);
+        },
         async init(poolId: string, origin?: string) {
             const authStore = useAuthStore();
 

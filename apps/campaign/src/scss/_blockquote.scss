@@ -10,6 +10,8 @@ blockquote {
 
     a {
         transition: color 0.2s ease;
+        color: var(--bs-body-color);
+        opacity: .7;
 
         &:hover {
             color: var(--thx-blockquote-link-hover) !important;
