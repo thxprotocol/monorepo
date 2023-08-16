@@ -73,6 +73,7 @@ type TQuestWeb3 = TBaseQuest & {
     contracts: { chainId: ChainId; address: string }[];
     methodName: string;
     threshold: number;
+    isClaimed: boolean;
 };
 
 type TQuestCustomClaim = {
