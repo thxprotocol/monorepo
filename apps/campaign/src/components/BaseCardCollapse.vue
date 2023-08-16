@@ -13,8 +13,10 @@
                 <slot name="header"></slot>
             </b-card-title>
         </template>
-        <b-collapse v-model="isVisible" class="px-3">
-            <div class="my-3">
+
+        <b-collapse v-model="isVisible">
+            <img v-if="image" class="img-fluid" :src="image" alt="header image" />
+            <div class="px-3 my-3">
                 <slot></slot>
 
                 <b-button-group class="w-100" block v-if="infoLinks && infoLinks.length">
@@ -41,8 +43,9 @@ import { PropType, defineComponent } from 'vue';
 export default defineComponent({
     name: 'BaseCardCollapse',
     props: {
-        visible: { type: Boolean },
-        isPromoted: { type: Boolean },
+        image: String,
+        visible: Boolean,
+        isPromoted: Boolean,
         infoLinks: { type: Object as PropType<{ label: string; url: string }[]>, required: false },
     },
     data: function () {

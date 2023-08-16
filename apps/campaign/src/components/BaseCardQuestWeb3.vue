@@ -1,9 +1,10 @@
 <template>
-    <BaseCardCollapse :info-links="reward.infoLinks" :visible="!!authStore.oAuthShare && !reward.isClaimed">
+    <BaseCardCollapse
+        :image="reward.image"
+        :info-links="reward.infoLinks"
+        :visible="!!authStore.oAuthShare && !reward.isClaimed"
+    >
         <template #header>
-            <div v-if="reward.platform" class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i class="fab fa-ethereum me-2 text-primary"></i>
-            </div>
             <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
             <div class="text-accent fw-bold">{{ reward.amount }}</div>
         </template>
