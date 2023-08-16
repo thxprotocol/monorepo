@@ -24,6 +24,7 @@ export default defineConfig({
     },
     optimizeDeps: {
         esbuildOptions: {
+            target: 'esnext',
             // Node.js global to browser globalThis
             define: {
                 global: 'globalThis',
@@ -32,6 +33,7 @@ export default defineConfig({
     },
     build: {
         outDir: 'build',
+        target: ['esnext'],
         // used for "Graph" is undefined error with Dagre package https://github.com/vitejs/vite/issues/5759
         commonjsOptions: {
             ignoreTryCatch: false,

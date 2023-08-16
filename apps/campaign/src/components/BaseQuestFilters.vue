@@ -38,7 +38,7 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
-import { RewardSortVariant, RewardVariant } from '../types/enums/rewards';
+import { RewardSortVariant, QuestVariant } from '../types/enums/rewards';
 
 export default defineComponent({
     name: 'Home',
@@ -52,10 +52,11 @@ export default defineComponent({
                 { label: 'Amount', key: RewardSortVariant.Amount },
             ],
             filters: [
-                { label: 'Daily', key: RewardVariant.Daily, icon: 'fa fa-calendar' },
-                { label: 'Invite', key: RewardVariant.Referral, icon: 'fas fa-comments' },
-                { label: 'Social', key: RewardVariant.Conditional, icon: 'fas fa-trophy' },
-                { label: 'Custom', key: RewardVariant.Milestone, icon: 'fas fa-flag' },
+                { label: 'Daily', key: QuestVariant.Daily, icon: 'fa fa-calendar' },
+                { label: 'Invite', key: QuestVariant.Invite, icon: 'fas fa-comments' },
+                { label: 'Social', key: QuestVariant.Social, icon: 'fas fa-trophy' },
+                { label: 'Custom', key: QuestVariant.Custom, icon: 'fas fa-flag' },
+                { label: 'Web3', key: QuestVariant.Web3, icon: 'fab fa-ethereum' },
             ],
         };
     },

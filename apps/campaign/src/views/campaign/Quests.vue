@@ -29,29 +29,29 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useRewardStore } from '../../stores/Reward';
 import { useAccountStore } from '../../stores/Account';
-import BaseCardRewardReferral from '../../components/BaseCardRewardReferral.vue';
-import BaseCardRewardPoints from '../../components/BaseCardRewardPoints.vue';
-import BaseCardRewardNFT from '../../components/BaseCardPerkERC721.vue';
-import BaseCardRewardMilestone from '../../components/BaseCardRewardMilestone.vue';
-import BaseCardRewardDaily from '../../components/BaseCardRewardDaily.vue';
+import BaseCardQuestInvite from '../../components/BaseCardQuestInvite.vue';
+import BaseCardQuestSocial from '../../components/BaseCardQuestSocial.vue';
+import BaseCardQuestCustom from '../../components/BaseCardQuestCustom.vue';
+import BaseCardQuestDaily from '../../components/BaseCardQuestDaily.vue';
+import BaseCardQuestWeb3 from '../../components/BaseCardQuestWeb3.vue';
 import BaseModalCampaignExpired from '../../components/BaseModalCampaignExpired.vue';
 import BaseQuestFilters from '../../components/BaseQuestFilters.vue';
 import BaseQuestLeaderboard from '../../components/BaseQuestLeaderboard.vue';
 import { useWalletStore } from '../../stores/Wallet';
 import { usePerkStore } from '../../stores/Perk';
 import { RewardSortVariant } from '../../types/enums/rewards';
-import { rewardComponentMap, sortMap } from '../../utils/rewards';
+import { rewardComponentMap, sortMap } from '../../utils/quests';
 
 export default defineComponent({
-    name: 'Home',
+    name: 'Quests',
     components: {
         BaseQuestFilters,
         BaseQuestLeaderboard,
-        BaseCardRewardReferral,
-        BaseCardRewardPoints,
-        BaseCardRewardMilestone,
-        BaseCardRewardDaily,
-        BaseCardRewardNFT,
+        BaseCardQuestInvite,
+        BaseCardQuestSocial,
+        BaseCardQuestCustom,
+        BaseCardQuestDaily,
+        BaseCardQuestWeb3,
         BaseModalCampaignExpired,
     },
     data(): any {
@@ -70,9 +70,9 @@ export default defineComponent({
         rewards() {
             const { rewards } = useRewardStore();
             return rewards
-                .filter((r: TBaseReward) =>
+                .filter((r: TBaseQuest) =>
                     this.activeFilters.length
-                        ? this.activeFilters.map((f: TRewardFilter) => f.key).includes(r.variant)
+                        ? this.activeFilters.map((f: TQuestFilter) => f.key).includes(r.variant)
                         : true,
                 )
                 .sort(sortMap[this.selectedSort.key]);

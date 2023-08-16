@@ -69,7 +69,7 @@ import { intervalToDuration, sub } from 'date-fns';
 import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
 export default defineComponent({
-    name: 'BaseCardRewardDaily',
+    name: 'BaseCardQuestDaily',
     components: {
         BaseCardCollapse,
     },
@@ -78,7 +78,7 @@ export default defineComponent({
             type: Boolean,
         },
         reward: {
-            type: Object as PropType<TDailyReward>,
+            type: Object as PropType<TQuestDaily>,
             required: true,
         },
     },
@@ -127,7 +127,7 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
-                await this.rewardsStore.claimDailyReward(this.reward);
+                await this.rewardsStore.completeDailyQuest(this.reward);
             } catch (error) {
                 this.error = error;
             } finally {

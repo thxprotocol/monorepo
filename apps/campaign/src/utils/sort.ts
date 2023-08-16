@@ -11,3 +11,7 @@ export const sortMilestoneRewards = (a: any, b: any) => {
     const bNum = b.claims && b.claims.length - b.claims.filter((c: TMilestoneRewardClaim) => c.isClaimed).length;
     return aNum - bNum > 0 ? -1 : bNum - aNum > 0 ? 1 : -1;
 };
+
+export const sortWeb3Rewards = (a: any, b: any) => {
+    return (!!a.isClaimed as boolean) ? 1 : (!!b.isClaimed as boolean) ? 1 : -1;
+};

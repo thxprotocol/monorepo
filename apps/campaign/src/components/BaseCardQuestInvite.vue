@@ -55,7 +55,7 @@ import BaseBtnShareTelegram from '../components/BaseBtnShareTelegram.vue';
 import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
 export default defineComponent({
-    name: 'BaseCardRewardReferral',
+    name: 'BaseCardQuestInvite',
     components: {
         BaseCardCollapse,
         BaseBtnShareWhatsapp,
@@ -66,7 +66,7 @@ export default defineComponent({
     },
     props: {
         reward: {
-            type: Object as PropType<TReferralReward>,
+            type: Object as PropType<TQuestInvite>,
             required: true,
         },
     },

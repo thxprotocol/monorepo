@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/maintenance',
         name: 'maintenance',
-        component: () => import(/* webpackChunkName: "home" */ '../views/Maintenance.vue'),
+        component: () => import(/* webpackChunkName: "maintenance" */ '../views/Maintenance.vue'),
     },
     {
         path: '/c/:poolId',
@@ -33,13 +33,13 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/c/:poolId/quests',
                 name: 'quests',
                 beforeEnter,
-                component: () => import(/* webpackChunkName: "campaignhome" */ '../views/campaign/Home.vue'),
+                component: () => import(/* webpackChunkName: "quests" */ '../views/campaign/Quests.vue'),
             },
             {
                 path: '/c/:poolId/rewards',
                 name: 'rewards',
                 beforeEnter,
-                component: () => import(/* webpackChunkName: "perks" */ '../views/campaign/Perks.vue'),
+                component: () => import(/* webpackChunkName: "rewards" */ '../views/campaign/Rewards.vue'),
             },
             {
                 path: '/c/:poolId/wallet',

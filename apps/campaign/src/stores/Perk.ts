@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { toNumber } from '../utils/rewards';
+import { toNumber } from '../utils/quests';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
 import { parseUnitAmount } from '../utils/price';

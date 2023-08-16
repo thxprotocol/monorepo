@@ -1,15 +1,16 @@
-import { RewardSortVariant, RewardVariant } from '../types/enums/rewards';
-import { sortDailyRewards, sortConditionalRewards, sortMilestoneRewards } from '../utils/sort';
+import { RewardSortVariant, QuestVariant } from '../types/enums/rewards';
+import { sortDailyRewards, sortConditionalRewards, sortMilestoneRewards, sortWeb3Rewards } from '../utils/sort';
 
 export function toNumber(value?: boolean) {
     return value === undefined ? 0 : Number(value);
 }
 
 export const rewardComponentMap = {
-    [RewardVariant.Daily]: 'BaseCardRewardDaily',
-    [RewardVariant.Referral]: 'BaseCardRewardReferral',
-    [RewardVariant.Conditional]: 'BaseCardRewardPoints',
-    [RewardVariant.Milestone]: 'BaseCardRewardMilestone',
+    [QuestVariant.Daily]: 'BaseCardQuestDaily',
+    [QuestVariant.Invite]: 'BaseCardQuestInvite',
+    [QuestVariant.Social]: 'BaseCardQuestSocial',
+    [QuestVariant.Custom]: 'BaseCardQuestCustom',
+    [QuestVariant.Web3]: 'BaseCardQuestWeb3',
 };
 
 export const sortMap: { [k: number]: any } = {
@@ -18,14 +19,16 @@ export const sortMap: { [k: number]: any } = {
     },
     [RewardSortVariant.Available]: (a: any, b: any): any => {
         switch (a.component) {
-            case 'BaseCardRewardDaily':
+            case 'BaseCardQuestDaily':
                 return sortDailyRewards(a, b);
-            case 'BaseCardRewardReferral':
+            case 'BaseCardQuestInvite':
                 return -1;
-            case 'BaseCardRewardPoints':
+            case 'BaseCardQuestSocial':
                 return sortConditionalRewards(a, b);
-            case 'BaseCardRewardMilestone':
+            case 'BaseCardQuestCustom':
                 return sortMilestoneRewards(a, b);
+            case 'BaseCardQuestWeb3':
+                return sortWeb3Rewards(a, b);
             default:
                 return 0;
         }

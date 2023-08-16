@@ -75,7 +75,7 @@ import BaseBlockquoteDiscordServerJoin from '../components/blockquote/BaseBlockq
 import BaseBlockquoteDiscordInviteUsed from '../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
 
 export default defineComponent({
-    name: 'BaseCardRewardPoints',
+    name: 'BaseCardQuestSocial',
     components: {
         BaseCardCollapse,
         BaseBlockquoteYoutubeChannelSubscription,
@@ -88,7 +88,7 @@ export default defineComponent({
     },
     props: {
         reward: {
-            type: Object as PropType<TPointReward>,
+            type: Object as PropType<TQuestSocial>,
             required: true,
         },
     },
@@ -130,7 +130,7 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
-                await this.rewardsStore.claimConditionalReward(this.reward._id);
+                await this.rewardsStore.completeSocialQuest(this.reward._id);
             } catch (error) {
                 this.error = error;
             } finally {
