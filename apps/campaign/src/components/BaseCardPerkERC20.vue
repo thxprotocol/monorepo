@@ -1,5 +1,5 @@
 <template>
-    <BaseCardPerk
+    <BaseCardReward
         :isDisabled="perk.isDisabled"
         :isPromoted="perk.isPromoted"
         :image="perk.image"
@@ -16,8 +16,8 @@
             <div class="flex-grow-1">{{ perk.title }}</div>
             <div class="text-accent fw-bold">{{ perk.amount }} {{ perk.erc20.symbol }}</div>
         </template>
-    </BaseCardPerk>
-    <BaseModalPerkPayment
+    </BaseCardReward>
+    <BaseCardRewardPayment
         :id="id"
         :perk="perk"
         :error="error"
@@ -35,14 +35,14 @@ import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
 import { useAuthStore } from '../stores/Auth';
-import BaseCardPerk from './BaseCardPerk.vue';
-import BaseModalPerkPayment from './BaseModalPerkPayment.vue';
+import BaseCardReward from './BaseCardPerk.vue';
+import BaseCardRewardPayment from './BaseModalPerkPayment.vue';
 
 export default defineComponent({
-    name: 'BaseCardPerkERC721',
+    name: 'BaseCardRewardCoin',
     components: {
-        BaseCardPerk,
-        BaseModalPerkPayment,
+        BaseCardReward,
+        BaseCardRewardPayment,
     },
     data() {
         return {

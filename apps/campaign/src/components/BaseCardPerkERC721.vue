@@ -1,5 +1,5 @@
 <template>
-    <BaseCardPerk
+    <BaseCardReward
         :isPromoted="perk.isPromoted"
         :image="imgUrl"
         :title="perk.title"
@@ -17,8 +17,8 @@
             <div class="flex-grow-1">{{ perk.title }}</div>
             <div class="text-success fw-bold" v-if="perk.erc1155Amount">{{ perk.erc1155Amount }}x</div>
         </template>
-    </BaseCardPerk>
-    <BaseModalPerkPayment
+    </BaseCardReward>
+    <BaseModalRewardPayment
         :id="`${id}${perk.uuid}`"
         :show="isModalShown"
         :error="error"
@@ -36,15 +36,15 @@ import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
 import { useAuthStore } from '../stores/Auth';
-import BaseModalPerkPayment from './BaseModalPerkPayment.vue';
-import BaseCardPerk from './BaseCardPerk.vue';
+import BaseModalRewardPayment from './BaseModalPerkPayment.vue';
+import BaseCardReward from './BaseCardPerk.vue';
 import { format, formatDistance } from 'date-fns';
 
 export default defineComponent({
-    name: 'BaseCardPerkERC721',
+    name: 'BaseCardRewardNFT',
     components: {
-        BaseModalPerkPayment,
-        BaseCardPerk,
+        BaseModalRewardPayment,
+        BaseCardReward,
     },
     data() {
         return { format, id: 'modalERC721PerkPayment', error: '', isModalShown: false, isSubmitting: false };

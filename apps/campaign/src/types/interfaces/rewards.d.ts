@@ -15,25 +15,17 @@ type TQuestSort = {
 };
 
 type TBaseQuest = {
-    _id?: string;
+    _id: string;
     uuid: string;
     poolId: string;
     title: string;
     description: string;
-    expiryDate: Date;
-    claimAmount: number;
-    rewardLimit: number;
-    platform: RewardConditionPlatform;
-    interaction?: RewardConditionInteraction;
-    content?: string;
-    contentMetadata?: any;
-    createdAt?: string;
-    updatedAt?: string;
-    progress?: number;
-    page?: number;
-    claims?: any[];
+    image: string;
     variant: QuestVariant;
     infoLinks: TInfoLink[];
+    component: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 type TQuestState = {
@@ -43,13 +35,15 @@ type TQuestState = {
 
 type TQuestSocial = TBaseQuest & {
     amount: number;
-    component?: string;
+    platform: RewardConditionPlatform;
+    interaction?: RewardConditionInteraction;
+    content?: string;
+    contentMetadata?: any;
     isClaimed?: boolean;
 };
 
 type TQuestCustom = TBaseQuest & {
     amount: number;
-    component?: string;
     isClaimed?: boolean;
     claims: TQuestCustomClaim[];
 };
@@ -58,11 +52,9 @@ type TQuestInvite = TBaseQuest & {
     pathname: string;
     amount: number;
     referralUrl?: string;
-    component?: string;
 };
 
 type TQuestDaily = TBaseQuest & {
-    uuid: string;
     amount: number;
     amounts: number[];
     claims: TDailyRewardClaim[];

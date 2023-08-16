@@ -31,6 +31,7 @@ declare module 'vue' {
     BaseCardPerkCustom: typeof import('./src/components/BaseCardPerkCustom.vue')['default']
     BaseCardPerkERC20: typeof import('./src/components/BaseCardPerkERC20.vue')['default']
     BaseCardPerkERC721: typeof import('./src/components/BaseCardPerkERC721.vue')['default']
+    BaseCardQuest: typeof import('./src/components/BaseCardQuest.vue')['default']
     BaseCardQuestCustom: typeof import('./src/components/BaseCardQuestCustom.vue')['default']
     BaseCardQuestDaily: typeof import('./src/components/BaseCardQuestDaily.vue')['default']
     BaseCardQuestInvite: typeof import('./src/components/BaseCardQuestInvite.vue')['default']
