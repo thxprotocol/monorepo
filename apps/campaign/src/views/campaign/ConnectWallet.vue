@@ -51,7 +51,7 @@ import BaseAlertWalletAddress from '../../components/BaseAlertWalletAddress.vue'
 import { validate } from 'uuid';
 
 export default defineComponent({
-    name: 'CollectWallet',
+    name: 'ConnectWallet',
     components: { BaseAlertWalletAddress },
     data() {
         return {
@@ -98,6 +98,7 @@ export default defineComponent({
     },
     methods: {
         async onClickCollect() {
+            this.isLoadingCollect = true;
             try {
                 await this.accountStore.api.request.post('/v1/account/wallet/connect', {
                     body: JSON.stringify({ code: this.uuid }),
@@ -106,6 +107,8 @@ export default defineComponent({
                 this.$router.push(`/c/${this.accountStore.poolId}/quests`);
             } catch (error) {
                 this.error = (error as Error).message || 'Something went wrong..';
+            } finally {
+                this.isLoadingCollect = false;
             }
         },
         async onClickSignin() {

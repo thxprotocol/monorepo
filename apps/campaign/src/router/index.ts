@@ -55,9 +55,9 @@ const routes: Array<RouteRecordRaw> = [
             },
             {
                 path: '/c/:poolId/w/:uuid',
-                name: 'CollectWallet',
+                name: 'ConnectWallet',
                 beforeEnter,
-                component: () => import(/* webpackChunkName: "collectwallet" */ '../views/campaign/CollectWallet.vue'),
+                component: () => import(/* webpackChunkName: "connectwallet" */ '../views/campaign/ConnectWallet.vue'),
             },
             {
                 path: '/c/:poolId/checkout/:uuid',
