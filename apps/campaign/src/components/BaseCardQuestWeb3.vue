@@ -134,7 +134,7 @@ export default defineComponent({
         chainList: { [chainId: number]: ChainInfo };
         getAddressURL: any;
         show: boolean;
-        chainId: ChainId;
+        chainId: ChainId.Polygon;
         unsubscribe: any;
     } {
         return {
