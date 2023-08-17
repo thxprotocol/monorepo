@@ -83,19 +83,6 @@
                     </BDropdownItem>
                 </b-dropdown>
             </b-button-group>
-
-            <!-- <b-button
-                variant="primary"
-                block
-                class="w-100"
-                @click="onClickClaim"
-                :disabled="isSubmitting || isModalOpen"
-            >
-                <b-spinner small v-if="isSubmitting || isModalOpen"></b-spinner>
-                <template v-else>
-                    Claim <strong>{{ reward.amount }} points</strong>
-                </template>
-            </b-button> -->
         </template>
     </BaseCardCollapse>
 </template>
@@ -175,6 +162,7 @@ export default defineComponent({
         if (this.reward.isClaimed) return;
         const chains = this.reward.contracts.map((contract: { chainId: ChainId }) => chainList[contract.chainId].chain);
         const theme = this.accountStore.getTheme();
+        this.chainId = this.reward.contracts[0].chainId;
         this.modal = getModal(chainList[this.chainId].chain, chains, theme);
         this.unsubscribe = this.modal.subscribeModal(this.onModalStateChange);
     },

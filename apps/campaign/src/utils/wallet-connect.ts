@@ -6,7 +6,6 @@ import { WALLET_CONNECT_PROJECT_ID } from '../config/secrets';
 const projectId = WALLET_CONNECT_PROJECT_ID;
 
 const getModal = (defaultChain: Chain, chains: Chain[], theme?: any) => {
-    console.log(theme);
     const { publicClient } = configureChains(chains, [w3mProvider({ projectId })]);
     const wagmiConfig = createConfig({
         autoConnect: false,

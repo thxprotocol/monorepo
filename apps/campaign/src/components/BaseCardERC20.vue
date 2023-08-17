@@ -8,7 +8,7 @@
         </div>
         <div class="text-success fw-bold">{{ token.walletBalance }} {{ token.erc20.symbol }}</div>
         <div>
-            <b-dropdown variant="link" size="sm" no-caret>
+            <b-dropdown variant="link" size="sm" no-caret toggle-class="py-0">
                 <template #button-content>
                     <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                 </template>

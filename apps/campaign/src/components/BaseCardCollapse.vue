@@ -11,6 +11,30 @@
                 style="cursor: pointer"
             >
                 <slot name="header"></slot>
+                <div>
+                    <b-dropdown
+                        v-if="infoLinks && infoLinks.length"
+                        variant="link"
+                        size="sm"
+                        no-caret
+                        toggle-class="py-0"
+                    >
+                        <template #button-content>
+                            <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
+                        </template>
+                        <b-dropdown-item
+                            @click="onClickLink(link.url)"
+                            :key="key"
+                            v-for="(link, key) of infoLinks"
+                            class="d-flex align-items-center justify-content-between"
+                        >
+                            <div>
+                                {{ link.label }}
+                            </div>
+                            <i class="fas fa-caret-right text-opaque"></i>
+                        </b-dropdown-item>
+                    </b-dropdown>
+                </div>
             </b-card-title>
         </template>
 
@@ -18,20 +42,7 @@
             <img v-if="image" class="img-fluid" :src="image" alt="header image" />
             <div class="px-3 my-3">
                 <slot></slot>
-
-                <b-button-group class="w-100" block v-if="infoLinks && infoLinks.length">
-                    <slot name="button"></slot>
-
-                    <b-dropdown right variant="primary" no-caret toggle-class="pe-3">
-                        <template #button-content>
-                            <i class="fas fa-caret-down"></i>
-                        </template>
-                        <b-dropdown-item @click="onClickLink(link.url)" :key="key" v-for="(link, key) of infoLinks">
-                            {{ link.label }}
-                        </b-dropdown-item>
-                    </b-dropdown>
-                </b-button-group>
-                <slot v-else name="button"></slot>
+                <slot name="button"></slot>
             </div>
         </b-collapse>
     </b-card>
