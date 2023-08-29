@@ -7,6 +7,7 @@ import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { getIsMobile } from '../utils/user-agent';
 import { Wallet } from '@ethersproject/wallet';
 import { track } from '@thxnetwork/mixpanel';
+import poll from 'promise-poller';
 
 const userManager = new UserManager({
     authority: AUTH_URL,
@@ -55,7 +56,6 @@ export const useAuthStore = defineStore('auth', {
                     user_info_route: 'me',
                 },
             };
-
             await this.triggerLogin(requestConfig);
         },
         onUserUnloadedCallback() {
@@ -81,7 +81,21 @@ export const useAuthStore = defineStore('auth', {
                     claim_id: claim ? claim.uuid : '',
                     ...extraQueryParams,
                 },
+            }).catch(async (error: Error) => {
+                console.log(error);
+                // Should start polling in order to check if auth flow is completed
+                if (error.message === 'Popup closed by user') {
+                    // We should poll the signin silent request until a user becomes available
+                    this.waitForUser();
+                }
             });
+        },
+        waitForUser() {
+            const taskFn = async () => {
+                await this.requestOAuthShareRefresh();
+                return this.user ? Promise.resolve() : Promise.reject('Could not find an authenticated user...');
+            };
+            poll({ taskFn, interval: 5000, retries: 60 });
         },
         async requestOAuthShareRefresh() {
             const { poolId, getConfig } = useAccountStore();

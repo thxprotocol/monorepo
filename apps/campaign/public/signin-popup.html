@@ -38,6 +38,11 @@
                 if (!window.opener) {
                     window.close()
                 }
+            }).catch(async () => {
+                // signinPopupCallback might throw an error if there is no window.opener which occurs for Twitter oauth
+                if (!window.opener) {
+                    window.close()
+                }
             });
         }
     </script>
