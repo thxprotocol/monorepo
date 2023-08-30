@@ -15,7 +15,23 @@
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         const url = new URL(window.location);
-        const state = JSON.parse(localStorage.getItem(`oidc.${url.searchParams.get('state')}`));
+        const stateString = url.searchParams.get('state');
+
+        function isBase64(str) {
+            return str.startsWith('ey');
+        }
+
+        let stateId;
+        // Social callbacks will return a base64 encoded state string that also contains a return_url
+        if (isBase64(stateString)) {
+            const stateSerialized = window.atob(stateString);
+            const state = JSON.parse(stateSerialized);
+            stateId = state.stateId;
+        } else {
+            stateId = stateString
+        }
+
+        const state = JSON.parse(localStorage.getItem(`oidc.${stateId}`));
         const userManager = new window.oidc.UserManager({
             authority: url.searchParams.get('iss'),
             client_id: state && state.data.client_id,

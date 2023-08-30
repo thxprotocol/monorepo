@@ -88,6 +88,11 @@ export const useAuthStore = defineStore('auth', {
                     // We should poll the signin silent request until a user becomes available
                     this.waitForUser();
                 }
+
+                // Should refresh because issue could be caused by base64 state string in redirect
+                if (error.message === 'No matching state found in storage') {
+                    this.requestOAuthShareRefresh();
+                }
             });
         },
         waitForUser() {

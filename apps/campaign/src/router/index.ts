@@ -30,6 +30,12 @@ const routes: Array<RouteRecordRaw> = [
         },
         children: [
             {
+                path: '/c/:poolId/signin',
+                name: 'signin',
+                beforeEnter,
+                component: () => import(/* webpackChunkName: "signin" */ '../views/campaign/Signin.vue'),
+            },
+            {
                 path: '/c/:poolId/quests',
                 name: 'quests',
                 beforeEnter,

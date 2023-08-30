@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Redirect</title>
+    <title>Sign in | THX Network </title>
 </head>
 
 <body>
@@ -14,13 +14,33 @@
             integrity="sha512-v9YAXYIA7sZ48R0CuD5+nKrTrFfSQT4i7iRDSbAhZFYy6mkxom6wvNnkW6fiZ916YoovjrwDlUQLRS7xZuJddw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
+        function isBase64(str) {
+            return str.startsWith('ey');
+        }
+
         const url = new URL(window.location);
+        // Social Connect flow
         if (!url.searchParams.has('code')) {
             window.close()
         }
-        const state = JSON.parse(localStorage.getItem(`oidc.${url.searchParams.get('state')}`));
+
+        const iss = url.searchParams.get('iss');
+        const stateString = url.searchParams.get('state');
+
+        let stateId, returnUrl;
+        // Social callbacks will return a base64 encoded state string that also contains a return_url
+        if (isBase64(stateString)) {
+            const stateSerialized = window.atob(stateString);
+            const state = JSON.parse(stateSerialized);
+            stateId = state.stateId;
+            returnUrl = state.returnUrl;
+        } else {
+            stateId = stateString
+        }
+
+        const state = JSON.parse(localStorage.getItem(`oidc.${stateId}`));
         const userManager = new window.oidc.UserManager({
-            authority: url.searchParams.get('iss'),
+            authority: iss,
             client_id: state && state.data.client_id,
             redirect_uri: url.origin + '/singin-popup.html',
             userStore: new window.oidc.WebStorageStateStore({store: window.localStorage}),
@@ -28,25 +48,28 @@
         const isMobile = window.matchMedia('(pointer:coarse)').matches;
         const isCypress = window.Cypress;
 
+        async function onError(error) {
+            console.error(error);
+
+            // signinPopupCallback might throw an error if there is no window.opener which occurs for Twitter oauth
+            if (!window.opener) {
+                window.close()
+                // If close fails redirect to return_url
+                window.location.href = returnUrl
+            }
+        }
+
         if (isMobile || isCypress) {
             userManager.signinRedirectCallback().then(async (user) => {
                 window.open(state.data.returnUrl, '_self')
-            }).catch(console.error);
+            }).catch(onError);
         } else {
             userManager.signinPopupCallback().then(() => {
                 // If there is no opener we need to close it ourselve
                 if (!window.opener) {
                     window.close()
                 }
-            }).catch(async (error) => {
-                console.error(error);
-                // signinPopupCallback might throw an error if there is no window.opener which occurs for Twitter oauth
-                if (!window.opener) {
-                    window.close()
-                    window.location.href = 'https://localhost:8080/c/64da241ac46a718f2ef099b9/quests'
-
-                }
-            });
+            }).catch(onError);
         }
     </script>
 </body>
