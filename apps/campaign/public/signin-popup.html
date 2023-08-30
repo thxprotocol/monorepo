@@ -38,10 +38,13 @@
                 if (!window.opener) {
                     window.close()
                 }
-            }).catch(async () => {
+            }).catch(async (error) => {
+                console.error(error);
                 // signinPopupCallback might throw an error if there is no window.opener which occurs for Twitter oauth
                 if (!window.opener) {
                     window.close()
+                    window.location.href = 'https://localhost:8080/c/64da241ac46a718f2ef099b9/quests'
+
                 }
             });
         }
