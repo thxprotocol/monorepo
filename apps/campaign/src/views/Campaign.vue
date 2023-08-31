@@ -9,12 +9,13 @@
     ></div>
     <div class="d-flex flex-column h-100 container-lg my-lg-3 p-0">
         <BaseNavbarSecondary class="d-flex d-lg-none" />
-        <div
+        <b-container
+            style="max-width: none"
             v-if="accountStore.isAuthenticated === false"
-            class="d-flex align-items-center justify-content-center h-100"
+            class="d-flex align-items-center justify-content-center h-100 order-lg-1 mt-lg-5"
         >
             <b-spinner type="grow" variant="primary" small />
-        </div>
+        </b-container>
         <template v-else>
             <b-container class="order-lg-1 d-none d-lg-block mt-lg-5" style="max-width: none">
                 <b-row>
