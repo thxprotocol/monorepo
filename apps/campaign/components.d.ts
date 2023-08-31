@@ -43,6 +43,7 @@ declare module 'vue' {
     BaseCardRewardReferral: typeof import('./src/components/BaseCardRewardReferral.vue')['default']
     BaseCardRewardWeb3: typeof import('./src/components/BaseCardRewardWeb3.vue')['default']
     BaseModalCampaignExpired: typeof import('./src/components/BaseModalCampaignExpired.vue')['default']
+    BaseModalConnectSettings: typeof import('./src/components/BaseModalConnectSettings.vue')['default']
     BaseModalERC20Transfer: typeof import('./src/components/BaseModalERC20Transfer.vue')['default']
     BaseModalERC721Transfer: typeof import('./src/components/BaseModalERC721Transfer.vue')['default']
     BaseModalPerkPayment: typeof import('./src/components/BaseModalPerkPayment.vue')['default']

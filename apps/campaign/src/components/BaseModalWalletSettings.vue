@@ -125,18 +125,6 @@
                             <template v-else> Change Security Question </template>
                         </b-button>
                     </b-tab>
-                    <!-- <b-tab title="Export">
-                        <p>Store the twelve word sequence somewhere safe and use it to recover wallet access.</p>
-                        <b-card bg-variant="dark" class="mb-3">
-                            <strong v-if="mnemonic" style="font-size: 1.3rem">{{ mnemonic }}</strong>
-                            <strong v-else>...</strong>
-                        </b-card>
-                        <b-alert v-if="mnemonic" variant="warning">Do not store your mnemonic on this device!</b-alert>
-                        <b-button class="w-100" variant="primary" @click="onSubmitCreateMnemonic">
-                            <b-spinner small variant="light" v-if="isLoadingMnemonic" />
-                            <template v-else>Create Backup</template>
-                        </b-button>
-                    </b-tab> -->
                 </b-tabs>
             </b-form>
         </template>

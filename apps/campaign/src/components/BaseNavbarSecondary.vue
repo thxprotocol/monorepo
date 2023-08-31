@@ -66,8 +66,15 @@
                         <i class="fas fa-ellipsis-v"></i>
                     </template>
 
-                    <b-dropdown-item-button v-if="walletAddress" size="sm" @click="onClickWallet">
-                        {{ walletAddress }}
+                    <b-dropdown-item-button size="sm" @click="onClickWallet">
+                        <b-spinner v-if="!walletAddress" small />
+                        <template v-else>
+                            {{ walletAddress }}
+                        </template>
+                    </b-dropdown-item-button>
+
+                    <b-dropdown-item-button @click="isModalConnectSettingsShown = true" size="sm">
+                        <div class="d-flex align-items-center justify-content-between">Connections</div>
                     </b-dropdown-item-button>
 
                     <b-dropdown-item-button @click="isModalWalletSettingsShown = true" size="sm">
@@ -92,6 +99,11 @@
                     @hidden="isModalWalletSettingsShown = false"
                     :show="isModalWalletSettingsShown"
                 />
+                <BaseModalConnectSettings
+                    id="connect-settings"
+                    @hidden="isModalConnectSettingsShown = false"
+                    :show="isModalConnectSettingsShown"
+                />
                 <BaseModalWalletRecovery
                     id="wallet-recovery"
                     @hidden="isModalWalletRecoveryShown = false"
@@ -114,6 +126,7 @@ import { decodeHTML } from '../utils/decode-html';
 import { AccountVariant } from '../types/enums/accountVariant';
 import BaseModalPoolSubscription from '../components/BaseModalPoolSubscription.vue';
 import BaseModalWalletCreate from '../components/BaseModalWalletCreate.vue';
+import BaseModalConnectSettings from '../components/BaseModalConnectSettings.vue';
 import BaseModalWalletSettings from '../components/BaseModalWalletSettings.vue';
 import BaseModalWalletRecovery from '../components/BaseModalWalletRecovery.vue';
 import { getIsMobile } from '../utils/user-agent';
@@ -122,6 +135,7 @@ export default defineComponent({
     name: 'BaseNavbarSecondary',
     components: {
         BaseModalWalletCreate,
+        BaseModalConnectSettings,
         BaseModalWalletSettings,
         BaseModalWalletRecovery,
         BaseModalPoolSubscription,
@@ -132,6 +146,7 @@ export default defineComponent({
             decodeHTML,
             error: '',
             isRefreshing: false,
+            isModalConnectSettingsShown: false,
             isModalWalletCreateShown: false,
             isModalWalletSettingsShown: false,
             isModalWalletRecoveryShown: false,

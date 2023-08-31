@@ -9,14 +9,22 @@
     ></div>
     <div class="d-flex flex-column h-100 container-lg my-lg-3 p-0">
         <BaseNavbarSecondary class="d-flex d-lg-none" />
-        <b-container class="order-lg-1 d-none d-lg-block mt-lg-5" style="max-width: none">
-            <b-row>
-                <b-col xl="10" offset-xl="1">
-                    <h2 style="text-transform: capitalize">{{ $route.name }}</h2>
-                </b-col>
-            </b-row>
-        </b-container>
-        <router-view />
+        <div
+            v-if="accountStore.isAuthenticated === false"
+            class="d-flex align-items-center justify-content-center h-100"
+        >
+            <b-spinner size="sm" />
+        </div>
+        <template v-else>
+            <b-container class="order-lg-1 d-none d-lg-block mt-lg-5" style="max-width: none">
+                <b-row>
+                    <b-col xl="10" offset-xl="1">
+                        <h2 style="text-transform: capitalize">{{ $route.name }}</h2>
+                    </b-col>
+                </b-row>
+            </b-container>
+            <router-view />
+        </template>
         <BaseNavbarPrimary />
     </div>
 </template>

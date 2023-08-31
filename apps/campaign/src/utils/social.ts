@@ -1,21 +1,33 @@
 import { RewardConditionInteraction, RewardConditionPlatform } from '../types/enums/rewards';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
+import { AccountVariant } from '../types/enums/accountVariant';
 
-function getConnectionStatus(account: TAccount, platform: RewardConditionPlatform) {
-    switch (platform) {
-        case RewardConditionPlatform.YouTube:
-            return account.youtubeManageAccess;
-        case RewardConditionPlatform.Twitter:
-            return account.twitterAccess;
-        case RewardConditionPlatform.Discord:
-            return account.discordAccess;
-        case RewardConditionPlatform.Github:
-            return account.githubAccess;
-        case RewardConditionPlatform.Twitch:
-            return account.twitchAccess;
-        default:
-            return true;
-    }
+const platformIconMap: any = {
+    [RewardConditionPlatform.None]: '',
+    [RewardConditionPlatform.YouTube]: 'fab fa-youtube',
+    [RewardConditionPlatform.Twitter]: 'fab fa-twitter',
+    [RewardConditionPlatform.Discord]: 'fab fa-discord',
+};
+
+const platformAccessKeyMap: any = {
+    [RewardConditionPlatform.None]: '',
+    [RewardConditionPlatform.YouTube]: 'youtubeManageAccess',
+    [RewardConditionPlatform.Twitter]: 'twitterAccess',
+    [RewardConditionPlatform.Discord]: 'discordAccess',
+    [RewardConditionPlatform.Github]: 'githubAccess',
+    [RewardConditionPlatform.Twitch]: 'twitchAccess',
+};
+
+const platformAccountVariantMap: any = {
+    [RewardConditionPlatform.Twitter]: AccountVariant.SSOTwitter,
+    [RewardConditionPlatform.Discord]: AccountVariant.SSODiscord,
+    [RewardConditionPlatform.Github]: AccountVariant.SSOGithub,
+    [RewardConditionPlatform.Twitch]: AccountVariant.SSOTwitch,
+};
+
+function getConnectionStatus(account: { [accessKey: string]: boolean }, platform: RewardConditionPlatform) {
+    const accessKey: string = platformAccessKeyMap[platform];
+    return account[accessKey];
 }
 
 function getInteractionComponent(interaction: RewardConditionInteraction) {
@@ -35,6 +47,8 @@ function getInteractionComponent(interaction: RewardConditionInteraction) {
             return 'BaseBlockquoteDiscordServerJoin';
         case RewardConditionInteraction.DiscordInviteUsed:
             return 'BaseBlockquoteDiscordInviteUsed';
+        default:
+            return null;
     }
 }
 
@@ -49,7 +63,16 @@ function getAccessTokenKindForPlatform(platform: RewardConditionPlatform) {
         case RewardConditionPlatform.Discord: {
             return AccessTokenKind.Discord;
         }
+        default:
+            return null;
     }
 }
 
-export { getAccessTokenKindForPlatform, getConnectionStatus, getInteractionComponent };
+export {
+    getAccessTokenKindForPlatform,
+    getConnectionStatus,
+    getInteractionComponent,
+    platformIconMap,
+    platformAccessKeyMap,
+    platformAccountVariantMap,
+};

@@ -18,7 +18,12 @@
         const stateString = url.searchParams.get('state');
 
         function isBase64(str) {
-            return str.startsWith('ey');
+            try {
+                const object = JSON.parse(window.atob(str));
+                return typeof object === 'object';
+            } catch {
+                return false;
+            }
         }
 
         let stateId;

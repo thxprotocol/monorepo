@@ -57,6 +57,7 @@ export default defineComponent({
         image: String,
         visible: Boolean,
         isPromoted: Boolean,
+        loading: Boolean,
         infoLinks: { type: Object as PropType<{ label: string; url: string }[]>, required: false },
     },
     data: function () {

@@ -15,7 +15,12 @@
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         function isBase64(str) {
-            return str.startsWith('ey');
+            try {
+                const object = JSON.parse(window.atob(str));
+                return typeof object === 'object';
+            } catch {
+                return false;
+            }
         }
 
         const url = new URL(window.location);
@@ -51,7 +56,19 @@
         async function onError(error) {
             console.error(error);
 
-            // signinPopupCallback might throw an error if there is no window.opener which occurs for Twitter oauth
+            // Throws if no state is found for custom base64 state key
+            if (error.message === 'No matching state found in storage') {
+                if (isMobile || isCypress) {
+                    // If close fails redirect to return_url
+                    window.location.href = returnUrl
+                } else {
+                    window.close()
+                    // If close fails redirect to return_url
+                    window.location.href = returnUrl
+                }
+            }
+
+            // Throws if there is no window.opener which occurs for Twitter oauth
             if (!window.opener) {
                 window.close()
                 // If close fails redirect to return_url

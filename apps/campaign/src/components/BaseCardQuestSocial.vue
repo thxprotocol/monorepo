@@ -1,5 +1,9 @@
 <template>
-    <BaseCardCollapse :info-links="reward.infoLinks" :visible="!!authStore.oAuthShare && !reward.isClaimed">
+    <BaseCardCollapse
+        :info-links="reward.infoLinks"
+        :visible="!!authStore.oAuthShare && !reward.isClaimed"
+        @cancel="onCancel"
+    >
         <template #header>
             <div v-if="reward.platform" class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i :class="platformIconMap[reward.platform]" class="me-2 text-primary"></i>
@@ -27,22 +31,20 @@
                 Quest Completed
             </b-button>
 
-            <b-button
-                v-else-if="reward.platform && !isConnected"
-                variant="primary"
-                block
-                class="w-100"
-                @click="onClickConnect"
-                :disabled="isSubmitting"
-            >
-                <template v-if="isSubmitting">
-                    <b-spinner small></b-spinner>
-                    Connecting platform
-                </template>
-                <template v-else>
-                    Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
-                </template>
-            </b-button>
+            <BButtonGroup block class="w-100" v-else-if="reward.platform && !isConnected">
+                <b-button variant="primary" @click="onClickConnect" :disabled="isSubmitting">
+                    <template v-if="isSubmitting">
+                        <b-spinner small class="me-1" />
+                        Connecting platform...
+                    </template>
+                    <template v-else>
+                        Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
+                    </template>
+                </b-button>
+                <BButton v-if="isSubmitting" @click="onClickCancel" variant="primary" style="max-width: 40px">
+                    <i class="fas fa-times text-opaque" />
+                </BButton>
+            </BButtonGroup>
 
             <b-button v-else variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
                 <template v-if="isSubmitting">
@@ -64,7 +66,7 @@ import { useAccountStore } from '../stores/Account';
 import { useAuthStore } from '../stores/Auth';
 import { useRewardStore } from '../stores/Reward';
 import { RewardConditionPlatform, RewardConditionInteraction } from '../types/enums/rewards';
-import { getInteractionComponent, getConnectionStatus } from '../utils/social';
+import { getInteractionComponent, getConnectionStatus, platformIconMap } from '../utils/social';
 import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 import BaseBlockquoteTwitterTweet from './blockquote/BaseBlockquoteTwitterTweet.vue';
 import BaseBlockquoteTwitterMessage from './blockquote/BaseBlockquoteTwitterMessage.vue';
@@ -99,12 +101,7 @@ export default defineComponent({
             RewardConditionPlatform,
             RewardConditionInteraction,
             getInteractionComponent,
-            platformIconMap: {
-                [RewardConditionPlatform.None]: '',
-                [RewardConditionPlatform.YouTube]: 'fab fa-youtube',
-                [RewardConditionPlatform.Twitter]: 'fab fa-twitter',
-                [RewardConditionPlatform.Discord]: 'fab fa-discord',
-            },
+            platformIconMap,
             tooltipContent: 'Copy URL',
         };
     },
@@ -123,6 +120,9 @@ export default defineComponent({
         },
     },
     methods: {
+        onClickCancel() {
+            this.isSubmitting = false;
+        },
         onClickSignin: function () {
             this.accountStore.signin();
         },
@@ -132,7 +132,8 @@ export default defineComponent({
                 this.isSubmitting = true;
                 await this.rewardsStore.completeSocialQuest(this.reward._id);
             } catch (error) {
-                this.error = error;
+                this.error = 'Could not claim points.';
+                console.error(error);
             } finally {
                 this.isSubmitting = false;
             }
@@ -144,7 +145,8 @@ export default defineComponent({
                 this.accountStore.connect(this.reward.platform);
                 await this.accountStore.waitForConnectionStatus(this.reward.platform);
             } catch (error) {
-                this.error = error;
+                this.error = 'Could not connect platform.';
+                console.error(error);
                 await this.accountStore.getAccount();
             } finally {
                 this.isSubmitting = false;
