@@ -13,7 +13,7 @@
             v-if="accountStore.isAuthenticated === false"
             class="d-flex align-items-center justify-content-center h-100"
         >
-            <b-spinner size="sm" />
+            <b-spinner type="grow" variant="primary" small />
         </div>
         <template v-else>
             <b-container class="order-lg-1 d-none d-lg-block mt-lg-5" style="max-width: none">
