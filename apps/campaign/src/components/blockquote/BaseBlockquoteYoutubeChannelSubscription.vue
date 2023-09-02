@@ -16,7 +16,7 @@ export default defineComponent({
     name: 'BaseBlockquoteYoutubeChannelSubscription',
     props: {
         reward: {
-            type: Object as PropType<TPointReward>,
+            type: Object as PropType<TQuestSocial>,
             required: true,
         },
     },

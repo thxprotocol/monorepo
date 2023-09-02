@@ -11,7 +11,7 @@
             <b-link
                 :href="`https://youtu.be/${reward.contentMetadata.videoId}`"
                 target="_blank"
-                class="text-muted ms-auto"
+                class="text-opaque ms-auto"
             >
                 Like this Youtube video
                 <i class="fas fa-external-link-alt"></i>
@@ -27,7 +27,7 @@ export default defineComponent({
     name: 'BaseBlockquoteVideo',
     props: {
         reward: {
-            type: Object as PropType<TPointReward>,
+            type: Object as PropType<TQuestSocial>,
             required: true,
         },
     },

@@ -20,32 +20,31 @@
             <b-form>
                 <b-tabs justified content-class="mt-3">
                     <b-tab title="Accounts" active>
-                        <b-card
-                            body-class="px-3 py-2 d-flex align-items-center"
-                            class="bg-primary mb-2"
-                            v-for="{ platform, color, isConnected, isSubmitting, isDisabled } of platforms"
-                        >
-                            <strong class="me-auto">
-                                <i :class="platformIconMap[platform]" class="me-2" :style="{ color: color }"></i>
-                                {{ RewardConditionPlatform[platform] }}
-                            </strong>
-                            <b-spinner v-if="isSubmitting" small />
-                            <template v-else>
-                                <BButton
-                                    :disabled="isDisabled"
-                                    @click="onClickDisconnect(platform)"
-                                    variant="primary"
-                                    class="text-danger"
-                                    size="sm"
-                                    v-if="isConnected"
-                                >
-                                    Disconnect
-                                </BButton>
-                                <BButton @click="onClickConnect(platform)" variant="primary" size="sm" v-else>
-                                    Connect
-                                </BButton>
-                            </template>
-                        </b-card>
+                        <template v-for="{ platform, color, isConnected, isSubmitting, isDisabled } of platforms">
+                            <div class="px-3 py-2 d-flex align-items-center">
+                                <strong class="me-auto">
+                                    <i :class="platformIconMap[platform]" class="me-2" :style="{ color: color }"></i>
+                                    {{ RewardConditionPlatform[platform] }}
+                                </strong>
+                                <b-spinner v-if="isSubmitting" small />
+                                <template v-else>
+                                    <BButton
+                                        :disabled="isDisabled"
+                                        @click="onClickDisconnect(platform)"
+                                        variant="primary"
+                                        class="text-danger"
+                                        size="sm"
+                                        v-if="isConnected"
+                                    >
+                                        Disconnect
+                                    </BButton>
+                                    <BButton @click="onClickConnect(platform)" variant="primary" size="sm" v-else>
+                                        Connect
+                                    </BButton>
+                                </template>
+                            </div>
+                            <hr class="my-1" />
+                        </template>
                     </b-tab>
                     <b-tab title="Information">
                         <p>

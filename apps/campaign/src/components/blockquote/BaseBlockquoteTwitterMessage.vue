@@ -2,7 +2,7 @@
     <blockquote>
         <div class="card-text ps-2">
             {{ interactionLabel[reward.interaction] }}<br />
-            <em>"{{ content }}"</em>
+            <em>"{{ content }}" (exact match)</em>
         </div>
     </blockquote>
 </template>
@@ -18,7 +18,7 @@ export default defineComponent({
     name: 'BaseBlockquoteTweet',
     props: {
         reward: {
-            type: Object as PropType<TPointReward>,
+            type: Object as PropType<TQuestSocial>,
             required: true,
         },
     },

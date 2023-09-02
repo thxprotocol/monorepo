@@ -14,7 +14,7 @@
             <b-link
                 :href="`https://twitter.com/${reward.contentMetadata.username}`"
                 target="_blank"
-                class="text-muted ms-auto"
+                class="text-opaque ms-auto"
             >
                 Follow this Twitter account
                 <i class="fas fa-external-link-alt"></i>
@@ -30,7 +30,7 @@ export default defineComponent({
     name: 'BaseBlockquoteTweet',
     props: {
         reward: {
-            type: Object as PropType<TPointReward>,
+            type: Object as PropType<TQuestSocial>,
             required: true,
         },
     },

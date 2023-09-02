@@ -2,7 +2,7 @@
     <blockquote>
         <div class="text-center">
             <b-link
-                class="text-muted ms-auto"
+                class="text-opaque ms-auto"
                 :href="reward.contentMetadata.inviteURL ? reward.contentMetadata.inviteURL : null"
                 target="_blank"
             >
@@ -20,7 +20,7 @@ export default defineComponent({
     name: 'BaseBlockquoteDiscordServerJoin',
     props: {
         reward: {
-            type: Object as PropType<TPointReward>,
+            type: Object as PropType<TQuestSocial>,
             required: true,
         },
     },

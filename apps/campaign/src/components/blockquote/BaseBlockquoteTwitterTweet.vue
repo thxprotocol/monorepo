@@ -19,7 +19,7 @@
         </b-link>
         <hr class="my-2" />
         <div class="text-center card-text">
-            <b-link :href="reward.contentMetadata.url" target="_blank" class="text-muted ms-auto">
+            <b-link :href="reward.contentMetadata.url" target="_blank" class="text-opaque ms-auto">
                 {{ interactionLabel[reward.interaction] }}
                 <i class="fas fa-external-link-alt"></i>
             </b-link>
@@ -38,7 +38,7 @@ export default defineComponent({
     name: 'BaseBlockquoteTweet',
     props: {
         reward: {
-            type: Object as PropType<TPointReward>,
+            type: Object as PropType<TQuestSocial>,
             required: true,
         },
     },
