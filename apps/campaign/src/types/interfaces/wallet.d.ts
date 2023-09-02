@@ -17,6 +17,7 @@ type TTransaction = {
     chainId: ChainId;
     walletId: string;
     transactionHash: string;
+    safeTxHash: string;
 };
 
 type TWalletState = {

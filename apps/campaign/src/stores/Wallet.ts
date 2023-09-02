@@ -49,7 +49,7 @@ export const useWalletStore = defineStore('wallet', {
             if (!this.wallet) return;
 
             for (const tx of this.wallet.pendingTransactions) {
-                await this.confirmTransaction(tx.transactionHash);
+                await this.confirmTransaction(tx.safeTxHash);
             }
         },
         async getERC721Token({ _id }: TERC721Token) {
@@ -75,14 +75,14 @@ export const useWalletStore = defineStore('wallet', {
         async transferERC20(config: TERC20TransferConfig) {
             const { api, account } = useAccountStore();
             const response = await api.erc20.transfer(config);
-            await this.confirmTransaction(response.transactionHash);
+            await this.confirmTransaction(response.safeTxHash);
             track('UserCreates', [account?.sub, 'erc20 transfer']);
         },
         async transferERC721(config: TERC721TransferConfig) {
             const { api, account } = useAccountStore();
             const response = await api.erc721.transfer(config);
 
-            await this.confirmTransaction(response.transactionHash);
+            await this.confirmTransaction(response.safeTxHash);
             track('UserCreates', [account?.sub, 'erc721 transfer']);
         },
         async upgrade() {
