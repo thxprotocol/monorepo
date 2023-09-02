@@ -49,7 +49,12 @@ export const useWalletStore = defineStore('wallet', {
             if (!this.wallet) return;
 
             for (const tx of this.wallet.pendingTransactions) {
-                await this.confirmTransaction(tx.safeTxHash);
+                try {
+                    if (!tx.safeTxHash) continue;
+                    await this.confirmTransaction(tx.safeTxHash);
+                } catch (error) {
+                    console.error(error);
+                }
             }
         },
         async getERC721Token({ _id }: TERC721Token) {
