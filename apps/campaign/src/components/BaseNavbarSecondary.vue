@@ -179,6 +179,12 @@ export default defineComponent({
         },
     },
     watch: {
+        // This redirects the user to the wallet of there are no rewards and perks
+        'accountStore.isRewardsLoaded'(isRewardsLoaded) {
+            if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
+                this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
+            }
+        },
         // OAuthshare retrieved but device share and security quesiton not found
         'authStore.isSecurityQuestionAvailable'(isSecurityQuestionAvailable) {
             const { oAuthShare, isDeviceShareAvailable } = this.authStore;

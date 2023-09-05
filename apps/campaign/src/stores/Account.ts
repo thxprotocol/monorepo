@@ -188,9 +188,10 @@ export const useAccountStore = defineStore('account', {
             rewardsStore.list().then(() => {
                 const amount = rewardsStore.rewards.filter((r: any) => !r.isClaimed).length;
 
+                this.isRewardsLoaded = true;
+
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
                 this.postMessage({ message: 'thx.reward.amount', amount });
-                this.isRewardsLoaded = true;
             });
             perksStore.list();
 

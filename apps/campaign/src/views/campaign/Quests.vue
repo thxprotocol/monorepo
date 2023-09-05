@@ -78,14 +78,6 @@ export default defineComponent({
                 .sort(sortMap[this.selectedSort.key]);
         },
     },
-    watch: {
-        // This redirects the user to the wallet of there are no rewards and perks
-        'accountStore.isRewardsLoaded'(isRewardsLoaded) {
-            if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
-                this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
-            }
-        },
-    },
     methods: {
         onChangeFilter(filter: any) {
             const filterArr = Object.values(this.activeFilters);

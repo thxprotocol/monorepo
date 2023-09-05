@@ -86,7 +86,6 @@ export const useWalletStore = defineStore('wallet', {
         async transferERC721(config: TERC721TransferConfig) {
             const { api, account } = useAccountStore();
             const response = await api.erc721.transfer(config);
-
             await this.confirmTransaction(response.safeTxHash);
             track('UserCreates', [account?.sub, 'erc721 transfer']);
         },

@@ -157,27 +157,26 @@ export default defineComponent({
         onModalTransferHidden() {
             this.isModalTransferShown = false;
         },
-        onSubmitTransfer(config: TERC721TransferConfig) {
-            toast(
-                'Processing transaction...',
-                'dark',
-                15000,
-                async () => {
-                    try {
-                        this.isSubmitting = true;
-                        await this.walletStore.transferERC721(config);
-                        this.isModalTransferShown = false;
-                    } catch (error) {
-                        this.error = 'Transaction failed';
-                        console.error(error);
-                    } finally {
-                        this.isSubmitting = false;
-                    }
-                },
-                async () => {
-                    await this.walletStore.list();
-                },
-            );
+        async onSubmitTransfer(config: TERC721TransferConfig) {
+            try {
+                this.isSubmitting = true;
+                await this.walletStore.transferERC721(config);
+                this.isModalTransferShown = false;
+                toast(
+                    'Processing transaction...',
+                    'dark',
+                    45000,
+                    () => {},
+                    async () => {
+                        await this.walletStore.list();
+                    },
+                );
+            } catch (error) {
+                this.error = 'Transaction failed';
+                console.error(error);
+            } finally {
+                this.isSubmitting = false;
+            }
         },
         waitForMinted() {
             const taskFn = async () => {

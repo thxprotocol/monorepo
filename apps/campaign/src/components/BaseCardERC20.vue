@@ -81,27 +81,26 @@ export default defineComponent({
         onModalTransferHidden() {
             this.isModalTransferShown = false;
         },
-        onSubmitTransfer(config: TERC20TransferConfig) {
-            toast(
-                'Processing transaction...',
-                'dark',
-                15000,
-                async () => {
-                    try {
-                        this.isPendingTransfer = true;
-                        await this.walletStore.transferERC20(config);
-                        this.isModalTransferShown = false;
-                    } catch (error) {
-                        this.error = 'Transaction failed';
-                        console.error(error);
-                    } finally {
-                        this.isPendingTransfer = false;
-                    }
-                },
-                async () => {
-                    await this.walletStore.list();
-                },
-            );
+        async onSubmitTransfer(config: TERC20TransferConfig) {
+            try {
+                this.isPendingTransfer = true;
+                await this.walletStore.transferERC20(config);
+                this.isModalTransferShown = false;
+                toast(
+                    'Executing transaction...',
+                    'dark',
+                    45000,
+                    () => {},
+                    async () => {
+                        await this.walletStore.list();
+                    },
+                );
+            } catch (error) {
+                this.error = 'Transaction failed.';
+                console.error(error);
+            } finally {
+                this.isPendingTransfer = false;
+            }
         },
         async onClickMigrate() {
             this.isMigratingTokens = true;
