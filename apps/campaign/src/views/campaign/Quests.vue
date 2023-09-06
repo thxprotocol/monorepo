@@ -62,6 +62,14 @@ export default defineComponent({
             activeFilters: [],
         };
     },
+    watch: {
+        // This redirects the user to the wallet of there are no rewards and perks
+        'accountStore.isRewardsLoaded'(isRewardsLoaded) {
+            if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
+                this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
+            }
+        },
+    },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
