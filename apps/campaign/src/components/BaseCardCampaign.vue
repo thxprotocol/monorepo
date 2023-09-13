@@ -51,10 +51,7 @@
             <div class="flex-grow-1">
                 <strong>
                     {{ campaign.title }}
-                    <i
-                        class="fas fa-check-circle"
-                        :class="{ 'text-success': campaign.active, 'text-gray': !campaign.active }"
-                    />
+                    <i v-if="campaign.active" class="fas fa-check-circle text-success" />
                 </strong>
             </div>
             <b-badge variant="dark" class="ms-2 p-2">
