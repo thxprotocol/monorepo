@@ -86,9 +86,9 @@
             :title="campaign.title"
             size="xl"
             v-model="isModalCampaignFsShown"
-            @hidden="isModalCampaignFsShown = false"
+            @show="onShow"
+            @hidden="onHidden"
             centered
-            scrollable
             body-class="p-0"
             hide-footer
         >
@@ -132,7 +132,8 @@ export default defineComponent({
         return {
             isModalCampaignDomainShown: false,
             isModalCampaignFsShown: false,
-            format: format,
+            format,
+            scrollY: window.scrollY,
         };
     },
     computed: {
@@ -145,6 +146,13 @@ export default defineComponent({
         },
     },
     methods: {
+        onShow() {
+            this.scrollY = window.scrollY;
+        },
+        onHidden() {
+            this.isModalCampaignFsShown = false;
+            window.scrollTo(0, this.scrollY);
+        },
         onClickContinueCampaign() {
             const { account } = useAccountStore();
             track('UserVisits', [

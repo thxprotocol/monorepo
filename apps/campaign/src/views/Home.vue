@@ -3,7 +3,7 @@
         <b-container>
             <!-- <b-navbar class="navbar-top pt-3 px-lg-3 p-lg-0"></b-navbar> -->
             <b-row class="py-md-5">
-                <b-col lg="4" class="text-white brand-intro order-1 order-md-0 align-items-center d-flex">
+                <b-col lg="4" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex">
                     <div>
                         <h1 class="mb-3">
                             Campaign<br />
@@ -14,7 +14,7 @@
                         </p>
                     </div>
                 </b-col>
-                <b-col lg="5" class="order-0 order-md-1 offset-lg-3 text-right">
+                <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
                     <b-card class="p-1">
                         <p class="d-flex align-items-center justify-content-between">
                             <div class="text-opaque">
