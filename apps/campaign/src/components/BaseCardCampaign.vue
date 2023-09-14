@@ -109,10 +109,10 @@
         <template #footer>
             <div class="flex-grow-1">
                 <b-badge variant="dark" class="me-2 p-2">
-                    <i class="fas fa-trophy me-1"></i> {{ campaign.quests.length }}
+                    <i class="fas fa-trophy me-1"></i> {{ campaign.quests }}
                 </b-badge>
                 <b-badge variant="dark" class="me-2 p-2">
-                    <i class="fas fa-gift me-1"></i> {{ campaign.rewards.length }}
+                    <i class="fas fa-gift me-1"></i> {{ campaign.rewards }}
                 </b-badge>
             </div>
             <b-button @click.stop="isModalCampaignFsShown = true" class="rounded-pill px-3" variant="primary" size="sm">

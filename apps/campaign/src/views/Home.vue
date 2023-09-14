@@ -63,10 +63,13 @@
         <hr />
         <b-row :style="{ opacity: isLoadingSearch || isLoadingPage ? 0.5 : 1 }">
             <b-col v-if="isLoading" class="justify-content-center d-flex">
-                <b-spinner variant="light" />
+                <b-spinner small variant="primary" />
             </b-col>
             <b-col v-else lg="4" xl="3" :key="key" v-for="(campaign, key) of campaigns.results">
                 <BaseCardCampaign :campaign="campaign" @clicked="onClickCampaign" />
+            </b-col>
+            <b-col v-if="!isLoading && !campaigns.results.length">
+                <p class="text-opaque">Could not find a campaign with that name...</p>
             </b-col>
         </b-row>
     </b-container>
@@ -91,7 +94,7 @@ export default defineComponent({
             isLoadingPage: false,
             isAlertShown: true,
             imgJumbotron,
-            isLoading: false,
+            isLoading: true,
             page: 1,
             limit: 1,
             search: '',
@@ -117,6 +120,7 @@ export default defineComponent({
             const url = new URL(API_URL);
             url.pathname = '/v1/pools/public';
             url.searchParams.append('page', this.page);
+            url.searchParams.append('limit', this.limit);
             if (this.search) {
                 url.searchParams.append('search', this.search);
             }

@@ -14,11 +14,7 @@
             </b-card-title>
         </template>
         <b-list-group>
-            <b-list-group-item
-                class="bg-primary text-white d-flex"
-                :key="key"
-                v-for="(entry, key) of rewardsStore.leaderboard"
-            >
+            <b-list-group-item class="d-flex" :key="key" v-for="(entry, key) of rewardsStore.leaderboard">
                 <span class="list-item-field-rank">{{ key + 1 }}</span>
                 <span class="list-item-field-address flex-grow-1 ps-2">{{ entry.address.substring(0, 8) }}...</span>
                 <span class="list-item-field-questcount flex-grow-1 text-opaque pe-3">

@@ -42,6 +42,10 @@ export function getStyles(elements: any, colors: any) {
             '--thx-blockquote-link': theme.elements.text,
             '--thx-blockquote-link-hover': theme.elements.text,
         },
+        '.list-group-item': {
+            '--bs-list-group-bg': theme.elements.bodyBg,
+            '--bs-list-group-color': theme.elements.text,
+        },
         '.modal': {
             '--bs-modal-bg': theme.elements.navbarBg,
             '--bs-modal-color': theme.elements.btnText,
