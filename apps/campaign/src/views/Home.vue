@@ -52,7 +52,6 @@
             </b-col>
             <b-col class="d-flex align-items-center justify-content-end">
                 <b-pagination
-                    @change="onChangePage"
                     v-model="page"
                     :per-page="limit"
                     :total-rows="campaigns.total"
@@ -94,7 +93,7 @@ export default defineComponent({
             imgJumbotron,
             isLoading: false,
             page: 1,
-            limit: 25,
+            limit: 1,
             search: '',
             debouncedSearch: null,
             screenWidth: window.innerWidth,
@@ -104,6 +103,14 @@ export default defineComponent({
     async mounted() {
         await this.getCampaigns();
         this.isLoading = false;
+    },
+    watch: {
+        async page(page) {
+            this.page = page;
+            this.isLoadingPage = true;
+            await this.getCampaigns();
+            this.isLoadingPage = false;
+        }
     },
     methods: {
         async getCampaigns() {
@@ -117,12 +124,6 @@ export default defineComponent({
             const campaigns = await res.json();
 
             this.campaigns = campaigns;
-        },
-        async onChangePage(page:number) {
-            this.page = page;
-            this.isLoadingPage = true;
-            await this.getCampaigns();
-            this.isLoadingPage = false;
         },
         onInputSearch() {
             this.isLoadingSearch = true;

@@ -98,7 +98,13 @@
                     <i class="fas fa-times"></i>
                 </b-link>
             </template>
-            <iframe width="100%" class="m-0" style="height: 90vh" :src="campaignUrl"></iframe>
+            <iframe
+                v-if="isModalCampaignFsShown"
+                width="100%"
+                class="m-0"
+                style="height: 90vh"
+                :src="campaignUrl"
+            ></iframe>
         </b-modal>
         <template #footer>
             <div class="flex-grow-1">
