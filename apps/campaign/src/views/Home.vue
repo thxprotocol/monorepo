@@ -54,7 +54,7 @@
                 <b-pagination
                     @change="onChangePage"
                     v-model="page"
-                    :per-page="25"
+                    :per-page="limit"
                     :total-rows="campaigns.total"
                     align="center"
                     class="mb-0"
@@ -94,6 +94,7 @@ export default defineComponent({
             imgJumbotron,
             isLoading: false,
             page: 1,
+            limit: 25,
             search: '',
             debouncedSearch: null,
             screenWidth: window.innerWidth,
@@ -140,11 +141,21 @@ export default defineComponent({
 
 <style>
 .pagination {
-    --bs-pagination-border-color: #37277b;
-    --bs-pagination-disabled-border-color: #37277b;
+    --bs-pagination-focus-bg: var(--bs-purple-dark);
+    --bs-pagination-focus-color: rgba(255,255,255,.5);;
+    --bs-pagination-focus-border-color: var(--bs-purple-dark);
 
+    --bs-pagination-hover-color: white;
+    --bs-pagination-hover-bg: var(--bs-purple);
+    --bs-pagination-hover-border-color: var(--bs-purple);
+    
+    --bs-pagination-color: rgba(255,255,255,.5);;
     --bs-pagination-bg: #37277b;
+    --bs-pagination-border-color: #37277b;
+    
+    --bs-pagination-disabled-color: rgba(255,255,255,.25);
     --bs-pagination-disabled-bg: #37277b;
+    --bs-pagination-disabled-border-color: #37277b;
 }
 .form-control {
     border-color: var(--bs-primary);
