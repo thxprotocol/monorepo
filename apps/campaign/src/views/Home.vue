@@ -118,7 +118,8 @@ export default defineComponent({
 
             this.campaigns = campaigns;
         },
-        async onChangePage() {
+        async onChangePage(page:number) {
+            this.page = page;
             this.isLoadingPage = true;
             await this.getCampaigns();
             this.isLoadingPage = false;
