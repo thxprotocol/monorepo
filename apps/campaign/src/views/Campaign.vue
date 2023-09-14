@@ -1,7 +1,4 @@
 <template>
-    <!-- <b-button class="pe-3 rounded position-fixed d-none d-lg-block" variant="primary" to="/">
-        <i class="fas fa-chevron-left me-1"> </i> Back</b-button
-    > -->
     <div
         v-if="config && config.backgroundUrl"
         class="d-none d-lg-block bg-splash"
@@ -26,7 +23,7 @@
             </b-container>
             <router-view />
         </template>
-        <BaseNavbarPrimary />
+        <BaseNavbarPrimary :screen-width="screenWidth" />
     </div>
 </template>
 <script lang="ts">
@@ -54,6 +51,7 @@ export default defineComponent({
             isModalWalletAccessShown: false,
             isRefreshing: false,
             error: '',
+            screenWidth: window.innerWidth,
         };
     },
     computed: {
@@ -81,10 +79,14 @@ export default defineComponent({
     },
     async created() {
         if (GTM) initGTM();
+        window.addEventListener('resize', this.onResize.bind(this));
         window.onmessage = this.onMessage;
         this.accountStore.postMessage({ message: 'thx.widget.ready' });
     },
     methods: {
+        onResize() {
+            this.screenWidth = window.innerWidth;
+        },
         async onMessage(event: MessageEvent) {
             const { getConfig, poolId } = this.accountStore;
             const origin = getConfig(poolId).origin;

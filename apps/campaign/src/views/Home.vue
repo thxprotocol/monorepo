@@ -1,6 +1,7 @@
 <template>
     <div>
         <b-container>
+            <!-- <b-navbar class="navbar-top pt-3 px-lg-3 p-lg-0"></b-navbar> -->
             <b-row class="py-md-5">
                 <b-col lg="4" class="text-white brand-intro order-1 order-md-0 align-items-center d-flex">
                     <div>
@@ -9,12 +10,19 @@
                             Discovery
                         </h1>
                         <p class="lead mb-4">
-                            A single spot to discover all Quest &amp; Reward campaigns that you can participate in.
+                            A single spot to discover all Quest &amp; Reward campaigns for you to join.
                         </p>
                     </div>
                 </b-col>
                 <b-col lg="5" class="order-0 order-md-1 offset-lg-3 text-right">
                     <b-card class="p-1">
+                        <p class="d-flex align-items-center justify-content-between">
+                            <div class="text-opaque">
+                                <i class="fas fa-star me-2" />
+                                Campaign Spotlight
+                            </div>
+                            <b-button size="sm" variant="primary" href="https://example.com">Join Campaign!</b-button>
+                        </p>
                         <iframe
                             width="100%"
                             height="280"
@@ -68,6 +76,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BaseCardCampaign from '../components/BaseCardCampaign.vue';
+import BaseNavbarSecondary from '../components/BaseNavbarSecondary.vue';
 import { API_URL } from '../config/secrets';
 import imgJumbotron from '../assets/thx_token_governance.webp';
 
@@ -75,6 +84,7 @@ export default defineComponent({
     name: 'Home',
     components: {
         BaseCardCampaign,
+        BaseNavbarSecondary,
     },
     data(): any {
         return {
@@ -86,6 +96,7 @@ export default defineComponent({
             page: 1,
             search: '',
             debouncedSearch: null,
+            screenWidth: window.innerWidth,
             campaigns: { results: [], total: 0 },
         };
     },

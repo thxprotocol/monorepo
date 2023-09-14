@@ -6,7 +6,7 @@
         header-class="p-0 card-header-campaign"
         body-class="p-0"
         footer-class="justify-content-end d-flex px-3 py-2"
-        @click="$emit('clicked', campaign._id)"
+        @click.delegate="isModalCampaignDomainShown = true"
     >
         <template #header>
             <div class="d-flex flex-column">
@@ -32,9 +32,12 @@
                     </b-avatar>
 
                     <div class="my-2">
-                        <b-badge :key="key" v-for="(tag, key) of campaign.tags" variant="dark" class="me-1 p-2">
-                            {{ tag }}
+                        <b-badge variant="dark" class="p-2">
+                            <i class="fas fa-users me-1"></i> {{ campaign.participants }}
                         </b-badge>
+                        <!-- <b-badge :key="key" v-for="(tag, key) of campaign.tags" variant="dark" class="me-1 p-2">
+                            {{ tag }}
+                        </b-badge> -->
                     </div>
                 </div>
             </div>
@@ -54,10 +57,49 @@
                     <i v-if="campaign.active" class="fas fa-check-circle text-success" />
                 </strong>
             </div>
-            <b-badge variant="dark" class="ms-2 p-2">
-                <i class="fas fa-users me-1"></i> {{ campaign.participants }}
-            </b-badge>
         </div>
+        <b-modal
+            class="modal-campaign-domain"
+            :title="campaign.title"
+            v-model="isModalCampaignDomainShown"
+            @hidden="isModalCampaignDomainShown = false"
+            centered
+            hide-footer
+        >
+            <template #header>
+                <h5 class="modal-title"><i class="fas fa-gift me-2"></i> {{ campaign.title }}</h5>
+                <b-link class="btn-close" @click="isModalCampaignDomainShown = false">
+                    <i class="fas fa-times"></i>
+                </b-link>
+            </template>
+            <p>
+                You will be redirected you to the campaign domain: <br />
+                <code>{{ campaign.domain }}</code>
+            </p>
+            <b-button @click="onClickContinueCampaign" variant="primary" class="w-100">
+                Continue
+                <i class="fas fa-chevron-right ms-1" />
+            </b-button>
+        </b-modal>
+        <b-modal
+            class="modal-campaign-iframe"
+            :title="campaign.title"
+            size="xl"
+            v-model="isModalCampaignFsShown"
+            @hidden="isModalCampaignFsShown = false"
+            centered
+            scrollable
+            body-class="p-0"
+            hide-footer
+        >
+            <template #header>
+                <h5 class="modal-title"><i class="fas fa-gift me-2"></i> {{ campaign.title }}</h5>
+                <b-link class="btn-close" @click="isModalCampaignFsShown = false">
+                    <i class="fas fa-times"></i>
+                </b-link>
+            </template>
+            <iframe width="100%" class="m-0" style="height: 90vh" :src="campaignUrl"></iframe>
+        </b-modal>
         <template #footer>
             <div class="flex-grow-1">
                 <b-badge variant="dark" class="me-2 p-2">
@@ -67,16 +109,8 @@
                     <i class="fas fa-gift me-1"></i> {{ campaign.rewards.length }}
                 </b-badge>
             </div>
-            <b-button
-                v-b-tooltip
-                :title="origin"
-                :href="campaign.domain"
-                target="_blank"
-                class="rounded-pill px-3"
-                variant="primary"
-                size="sm"
-            >
-                <i class="fas fa-link ms-0"></i>
+            <b-button @click.stop="isModalCampaignFsShown = true" class="rounded-pill px-3" variant="primary" size="sm">
+                <i class="fas fa-expand ms-0"></i>
             </b-button>
         </template>
     </b-card>
@@ -84,6 +118,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { format } from 'date-fns';
+import { WIDGET_URL } from '../config/secrets';
+import { track } from '@thxnetwork/mixpanel';
+import { useAccountStore } from '../stores/Account';
 
 export default defineComponent({
     name: 'BaseCardCampaign',
@@ -93,13 +130,30 @@ export default defineComponent({
     },
     data() {
         return {
+            isModalCampaignDomainShown: false,
+            isModalCampaignFsShown: false,
             format: format,
         };
     },
     computed: {
+        campaignUrl() {
+            return WIDGET_URL + '/c/' + this.campaign._id;
+        },
         origin() {
             if (!this.campaign.domain) return '';
             return new URL(this.campaign.domain).host;
+        },
+    },
+    methods: {
+        onClickContinueCampaign() {
+            const { account } = useAccountStore();
+            track('UserVisits', [
+                account?.sub || '',
+                'campaign discovery',
+                { origin: this.campaign.domain, poolId: this.campaign._id },
+            ]);
+            window.open(this.campaign.domain, '_blank');
+            this.isModalCampaignDomainShown = false;
         },
     },
 });
@@ -137,5 +191,25 @@ export default defineComponent({
     filter: blur(8px);
     -webkit-filter: blur(8px);
     transition: 0.2s filter ease, 0.2s -webkit-filter ease;
+}
+
+.modal-campaign-domain,
+.modal-campaign-iframe {
+    .modal-header,
+    .modal-body {
+        background-color: var(--bs-body-bg);
+    }
+    .modal-header .btn-close {
+        color: white;
+    }
+}
+
+.modal-campaign-iframe .modal-content {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.modal-campaign-iframe .modal-content .modal-body {
+    line-height: 0;
 }
 </style>

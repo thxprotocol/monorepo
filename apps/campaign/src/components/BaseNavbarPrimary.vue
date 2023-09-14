@@ -43,14 +43,16 @@ export default defineComponent({
     data(): any {
         return { decodeHTML };
     },
-    props: {},
+    props: {
+        screenWidth: Number,
+    },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
         isNavbarSecondaryShown() {
-            return (() => window.innerWidth > 768)();
+            return this.screenWidth > 768;
         },
         config() {
             const { poolId, getConfig } = useAccountStore();
