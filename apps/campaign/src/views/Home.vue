@@ -96,7 +96,7 @@ export default defineComponent({
             imgJumbotron,
             isLoading: true,
             page: 1,
-            limit: 1,
+            limit: 25,
             search: '',
             debouncedSearch: null,
             screenWidth: window.innerWidth,
