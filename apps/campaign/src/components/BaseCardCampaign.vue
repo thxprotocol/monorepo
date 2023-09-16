@@ -58,29 +58,11 @@
                 </strong>
             </div>
         </div>
-        <b-modal
-            class="modal-campaign-domain"
-            :title="campaign.title"
-            v-model="isModalCampaignDomainShown"
+        <BaseModalCampaignDomain
+            :show="isModalCampaignDomainShown"
+            :campaign="campaign"
             @hidden="isModalCampaignDomainShown = false"
-            centered
-            hide-footer
-        >
-            <template #header>
-                <h5 class="modal-title"><i class="fas fa-gift me-2"></i> {{ campaign.title }}</h5>
-                <b-link class="btn-close" @click="isModalCampaignDomainShown = false">
-                    <i class="fas fa-times"></i>
-                </b-link>
-            </template>
-            <p>
-                You will be redirected you to the campaign domain: <br />
-                <code>{{ campaign.domain }}</code>
-            </p>
-            <b-button @click="onClickContinueCampaign" variant="primary" class="w-100">
-                Continue
-                <i class="fas fa-chevron-right ms-1" />
-            </b-button>
-        </b-modal>
+        />
         <b-modal
             class="modal-campaign-iframe"
             :title="campaign.title"
@@ -125,12 +107,11 @@
 import { defineComponent } from 'vue';
 import { format } from 'date-fns';
 import { WIDGET_URL } from '../config/secrets';
-import { track } from '@thxnetwork/mixpanel';
-import { useAccountStore } from '../stores/Account';
+import BaseModalCampaignDomain from './BaseModalCampaignDomain.vue';
 
 export default defineComponent({
     name: 'BaseCardCampaign',
-    components: {},
+    components: { BaseModalCampaignDomain },
     props: {
         campaign: { type: Object, required: true },
     },
@@ -158,16 +139,6 @@ export default defineComponent({
         onHidden() {
             this.isModalCampaignFsShown = false;
             window.scrollTo(0, this.scrollY);
-        },
-        onClickContinueCampaign() {
-            const { account } = useAccountStore();
-            track('UserVisits', [
-                account?.sub || '',
-                'campaign discovery',
-                { origin: this.campaign.domain, poolId: this.campaign._id },
-            ]);
-            window.open(this.campaign.domain, '_blank');
-            this.isModalCampaignDomainShown = false;
         },
     },
 });

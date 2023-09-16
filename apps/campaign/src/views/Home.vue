@@ -5,13 +5,19 @@
             <b-row class="py-md-5">
                 <b-col lg="4" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex">
                     <div>
-                        <h1 class="mb-3">
+                        <h1>
                             Campaign<br />
                             Discovery
                         </h1>
                         <p class="lead mb-4">
                             A single spot to discover all Quest &amp; Reward campaigns for you to join.
                         </p>
+                        <b-button @click="onClickStart" variant="primary" class="me-3">
+                            Start Campaign
+                        </b-button>
+                        <b-button @click="onClickStart" variant="link" class="text-white">
+                            Learn more
+                        </b-button>
                     </div>
                 </b-col>
                 <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
@@ -34,13 +40,34 @@
                     </b-card>
                 </b-col>
             </b-row>
+            <hr class="mb-5"/>
         </b-container>
     </div>
     <b-container class="flex-grow-1 overflow-auto order-lg-1 pt-0 pb-5">
-        <hr />
-        <b-row>
-            <b-col>
-                <b-input-group>
+        <b-tabs pills content-class="mt-3" align="end">
+            <template #tabs-start>
+                <strong class="text-opaque align-self-center me-auto">
+                    <i class="fas fa-trophy me-1" />
+                    Quests
+                </strong>
+            </template>
+            <b-tab :title="key" v-for="quests, key of questLists">
+                <b-row>
+                    <b-col v-for="quest of quests" md="3">
+                        <BaseCardQuest :quest="quest" />
+                    </b-col>
+                </b-row>
+            </b-tab>
+        </b-tabs>
+        <b-row class="mt-5 mb-3">
+            <b-col class="d-flex align-items-center">
+                <strong class="mb-3 mb-md-0 text-opaque">
+                    <i class="fas fa-gift me-1" />
+                    Campaigns
+                </strong>    
+            </b-col>
+            <b-col xs="12" md="4">
+                <b-input-group class="mb-3 mb-md-0">
                     <template #prepend>
                         <b-input-group-text class="bg-primary">
                             <b-spinner small variant="white" v-if="isLoadingSearch" />
@@ -50,7 +77,7 @@
                     <b-form-input placeholder="Search..." v-model="search" @input="onInputSearch" />
                 </b-input-group>
             </b-col>
-            <b-col class="d-flex align-items-center justify-content-end">
+            <b-col xs="12" md="4" class="d-flex align-items-center justify-content-end">
                 <b-pagination
                     v-model="page"
                     :per-page="limit"
@@ -60,7 +87,7 @@
                 ></b-pagination>
             </b-col>
         </b-row>
-        <hr />
+        <!-- <hr /> -->
         <b-row :style="{ opacity: isLoadingSearch || isLoadingPage ? 0.5 : 1 }">
             <b-col v-if="isLoading" class="justify-content-center d-flex">
                 <b-spinner small variant="primary" />
@@ -77,6 +104,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BaseCardQuest from '../components/BaseCardQuest.vue';
 import BaseCardCampaign from '../components/BaseCardCampaign.vue';
 import BaseNavbarSecondary from '../components/BaseNavbarSecondary.vue';
 import { API_URL } from '../config/secrets';
@@ -85,11 +113,13 @@ import imgJumbotron from '../assets/thx_token_governance.webp';
 export default defineComponent({
     name: 'Home',
     components: {
+        BaseCardQuest,
         BaseCardCampaign,
         BaseNavbarSecondary,
     },
     data(): any {
         return {
+            questLists: { daily: [],invite: [],social: [],custom: [],web3: []},
             isLoadingSearch: false,
             isLoadingPage: false,
             isAlertShown: true,
@@ -105,6 +135,7 @@ export default defineComponent({
     },
     async mounted() {
         await this.getCampaigns();
+        await this.getQuests();
         this.isLoading = false;
     },
     watch: {
@@ -128,6 +159,14 @@ export default defineComponent({
             const campaigns = await res.json();
 
             this.campaigns = campaigns;
+        },
+        async getQuests() {
+            const url = new URL(API_URL);
+            url.pathname = '/v1/rewards/public';
+            const res = await fetch(url);
+            const questLists = await res.json();
+
+            this.questLists = questLists;
         },
         onInputSearch() {
             this.isLoadingSearch = true;
@@ -165,5 +204,9 @@ export default defineComponent({
 }
 .form-control {
     border-color: var(--bs-primary);
+}
+.nav-pills .nav-link {
+    text-transform: capitalize;
+    color: rgba(255,255,255,0.5 )
 }
 </style>
