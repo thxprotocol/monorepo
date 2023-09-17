@@ -55,3 +55,39 @@
         color: white;
     }
 }
+.card-campaign {
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.5);
+    transform: 0;
+    transition: 0.2s transform ease;
+}
+.card-header-campaign {
+    overflow: hidden;
+    position: relative;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.card-header-content {
+    z-index: 1;
+    text-align: center;
+}
+
+.card-header-bg {
+    background-image: radial-gradient(var(--bs-primary), var(--bs-body-bg));
+    top: 0;
+    left: 0;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-position: center center;
+    filter: blur(.25rem);
+    -webkit-filter: blur(.25rem);
+    transition: filter .2s ease, -webkit-filter .2s ease;
+}
+
+.card-campaign:hover .card-header-bg {
+    filter: none;
+    -webhkit-filter: none;
+}

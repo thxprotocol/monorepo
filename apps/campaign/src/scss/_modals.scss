@@ -19,3 +19,23 @@
         }   
     }       
 }
+
+.modal-campaign-domain,
+.modal-campaign-iframe {
+    .modal-header,
+    .modal-body {
+        background-color: var(--bs-body-bg);
+    }
+    .modal-header .btn-close {
+        color: white;
+    }
+}
+
+.modal-campaign-iframe .modal-content {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.modal-campaign-iframe .modal-content .modal-body {
+    line-height: 0;
+}
