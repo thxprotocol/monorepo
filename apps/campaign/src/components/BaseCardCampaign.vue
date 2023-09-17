@@ -147,10 +147,13 @@ export default defineComponent({
 <style lang="scss">
 .card-campaign {
     box-shadow: 0 0 0 rgba(0, 0, 0, 0.5);
+    transform: 0;
+    transition: 0.2s transform ease;
 
-    &:hover .card-header-bg {
-        filter: none;
-        -webkit-filter: none;
+    &:hover {
+        transform: scale(1.02);
+        // filter: none;
+        // -webkit-filter: none;
     }
 }
 .card-header-campaign {
@@ -173,9 +176,9 @@ export default defineComponent({
     width: 100%;
     background-size: cover;
     z-index: 0;
-    filter: blur(8px);
-    -webkit-filter: blur(8px);
-    transition: 0.2s filter ease, 0.2s -webkit-filter ease;
+    // filter: blur(8px);
+    // -webkit-filter: blur(8px);
+    // transition: 0.2s filter ease, 0.2s -webkit-filter ease;
 }
 
 .modal-campaign-domain,

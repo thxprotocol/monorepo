@@ -12,10 +12,11 @@
                         <p class="lead mb-4">
                             A single spot to discover all Quest &amp; Reward campaigns for you to join.
                         </p>
-                        <b-button @click="onClickStart" variant="primary" class="me-3">
+                        <b-button @click="onClickStart" variant="primary" class="me-3 px-5">
                             Start Campaign
+                            <i class="fas fa-chevron-right ms-2" />
                         </b-button>
-                        <b-button @click="onClickStart" variant="link" class="text-white">
+                        <b-button :href="publicUrl" target="_blank" variant="link" class="text-white">
                             Learn more
                         </b-button>
                     </div>
@@ -119,6 +120,7 @@ export default defineComponent({
     },
     data(): any {
         return {
+            publicUrl: "https://www.thx.network",
             questLists: { daily: [],invite: [],social: [],custom: [],web3: []},
             isLoadingSearch: false,
             isLoadingPage: false,
@@ -147,6 +149,9 @@ export default defineComponent({
         }
     },
     methods: {
+        onClickStart() {
+            window.open('https://dashboard.thx.network', '_blank')
+        },
         async getCampaigns() {
             const url = new URL(API_URL);
             url.pathname = '/v1/pools/public';
