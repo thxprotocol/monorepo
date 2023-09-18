@@ -1,7 +1,7 @@
 <template>
     <b-card>
         <div class="d-flex">
-            <div class="me-3">
+            <div class="me-3" v-if="quest.brand && quest.brand.logoImgUrl">
                 <BImg lazy width="40" height="auto" :src="quest.brand.logoImgUrl" />
             </div>
             <div>
