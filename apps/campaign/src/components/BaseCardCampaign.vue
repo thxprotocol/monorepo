@@ -18,9 +18,10 @@
             <div
                 class="d-flex flex-column align-items-center justify-content-center card-header-bg"
                 :style="{
-                    backgroundImage: isLazyLoaded
-                        ? `url('${campaign.backgroundImgUrl}')`
-                        : 'radial-gradient(var(--bs-primary), var(--bs-body-bg))',
+                    backgroundImage:
+                        isLazyLoaded && campaign.backgroundImgUrl
+                            ? `url('${campaign.backgroundImgUrl}')`
+                            : 'radial-gradient(var(--bs-primary), var(--bs-body-bg))',
                 }"
             ></div>
             <div class="card-header-content">
