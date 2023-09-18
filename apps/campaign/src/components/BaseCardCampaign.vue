@@ -123,7 +123,6 @@ export default defineComponent({
     computed: {
         onDecode() {
             this.isLazyLoaded = true;
-            debugger;
         },
         campaignUrl() {
             return WIDGET_URL + '/c/' + this.campaign._id;
