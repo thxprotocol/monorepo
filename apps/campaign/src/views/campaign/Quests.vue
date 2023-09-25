@@ -78,17 +78,16 @@ export default defineComponent({
                 .sort(sortMap[this.selectedSort.key]);
         },
     },
-    mounted() {
-        if (this.accountStore.isRewardsLoaded && !this.rewardsStore.rewards.length) {
-            this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
-        }
-    },
     watch: {
         // This redirects the user to the wallet of there are no rewards and perks
-        'accountStore.isRewardsLoaded'(isRewardsLoaded) {
-            if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
-                this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
-            }
+        'accountStore.isRewardsLoaded': {
+            handler(isRewardsLoaded) {
+                if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
+                    this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
+                }
+            },
+            deep: true,
+            immediate: true,
         },
     },
     methods: {
