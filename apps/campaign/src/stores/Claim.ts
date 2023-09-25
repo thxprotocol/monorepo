@@ -12,7 +12,7 @@ export const useClaimStore = defineStore('claims', {
     }),
     actions: {
         async getClaim(uuid: string) {
-            const { api } = useAccountStore();
+            const { api, account, poolId, getConfig } = useAccountStore();
             const r = await api.claims.get(uuid);
             this.error = r.error;
             this.claim = r.claim;
@@ -22,6 +22,8 @@ export const useClaimStore = defineStore('claims', {
             if (!this.error || !this.claim?.error) {
                 sessionStorage.setItem('thxClaimUuid', uuid);
             }
+
+            track('UserVisits', [account?.sub, 'claim URL', { poolId, origin: getConfig(poolId).origin }]);
 
             return r;
         },

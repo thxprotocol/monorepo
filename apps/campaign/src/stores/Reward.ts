@@ -15,11 +15,7 @@ export const useRewardStore = defineStore('rewards', {
             const claim = await api.quests.web3.complete(uuid, payload);
             if (claim.error) throw new Error(claim.error);
 
-            track('UserCreates', [
-                account?.sub,
-                'conditional reward claim',
-                { poolId, origin: getConfig(poolId).origin },
-            ]);
+            track('UserCreates', [account?.sub, 'web3 quest entry', { poolId, origin: getConfig(poolId).origin }]);
 
             getBalance();
 
