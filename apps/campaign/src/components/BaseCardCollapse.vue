@@ -1,5 +1,6 @@
 <template>
     <b-card
+        class="mb-1"
         header-class="p-0"
         body-class="d-flex flex-column p-0"
         :class="{ 'card-collapsed': isVisible, 'card-promoted': isPromoted }"
@@ -46,18 +47,34 @@
             </div>
         </b-collapse>
     </b-card>
+    <BaseModalQuestEntry
+        @close="$emit('modal-close')"
+        :id="id"
+        :loading="loading"
+        :show="completing"
+        :amount="amount"
+        :error="error"
+    />
 </template>
 
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
+import BaseModalQuestEntry from '../components/BaseModalQuestEntry.vue';
 
 export default defineComponent({
     name: 'BaseCardCollapse',
+    components: {
+        BaseModalQuestEntry,
+    },
     props: {
+        id: String,
         image: String,
         visible: Boolean,
         isPromoted: Boolean,
         loading: Boolean,
+        completing: Boolean,
+        error: String,
+        amount: Number,
         infoLinks: { type: Object as PropType<{ label: string; url: string }[]>, required: false },
     },
     data: function () {

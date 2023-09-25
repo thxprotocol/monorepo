@@ -14,7 +14,7 @@
         </b-button>
         <BaseModalCampaignDomain
             :show="isModalCampaignDomainShown"
-            :campaign="{ domain: quest.domain, title: 'test' }"
+            :campaign="{ domain: quest.domain }"
             @hidden="isModalCampaignDomainShown = false"
         />
     </b-card>

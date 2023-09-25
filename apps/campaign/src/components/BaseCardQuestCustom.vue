@@ -1,5 +1,15 @@
 <template>
-    <BaseCardCollapse :info-links="reward.infoLinks" :visible="!!authStore.oAuthShare && pendingClaims > 0">
+    <BaseCardCollapse
+        @modal-close="isModalQuestEntryShown = false"
+        :id="reward._id"
+        :loading="isSubmitting"
+        :completing="isModalQuestEntryShown"
+        :amount="reward.amount"
+        :error="error"
+        :image="reward.image"
+        :info-links="reward.infoLinks"
+        :visible="!!authStore.oAuthShare && pendingClaims > 0"
+    >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fas fa-flag me-2 text-primary"></i>
@@ -71,13 +81,13 @@ export default defineComponent({
         BaseCardCollapse,
     },
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestCustom>,
             required: true,
         },
     },
     data: function (): any {
-        return { error: '', isSubmitting: false };
+        return { error: '', isSubmitting: false, isModalQuestEntryShown: false };
     },
     computed: {
         ...mapStores(useAccountStore),
@@ -90,6 +100,9 @@ export default defineComponent({
             return this.reward.claims.length - this.claimedAmount;
         },
     },
+    mounted() {
+        console.log(this.quest);
+    },
     methods: {
         onClickSignin: function () {
             this.accountStore.signin();
@@ -98,6 +111,7 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
+                this.isModalQuestEntryShown = true;
                 await this.rewardsStore.completeCustomQuest(this.reward);
             } catch (error) {
                 this.error = error;

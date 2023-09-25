@@ -2,6 +2,13 @@
     <BaseCardCollapse
         :info-links="reward.infoLinks"
         :visible="!!authStore.oAuthShare && !reward.isClaimed"
+        @modal-close="isModalQuestEntryShown = false"
+        :id="reward._id"
+        :loading="isSubmitting"
+        :completing="isModalQuestEntryShown"
+        :amount="reward.amount"
+        :error="error"
+        :image="reward.image"
         @cancel="onCancel"
     >
         <template #header>
@@ -17,10 +24,6 @@
         </b-card-text>
 
         <component :is="getInteractionComponent(reward.interaction)" :reward="reward" />
-
-        <b-alert class="p-2" v-model="isAlertDangerShown" variant="danger">
-            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
-        </b-alert>
 
         <template #button>
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
@@ -103,6 +106,7 @@ export default defineComponent({
             getInteractionComponent,
             platformIconMap,
             tooltipContent: 'Copy URL',
+            isModalQuestEntryShown: false,
         };
     },
     computed: {
@@ -115,9 +119,6 @@ export default defineComponent({
 
             return getConnectionStatus(account, this.reward.platform);
         },
-        isAlertDangerShown() {
-            return !!this.error && !this.isSubmitting;
-        },
     },
     methods: {
         onClickCancel() {
@@ -128,6 +129,7 @@ export default defineComponent({
         },
         onClickClaim: async function () {
             try {
+                this.isModalQuestEntryShown = true;
                 this.error = '';
                 this.isSubmitting = true;
                 await this.rewardsStore.completeSocialQuest(this.reward._id);
@@ -143,6 +145,7 @@ export default defineComponent({
                 this.error = '';
                 this.isSubmitting = true;
                 this.accountStore.connect(this.reward.platform);
+
                 await this.accountStore.waitForConnectionStatus(this.reward.platform);
             } catch (error) {
                 this.error = 'Could not connect platform.';

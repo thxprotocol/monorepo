@@ -1,5 +1,11 @@
 <template>
     <BaseCardCollapse
+        @modal-close="isModalQuestEntryShown = false"
+        :id="reward._id"
+        :loading="isSubmitting"
+        :completing="isModalQuestEntryShown"
+        :amount="reward.amount"
+        :error="error"
         :image="reward.image"
         :info-links="reward.infoLinks"
         :visible="!!authStore.oAuthShare && !reward.isClaimed"
@@ -123,6 +129,7 @@ export default defineComponent({
         show: boolean;
         chainId: ChainId;
         unsubscribe: any;
+        isModalQuestEntryShown: boolean;
     } {
         return {
             error: '',
@@ -135,6 +142,7 @@ export default defineComponent({
             show: false,
             chainId: ChainId.Polygon,
             unsubscribe: null,
+            isModalQuestEntryShown: false,
         };
     },
     computed: {
@@ -186,6 +194,7 @@ export default defineComponent({
 
             this.error = '';
             this.isSubmitting = true;
+            this.isModalQuestEntryShown = true;
 
             try {
                 this.modal.setDefaultChain(this.chainList[this.chainId].chain);

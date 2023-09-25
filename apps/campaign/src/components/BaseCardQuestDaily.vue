@@ -1,5 +1,12 @@
 <template>
     <BaseCardCollapse
+        @modal-close="isModalQuestEntryShown = false"
+        :id="reward._id"
+        :loading="isSubmitting"
+        :completing="isModalQuestEntryShown"
+        :amount="reward.amount"
+        :error="error"
+        :image="reward.image"
         :info-links="reward.infoLinks"
         :visible="!!authStore.oAuthShare && !waitDuration"
         :info-url="reward.infoUrl || 'https://example.com'"
@@ -89,6 +96,7 @@ export default defineComponent({
             isSubmitting: false,
             secondsToSubtract: 0,
             now: Math.floor(Date.now() / 1000),
+            isModalQuestEntryShown: false,
         };
     },
     computed: {
@@ -127,6 +135,7 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
+                this.isModalQuestEntryShown = true;
                 await this.rewardsStore.completeDailyQuest(this.reward);
             } catch (error) {
                 this.error = error;
