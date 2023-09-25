@@ -22,18 +22,21 @@
             </b-alert>
 
             <template v-if="!error">
-                <div class="h1 text-center text-accent mt-2">
-                    <i class="fas fa-trophy mb-2"></i>
-                    <p class="lead">You have earned {{ amount }} points</p>
-                </div>
+                <b-alert v-model="isAlertSuccessShown" show variant="success" class="p-2">
+                    <i class="fas fa-trophy me-2"></i>
+                    You have earned {{ amount }} points!
+                </b-alert>
 
                 <div v-if="!isSubscribed">
-                    <p>Subscribe to receive notifications when new quests are available.</p>
-                    <b-form-group v-if="!accountStore.account?.email" :state="isEmailValid">
+                    <b-form-group
+                        class="mb-0"
+                        :state="isEmailValid"
+                        description="Subscribe and receive e-mail notifications when new quests become available."
+                    >
                         <b-form-input v-model="email" type="email" :state="isEmailValid" placeholder="E-mail" />
                     </b-form-group>
                 </div>
-                <p v-else>Continue collecting points or redeem your points for rewards.</p>
+                <p class="mb-0" v-else>Continue collecting points or redeem your points for rewards.</p>
             </template>
         </template>
 
@@ -80,7 +83,11 @@ export default defineComponent({
         isAlertErrorShown() {
             return !!this.error || !!this.subscribeError;
         },
+        isAlertSuccessShown() {
+            return !this.error && !this.subscribeError;
+        },
         isEmailValid: function () {
+            if (!this.email) return null;
             return !!this.email;
         },
         isSubscribed() {
