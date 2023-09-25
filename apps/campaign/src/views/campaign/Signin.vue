@@ -15,7 +15,12 @@ export default defineComponent({
         const { userManager } = useAuthStore();
         const user = await userManager.getUser();
         if (user) {
-            this.$router.push({ name: 'quests' });
+            const uuid = sessionStorage.getItem('thxClaimUuid');
+            if (uuid) {
+                this.$router.push({ name: 'collect', params: { uuid } });
+            } else {
+                this.$router.push({ name: 'quests' });
+            }
         } else {
             useAccountStore().signin();
         }

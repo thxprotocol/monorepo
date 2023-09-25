@@ -19,6 +19,10 @@ export const useClaimStore = defineStore('claims', {
             this.metadata = r.metadata;
             this.erc721 = r.erc721;
 
+            if (!this.error || !this.claim?.error) {
+                sessionStorage.setItem('thxClaimUuid', uuid);
+            }
+
             return r;
         },
         async collect(uuid: string) {
@@ -26,6 +30,8 @@ export const useClaimStore = defineStore('claims', {
             if (!this.claim) this.getClaim(uuid);
 
             await api.claims.collect({ poolId, claimUuid: uuid });
+
+            sessionStorage.removeItem('thxClaimUuid');
 
             track('UserCreates', [account?.sub, 'claim URL claim', { poolId, origin: getConfig(poolId).origin }]);
         },

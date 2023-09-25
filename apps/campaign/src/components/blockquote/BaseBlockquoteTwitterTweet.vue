@@ -8,7 +8,7 @@
             @{{ reward.contentMetadata.username }}
         </b-link>
         -
-        <span> {{ reward.contentMetadata.text.substring(0, 110) }}</span>
+        <span v-if="reward.contentMetadata.text"> {{ reward.contentMetadata.text.substring(0, 110) }}</span>
         <b-link
             v-if="reward.contentMetadata.text.length > 110"
             :href="reward.contentMetadata.url"
