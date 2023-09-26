@@ -1,7 +1,7 @@
 import { BootstrapVueNext } from 'bootstrap-vue-next';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import { MODE, API_URL, MIXPANEL_TOKEN } from './config/secrets';
+import { MODE, API_URL, MIXPANEL_TOKEN, AUTH_URL, WIDGET_URL } from './config/secrets';
 import VueClipboard from 'vue3-clipboard';
 import Vue3Toastify from 'vue3-toastify';
 import App from './App.vue';
@@ -21,7 +21,7 @@ const pinia = createPinia();
 const app = createApp(App);
 
 if (MODE === 'production') {
-    Sentry.init(app, router);
+    Sentry.init(app, router, [WIDGET_URL, API_URL, AUTH_URL]);
 }
 
 app.use(pinia);

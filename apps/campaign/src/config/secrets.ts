@@ -1,4 +1,5 @@
 export const MODE = import.meta.env.MODE || '';
+export const BASE_URL = import.meta.env.BASE_URL || '';
 export const AUTH_URL = import.meta.env.VITE_AUTH_URL || '';
 export const API_URL = import.meta.env.VITE_API_URL || '';
 export const WIDGET_URL = import.meta.env.VITE_WIDGET_URL || '';
