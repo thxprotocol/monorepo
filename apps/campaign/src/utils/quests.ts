@@ -18,6 +18,7 @@ export const filterAvailableMap: any = {
     [QuestVariant.Invite]: (quest: TQuestInvite) => !!quest,
     [QuestVariant.Social]: (quest: TQuestSocial) => !quest.isClaimed,
     [QuestVariant.Custom]: (quest: TQuestCustom) =>
+        !quest.claims.length ||
         quest.claims.length - quest.claims.filter((c: TQuestCustomClaim) => c.isClaimed).length > 0,
     [QuestVariant.Web3]: (quest: TQuestWeb3) => !quest.isClaimed,
 };

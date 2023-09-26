@@ -133,6 +133,17 @@ export default defineComponent({
         },
     },
     watch: {
+        'availableQuestCount': {
+            handler(amount: number) {
+                // Return if not in iframe
+                if (window.top === window.self) return;
+
+                const { getConfig, poolId } = this.accountStore;
+                // Send the amount of unclaimed rewards to the parent window and update the launcher
+                window.top?.postMessage({ message: 'thx.reward.amount', amount }, getConfig(poolId).origin);
+            },
+            immediate: true,
+        },
         // This redirects the user to the wallet of there are no rewards and perks
         'accountStore.isRewardsLoaded': {
             handler(isRewardsLoaded) {

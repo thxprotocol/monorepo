@@ -106,17 +106,6 @@ export const useAccountStore = defineStore('account', {
         onUserUnloaded() {
             return useAuthStore().onUserUnloadedCallback();
         },
-        updateLauncher() {
-            const rewardsStore = useRewardStore();
-            const amount = rewardsStore.rewards.filter((r: any) => !r.isClaimed).length;
-            const { origin } = this.getConfig(this.poolId);
-
-            // Return if not in iframe
-            if (window.top === window.self) return;
-
-            // Send the amount of unclaimed rewards to the parent window and update the launcher
-            window.top?.postMessage({ message: 'thx.reward.amount', amount }, origin);
-        },
         async getAccount() {
             this.account = await this.api.request.get('/v1/account');
         },

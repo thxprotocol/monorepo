@@ -100,9 +100,6 @@ export default defineComponent({
             return this.reward.claims.length - this.claimedAmount;
         },
     },
-    mounted() {
-        console.log(this.quest);
-    },
     methods: {
         onClickSignin: function () {
             this.accountStore.signin();
