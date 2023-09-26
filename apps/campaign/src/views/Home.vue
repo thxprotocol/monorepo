@@ -1,7 +1,38 @@
 <template>
     <div>
         <b-container>
-            <!-- <b-navbar class="navbar-top pt-3 px-lg-3 p-lg-0"></b-navbar> -->
+            <b-navbar toggleable="lg" type="dark" class="mt-3" :container="false">
+                <b-navbar-brand href="#" style="width: 120px;">
+                    <b-img :src="imgLogo" height="50" alt="" />
+                </b-navbar-brand>
+                <b-navbar-toggle target="nav-collapse" />
+                <b-collapse id="nav-collapse" is-nav>
+                    <b-navbar-nav class="ms-auto">
+                        <b-button class="me-lg-3 mb-3 mb-lg-0 px-4" variant="outline-primary" to="/">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            Learn
+                        </b-button>
+                        <b-button class="me-lg-3 mb-3 mb-lg-0 px-4" variant="outline-primary" to="/">
+                            <i class="fas fa-rocket me-2"></i>
+                            Earn
+                        </b-button>
+                    </b-navbar-nav>
+                    <!-- Right aligned nav items -->
+                    <b-navbar-nav class="ms-auto mb-2 mb-lg-0" style="width: 120px;">
+                        <b-button class="px-4" variant="primary" href="#" v-if="!accountStore.isAuthenticated" @click="accountStore.signin()">
+                            Sign in
+                            <i class="fas fa-sign-in-alt ms-2" />
+                        </b-button>
+                        <b-nav-item-dropdown v-else right>
+                            <template #button-content>
+                                User
+                            </template>
+                            <BDropdownItem href="#">Profile</BDropdownItem>
+                            <BDropdownItem href="#">Sign Out</BDropdownItem>
+                        </b-nav-item-dropdown>
+                    </b-navbar-nav>
+                </b-collapse>
+            </b-navbar>
             <b-row class="py-md-5">
                 <b-col lg="4" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex">
                     <div>
@@ -33,7 +64,7 @@
                         <iframe
                             width="100%"
                             height="280"
-                            src="https://www.youtube.com/embed/1p0sw4yBTfo?si=Q8CnyNHsDIwcqVx7?controls=0"
+                            src="https://www.youtube.com/embed/ZKqkdNKb3ks?controls=0"
                             frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowfullscreen
@@ -110,6 +141,9 @@ import BaseCardCampaign from '../components/BaseCardCampaign.vue';
 import BaseNavbarSecondary from '../components/BaseNavbarSecondary.vue';
 import { API_URL } from '../config/secrets';
 import imgJumbotron from '../assets/thx_token_governance.webp';
+import imgLogo from '../assets/logo.png';
+import { useAccountStore } from '../stores/Account';
+import { mapStores } from 'pinia';
 
 export default defineComponent({
     name: 'Home',
@@ -126,6 +160,7 @@ export default defineComponent({
             isLoadingPage: false,
             isAlertShown: true,
             imgJumbotron,
+            imgLogo,
             isLoading: true,
             page: 1,
             limit: 25,
@@ -134,6 +169,9 @@ export default defineComponent({
             screenWidth: window.innerWidth,
             campaigns: { results: [], total: 0 },
         };
+    },
+    computed: {
+        ...mapStores(useAccountStore),
     },
     async mounted() {
         await this.getCampaigns();
