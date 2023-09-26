@@ -122,6 +122,7 @@ export default defineComponent({
             try {
                 await createDeviceShare(this.question, this.password);
                 this.isLoadingPasswordCreate = false;
+                this.accountStore.isAuthenticated = true;
                 this.$emit('hidden');
             } catch (error) {
                 this.isLoadingPasswordCreate = false;
