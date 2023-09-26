@@ -1,3 +1,3 @@
-import { Sentry } from './lib/sentry.ts';
+import { Sentry } from './lib/sentry';
 
 export { Sentry };
