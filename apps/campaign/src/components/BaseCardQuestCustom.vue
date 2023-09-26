@@ -2,11 +2,11 @@
     <BaseCardCollapse
         @modal-close="isModalQuestEntryShown = false"
         :id="reward._id"
+        :amount="reward.amount"
+        :image="reward.image"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="reward.amount"
         :error="error"
-        :image="reward.image"
         :info-links="reward.infoLinks"
         :visible="!!authStore.oAuthShare && pendingClaims > 0"
     >
@@ -81,12 +81,12 @@ export default defineComponent({
         BaseCardCollapse,
     },
     props: {
-        quest: {
+        reward: {
             type: Object as PropType<TQuestCustom>,
             required: true,
         },
     },
-    data: function (): any {
+    data(): any {
         return { error: '', isSubmitting: false, isModalQuestEntryShown: false };
     },
     computed: {

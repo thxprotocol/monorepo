@@ -13,6 +13,15 @@ export const rewardComponentMap = {
     [QuestVariant.Web3]: 'BaseCardQuestWeb3',
 };
 
+export const filterAvailableMap: any = {
+    [QuestVariant.Daily]: (quest: TQuestDaily & { claimAgainDuration: number }) => quest.claimAgainDuration <= 0,
+    [QuestVariant.Invite]: (quest: TQuestInvite) => !!quest,
+    [QuestVariant.Social]: (quest: TQuestSocial) => !quest.isClaimed,
+    [QuestVariant.Custom]: (quest: TQuestCustom) =>
+        quest.claims.length - quest.claims.filter((c: TQuestCustomClaim) => c.isClaimed).length > 0,
+    [QuestVariant.Web3]: (quest: TQuestWeb3) => !quest.isClaimed,
+};
+
 export const sortMap: { [k: number]: any } = {
     [RewardSortVariant.Default]: (a: any, b: any): any => {
         return a.index - b.index;

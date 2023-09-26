@@ -15,14 +15,14 @@ declare global {
     }
 }
 
-Mixpanel.init(MIXPANEL_TOKEN, API_URL);
-
 const pinia = createPinia();
 const app = createApp(App);
 
 if (MODE === 'production') {
     Sentry.init(app, router, [WIDGET_URL, API_URL, AUTH_URL]);
 }
+
+Mixpanel.init(MIXPANEL_TOKEN, API_URL);
 
 app.use(pinia);
 app.use(router);

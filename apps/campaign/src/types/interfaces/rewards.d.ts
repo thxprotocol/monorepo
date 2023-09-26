@@ -26,6 +26,7 @@ type TBaseQuest = {
     component: string;
     createdAt: string;
     updatedAt: string;
+    isHidden: boolean;
 };
 
 type TQuestState = {

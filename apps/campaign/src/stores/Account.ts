@@ -131,7 +131,8 @@ export const useAccountStore = defineStore('account', {
             track('UserCreates', [this.account?.sub, 'pool subscription', { poolId: this.poolId, origin }]);
         },
         async unsubscribe() {
-            this.subscription = await this.api.pools.subscription.delete(this.poolId);
+            await this.api.pools.subscription.delete(this.poolId);
+            this.subscription = null;
 
             const { origin } = this.getConfig(this.poolId);
             track('UserCreates', [this.account?.sub, 'pool unsubscription', { poolId: this.poolId, origin }]);

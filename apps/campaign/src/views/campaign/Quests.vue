@@ -9,13 +9,40 @@
                     @change-filter="onChangeFilter"
                     @change-sort="onChangeSort"
                 />
-                <component
-                    :key="key"
-                    v-for="(reward, key) of rewards"
-                    :is="rewardComponentMap[reward.variant]"
-                    :reward="reward"
-                    class="mb-2 mx-lg-0 my-lg-3"
-                />
+                <b-tabs content-class="mt-3" justified>
+                    <b-tab active>
+                        <template #title>
+                            Available
+                            <sup v-if="availableQuestCount">
+                                <b-badge class="px-1 py-1" variant="danger">
+                                    {{ availableQuestCount }}
+                                </b-badge>
+                            </sup>
+                        </template>
+                        <div :class="{ 'd-none': quest.isHidden }" :key="key" v-for="(quest, key) of available">
+                            <component
+                                v-if="quest"
+                                :is="rewardComponentMap[quest.variant]"
+                                :reward="quest"
+                                class="mb-2 mx-lg-0 my-lg-3"
+                            />
+                        </div>
+                        <div class="text-center mt-5" v-if="!availableQuestCount">
+                            <i class="h1 fas fa-trophy text-accent" />
+                            <p class="lead text-accent">Well done!</p>
+                            <p class="text-opaque">You have completed all available quests</p>
+                        </div>
+                    </b-tab>
+                    <b-tab title="Completed">
+                        <div :class="{ 'd-none': !quest.isHidden }" :key="key" v-for="(quest, key) of available">
+                            <component
+                                :is="rewardComponentMap[quest.variant]"
+                                :reward="quest"
+                                class="mb-2 mx-lg-0 my-lg-3"
+                            />
+                        </div>
+                    </b-tab>
+                </b-tabs>
             </b-col>
             <b-col lg="5" xl="4">
                 <BaseQuestLeaderboard />
@@ -40,7 +67,8 @@ import BaseQuestLeaderboard from '../../components/BaseQuestLeaderboard.vue';
 import { useWalletStore } from '../../stores/Wallet';
 import { usePerkStore } from '../../stores/Perk';
 import { RewardSortVariant } from '../../types/enums/rewards';
-import { rewardComponentMap, sortMap } from '../../utils/quests';
+import { filterAvailableMap, rewardComponentMap, sortMap } from '../../utils/quests';
+import BaseModalQuestEntry from '../../components/BaseModalQuestEntry.vue';
 
 export default defineComponent({
     name: 'Quests',
@@ -53,6 +81,7 @@ export default defineComponent({
         BaseCardQuestDaily,
         BaseCardQuestWeb3,
         BaseModalCampaignExpired,
+        BaseModalQuestEntry,
     },
     data(): any {
         return {
@@ -60,6 +89,8 @@ export default defineComponent({
             isLgScreen: window.innerWidth > 1000,
             selectedSort: { label: 'Default', key: RewardSortVariant.Default },
             activeFilters: [],
+            isModalQuestEntryShown: false,
+            entry: null,
         };
     },
     computed: {
@@ -67,12 +98,35 @@ export default defineComponent({
         ...mapStores(useRewardStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
-        rewards() {
+        isSubscribed() {
+            const { subscription } = useAccountStore();
+            return !!subscription;
+        },
+        isAlertSubscribeShown() {
+            return !this.availableQuestCount;
+        },
+        availableQuestCount() {
+            const { rewards } = useRewardStore();
+            return rewards.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q)).length;
+        },
+        available() {
             const { rewards } = useRewardStore();
             return rewards
-                .filter((r: TBaseQuest) =>
+                .map((q: TBaseQuest) => ({ ...q, isHidden: !filterAvailableMap[q.variant](q) }))
+                .filter((q: TBaseQuest) =>
                     this.activeFilters.length
-                        ? this.activeFilters.map((f: TQuestFilter) => f.key).includes(r.variant)
+                        ? this.activeFilters.map((f: TQuestFilter) => f.key).includes(q.variant)
+                        : true,
+                )
+                .sort(sortMap[this.selectedSort.key]);
+        },
+        completed() {
+            const { rewards } = useRewardStore();
+            return rewards
+                .map((q: TBaseQuest) => ({ ...q, isHidden: filterAvailableMap[q.variant](q) }))
+                .filter((q: TBaseQuest) =>
+                    this.activeFilters.length
+                        ? this.activeFilters.map((f: TQuestFilter) => f.key).includes(q.variant)
                         : true,
                 )
                 .sort(sortMap[this.selectedSort.key]);

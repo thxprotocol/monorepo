@@ -24,7 +24,7 @@
             <template v-if="!error">
                 <b-alert v-model="isAlertSuccessShown" show variant="success" class="p-2">
                     <i class="fas fa-trophy me-2"></i>
-                    You have earned {{ amount }} points!
+                    You have earned {{ amount }} points
                 </b-alert>
 
                 <div v-if="!isSubscribed">

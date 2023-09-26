@@ -39,7 +39,7 @@
                     We will stop sending reward notifications to <strong class="text-accent">{{ email }} </strong>.
                 </template>
             </p>
-            <b-form-group v-if="!accountStore.account?.email" :state="isEmailValid">
+            <b-form-group :state="isEmailValid">
                 <b-form-input v-model="email" type="email" :state="isEmailValid" placeholder="E-mail" />
             </b-form-group>
         </template>

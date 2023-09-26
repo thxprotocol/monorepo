@@ -7,8 +7,8 @@ export const sortConditionalRewards = (a: any, b: any) => {
 };
 
 export const sortMilestoneRewards = (a: any, b: any) => {
-    const aNum = a.claims && a.claims.length - a.claims.filter((c: TMilestoneRewardClaim) => c.isClaimed).length;
-    const bNum = b.claims && b.claims.length - b.claims.filter((c: TMilestoneRewardClaim) => c.isClaimed).length;
+    const aNum = a.claims && a.claims.length - a.claims.filter((c: TQuestCustomClaim) => c.isClaimed).length;
+    const bNum = b.claims && b.claims.length - b.claims.filter((c: TQuestCustomClaim) => c.isClaimed).length;
     return aNum - bNum > 0 ? -1 : bNum - aNum > 0 ? 1 : -1;
 };
 
