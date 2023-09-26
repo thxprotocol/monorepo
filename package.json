@@ -15,6 +15,7 @@
         "@safe-global/api-kit": "^1.1.0",
         "@safe-global/protocol-kit": "^1.0.1",
         "@safe-global/safe-core-sdk-types": "^1.9.2",
+        "@sentry/vue": "^7.71.0",
         "@stripe/stripe-js": "^1.46.0",
         "@thxnetwork/sdk": "1.1.18",
         "@tkey/default": "^10.0.0",

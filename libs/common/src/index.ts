@@ -1,2 +1,3 @@
-import HelloWorld from './lib/HelloWorld.vue';
-export { HelloWorld };
+import { Sentry } from './lib/sentry.ts';
+
+export { Sentry };
