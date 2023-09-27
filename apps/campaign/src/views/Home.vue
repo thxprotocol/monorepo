@@ -8,12 +8,12 @@
                 <b-navbar-toggle target="nav-collapse" />
                 <b-collapse id="nav-collapse" is-nav>
                     <b-navbar-nav class="ms-auto">
-                        <b-button class="me-lg-3 mb-3 mb-lg-0 px-4" variant="outline-primary" to="/">
-                            <i class="fas fa-graduation-cap me-2"></i>
+                        <b-button class="me-lg-3 mb-3 mb-lg-0 px-4" variant="outline-light" to="/">
+                            <i class="fas fa-graduation-cap me-1"></i>
                             Learn
                         </b-button>
-                        <b-button class="me-lg-3 mb-3 mb-lg-0 px-4" variant="outline-primary" to="/">
-                            <i class="fas fa-rocket me-2"></i>
+                        <b-button class="me-lg-3 mb-3 mb-lg-0 px-4" variant="outline-light" to="/">
+                            <i class="fas fa-rocket me-1"></i>
                             Earn
                         </b-button>
                     </b-navbar-nav>
