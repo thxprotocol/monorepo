@@ -62,7 +62,7 @@ export default defineComponent({
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
         perk: function (): TPerk {
-            return this.perksStore.perks.filter((p) => p.uuid === this.uuid)[0];
+            return this.perksStore.rewards.filter((p) => p.uuid === this.uuid)[0];
         },
     },
     methods: {

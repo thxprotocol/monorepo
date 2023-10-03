@@ -194,7 +194,6 @@ export default defineComponent({
 
             this.error = '';
             this.isSubmitting = true;
-            this.isModalQuestEntryShown = true;
 
             try {
                 this.modal.setDefaultChain(this.chainList[this.chainId].chain);
@@ -209,6 +208,8 @@ export default defineComponent({
                     message,
                     chainId: this.chainId,
                 });
+
+                this.isModalQuestEntryShown = true;
             } catch (error) {
                 this.error = error as string;
                 this.modal.closeModal();

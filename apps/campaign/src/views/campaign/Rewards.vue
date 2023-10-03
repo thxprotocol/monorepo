@@ -4,7 +4,7 @@
         <b-row>
             <b-col lg="11" offset-xl="1">
                 <b-row>
-                    <b-col lg="4" :key="key" v-for="(perk, key) of perksStore.perks">
+                    <b-col lg="4" :key="key" v-for="(perk, key) of perksStore.rewards">
                         <component :is="perk.component" :perk="perk" class="mb-2" />
                     </b-col>
                 </b-row>
@@ -18,14 +18,21 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { usePerkStore } from '../../stores/Perk';
 import { useAccountStore } from '../../stores/Account';
-import BaseCardPerkERC20 from '../../components/BaseCardPerkERC20.vue';
-import BaseCardPerkERC721 from '../../components/BaseCardPerkERC721.vue';
-import BaseCardPerkCustom from '../../components/BaseCardPerkCustom.vue';
+import BaseCardRewardERC20 from '../../components/BaseCardRewardERC20.vue';
+import BaseCardRewardERC721 from '../../components/BaseCardRewardERC721.vue';
+import BaseCardRewardCustom from '../../components/BaseCardRewardCustom.vue';
+import BaseCardRewardCoupon from '../../components/BaseCardRewardCoupon.vue';
 import BaseModalCampaignExpired from '../../components/BaseModalCampaignExpired.vue';
 
 export default defineComponent({
     name: 'Rewards',
-    components: { BaseCardPerkERC20, BaseCardPerkERC721, BaseCardPerkCustom, BaseModalCampaignExpired },
+    components: {
+        BaseCardRewardERC20,
+        BaseCardRewardERC721,
+        BaseCardRewardCustom,
+        BaseCardRewardCoupon,
+        BaseModalCampaignExpired,
+    },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(usePerkStore),

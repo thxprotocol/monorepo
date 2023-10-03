@@ -6,7 +6,7 @@ import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 
 export const useRewardStore = defineStore('rewards', {
     state: (): TQuestState => ({
-        rewards: [],
+        quests: [],
         leaderboard: [],
     }),
     actions: {
@@ -19,8 +19,8 @@ export const useRewardStore = defineStore('rewards', {
 
             getBalance();
 
-            const index = this.rewards.findIndex((r) => r.uuid === uuid);
-            this.rewards[index].isClaimed = true;
+            const index = this.quests.findIndex((r) => r.uuid === uuid);
+            this.quests[index].isClaimed = true;
         },
         async completeSocialQuest(id: string) {
             const { api, account, getBalance, poolId, getConfig } = useAccountStore();
@@ -35,8 +35,8 @@ export const useRewardStore = defineStore('rewards', {
 
             getBalance();
 
-            const index = this.rewards.findIndex((r) => r._id === id);
-            this.rewards[index].isClaimed = true;
+            const index = this.quests.findIndex((r) => r._id === id);
+            this.quests[index].isClaimed = true;
         },
         async completeCustomQuest(reward: TQuestCustom) {
             const { api, account, getBalance, poolId, getConfig } = useAccountStore();
@@ -91,42 +91,41 @@ export const useRewardStore = defineStore('rewards', {
 
         async list() {
             const { api } = useAccountStore();
-            const { leaderboard, referralRewards, pointRewards, milestoneRewards, dailyRewards, web3Quests } =
-                await api.quests.list();
+            const { leaderboard, invite, social, custom, daily, web3 } = await api.quests.list();
 
             this.leaderboard = leaderboard;
 
-            const dailyRewardsArray = Object.values(dailyRewards);
+            const dailyRewardsArray = Object.values(daily);
             const dailyRewardsList = dailyRewardsArray.map((a: any) => {
                 a.variant = QuestVariant.Daily;
                 return a;
             });
 
-            const referralRewardsList = Object.values(referralRewards).map((r: any) => {
+            const referralRewardsList = Object.values(invite).map((r: any) => {
                 r.variant = QuestVariant.Invite;
                 return r;
             });
 
-            const pointRewardsArray = Object.values(pointRewards);
+            const pointRewardsArray = Object.values(social);
             const pointRewardsList = pointRewardsArray.map((a: any): TQuestDaily => {
                 a.contentMetadata = a.contentMetadata && JSON.parse(a.contentMetadata);
                 a.variant = QuestVariant.Social;
                 return a;
             });
 
-            const milestoneRewardsArray = Object.values(milestoneRewards);
+            const milestoneRewardsArray = Object.values(custom);
             const milestoneRewardsList = milestoneRewardsArray.map((a: any): TQuestCustom => {
                 a.variant = QuestVariant.Custom;
                 return a;
             });
 
-            const web3QuestsArray = Object.values(web3Quests);
+            const web3QuestsArray = Object.values(web3);
             const web3QuestsList = web3QuestsArray.map((a: any): TQuestWeb3 => {
                 a.variant = QuestVariant.Web3;
                 return a;
             });
 
-            this.rewards = [
+            this.quests = [
                 ...milestoneRewardsList,
                 ...pointRewardsList,
                 ...dailyRewardsList,

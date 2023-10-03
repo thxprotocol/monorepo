@@ -30,6 +30,7 @@ type TAuthState = {
     userManager: UserManager;
     user: {
         id_token?: string;
+        expired: boolean;
         session_state: string | null;
         access_token: string;
         refresh_token?: string;

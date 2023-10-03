@@ -6,7 +6,7 @@
         <b-link
             @click="onClickRefresh"
             class="pl-3 py-2 p-lg-0 m-lg-0 text-center text-decoration-none"
-            v-if="authStore.oAuthShare && rewardsStore.rewards.length"
+            v-if="authStore.oAuthShare && rewardsStore.quests.length"
         >
             <div class="text-accent h1 m-0 d-flex align-items-center">
                 <strong>{{ accountStore.balance }}</strong>
@@ -29,7 +29,7 @@
             <template
                 v-if="
                     authStore.oAuthShare &&
-                    rewardsStore.rewards.length &&
+                    rewardsStore.quests.length &&
                     ['home', 'quests'].includes(String($route.name))
                 "
             >
@@ -48,11 +48,7 @@
                     <i class="fas fa-sliders-h"></i>
                 </b-button>
             </template>
-            <b-button
-                v-if="authStore.oAuthShare && !rewardsStore.rewards.length"
-                variant="link"
-                @click="onClickRefresh"
-            >
+            <b-button v-if="authStore.oAuthShare && !rewardsStore.quests.length" variant="link" @click="onClickRefresh">
                 <b-spinner v-if="isRefreshing" small variant="white" />
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
             </b-button>

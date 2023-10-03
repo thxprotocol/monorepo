@@ -1,6 +1,6 @@
 <template>
     <b-navbar
-        v-if="rewardsStore.rewards.length || perksStore.perks.length"
+        v-if="rewardsStore.quests.length || perksStore.rewards.length"
         class="navbar-bottom my-lg-3 px-lg-3 order-lg-0"
     >
         <div v-if="config" class="pl-3 py-2 text-center text-decoration-none d-none d-lg-block me-lg-5">
@@ -10,11 +10,11 @@
                 v-b-tooltip.hover.bottom="{ title: decodeHTML(config.title) }"
             />
         </div>
-        <router-link v-if="rewardsStore.rewards.length" :to="`/c/${accountStore.poolId}/quests`">
+        <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.poolId}/quests`">
             <i class="fas fa-trophy me-lg-3"></i>
             <div>Quests</div>
         </router-link>
-        <router-link v-if="perksStore.perks.length" :to="`/c/${accountStore.poolId}/rewards`">
+        <router-link v-if="perksStore.rewards.length" :to="`/c/${accountStore.poolId}/rewards`">
             <i class="fas fa-store me-lg-3"></i>
             <div>Rewards</div>
         </router-link>

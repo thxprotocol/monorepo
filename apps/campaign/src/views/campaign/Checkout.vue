@@ -71,7 +71,7 @@ export default defineComponent({
         ...mapStores(usePerkStore),
         perk: function (): TPerk {
             const uuid = this.$route.params.uuid as string;
-            return this.perksStore.perks.filter((p) => p.uuid === uuid)[0];
+            return this.perksStore.rewards.filter((p) => p.uuid === uuid)[0];
         },
     },
     methods: {

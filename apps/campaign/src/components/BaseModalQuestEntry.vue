@@ -57,7 +57,7 @@ import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
 
 export default defineComponent({
-    name: 'BaseCardPerkPayment',
+    name: 'BaseCardRewardPayment',
     data() {
         return {
             isShown: false,

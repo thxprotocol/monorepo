@@ -71,7 +71,7 @@ import { mapStores } from 'pinia';
 import { usePerkStore } from '../stores/Perk';
 
 export default defineComponent({
-    name: 'BaseCardPerkPayment',
+    name: 'BaseModalRewardPayment',
     data() {
         return {
             isShown: false,

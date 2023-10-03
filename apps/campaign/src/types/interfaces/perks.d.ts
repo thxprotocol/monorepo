@@ -1,5 +1,5 @@
 type TPerkState = {
-    perks: any[];
+    rewards: any[];
 };
 
 type TPerk = {

@@ -19,7 +19,7 @@
                                 </b-badge>
                             </sup>
                         </template>
-                        <div :class="{ 'd-none': quest.isHidden }" :key="key" v-for="(quest, key) of available">
+                        <div :class="{ 'd-none': quest.isHidden }" :key="key" v-for="(quest, key) of quests">
                             <component
                                 v-if="quest"
                                 :is="rewardComponentMap[quest.variant]"
@@ -34,7 +34,7 @@
                         </div>
                     </b-tab>
                     <b-tab title="Completed">
-                        <div :class="{ 'd-none': !quest.isHidden }" :key="key" v-for="(quest, key) of available">
+                        <div :class="{ 'd-none': !quest.isHidden }" :key="key" v-for="(quest, key) of quests">
                             <component
                                 :is="rewardComponentMap[quest.variant]"
                                 :reward="quest"
@@ -106,24 +106,13 @@ export default defineComponent({
             return !this.availableQuestCount;
         },
         availableQuestCount() {
-            const { rewards } = useRewardStore();
-            return rewards.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q)).length;
+            const { quests } = useRewardStore();
+            return quests.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q)).length;
         },
-        available() {
-            const { rewards } = useRewardStore();
-            return rewards
+        quests() {
+            const { quests } = useRewardStore();
+            return quests
                 .map((q: TBaseQuest) => ({ ...q, isHidden: !filterAvailableMap[q.variant](q) }))
-                .filter((q: TBaseQuest) =>
-                    this.activeFilters.length
-                        ? this.activeFilters.map((f: TQuestFilter) => f.key).includes(q.variant)
-                        : true,
-                )
-                .sort(sortMap[this.selectedSort.key]);
-        },
-        completed() {
-            const { rewards } = useRewardStore();
-            return rewards
-                .map((q: TBaseQuest) => ({ ...q, isHidden: filterAvailableMap[q.variant](q) }))
                 .filter((q: TBaseQuest) =>
                     this.activeFilters.length
                         ? this.activeFilters.map((f: TQuestFilter) => f.key).includes(q.variant)
@@ -147,7 +136,7 @@ export default defineComponent({
         // This redirects the user to the wallet of there are no rewards and perks
         'accountStore.isRewardsLoaded': {
             handler(isRewardsLoaded) {
-                if (isRewardsLoaded && !this.rewardsStore.rewards.length && !this.perksStore.perks.length) {
+                if (isRewardsLoaded && !this.rewardsStore.quests.length && !this.perksStore.rewards.length) {
                     this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
                 }
             },

@@ -1,5 +1,6 @@
 <template>
     <BaseCardReward
+        :isDisabled="perk.isDisabled"
         :isPromoted="perk.isPromoted"
         :image="imgUrl"
         :title="perk.title"
@@ -15,7 +16,6 @@
     >
         <template #title>
             <div class="flex-grow-1">{{ perk.title }}</div>
-            <div class="text-success fw-bold" v-if="perk.erc1155Amount">{{ perk.erc1155Amount }}x</div>
         </template>
     </BaseCardReward>
     <BaseModalRewardPayment
@@ -36,18 +36,18 @@ import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
 import { useAuthStore } from '../stores/Auth';
-import BaseModalRewardPayment from './BaseModalPerkPayment.vue';
-import BaseCardReward from './BaseCardPerk.vue';
+import BaseModalRewardPayment from './BaseModalRewardPayment.vue';
+import BaseCardReward from './BaseCardReward.vue';
 import { format, formatDistance } from 'date-fns';
 
 export default defineComponent({
-    name: 'BaseCardRewardNFT',
+    name: 'BaseCardRewardCustom',
     components: {
-        BaseModalRewardPayment,
         BaseCardReward,
+        BaseModalRewardPayment,
     },
     data() {
-        return { format, id: 'modalERC721PerkPayment', error: '', isModalShown: false, isSubmitting: false };
+        return { format, id: 'modalCustomPerkPayment', error: '', isModalShown: false, isSubmitting: false };
     },
     props: {
         perk: {
@@ -60,7 +60,7 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         imgUrl() {
-            return this.perk.image || (this.perk.metadata && this.perk.metadata.imageUrl);
+            return this.perk.image;
         },
         isExpired: function () {
             return this.perk.expiry.now - this.perk.expiry.date > 0;
@@ -79,15 +79,14 @@ export default defineComponent({
             this.error = '';
         },
         onClickRedeem() {
-            if (!this.authStore.oAuthShare) {
-                return this.accountStore.signin();
-            }
+            if (!this.authStore.oAuthShare) return this.accountStore.signin();
             this.isModalShown = true;
+            return null;
         },
         onSubmitRedemption() {
             this.isSubmitting = true;
             this.perksStore
-                .createERC721Redemption(this.perk.uuid)
+                .createCouponRedemption(this.perk.uuid)
                 .then(async () => {
                     const walletStore = useWalletStore();
                     await this.accountStore.getBalance();

@@ -92,7 +92,7 @@ import { defineComponent, PropType } from 'vue';
 import { format, formatDistance } from 'date-fns';
 
 export default defineComponent({
-    name: 'BaseCardPerk',
+    name: 'BaseCardRewardCustom',
     components: {},
     data() {
         return { format, id: 'modalERC721PerkPayment', error: '', isModalShown: false, isSubmitting: false };

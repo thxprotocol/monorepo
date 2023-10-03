@@ -106,6 +106,10 @@ export const useAuthStore = defineStore('auth', {
             const { poolId, getConfig } = useAccountStore();
             const { origin } = getConfig(poolId);
 
+            if (this.user && this.user.expired) {
+                this.user = null;
+            }
+
             this.user = await this.userManager.signinSilent({
                 state: {
                     returnUrl: window.location.href,

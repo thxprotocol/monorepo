@@ -29,8 +29,10 @@ type TBaseQuest = {
     isHidden: boolean;
 };
 
+type TAnyQuest = (TQuestSocial | TQuestCustom | TQuestInvite | TQuestDaily | TQuestWeb3) & { isClaimed: boolean };
+
 type TQuestState = {
-    rewards: IReward[];
+    quests: TAnyQuest[];
     leaderboard: { score; wallet; questsCompleted }[];
 };
 

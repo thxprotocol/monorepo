@@ -35,8 +35,8 @@ import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
 import { useAuthStore } from '../stores/Auth';
-import BaseCardReward from './BaseCardPerk.vue';
-import BaseCardRewardPayment from './BaseModalPerkPayment.vue';
+import BaseCardReward from './BaseCardReward.vue';
+import BaseCardRewardPayment from './BaseModalRewardPayment.vue';
 
 export default defineComponent({
     name: 'BaseCardRewardCoin',

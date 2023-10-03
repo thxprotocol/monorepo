@@ -79,7 +79,7 @@ export const useAccountStore = defineStore('account', {
                 })
                 .catch((error) => {
                     this.isAuthenticated = null;
-                    console.error(error);
+                    console.log(error);
                 });
 
             track('UserVisits', [
@@ -176,7 +176,7 @@ export const useAccountStore = defineStore('account', {
             const authStore = useAuthStore();
 
             rewardsStore.list().then(() => {
-                const amount = rewardsStore.rewards.filter((r: any) => !r.isClaimed).length;
+                const amount = rewardsStore.quests.filter((r: any) => !r.isClaimed).length;
 
                 this.isRewardsLoaded = true;
 
