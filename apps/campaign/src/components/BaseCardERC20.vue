@@ -1,5 +1,5 @@
 <template>
-    <b-card body-class="d-flex align-items-center">
+    <b-card body-class="d-flex align-items-center" class="mb-1">
         <div class="pe-3">
             <img height="25" :src="token.erc20.logoImgUrl" />
         </div>

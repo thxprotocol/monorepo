@@ -86,3 +86,14 @@ type TQuestDailyClaim = {
     amount: string;
     isClaimed?: boolean;
 };
+
+type TCouponRewardPayment = {
+    perkId: string;
+    code: string;
+    webshopURL: string;
+    couponCodeId: string;
+    walletId: string;
+    sub: string;
+    poolId: string;
+    amount: number;
+};

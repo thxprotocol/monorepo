@@ -27,7 +27,7 @@
 
                     <b-row>
                         <b-col lg="4" :key="key" v-for="(token, key) of list">
-                            <component :is="token.component" :token="token" class="mb-2" />
+                            <component :is="token.component" :token="token" class="mb-1" />
                         </b-col>
                     </b-row>
                 </template>
@@ -61,12 +61,14 @@ import { useAuthStore } from '../../stores/Auth';
 import { useAccountStore } from '../../stores/Account';
 import BaseCardERC20 from '../../components/BaseCardERC20.vue';
 import BaseCardERC721 from '../../components/BaseCardERC721.vue';
+import BaseCardCouponCode from '../../components/BaseCardCouponCode.vue';
 
 export default defineComponent({
     name: 'Wallet',
     components: {
         BaseCardERC20,
         BaseCardERC721,
+        BaseCardCouponCode,
     },
     data: function () {
         return { error: '', isSubmitting: false, isModalUpgradeShown: false };
@@ -76,7 +78,12 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useAccountStore),
         list: function (): any {
-            return [...this.walletStore.erc20, ...this.walletStore.erc721, ...this.walletStore.erc1155]
+            return [
+                ...this.walletStore.couponCodes,
+                ...this.walletStore.erc20,
+                ...this.walletStore.erc721,
+                ...this.walletStore.erc1155,
+            ]
                 .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
                 .reverse();
         },

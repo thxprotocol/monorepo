@@ -25,6 +25,7 @@ export const useWalletStore = defineStore('wallet', {
         erc20: [],
         erc721: [],
         erc1155: [],
+        couponCodes: [],
         pendingPoints: 0,
         wallets: [],
     }),
@@ -67,15 +68,18 @@ export const useWalletStore = defineStore('wallet', {
         async list() {
             const { api, getConfig, poolId } = useAccountStore();
             const options = { chainId: getConfig(poolId).chainId };
-            this.erc20 = (await api.erc20.list(options)).map((t: any) => {
-                return { ...t, component: 'BaseCardERC20' };
-            });
-            this.erc721 = (await api.erc721.list(options)).map((t: any) => {
-                return { ...t, component: 'BaseCardERC721' };
-            });
-            this.erc1155 = (await api.erc1155.list(options)).map((t: any) => {
-                return { ...t, component: 'BaseCardERC721' };
-            });
+
+            const [erc20, erc721, erc1155, couponCodes] = await Promise.all([
+                (await api.erc20.list(options)).map((t: any) => ({ ...t, component: 'BaseCardERC20' })),
+                (await api.erc721.list(options)).map((t: any) => ({ ...t, component: 'BaseCardERC721' })),
+                (await api.erc1155.list(options)).map((t: any) => ({ ...t, component: 'BaseCardERC721' })),
+                (await api.couponCodes.list(options)).map((t: any) => ({ ...t, component: 'BaseCardCouponCode' })),
+            ]);
+
+            this.erc20 = erc20;
+            this.erc721 = erc721;
+            this.erc1155 = erc1155;
+            this.couponCodes = couponCodes;
         },
         async transferERC20(config: TERC20TransferConfig) {
             const { api, account } = useAccountStore();

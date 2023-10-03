@@ -2927,10 +2927,10 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@thxnetwork/sdk@1.1.20":
-  version "1.1.20"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.1.20.tgz#ea87fe3541446a9a947ba574455fa180a8b2ef31"
-  integrity sha512-5TJbd5LYgIvv2WVJ8l2OjvqZf3dFChXkyNkARO1M/FqfgucXVsTxj/4Qghp2FGj6Tc30eMs6TiiMdjjyQBNYVg==
+"@thxnetwork/sdk@1.1.21":
+  version "1.1.21"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.1.21.tgz#20c3cef0df280b24bc8e619712ca19e4fc6a7b68"
+  integrity sha512-8F/aDZHVt2giBQBaLczC9NqU5VLaZjlkdpHIHAexXrbXr5FpHyiUeg4tyqQtT6Qm6VmFPkD3f+1Jj7bDDJefTw==
 
 "@tkey/common-types@^10.0.0":
   version "10.0.0"
