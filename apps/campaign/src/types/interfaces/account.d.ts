@@ -46,7 +46,6 @@ type TAuthState = {
 };
 
 type TAccountState = {
-    debugger: boolean | null;
     isAuthenticated: boolean | null;
     isEthereumBrowser: boolean;
     isRewardsLoaded: boolean;

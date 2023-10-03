@@ -141,7 +141,7 @@ export default defineComponent({
             return this.token.recipient !== this.walletStore.wallet?.address;
         },
     },
-    async mounted() {
+    mounted() {
         if (!this.token.tokenId) {
             this.waitForMinted();
         } else {

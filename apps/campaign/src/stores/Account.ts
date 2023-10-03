@@ -16,7 +16,6 @@ import poll from 'promise-poller';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
-        debugger: null,
         poolId: '',
         api: null,
         account: null,
@@ -28,9 +27,6 @@ export const useAccountStore = defineStore('account', {
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
-        debug() {
-            this.debugger = true;
-        },
         getConfig: (poolId: string): TWidgetConfig => {
             const data = localStorage.getItem(`thx:widget:${poolId}:config`);
             if (!data) return {} as TWidgetConfig;
@@ -59,10 +55,9 @@ export const useAccountStore = defineStore('account', {
             this.api = new THXClient({ url: API_URL, accessToken: '', poolId });
             this.poolId = poolId;
 
-            this.isAuthenticated = false;
-
             const config = await this.api.request.get('/v1/widget/' + poolId);
 
+            this.setStatus(false);
             this.setConfig(this.poolId, { ...config, origin });
             this.setTheme(config);
             this.getUserData();
@@ -74,11 +69,11 @@ export const useAccountStore = defineStore('account', {
                 .getUser()
                 .then(() => {
                     if (!authStore.user) {
-                        this.isAuthenticated = null;
+                        this.setStatus(null);
                     }
                 })
                 .catch((error) => {
-                    this.isAuthenticated = null;
+                    this.setStatus(null);
                     console.log(error);
                 });
 
@@ -152,7 +147,7 @@ export const useAccountStore = defineStore('account', {
             });
         },
         signin(extraQueryParams?: { [key: string]: string }) {
-            this.isAuthenticated = false;
+            this.setStatus(false);
             return useAuthStore().requestOAuthShare(extraQueryParams);
         },
         async signout() {
@@ -164,7 +159,8 @@ export const useAccountStore = defineStore('account', {
                 state: { isMobile, origin: window.location.href },
                 id_token_hint: authStore.user.id_token,
             });
-            this.isAuthenticated = null;
+
+            this.setStatus(null);
         },
         async migrate(body: { erc20Id?: string; erc721Id?: string; erc721TokenId?: string }) {
             await this.api.request.post('/v1/account/wallet/migrate', { body: JSON.stringify(body) });
@@ -196,9 +192,15 @@ export const useAccountStore = defineStore('account', {
 
             await Promise.all([this.getBalance(), this.getSubscription(), walletStore.list(), walletStore.getWallet()]);
 
-            this.isAuthenticated = true;
+            this.setStatus(true);
+        },
+        setStatus(isAuthenticated: boolean | null) {
+            this.isAuthenticated = isAuthenticated;
+            this.postMessage({ message: 'thx.auth.status', isAuthenticated });
 
-            track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
+            if (isAuthenticated) {
+                track('UserSignsIn', [this.account, { origin, poolId: this.poolId }]);
+            }
         },
         postMessage(payload: any) {
             const { origin } = this.getConfig(this.poolId);

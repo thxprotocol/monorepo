@@ -110,7 +110,21 @@ export default defineComponent({
                     this.onInviteQuestComplete(event.data.uuid);
                     break;
                 }
+                case 'thx.auth.signout': {
+                    this.onSignout();
+                    break;
+                }
+                case 'thx.auth.signin': {
+                    this.onSignin();
+                    break;
+                }
             }
+        },
+        onSignin() {
+            this.accountStore.signin();
+        },
+        onSignout() {
+            this.accountStore.signout();
         },
         onInviteQuestUpdate(ref: string) {
             if (!ref) return;

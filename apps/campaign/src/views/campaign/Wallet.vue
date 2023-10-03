@@ -77,7 +77,7 @@ export default defineComponent({
         ...mapStores(useWalletStore),
         ...mapStores(useAuthStore),
         ...mapStores(useAccountStore),
-        list: function (): any {
+        list() {
             return [
                 ...this.walletStore.couponCodes,
                 ...this.walletStore.erc20,
