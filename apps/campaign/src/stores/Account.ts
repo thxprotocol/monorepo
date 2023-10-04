@@ -190,7 +190,9 @@ export const useAccountStore = defineStore('account', {
                 authStore.getPrivateKey();
             }
 
-            await Promise.all([this.getBalance(), this.getSubscription(), walletStore.list(), walletStore.getWallet()]);
+            await Promise.all([this.getBalance(), this.getSubscription(), walletStore.getWallet()]);
+
+            walletStore.list();
 
             this.setStatus(true);
         },
