@@ -118,7 +118,14 @@ export default defineComponent({
                     this.onSignin();
                     break;
                 }
+                case 'thx.quests.list': {
+                    this.onQuestsList();
+                    break;
+                }
             }
+        },
+        onQuestsList() {
+            this.rewardsStore.list();
         },
         onSignin() {
             this.accountStore.signin();
