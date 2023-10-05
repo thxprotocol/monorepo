@@ -9,7 +9,7 @@
         no-close-on-esc
     >
         <template #header>
-            <h5 class="modal-title"><i class="fas fa-bell me-2"></i> Reward notifications</h5>
+            <h5 class="modal-title"><i class="fas fa-bell me-2"></i> Quest notifications</h5>
             <b-link class="btn-close" @click="isShown = false"> <i class="fas fa-times"></i> </b-link>
         </template>
         <div v-if="isLoading" class="text-center">

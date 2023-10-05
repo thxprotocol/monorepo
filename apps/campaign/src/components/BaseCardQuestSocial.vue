@@ -129,12 +129,13 @@ export default defineComponent({
         },
         onClickClaim: async function () {
             try {
-                this.isModalQuestEntryShown = true;
                 this.error = '';
                 this.isSubmitting = true;
+                this.isModalQuestEntryShown = true;
                 await this.rewardsStore.completeSocialQuest(this.reward._id);
             } catch (error) {
-                this.error = 'Could not claim points.';
+                const err = error as Error;
+                this.error = err.message ? err.message : 'Could not claim points.';
                 console.error(error);
             } finally {
                 this.isSubmitting = false;

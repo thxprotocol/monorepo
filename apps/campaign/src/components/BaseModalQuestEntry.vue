@@ -9,15 +9,15 @@
         no-close-on-esc
     >
         <template #header>
-            <h5 class="modal-title">Quest Completed!</h5>
+            <h5 class="modal-title">{{ error && !loading ? 'Quest verification failed' : 'Quest completed!' }}</h5>
             <b-link class="btn-close" @click="isShown = false"><i class="fas fa-times"></i></b-link>
         </template>
         <div v-if="loading" class="text-center">
             <b-spinner show small variant="primary" />
         </div>
         <template v-else>
-            <b-alert v-model="isAlertErrorShown" show variant="danger" class="p-2">
-                <i class="fas fa-exclamation-circle me-2"></i>
+            <b-alert v-model="isAlertErrorShown" show variant="info" class="p-2 mb-0">
+                <i class="fas fa-exclamation-circle me-1"></i>
                 {{ error || subscribeError }}
             </b-alert>
 

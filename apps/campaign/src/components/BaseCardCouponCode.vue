@@ -19,7 +19,7 @@
                     class="d-flex justify-content-between align-items-center"
                 >
                     Use this code
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="fas fa-caret-right text-opaque"></i>
                 </b-dropdown-item>
             </b-dropdown>
         </div>
