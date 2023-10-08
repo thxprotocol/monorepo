@@ -1,5 +1,5 @@
 <template>
-    <blockquote>
+    <blockquote v-if="reward.contentMetadata">
         <div class="d-flex align-items-center">
             <b-avatar :src="reward.contentMetadata.profileImgUrl" class="me-2" />
             <div>
