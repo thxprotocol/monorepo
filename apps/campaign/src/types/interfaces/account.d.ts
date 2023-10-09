@@ -6,6 +6,7 @@ type TSubscription = {
 };
 
 type TAccount = {
+    username: string;
     sub: string;
     firstName: string;
     lastName: string;

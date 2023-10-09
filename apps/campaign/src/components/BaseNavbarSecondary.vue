@@ -70,7 +70,7 @@
                     </b-dropdown-item-button>
 
                     <b-dropdown-item-button @click="isModalConnectSettingsShown = true" size="sm">
-                        <div class="d-flex align-items-center justify-content-between">Connections</div>
+                        <div class="d-flex align-items-center justify-content-between">Profile</div>
                     </b-dropdown-item-button>
 
                     <b-dropdown-item-button @click="isModalWalletSettingsShown = true" size="sm">
