@@ -4,7 +4,7 @@
         :id="reward._id"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="reward.amount"
+        :amount="amount"
         :error="error"
         :image="reward.image"
         :info-links="reward.infoLinks"
@@ -117,6 +117,13 @@ export default defineComponent({
                 minutes: String(minutes).padStart(2, '0'),
                 seconds: String(seconds).padStart(2, '0'),
             };
+        },
+        amount() {
+            const amountIndex =
+                this.reward.claims.length >= this.reward.amounts.length
+                    ? this.reward.claims.length % this.reward.amounts.length
+                    : this.reward.claims.length;
+            return this.reward.amounts[amountIndex];
         },
     },
     created() {

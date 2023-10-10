@@ -61,6 +61,8 @@ type TQuestDaily = TBaseQuest & {
     amount: number;
     amounts: number[];
     claims: TDailyRewardClaim[];
+    isDisabled: boolean;
+    claimAgainDuration;
 };
 
 type TQuestWeb3 = TBaseQuest & {

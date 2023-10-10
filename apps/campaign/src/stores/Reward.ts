@@ -55,8 +55,6 @@ export const useRewardStore = defineStore('rewards', {
             ]);
 
             getBalance();
-
-            await this.list();
         },
         async completeInviteQuest(uuid: string) {
             const { account, getConfig, setConfig, poolId, api } = useAccountStore();
@@ -84,8 +82,6 @@ export const useRewardStore = defineStore('rewards', {
                 ]);
 
                 getBalance();
-
-                await this.list();
             }
         },
 

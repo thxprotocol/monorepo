@@ -9,7 +9,9 @@
         no-close-on-esc
     >
         <template #header>
-            <h5 class="modal-title">{{ error && !loading ? 'Quest verification failed' : 'Quest completed!' }}</h5>
+            <h5 class="modal-title">
+                {{ loading ? 'Loading...' : error ? 'Quest verification failed' : 'Quest completed!' }}
+            </h5>
             <b-link class="btn-close" @click="isShown = false"><i class="fas fa-times"></i></b-link>
         </template>
         <div v-if="loading" class="text-center">
@@ -44,8 +46,9 @@
             <b-button v-if="!isSubscribed" @click="onClickSubscribe" variant="primary" class="w-100 rounded-pill">
                 Subscribe
             </b-button>
-            <b-button :variant="isSubscribed ? 'primary' : 'link'" class="w-100 rounded-pill" @click="$emit('close')">
-                Continue
+            <b-button :variant="isSubscribed ? 'primary' : 'link'" class="w-100 rounded-pill" @click="onClickContinue">
+                <b-spinner v-if="isLoadingContinue" small variant="primary" />
+                <template v-else>Continue</template>
             </b-button>
         </template>
     </b-modal>
@@ -55,6 +58,7 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
+import { useRewardStore } from '../stores/Reward';
 
 export default defineComponent({
     name: 'BaseCardRewardPayment',
@@ -62,6 +66,7 @@ export default defineComponent({
         return {
             isShown: false,
             isSubmitting: false,
+            isLoadingContinue: false,
             email: '',
             subscribeError: '',
         };
@@ -80,6 +85,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useRewardStore),
         isAlertErrorShown() {
             return !!this.error || !!this.subscribeError;
         },
@@ -104,13 +110,18 @@ export default defineComponent({
         },
         async onClickSubscribe() {
             try {
-                console.log(this.email);
                 await this.accountStore.subscribe(this.email);
-                this.$emit('close');
+                this.onClickContinue();
             } catch (error) {
                 this.subscribeError = 'This e-mail is used by someone else.';
                 console.error(error);
             }
+        },
+        async onClickContinue() {
+            this.isLoadingContinue = true;
+            await this.rewardsStore.list();
+            this.isLoadingContinue = false;
+            this.$emit('close');
         },
     },
 });

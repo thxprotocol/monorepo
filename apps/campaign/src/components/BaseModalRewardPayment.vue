@@ -16,7 +16,7 @@
             <b-spinner show size="sm" />
         </div>
         <template v-else>
-            <b-alert v-if="error" show variant="danger" class="p-2">
+            <b-alert v-model="isAlertDangerShown" show variant="danger" class="p-2">
                 <i class="fas fa-exclamation-circle me-2"></i>
                 {{ error }}
             </b-alert>
@@ -104,6 +104,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(usePerkStore),
+        isAlertDangerShown() {
+            return !!this.error;
+        },
     },
 });
 </script>
