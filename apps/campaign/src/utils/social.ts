@@ -38,6 +38,7 @@ function getInteractionComponent(interaction: RewardConditionInteraction) {
             return 'BaseBlockquoteYoutubeChannelSubscription';
         case RewardConditionInteraction.TwitterLike:
         case RewardConditionInteraction.TwitterRetweet:
+        case RewardConditionInteraction.TwitterLikeRetweet:
             return 'BaseBlockquoteTwitterTweet';
         case RewardConditionInteraction.TwitterFollow:
             return 'BaseBlockquoteTwitterUser';

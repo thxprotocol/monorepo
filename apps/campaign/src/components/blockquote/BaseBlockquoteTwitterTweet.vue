@@ -45,8 +45,9 @@ export default defineComponent({
     data: function (): any {
         return {
             interactionLabel: {
-                [RewardConditionInteraction.TwitterLike]: 'Like this tweet',
-                [RewardConditionInteraction.TwitterRetweet]: 'Retweet this tweet',
+                [RewardConditionInteraction.TwitterLike]: 'Like this post',
+                [RewardConditionInteraction.TwitterRetweet]: 'Repost this post',
+                [RewardConditionInteraction.TwitterLikeRetweet]: 'Repost & Like this post',
             },
             tooltipContent: 'Copy URL',
         };
@@ -63,8 +64,8 @@ export default defineComponent({
         getChannelActionURL(interaction: RewardConditionInteraction, content: string) {
             switch (interaction) {
                 case RewardConditionInteraction.TwitterLike:
-                    return { url: `https://www.twitter.com/twitter/status/${content}` };
                 case RewardConditionInteraction.TwitterRetweet:
+                case RewardConditionInteraction.TwitterLikeRetweet:
                     return { url: `https://www.twitter.com/twitter/status/${content}` };
                 default:
                     return '';
