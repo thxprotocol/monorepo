@@ -1,80 +1,46 @@
 <template>
-    <div>
-        <b-container>
-            <b-navbar toggleable="lg" type="dark" class="mt-3" :container="false">
-                <b-navbar-brand href="#" style="width: 120px;">
-                    <b-img :src="imgLogo" height="50" alt="" />
-                </b-navbar-brand>
-                <b-navbar-toggle target="nav-collapse" />
-                <b-collapse id="nav-collapse" is-nav>
-                    <b-navbar-nav class="ms-auto">
-                        <b-button class="me-lg-3 mb-3 mb-lg-0 px-4" variant="outline-light" to="/">
-                            <i class="fas fa-graduation-cap me-1"></i>
-                            Learn
-                        </b-button>
-                        <b-button class="me-lg-3 mb-3 mb-lg-0 px-4" variant="outline-light" to="/">
-                            <i class="fas fa-rocket me-1"></i>
-                            Earn
-                        </b-button>
-                    </b-navbar-nav>
-                    <!-- Right aligned nav items -->
-                    <b-navbar-nav class="ms-auto mb-2 mb-lg-0" style="width: 120px;">
-                        <b-button class="px-4" variant="primary" href="#" v-if="!accountStore.isAuthenticated" @click="accountStore.signin()">
-                            Sign in
-                            <i class="fas fa-sign-in-alt ms-2" />
-                        </b-button>
-                        <b-nav-item-dropdown v-else right>
-                            <template #button-content>
-                                User
-                            </template>
-                            <BDropdownItem href="#">Profile</BDropdownItem>
-                            <BDropdownItem href="#">Sign Out</BDropdownItem>
-                        </b-nav-item-dropdown>
-                    </b-navbar-nav>
-                </b-collapse>
-            </b-navbar>
-            <b-row class="py-md-5">
-                <b-col lg="4" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex">
-                    <div>
-                        <h1>
-                            Campaign<br />
-                            Discovery
-                        </h1>
-                        <p class="lead mb-4">
-                            A single spot to discover all Quest &amp; Reward campaigns for you to join.
-                        </p>
-                        <b-button @click="onClickStart" variant="primary" class="me-3 px-5">
-                            Start Campaign
-                            <i class="fas fa-chevron-right ms-2" />
-                        </b-button>
-                        <b-button :href="publicUrl" target="_blank" variant="link" class="text-white">
-                            Learn more
-                        </b-button>
-                    </div>
-                </b-col>
-                <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
-                    <b-card class="p-1">
-                        <p class="d-flex align-items-center justify-content-between">
-                            <div class="text-opaque">
-                                <i class="fas fa-star me-2" />
-                                Campaign Spotlight
-                            </div>
-                            <b-button size="sm" variant="primary" href="https://example.com">Join Campaign!</b-button>
-                        </p>
-                        <iframe
-                            width="100%"
-                            height="280"
-                            src="https://www.youtube.com/embed/ZKqkdNKb3ks?controls=0"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen
-                        ></iframe>
-                    </b-card>
-                </b-col>
-            </b-row>
-            <hr class="mb-5"/>
-        </b-container>
-    </div>
+    <b-container>
+        <b-row class="py-md-5">
+            <b-col lg="4" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex">
+                <div>
+                    <h1>
+                        Campaign<br />
+                        Discovery
+                    </h1>
+                    <p class="lead mb-4">
+                        A single spot to discover all Quest &amp; Reward campaigns for you to join.
+                    </p>
+                    <b-button @click="onClickStart" variant="primary" class="me-3 px-5">
+                        Start Campaign
+                        <i class="fas fa-chevron-right ms-2" />
+                    </b-button>
+                    <b-button :href="publicUrl" target="_blank" variant="link" class="text-white">
+                        Learn more
+                    </b-button>
+                </div>
+            </b-col>
+            <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
+                <b-card class="p-1">
+                    <p class="d-flex align-items-center justify-content-between">
+                        <div class="text-opaque">
+                            <i class="fas fa-star me-2" />
+                            Campaign Spotlight
+                        </div>
+                        <b-button size="sm" variant="primary" href="https://example.com">Join Campaign!</b-button>
+                    </p>
+                    <iframe
+                        width="100%"
+                        height="280"
+                        src="https://www.youtube.com/embed/ZKqkdNKb3ks?controls=0"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen
+                    ></iframe>
+                </b-card>
+            </b-col>
+        </b-row>
+        <hr class="mb-5"/>
+    </b-container>
     <b-container class="flex-grow-1 overflow-auto order-lg-1 pt-0 pb-5">
         <b-tabs pills content-class="mt-3" align="end">
             <template #tabs-start>
@@ -136,13 +102,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import BaseCardQuest from '../components/BaseCardQuest.vue';
-import BaseCardCampaign from '../components/BaseCardCampaign.vue';
-import BaseNavbarSecondary from '../components/BaseNavbarSecondary.vue';
-import { API_URL } from '../config/secrets';
-import imgJumbotron from '../assets/thx_token_governance.webp';
-import imgLogo from '../assets/logo.png';
-import { useAccountStore } from '../stores/Account';
+import BaseCardQuest from '../../components/BaseCardQuest.vue';
+import BaseCardCampaign from '../../components/BaseCardCampaign.vue';
+import BaseNavbarSecondary from '../../components/BaseNavbarSecondary.vue';
+import { API_URL } from '../../config/secrets';
+import imgJumbotron from '../../assets/thx_token_governance.webp';
+import imgLogo from '../../assets/logo.png';
+import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 
 export default defineComponent({

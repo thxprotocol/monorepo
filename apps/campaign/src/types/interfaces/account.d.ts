@@ -50,6 +50,7 @@ type TAccountState = {
     isAuthenticated: boolean | null;
     isEthereumBrowser: boolean;
     isRewardsLoaded: boolean;
+    isPreview: boolean;
     api: THXClient | null;
     poolId: string;
     migration: {

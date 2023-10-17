@@ -6,15 +6,28 @@ function beforeEnter(to: any, from: any, next: any) {
     if (poolId) {
         next();
     } else {
-        init(to.params.poolId, to.query.origin).then(() => next());
+        const isPreview = to.query.isPreview ? JSON.parse(to.query.isPreview) : false;
+        init(to.params.poolId, to.query.origin, isPreview).then(() => next());
     }
 }
 
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
-        name: 'home',
-        component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue'),
+        name: '',
+        component: () => import(/* webpackChunkName: "public" */ '../views/Public.vue'),
+        children: [
+            {
+                path: '/',
+                name: 'home',
+                component: () => import(/* webpackChunkName: "home" */ '../views/public/Home.vue'),
+            },
+            {
+                path: '/earn',
+                name: 'earn',
+                component: () => import(/* webpackChunkName: "home" */ '../views/public/Earn.vue'),
+            },
+        ],
     },
     {
         path: '/maintenance',

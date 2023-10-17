@@ -1,0 +1,28 @@
+
+.table {
+    --bs-table-bg: var(--purple-darker);
+
+    th,
+    td {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        vertical-align: middle;
+        border-color: $purple-dark;
+
+        &:last-of-type {
+            text-align: right;
+        }
+    }
+
+   tbody tr:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+
+    thead tr {
+
+        th {
+            opacity: .35;
+            vertical-align: middle;
+        }
+    }
+}

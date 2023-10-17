@@ -17,6 +17,7 @@ import poll from 'promise-poller';
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
         poolId: '',
+        isPreview: false,
         api: null,
         account: null,
         balance: 0,
@@ -49,11 +50,12 @@ export const useAccountStore = defineStore('account', {
             const { theme } = this.getConfig(this.poolId);
             return JSON.parse(theme);
         },
-        async init(poolId: string, origin?: string) {
+        async init(poolId: string, origin: string, isPreview: boolean) {
             const authStore = useAuthStore();
 
             this.api = new THXClient({ url: API_URL, accessToken: '', poolId });
             this.poolId = poolId;
+            this.isPreview = isPreview;
 
             const config = await this.api.request.get('/v1/widget/' + poolId);
 
@@ -171,7 +173,7 @@ export const useAccountStore = defineStore('account', {
             const walletStore = useWalletStore();
             const authStore = useAuthStore();
 
-            rewardsStore.list().then(() => {
+            rewardsStore.list(this.isPreview).then(() => {
                 const amount = rewardsStore.quests.filter((r: any) => !r.isClaimed).length;
 
                 this.isRewardsLoaded = true;
