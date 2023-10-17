@@ -1,6 +1,7 @@
 <template>
     <b-modal
         :id="id"
+        :size="(size as any)"
         v-model="isShown"
         @show="onShow"
         @hidden="$emit('hidden')"
@@ -141,6 +142,11 @@ export default defineComponent({
         },
         show: {
             type: Boolean,
+        },
+        size: {
+            type: String,
+            required: true,
+            default: 'sm',
         },
         isLoading: {
             type: Boolean,

@@ -19,22 +19,31 @@
                             Earn
                         </b-button>
                     </b-navbar-nav>
-                    <b-navbar-nav class="ms-auto mb-2 mb-lg-0" style="width: 120px">
-                        <b-button
-                            class="px-4"
-                            variant="primary"
-                            href="#"
-                            v-if="!accountStore.isAuthenticated"
-                            @click="accountStore.signin()"
-                        >
-                            Sign in
-                            <i class="fas fa-sign-in-alt ms-2" />
-                        </b-button>
-                        <b-nav-item-dropdown v-else right>
-                            <template #button-content> User </template>
-                            <BDropdownItem href="#">Profile</BDropdownItem>
-                            <BDropdownItem href="#">Sign Out</BDropdownItem>
-                        </b-nav-item-dropdown>
+                    <b-navbar-nav class="ms-auto mb-2 mb-lg-0 justify-content-end" style="width: 120px">
+                        <template v-if="!authStore.user">
+                            <b-button class="px-4" variant="primary" href="#" @click="accountStore.signin()">
+                                Sign in
+                                <i class="fas fa-sign-in-alt ms-2" />
+                            </b-button>
+                        </template>
+                        <template v-else>
+                            <b-nav-item-dropdown v-if="accountStore.account" right no-caret>
+                                <template #button-content>
+                                    <b-avatar variant="light" :src="accountStore.account.profileImg" />
+                                </template>
+                                <BDropdownItem @click="isModalConnectSettingsShown = true">
+                                    Profile
+                                    <BaseModalConnectSettings
+                                        size="lg"
+                                        id="connect-settings"
+                                        @hidden="isModalConnectSettingsShown = false"
+                                        :show="isModalConnectSettingsShown"
+                                    />
+                                </BDropdownItem>
+                                <BDropdownItem @click="authStore.signout()">Sign Out</BDropdownItem>
+                            </b-nav-item-dropdown>
+                            <b-spinner v-else variant="light" small />
+                        </template>
                     </b-navbar-nav>
                 </b-collapse>
             </b-navbar>
@@ -46,20 +55,27 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BaseNavbarSecondary from '../components/BaseNavbarSecondary.vue';
+import BaseModalConnectSettings from '../components/BaseModalConnectSettings.vue';
 import imgLogo from '../assets/logo.png';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
+import { useAuthStore } from '../stores/Auth';
 
 export default defineComponent({
     name: 'Public',
     components: {
+        BaseModalConnectSettings,
         BaseNavbarSecondary,
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
     },
     data() {
-        return { imgLogo };
+        return {
+            isModalConnectSettingsShown: false,
+            imgLogo,
+        };
     },
 });
 </script>

@@ -109,6 +109,7 @@ import { API_URL } from '../../config/secrets';
 import imgJumbotron from '../../assets/thx_token_governance.webp';
 import imgLogo from '../../assets/logo.png';
 import { useAccountStore } from '../../stores/Account';
+import { useAuthStore } from '../../stores/Auth';
 import { mapStores } from 'pinia';
 
 export default defineComponent({
@@ -138,6 +139,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
     },
     async mounted() {
         await this.getCampaigns();

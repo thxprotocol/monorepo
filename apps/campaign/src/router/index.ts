@@ -15,6 +15,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         name: '',
+        beforeEnter,
         component: () => import(/* webpackChunkName: "public" */ '../views/Public.vue'),
         children: [
             {

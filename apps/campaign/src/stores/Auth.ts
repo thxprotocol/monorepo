@@ -102,6 +102,16 @@ export const useAuthStore = defineStore('auth', {
             };
             poll({ taskFn, interval: 5000, retries: 60 });
         },
+        async signout() {
+            if (!this.user) return;
+
+            const isMobile = getIsMobile();
+            await this.userManager[isMobile ? 'signoutRedirect' : 'signoutPopup']({
+                state: { isMobile, origin: window.location.href },
+                id_token_hint: this.user.id_token,
+            });
+            this.user = null;
+        },
         async requestOAuthShareRefresh() {
             const { poolId, getConfig } = useAccountStore();
             const { origin } = getConfig(poolId);

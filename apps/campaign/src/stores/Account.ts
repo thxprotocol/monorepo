@@ -10,7 +10,6 @@ import { useAuthStore } from './Auth';
 import { getAccessTokenKindForPlatform, getConnectionStatus } from '../utils/social';
 import { RewardConditionPlatform } from '../types/enums/rewards';
 import { User } from 'oidc-client-ts';
-import { getIsMobile } from '../utils/user-agent';
 import { AccountVariant } from '../types/enums/accountVariant';
 import poll from 'promise-poller';
 
@@ -51,33 +50,19 @@ export const useAccountStore = defineStore('account', {
             return JSON.parse(theme);
         },
         async init(poolId: string, origin: string, isPreview: boolean) {
-            const authStore = useAuthStore();
-
             this.api = new THXClient({ url: API_URL, accessToken: '', poolId });
+            this.addEventListeners();
+            this.setStatus(false);
+            if (!poolId) return;
+
             this.poolId = poolId;
             this.isPreview = isPreview;
 
             const config = await this.api.request.get('/v1/widget/' + poolId);
 
-            this.setStatus(false);
             this.setConfig(this.poolId, { ...config, origin });
             this.setTheme(config);
             this.getUserData();
-
-            authStore.userManager.events.addUserLoaded(this.onUserLoaded);
-            authStore.userManager.events.addUserUnloaded(this.onUserUnloaded);
-            authStore.userManager.events.load(this.onLoad);
-            authStore
-                .getUser()
-                .then(() => {
-                    if (!authStore.user) {
-                        this.setStatus(null);
-                    }
-                })
-                .catch((error) => {
-                    this.setStatus(null);
-                    console.log(error);
-                });
 
             track('UserVisits', [
                 this.account?.sub || '',
@@ -93,12 +78,30 @@ export const useAccountStore = defineStore('account', {
         onLoad() {
             // debugger;
         },
+        addEventListeners() {
+            const authStore = useAuthStore();
+
+            authStore.userManager.events.addUserLoaded(this.onUserLoaded);
+            authStore.userManager.events.addUserUnloaded(this.onUserUnloaded);
+            authStore.userManager.events.load(this.onLoad);
+            authStore
+                .getUser()
+                .then(() => {
+                    if (!authStore.user) {
+                        this.setStatus(null);
+                    }
+                })
+                .catch((error) => {
+                    this.setStatus(null);
+                    console.log(error);
+                });
+        },
         async onUserLoaded(user: User) {
             const authStore = useAuthStore();
             await authStore.onUserLoadedCallback(user);
 
             this.api.setAccessToken(user.access_token);
-            this.getUserData();
+            this.poolId ? this.getUserData() : this.getAccount();
         },
         onUserUnloaded() {
             return useAuthStore().onUserUnloadedCallback();
@@ -138,7 +141,7 @@ export const useAccountStore = defineStore('account', {
                 if (!this.account) return;
                 await this.getAccount();
 
-                return getConnectionStatus(this.account, platform)
+                return getConnectionStatus(this.account as unknown as { [accessKey: string]: boolean }, platform)
                     ? Promise.resolve()
                     : Promise.reject('Could no validate connection status...');
             };
@@ -153,16 +156,10 @@ export const useAccountStore = defineStore('account', {
             return useAuthStore().requestOAuthShare(extraQueryParams);
         },
         async signout() {
-            const authStore = useAuthStore();
-            if (!authStore.user) return;
-
-            const isMobile = getIsMobile();
-            await authStore.userManager[isMobile ? 'signoutRedirect' : 'signoutPopup']({
-                state: { isMobile, origin: window.location.href },
-                id_token_hint: authStore.user.id_token,
-            });
-
+            const { signout } = useAuthStore();
+            await signout();
             this.setStatus(null);
+            this.account = null;
         },
         async migrate(body: { erc20Id?: string; erc721Id?: string; erc721TokenId?: string }) {
             await this.api.request.post('/v1/account/wallet/migrate', { body: JSON.stringify(body) });
@@ -173,7 +170,7 @@ export const useAccountStore = defineStore('account', {
             const walletStore = useWalletStore();
             const authStore = useAuthStore();
 
-            rewardsStore.list(this.isPreview).then(() => {
+            rewardsStore.list().then(() => {
                 const amount = rewardsStore.quests.filter((r: any) => !r.isClaimed).length;
 
                 this.isRewardsLoaded = true;

@@ -47,8 +47,8 @@ export function getStyles(elements: any, colors: any) {
             '--bs-list-group-color': theme.elements.text,
         },
         '.modal': {
-            '--bs-modal-bg': theme.elements.navbarBg,
-            '--bs-modal-color': theme.elements.btnText,
+            '--bs-modal-bg': theme.elements.bodyBg,
+            '--bs-modal-color': theme.elements.text,
             '--bs-modal-border-color': theme.elements.btnBg,
         },
         '.form-control,.form-control:focus': {

@@ -21,7 +21,7 @@ type TAccount = {
     discordAccess: boolean;
     twitchAccess: boolean;
     githubAccess: boolean;
-    shopifyAccess: boolean;
+    profileImg: string;
 };
 
 type TAuthState = {
