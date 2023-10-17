@@ -58,10 +58,12 @@
                     class="rounded-circle"
                     src="https://raw.githubusercontent.com/balancer/tokenlists/main/src/assets/images/tokens/0x3a58a54c066fdc0f2d55fc9c89f0415c92ebf3c4.png"
                 />
-                <b-badge class="p-2 ms-2" variant="success">THX <small>80%</small></b-badge>
+                <b-badge class="p-2 ms-2 text-dark" variant="white">THX <small>80%</small></b-badge>
                 <b-badge class="p-2" variant="link">USD <small>20%</small></b-badge>
             </template>
-            <template #cell(APR)="{ item }"> {{ item.APR }} ✨ </template>
+            <template #cell(APR)="{ item }">
+                <span class="text-success">{{ item.APR }}</span> ✨
+            </template>
             <template #head(More)="{ item }"></template>
             <template #cell(More)="{ item }">
                 <b-button variant="primary" size="sm" :href="item.More" target="_blank">View Pool</b-button>
