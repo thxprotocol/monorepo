@@ -49,6 +49,8 @@
             </div>
         </template>
 
+        <b-alert v-model="isMigrateAvailable" variant="warning"> Your wallet is not the owner of this token. </b-alert>
+
         <b-link :href="token.metadata.imageUrl" target="_blank">
             <b-img lazy :src="token.metadata.imageUrl" class="mb-3" fluid rounded />
         </b-link>
