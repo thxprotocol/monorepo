@@ -34,39 +34,33 @@
             </b-col>
         </b-row>
         <h2>Investments</h2>
-        <BTable
-            responsive="lg"
-            show-empty
-            :items="[
-                {
-                    Composition: 'Balancer THX/USD',
-                    APR: '16.27%-37.94%',
-                    MyValue: '$930,12',
-                    PoolValue: '$2830,12',
-                    More: 'https://app.balancer.fi/#/polygon/pool/0xeab6455f8a99390b941a33bbdaf615abdf93455e000200000000000000000a66',
-                },
-            ]"
-        >
-            <template #cell(Composition)="{ item }">
-                <b-img
-                    width="23"
-                    class="rounded-circle"
-                    src="https://raw.githubusercontent.com/balancer-labs/assets/refactor-for-multichain/assets/0x2934b36ca9a4b31e633c5be670c8c8b28b6aa015.png"
-                />
-                <b-img
-                    width="23"
-                    class="rounded-circle"
-                    src="https://raw.githubusercontent.com/balancer/tokenlists/main/src/assets/images/tokens/0x3a58a54c066fdc0f2d55fc9c89f0415c92ebf3c4.png"
-                />
-                <b-badge class="p-2 ms-2 text-dark" variant="white">THX <small>80%</small></b-badge>
-                <b-badge class="p-2" variant="link">USD <small>20%</small></b-badge>
+        <BTable responsive="lg" show-empty :items="investments">
+            <template #cell(tokens)="{ item }">
+                <template v-for="token of item.tokens">
+                    <b-img width="23" class="rounded-circle" :src="imgTokens[token.address]" />
+                </template>
+                <b-badge
+                    class="p-2"
+                    :class="!key && 'ms-2 text-dark'"
+                    :variant="!key ? 'white' : 'link'"
+                    v-for="(token, key) of item.tokens"
+                >
+                    {{ token.symbol }} <small>{{ Number(token.weight) * 100 }}%</small>
+                </b-badge>
             </template>
-            <template #cell(APR)="{ item }">
-                <span class="text-success">{{ item.APR }}</span> ✨
+            <template #cell(apr)="{ item }">
+                <span class="text-success">{{ item.apr }}</span> ✨
             </template>
-            <template #head(More)="{ item }"></template>
-            <template #cell(More)="{ item }">
-                <b-button variant="primary" size="sm" :href="item.More" target="_blank">View Pool</b-button>
+            <template #head(pool)="{ item }"></template>
+            <template #cell(pool)="{ item }">
+                <b-button
+                    variant="primary"
+                    size="sm"
+                    :href="`https://app.balancer.fi/#/polygon/pool/${item.pool.id}`"
+                    target="_blank"
+                >
+                    View Pool
+                </b-button>
             </template>
         </BTable>
         <h2 class="mt-5">Rewards</h2>
@@ -108,113 +102,94 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import BaseCardQuest from '../../components/BaseCardQuest.vue';
-import BaseCardCampaign from '../../components/BaseCardCampaign.vue';
-import BaseNavbarSecondary from '../../components/BaseNavbarSecondary.vue';
-import { API_URL } from '../../config/secrets';
-import imgJumbotron from '../../assets/thx_token_governance.webp';
-import imgLogo from '../../assets/logo.png';
 import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
+import { Pool, BalancerSDK, BalancerSdkConfig, Network } from '@balancer-labs/sdk';
+import imgLogo from '../../assets/logo.png';
+
+const BALANCER_POOL_ID = '0xeab6455f8a99390b941a33bbdaf615abdf93455e000200000000000000000a66';
+const TEST_LP = ''.toLowerCase();
+const config: BalancerSdkConfig = {
+    network: Network.POLYGON,
+    rpcUrl: `https://polygon-mainnet.infura.io/v3/19873fb8698b40fe816387d20a5d61f4`,
+    enableLogging: true,
+};
+const balancer = new BalancerSDK(config);
 
 export default defineComponent({
-    name: 'Home',
-    components: {
-        BaseCardQuest,
-        BaseCardCampaign,
-        BaseNavbarSecondary,
-    },
+    name: 'Earn',
+    components: {},
     data(): any {
         return {
-            publicUrl: 'https://www.thx.network',
-            questLists: { daily: [], invite: [], social: [], custom: [], web3: [] },
-            isLoadingSearch: false,
-            isLoadingPage: false,
-            isAlertShown: true,
-            imgJumbotron,
             imgLogo,
-            isLoading: true,
-            page: 1,
-            limit: 8,
-            search: '',
-            debouncedSearch: null,
-            screenWidth: window.innerWidth,
-            campaigns: { results: [], total: 0 },
+            pool: null,
+            apr: null,
+            imgTokens: {
+                // THX
+                '0x2934b36ca9a4b31e633c5be670c8c8b28b6aa015':
+                    'https://raw.githubusercontent.com/balancer/tokenlists/main/src/assets/images/tokens/0x2934b36ca9a4b31e633c5be670c8c8b28b6aa015.png',
+                // stMATIC
+                '0x3a58a54c066fdc0f2d55fc9c89f0415c92ebf3c4':
+                    'https://raw.githubusercontent.com/balancer/tokenlists/main/src/assets/images/tokens/0x3a58a54c066fdc0f2d55fc9c89f0415c92ebf3c4.png',
+                // BAL
+                '0xba100000625a3754423978a60c9317c58a424e3d':
+                    'https://raw.githubusercontent.com/balancer/tokenlists/main/src/assets/images/tokens/0xba100000625a3754423978a60c9317c58a424e3d.png',
+            },
         };
     },
     computed: {
         ...mapStores(useAccountStore),
+        investments() {
+            if (!this.pool) return [];
+            return [
+                {
+                    tokens: this.pool.tokens,
+                    name: this.pool.name,
+                    apr: `${this.apr.min / 100}%-${this.apr.max / 100}%`,
+                    myValue: '',
+                    poolValue: `$${Math.floor(this.pool.totalLiquidity)}`,
+                    pool: this.pool,
+                },
+            ];
+            // [
+            //     {
+            //         Composition: 'Balancer THX/USD',
+            //         APR: '16.27%-37.94%',
+            //         MyValue: '$930,12',
+            //         PoolValue: '$2830,12',
+            //         More: 'https://app.balancer.fi/#/polygon/pool/0xeab6455f8a99390b941a33bbdaf615abdf93455e000200000000000000000a66',
+            //     },
+            // ]
+        },
     },
     async mounted() {
-        await this.getCampaigns();
-        await this.getQuests();
-        this.isLoading = false;
-    },
-    watch: {
-        async page(page) {
-            this.page = page;
-            this.isLoadingPage = true;
-            await this.getCampaigns();
-            this.isLoadingPage = false;
-        },
-    },
-    methods: {
-        onClickStart() {
-            window.open('https://dashboard.thx.network', '_blank');
-        },
-        async getCampaigns() {
-            const url = new URL(API_URL);
-            url.pathname = '/v1/pools/public';
-            url.searchParams.append('page', this.page);
-            url.searchParams.append('limit', this.limit);
-            if (this.search) {
-                url.searchParams.append('search', this.search);
-            }
-            const res = await fetch(url);
-            const campaigns = await res.json();
+        const pool = await balancer.pools.find(BALANCER_POOL_ID);
+        if (!pool) return;
 
-            this.campaigns = campaigns;
-        },
-        async getQuests() {
-            const url = new URL(API_URL);
-            url.pathname = '/v1/rewards/public';
-            const res = await fetch(url);
-            const questLists = await res.json();
+        this.apr = await balancer.pools.apr(pool as Pool);
+        this.pool = pool;
 
-            this.questLists = questLists;
-        },
-        onInputSearch() {
-            this.isLoadingSearch = true;
-            clearTimeout(this.debouncedSearch);
-            this.debouncedSearch = setTimeout(async () => {
-                await this.getCampaigns();
-                this.isLoadingSearch = false;
-            }, 1000);
-        },
-        onClickCampaign(campaignId: string) {
-            this.isLoading = true;
-            this.$router.push({ path: `/c/${campaignId}`, query: { origin: window.location.origin } });
-        },
+        // THX Balance
+        // veBAL Balance
+        // BAL Balance
+
+        // Unstaked
+        const poolShares = await balancer.data.poolShares.findByUser(TEST_LP);
+        const poolShare = poolShares?.find((share) => share.poolId === pool.id);
+        console.log({ poolShare });
+
+        // Staked
+        const gaugeShares = await balancer.data.gaugeShares?.findByUser(TEST_LP);
+        const gaugeShare = gaugeShares?.find((share) => share.gauge.poolId === pool.id);
+        console.log({ gaugeShare });
+
+        const balanceGauges = await balancer.claimService?.getClaimableRewardTokens(TEST_LP);
+        console.table({ balanceGauges });
+
+        // const claimableTokens: string[] = ['0xba100000625a3754423978a60c9317c58a424e3D'];
+        // const balanceGaugesVeBal = await balancer.claimService?.getClaimableVeBalTokens(TEST_LP, claimableTokens);
+        // console.table({ balanceGaugesVeBal });
     },
+    methods: {},
 });
 </script>
-
-<style>
-.table {
-    --bs-pagination-focus-bg: var(--bs-purple-dark);
-    --bs-pagination-focus-color: rgba(255, 255, 255, 0.5);
-    --bs-pagination-focus-border-color: var(--bs-purple-dark);
-
-    --bs-pagination-hover-color: white;
-    --bs-pagination-hover-bg: var(--bs-purple);
-    --bs-pagination-hover-border-color: var(--bs-purple);
-
-    --bs-pagination-color: rgba(255, 255, 255, 0.5);
-    --bs-pagination-bg: #37277b;
-    --bs-pagination-border-color: #37277b;
-
-    --bs-pagination-disabled-color: rgba(255, 255, 255, 0.25);
-    --bs-pagination-disabled-bg: #37277b;
-    --bs-pagination-disabled-border-color: #37277b;
-}
-</style>

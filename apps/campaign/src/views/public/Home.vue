@@ -173,7 +173,7 @@ export default defineComponent({
         },
         async getQuests() {
             const url = new URL(API_URL);
-            url.pathname = '/v1/rewards/public';
+            url.pathname = '/v1/quests/public';
             const res = await fetch(url);
             const questLists = await res.json();
 
