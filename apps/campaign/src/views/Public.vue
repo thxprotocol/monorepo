@@ -40,6 +40,7 @@
                                         :show="isModalConnectSettingsShown"
                                     />
                                 </BDropdownItem>
+                                <BDropdownItem @click="isModalConnectSettingsShown = true"> Wallet</BDropdownItem>
                                 <BDropdownItem @click="authStore.signout()">Sign Out</BDropdownItem>
                             </b-nav-item-dropdown>
                             <b-spinner v-else variant="light" small />

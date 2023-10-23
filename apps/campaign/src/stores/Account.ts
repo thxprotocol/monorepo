@@ -101,7 +101,12 @@ export const useAccountStore = defineStore('account', {
             await authStore.onUserLoadedCallback(user);
 
             this.api.setAccessToken(user.access_token);
-            this.poolId ? this.getUserData() : this.getAccount();
+            if (this.poolId) {
+                this.getUserData();
+            } else {
+                await this.getAccount();
+                useWalletStore().getWallet();
+            }
         },
         onUserUnloaded() {
             return useAuthStore().onUserUnloadedCallback();

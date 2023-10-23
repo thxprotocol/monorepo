@@ -8,6 +8,7 @@ import { ethers } from 'ethers';
 import Safe from '@safe-global/protocol-kit';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import { AccountVariant } from '../types/enums/accountVariant';
+import { MODE } from '../config/secrets';
 
 // Safe Contracts
 const GnosisSafeProxyFactoryAddress = '0x1122fD9eBB2a8E7c181Cc77705d2B4cA5D72988A';
@@ -37,15 +38,15 @@ export const useWalletStore = defineStore('wallet', {
             this.walletTransfer = wallet;
         },
         async getWallet() {
-            const { api, getConfig, account, poolId } = useAccountStore();
+            const { api, account } = useAccountStore();
             if (!account) return;
 
             const isMetamask = account.variant === AccountVariant.Metamask;
             const predicate = isMetamask
                 ? (w: TWallet) => !w.safeVersion && !w.version && w.address
                 : (w: TWallet) => w.safeVersion;
-
-            this.wallets = await api.request.get(`/v1/account/wallet?chainId=${getConfig(poolId).chainId}`);
+            const chainId = MODE === 'development' ? ChainId.Hardhat : ChainId.Polygon;
+            this.wallets = await api.request.get(`/v1/account/wallet?chainId=${chainId}`);
             this.wallet = this.wallets.find(predicate) as TWallet;
             if (!this.wallet) return;
 
