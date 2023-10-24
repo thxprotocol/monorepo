@@ -22,17 +22,19 @@ const getModal = (defaultChain: Chain, chains: Chain[], theme?: any) => {
             themeMode: 'dark',
             privacyPolicyUrl: '',
             termsOfServiceUrl: '',
-            themeVariables: {
-                '--w3m-font-family': '"Exo 2", sans-serif',
-                '--w3m-accent-color': theme.elements['btnBg'].color,
-                '--w3m-color-bg-1': theme.elements['bodyBg'].color,
-                '--w3m-color-fg-1': theme.elements['text'].color,
-                '--w3m-background-color': theme.elements['cardBg'].color,
-                '--w3m-accent-fill-color': theme.elements['cardText'].color,
-                '--w3m-container-border-radius': '0',
-                '--w3m-background-border-radius': '0',
-                '--w3m-icon-button-border-radius': '5px',
-            } as any,
+            themeVariables:
+                theme &&
+                ({
+                    '--w3m-font-family': '"Exo 2", sans-serif',
+                    '--w3m-accent-color': theme.elements['btnBg'].color,
+                    '--w3m-color-bg-1': theme.elements['bodyBg'].color,
+                    '--w3m-color-fg-1': theme.elements['text'].color,
+                    '--w3m-background-color': theme.elements['cardBg'].color,
+                    '--w3m-accent-fill-color': theme.elements['cardText'].color,
+                    '--w3m-container-border-radius': '0',
+                    '--w3m-background-border-radius': '0',
+                    '--w3m-icon-button-border-radius': '5px',
+                } as any),
         },
         ethereumClient,
     );

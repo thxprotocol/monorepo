@@ -14,8 +14,8 @@ const chainList: { [chainId: number]: ChainInfo } = {
         blockExplorer: 'https://etherscan.com',
         chain: mainnet,
     },
-    [ChainId.BinanceSmartChain]: {
-        chainId: ChainId.BinanceSmartChain,
+    [ChainId.BNBChain]: {
+        chainId: ChainId.BNBChain,
         name: 'BNB Chain',
         logo: ImgLogoBinanceSmartChain,
         blockExplorer: 'https://bscscan.com',
