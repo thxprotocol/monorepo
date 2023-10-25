@@ -181,7 +181,7 @@ export default defineComponent({
             gaugeShare: 0,
             gaugeBalanceUSD: 0,
             balRewards: [],
-            balances: [],
+            balances: [0, 0],
             balPrice: 0,
             amounts: { 0: '0', 1: '0' },
             modal: null,
@@ -219,7 +219,7 @@ export default defineComponent({
             ];
         },
         tokens() {
-            if (!this.pool || !this.balances.length) return [];
+            if (!this.pool) return [];
             return this.pool.tokens.map((token: any, index: number) => {
                 const myBalance = this.balances[index] ? fromWei(String(this.balances[index])) : 0;
                 return { ...token, myBalance };
@@ -352,5 +352,10 @@ export default defineComponent({
 }
 .progress {
     background-color: var(--bs-primary);
+}
+</style>
+<style>
+.placeholder {
+    border-radius: 3px !important;
 }
 </style>
