@@ -131,8 +131,8 @@ import { GetAccountResult, PublicClient, getAccount, sendTransaction } from '@wa
 import { Web3Modal } from '@web3modal/html';
 
 const liquidityGaugeIds = [
-    '0x55ec14e951b1c25ab09132dae12363bea0d20105', // 8020
-    '0xe99a452a65e5bb316febac5de83a1ca59f6a3a94', // 5050
+    '0x55ec14e951b1c25ab09132dae12363bea0d20105', // Balancer 50THX-50stMATIC RewardGauge Deposit
+    '0xe99a452a65e5bb316febac5de83a1ca59f6a3a94', // Balancer 50THX-50stMATIC Gauge Deposit
 ];
 const BAL_MAINNET_ADDRESS = '0xba100000625a3754423978a60c9317c58a424e3d';
 const BAL_POLYGON_ADDRESS = '0x9a71012b13ca4d3d0cdc72a177df3ef03b0e76a3';
@@ -162,8 +162,8 @@ export default defineComponent({
             balRewards: [],
             balPrice: 0,
             amounts: {
-                0: 0,
-                1: 0,
+                0: '0',
+                1: '0',
             },
             modal: null,
             unsubscribe: null,
@@ -205,7 +205,7 @@ export default defineComponent({
             return this.pool.tokens;
         },
         preview() {
-            if (!this.pool || (Number(this.amounts['0']) > 0 && Number(this.amounts['1']) > 0)) return;
+            if (!this.pool || (!Number(this.amounts['0']) && !Number(this.amounts['1']))) return;
             return this.pool.buildJoin(
                 this.walletStore.wallet.address,
                 this.pool.tokenAddresses,
