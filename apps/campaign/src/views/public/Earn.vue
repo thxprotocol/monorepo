@@ -18,9 +18,19 @@
             </b-col>
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
                 <b-card>
-                    <b-spinner small v-if="!pool" />
+                    <div class="mb-3" v-if="!pool">
+                        <b-placeholder cols="12" size="lg" class="mb-1" animation="glow" />
+                        <b-placeholder cols="12" size="lg" class="mb-2" animation="glow" />
+                        <b-placeholder cols="5" size="xs" class="mb-3" animation="glow" />
+                        <b-placeholder cols="12" size="lg" class="mb-1" animation="glow" />
+                        <b-placeholder cols="12" size="lg" class="mb-2" animation="glow" />
+                        <b-placeholder cols="10" size="xs" class="mb-3" animation="glow" />
+                        <hr />
+                        <b-placeholder cols="12" animation="glow" />
+                        <b-placeholder cols="12" animation="glow" />
+                    </div>
                     <b-form v-else class="mb-3">
-                        <b-form-group v-for="(token, key) of balances" class="mb-3">
+                        <b-form-group v-for="(token, key) of tokens" class="mb-3">
                             <div class="d-flex align-items-center justify-content-between">
                                 <b-badge
                                     class="p-2 d-flex align-items-center"
@@ -36,20 +46,34 @@
                                     />
                                     <small class="text-opaque">{{ Number(token.weight) * 100 }}%</small>
                                 </b-badge>
-                                <b-form-input min="0" class="ms-3" type="number" v-model="amounts[key]" />
+                                <b-form-input
+                                    min="0"
+                                    :max="Math.floor(token.myBalance)"
+                                    class="ms-3"
+                                    type="number"
+                                    v-model="amounts[key]"
+                                />
                             </div>
                             <div class="d-flex mb-1 justify-content-between mt-1 text-opaque">
                                 <div>
-                                    Balance: {{ 12 }}
-                                    <span v-if="amounts[key] == 12" class="text-muted">Maxed</span>
+                                    Balance: {{ token.myBalance }}
+                                    <span v-if="amounts[key] >= Math.floor(token.myBalance)" class="text-muted">
+                                        Maxed
+                                    </span>
                                 </div>
-                                <span>$12</span>
+                                <span> {{ toFiat(Number(amounts[key]) * token.token.latestUSDPrice) }} </span>
                             </div>
-                            <b-progress variant="success" :value="amounts[key]" max="12" style="height: 5px" />
+                            <b-progress
+                                variant="success"
+                                :value="amounts[key]"
+                                :max="Math.floor(token.myBalance)"
+                                style="height: 5px"
+                            />
                         </b-form-group>
                         <hr />
                         <div class="d-flex justify-content-between">
-                            Total: <strong>${{ preview ? fromWei(preview.expectedBPTOut) * price : 0 }}</strong>
+                            Total:
+                            <strong>{{ preview ? toFiat(fromWei(preview.expectedBPTOut) * price) : '$0.00' }}</strong>
                         </div>
                         <div class="d-flex justify-content-between">
                             Price impact:
@@ -63,8 +87,7 @@
             </b-col>
         </b-row>
         <h2>Investments</h2>
-        <BTable responsive="lg" :items="investments" :show-empty="true">
-            <template #empty> <b-spinner small /> </template>
+        <BTable responsive="lg" :items="investments" show-empty>
             <template #cell(tokens)="{ item }">
                 <template v-for="token of item.tokens">
                     <b-img width="23" class="rounded-circle" :src="`${imgTokensUrl}${token.address}.png`" />
@@ -88,17 +111,6 @@
             <template #cell(apr)="{ item }">
                 <span class="text-success">{{ item.apr }}</span> ✨
             </template>
-            <template #head(pool)=""></template>
-            <template #cell(pool)="{ item }">
-                <b-button
-                    variant="primary"
-                    size="sm"
-                    :href="`https://app.balancer.fi/#/polygon/pool/${item.pool.id}`"
-                    target="_blank"
-                >
-                    View Pool
-                </b-button>
-            </template>
         </BTable>
         <h2 class="mt-5">Rewards</h2>
         <BTable responsive="lg" show-empty :items="rewards">
@@ -110,7 +122,7 @@
             </template>
             <template #head(action)></template>
             <template #cell(action)>
-                <b-button variant="primary" size="sm">Claim!</b-button>
+                <b-button variant="primary" size="sm" disabled>Claim!</b-button>
             </template>
         </BTable>
     </b-container>
@@ -129,42 +141,49 @@ import { getModal } from '../../utils/wallet-connect';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import { GetAccountResult, PublicClient, getAccount, sendTransaction } from '@wagmi/core';
 import { Web3Modal } from '@web3modal/html';
+import {
+    BALANCER_POOL_ID,
+    BAL_MAINNET_ADDRESS,
+    BAL_POLYGON_ADDRESS,
+    USDC_POLYGON_ADDRESS,
+    liquidityGaugeIds,
+} from '../../config/constants';
 
-const liquidityGaugeIds = [
-    '0x55ec14e951b1c25ab09132dae12363bea0d20105', // Balancer 50THX-50stMATIC RewardGauge Deposit
-    '0xe99a452a65e5bb316febac5de83a1ca59f6a3a94', // Balancer 50THX-50stMATIC Gauge Deposit
-];
-const BAL_MAINNET_ADDRESS = '0xba100000625a3754423978a60c9317c58a424e3d';
-const BAL_POLYGON_ADDRESS = '0x9a71012b13ca4d3d0cdc72a177df3ef03b0e76a3';
-const USDC_POLYGON_ADDRESS = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174';
-const BALANCER_POOL_ID = '0xeab6455f8a99390b941a33bbdaf615abdf93455e000200000000000000000a66';
 const config: BalancerSdkConfig = {
     network: Network.POLYGON,
-    rpcUrl: `https://polygon-mainnet.infura.io/v3/86d56ef25fa3495fb9e2f70f0d5ddc49`,
+    rpcUrl: 'https://polygon-rpc.com',
 };
 const balancer = new BalancerSDK(config);
+
+function toFiat(amount: number | string) {
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+    });
+    return formatter.format(Number(amount));
+}
 
 export default defineComponent({
     name: 'Earn',
     components: {},
     data(): { pool: Pool | null; modal: Web3Modal | null; account: GetAccountResult<PublicClient> | null } & any {
         return {
-            account: null,
             fromWei,
+            toFiat,
             imgLogo,
-            pool: null,
-            apr: null,
             imgTokensUrl: 'https://raw.githubusercontent.com/balancer/tokenlists/main/src/assets/images/tokens/',
+            account: null,
+            pool: null,
+            apr: 0,
             poolShare: 0,
             poolBalanceUSD: 0,
             gaugeShare: 0,
             gaugeBalanceUSD: 0,
             balRewards: [],
+            balances: [],
             balPrice: 0,
-            amounts: {
-                0: '0',
-                1: '0',
-            },
+            amounts: { 0: '0', 1: '0' },
             modal: null,
             unsubscribe: null,
             isModalOpen: false,
@@ -179,7 +198,7 @@ export default defineComponent({
                 return {
                     image: this.imgTokensUrl + `${BAL_MAINNET_ADDRESS}.png`,
                     amount,
-                    value: `$${Math.floor(Number(amount) * Number(this.balPrice) * 100) / 100}`,
+                    value: toFiat(Number(amount) * Number(this.balPrice)),
                     action: balReward,
                 };
             });
@@ -193,16 +212,18 @@ export default defineComponent({
             return [
                 {
                     tokens: this.pool.tokens,
-                    apr: `${this.apr.min / 100}%-${this.apr.max / 100}%`,
-                    myValue: `$${Math.floor(poolBalanceUSD + gaugeBalanceUSD)}`,
-                    poolValue: `$${Math.floor(this.pool.totalLiquidity)}`,
-                    pool: this.pool,
+                    apr: this.apr ? `${this.apr.min / 100}%-${this.apr.max / 100}%` : '0%',
+                    myValue: toFiat(poolBalanceUSD + gaugeBalanceUSD),
+                    poolValue: toFiat(this.pool.totalLiquidity),
                 },
             ];
         },
-        balances() {
-            if (!this.pool) return [];
-            return this.pool.tokens;
+        tokens() {
+            if (!this.pool || !this.balances.length) return [];
+            return this.pool.tokens.map((token: any, index: number) => {
+                const myBalance = this.balances[index] ? fromWei(String(this.balances[index])) : 0;
+                return { ...token, myBalance };
+            });
         },
         preview() {
             if (!this.pool || (!Number(this.amounts['0']) && !Number(this.amounts['1']))) return;
@@ -215,12 +236,11 @@ export default defineComponent({
         },
     },
     watch: {
-        async 'walletStore.wallet'(wallet: TWallet) {
-            await Promise.all([
-                this.getPoolShare(wallet.address),
-                this.getGaugeShare(wallet.address),
-                this.getRewards(wallet.address),
-            ]);
+        'walletStore.wallet': {
+            handler(wallet: TWallet) {
+                this.onWalletReady(wallet.address);
+            },
+            deep: true,
         },
     },
     async mounted() {
@@ -228,31 +248,44 @@ export default defineComponent({
 
         const pool = await balancer.pools.find(BALANCER_POOL_ID);
         if (!pool) return;
-
-        const [apr, price] = await Promise.all([
-            balancer.pools.apr(pool as Pool),
-            balancer.pools.liquidityService.getBptPrice(pool),
-        ]);
-        this.apr = apr;
-        this.price = price;
         this.pool = pool;
+
+        if (this.walletStore.wallet) {
+            this.onWalletReady(this.walletStore.wallet.address);
+        }
+
+        balancer.pools.apr(pool as Pool).then((apr) => (this.apr = apr));
+        balancer.pools.liquidityService.getBptPrice(pool).then((price) => (this.price = price));
 
         const { chain } = chainList[ChainId.Polygon];
         this.modal = getModal(chain, [chain]);
         this.unsubscribe = this.modal.subscribeModal(this.onModalStateChange);
     },
     methods: {
-        async getBALPrice() {
-            try {
-                this.balPrice = await balancer.pricing.getSpotPrice(USDC_POLYGON_ADDRESS, BAL_POLYGON_ADDRESS);
-                this.isLoadingPrice = false;
-            } catch (error) {
-                // console.log(error);
-            }
+        // Invoked when wallet is ready and on mounted
+        onWalletReady(address: string) {
+            this.getBalances(address);
+            this.getPoolShare(address);
+            this.getGaugeShare(address);
+            this.getRewards(address);
         },
-        // Other token rewards
+        // Gets the balancers for the available pool tokens
+        async getBalances(walletAddress: string) {
+            if (!this.pool) return;
+            this.balances = await Promise.all(
+                this.pool.tokenAddresses.map(async (tokenAddress: string) => {
+                    const contract = balancer.contracts.ERC20(tokenAddress, balancer.provider);
+                    return await contract.balanceOf(walletAddress);
+                }),
+            );
+        },
+        // Gets the BAL price in order to calc the BAL rewards value
+        async getBALPrice() {
+            this.balPrice = await balancer.pricing.getSpotPrice(USDC_POLYGON_ADDRESS, BAL_POLYGON_ADDRESS);
+        },
+        // Other token rewards (does not include Polygon POS incentives for some reason)
         async getRewards(walletAddress: string) {
-            // TODO Should list reward tokens for pool
+            // TODO Should query for pool tokens for user and work from there
             this.balRewards = await Promise.all(
                 liquidityGaugeIds.map(async (id) => {
                     const contract = balancer.contracts.liquidityGauge(id, balancer.provider);
