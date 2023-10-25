@@ -36,7 +36,7 @@
                                     />
                                     <small class="text-opaque">{{ Number(token.weight) * 100 }}%</small>
                                 </b-badge>
-                                <b-form-input class="ms-3" type="number" v-model="amounts[key]" />
+                                <b-form-input min="0" class="ms-3" type="number" v-model="amounts[key]" />
                             </div>
                             <div class="d-flex mb-1 justify-content-between mt-1 text-opaque">
                                 <div>
@@ -49,11 +49,13 @@
                         </b-form-group>
                         <hr />
                         <div class="d-flex justify-content-between">
-                            Total: <strong>${{ fromWei(preview.expectedBPTOut) * this.price }}</strong>
+                            Total: <strong>${{ preview ? fromWei(preview.expectedBPTOut) * price : 0 }}</strong>
                         </div>
                         <div class="d-flex justify-content-between">
                             Price impact:
-                            <strong>{{ Math.floor(fromWei(String(preview.priceImpact * 100)) * 100) / 100 }}%</strong>
+                            <strong>
+                                {{ preview ? Math.floor(fromWei(String(preview.priceImpact * 100)) * 100) / 100 : 0 }}%
+                            </strong>
                         </div>
                     </b-form>
                     <b-button class="w-100" :disabled="!pool" @click="joinPool" variant="primary"> Invest </b-button>
@@ -99,37 +101,16 @@
             </template>
         </BTable>
         <h2 class="mt-5">Rewards</h2>
-        <BTable
-            responsive="lg"
-            show-empty
-            :items="[
-                {
-                    Token: {
-                        image: 'https://raw.githubusercontent.com/balancer-labs/assets/refactor-for-multichain/assets/0x2934b36ca9a4b31e633c5be670c8c8b28b6aa015.png',
-                        name: 'THX Network (POS)',
-                    },
-                    Amount: '768.231 THX',
-                    Value: '$32.22',
-                    Action: 'Claim',
-                },
-                {
-                    Token: {
-                        image: 'https://raw.githubusercontent.com/balancer/tokenlists/main/src/assets/images/tokens/0xba100000625a3754423978a60c9317c58a424e3d.png',
-                        name: 'Balancer (POS)',
-                    },
-                    Amount: '35.203 BAL',
-                    Value: '$12.22',
-                    Action: 'Claim',
-                },
-            ]"
-        >
-            <template #cell(Token)="{ item }">
-                <b-img width="23" class="rounded-circle me-2" :src="item.Token.image" />
-                {{ item.Token.name }}
+        <BTable responsive="lg" show-empty :items="rewards">
+            <template #cell(image)="{ item }">
+                <b-img width="23" class="rounded-circle" :src="item.image" />
             </template>
-            <template #head(Action)="{ item }"></template>
-            <template #cell(Action)="{ item }">
-                <b-button variant="primary" size="sm">{{ item.Action }}</b-button>
+            <template #cell(amount)="{ item }">
+                {{ item.amount }}
+            </template>
+            <template #head(action)></template>
+            <template #cell(action)>
+                <b-button variant="primary" size="sm">Claim!</b-button>
             </template>
         </BTable>
     </b-container>
@@ -146,9 +127,16 @@ import { fromWei, toWei } from 'web3-utils';
 import { chainList } from '../../utils/chains';
 import { getModal } from '../../utils/wallet-connect';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { getAccount, sendTransaction } from '@wagmi/core';
+import { GetAccountResult, PublicClient, getAccount, sendTransaction } from '@wagmi/core';
 import { Web3Modal } from '@web3modal/html';
 
+const liquidityGaugeIds = [
+    '0x55ec14e951b1c25ab09132dae12363bea0d20105', // 8020
+    '0xe99a452a65e5bb316febac5de83a1ca59f6a3a94', // 5050
+];
+const BAL_MAINNET_ADDRESS = '0xba100000625a3754423978a60c9317c58a424e3d';
+const BAL_POLYGON_ADDRESS = '0x9a71012b13ca4d3d0cdc72a177df3ef03b0e76a3';
+const USDC_POLYGON_ADDRESS = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174';
 const BALANCER_POOL_ID = '0xeab6455f8a99390b941a33bbdaf615abdf93455e000200000000000000000a66';
 const config: BalancerSdkConfig = {
     network: Network.POLYGON,
@@ -171,8 +159,10 @@ export default defineComponent({
             poolBalanceUSD: 0,
             gaugeShare: 0,
             gaugeBalanceUSD: 0,
+            balRewards: [],
+            balPrice: 0,
             amounts: {
-                0: 1,
+                0: 0,
                 1: 0,
             },
             modal: null,
@@ -183,13 +173,28 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
+        rewards() {
+            return this.balRewards.map((balReward: number) => {
+                const amount = fromWei(String(balReward));
+                return {
+                    image: this.imgTokensUrl + `${BAL_MAINNET_ADDRESS}.png`,
+                    amount,
+                    value: `$${Math.floor(Number(amount) * Number(this.balPrice) * 100) / 100}`,
+                    action: balReward,
+                };
+            });
+        },
         investments() {
             if (!this.pool) return [];
+            const poolBalanceUSD =
+                this.gaugeShare && this.price ? Number(this.poolShare.balance) * Number(this.price) : 0;
+            const gaugeBalanceUSD =
+                this.gaugeShare && this.price ? Number(this.gaugeShare.balance) * Number(this.price) : 0;
             return [
                 {
                     tokens: this.pool.tokens,
                     apr: `${this.apr.min / 100}%-${this.apr.max / 100}%`,
-                    myValue: `$${Math.floor(this.poolBalanceUSD + this.gaugeBalanceUSD)}`,
+                    myValue: `$${Math.floor(poolBalanceUSD + gaugeBalanceUSD)}`,
                     poolValue: `$${Math.floor(this.pool.totalLiquidity)}`,
                     pool: this.pool,
                 },
@@ -200,7 +205,7 @@ export default defineComponent({
             return this.pool.tokens;
         },
         preview() {
-            if (!this.pool) return;
+            if (!this.pool || (Number(this.amounts['0']) > 0 && Number(this.amounts['1']) > 0)) return;
             return this.pool.buildJoin(
                 this.walletStore.wallet.address,
                 this.pool.tokenAddresses,
@@ -208,33 +213,25 @@ export default defineComponent({
                 toWei('0'),
             );
         },
-        accountStatus() {
-            if (!this.account) return 'text-opaque';
-            switch (this.account.status) {
-                case 'connected':
-                    return 'text-success';
-                case 'connecting':
-                    return 'text-warning';
-                case 'disconnected':
-                    return 'text-danger';
-                default:
-                    return 'text-opaque';
-            }
-        },
     },
     watch: {
-        'walletStore.wallet'(wallet: TWallet) {
-            this.getPoolShare(wallet.address);
-            this.getGaugeShare(wallet.address);
+        async 'walletStore.wallet'(wallet: TWallet) {
+            await Promise.all([
+                this.getPoolShare(wallet.address),
+                this.getGaugeShare(wallet.address),
+                this.getRewards(wallet.address),
+            ]);
         },
     },
     async mounted() {
+        this.getBALPrice();
+
         const pool = await balancer.pools.find(BALANCER_POOL_ID);
         if (!pool) return;
 
         const [apr, price] = await Promise.all([
-            await balancer.pools.apr(pool as Pool),
-            await balancer.pools.liquidityService.getBptPrice(pool),
+            balancer.pools.apr(pool as Pool),
+            balancer.pools.liquidityService.getBptPrice(pool),
         ]);
         this.apr = apr;
         this.price = price;
@@ -245,18 +242,34 @@ export default defineComponent({
         this.unsubscribe = this.modal.subscribeModal(this.onModalStateChange);
     },
     methods: {
+        async getBALPrice() {
+            try {
+                this.balPrice = await balancer.pricing.getSpotPrice(USDC_POLYGON_ADDRESS, BAL_POLYGON_ADDRESS);
+                this.isLoadingPrice = false;
+            } catch (error) {
+                // console.log(error);
+            }
+        },
+        // Other token rewards
+        async getRewards(walletAddress: string) {
+            // TODO Should list reward tokens for pool
+            this.balRewards = await Promise.all(
+                liquidityGaugeIds.map(async (id) => {
+                    const contract = balancer.contracts.liquidityGauge(id, balancer.provider);
+                    return await contract.claimable_reward(walletAddress.toLowerCase(), BAL_POLYGON_ADDRESS);
+                }),
+            );
+        },
         // Unstaked
         async getPoolShare(walletAddress: string) {
-            const poolShares = await balancer.data.poolShares.findByUser(walletAddress);
-            this.poolShare = poolShares?.find((share) => share.poolId === this.pool.id);
-            this.poolBalanceUSD = this.poolShare ? Number(this.poolShare.balance) * Number(this.price) : 0;
+            const poolShares = await balancer.data.poolShares.findByUser(walletAddress.toLowerCase());
+            this.poolShare = poolShares?.find((share) => share.poolId === BALANCER_POOL_ID);
             console.log(this.poolShare);
         },
         // Staked
         async getGaugeShare(walletAddress: string) {
-            const gaugeShares = await balancer.data.gaugeShares?.findByUser(walletAddress);
-            this.gaugeShare = gaugeShares?.find((share) => share.gauge.poolId === this.pool.id);
-            this.gaugeBalanceUSD = this.gaugeShare ? Number(this.gaugeShare.balance) * Number(this.price) : 0;
+            const gaugeShares = await balancer.data.gaugeShares?.findByUser(walletAddress.toLowerCase());
+            this.gaugeShare = gaugeShares?.find((share) => share.gauge.poolId === BALANCER_POOL_ID);
             console.log(this.gaugeShare);
         },
         onModalStateChange({ open }: { open: boolean }) {
