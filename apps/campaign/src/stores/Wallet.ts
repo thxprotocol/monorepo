@@ -29,6 +29,9 @@ export const useWalletStore = defineStore('wallet', {
         couponCodes: [],
         pendingPoints: 0,
         wallets: [],
+        isModalWalletCreateShown: false,
+        isModalWalletSettingsShown: false,
+        isModalWalletRecoveryShown: false,
     }),
     actions: {
         async getTransfer(uuid: string) {
@@ -67,8 +70,8 @@ export const useWalletStore = defineStore('wallet', {
             this.erc721[index] = { ...token, component: 'BaseCardERC721' };
         },
         list() {
-            const { api, getConfig, poolId } = useAccountStore();
-            const options = { chainId: getConfig(poolId).chainId };
+            const { api } = useAccountStore();
+            const options = { chainId: this.wallet?.chainId };
 
             api.erc20.list(options).then((list: TERC20Token[]) => {
                 this.erc20 = list.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' }));

@@ -78,7 +78,7 @@ export default defineComponent({
         async onClickPay() {
             if (!this.stripe) return;
             this.isLoadingPayment = true;
-            const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
+            const { origin } = this.accountStore.config;
             const { error } = await this.stripe.confirmPayment({
                 elements: this.elements as StripeElements,
                 redirect: 'if_required',

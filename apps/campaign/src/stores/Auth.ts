@@ -62,8 +62,7 @@ export const useAuthStore = defineStore('auth', {
             this.oAuthShare = '';
         },
         async requestOAuthShare(extraQueryParams?: { [key: string]: string }) {
-            const { poolId, getConfig } = useAccountStore();
-            const { origin } = getConfig(poolId);
+            const { poolId, config } = useAccountStore();
             const { claim } = useClaimStore();
             const isMobile = getIsMobile();
             const returnUrl = window.location.href;
@@ -73,7 +72,7 @@ export const useAuthStore = defineStore('auth', {
                     isMobile,
                     returnUrl,
                     client_id: CLIENT_ID,
-                    origin,
+                    origin: config.origin,
                 },
                 extraQueryParams: {
                     return_url: returnUrl,
@@ -81,11 +80,13 @@ export const useAuthStore = defineStore('auth', {
                     claim_id: claim ? claim.uuid : '',
                     ...extraQueryParams,
                 },
-            }).catch(async (error: Error) => {
+            }).catch((error: Error) => {
                 console.log(error);
-                // Should start polling in order to check if auth flow is completed
+
                 if (error.message === 'Popup closed by user') {
-                    // We should poll the signin silent request until a user becomes available
+                    // Should start polling in order to check if auth flow is completed
+                    // We should poll the signin silent request until a user becomes available (Twitter throws this after loosing window.top)
+                    // Its problematic that the user also could have closed it on purpose
                     this.waitForUser();
                 }
 
@@ -113,20 +114,27 @@ export const useAuthStore = defineStore('auth', {
             this.user = null;
         },
         async requestOAuthShareRefresh() {
-            const { poolId, getConfig } = useAccountStore();
-            const { origin } = getConfig(poolId);
+            const { config } = useAccountStore();
 
             if (this.user && this.user.expired) {
                 this.user = null;
             }
 
-            this.user = await this.userManager.signinSilent({
-                state: {
-                    returnUrl: window.location.href,
-                    client_id: CLIENT_ID,
-                    origin,
-                },
-            });
+            this.user = await this.userManager
+                .signinSilent({
+                    state: {
+                        returnUrl: window.location.href,
+                        client_id: CLIENT_ID,
+                        origin: config.origin,
+                    },
+                })
+                .catch((error: Error) => {
+                    console.log(error);
+                    // // Should refresh because issue could be caused by base64 state string in redirect
+                    // if (error.message === 'No matching state found in storage') {
+                    //     this.requestOAuthShareRefresh();
+                    // }
+                });
         },
         async triggerLogin(requestConfig: any) {
             await tKey.serviceProvider.init({ skipSw: true });

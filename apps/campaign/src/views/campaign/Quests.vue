@@ -126,10 +126,8 @@ export default defineComponent({
             handler(amount: number) {
                 // Return if not in iframe
                 if (window.top === window.self) return;
-
-                const { getConfig, poolId } = this.accountStore;
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
-                window.top?.postMessage({ message: 'thx.reward.amount', amount }, getConfig(poolId).origin);
+                window.top?.postMessage({ message: 'thx.reward.amount', amount }, this.accountStore.config.origin);
             },
             immediate: true,
         },

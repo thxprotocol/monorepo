@@ -72,9 +72,7 @@ export default defineComponent({
             )}`;
         },
         config() {
-            const { poolId, getConfig } = useAccountStore();
-            if (!poolId) return;
-            return getConfig(poolId);
+            return this.accountStore.config;
         },
     },
     async created() {
@@ -88,8 +86,7 @@ export default defineComponent({
             this.screenWidth = window.innerWidth;
         },
         async onMessage(event: MessageEvent) {
-            const { getConfig, poolId } = this.accountStore;
-            const origin = getConfig(poolId).origin;
+            const { origin } = this.accountStore.config;
             const localOrigin = origin && new URL(origin).origin;
             if (event.origin !== localOrigin) return;
 

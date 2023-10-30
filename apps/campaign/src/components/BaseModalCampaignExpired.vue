@@ -1,7 +1,7 @@
 <template>
     <b-modal
         :id="id"
-        v-model="isShown"
+        v-model="accountStore.config.expired"
         centered
         hide-footer
         no-close-on-backdrop
@@ -32,9 +32,6 @@ export default defineComponent({
     props: {
         id: { type: String, required: true },
         show: { type: Boolean },
-    },
-    mounted() {
-        this.isShown = this.accountStore.getConfig(this.accountStore.poolId).expired;
     },
 });
 </script>

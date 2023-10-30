@@ -1,9 +1,8 @@
 <template>
     <b-modal
-        :id="id"
-        v-model="isShown"
+        v-model="walletStore.isModalWalletCreateShown"
         @show="onShow"
-        @hidden="$emit('hidden')"
+        @hidden="walletStore.isModalWalletCreateShown = false"
         centered
         no-close-on-backdrop
         no-close-on-esc
@@ -64,6 +63,7 @@
 <script lang="ts">
 import { useAccountStore } from '../stores/Account';
 import { useAuthStore } from '../stores/Auth';
+import { useWalletStore } from '../stores/Wallet';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 
@@ -71,7 +71,6 @@ export default defineComponent({
     name: 'BaseModalWalletCreate',
     data() {
         return {
-            isShown: false,
             question: '',
             password: '',
             passwordCheck: '',
@@ -83,6 +82,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
+        ...mapStores(useWalletStore),
         isPasswordValid: function () {
             if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
             if (this.password.length && this.password.length < 10) return false;
@@ -90,23 +90,6 @@ export default defineComponent({
         },
         isAlertShown() {
             return this.isCreateFailed || (this.isPasswordValid && !this.authStore.isDeviceShareAvailable);
-        },
-    },
-    props: {
-        id: {
-            type: String,
-            required: true,
-        },
-        error: {
-            type: String,
-        },
-        show: {
-            type: Boolean,
-        },
-    },
-    watch: {
-        show(value) {
-            this.isShown = value;
         },
     },
     methods: {
@@ -123,7 +106,7 @@ export default defineComponent({
                 await createDeviceShare(this.question, this.password);
                 this.isLoadingPasswordCreate = false;
                 this.accountStore.isAuthenticated = true;
-                this.$emit('hidden');
+                this.walletStore.isModalWalletCreateShown = false;
             } catch (error) {
                 this.isLoadingPasswordCreate = false;
                 this.isCreateFailed = true;
