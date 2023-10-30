@@ -1,82 +1,80 @@
 <template>
     <b-modal
-        :id="id"
         :size="(size as any)"
-        v-model="isShown"
+        v-model="accountStore.isModalConnectSettingsShown"
         @show="onShow"
-        @hidden="$emit('hidden')"
+        @hidden="accountStore.isModalConnectSettingsShown = false"
         centered
         no-close-on-backdrop
         no-close-on-esc
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-user me-2"></i> Profile</h5>
-            <b-link class="btn-close" @click="$emit('hidden')"> <i class="fas fa-times"></i> </b-link>
+            <b-link class="btn-close" @click="accountStore.isModalConnectSettingsShown = false">
+                <i class="fas fa-times"></i>
+            </b-link>
         </template>
-        <div v-if="isLoading" class="text-center">
-            <b-spinner show size="sm" />
-        </div>
-        <template v-else>
-            <b-form>
-                <b-tabs justified content-class="mt-3">
-                    <b-tab title="Personal" active>
-                        <b-form-group label="Username" :state="!errorUsername" :invalid-feedback="errorUsername">
-                            <b-input-group>
-                                <b-form-input
-                                    v-model="username"
-                                    @input="updateUsername"
-                                    placeholder="johndoe1337"
-                                    :state="!errorUsername"
-                                />
-                                <b-input-group-append v-if="isLoadingUsername">
-                                    <b-button size="sm" variant="primary" class="px-3" :disabled="true">
-                                        <b-spinner small />
-                                    </b-button>
-                                </b-input-group-append>
-                            </b-input-group>
-                        </b-form-group>
-                    </b-tab>
-                    <b-tab title="Connected">
-                        <b-alert v-model="isAlertShown" variant="warning" show class="py-1 px-2">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            Sign in connections can not be disconnected!
-                        </b-alert>
-                        <b-alert v-model="isErrorShown" show variant="danger" class="p-2">{{ error }}</b-alert>
-                        <template v-for="{ platform, color, isConnected, isSubmitting, isDisabled } of platforms">
-                            <div class="px-3 py-2 d-flex align-items-center">
-                                <strong class="me-auto">
-                                    <i :class="platformIconMap[platform]" class="me-2" :style="{ color: color }"></i>
-                                    {{ RewardConditionPlatform[platform] }}
-                                </strong>
-                                <b-spinner v-if="isSubmitting" small />
-                                <template v-else>
-                                    <BButton
-                                        :disabled="isDisabled"
-                                        @click="onClickDisconnect(platform)"
-                                        variant="primary"
-                                        class="text-danger"
-                                        size="sm"
-                                        v-if="isConnected"
-                                    >
-                                        Disconnect
-                                    </BButton>
-                                    <BButton @click="onClickConnect(platform)" variant="primary" size="sm" v-else>
-                                        Connect
-                                    </BButton>
-                                </template>
-                            </div>
-                            <hr class="my-1" />
-                        </template>
-                        <p class="small text-opaque mt-2">
-                            <strong>Connected accounts</strong> are used to verify if your social account has completed
-                            social quests.
-                        </p>
-                    </b-tab>
-                </b-tabs>
-            </b-form>
-        </template>
+        <b-form>
+            <b-tabs justified content-class="mt-3">
+                <b-tab title="Personal" active>
+                    <b-form-group label="Username" :state="!errorUsername" :invalid-feedback="errorUsername">
+                        <b-input-group>
+                            <b-form-input
+                                v-model="username"
+                                @input="updateUsername"
+                                placeholder="johndoe1337"
+                                :state="!errorUsername"
+                            />
+                            <b-input-group-append v-if="isLoadingUsername">
+                                <b-button size="sm" variant="primary" class="px-3" :disabled="true">
+                                    <b-spinner small />
+                                </b-button>
+                            </b-input-group-append>
+                        </b-input-group>
+                    </b-form-group>
+                </b-tab>
+                <b-tab title="Connected">
+                    <b-alert v-model="isAlertShown" variant="warning" show class="py-1 px-2">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Sign in connections can not be disconnected!
+                    </b-alert>
+                    <b-alert v-model="isErrorShown" show variant="danger" class="p-2">{{ error }}</b-alert>
+                    <template v-for="{ platform, color, isConnected, isSubmitting, isDisabled } of platforms">
+                        <div class="px-3 py-2 d-flex align-items-center">
+                            <strong class="me-auto">
+                                <i :class="platformIconMap[platform]" class="me-2" :style="{ color: color }"></i>
+                                {{ RewardConditionPlatform[platform] }}
+                            </strong>
+                            <b-spinner v-if="isSubmitting" small />
+                            <template v-else>
+                                <BButton
+                                    :disabled="isDisabled"
+                                    @click="onClickDisconnect(platform)"
+                                    variant="primary"
+                                    class="text-danger"
+                                    size="sm"
+                                    v-if="isConnected"
+                                >
+                                    Disconnect
+                                </BButton>
+                                <BButton @click="onClickConnect(platform)" variant="primary" size="sm" v-else>
+                                    Connect
+                                </BButton>
+                            </template>
+                        </div>
+                        <hr class="my-1" />
+                    </template>
+                    <p class="small text-opaque mt-2">
+                        <strong>Connected accounts</strong> are used to verify if your social account has completed
+                        social quests.
+                    </p>
+                </b-tab>
+            </b-tabs>
+        </b-form>
         <template #footer>
-            <b-button class="w-100" variant="primary" @click="$emit('hidden')"> Close </b-button>
+            <b-button class="w-100" variant="primary" @click="accountStore.isModalConnectSettingsShown = false">
+                Close
+            </b-button>
         </template>
     </b-modal>
 </template>
@@ -136,25 +134,10 @@ export default defineComponent({
         },
     },
     props: {
-        id: {
-            type: String,
-            required: true,
-        },
-        show: {
-            type: Boolean,
-        },
         size: {
             type: String,
             required: true,
             default: 'sm',
-        },
-        isLoading: {
-            type: Boolean,
-        },
-    },
-    watch: {
-        show(value) {
-            this.isShown = value;
         },
     },
     methods: {

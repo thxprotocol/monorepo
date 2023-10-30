@@ -80,12 +80,11 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
         referralUrl() {
-            const { getConfig, account, poolId } = useAccountStore();
-            if (!getConfig || !account || !this.reward) return '';
-            const { origin } = getConfig(poolId);
-            if (!origin) return '';
+            const { config, account, poolId } = useAccountStore();
+            if (!account || !this.reward) return '';
+            if (!config.origin) return '';
             const hash = window.btoa(JSON.stringify({ sub: account.sub, poolId, uuid: this.reward.uuid }));
-            const url = new URL(`${origin}/${this.reward.pathname || ''}`);
+            const url = new URL(`${config.origin}/${this.reward.pathname || ''}`);
             url.searchParams.append('ref', hash);
             return url.toString();
         },

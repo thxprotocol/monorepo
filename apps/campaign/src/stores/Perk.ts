@@ -14,61 +14,53 @@ export const usePerkStore = defineStore('perks', {
             this.rewards[index].progress.count = this.rewards[index].progress.count + 1;
         },
         createERC20Redemption: async function (uuid: string) {
-            const { api, account, poolId, getConfig } = useAccountStore();
+            const { api, account, poolId, config } = useAccountStore();
             const { error } = await api.rewards.coin.redemption.post(uuid);
             if (error) throw error;
 
             this.updateSupply(uuid);
 
-            track('UserCreates', [account?.sub, 'coin reward payment', { poolId, origin: getConfig(poolId).origin }]);
+            track('UserCreates', [account?.sub, 'coin reward payment', { poolId, origin: config.origin }]);
         },
         createERC721Redemption: async function (uuid: string) {
-            const { api, account, poolId, getConfig } = useAccountStore();
+            const { api, account, poolId, config } = useAccountStore();
             const { error } = await api.rewards.nft.redemption.post(uuid);
             if (error) throw error;
 
             this.updateSupply(uuid);
 
-            track('UserCreates', [account?.sub, 'nft reward redemption', { poolId, origin: getConfig(poolId).origin }]);
+            track('UserCreates', [account?.sub, 'nft reward redemption', { poolId, origin: config.origin }]);
         },
         createERC721Payment: async function (uuid: string) {
-            const { api, account, poolId, getConfig } = useAccountStore();
+            const { api, account, poolId, config } = useAccountStore();
             const r = await api.rewards.nft.payment.post(uuid);
             if (r.error) throw r.error;
 
             this.updateSupply(uuid);
 
-            track('UserCreates', [account?.sub, 'nft reward payment', { poolId, origin: getConfig(poolId).origin }]);
+            track('UserCreates', [account?.sub, 'nft reward payment', { poolId, origin: config.origin }]);
 
             return r;
         },
         createCustomRedemption: async function (uuid: string) {
-            const { api, account, poolId, getConfig } = useAccountStore();
+            const { api, account, poolId, config } = useAccountStore();
             const r = await api.rewards.custom.redemption.post(uuid);
             if (r.error) throw r.error;
 
             this.updateSupply(uuid);
 
-            track('UserCreates', [
-                account?.sub,
-                'custom reward redemption',
-                { poolId, origin: getConfig(poolId).origin },
-            ]);
+            track('UserCreates', [account?.sub, 'custom reward redemption', { poolId, origin: config.origin }]);
 
             return r;
         },
         createCouponRedemption: async function (uuid: string) {
-            const { api, account, poolId, getConfig } = useAccountStore();
+            const { api, account, poolId, config } = useAccountStore();
             const r = await api.rewards.coupon.redemption.post(uuid);
             if (r.error) throw r.error;
 
             this.updateSupply(uuid);
 
-            track('UserCreates', [
-                account?.sub,
-                'custom reward redemption',
-                { poolId, origin: getConfig(poolId).origin },
-            ]);
+            track('UserCreates', [account?.sub, 'custom reward redemption', { poolId, origin: config.origin }]);
 
             return r;
         },

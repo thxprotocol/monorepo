@@ -29,6 +29,9 @@ type TWalletState = {
     erc1155: any[];
     couponCodes: any[];
     pendingPoints: number;
+    isModalWalletCreateShown: boolean;
+    isModalWalletSettingsShown: boolean;
+    isModalWalletRecoveryShown: boolean;
 };
 
 type TERC20 = {

@@ -55,9 +55,7 @@ export default defineComponent({
             return this.screenWidth > 768;
         },
         config() {
-            const { poolId, getConfig } = useAccountStore();
-            if (!poolId) return;
-            return getConfig(poolId);
+            return this.accountStore.config;
         },
     },
 });

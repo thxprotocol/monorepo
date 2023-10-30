@@ -6,8 +6,7 @@ function beforeEnter(to: any, from: any, next: any) {
     if (poolId) {
         next();
     } else {
-        const isPreview = to.query.isPreview ? JSON.parse(to.query.isPreview) : false;
-        init(to.params.poolId, to.query.origin, isPreview).then(() => next());
+        init(to.params.poolId, to.query.origin).then(() => next());
     }
 }
 
@@ -16,7 +15,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/',
         name: '',
         beforeEnter,
-        component: () => import(/* webpackChunkName: "public" */ '../views/Public.vue'),
+        component: () => import(/* webpackChunkName: "discovery" */ '../views/Discovery.vue'),
         children: [
             {
                 path: '/',

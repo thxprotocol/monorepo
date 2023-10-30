@@ -27,7 +27,7 @@
         "@web3modal/ethereum": "^2.7.1",
         "@web3modal/html": "^2.7.1",
         "bootstrap": "^5.2.3",
-        "bootstrap-vue-next": "^0.9.26",
+        "bootstrap-vue-next": "^0.14.10",
         "color": "^4.2.3",
         "core-js": "^3.6.5",
         "date-fns": "^2.29.3",

@@ -51,6 +51,7 @@ type TAccountState = {
     isEthereumBrowser: boolean;
     isRewardsLoaded: boolean;
     isPreview: boolean;
+    isModalConnectSettingsShown: boolean;
     api: THXClient | null;
     poolId: string;
     migration: {
@@ -61,6 +62,7 @@ type TAccountState = {
     balance: number;
     account: TAccount | null;
     subscription: TSubscription | null;
+    config: any;
 };
 
 type TWidgetTheme = {

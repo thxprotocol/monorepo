@@ -11,11 +11,11 @@ export const useRewardStore = defineStore('rewards', {
     }),
     actions: {
         async completeWeb3Quest(uuid: string, payload: { signature: string; message: string; chainId: ChainId }) {
-            const { api, account, getBalance, poolId, getConfig } = useAccountStore();
+            const { api, account, getBalance, poolId, config } = useAccountStore();
             const claim = await api.quests.web3.complete(uuid, payload);
             if (claim.error) throw new Error(claim.error);
 
-            track('UserCreates', [account?.sub, 'web3 quest entry', { poolId, origin: getConfig(poolId).origin }]);
+            track('UserCreates', [account?.sub, 'web3 quest entry', { poolId, origin: config.origin }]);
 
             getBalance();
 
@@ -23,15 +23,11 @@ export const useRewardStore = defineStore('rewards', {
             this.quests[index].isClaimed = true;
         },
         async completeSocialQuest(id: string) {
-            const { api, account, getBalance, poolId, getConfig } = useAccountStore();
+            const { api, account, getBalance, poolId, config } = useAccountStore();
             const claim = await api.quests.social.complete(id);
             if (claim.error) throw new Error(claim.error);
 
-            track('UserCreates', [
-                account?.sub,
-                'conditional reward claim',
-                { poolId, origin: getConfig(poolId).origin },
-            ]);
+            track('UserCreates', [account?.sub, 'conditional reward claim', { poolId, origin: config.origin }]);
 
             getBalance();
 
@@ -39,7 +35,7 @@ export const useRewardStore = defineStore('rewards', {
             this.quests[index].isClaimed = true;
         },
         async completeCustomQuest(reward: TQuestCustom) {
-            const { api, account, getBalance, poolId, getConfig } = useAccountStore();
+            const { api, account, getBalance, poolId, config } = useAccountStore();
             const pendingClaims = reward.claims.filter((c) => !c.isClaimed);
             if (!pendingClaims.length) return;
 
@@ -48,38 +44,29 @@ export const useRewardStore = defineStore('rewards', {
 
             if (claim.error) throw claim.error;
 
-            track('UserCreates', [
-                account?.sub,
-                'milestone reward claim',
-                { poolId, origin: getConfig(poolId).origin },
-            ]);
+            track('UserCreates', [account?.sub, 'milestone reward claim', { poolId, origin: config.origin }]);
 
             getBalance();
         },
         async completeInviteQuest(uuid: string) {
-            const { account, getConfig, setConfig, poolId, api } = useAccountStore();
-            const { ref } = getConfig(poolId);
-            if (!ref) return;
+            const { account, config, setConfig, poolId, api } = useAccountStore();
+            if (!config.ref) return;
 
-            const { sub } = JSON.parse(window.atob(ref));
+            const { sub } = JSON.parse(window.atob(config.ref));
             await api.quests.invite.complete(uuid, { sub });
 
             setConfig(poolId, { ref: '' } as TWidgetConfig);
 
-            track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: getConfig(poolId).origin }]);
+            track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: config.origin }]);
         },
         async completeDailyQuest(reward: TQuestDaily) {
-            const { api, account, getBalance, poolId, getConfig } = useAccountStore();
+            const { api, account, getBalance, poolId, config } = useAccountStore();
             const claim = await api.quests.daily.complete(reward._id);
 
             if (claim.error) {
                 throw claim.error;
             } else {
-                track('UserCreates', [
-                    account?.sub,
-                    'daily reward claim',
-                    { poolId, origin: getConfig(poolId).origin },
-                ]);
+                track('UserCreates', [account?.sub, 'daily reward claim', { poolId, origin: config.origin }]);
 
                 getBalance();
             }

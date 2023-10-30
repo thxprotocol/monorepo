@@ -103,13 +103,11 @@ export default defineComponent({
     },
     methods: {
         onClickSubmit() {
-            const { getConfig, poolId } = useAccountStore();
-            const { chainId } = getConfig(poolId);
             const config: TERC20TransferConfig = {
                 erc20Id: this.token.erc20._id,
                 to: this.receiver,
                 amount: toWei(String(this.amount), 'ether'),
-                chainId,
+                chainId: this.accountStore.config.chainId,
             };
             this.$emit('submit', config);
         },

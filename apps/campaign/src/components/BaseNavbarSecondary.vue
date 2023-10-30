@@ -69,11 +69,11 @@
                         </template>
                     </b-dropdown-item-button>
 
-                    <b-dropdown-item-button @click="isModalConnectSettingsShown = true" size="sm">
+                    <b-dropdown-item-button @click="accountStore.isModalConnectSettingsShown = true">
                         <div class="d-flex align-items-center justify-content-between">Profile</div>
                     </b-dropdown-item-button>
 
-                    <b-dropdown-item-button @click="isModalWalletSettingsShown = true" size="sm">
+                    <b-dropdown-item-button @click="walletStore.isModalWalletSettingsShown = true">
                         <div class="d-flex align-items-center justify-content-between">Wallet</div>
                     </b-dropdown-item-button>
 
@@ -85,26 +85,6 @@
                         </div>
                     </b-dropdown-item-button>
                 </b-dropdown>
-                <BaseModalWalletCreate
-                    id="wallet-create"
-                    @hidden="isModalWalletCreateShown = false"
-                    :show="isModalWalletCreateShown"
-                />
-                <BaseModalWalletSettings
-                    id="wallet-config"
-                    @hidden="isModalWalletSettingsShown = false"
-                    :show="isModalWalletSettingsShown"
-                />
-                <BaseModalConnectSettings
-                    id="connect-settings"
-                    @hidden="isModalConnectSettingsShown = false"
-                    :show="isModalConnectSettingsShown"
-                />
-                <BaseModalWalletRecovery
-                    id="wallet-recovery"
-                    @hidden="isModalWalletRecoveryShown = false"
-                    :show="isModalWalletRecoveryShown"
-                />
             </template>
         </div>
     </b-navbar>
@@ -121,19 +101,13 @@ import { usePerkStore } from '../stores/Perk';
 import { decodeHTML } from '../utils/decode-html';
 import { AccountVariant } from '../types/enums/accountVariant';
 import BaseModalPoolSubscription from '../components/BaseModalPoolSubscription.vue';
-import BaseModalWalletCreate from '../components/BaseModalWalletCreate.vue';
 import BaseModalConnectSettings from '../components/BaseModalConnectSettings.vue';
-import BaseModalWalletSettings from '../components/BaseModalWalletSettings.vue';
-import BaseModalWalletRecovery from '../components/BaseModalWalletRecovery.vue';
 import { getIsMobile } from '../utils/user-agent';
 
 export default defineComponent({
     name: 'BaseNavbarSecondary',
     components: {
-        BaseModalWalletCreate,
         BaseModalConnectSettings,
-        BaseModalWalletSettings,
-        BaseModalWalletRecovery,
         BaseModalPoolSubscription,
     },
     data(): any {
@@ -142,14 +116,9 @@ export default defineComponent({
             decodeHTML,
             error: '',
             isRefreshing: false,
-            isModalConnectSettingsShown: false,
-            isModalWalletCreateShown: false,
-            isModalWalletSettingsShown: false,
-            isModalWalletRecoveryShown: false,
             isModalPoolSubscriptionShown: false,
         };
     },
-    props: {},
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
@@ -169,31 +138,7 @@ export default defineComponent({
             )}`;
         },
         config() {
-            const { poolId, getConfig } = useAccountStore();
-            if (!poolId) return;
-            return getConfig(poolId);
-        },
-    },
-    watch: {
-        // OAuthshare retrieved but device share and security quesiton not found
-        'authStore.isSecurityQuestionAvailable'(isSecurityQuestionAvailable) {
-            const { oAuthShare, isDeviceShareAvailable } = this.authStore;
-            if (!oAuthShare) return;
-
-            console.debug({ isDeviceShareAvailable, isSecurityQuestionAvailable });
-
-            this.isModalWalletCreateShown =
-                (isDeviceShareAvailable && !(isSecurityQuestionAvailable ?? false)) ||
-                (!isDeviceShareAvailable && !(isSecurityQuestionAvailable ?? false));
-            this.isModalWalletRecoveryShown = !isDeviceShareAvailable && (isSecurityQuestionAvailable ?? false);
-
-            // Achieved 3/3, let's patch account address and deploy Safe!
-            if (isDeviceShareAvailable && isSecurityQuestionAvailable) {
-                this.accountStore
-                    .updateAccountAddress()
-                    .then(() => this.walletStore.getWallet())
-                    .catch(console.error);
-            }
+            return this.accountStore.config;
         },
     },
     methods: {
@@ -216,11 +161,10 @@ export default defineComponent({
             this.accountStore.signout();
         },
         onClickClose() {
-            const { origin } = this.accountStore.getConfig(this.accountStore.poolId);
             if (getIsMobile()) {
-                window.open(origin, '_self');
+                window.open(this.accountStore.config.origin, '_self');
             } else {
-                window.top?.postMessage({ message: 'thx.widget.toggle' }, origin);
+                window.top?.postMessage({ message: 'thx.widget.toggle' }, this.accountStore.config.origin);
             }
         },
         onClickWallet() {

@@ -22,20 +22,16 @@ export const useAccountStore = defineStore('account', {
         balance: 0,
         migration: null,
         subscription: null,
+        config: {},
+        isModalConnectSettingsShown: false,
         isAuthenticated: null,
         isRewardsLoaded: false,
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
-        getConfig: (poolId: string): TWidgetConfig => {
-            const data = localStorage.getItem(`thx:widget:${poolId}:config`);
-            if (!data) return {} as TWidgetConfig;
-            return JSON.parse(data);
-        },
         setConfig(poolId: string, config: TWidgetConfig) {
-            const data = { ...this.getConfig(poolId), ...config };
-            localStorage.setItem(`thx:widget:${poolId}:config`, JSON.stringify(data));
             this.poolId = poolId;
+            this.config = { ...this.config, ...config };
         },
         setTheme(config: TWidgetConfig) {
             const { title, theme } = config;
@@ -46,33 +42,35 @@ export const useAccountStore = defineStore('account', {
             document.head.appendChild(sheet);
         },
         getTheme() {
-            const { theme } = this.getConfig(this.poolId);
-            return JSON.parse(theme);
+            return JSON.parse(this.config.theme);
         },
-        async init(poolId: string, origin: string, isPreview: boolean) {
+        async init(poolId: string, origin: string) {
             this.api = new THXClient({ url: API_URL, accessToken: '', poolId });
             this.addEventListeners();
             this.setStatus(false);
-            if (!poolId) return;
-
-            this.poolId = poolId;
-            this.isPreview = isPreview;
-
-            const config = await this.api.request.get('/v1/widget/' + poolId);
-
-            this.setConfig(this.poolId, { ...config, origin });
-            this.setTheme(config);
             this.getUserData();
 
-            track('UserVisits', [
-                this.account?.sub || '',
-                'page with widget',
-                { origin: this.getConfig(poolId).origin, poolId },
-            ]);
+            if (poolId) {
+                this.poolId = poolId;
+                const config = await this.api.request.get('/v1/widget/' + poolId);
 
-            if (window.top === window.self) {
-                const { origin } = this.getConfig(this.poolId);
-                track('UserOpens', [this.account?.sub || '', `widget iframe`, { origin, poolId, isShown: true }]);
+                this.setConfig(this.poolId, { ...config, origin });
+                this.setTheme(config);
+                this.getCampaignData();
+
+                track('UserVisits', [
+                    this.account?.sub || '',
+                    'page with widget',
+                    { origin: this.config.origin, poolId },
+                ]);
+
+                if (window.top === window.self) {
+                    track('UserOpens', [
+                        this.account?.sub || '',
+                        `widget iframe`,
+                        { origin: this.config.origin, poolId, isShown: true },
+                    ]);
+                }
             }
         },
         onLoad() {
@@ -101,11 +99,11 @@ export const useAccountStore = defineStore('account', {
             await authStore.onUserLoadedCallback(user);
 
             this.api.setAccessToken(user.access_token);
+
+            this.getUserData();
+
             if (this.poolId) {
-                this.getUserData();
-            } else {
-                await this.getAccount();
-                useWalletStore().getWallet();
+                this.getCampaignData();
             }
         },
         onUserUnloaded() {
@@ -121,15 +119,21 @@ export const useAccountStore = defineStore('account', {
         async subscribe(email: string) {
             this.subscription = await this.api.pools.subscription.post({ poolId: this.poolId, email });
 
-            const { origin } = this.getConfig(this.poolId);
-            track('UserCreates', [this.account?.sub, 'pool subscription', { poolId: this.poolId, origin }]);
+            track('UserCreates', [
+                this.account?.sub,
+                'pool subscription',
+                { poolId: this.poolId, origin: this.config.origin },
+            ]);
         },
         async unsubscribe() {
             await this.api.pools.subscription.delete(this.poolId);
             this.subscription = null;
 
-            const { origin } = this.getConfig(this.poolId);
-            track('UserCreates', [this.account?.sub, 'pool unsubscription', { poolId: this.poolId, origin }]);
+            track('UserCreates', [
+                this.account?.sub,
+                'pool unsubscription',
+                { poolId: this.poolId, origin: this.config.origin },
+            ]);
         },
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
@@ -169,21 +173,28 @@ export const useAccountStore = defineStore('account', {
         async migrate(body: { erc20Id?: string; erc721Id?: string; erc721TokenId?: string }) {
             await this.api.request.post('/v1/account/wallet/migrate', { body: JSON.stringify(body) });
         },
-        async getUserData() {
-            const rewardsStore = useRewardStore();
-            const perksStore = usePerkStore();
-            const walletStore = useWalletStore();
+        async getCampaignData() {
+            if (!this.poolId) return;
+            const questStore = useRewardStore();
+            const rewardStore = usePerkStore();
             const authStore = useAuthStore();
 
-            rewardsStore.list().then(() => {
-                const amount = rewardsStore.quests.filter((r: any) => !r.isClaimed).length;
-
+            questStore.list().then(() => {
+                const amount = questStore.quests.filter((r: any) => !r.isClaimed).length;
                 this.isRewardsLoaded = true;
-
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
                 this.postMessage({ message: 'thx.reward.amount', amount });
             });
-            perksStore.list();
+            rewardStore.list();
+
+            // Guard HTTP requests that do require auth
+            if (!authStore.oAuthShare) return;
+
+            await Promise.all([this.getBalance(), this.getSubscription()]);
+        },
+        async getUserData() {
+            const walletStore = useWalletStore();
+            const authStore = useAuthStore();
 
             // Guard HTTP requests that do require auth
             if (!authStore.oAuthShare) return;
@@ -194,8 +205,7 @@ export const useAccountStore = defineStore('account', {
                 authStore.getPrivateKey();
             }
 
-            await Promise.all([this.getBalance(), this.getSubscription(), walletStore.getWallet()]);
-
+            await walletStore.getWallet();
             walletStore.list();
 
             this.setStatus(true);
@@ -209,9 +219,8 @@ export const useAccountStore = defineStore('account', {
             }
         },
         postMessage(payload: any) {
-            const { origin } = this.getConfig(this.poolId);
-            if (origin && window.self !== window.top) {
-                window.top?.postMessage(payload, origin);
+            if (this.config.origin && window.self !== window.top) {
+                window.top?.postMessage(payload, this.config.origin);
             }
         },
         async updateAccountAddress() {

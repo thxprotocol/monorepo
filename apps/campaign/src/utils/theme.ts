@@ -35,6 +35,7 @@ export function getStyles(elements: any, colors: any) {
         'body,.bg-splash,.card-header-bg': {
             '--bs-body-bg': theme.elements.bodyBg,
             '--bs-body-color': theme.elements.text,
+            '--bs-btn-bg': theme.elements.btnBg,
         },
         'blockquote': {
             '--thx-blockquote-bg': theme.elements.bodyBg,
@@ -95,8 +96,8 @@ export function getStyles(elements: any, colors: any) {
         },
         '.nav-tabs': {
             '--bs-nav-tabs-border-color': theme.elements.btnBg,
-            '--bs-nav-link-color': theme.elements.btnText,
-            '--bs-nav-link-hover-color': theme.elements.btnText,
+            '--bs-nav-link-color': theme.elements.text,
+            '--bs-nav-link-hover-color': theme.elements.text,
         },
         '.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-item .nav-link:hover': {
             '--bs-nav-tabs-link-active-color': theme.elements.text,

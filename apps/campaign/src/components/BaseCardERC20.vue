@@ -1,6 +1,6 @@
 <template>
     <b-card body-class="d-flex align-items-center" class="mb-1">
-        <div class="pe-3">
+        <div class="pe-3" v-if="token.erc20">
             <img height="25" :src="token.erc20.logoImgUrl" />
         </div>
         <div class="flex-grow-1">

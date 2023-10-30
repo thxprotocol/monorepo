@@ -1,143 +1,129 @@
 <template>
     <b-modal
-        :id="id"
-        v-model="isShown"
+        v-model="walletStore.isModalWalletSettingsShown"
         @show="onShow"
-        @hidden="$emit('hidden')"
+        @hidden="walletStore.isModalWalletSettingsShown = false"
         centered
         no-close-on-backdrop
         no-close-on-esc
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-key me-2"></i> Wallet Settings</h5>
-            <b-link class="btn-close" @click="$emit('hidden')"> <i class="fas fa-times"></i> </b-link>
+            <b-link class="btn-close" @click="walletStore.isModalWalletSettingsShown = false">
+                <i class="fas fa-times"></i>
+            </b-link>
         </template>
-        <div v-if="isLoading" class="text-center">
-            <b-spinner show size="sm" />
-        </div>
-        <template v-else>
-            <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
-            <b-form>
-                <b-tabs justified content-class="mt-3">
-                    <b-tab title="About">
-                        <b-form-group v-if="walletStore.wallet && !isMetamaskAccount">
-                            <template #label>
-                                <div class="d-flex align-items-center">
-                                    <img
-                                        v-b-tooltip
-                                        title="Secured by Safe (f.k.a. Gnosis Safe)"
-                                        :src="imgSafeLogo"
-                                        width="15"
-                                        height="15"
-                                        style="border-radius: 3px"
-                                        class="me-2"
-                                        alt="Safe Logo"
-                                    />
-                                    Wallet Address
-                                </div>
-                            </template>
-                            <code>{{ walletStore.wallet.address }}</code>
-                        </b-form-group>
-                        <b-form-group v-if="accountStore.account">
-                            <template #label>
-                                <div class="d-flex align-items-center">
-                                    <img
-                                        v-b-tooltip
-                                        title="Secured by Metamask"
-                                        v-if="isMetamaskAccount"
-                                        :src="imgMetamaskLogo"
-                                        width="15"
-                                        height="15"
-                                        style="border-radius: 3px"
-                                        class="me-2"
-                                        alt="Metamask Logo"
-                                    />
-                                    <img
-                                        v-b-tooltip
-                                        title="Secured by Web3Auth"
-                                        v-if="!isMetamaskAccount"
-                                        :src="imgWeb3AuthLogo"
-                                        width="15"
-                                        height="15"
-                                        style="border-radius: 3px"
-                                        class="me-2"
-                                        alt="Web3Auth Logo"
-                                    />
-                                    Account Address
-                                </div>
-                            </template>
-                            <code>{{ accountStore.account.address }}</code>
-                        </b-form-group>
-                        <b-form-group v-if="!isMetamaskAccount" :label="`Account Private Key (${currentKeyTreshold})`">
-                            <b-input-group>
-                                <b-form-input :value="privateKey" />
-                                <b-input-group-append>
-                                    <b-button
-                                        size="sm"
-                                        variant="primary"
-                                        @click="isPrivateKeyHidden = !isPrivateKeyHidden"
-                                    >
-                                        <i v-if="isPrivateKeyHidden" class="fas fa-eye px-2"></i>
-                                        <i v-else class="fas fa-eye-slash px-2"></i>
-                                    </b-button>
-                                    <b-button
-                                        size="sm"
-                                        variant="primary"
-                                        v-clipboard:copy="authStore.privateKey"
-                                        v-clipboard:success="onCopySuccess"
-                                    >
-                                        <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
-                                        <i v-else class="fas fa-clipboard px-2"></i>
-                                    </b-button>
-                                </b-input-group-append>
-                            </b-input-group>
-                        </b-form-group>
-                    </b-tab>
-                    <b-tab title="Security Question" v-if="authStore.securityQuestion">
-                        <b-form-group>
-                            <b-form-input v-model="question" placeholder="Question" />
-                        </b-form-group>
-                        <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
-                            <b-form-input
-                                :state="isPasswordValid"
-                                v-model="password"
-                                type="password"
-                                placeholder="Answer"
-                                autocomplete="off"
-                            />
-                        </b-form-group>
-                        <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
-                            <b-form-input
-                                :state="isPasswordValid"
-                                v-model="passwordCheck"
-                                type="password"
-                                placeholder="Answer again"
-                                autocomplete="off"
-                            />
-                        </b-form-group>
-                        <b-button
-                            :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable"
-                            class="w-100"
-                            variant="primary"
-                            @click="onSubmitDeviceSharePasswordUpdate"
-                        >
-                            <b-spinner small variant="light" v-if="isLoadingPasswordChange" />
-                            <template v-else> Change Security Question </template>
-                        </b-button>
-                    </b-tab>
-                </b-tabs>
-            </b-form>
-        </template>
+
+        <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
+        <b-form>
+            <b-tabs justified content-class="mt-3">
+                <b-tab title="About">
+                    <b-form-group v-if="walletStore.wallet && !isMetamaskAccount">
+                        <template #label>
+                            <div class="d-flex align-items-center">
+                                <img
+                                    v-b-tooltip
+                                    title="Secured by Safe (f.k.a. Gnosis Safe)"
+                                    :src="imgSafeLogo"
+                                    width="15"
+                                    height="15"
+                                    style="border-radius: 3px"
+                                    class="me-2"
+                                    alt="Safe Logo"
+                                />
+                                Wallet Address
+                            </div>
+                        </template>
+                        <code>{{ walletStore.wallet.address }}</code>
+                    </b-form-group>
+                    <b-form-group v-if="accountStore.account">
+                        <template #label>
+                            <div class="d-flex align-items-center">
+                                <img
+                                    v-b-tooltip
+                                    title="Secured by Metamask"
+                                    v-if="isMetamaskAccount"
+                                    :src="imgMetamaskLogo"
+                                    width="15"
+                                    height="15"
+                                    style="border-radius: 3px"
+                                    class="me-2"
+                                    alt="Metamask Logo"
+                                />
+                                <img
+                                    v-b-tooltip
+                                    title="Secured by Web3Auth"
+                                    v-if="!isMetamaskAccount"
+                                    :src="imgWeb3AuthLogo"
+                                    width="15"
+                                    height="15"
+                                    style="border-radius: 3px"
+                                    class="me-2"
+                                    alt="Web3Auth Logo"
+                                />
+                                Account Address
+                            </div>
+                        </template>
+                        <code>{{ accountStore.account.address }}</code>
+                    </b-form-group>
+                    <b-form-group v-if="!isMetamaskAccount" :label="`Account Private Key (${currentKeyTreshold})`">
+                        <b-input-group>
+                            <b-form-input :value="privateKey" />
+                            <b-input-group-append>
+                                <b-button size="sm" variant="primary" @click="isPrivateKeyHidden = !isPrivateKeyHidden">
+                                    <i v-if="isPrivateKeyHidden" class="fas fa-eye px-2"></i>
+                                    <i v-else class="fas fa-eye-slash px-2"></i>
+                                </b-button>
+                                <b-button
+                                    size="sm"
+                                    variant="primary"
+                                    v-clipboard:copy="authStore.privateKey"
+                                    v-clipboard:success="onCopySuccess"
+                                >
+                                    <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
+                                    <i v-else class="fas fa-clipboard px-2"></i>
+                                </b-button>
+                            </b-input-group-append>
+                        </b-input-group>
+                    </b-form-group>
+                </b-tab>
+                <b-tab title="Security Question" v-if="authStore.securityQuestion">
+                    <b-form-group>
+                        <b-form-input v-model="question" placeholder="Question" />
+                    </b-form-group>
+                    <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
+                        <b-form-input
+                            :state="isPasswordValid"
+                            v-model="password"
+                            type="password"
+                            placeholder="Answer"
+                            autocomplete="off"
+                        />
+                    </b-form-group>
+                    <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
+                        <b-form-input
+                            :state="isPasswordValid"
+                            v-model="passwordCheck"
+                            type="password"
+                            placeholder="Answer again"
+                            autocomplete="off"
+                        />
+                    </b-form-group>
+                    <b-button
+                        :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable"
+                        class="w-100"
+                        variant="primary"
+                        @click="onSubmitDeviceSharePasswordUpdate"
+                    >
+                        <b-spinner small variant="light" v-if="isLoadingPasswordChange" />
+                        <template v-else> Change Security Question </template>
+                    </b-button>
+                </b-tab>
+            </b-tabs>
+        </b-form>
         <template #footer>
-            <b-button class="w-100" variant="primary" @click="$emit('hidden')"> Close </b-button>
-            <b-button
-                v-if="accountStore.debugger"
-                class="w-100 text-danger"
-                variant="link"
-                @click="onSubmitResetAccount"
-            >
-                <b-spinner small variant="light" v-if="isLoadingReset" />
-                <template v-else> Reset Account </template>
+            <b-button class="w-100" variant="primary" @click="walletStore.isModalWalletSettingsShown = false">
+                Close
             </b-button>
         </template>
     </b-modal>
@@ -164,7 +150,6 @@ export default defineComponent({
             imgMetamaskLogo,
             imgWeb3AuthLogo,
             error: '',
-            isShown: false,
             isCopied: false,
             isPrivateKeyHidden: true,
             question: '',
@@ -209,21 +194,8 @@ export default defineComponent({
             return undefined;
         },
     },
-    props: {
-        id: {
-            type: String,
-            required: true,
-        },
-        show: {
-            type: Boolean,
-        },
-        isLoading: {
-            type: Boolean,
-        },
-    },
     watch: {
-        show(value) {
-            this.isShown = value;
+        'walletStore.isModalWalletSettingsShown'() {
             this.accountStore.getAccount();
             this.walletStore.getWallet();
         },

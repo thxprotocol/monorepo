@@ -31,16 +31,12 @@
                                 <template #button-content>
                                     <b-avatar variant="light" :src="accountStore.account.profileImg" />
                                 </template>
-                                <BDropdownItem @click="isModalConnectSettingsShown = true">
+                                <BDropdownItem @click="accountStore.isModalConnectSettingsShown = true">
                                     Profile
-                                    <BaseModalConnectSettings
-                                        size="lg"
-                                        id="connect-settings"
-                                        @hidden="isModalConnectSettingsShown = false"
-                                        :show="isModalConnectSettingsShown"
-                                    />
                                 </BDropdownItem>
-                                <BDropdownItem @click="isModalConnectSettingsShown = true"> Wallet</BDropdownItem>
+                                <BDropdownItem @click="walletStore.isModalWalletSettingsShown = true">
+                                    Wallet
+                                </BDropdownItem>
                                 <BDropdownItem @click="authStore.signout()">Sign Out</BDropdownItem>
                             </b-nav-item-dropdown>
                             <b-spinner v-else variant="light" small />
@@ -55,26 +51,29 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import BaseNavbarSecondary from '../components/BaseNavbarSecondary.vue';
+import BaseModalWalletSettings from '../components/BaseModalWalletSettings.vue';
 import BaseModalConnectSettings from '../components/BaseModalConnectSettings.vue';
 import imgLogo from '../assets/logo.png';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
 import { useAuthStore } from '../stores/Auth';
+import { useWalletStore } from '../stores/Wallet';
 
 export default defineComponent({
     name: 'Public',
     components: {
         BaseModalConnectSettings,
-        BaseNavbarSecondary,
+        BaseModalWalletSettings,
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
+        ...mapStores(useWalletStore),
     },
     data() {
         return {
             isModalConnectSettingsShown: false,
+            isModalWalletSettingsShown: false,
             imgLogo,
         };
     },
