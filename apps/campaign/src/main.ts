@@ -1,4 +1,4 @@
-import { BootstrapVueNext } from 'bootstrap-vue-next';
+import { BootstrapVueNext, vBTooltip } from 'bootstrap-vue-next';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import { MODE, API_URL, MIXPANEL_TOKEN, AUTH_URL, WIDGET_URL } from './config/secrets';
@@ -24,6 +24,7 @@ if (MODE === 'production') {
 
 Mixpanel.init(MIXPANEL_TOKEN, API_URL);
 
+app.directive('b-tooltip', vBTooltip);
 app.use(pinia);
 app.use(router);
 app.use(BootstrapVueNext);
