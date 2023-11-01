@@ -1,23 +1,30 @@
 <template>
     <b-card>
-        <div class="d-flex">
-            {{ quest.variant }}
-            <div class="me-3" v-if="quest.brand && quest.brand.logoImgUrl">
-                <BImg lazy width="40" height="auto" :src="quest.brand.logoImgUrl" />
+        <template #header>
+            <div class="text-center pt-2">
+                <BImg v-if="quest.image" class="rounded" lazy fluid :src="quest.image" />
+                <BImg v-else-if="logoImage" lazy width="150" height="auto" :src="logoImage" />
             </div>
-            <div>
+        </template>
+        <div>
+            <div class="d-flex justify-content-between">
                 <strong class="text-success">{{ quest.title }}</strong>
-                <p class="text-opaque">{{ quest.description }}</p>
+                <b-badge variant="primary" class="p-2">
+                    <i class="fab fa-twitter text-opaque me-0" />
+                </b-badge>
             </div>
+            <p class="text-opaque mb-0">{{ quest.description }}</p>
         </div>
-        <b-button @click="isModalCampaignDomainShown = true" variant="primary" size="sm" class="w-100 rounded-pill">
-            Earn {{ quest.amount }} points
-        </b-button>
-        <BaseModalCampaignDomain
-            :show="isModalCampaignDomainShown"
-            :campaign="{ domain: quest.domain }"
-            @hidden="isModalCampaignDomainShown = false"
-        />
+        <template #footer>
+            <b-button @click="isModalCampaignDomainShown = true" variant="primary" size="m" class="w-100 rounded-pill">
+                Earn <strong>{{ quest.amount }}</strong> points!
+            </b-button>
+            <BaseModalCampaignDomain
+                :show="isModalCampaignDomainShown"
+                :campaign="{ domain: quest.domain }"
+                @hidden="isModalCampaignDomainShown = false"
+            />
+        </template>
     </b-card>
 </template>
 
@@ -39,5 +46,16 @@ export default defineComponent({
     data(): any {
         return { isModalCampaignDomainShown: false };
     },
+    computed: {
+        logoImage() {
+            return this.quest.brand && this.quest.brand.logoImgUrl;
+        },
+    },
 });
 </script>
+<style>
+.card-quest-header {
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+</style>

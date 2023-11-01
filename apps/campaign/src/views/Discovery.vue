@@ -27,7 +27,7 @@
                             </b-button>
                         </template>
                         <template v-else>
-                            <b-nav-item-dropdown v-if="accountStore.account" right no-caret>
+                            <b-nav-item-dropdown v-if="accountStore.account" end no-caret>
                                 <template #button-content>
                                     <b-avatar variant="light" :src="accountStore.account.profileImg" />
                                 </template>
@@ -47,12 +47,14 @@
         </b-container>
     </div>
     <router-view />
+    <BaseFooter />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BaseModalWalletSettings from '../components/BaseModalWalletSettings.vue';
 import BaseModalConnectSettings from '../components/BaseModalConnectSettings.vue';
+import BaseFooter from '../components/BaseFooter.vue';
 import imgLogo from '../assets/logo.png';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';

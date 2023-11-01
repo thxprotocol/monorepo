@@ -42,21 +42,6 @@
         <hr class="mb-5"/>
     </b-container>
     <b-container class="flex-grow-1 overflow-auto order-lg-1 pt-0 pb-5">
-        <b-tabs pills content-class="mt-3" align="end">
-            <template #tabs-start>
-                <strong class="text-opaque align-self-center me-auto">
-                    <i class="fas fa-trophy me-1" />
-                    Quests
-                </strong>
-            </template>
-            <b-tab :title="key" v-for="quests, key of questLists">
-                <b-row>
-                    <b-col v-for="quest of quests" md="3">
-                        <BaseCardQuest :quest="quest" />
-                    </b-col>
-                </b-row>
-            </b-tab>
-        </b-tabs>
         <b-row class="mt-5 mb-3">
             <b-col class="d-flex align-items-center">
                 <strong class="mb-3 mb-md-0 text-opaque">
@@ -85,7 +70,6 @@
                 ></b-pagination>
             </b-col>
         </b-row>
-        <!-- <hr /> -->
         <b-row :style="{ opacity: isLoadingSearch || isLoadingPage ? 0.5 : 1 }">
             <b-col v-if="isLoading" class="justify-content-center d-flex">
                 <b-spinner small variant="primary" />
@@ -95,6 +79,18 @@
             </b-col>
             <b-col v-if="!isLoading && !campaigns.results.length">
                 <p class="text-opaque">Could not find a campaign with that name...</p>
+            </b-col>
+        </b-row>
+        <hr />
+        <b-row class="mt-5 mb-3">
+            <b-col md="12" class="d-flex align-items-center pb-3">
+                <strong class="mb-3 mb-md-0 text-opaque">
+                    <i class="fas fa-trophy me-1" />
+                    Quests
+                </strong>    
+            </b-col>        
+            <b-col v-for="quest of questLists" md="3">
+                <BaseCardQuest :quest="quest" />
             </b-col>
         </b-row>
     </b-container>

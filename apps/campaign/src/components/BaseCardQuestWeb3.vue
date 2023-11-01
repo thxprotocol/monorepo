@@ -73,7 +73,7 @@
                     />
                     Claim <strong>{{ reward.amount }}</strong> points
                 </b-button>
-                <b-dropdown right variant="primary" no-caret toggle-class="pe-3">
+                <b-dropdown end variant="primary" no-caret toggle-class="pe-3">
                     <template #button-content>
                         <i class="fas fa-caret-down"></i>
                     </template>
