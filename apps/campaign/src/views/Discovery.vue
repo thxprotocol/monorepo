@@ -1,7 +1,14 @@
 <template>
-    <div>
+    <div
+        :style="{
+            minHeight: '100%',
+            backgroundSize: 'cover',
+            backgroundImage: `url(${imgBgOverlay})`,
+        }"
+        class="pt-3"
+    >
         <b-container>
-            <b-navbar toggleable="lg" type="dark" class="mt-3" :container="false">
+            <b-navbar toggleable="lg" type="dark" :container="false">
                 <b-navbar-brand href="#" style="width: 120px">
                     <b-link to="/">
                         <b-img :src="imgLogo" height="50" alt="" />
@@ -45,9 +52,9 @@
                 </b-collapse>
             </b-navbar>
         </b-container>
+        <router-view />
+        <BaseFooter />
     </div>
-    <router-view />
-    <BaseFooter />
 </template>
 
 <script lang="ts">
@@ -56,6 +63,7 @@ import BaseModalWalletSettings from '../components/BaseModalWalletSettings.vue';
 import BaseModalConnectSettings from '../components/BaseModalConnectSettings.vue';
 import BaseFooter from '../components/BaseFooter.vue';
 import imgLogo from '../assets/logo.png';
+import imgBgOverlay from '../assets/bg-overlay.png';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
 import { useAuthStore } from '../stores/Auth';
@@ -77,6 +85,7 @@ export default defineComponent({
             isModalConnectSettingsShown: false,
             isModalWalletSettingsShown: false,
             imgLogo,
+            imgBgOverlay,
         };
     },
 });

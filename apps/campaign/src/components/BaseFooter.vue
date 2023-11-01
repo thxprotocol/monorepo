@@ -1,6 +1,9 @@
 <template>
-    <b-container class="pt-5">
+    <b-container class="py-3">
         <b-row>
+            <b-col md="12">
+                <hr />
+            </b-col>
             <b-col md="6">
                 <b-nav>
                     <b-nav-item href="https://thx.network" target="_blank" link-classes="text-white text-opaque ps-0">
@@ -23,7 +26,7 @@
                 </b-nav>
             </b-col>
             <b-col md="6">
-                <b-nav class="justify-content-end">
+                <b-nav class="justify-content-end text-opaque">
                     <b-nav-item href="https://discord.com/invite/TzbbSmkE7Y" target="_blank">
                         <i class="fab fa-discord" style="color: #7289da" />
                     </b-nav-item>

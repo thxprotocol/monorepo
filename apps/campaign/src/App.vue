@@ -4,7 +4,7 @@
         <BaseModalConnectSettings size="lg" />
         <BaseModalWalletCreate />
         <BaseModalWalletRecovery />
-        <BaseModalWalletSettings />
+        <BaseModalWalletSettings size="lg" />
     </div>
 </template>
 <script lang="ts">

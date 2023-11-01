@@ -81,7 +81,6 @@
                 <p class="text-opaque">Could not find a campaign with that name...</p>
             </b-col>
         </b-row>
-        <hr />
         <b-row class="mt-5 mb-3">
             <b-col md="12" class="d-flex align-items-center pb-3">
                 <strong class="mb-3 mb-md-0 text-opaque">

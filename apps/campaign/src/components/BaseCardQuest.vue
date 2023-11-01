@@ -1,5 +1,5 @@
 <template>
-    <b-card header-class="p-0">
+    <b-card header-class="p-0" class="mb-3">
         <template #header>
             <div
                 class="d-flex bg-dark rounded"
