@@ -148,14 +148,13 @@ export default defineComponent({
             this.accountStore.signin();
         },
         onClickGoToWallet() {
-            const { poolId } = this.accountStore;
-            this.$router.push(`/c/${poolId}/wallet`);
+            this.$router.push(`/c/${this.accountStore.config.slug}/wallet`);
         },
         async onClickCollect() {
             this.isLoadingCollect = true;
             try {
                 await this.claimsStore.collect(this.uuid);
-                await this.walletStore.list();
+                this.walletStore.list();
 
                 this.isLoadingCollectComplete = true;
             } catch (res) {

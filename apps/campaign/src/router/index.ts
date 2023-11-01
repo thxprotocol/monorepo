@@ -1,13 +1,10 @@
 import { useAccountStore } from '../stores/Account';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
-function beforeEnter(to: any, from: any, next: any) {
+async function beforeEnter(to: any, from: any, next: any) {
     const { poolId, init } = useAccountStore();
-    if (poolId) {
-        next();
-    } else {
-        init(to.params.poolId, to.query.origin).then(() => next());
-    }
+    if (!poolId) await init(to.params.slug, to.query.origin);
+    next();
 }
 
 const routes: Array<RouteRecordRaw> = [
@@ -35,57 +32,57 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "maintenance" */ '../views/Maintenance.vue'),
     },
     {
-        path: '/c/:poolId',
+        path: '/c/:slug',
         name: 'campaign',
         component: () => import(/* webpackChunkName: "campaign" */ '../views/Campaign.vue'),
         redirect: (route) => {
-            return `/c/${route.params.poolId}/quests`;
+            return `/c/${route.params.slug}/quests`;
         },
         children: [
             {
-                path: '/c/:poolId/signin',
+                path: '/c/:slug/signin',
                 name: 'signin',
                 beforeEnter,
                 component: () => import(/* webpackChunkName: "signin" */ '../views/campaign/Signin.vue'),
             },
             {
-                path: '/c/:poolId/quests',
+                path: '/c/:slug/quests',
                 name: 'quests',
                 beforeEnter,
                 component: () => import(/* webpackChunkName: "quests" */ '../views/campaign/Quests.vue'),
             },
             {
-                path: '/c/:poolId/rewards',
+                path: '/c/:slug/rewards',
                 name: 'rewards',
                 beforeEnter,
                 component: () => import(/* webpackChunkName: "rewards" */ '../views/campaign/Rewards.vue'),
             },
             {
-                path: '/c/:poolId/wallet',
+                path: '/c/:slug/wallet',
                 name: 'wallet',
                 beforeEnter,
                 component: () => import(/* webpackChunkName: "wallet" */ '../views/campaign/Wallet.vue'),
             },
             {
-                path: '/c/:poolId/c/:uuid',
+                path: '/c/:slug/c/:uuid',
                 name: 'collect',
                 beforeEnter,
                 component: () => import(/* webpackChunkName: "collect" */ '../views/campaign/Collect.vue'),
             },
             {
-                path: '/c/:poolId/w/:uuid',
+                path: '/c/:slug/w/:uuid',
                 name: 'ConnectWallet',
                 beforeEnter,
                 component: () => import(/* webpackChunkName: "connectwallet" */ '../views/campaign/ConnectWallet.vue'),
             },
             {
-                path: '/c/:poolId/checkout/:uuid',
+                path: '/c/:slug/checkout/:uuid',
                 name: 'checkout',
                 beforeEnter,
                 component: () => import(/* webpackChunkName: "checkout" */ '../views/campaign/Checkout.vue'),
             },
             {
-                path: '/c/:poolId/checkout/:uuid/complete',
+                path: '/c/:slug/checkout/:uuid/complete',
                 name: 'checkout_complete',
                 beforeEnter,
                 component: () =>

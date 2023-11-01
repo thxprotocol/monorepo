@@ -168,7 +168,7 @@ export default defineComponent({
             }
         },
         onClickWallet() {
-            this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
+            this.$router.push(`/c/${this.accountStore.config.slug}/wallet`);
         },
         async onClickRefresh() {
             this.isRefreshing = true;

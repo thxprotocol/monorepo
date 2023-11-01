@@ -5,7 +5,7 @@
         header-class="p-0 card-header-campaign"
         body-class="p-0"
         footer-class="justify-content-end d-flex px-3 py-2"
-        @click.delegate="isModalCampaignDomainShown = true"
+        @click.delegate="onClickCampaign"
     >
         <BCardImg
             v-if="campaign.backgroundImgUrl"
@@ -93,7 +93,12 @@
                     <i class="fas fa-gift me-1"></i> {{ campaign.rewards }}
                 </b-badge>
             </div>
-            <b-button @click.stop="isModalCampaignFsShown = true" class="rounded-pill px-3" variant="primary" size="sm">
+            <b-button
+                @click.stop="isModalCampaignDomainShown = true"
+                class="rounded-pill px-3"
+                variant="primary"
+                size="sm"
+            >
                 <i class="fas fa-expand ms-0"></i>
             </b-button>
         </template>
@@ -139,6 +144,9 @@ export default defineComponent({
         onHidden() {
             this.isModalCampaignFsShown = false;
             window.scrollTo(0, this.scrollY);
+        },
+        onClickCampaign() {
+            this.$router.push({ path: `/c/${this.campaign.slug}` });
         },
     },
 });

@@ -44,31 +44,32 @@ export const useAccountStore = defineStore('account', {
         getTheme() {
             return JSON.parse(this.config.theme);
         },
-        async init(poolId: string, origin: string) {
-            this.api = new THXClient({ url: API_URL, accessToken: '', poolId });
+        async init(poolIdOrSlug: string, origin: string) {
+            this.api = new THXClient({ url: API_URL, accessToken: '', poolId: '' });
             this.addEventListeners();
             this.setStatus(false);
             this.getUserData();
 
-            if (poolId) {
-                this.poolId = poolId;
-                const config = await this.api.request.get('/v1/widget/' + poolId);
+            if (poolIdOrSlug) {
+                const config = await this.api.request.get('/v1/widget/' + poolIdOrSlug);
+                this.poolId = config.poolId;
+                this.api.setPoolId(this.poolId);
 
-                this.setConfig(this.poolId, { ...config, origin });
+                this.setConfig(config.poolId, { ...config, origin });
                 this.setTheme(config);
                 this.getCampaignData();
 
                 track('UserVisits', [
                     this.account?.sub || '',
                     'page with widget',
-                    { origin: this.config.origin, poolId },
+                    { origin: this.config.origin, poolId: this.poolId },
                 ]);
 
                 if (window.top === window.self) {
                     track('UserOpens', [
                         this.account?.sub || '',
                         `widget iframe`,
-                        { origin: this.config.origin, poolId, isShown: true },
+                        { origin: this.config.origin, poolId: this.poolId, isShown: true },
                     ]);
                 }
             }

@@ -104,7 +104,7 @@ export default defineComponent({
                     body: JSON.stringify({ code: this.uuid }),
                 });
                 await this.rewardsStore.list();
-                this.$router.push(`/c/${this.accountStore.poolId}/quests`);
+                this.$router.push(`/c/${this.accountStore.config.slug}/quests`);
             } catch (error) {
                 this.error = (error as Error).message || 'Something went wrong..';
             } finally {

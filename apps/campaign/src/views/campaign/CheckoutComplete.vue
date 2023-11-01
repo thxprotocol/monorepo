@@ -68,7 +68,7 @@ export default defineComponent({
     methods: {
         toWallet() {
             this.walletStore.list();
-            this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
+            this.$router.push(`/c/${this.accountStore.config.slug}/wallet`);
         },
     },
 });

@@ -91,7 +91,7 @@
                 <b-spinner small variant="primary" />
             </b-col>
             <b-col v-else lg="4" xl="3" :key="key" v-for="(campaign, key) of campaigns.results">
-                <BaseCardCampaign :campaign="campaign" @clicked="onClickCampaign" />
+                <BaseCardCampaign :campaign="campaign" />
             </b-col>
             <b-col v-if="!isLoading && !campaigns.results.length">
                 <p class="text-opaque">Could not find a campaign with that name...</p>
@@ -186,11 +186,7 @@ export default defineComponent({
                 await this.getCampaigns();
                 this.isLoadingSearch = false;
             }, 1000);
-        },
-        onClickCampaign(campaignId: string) {
-            this.isLoading = true;
-            this.$router.push({ path: `/c/${campaignId}`, query: { origin: window.location.origin } });
-        },
+        }, 
     },
 });
 </script>

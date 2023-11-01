@@ -35,7 +35,7 @@
                     variant="success"
                     class="w-100 rounded-pill"
                     :disabled="isLoading"
-                    :to="`/c/${perk.poolId}/checkout/${perk.uuid}`"
+                    :to="`/c/${accountStore.config.slug}/checkout/${perk.uuid}`"
                 >
                     <b-spinner small variant="primary" v-if="isSubmitting" />
                     {{ perk.price }} {{ perk.priceCurrency }}
@@ -69,6 +69,7 @@
 import { defineComponent, PropType } from 'vue';
 import { mapStores } from 'pinia';
 import { usePerkStore } from '../stores/Perk';
+import { useAccountStore } from '../stores/Account';
 
 export default defineComponent({
     name: 'BaseModalRewardPayment',
@@ -103,6 +104,7 @@ export default defineComponent({
         },
     },
     computed: {
+        ...mapStores(useAccountStore),
         ...mapStores(usePerkStore),
         isAlertDangerShown() {
             return !!this.error;

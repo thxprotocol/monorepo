@@ -10,15 +10,15 @@
                 v-b-tooltip.hover.bottom="{ title: decodeHTML(config.title) }"
             />
         </div>
-        <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.poolId}/quests`">
+        <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.config.slug}/quests`">
             <i class="fas fa-trophy me-lg-3"></i>
             <div>Quests</div>
         </router-link>
-        <router-link v-if="perksStore.rewards.length" :to="`/c/${accountStore.poolId}/rewards`">
+        <router-link v-if="perksStore.rewards.length" :to="`/c/${accountStore.config.slug}/rewards`">
             <i class="fas fa-store me-lg-3"></i>
             <div>Rewards</div>
         </router-link>
-        <router-link :to="`/c/${accountStore.poolId}/wallet`">
+        <router-link :to="`/c/${accountStore.config.slug}/wallet`">
             <i class="fas fa-wallet mr-lg-3"></i>
             <div>Wallet</div>
         </router-link>

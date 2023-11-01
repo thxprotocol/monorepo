@@ -135,7 +135,7 @@ export default defineComponent({
         'accountStore.isRewardsLoaded': {
             handler(isRewardsLoaded) {
                 if (isRewardsLoaded && !this.rewardsStore.quests.length && !this.perksStore.rewards.length) {
-                    this.$router.push(`/c/${this.accountStore.poolId}/wallet`);
+                    this.$router.push(`/c/${this.accountStore.config.slug}/wallet`);
                 }
             },
             deep: true,
