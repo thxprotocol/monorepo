@@ -12,43 +12,32 @@
                         Start Campaign
                         <i class="fas fa-chevron-right ms-2" />
                     </b-button>
-                    <b-button :href="publicUrl" target="_blank" variant="link" class="text-white">
+                    <b-button href="https://docs.thx.network" target="_blank" variant="link" class="text-white">
                         Learn more
                     </b-button>
                 </div>
             </b-col>
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
-                <!-- <p class="d-flex align-items-center justify-content-between">
-                    <div class="text-opaque">
-                        <i class="fas fa-trophy me-1" />
-                        Quest Spotlight
-                    </div>
-                </p> -->
-                <b-carousel indicators>
+                <div class="py-2 text-opaque">
+                    <i class="fas fa-trophy me-1" />
+                    Quest Spotlight
+                </div>
+                <b-carousel fade indicators :interval="500">
                     <b-carousel-slide
                         background="transparent"
-                        style="height: 380px"
-                        class="p-0"
                         img-blank
                         img-blank-color="primary"
                         v-for="quest of questLists"
-                        md="3"
                     >
                         <BaseCardQuest :quest="quest" />
                     </b-carousel-slide>
                 </b-carousel>
             </b-col>
         </b-row>
-        <hr class="mb-5" />
+        <hr class="my-5" />
     </b-container>
     <b-container class="flex-grow-1 overflow-auto order-lg-1 pt-0 pb-5">
         <b-row class="mt-5 mb-3">
-            <b-col class="d-flex align-items-center">
-                <strong class="mb-3 mb-md-0 text-opaque">
-                    <i class="fas fa-gift me-1" />
-                    Campaigns
-                </strong>
-            </b-col>
             <b-col xs="12" md="4">
                 <b-input-group class="mb-3 mb-md-0">
                     <template #prepend>
@@ -60,7 +49,7 @@
                     <b-form-input placeholder="Search..." v-model="search" @input="onInputSearch" />
                 </b-input-group>
             </b-col>
-            <b-col xs="12" md="4" class="d-flex align-items-center justify-content-end">
+            <b-col xs="12" md="6" offset="2" class="d-flex align-items-center justify-content-end">
                 <b-pagination
                     v-model="page"
                     :per-page="limit"
@@ -78,10 +67,10 @@
                 <p v-if="!isLoading && !campaigns.results.length" class="text-opaque">
                     Could not find a campaign with that name...
                 </p>
-                <b-table id="table-campaigns" hover :items="campaignData">
-                    <template #head(isSubscribed)></template>
+                <b-table id="table-campaigns" hover :items="campaignData" @row-clicked="onRowClicked">
                     <template #head(rank)></template>
                     <template #head(logo)></template>
+                    <template #head(isSubscribed)>Notification</template>
 
                     <template #cell(isSubscribed)="{ item }">
                         <i
@@ -95,7 +84,11 @@
                     </template>
 
                     <template #cell(logo)="{ item }">
-                        <BImg lazy width="100" height="auto" :src="item.logo" />
+                        <BImg
+                            lazy
+                            style="max-width: 100px; max-height: 40px; width: auto; height: auto"
+                            :src="item.logo"
+                        />
                     </template>
 
                     <template #cell(name)="{ item }">
@@ -107,20 +100,16 @@
                     </template>
 
                     <template #cell(duration)="{ item }">
-                        <span class="text-opaque">{{
-                            item.duration.expiryDate ? `End: ${item.duration.expiryDate}` : 'Unlimited'
-                        }}</span>
-                        <b-progress class="bg-primary" style="height: 10px">
+                        <span class="text-opaque">
+                            {{ item.duration.expiryDate ? `End: ${item.duration.expiryDate}` : 'Unlimited' }}
+                        </span>
+                        <b-progress v-if="item.duration.expiryDate" class="bg-primary" style="height: 6px">
                             <b-progress-bar :value="item.duration.progress" :max="100" variant="success" />
                         </b-progress>
                     </template>
 
                     <template #cell(participants)="{ item }">
-                        <i class="fas fa-users me-1"></i> {{ item.participants }}
-                    </template>
-
-                    <template #cell(campaign)="{ item }">
-                        <b-button variant="primary" size="sm" :to="`/c/${item.campaign.slug}`">View Campaign</b-button>
+                        <i class="fas text-opaque fa-users me-1"></i> {{ item.participants }}
                     </template>
                 </b-table>
             </b-col>
@@ -171,20 +160,20 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         campaignData() {
             return this.campaigns.results.map((c: any, index: number) => ({
-                isSubscribed: c.subscribed || false,
                 rank: index + 1,
                 logo: c.logoImgUrl,
                 name: {
                     title: c.title,
                     active: c.active,
                     description: c.description,
+                    slug: c.slug,
                 },
                 participants: c.participants,
                 duration: {
                     progress: c.progress,
                     expiryDate: c.expiryDate && format(new Date(c.expiryDate), 'dd-MM-yyyy HH:mm'),
                 },
-                campaign: c,
+                isSubscribed: c.subscribed || false,
             }));
         },
     },
@@ -204,6 +193,9 @@ export default defineComponent({
     methods: {
         onClickStart() {
             window.open('https://dashboard.thx.network', '_blank');
+        },
+        onRowClicked(row: any) {
+            this.$router.push({ path: `/c/${row.name.slug}` });
         },
         async getCampaigns() {
             const url = new URL(API_URL);
@@ -264,18 +256,49 @@ export default defineComponent({
     color: rgba(255, 255, 255, 0.5);
 }
 #table-campaigns th:nth-child(1) {
-    width: 40px;
+    width: 50px;
 }
 #table-campaigns th:nth-child(2) {
-    width: 40px;
-}
-#table-campaigns th:nth-child(3) {
     width: 120px;
 }
-#table-campaigns th:nth-child(4) {
+#table-campaigns td:nth-child(2) {
+    padding: 0px !important;
+}
+#table-campaigns th:nth-child(3) {
     width: auto;
 }
-.carousel-item > img {
+#table-campaigns th:nth-child(4) {
+    width: 150px;
+}
+#table-campaigns th:nth-child(5) {
+    width: 120px;
+}
+#table-campaigns th:nth-child(6) {
+    width: 100px;
+}
+#table-campaigns tr td {
+    cursor: pointer;
+}
+.carousel-inner > div > img,
+.carousel-inner > img {
     display: none !important;
+}
+
+.carousel-caption {
+    position: relative;
+    right: 0;
+    left: 0;
+    bottom: auto;
+    padding: 0;
+    text-align: left;
+}
+.carousel-indicators {
+    position: absolute;
+    top: 0;
+    bottom: auto;
+    margin: 0;
+    margin-top: -2rem;
+    justify-content: flex-end;
+    width: auto;
 }
 </style>

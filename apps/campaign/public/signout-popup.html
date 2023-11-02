@@ -27,9 +27,7 @@
                 }
             }).catch(console.error);
         } else {
-            mgr.signoutPopupCallback().then(() => {
-                if (window.opener) window.close();
-            }).catch(console.error);
+            mgr.signoutPopupCallback().then(() => window.close()).catch(console.error);
         }
     </script>
 </body>

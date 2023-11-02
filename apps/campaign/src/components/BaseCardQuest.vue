@@ -1,5 +1,5 @@
 <template>
-    <b-card header-class="p-0" class="mb-3">
+    <b-card header-class="p-0" body-class="justify-content-start" class="w-100">
         <template #header>
             <div
                 class="d-flex bg-dark rounded"
@@ -8,7 +8,7 @@
                     'justify-content-center align-items-center': !quest.image,
                 }"
                 :style="{
-                    height: '120px',
+                    height: '180px',
                     backgroundImage: `url(${quest.image})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center center',
@@ -17,29 +17,28 @@
                 <BImg lazy width="100" height="auto" :src="logoImage" class="m-3" />
             </div>
         </template>
-        <div>
-            <div class="d-flex justify-content-between">
-                <strong class="text-success">{{ quest.title }} </strong>
-                <div class="flex-shrink-0">
-                    <b-badge
-                        variant="primary"
-                        class="p-2"
-                        v-b-tooltip
-                        :title="`Created: ${quest.createdAt && format(new Date(quest.createdAt), 'dd-MM-yyyy HH:mm')}`"
-                    >
-                        <i class="fas fa-clock text-opaque me-0" />
-                    </b-badge>
-                    <b-badge variant="primary" class="p-2 ms-1" v-b-tooltip title="Twitter Quest">
-                        <i class="fab fa-twitter text-opaque me-0" />
-                    </b-badge>
-                    <b-badge variant="primary" class="p-2 ms-1" v-b-tooltip :title="`Visit ${quest.domain}`">
-                        <b-link @click.stop="isModalCampaignDomainShown = true" class="text-white">
-                            <i class="fas fa-external-link-alt text-opaque me-0" />
-                        </b-link>
-                    </b-badge>
-                </div>
+        <div class="d-flex justify-content-between">
+            <strong class="text-success">{{ quest.title }} </strong>
+            <div class="flex-shrink-0">
+                <b-badge
+                    variant="primary"
+                    class="p-2"
+                    v-b-tooltip
+                    :title="`Created: ${quest.createdAt && format(new Date(quest.createdAt), 'dd-MM-yyyy HH:mm')}`"
+                >
+                    <i class="fas fa-clock text-opaque me-0" />
+                </b-badge>
+                <b-badge variant="primary" class="p-2 ms-1" v-b-tooltip title="Twitter Quest">
+                    <i class="fab fa-twitter text-opaque me-0" />
+                </b-badge>
+                <b-badge variant="primary" class="p-2 ms-1" v-b-tooltip :title="`Visit ${quest.domain}`">
+                    <b-link @click.stop="isModalCampaignDomainShown = true" class="text-white">
+                        <i class="fas fa-external-link-alt text-opaque me-0" />
+                    </b-link>
+                </b-badge>
             </div>
         </div>
+        <p class="mb-0">{{ quest.description }}</p>
         <template #footer>
             <b-button class="w-100" :to="`/c/${quest.poolId}`" variant="primary">
                 Earn <strong>{{ quest.amount }}</strong> points!

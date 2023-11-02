@@ -17,7 +17,12 @@
                 <b-navbar-toggle target="nav-collapse" />
                 <b-collapse id="nav-collapse" is-nav>
                     <b-navbar-nav class="ms-auto">
-                        <b-button class="me-lg-3 mb-3 mb-lg-0 px-4" variant="outline-light" to="/learn">
+                        <b-button
+                            class="me-lg-3 mb-3 mb-lg-0 px-4"
+                            variant="outline-light"
+                            href="https://docs.thx.network"
+                            target="_blank"
+                        >
                             <i class="fas fa-graduation-cap me-1"></i>
                             Learn
                         </b-button>
