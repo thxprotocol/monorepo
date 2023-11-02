@@ -61,6 +61,8 @@ declare module 'vue' {
     BCardImg: typeof import('bootstrap-vue-next')['BCardImg']
     BCardText: typeof import('bootstrap-vue-next')['BCardText']
     BCardTitle: typeof import('bootstrap-vue-next')['BCardTitle']
+    BCarousel: typeof import('bootstrap-vue-next')['BCarousel']
+    BCarouselSlide: typeof import('bootstrap-vue-next')['BCarouselSlide']
     BCol: typeof import('bootstrap-vue-next')['BCol']
     BCollapse: typeof import('bootstrap-vue-next')['BCollapse']
     BContainer: typeof import('bootstrap-vue-next')['BContainer']

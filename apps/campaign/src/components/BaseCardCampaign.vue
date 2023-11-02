@@ -1,43 +1,27 @@
 <template>
     <b-card
-        class="card-campaign text-white mb-4 cursor-pointer mb-2"
         style="cursor: pointer"
-        header-class="p-0 card-header-campaign"
-        body-class="p-0"
+        class="w-100"
+        body-class="p-0 d-flex"
         footer-class="justify-content-end d-flex px-3 py-2"
         @click.delegate="onClickCampaign"
     >
-        <BCardImg
-            v-if="campaign.backgroundImgUrl"
-            class="d-none"
-            :src="campaign.backgroundImgUrl"
-            lazy
-            v-on:decode.native="onDecode"
-        />
-        <template #header>
-            <div
-                class="d-flex flex-column align-items-center justify-content-center card-header-bg"
-                :style="{
-                    backgroundImage:
-                        isLazyLoaded && campaign.backgroundImgUrl
-                            ? `url('${campaign.backgroundImgUrl}')`
-                            : 'radial-gradient(var(--bs-primary), var(--bs-body-bg))',
-                }"
-            ></div>
-            <div class="card-header-content">
-                <b-img v-if="campaign.logoImgUrl" width="75" height="auto" class="rounded" :src="campaign.logoImgUrl" />
-
-                <b-avatar v-else class="bg-primary">
-                    <i class="far fa-question-circle m-0"></i>
-                </b-avatar>
-
-                <div class="my-2">
-                    <b-badge variant="dark" class="p-2">
-                        <i class="fas fa-users me-1"></i> {{ campaign.participants }}
-                    </b-badge>
-                </div>
-            </div>
-        </template>
+        <div
+            class="d-flex bg-dark rounded"
+            :class="{
+                'justify-content-end align-items-center': !!campaign.backgroundImgUrl,
+                'justify-content-center align-items-center': !campaign.backgroundImgUrl,
+            }"
+            :style="{
+                width: '220px',
+                height: '100px',
+                backgroundImage: `url(${campaign.backgroundImgUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+            }"
+        >
+            <BImg class="m-3 align-self-end" lazy width="100" height="auto" :src="campaign.logoImgUrl" />
+        </div>
         <b-progress
             v-if="campaign.progress > 0"
             style="height: 10px; border-radius: 0"
@@ -46,12 +30,15 @@
         >
             <b-progress-bar :value="campaign.progress" :max="100" variant="primary" />
         </b-progress>
-        <div class="d-flex align-items-start p-3">
-            <div class="flex-grow-1">
-                <strong>
-                    {{ campaign.title }}
-                    <i v-if="campaign.active" class="fas fa-check-circle text-success" />
-                </strong>
+        <div class="d-flex flex-column p-3">
+            <strong>
+                <i v-if="!campaign.active" class="fas fa-check-circle text-success me-1" />
+                {{ campaign.title }}
+            </strong>
+            <div>
+                <b-badge variant="dark" class="p-2">
+                    <i class="fas fa-users me-1"></i> {{ campaign.participants }}
+                </b-badge>
             </div>
         </div>
         <BaseModalCampaignDomain
@@ -99,7 +86,7 @@
                 variant="primary"
                 size="sm"
             >
-                <i class="fas fa-expand ms-0"></i>
+                <i class="fas fa-external-link-alt ms-0"></i>
             </b-button>
         </template>
     </b-card>

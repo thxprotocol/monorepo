@@ -7,9 +7,7 @@
                         Campaign<br />
                         Discovery
                     </h1>
-                    <p class="lead mb-4">
-                        A single spot to discover all Quest &amp; Reward campaigns for you to join.
-                    </p>
+                    <p class="lead mb-4">A single spot to discover all Quest &amp; Reward campaigns for you to join.</p>
                     <b-button @click="onClickStart" variant="primary" class="me-3 px-5">
                         Start Campaign
                         <i class="fas fa-chevron-right ms-2" />
@@ -20,26 +18,28 @@
                 </div>
             </b-col>
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
-                <b-card class="p-1">
-                    <p class="d-flex align-items-center justify-content-between">
-                        <div class="text-opaque">
-                            <i class="fas fa-star me-2" />
-                            Campaign Spotlight
-                        </div>
-                        <b-button size="sm" variant="primary" href="https://example.com">Join Campaign!</b-button>
-                    </p>
-                    <iframe
-                        width="100%"
-                        height="280"
-                        src="https://www.youtube.com/embed/ZKqkdNKb3ks?controls=0"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen
-                    ></iframe>
-                </b-card>
+                <!-- <p class="d-flex align-items-center justify-content-between">
+                    <div class="text-opaque">
+                        <i class="fas fa-trophy me-1" />
+                        Quest Spotlight
+                    </div>
+                </p> -->
+                <b-carousel indicators>
+                    <b-carousel-slide
+                        background="transparent"
+                        style="height: 380px"
+                        class="p-0"
+                        img-blank
+                        img-blank-color="primary"
+                        v-for="quest of questLists"
+                        md="3"
+                    >
+                        <BaseCardQuest :quest="quest" />
+                    </b-carousel-slide>
+                </b-carousel>
             </b-col>
         </b-row>
-        <hr class="mb-5"/>
+        <hr class="mb-5" />
     </b-container>
     <b-container class="flex-grow-1 overflow-auto order-lg-1 pt-0 pb-5">
         <b-row class="mt-5 mb-3">
@@ -47,7 +47,7 @@
                 <strong class="mb-3 mb-md-0 text-opaque">
                     <i class="fas fa-gift me-1" />
                     Campaigns
-                </strong>    
+                </strong>
             </b-col>
             <b-col xs="12" md="4">
                 <b-input-group class="mb-3 mb-md-0">
@@ -71,25 +71,58 @@
             </b-col>
         </b-row>
         <b-row :style="{ opacity: isLoadingSearch || isLoadingPage ? 0.5 : 1 }">
-            <b-col v-if="isLoading" class="justify-content-center d-flex">
-                <b-spinner small variant="primary" />
-            </b-col>
-            <b-col v-else lg="4" xl="3" :key="key" v-for="(campaign, key) of campaigns.results">
-                <BaseCardCampaign :campaign="campaign" />
-            </b-col>
-            <b-col v-if="!isLoading && !campaigns.results.length">
-                <p class="text-opaque">Could not find a campaign with that name...</p>
-            </b-col>
-        </b-row>
-        <b-row class="mt-5 mb-3">
-            <b-col md="12" class="d-flex align-items-center pb-3">
-                <strong class="mb-3 mb-md-0 text-opaque">
-                    <i class="fas fa-trophy me-1" />
-                    Quests
-                </strong>    
-            </b-col>        
-            <b-col v-for="quest of questLists" md="3">
-                <BaseCardQuest :quest="quest" />
+            <b-col>
+                <div v-if="isLoading" class="justify-content-center d-flex">
+                    <b-spinner small variant="primary" />
+                </div>
+                <p v-if="!isLoading && !campaigns.results.length" class="text-opaque">
+                    Could not find a campaign with that name...
+                </p>
+                <b-table id="table-campaigns" hover :items="campaignData">
+                    <template #head(isSubscribed)></template>
+                    <template #head(rank)></template>
+                    <template #head(logo)></template>
+
+                    <template #cell(isSubscribed)="{ item }">
+                        <i
+                            class="text-opaque fas"
+                            :class="{ 'fa-bell-slash': item.isSubscribed, 'fa-bell': !item.isSubscribed }"
+                        />
+                    </template>
+
+                    <template #cell(rank)="{ item }">
+                        <strong>#{{ item.rank }}</strong>
+                    </template>
+
+                    <template #cell(logo)="{ item }">
+                        <BImg lazy width="100" height="auto" :src="item.logo" />
+                    </template>
+
+                    <template #cell(name)="{ item }">
+                        <div>
+                            <span> {{ item.name.title }}</span>
+                            <i v-if="!item.name.active" class="fas fa-check-circle text-success ms-1" />
+                            <div></div>
+                        </div>
+                    </template>
+
+                    <template #cell(duration)="{ item }">
+                        <span class="text-opaque">{{
+                            item.duration.expiryDate ? `End: ${item.duration.expiryDate}` : 'Unlimited'
+                        }}</span>
+                        <b-progress class="bg-primary" style="height: 10px">
+                            <b-progress-bar :value="item.duration.progress" :max="100" variant="success" />
+                        </b-progress>
+                    </template>
+
+                    <template #cell(participants)="{ item }">
+                        <i class="fas fa-users me-1"></i> {{ item.participants }}
+                    </template>
+
+                    <template #cell(campaign)="{ item }">
+                        <b-button variant="primary" size="sm" :to="`/c/${item.campaign.slug}`">View Campaign</b-button>
+                    </template>
+                </b-table>
             </b-col>
         </b-row>
     </b-container>
@@ -106,6 +139,7 @@ import imgLogo from '../../assets/logo.png';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { mapStores } from 'pinia';
+import { format } from 'date-fns';
 
 export default defineComponent({
     name: 'Home',
@@ -116,8 +150,8 @@ export default defineComponent({
     },
     data(): any {
         return {
-            publicUrl: "https://www.thx.network",
-            questLists: { daily: [],invite: [],social: [],custom: [],web3: []},
+            publicUrl: 'https://www.thx.network',
+            questLists: { daily: [], invite: [], social: [], custom: [], web3: [] },
             isLoadingSearch: false,
             isLoadingPage: false,
             isAlertShown: true,
@@ -135,6 +169,24 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
+        campaignData() {
+            return this.campaigns.results.map((c: any, index: number) => ({
+                isSubscribed: c.subscribed || false,
+                rank: index + 1,
+                logo: c.logoImgUrl,
+                name: {
+                    title: c.title,
+                    active: c.active,
+                    description: c.description,
+                },
+                participants: c.participants,
+                duration: {
+                    progress: c.progress,
+                    expiryDate: c.expiryDate && format(new Date(c.expiryDate), 'dd-MM-yyyy HH:mm'),
+                },
+                campaign: c,
+            }));
+        },
     },
     async mounted() {
         await this.getCampaigns();
@@ -147,11 +199,11 @@ export default defineComponent({
             this.isLoadingPage = true;
             await this.getCampaigns();
             this.isLoadingPage = false;
-        }
+        },
     },
     methods: {
         onClickStart() {
-            window.open('https://dashboard.thx.network', '_blank')
+            window.open('https://dashboard.thx.network', '_blank');
         },
         async getCampaigns() {
             const url = new URL(API_URL);
@@ -181,26 +233,26 @@ export default defineComponent({
                 await this.getCampaigns();
                 this.isLoadingSearch = false;
             }, 1000);
-        }, 
+        },
     },
 });
 </script>
 
-<style>
+<style lang="scss">
 .pagination {
     --bs-pagination-focus-bg: var(--bs-purple-dark);
-    --bs-pagination-focus-color: rgba(255,255,255,.5);;
+    --bs-pagination-focus-color: rgba(255, 255, 255, 0.5);
     --bs-pagination-focus-border-color: var(--bs-purple-dark);
 
     --bs-pagination-hover-color: white;
     --bs-pagination-hover-bg: var(--bs-purple);
     --bs-pagination-hover-border-color: var(--bs-purple);
-    
-    --bs-pagination-color: rgba(255,255,255,.5);;
+
+    --bs-pagination-color: rgba(255, 255, 255, 0.5);
     --bs-pagination-bg: #37277b;
     --bs-pagination-border-color: #37277b;
-    
-    --bs-pagination-disabled-color: rgba(255,255,255,.25);
+
+    --bs-pagination-disabled-color: rgba(255, 255, 255, 0.25);
     --bs-pagination-disabled-bg: #37277b;
     --bs-pagination-disabled-border-color: #37277b;
 }
@@ -209,6 +261,21 @@ export default defineComponent({
 }
 .nav-pills .nav-link {
     text-transform: capitalize;
-    color: rgba(255,255,255,0.5 )
+    color: rgba(255, 255, 255, 0.5);
+}
+#table-campaigns th:nth-child(1) {
+    width: 40px;
+}
+#table-campaigns th:nth-child(2) {
+    width: 40px;
+}
+#table-campaigns th:nth-child(3) {
+    width: 120px;
+}
+#table-campaigns th:nth-child(4) {
+    width: auto;
+}
+.carousel-item > img {
+    display: none !important;
 }
 </style>
