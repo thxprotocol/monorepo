@@ -130,10 +130,10 @@ export const useAuthStore = defineStore('auth', {
                 })
                 .catch((error: Error) => {
                     console.log(error);
-                    // // Should refresh because issue could be caused by base64 state string in redirect
-                    // if (error.message === 'No matching state found in storage') {
-                    //     this.requestOAuthShareRefresh();
-                    // }
+                    // Should signout because refresh token is no longer valid
+                    if (error.message === 'grant request is invalid') {
+                        this.signout();
+                    }
                 });
         },
         async triggerLogin(requestConfig: any) {
