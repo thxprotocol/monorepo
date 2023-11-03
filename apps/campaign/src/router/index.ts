@@ -3,7 +3,9 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 async function beforeEnter(to: any, from: any, next: any) {
     const { poolId, init } = useAccountStore();
-    if (!poolId) await init(to.params.slug, to.query.origin);
+    if (!poolId) {
+        await init(to.params.slug, to.query.origin);
+    }
     next();
 }
 
@@ -11,7 +13,10 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         name: '',
-        beforeEnter,
+        beforeEnter: (to, from, next) => {
+            beforeEnter(to, from, next);
+            useAccountStore().reset();
+        },
         component: () => import(/* webpackChunkName: "discovery" */ '../views/Discovery.vue'),
         children: [
             {

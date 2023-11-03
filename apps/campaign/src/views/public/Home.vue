@@ -22,7 +22,7 @@
                     <i class="fas fa-trophy me-1" />
                     Quest Spotlight
                 </div>
-                <b-carousel fade indicators :interval="500">
+                <b-carousel fade indicators :interval="1000" ref="carouselQuests">
                     <b-carousel-slide
                         background="transparent"
                         img-blank
@@ -68,8 +68,9 @@
                     Could not find a campaign with that name...
                 </p>
                 <b-table id="table-campaigns" hover :items="campaignData" @row-clicked="onRowClicked">
-                    <template #head(rank)></template>
+                    <template #head(rank)>#</template>
                     <template #head(logo)></template>
+                    <template #head(name)></template>
                     <template #head(isSubscribed)>Notification</template>
 
                     <template #cell(isSubscribed)="{ item }">
@@ -80,7 +81,7 @@
                     </template>
 
                     <template #cell(rank)="{ item }">
-                        <strong>#{{ item.rank }}</strong>
+                        <span class="text-opaque">{{ item.rank }}</span>
                     </template>
 
                     <template #cell(logo)="{ item }">
@@ -159,8 +160,9 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         campaignData() {
-            return this.campaigns.results.map((c: any, index: number) => ({
-                rank: index + 1,
+            if (!this.campaigns.results) return [];
+            return this.campaigns.results.map((c: any) => ({
+                rank: c.rank,
                 logo: c.logoImgUrl,
                 name: {
                     title: c.title,
@@ -207,7 +209,6 @@ export default defineComponent({
             }
             const res = await fetch(url);
             const campaigns = await res.json();
-
             this.campaigns = campaigns;
         },
         async getQuests() {

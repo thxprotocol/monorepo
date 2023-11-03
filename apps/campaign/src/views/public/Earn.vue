@@ -18,71 +18,153 @@
             </b-col>
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
                 <b-card>
-                    <div class="mb-3" v-if="!pool">
-                        <b-placeholder cols="12" size="lg" class="mb-1" animation="glow" />
-                        <b-placeholder cols="12" size="lg" class="mb-2" animation="glow" />
-                        <b-placeholder cols="5" size="xs" class="mb-3" animation="glow" />
-                        <b-placeholder cols="12" size="lg" class="mb-1" animation="glow" />
-                        <b-placeholder cols="12" size="lg" class="mb-2" animation="glow" />
-                        <b-placeholder cols="10" size="xs" class="mb-3" animation="glow" />
-                        <hr />
-                        <b-placeholder cols="12" animation="glow" />
-                        <b-placeholder cols="12" animation="glow" />
-                    </div>
-                    <b-form v-else class="mb-3">
-                        <b-form-group v-for="(token, key) of tokens" class="mb-3">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <b-badge
-                                    class="p-2 d-flex align-items-center"
-                                    variant="primary"
-                                    style="font-size: 1rem; font-weight: normal"
-                                >
-                                    <b-img
-                                        width="23"
-                                        class="rounded-circle me-2"
-                                        :src="`${imgTokensUrl}${token.address}.png`"
-                                        :title="token.name"
-                                        v-b-tooltip
+                    <b-tabs pills justified content-class="mt-3" nav-wrapper-class="text-white">
+                        <b-tab title="Simple">
+                            <div class="mb-3" v-if="!pool">
+                                <b-placeholder cols="12" size="lg" class="mb-1" animation="glow" />
+                                <b-placeholder cols="12" size="lg" class="mb-2" animation="glow" />
+                                <b-placeholder cols="5" size="xs" class="mb-3" animation="glow" />
+                            </div>
+                            <b-form-group v-else>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <b-badge
+                                        class="p-2 d-flex align-items-center"
+                                        variant=" primary"
+                                        style="font-size: 1rem; font-weight: normal"
+                                    >
+                                        <b-img
+                                            width="23"
+                                            class="rounded-circle"
+                                            :src="`${imgTokensUrl}${tokens[0].address}.png`"
+                                            :title="tokens[0].name"
+                                            v-b-tooltip
+                                        />
+                                    </b-badge>
+                                    <b-form-input
+                                        min="0"
+                                        :max="Math.floor(tokens[0].myBalance)"
+                                        class="ms-3"
+                                        type="number"
+                                        v-model="amounts[0]"
+                                        style="text-align: right"
                                     />
-                                    <small class="text-opaque">{{ Number(token.weight) * 100 }}%</small>
-                                </b-badge>
-                                <b-form-input
-                                    min="0"
-                                    :max="Math.floor(token.myBalance)"
-                                    class="ms-3"
-                                    type="number"
-                                    v-model="amounts[key]"
-                                />
-                            </div>
-                            <div class="d-flex mb-1 justify-content-between mt-1 text-opaque">
-                                <div>
-                                    Balance: {{ token.myBalance }}
-                                    <span v-if="amounts[key] >= Math.floor(token.myBalance)" class="text-muted">
-                                        Maxed
-                                    </span>
                                 </div>
-                                <span> {{ toFiat(Number(amounts[key]) * token.token.latestUSDPrice) }} </span>
+                                <div class="d-flex mb-1 justify-content-between mt-1 text-opaque">
+                                    <div>
+                                        Balance: {{ tokens[0].myBalance }}
+                                        <span v-if="amounts[0] >= Math.floor(tokens[0].myBalance)" class="text-muted">
+                                            Maxed
+                                        </span>
+                                    </div>
+                                    <span> {{ toFiat(Number(amounts[0]) * tokens[0].token.latestUSDPrice) }} </span>
+                                </div>
+                                <b-progress
+                                    variant="success"
+                                    :value="amounts[0]"
+                                    :max="Math.floor(tokens[0].myBalance)"
+                                    style="height: 5px"
+                                />
+                            </b-form-group>
+                        </b-tab>
+                        <b-tab>
+                            <template #title>
+                                Advanced
+                                <i
+                                    class="fas fa-question-circle me-1"
+                                    v-b-tooltip
+                                    title="Advanced LP's may choose to adjust their investment."
+                                />
+                            </template>
+                            <div class="mb-3" v-if="!pool">
+                                <b-placeholder cols="12" size="lg" class="mb-1" animation="glow" />
+                                <b-placeholder cols="12" size="lg" class="mb-2" animation="glow" />
+                                <b-placeholder cols="5" size="xs" class="mb-3" animation="glow" />
+                                <b-placeholder cols="12" size="lg" class="mb-1" animation="glow" />
+                                <b-placeholder cols="12" size="lg" class="mb-2" animation="glow" />
+                                <b-placeholder cols="10" size="xs" class="mb-3" animation="glow" />
+                                <hr />
+                                <b-placeholder cols="12" animation="glow" />
+                                <b-placeholder cols="12" animation="glow" />
                             </div>
-                            <b-progress
-                                variant="success"
-                                :value="amounts[key]"
-                                :max="Math.floor(token.myBalance)"
-                                style="height: 5px"
+                            <b-form v-else class="mb-3">
+                                <b-form-group v-for="(token, key) of tokens" class="mb-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <b-badge
+                                            class="p-2 d-flex align-items-center"
+                                            variant=" primary"
+                                            style="font-size: 1rem; font-weight: normal"
+                                        >
+                                            <b-img
+                                                width="23"
+                                                class="rounded-circle me-2"
+                                                :src="`${imgTokensUrl}${token.address}.png`"
+                                                :title="token.name"
+                                                v-b-tooltip
+                                            />
+                                            <small class="text-opaque">{{ Number(token.weight) * 100 }}%</small>
+                                        </b-badge>
+                                        <b-form-input
+                                            min="0"
+                                            :max="Math.floor(token.myBalance)"
+                                            class="ms-3"
+                                            type="number"
+                                            v-model="amounts[key]"
+                                            style="text-align: right"
+                                        />
+                                    </div>
+                                    <div class="d-flex mb-1 justify-content-between mt-1 text-opaque">
+                                        <div>
+                                            Balance: {{ token.myBalance }}
+                                            <span v-if="amounts[key] >= Math.floor(token.myBalance)" class="text-muted">
+                                                Maxed
+                                            </span>
+                                        </div>
+                                        <span> {{ toFiat(Number(amounts[key]) * token.token.latestUSDPrice) }} </span>
+                                    </div>
+                                    <b-progress
+                                        variant="success"
+                                        :value="amounts[key]"
+                                        :max="Math.floor(token.myBalance)"
+                                        style="height: 5px"
+                                    />
+                                </b-form-group>
+                                <div class="d-flex justify-content-between text-opaque">
+                                    Price impact
+                                    <strong>
+                                        {{
+                                            preview
+                                                ? Math.floor(fromWei(String(preview.priceImpact * 100)) * 100) / 100
+                                                : 0
+                                        }}%
+                                    </strong>
+                                </div>
+                            </b-form>
+                        </b-tab>
+                    </b-tabs>
+                    <div class="d-flex justify-content-between">
+                        Total
+                        <strong>{{ preview ? toFiat(fromWei(preview.expectedBPTOut) * price) : '$0.00' }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between" v-if="apr && preview">
+                        <span>
+                            Estimated profit
+                            <i
+                                class="fas fa-question-circle ms-1 text-opaque"
+                                v-b-tooltip
+                                :title="`Estimated profit in 1 year with an APR ranging from ${apr.min / 100}% to ${
+                                    apr.max / 100
+                                }%.`"
                             />
-                        </b-form-group>
-                        <hr />
-                        <div class="d-flex justify-content-between">
-                            Total:
-                            <strong>{{ preview ? toFiat(fromWei(preview.expectedBPTOut) * price) : '$0.00' }}</strong>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            Price impact:
-                            <strong>
-                                {{ preview ? Math.floor(fromWei(String(preview.priceImpact * 100)) * 100) / 100 : 0 }}%
-                            </strong>
-                        </div>
-                    </b-form>
-                    <b-button class="w-100" :disabled="!pool" @click="joinPool" variant="primary"> Invest </b-button>
+                        </span>
+                        <span class="text-success">
+                            {{ toFiat((fromWei(preview.expectedBPTOut) * price * (apr.min / 100)) / 100) }} -
+                            {{ toFiat((fromWei(preview.expectedBPTOut) * price * (apr.max / 100)) / 100) }}
+                        </span>
+                    </div>
+                    <b-button class="w-100 mt-3" :disabled="!pool" @click="joinPool" variant="primary">
+                        Invest
+                        <strong> {{ preview ? toFiat(fromWei(preview.expectedBPTOut) * price) : '$0.00' }} </strong>
+                    </b-button>
                 </b-card>
             </b-col>
         </b-row>
@@ -187,6 +269,7 @@ export default defineComponent({
             modal: null,
             unsubscribe: null,
             isModalOpen: false,
+            isAlertDefaultShown: true,
         };
     },
     computed: {
@@ -278,6 +361,7 @@ export default defineComponent({
                     return await contract.balanceOf(walletAddress);
                 }),
             );
+            this.amounts[0] = fromWei(String(this.balances[0]));
         },
         // Gets the BAL price in order to calc the BAL rewards value
         async getBALPrice() {

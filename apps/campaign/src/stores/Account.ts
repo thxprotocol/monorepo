@@ -23,6 +23,7 @@ export const useAccountStore = defineStore('account', {
         migration: null,
         subscription: null,
         config: {},
+        sheet: null,
         isModalConnectSettingsShown: false,
         isAuthenticated: null,
         isRewardsLoaded: false,
@@ -37,18 +38,24 @@ export const useAccountStore = defineStore('account', {
             const { title, theme } = config;
             const { elements, colors } = JSON.parse(theme);
             const sheet = getStyles(elements, colors);
-
             document.title = title;
-            document.head.appendChild(sheet);
+            this.sheet = document.head.appendChild(sheet);
+        },
+        reset() {
+            this.poolId = '';
+            this.api.setPoolId('');
+            this.sheet?.remove();
         },
         getTheme() {
             return JSON.parse(this.config.theme);
         },
         async init(poolIdOrSlug: string, origin: string) {
-            this.api = new THXClient({ url: API_URL, accessToken: '', poolId: '' });
-            this.addEventListeners();
-            this.setStatus(false);
-            this.getUserData();
+            if (!this.api) {
+                this.api = new THXClient({ url: API_URL, accessToken: '', poolId: '' });
+                this.addEventListeners();
+                this.setStatus(false);
+                this.getUserData();
+            }
 
             if (poolIdOrSlug) {
                 const config = await this.api.request.get('/v1/widget/' + poolIdOrSlug);
@@ -97,9 +104,8 @@ export const useAccountStore = defineStore('account', {
         },
         async onUserLoaded(user: User) {
             const authStore = useAuthStore();
+            if (user.access_token) this.api.setAccessToken(user.access_token);
             await authStore.onUserLoadedCallback(user);
-
-            this.api.setAccessToken(user.access_token);
 
             this.getUserData();
 

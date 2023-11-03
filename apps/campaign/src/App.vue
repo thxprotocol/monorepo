@@ -45,10 +45,7 @@ export default defineComponent({
         // OAuthshare retrieved but device share and security quesiton not found
         'authStore.isSecurityQuestionAvailable'(isSecurityQuestionAvailable) {
             const { oAuthShare, isDeviceShareAvailable } = this.authStore;
-            console.log({ oAuthShare });
             if (!oAuthShare) return;
-
-            console.debug({ isDeviceShareAvailable, isSecurityQuestionAvailable });
 
             this.walletStore.isModalWalletCreateShown =
                 (isDeviceShareAvailable && !(isSecurityQuestionAvailable ?? false)) ||
