@@ -99,5 +99,8 @@
         "vitest": "^0.24.3",
         "vitest-preview": "latest",
         "vue3-jest": "^27.0.0-alpha.1"
+    },
+    "resolutions": {
+        "@achrinza/node-ipc": "9.2.5"
     }
 }

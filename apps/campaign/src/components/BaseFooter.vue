@@ -6,20 +6,20 @@
             </b-col>
             <b-col md="6">
                 <b-nav>
-                    <b-nav-item href="https://thx.network" target="_blank" link-classes="text-white text-opaque ps-0">
+                    <b-nav-item href="https://thx.network" target="_blank" link-class="text-white text-opaque ps-0">
                         &copy; 2023 THX Network
                     </b-nav-item>
                     <b-nav-item
                         href="https://thx.network/privacy-policy.pdf"
                         target="_blank"
-                        link-classes="text-white text-opaque"
+                        link-class="text-white text-opaque"
                     >
                         Privacy Policy
                     </b-nav-item>
                     <b-nav-item
                         href="https://thx.network/general-terms-and-conditions.pdf"
                         target="_blank"
-                        link-classes="text-white text-opaque"
+                        link-class="text-white text-opaque"
                     >
                         Terms of use
                     </b-nav-item>
