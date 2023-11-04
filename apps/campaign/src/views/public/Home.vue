@@ -161,22 +161,24 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         campaignData() {
             if (!this.campaigns.results) return [];
-            return this.campaigns.results.map((c: any) => ({
-                rank: c.rank,
-                logo: c.logoImgUrl,
-                name: {
-                    title: c.title,
-                    active: c.active,
-                    description: c.description,
-                    slug: c.slug,
-                },
-                participants: c.participants,
-                duration: {
-                    progress: c.progress,
-                    expiryDate: c.expiryDate && format(new Date(c.expiryDate), 'dd-MM-yyyy HH:mm'),
-                },
-                isSubscribed: c.subscribed || false,
-            }));
+            return this.campaigns.results
+                .map((c: any) => ({
+                    rank: c.rank,
+                    logo: c.logoImgUrl,
+                    name: {
+                        title: c.title,
+                        active: c.active,
+                        description: c.description,
+                        slug: c.slug,
+                    },
+                    participants: c.participants,
+                    duration: {
+                        progress: c.progress,
+                        expiryDate: c.expiryDate && format(new Date(c.expiryDate), 'dd-MM-yyyy HH:mm'),
+                    },
+                    isSubscribed: c.subscribed || false,
+                }))
+                .sort((a: any, b: any) => a.rank - b.rank);
         },
     },
     async mounted() {
