@@ -110,8 +110,16 @@ export const useAuthStore = defineStore('auth', {
             await this.userManager[isMobile ? 'signoutRedirect' : 'signoutPopup']({
                 state: { isMobile, origin: window.location.href },
                 id_token_hint: this.user.id_token,
-            });
-            this.user = null;
+            })
+                .then(() => {
+                    this.user = null;
+                })
+                .catch((error: Error) => {
+                    console.log(error);
+                    if (error.message === 'Popup closed by user') {
+                        this.user = null;
+                    }
+                });
         },
         async requestOAuthShareRefresh() {
             const { config } = useAccountStore();

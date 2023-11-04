@@ -14,8 +14,10 @@
                         <b-img :src="imgLogo" height="50" alt="" />
                     </b-link>
                 </b-navbar-brand>
-                <b-navbar-toggle target="nav-collapse" />
-                <b-collapse id="nav-collapse" is-nav>
+                <b-button variant="link" v-b-toggle="'nav-collapse'" class="d-block d-lg-none">
+                    <i class="fas fa-bars text-white"></i>
+                </b-button>
+                <b-collapse id="nav-collapse" is-nav class="pt-3">
                     <b-navbar-nav class="ms-auto">
                         <b-button
                             class="me-lg-3 mb-3 mb-lg-0 px-4"
