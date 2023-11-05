@@ -4,6 +4,19 @@
         class="d-none d-lg-block bg-splash"
         :style="{ backgroundImage: `url('${config.backgroundUrl}')` }"
     ></div>
+    <div class="px-3 p-1 bg-dark text-white d-none d-lg-flex justify-content-between">
+        <b-link to="/" class="text-white text-opaque text-decoration-none">
+            <i class="fas fa-caret-left me-1" />
+            Back
+        </b-link>
+        <div>
+            {{ config.title }}
+        </div>
+        <b-link to="/" class="text-white text-opaque text-decoration-none">
+            Next
+            <i class="fas fa-caret-right ms-1" />
+        </b-link>
+    </div>
     <div class="d-flex flex-column h-100 container-lg my-lg-3 p-0">
         <BaseNavbarSecondary class="d-flex d-lg-none" />
         <b-container
