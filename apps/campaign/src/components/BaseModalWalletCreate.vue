@@ -10,7 +10,7 @@
         <template #header>
             <h5 class="modal-title"><i class="fas fa-key me-2"></i> Complete account setup</h5>
         </template>
-        <BaseFormGroupUsername :username="accountStore.account?.username" @error="isUsernameValid = !!$event" />
+        <BaseFormGroupUsername :username="accountStore.account?.username" @error="isUsernameInvalid = !!$event" />
         <hr />
         <b-alert variant="warning" show class="p-2 px-3">
             <i class="fas fa-exclamation-circle me-2" />
@@ -46,7 +46,7 @@
         </b-form-group>
         <template #footer>
             <b-button
-                :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable || !isUsernameValid"
+                :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable || !isUsernameInvalid"
                 class="w-100"
                 variant="primary"
                 @click="onSubmitDeviceSharePasswordCreate"
@@ -80,7 +80,7 @@ export default defineComponent({
             isCreateFailed: false,
             isLoadingPasswordCreate: false,
             isLoadingReset: false,
-            isUsernameValid: false,
+            isUsernameInvalid: false,
         };
     },
     computed: {
