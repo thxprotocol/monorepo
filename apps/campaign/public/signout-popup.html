@@ -18,7 +18,7 @@
         const state = JSON.parse(localStorage.getItem(`oidc.${url.searchParams.get('state')}`));
         const mgr = new window.oidc.UserManager({});
 
-        if (state.data.isMobile) {
+        if (isMobile) {
             mgr.signoutRedirectCallback().then(() => {
                 if (window.opener) {
                     window.close();
