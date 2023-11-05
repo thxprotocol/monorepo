@@ -70,27 +70,9 @@ import { useAuthStore } from '../stores/Auth';
 import { useRewardStore } from '../stores/Reward';
 import { RewardConditionPlatform, RewardConditionInteraction } from '../types/enums/rewards';
 import { getInteractionComponent, getConnectionStatus, platformIconMap } from '../utils/social';
-import BaseCardCollapse from '../components/BaseCardCollapse.vue';
-import BaseBlockquoteTwitterTweet from './blockquote/BaseBlockquoteTwitterTweet.vue';
-import BaseBlockquoteTwitterMessage from './blockquote/BaseBlockquoteTwitterMessage.vue';
-import BaseBlockquoteTwitterUser from './blockquote/BaseBlockquoteTwitterUser.vue';
-import BaseBlockquoteYoutubeChannelSubscription from '../components/blockquote/BaseBlockquoteYoutubeChannelSubscription.vue';
-import BaseBlockquoteVideo from '../components/blockquote/BaseBlockquoteVideo.vue';
-import BaseBlockquoteDiscordServerJoin from '../components/blockquote/BaseBlockquoteDiscordServerJoin.vue';
-import BaseBlockquoteDiscordInviteUsed from '../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
 
 export default defineComponent({
     name: 'BaseCardQuestSocial',
-    components: {
-        BaseCardCollapse,
-        BaseBlockquoteYoutubeChannelSubscription,
-        BaseBlockquoteVideo,
-        BaseBlockquoteTwitterTweet,
-        BaseBlockquoteTwitterMessage,
-        BaseBlockquoteTwitterUser,
-        BaseBlockquoteDiscordServerJoin,
-        BaseBlockquoteDiscordInviteUsed,
-    },
     props: {
         reward: {
             type: Object as PropType<TQuestSocial>,

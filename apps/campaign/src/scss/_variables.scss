@@ -49,6 +49,7 @@ $grays: (
 $blue:    #0d6efd !default;
 $indigo:  #6610f2 !default;
 $purple:  #5942C1 !default;
+$purple:  #5942C1 !default;
 $purple-dark: #31236D !default;
 $purple-darker: #241956 !default;
 $pink:    #d63384 !default;
@@ -1422,7 +1423,7 @@ $modal-content-box-shadow-xs:       $box-shadow-sm !default;
 $modal-content-box-shadow-sm-up:    $box-shadow !default;
 
 $modal-backdrop-bg:                 $black !default;
-$modal-backdrop-opacity:            .5 !default;
+$modal-backdrop-opacity:            1 !default;
 
 $modal-header-border-color:         var(--#{$prefix}border-color) !default;
 $modal-header-border-width:         $modal-content-border-width !default;

@@ -47,12 +47,10 @@ import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useWalletStore } from '../../stores/Wallet';
 import { useRewardStore } from '../../stores/Reward';
-import BaseAlertWalletAddress from '../../components/BaseAlertWalletAddress.vue';
 import { validate } from 'uuid';
 
 export default defineComponent({
     name: 'ConnectWallet',
-    components: { BaseAlertWalletAddress },
     data() {
         return {
             uuid: '',

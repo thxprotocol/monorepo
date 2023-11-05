@@ -1,15 +1,17 @@
 <template>
     <b-modal
+        :id="`modal-campaign-domain-${campaign._id}`"
         class="modal-campaign-domain"
         :title="campaign.title"
-        v-model="isShown"
-        @hidden="$emit('hidden', false)"
+        @hidden="hide"
         centered
         hide-footer
+        ref="modal"
+        content-class="gradient-shadow-xl"
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-gift me-2"></i> {{ campaign.title }}</h5>
-            <b-link class="btn-close" @click="$emit('hidden', false)">
+            <b-link class="btn-close" @click="hide">
                 <i class="fas fa-times"></i>
             </b-link>
         </template>
@@ -21,6 +23,10 @@
             Continue
             <i class="fas fa-chevron-right ms-1" />
         </b-button>
+        <b-button :to="`/c/${campaign.slug}`" class="text-white w-100 text-opaque" variant="link">
+            Visit on thx.network
+            <i class="fas fa-chevron-right ms-1" />
+        </b-button>
     </b-modal>
 </template>
 
@@ -28,6 +34,7 @@
 import { defineComponent } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { track } from '@thxnetwork/mixpanel';
+import { BModalController } from 'bootstrap-vue-next';
 
 export default defineComponent({
     name: 'BaseModalERC20Transfer',
@@ -47,6 +54,9 @@ export default defineComponent({
         },
     },
     methods: {
+        hide() {
+            (this.$refs['modal'] as BModalController).hide();
+        },
         onClickContinueCampaign() {
             const { account } = useAccountStore();
             track('UserVisits', [

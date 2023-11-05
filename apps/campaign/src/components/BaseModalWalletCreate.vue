@@ -8,12 +8,14 @@
         no-close-on-esc
     >
         <template #header>
-            <h5 class="modal-title"><i class="fas fa-key me-2"></i> Create Self-Custodial Wallet</h5>
+            <h5 class="modal-title"><i class="fas fa-key me-2"></i> Complete account setup</h5>
         </template>
-        <p>
-            This question will be asked when you sign in on another device.
-            <strong>Store your answer safely!</strong>
-        </p>
+        <BaseFormGroupUsername :username="accountStore.account?.username" @error="isUsernameValid = !!$event" />
+        <hr />
+        <b-alert variant="warning" show class="p-2 px-3">
+            <i class="fas fa-exclamation-circle me-2" />
+            <span>Store your secret answer safely!</span>
+        </b-alert>
         <b-alert v-model="isAlertShown" variant="info" class="p-2 px-3">
             <i class="fas fa-exclamation-circle me-2"></i>Unable to submit your security question.
             <p class="mb-0">
@@ -21,7 +23,7 @@
                 <b-link href="" target="_blank">Contact support</b-link>
             </p>
         </b-alert>
-        <b-form-group>
+        <b-form-group description="This question will be asked when you sign in on another device.">
             <b-form-input v-model="question" placeholder="Question" />
         </b-form-group>
         <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
@@ -44,7 +46,7 @@
         </b-form-group>
         <template #footer>
             <b-button
-                :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable"
+                :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable || !isUsernameValid"
                 class="w-100"
                 variant="primary"
                 @click="onSubmitDeviceSharePasswordCreate"
@@ -52,10 +54,10 @@
                 <b-spinner small variant="light" v-if="isLoadingPasswordCreate" />
                 <template v-else> Set Security Question </template>
             </b-button>
-            <!-- <b-button variant="link" class="w-100 text-danger" @click="onSubmitReset">
+            <b-button variant="link" class="w-100 text-white" @click="onClickSignout">
                 <b-spinner small variant="light" v-if="isLoadingReset" />
-                <template v-else>Reset</template>
-            </b-button> -->
+                <template v-else>Sign out</template>
+            </b-button>
         </template>
     </b-modal>
 </template>
@@ -71,19 +73,21 @@ export default defineComponent({
     name: 'BaseModalWalletCreate',
     data() {
         return {
+            username: '',
             question: '',
             password: '',
             passwordCheck: '',
             isCreateFailed: false,
             isLoadingPasswordCreate: false,
             isLoadingReset: false,
+            isUsernameValid: false,
         };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         ...mapStores(useWalletStore),
-        isPasswordValid: function () {
+        isPasswordValid() {
             if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
             if (this.password.length && this.password.length < 10) return false;
             return undefined;
@@ -117,6 +121,10 @@ export default defineComponent({
             this.isLoadingReset = true;
             await this.authStore.resetKey();
             window.location.reload();
+        },
+        async onClickSignout() {
+            await this.accountStore.signout();
+            this.walletStore.isModalWalletCreateShown = false;
         },
     },
 });

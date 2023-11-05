@@ -37,7 +37,6 @@
 </template>
 
 <script lang="ts">
-import BaseModalERC20Transfer from '../components/BaseModalERC20Transfer.vue';
 import { defineComponent, PropType } from 'vue';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../stores/Wallet';
@@ -47,9 +46,6 @@ import { fromWei } from 'web3-utils';
 
 export default defineComponent({
     name: 'BaseCardERC20',
-    components: {
-        BaseModalERC20Transfer,
-    },
     props: {
         token: {
             type: Object as PropType<TERC20Token>,

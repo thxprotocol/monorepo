@@ -73,7 +73,6 @@ import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
 import { useAuthStore } from '../stores/Auth';
 import { intervalToDuration, sub } from 'date-fns';
-import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
 export default defineComponent({
     name: 'BaseCardQuestDaily',

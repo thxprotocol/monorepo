@@ -47,23 +47,9 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
 import { useAuthStore } from '../stores/Auth';
-import BaseBtnShareWhatsapp from '../components/BaseBtnShareWhatsapp.vue';
-import BaseBtnShareEmail from '../components/BaseBtnShareEmail.vue';
-import BaseBtnShareTwitter from '../components/BaseBtnShareTwitter.vue';
-import BaseBtnShareLinkedin from '../components/BaseBtnShareLinkedin.vue';
-import BaseBtnShareTelegram from '../components/BaseBtnShareTelegram.vue';
-import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
 export default defineComponent({
     name: 'BaseCardQuestInvite',
-    components: {
-        BaseCardCollapse,
-        BaseBtnShareWhatsapp,
-        BaseBtnShareEmail,
-        BaseBtnShareTwitter,
-        BaseBtnShareLinkedin,
-        BaseBtnShareTelegram,
-    },
     props: {
         reward: {
             type: Object as PropType<TQuestInvite>,

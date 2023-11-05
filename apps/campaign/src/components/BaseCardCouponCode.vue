@@ -30,14 +30,10 @@
 import { defineComponent, PropType } from 'vue';
 import { useWalletStore } from '../stores/Wallet';
 import { mapStores } from 'pinia';
-import BaseCardCollapse from './BaseCardCollapse.vue';
 import { useAccountStore } from '../stores/Account';
 
 export default defineComponent({
     name: 'BaseCardCustom',
-    components: {
-        BaseCardCollapse,
-    },
     props: {
         token: {
             type: Object as PropType<TCouponRewardPayment>,

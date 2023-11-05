@@ -17,21 +17,7 @@
         <b-form>
             <b-tabs justified content-class="mt-3">
                 <b-tab title="Personal" active>
-                    <b-form-group label="Username" :state="!errorUsername" :invalid-feedback="errorUsername">
-                        <b-input-group>
-                            <b-form-input
-                                v-model="username"
-                                @input="updateUsername"
-                                placeholder="johndoe1337"
-                                :state="!errorUsername"
-                            />
-                            <b-input-group-append v-if="isLoadingUsername">
-                                <b-button size="sm" variant="primary" class="px-3" :disabled="true">
-                                    <b-spinner small />
-                                </b-button>
-                            </b-input-group-append>
-                        </b-input-group>
-                    </b-form-group>
+                    <BaseFormGroupUsername :username="username" />
                 </b-tab>
                 <b-tab title="Connected">
                     <b-alert v-model="isAlertShown" variant="warning" show class="py-1 px-2">
@@ -146,22 +132,6 @@ export default defineComponent({
             const { username } = this.accountStore.account as TAccount;
             this.username = username || '';
             this.updateConnectionStatus();
-        },
-        updateUsername() {
-            const username = this.username;
-            this.isLoadingUsername = true;
-            clearTimeout(this.debounce);
-            this.debounce = setTimeout(async () => {
-                try {
-                    await this.accountStore.api.account.patch({ username: this.username });
-                    this.errorUsername = '';
-                } catch (error) {
-                    this.username = username;
-                    this.errorUsername = 'This username is already in use.';
-                } finally {
-                    this.isLoadingUsername = false;
-                }
-            }, 1000) as any;
         },
         async onClickConnect(platform: RewardConditionPlatform) {
             this.error = '';

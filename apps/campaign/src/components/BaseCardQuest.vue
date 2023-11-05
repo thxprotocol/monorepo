@@ -54,14 +54,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import BaseModalCampaignDomain from './BaseModalCampaignDomain.vue';
 import { format } from 'date-fns';
 
 export default defineComponent({
     name: 'BaseCardQuest',
-    components: {
-        BaseModalCampaignDomain,
-    },
     props: {
         quest: {
             type: Object as PropType<TBaseQuest>,

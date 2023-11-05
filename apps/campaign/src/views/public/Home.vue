@@ -22,7 +22,7 @@
                     <i class="fas fa-trophy me-1" />
                     Quest Spotlight
                 </div>
-                <b-carousel fade indicators :interval="1000" ref="carouselQuests">
+                <b-carousel fade indicators :interval="1000" ref="carouselQuests" class="gradient-shadow-xl">
                     <b-carousel-slide
                         background="transparent"
                         img-blank
@@ -71,14 +71,7 @@
                     <template #head(rank)>#</template>
                     <template #head(logo)></template>
                     <template #head(name)></template>
-                    <template #head(isSubscribed)>Notification</template>
-
-                    <template #cell(isSubscribed)="{ item }">
-                        <i
-                            class="text-opaque fas"
-                            :class="{ 'fa-bell-slash': item.isSubscribed, 'fa-bell': !item.isSubscribed }"
-                        />
-                    </template>
+                    <template #head(isSubscribed)></template>
 
                     <template #cell(rank)="{ item }">
                         <span class="text-opaque">{{ item.rank }}</span>
@@ -96,7 +89,6 @@
                         <div>
                             <span> {{ item.name.title }}</span>
                             <i v-if="!item.name.active" class="fas fa-check-circle text-success ms-1" />
-                            <div></div>
                         </div>
                     </template>
 
@@ -112,6 +104,25 @@
                     <template #cell(participants)="{ item }">
                         <i class="fas text-opaque fa-users me-1"></i> {{ item.participants }}
                     </template>
+
+                    <template #cell(domain)="{ item }">
+                        <b-button
+                            v-b-modal="`modal-campaign-domain-${item.domain.campaign._id}`"
+                            class="rounded-pill d-flex align-items-center p-0 text-white text-opaque"
+                            variant="link"
+                        >
+                            {{ item.domain.host }}
+                            <i class="fas fa-external-link-alt ms-1" />
+                        </b-button>
+                        <BaseModalCampaignDomain :campaign="item.domain.campaign" />
+                    </template>
+
+                    <template #cell(isSubscribed)="{ item }">
+                        <i
+                            class="text-opaque fas"
+                            :class="{ 'fa-bell-slash': item.isSubscribed, 'fa-bell': !item.isSubscribed }"
+                        />
+                    </template>
                 </b-table>
             </b-col>
         </b-row>
@@ -120,24 +131,16 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import BaseCardQuest from '../../components/BaseCardQuest.vue';
-import BaseCardCampaign from '../../components/BaseCardCampaign.vue';
-import BaseNavbarSecondary from '../../components/BaseNavbarSecondary.vue';
 import { API_URL } from '../../config/secrets';
-import imgJumbotron from '../../assets/thx_token_governance.webp';
-import imgLogo from '../../assets/logo.png';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { mapStores } from 'pinia';
 import { format } from 'date-fns';
+import imgJumbotron from '../../assets/thx_token_governance.webp';
+import imgLogo from '../../assets/logo.png';
 
 export default defineComponent({
     name: 'Home',
-    components: {
-        BaseCardQuest,
-        BaseCardCampaign,
-        BaseNavbarSecondary,
-    },
     data(): any {
         return {
             publicUrl: 'https://www.thx.network',
@@ -154,6 +157,7 @@ export default defineComponent({
             debouncedSearch: null,
             screenWidth: window.innerWidth,
             campaigns: { results: [], total: 0 },
+            isModalCampaignDomainShown: false,
         };
     },
     computed: {
@@ -175,6 +179,10 @@ export default defineComponent({
                     duration: {
                         progress: c.progress,
                         expiryDate: c.expiryDate && format(new Date(c.expiryDate), 'dd-MM-yyyy HH:mm'),
+                    },
+                    domain: {
+                        host: new URL(c.domain).host,
+                        campaign: c,
                     },
                     isSubscribed: c.subscribed || false,
                 }))
@@ -279,6 +287,9 @@ export default defineComponent({
 #table-campaigns th:nth-child(6) {
     width: 100px;
 }
+#table-campaigns th:nth-child(7) {
+    width: 100px;
+}
 #table-campaigns tr td {
     cursor: pointer;
 }
@@ -295,6 +306,7 @@ export default defineComponent({
     padding: 0;
     text-align: left;
 }
+
 .carousel-indicators {
     position: absolute;
     top: 0;
@@ -303,5 +315,11 @@ export default defineComponent({
     margin-top: -2rem;
     justify-content: flex-end;
     width: auto;
+
+    [data-bs-target] {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
 }
 </style>

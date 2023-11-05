@@ -71,7 +71,8 @@ export const useWalletStore = defineStore('wallet', {
         },
         list() {
             const { api } = useAccountStore();
-            const options = { chainId: this.wallet?.chainId };
+            if (!this.wallet) return;
+            const options = { chainId: this.wallet.chainId };
 
             api.erc20.list(options).then((list: TERC20Token[]) => {
                 this.erc20 = list.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' }));

@@ -110,11 +110,10 @@ import { useAuthStore } from '../../stores/Auth';
 import { useClaimStore } from '../../stores/Claim';
 import { useWalletStore } from '../../stores/Wallet';
 import ConfettiExplosion from 'vue-confetti-explosion';
-import BaseAlertWalletAddress from '../../components/BaseAlertWalletAddress.vue';
 
 export default defineComponent({
     name: 'Home',
-    components: { ConfettiExplosion, BaseAlertWalletAddress },
+    components: { ConfettiExplosion },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),

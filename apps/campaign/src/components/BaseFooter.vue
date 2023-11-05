@@ -1,12 +1,12 @@
 <template>
     <b-container class="py-3">
         <b-row>
-            <b-col md="12">
+            <b-col cols="12">
                 <hr />
             </b-col>
-            <b-col md="6">
+            <b-col cols="6">
                 <b-nav>
-                    <b-nav-item href="https://thx.network" target="_blank" link-class="text-white text-opaque ps-0">
+                    <b-nav-item href="https://thx.network" target="_blank" link-class="text-white text-opaque ps-lg-0">
                         &copy; 2023 THX Network
                     </b-nav-item>
                     <b-nav-item
@@ -25,7 +25,7 @@
                     </b-nav-item>
                 </b-nav>
             </b-col>
-            <b-col md="6">
+            <b-col cols="6">
                 <b-nav class="justify-content-end text-opaque">
                     <b-nav-item href="https://discord.com/invite/TzbbSmkE7Y" target="_blank">
                         <i class="fab fa-discord" style="color: #7289da" />

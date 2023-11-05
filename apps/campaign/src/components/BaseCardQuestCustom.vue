@@ -73,13 +73,9 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../stores/Account';
 import { useRewardStore } from '../stores/Reward';
 import { useAuthStore } from '../stores/Auth';
-import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 
 export default defineComponent({
     name: 'BaseCardQuestCustom',
-    components: {
-        BaseCardCollapse,
-    },
     props: {
         reward: {
             type: Object as PropType<TQuestCustom>,

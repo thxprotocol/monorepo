@@ -17,7 +17,7 @@
                 </div>
             </b-col>
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
-                <b-card>
+                <b-card class="gradient-shadow-xl">
                     <b-tabs pills justified content-class="mt-3" nav-wrapper-class="text-white">
                         <b-tab title="Simple">
                             <div class="mb-3" v-if="!pool">
@@ -29,7 +29,7 @@
                                 <div class="d-flex align-items-center justify-content-between">
                                     <b-badge
                                         class="p-2 d-flex align-items-center"
-                                        variant=" primary"
+                                        variant="primary"
                                         style="font-size: 1rem; font-weight: normal"
                                     >
                                         <b-img
@@ -91,7 +91,7 @@
                                     <div class="d-flex align-items-center justify-content-between">
                                         <b-badge
                                             class="p-2 d-flex align-items-center"
-                                            variant=" primary"
+                                            variant="primary"
                                             style="font-size: 1rem; font-weight: normal"
                                         >
                                             <b-img
@@ -175,10 +175,10 @@
                     <b-img width="23" class="rounded-circle" :src="`${imgTokensUrl}${token.address}.png`" />
                 </template>
                 <b-badge
-                    class="p-2"
-                    :class="!key && 'ms-2 text-dark'"
-                    :variant="!key ? 'white' : 'link'"
                     v-for="(token, key) of item.tokens"
+                    :variant="!key ? 'white' : 'link'"
+                    :class="{ 'ms-2 text-dark': !key, 'bg-white': !key }"
+                    class="p-2"
                 >
                     {{ token.symbol }} <small>{{ Number(token.weight) * 100 }}%</small>
                 </b-badge>

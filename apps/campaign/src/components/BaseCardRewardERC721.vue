@@ -36,16 +36,10 @@ import { useAccountStore } from '../stores/Account';
 import { usePerkStore } from '../stores/Perk';
 import { useWalletStore } from '../stores/Wallet';
 import { useAuthStore } from '../stores/Auth';
-import BaseModalRewardPayment from './BaseModalRewardPayment.vue';
-import BaseCardReward from './BaseCardReward.vue';
 import { format, formatDistance } from 'date-fns';
 
 export default defineComponent({
     name: 'BaseCardRewardNFT',
-    components: {
-        BaseModalRewardPayment,
-        BaseCardReward,
-    },
     data() {
         return { format, id: 'modalERC721PerkPayment', error: '', isModalShown: false, isSubmitting: false };
     },

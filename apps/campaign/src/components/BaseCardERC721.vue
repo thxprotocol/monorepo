@@ -106,8 +106,6 @@
 import { defineComponent, PropType } from 'vue';
 import { useWalletStore } from '../stores/Wallet';
 import { mapStores } from 'pinia';
-import BaseCardCollapse from './BaseCardCollapse.vue';
-import BaseModalERC721Transfer from './BaseModalERC721Transfer.vue';
 import poll from 'promise-poller';
 import { NFTVariant } from '../types/enums/nft';
 import { useAccountStore } from '../stores/Account';
@@ -115,10 +113,6 @@ import { toast } from '../utils/toast';
 
 export default defineComponent({
     name: 'BaseCardERC721',
-    components: {
-        BaseCardCollapse,
-        BaseModalERC721Transfer,
-    },
     props: {
         token: {
             type: Object as PropType<TERC721Token>,

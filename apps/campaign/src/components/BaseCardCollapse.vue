@@ -59,13 +59,9 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
-import BaseModalQuestEntry from '../components/BaseModalQuestEntry.vue';
 
 export default defineComponent({
     name: 'BaseCardCollapse',
-    components: {
-        BaseModalQuestEntry,
-    },
     props: {
         id: String,
         image: String,

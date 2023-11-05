@@ -101,7 +101,6 @@ import { useAuthStore } from '../stores/Auth';
 import { useRewardStore } from '../stores/Reward';
 import { getModal } from '../utils/wallet-connect';
 import { chainList, getAddressURL } from '../utils/chains';
-import BaseCardCollapse from '../components/BaseCardCollapse.vue';
 import { getAccount, GetAccountResult, PublicClient } from '@wagmi/core';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import { Web3Modal } from '@web3modal/html';
@@ -109,9 +108,6 @@ import { signMessage } from '@wagmi/core';
 
 export default defineComponent({
     name: 'BaseCardQuestSocial',
-    components: {
-        BaseCardCollapse,
-    },
     props: {
         reward: {
             type: Object as PropType<TQuestWeb3>,

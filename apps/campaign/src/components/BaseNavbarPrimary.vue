@@ -34,12 +34,8 @@ import { useRewardStore } from '../stores/Reward';
 import { useWalletStore } from '../stores/Wallet';
 import { usePerkStore } from '../stores/Perk';
 import { decodeHTML } from '../utils/decode-html';
-import BaseNavbarSecondary from '../components/BaseNavbarSecondary.vue';
 
 export default defineComponent({
-    components: {
-        BaseNavbarSecondary,
-    },
     data(): any {
         return { decodeHTML };
     },

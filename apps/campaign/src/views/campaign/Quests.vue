@@ -56,33 +56,13 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useRewardStore } from '../../stores/Reward';
 import { useAccountStore } from '../../stores/Account';
-import BaseCardQuestInvite from '../../components/BaseCardQuestInvite.vue';
-import BaseCardQuestSocial from '../../components/BaseCardQuestSocial.vue';
-import BaseCardQuestCustom from '../../components/BaseCardQuestCustom.vue';
-import BaseCardQuestDaily from '../../components/BaseCardQuestDaily.vue';
-import BaseCardQuestWeb3 from '../../components/BaseCardQuestWeb3.vue';
-import BaseModalCampaignExpired from '../../components/BaseModalCampaignExpired.vue';
-import BaseQuestFilters from '../../components/BaseQuestFilters.vue';
-import BaseQuestLeaderboard from '../../components/BaseQuestLeaderboard.vue';
 import { useWalletStore } from '../../stores/Wallet';
 import { usePerkStore } from '../../stores/Perk';
 import { RewardSortVariant } from '../../types/enums/rewards';
 import { filterAvailableMap, rewardComponentMap, sortMap } from '../../utils/quests';
-import BaseModalQuestEntry from '../../components/BaseModalQuestEntry.vue';
 
 export default defineComponent({
     name: 'Quests',
-    components: {
-        BaseQuestFilters,
-        BaseQuestLeaderboard,
-        BaseCardQuestInvite,
-        BaseCardQuestSocial,
-        BaseCardQuestCustom,
-        BaseCardQuestDaily,
-        BaseCardQuestWeb3,
-        BaseModalCampaignExpired,
-        BaseModalQuestEntry,
-    },
     data(): any {
         return {
             rewardComponentMap,

@@ -100,16 +100,10 @@ import { useWalletStore } from '../stores/Wallet';
 import { usePerkStore } from '../stores/Perk';
 import { decodeHTML } from '../utils/decode-html';
 import { AccountVariant } from '../types/enums/accountVariant';
-import BaseModalPoolSubscription from '../components/BaseModalPoolSubscription.vue';
-import BaseModalConnectSettings from '../components/BaseModalConnectSettings.vue';
 import { getIsMobile } from '../utils/user-agent';
 
 export default defineComponent({
     name: 'BaseNavbarSecondary',
-    components: {
-        BaseModalConnectSettings,
-        BaseModalPoolSubscription,
-    },
     data(): any {
         return {
             AccountVariant,

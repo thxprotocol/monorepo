@@ -15,19 +15,9 @@ import { mapStores } from 'pinia';
 import { useAuthStore } from './stores/Auth';
 import { useAccountStore } from './stores/Account';
 import { useWalletStore } from './stores/Wallet';
-import BaseModalWalletCreate from './components/BaseModalWalletCreate.vue';
-import BaseModalWalletSettings from './components/BaseModalWalletSettings.vue';
-import BaseModalWalletRecovery from './components/BaseModalWalletRecovery.vue';
-import BaseModalConnectSettings from './components/BaseModalConnectSettings.vue';
 import './scss/main.scss';
 
 export default defineComponent({
-    components: {
-        BaseModalConnectSettings,
-        BaseModalWalletCreate,
-        BaseModalWalletSettings,
-        BaseModalWalletRecovery,
-    },
     data() {
         return {
             isModalConnectSettingsShown: false,

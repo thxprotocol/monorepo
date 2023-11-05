@@ -199,9 +199,9 @@ export const useAuthStore = defineStore('auth', {
                 await tKey.modules.webStorage.inputShareFromWebStorage(); // 2/2 flow
                 this.isDeviceShareAvailable = true;
                 console.debug('Successfully asserted device share.');
-            } catch (error) {
+            } catch (error: unknown) {
                 this.isDeviceShareAvailable = false;
-                console.error((error as Error).toString());
+                console.log(error);
             }
         },
         async getSecurityQuestion() {
@@ -211,7 +211,7 @@ export const useAuthStore = defineStore('auth', {
                 console.debug('Successfully got security question.');
             } catch (error) {
                 this.isSecurityQuestionAvailable = false;
-                console.error((error as Error).toString());
+                console.log(error);
             }
         },
         async createDeviceShare(question: string, answer: string) {
@@ -239,7 +239,7 @@ export const useAuthStore = defineStore('auth', {
                         error: (error as Error).toString(),
                     },
                 ]);
-                console.error((error as Error).toString());
+                console.log(error);
             }
         },
         async updateDeviceShare(answer: string, question: string) {

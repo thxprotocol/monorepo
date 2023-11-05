@@ -36,14 +36,8 @@ import { useRewardStore } from '../stores/Reward';
 import { useWalletStore } from '../stores/Wallet';
 import { usePerkStore } from '../stores/Perk';
 import { initGTM } from '../utils/ga';
-import BaseNavbarPrimary from '../components/BaseNavbarPrimary.vue';
-import BaseNavbarSecondary from '../components/BaseNavbarSecondary.vue';
 
 export default defineComponent({
-    components: {
-        BaseNavbarPrimary,
-        BaseNavbarSecondary,
-    },
     data() {
         return {
             isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,

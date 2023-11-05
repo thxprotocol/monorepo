@@ -38,6 +38,7 @@ declare module 'vue' {
     BaseCardRewardERC20: typeof import('./src/components/BaseCardRewardERC20.vue')['default']
     BaseCardRewardERC721: typeof import('./src/components/BaseCardRewardERC721.vue')['default']
     BaseFooter: typeof import('./src/components/BaseFooter.vue')['default']
+    BaseFormGroupUsername: typeof import('./src/components/BaseFormGroupUsername.vue')['default']
     BaseModalCampaignDomain: typeof import('./src/components/BaseModalCampaignDomain.vue')['default']
     BaseModalCampaignExpired: typeof import('./src/components/BaseModalCampaignExpired.vue')['default']
     BaseModalConnectSettings: typeof import('./src/components/BaseModalConnectSettings.vue')['default']
@@ -106,6 +107,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
   }
   export interface ComponentCustomProperties {
+    vBModal: typeof import('bootstrap-vue-next')['vBModal']
     vBToggle: typeof import('bootstrap-vue-next')['vBToggle']
     vBTooltip: typeof import('bootstrap-vue-next')['vBTooltip']
   }
