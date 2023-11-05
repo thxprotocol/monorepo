@@ -46,7 +46,7 @@
         </b-form-group>
         <template #footer>
             <b-button
-                :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable || !isUsernameInvalid"
+                :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable || isUsernameInvalid"
                 class="w-100"
                 variant="primary"
                 @click="onSubmitDeviceSharePasswordCreate"
