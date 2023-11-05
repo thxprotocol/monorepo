@@ -41,9 +41,16 @@
                             </b-button>
                         </template>
                         <template v-else>
-                            <b-nav-item-dropdown v-if="accountStore.account" end no-caret>
+                            <b-nav-item-dropdown end no-caret>
                                 <template #button-content>
-                                    <b-avatar variant="light" :src="accountStore.account.profileImg" />
+                                    <b-avatar
+                                        v-if="accountStore.account"
+                                        variant="light"
+                                        :src="accountStore.account.profileImg"
+                                    />
+                                    <div class="d-inline-flex align-items-center" v-else style="height: 40px">
+                                        <b-spinner variant="light" small />
+                                    </div>
                                 </template>
                                 <BDropdownItem @click="accountStore.isModalConnectSettingsShown = true">
                                     Profile
@@ -53,7 +60,6 @@
                                 </BDropdownItem>
                                 <BDropdownItem @click="authStore.signout()">Sign Out</BDropdownItem>
                             </b-nav-item-dropdown>
-                            <b-spinner v-else variant="light" small />
                         </template>
                     </b-navbar-nav>
                 </b-collapse>

@@ -22,12 +22,12 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: '/',
                 name: 'home',
-                component: () => import(/* webpackChunkName: "home" */ '../views/public/Home.vue'),
+                component: () => import(/* webpackChunkName: "home" */ '../views/discovery/Home.vue'),
             },
             {
                 path: '/earn',
                 name: 'earn',
-                component: () => import(/* webpackChunkName: "earn" */ '../views/public/Earn.vue'),
+                component: () => import(/* webpackChunkName: "earn" */ '../views/discovery/Earn.vue'),
             },
         ],
     },

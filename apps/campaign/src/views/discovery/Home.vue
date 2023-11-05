@@ -22,16 +22,18 @@
                     <i class="fas fa-trophy me-1" />
                     Quest Spotlight
                 </div>
-                <b-carousel fade indicators :interval="1000" ref="carouselQuests" class="gradient-shadow-xl">
-                    <b-carousel-slide
-                        background="transparent"
-                        img-blank
-                        img-blank-color="primary"
-                        v-for="quest of questLists"
-                    >
-                        <BaseCardQuest :quest="quest" />
-                    </b-carousel-slide>
-                </b-carousel>
+                <b-card style="min-height: 352px" body-class="p-0" class="border-0">
+                    <b-carousel fade indicators :interval="1000" ref="carouselQuests" class="gradient-shadow-xl">
+                        <b-carousel-slide
+                            background="transparent"
+                            img-blank
+                            img-blank-color="primary"
+                            v-for="quest of questLists"
+                        >
+                            <BaseCardQuest :quest="quest" />
+                        </b-carousel-slide>
+                    </b-carousel>
+                </b-card>
             </b-col>
         </b-row>
         <hr class="my-5" />
@@ -49,7 +51,7 @@
                     <b-form-input placeholder="Search..." v-model="search" @input="onInputSearch" />
                 </b-input-group>
             </b-col>
-            <b-col xs="12" md="6" offset="2" class="d-flex align-items-center justify-content-end">
+            <b-col xs="12" md="6" offset-md="2" class="d-flex align-items-center justify-content-end">
                 <b-pagination
                     v-model="page"
                     :per-page="limit"

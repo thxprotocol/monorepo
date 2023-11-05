@@ -17,7 +17,7 @@
                 </div>
             </b-col>
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
-                <b-card class="gradient-shadow-xl">
+                <b-card class="border-0 gradient-shadow-xl" style="min-height: 264px">
                     <b-tabs pills justified content-class="mt-3" nav-wrapper-class="text-white">
                         <b-tab title="Simple">
                             <div class="mb-3" v-if="!pool">

@@ -10,7 +10,7 @@
             Back
         </b-link>
         <div class="text-opaque">{{ config.title }}</div>
-        <b-link to="/" class="text-white text-opaque text-decoration-none">
+        <b-link disabled to="/" class="text-white text-opaque text-decoration-none">
             Next
             <i class="fas fa-caret-right ms-1" />
         </b-link>
