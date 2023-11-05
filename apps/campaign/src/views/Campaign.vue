@@ -96,36 +96,17 @@ export default defineComponent({
             const localOrigin = origin && new URL(origin).origin;
             if (event.origin !== localOrigin) return;
 
-            switch (event.data.message) {
-                case 'thx.iframe.navigate': {
-                    this.onWidgetNavigate(event.data.path);
-                    break;
-                }
-                case 'thx.iframe.show': {
-                    this.onWidgetShow(origin, event.data.isShown);
-                    break;
-                }
-                case 'thx.config.ref': {
-                    this.onInviteQuestUpdate(event.data.ref);
-                    break;
-                }
-                case 'thx.referral.claim.create': {
-                    this.onInviteQuestComplete(event.data.uuid);
-                    break;
-                }
-                case 'thx.auth.signout': {
-                    this.onSignout();
-                    break;
-                }
-                case 'thx.auth.signin': {
-                    this.onSignin();
-                    break;
-                }
-                case 'thx.quests.list': {
-                    this.onQuestsList();
-                    break;
-                }
-            }
+            const mapMessage: { [message: string]: () => void } = {
+                'thx.iframe.navigate': () => this.onWidgetNavigate(event.data.path),
+                'thx.iframe.show': () => this.onWidgetShow(origin, event.data.isShown),
+                'thx.config.ref': () => this.onInviteQuestUpdate(event.data.ref),
+                'thx.referral.claim.create': () => this.onInviteQuestComplete(event.data.uuid),
+                'thx.auth.signout': () => this.onSignout,
+                'thx.auth.signin': () => this.onSignin,
+                'thx.quests.list': () => this.onQuestsList,
+            };
+
+            mapMessage[event.data.message]();
         },
         onQuestsList() {
             this.rewardsStore.list();
