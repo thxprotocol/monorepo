@@ -4,14 +4,12 @@
         class="d-none d-lg-block bg-splash"
         :style="{ backgroundImage: `url('${config.backgroundUrl}')` }"
     ></div>
-    <div class="px-3 p-1 bg-dark text-white d-none d-lg-flex justify-content-between">
+    <div v-if="!isIframe" class="px-3 p-1 bg-dark text-white d-none d-lg-flex justify-content-between">
         <b-link to="/" class="text-white text-opaque text-decoration-none">
             <i class="fas fa-caret-left me-1" />
             Back
         </b-link>
-        <div>
-            {{ config.title }}
-        </div>
+        <div class="text-opaque">{{ config.title }}</div>
         <b-link to="/" class="text-white text-opaque text-decoration-none">
             Next
             <i class="fas fa-caret-right ms-1" />
@@ -57,6 +55,7 @@ export default defineComponent({
             isModalPoolSubscriptionShown: false,
             isModalWalletAccessShown: false,
             isRefreshing: false,
+            isIframe: window.self !== window.top,
             error: '',
             screenWidth: window.innerWidth,
         };

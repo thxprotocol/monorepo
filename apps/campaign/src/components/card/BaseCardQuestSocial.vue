@@ -1,0 +1,159 @@
+<template>
+    <BaseCardCollapse
+        :info-links="reward.infoLinks"
+        :visible="!!authStore.oAuthShare && !reward.isClaimed"
+        @modal-close="isModalQuestEntryShown = false"
+        :id="reward._id"
+        :loading="isSubmitting"
+        :completing="isModalQuestEntryShown"
+        :amount="reward.amount"
+        :error="error"
+        :image="reward.image"
+        @cancel="onCancel"
+    >
+        <template #header>
+            <div v-if="reward.platform" class="d-flex align-items-center justify-content-center" style="width: 25px">
+                <i :class="platformIconMap[reward.platform]" class="me-2 text-primary"></i>
+            </div>
+            <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
+            <div class="text-accent fw-bold">{{ reward.amount }}</div>
+        </template>
+
+        <b-card-text v-if="reward.description">
+            {{ reward.description }}
+        </b-card-text>
+
+        <component :is="getInteractionComponent(reward.interaction)" :reward="reward" />
+
+        <template #button>
+            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
+                Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
+            </b-button>
+
+            <b-button v-else-if="reward.isClaimed" variant="primary" block class="w-100" disabled>
+                Quest Completed
+            </b-button>
+
+            <BButtonGroup block class="w-100" v-else-if="reward.platform && !isConnected">
+                <b-button variant="primary" @click="onClickConnect" :disabled="isSubmitting">
+                    <template v-if="isSubmitting">
+                        <b-spinner small class="me-1" />
+                        Connecting platform...
+                    </template>
+                    <template v-else>
+                        Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
+                    </template>
+                </b-button>
+                <BButton v-if="isSubmitting" @click="onClickCancel" variant="primary" style="max-width: 40px">
+                    <i class="fas fa-times text-opaque" />
+                </BButton>
+            </BButtonGroup>
+
+            <b-button v-else variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
+                <template v-if="isSubmitting">
+                    <b-spinner small></b-spinner>
+                    Adding points...
+                </template>
+                <template v-else>
+                    Claim <strong>{{ reward.amount }} points</strong>
+                </template>
+            </b-button>
+        </template>
+    </BaseCardCollapse>
+</template>
+
+<script lang="ts">
+import { mapStores } from 'pinia';
+import { defineComponent, PropType } from 'vue';
+import { useAccountStore } from '../../stores/Account';
+import { useAuthStore } from '../../stores/Auth';
+import { useRewardStore } from '../../stores/Reward';
+import { RewardConditionPlatform, RewardConditionInteraction } from '../../types/enums/rewards';
+import { getInteractionComponent, getConnectionStatus, platformIconMap } from '../../utils/social';
+import BaseBlockquoteTwitterTweet from '../blockquote/BaseBlockquoteTwitterTweet.vue';
+import BaseBlockquoteTwitterMessage from '../blockquote/BaseBlockquoteTwitterMessage.vue';
+import BaseBlockquoteTwitterUser from '../blockquote/BaseBlockquoteTwitterUser.vue';
+import BaseBlockquoteYoutubeChannelSubscription from '../../components/blockquote/BaseBlockquoteYoutubeChannelSubscription.vue';
+import BaseBlockquoteVideo from '../../components/blockquote/BaseBlockquoteVideo.vue';
+import BaseBlockquoteDiscordServerJoin from '../../components/blockquote/BaseBlockquoteDiscordServerJoin.vue';
+import BaseBlockquoteDiscordInviteUsed from '../../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
+
+export default defineComponent({
+    name: 'BaseCardQuestSocial',
+    components: {
+        BaseBlockquoteYoutubeChannelSubscription,
+        BaseBlockquoteVideo,
+        BaseBlockquoteTwitterTweet,
+        BaseBlockquoteTwitterMessage,
+        BaseBlockquoteTwitterUser,
+        BaseBlockquoteDiscordServerJoin,
+        BaseBlockquoteDiscordInviteUsed,
+    },
+    props: {
+        reward: {
+            type: Object as PropType<TQuestSocial>,
+            required: true,
+        },
+    },
+    data: function (): any {
+        return {
+            error: '',
+            isSubmitting: false,
+            RewardConditionPlatform,
+            RewardConditionInteraction,
+            getInteractionComponent,
+            platformIconMap,
+            tooltipContent: 'Copy URL',
+            isModalQuestEntryShown: false,
+        };
+    },
+    computed: {
+        ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
+        ...mapStores(useRewardStore),
+        isConnected() {
+            const { account } = useAccountStore();
+            if (!account || !this.reward) return;
+
+            return getConnectionStatus(account, this.reward.platform);
+        },
+    },
+    methods: {
+        onClickCancel() {
+            this.isSubmitting = false;
+        },
+        onClickSignin: function () {
+            this.accountStore.signin();
+        },
+        onClickClaim: async function () {
+            try {
+                this.error = '';
+                this.isSubmitting = true;
+                this.isModalQuestEntryShown = true;
+                await this.rewardsStore.completeSocialQuest(this.reward._id);
+            } catch (error) {
+                const err = error as Error;
+                this.error = err.message ? err.message : 'Could not claim points.';
+                console.error(error);
+            } finally {
+                this.isSubmitting = false;
+            }
+        },
+        onClickConnect: async function () {
+            try {
+                this.error = '';
+                this.isSubmitting = true;
+                this.accountStore.connect(this.reward.platform);
+
+                await this.accountStore.waitForConnectionStatus(this.reward.platform);
+            } catch (error) {
+                this.error = 'Could not connect platform.';
+                console.error(error);
+                await this.accountStore.getAccount();
+            } finally {
+                this.isSubmitting = false;
+            }
+        },
+    },
+});
+</script>

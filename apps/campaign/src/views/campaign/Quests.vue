@@ -14,7 +14,7 @@
                         <template #title>
                             Available
                             <sup v-if="availableQuestCount">
-                                <b-badge class="px-1 py-1" variant="danger">
+                                <b-badge class="px-1 py-1 text-white" variant="danger">
                                     {{ availableQuestCount }}
                                 </b-badge>
                             </sup>
@@ -60,11 +60,11 @@ import { useWalletStore } from '../../stores/Wallet';
 import { usePerkStore } from '../../stores/Perk';
 import { RewardSortVariant } from '../../types/enums/rewards';
 import { filterAvailableMap, rewardComponentMap, sortMap } from '../../utils/quests';
-import BaseCardQuestInvite from '../../components/BaseCardQuestInvite.vue';
-import BaseCardQuestSocial from '../../components/BaseCardQuestSocial.vue';
-import BaseCardQuestCustom from '../../components/BaseCardQuestCustom.vue';
-import BaseCardQuestDaily from '../../components/BaseCardQuestDaily.vue';
-import BaseCardQuestWeb3 from '../../components/BaseCardQuestWeb3.vue';
+import BaseCardQuestInvite from '../../components/card/BaseCardQuestInvite.vue';
+import BaseCardQuestSocial from '../../components/card/BaseCardQuestSocial.vue';
+import BaseCardQuestCustom from '../../components/card/BaseCardQuestCustom.vue';
+import BaseCardQuestDaily from '../../components/card/BaseCardQuestDaily.vue';
+import BaseCardQuestWeb3 from '../../components/card/BaseCardQuestWeb3.vue';
 
 export default defineComponent({
     name: 'Quests',

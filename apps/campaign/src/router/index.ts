@@ -27,7 +27,7 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: '/earn',
                 name: 'earn',
-                component: () => import(/* webpackChunkName: "home" */ '../views/public/Earn.vue'),
+                component: () => import(/* webpackChunkName: "earn" */ '../views/public/Earn.vue'),
             },
         ],
     },
