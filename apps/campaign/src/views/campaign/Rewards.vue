@@ -18,9 +18,19 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { usePerkStore } from '../../stores/Perk';
 import { useAccountStore } from '../../stores/Account';
+import BaseCardRewardERC20 from '../../components/BaseCardRewardERC20.vue';
+import BaseCardRewardERC721 from '../../components/BaseCardRewardERC721.vue';
+import BaseCardRewardCustom from '../../components/BaseCardRewardCustom.vue';
+import BaseCardRewardCoupon from '../../components/BaseCardRewardCoupon.vue';
 
 export default defineComponent({
     name: 'Rewards',
+    components: {
+        BaseCardRewardERC20,
+        BaseCardRewardERC721,
+        BaseCardRewardCustom,
+        BaseCardRewardCoupon,
+    },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(usePerkStore),

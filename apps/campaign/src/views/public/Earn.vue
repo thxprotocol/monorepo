@@ -248,7 +248,6 @@ function toFiat(amount: number | string) {
 
 export default defineComponent({
     name: 'Earn',
-    components: {},
     data(): { pool: Pool | null; modal: Web3Modal | null; account: GetAccountResult<PublicClient> | null } & any {
         return {
             fromWei,

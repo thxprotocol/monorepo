@@ -60,9 +60,21 @@ import { useWalletStore } from '../../stores/Wallet';
 import { usePerkStore } from '../../stores/Perk';
 import { RewardSortVariant } from '../../types/enums/rewards';
 import { filterAvailableMap, rewardComponentMap, sortMap } from '../../utils/quests';
+import BaseCardQuestInvite from '../../components/BaseCardQuestInvite.vue';
+import BaseCardQuestSocial from '../../components/BaseCardQuestSocial.vue';
+import BaseCardQuestCustom from '../../components/BaseCardQuestCustom.vue';
+import BaseCardQuestDaily from '../../components/BaseCardQuestDaily.vue';
+import BaseCardQuestWeb3 from '../../components/BaseCardQuestWeb3.vue';
 
 export default defineComponent({
     name: 'Quests',
+    components: {
+        BaseCardQuestInvite,
+        BaseCardQuestSocial,
+        BaseCardQuestCustom,
+        BaseCardQuestDaily,
+        BaseCardQuestWeb3,
+    },
     data(): any {
         return {
             rewardComponentMap,

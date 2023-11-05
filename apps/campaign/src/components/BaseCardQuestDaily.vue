@@ -76,9 +76,6 @@ import { intervalToDuration, sub } from 'date-fns';
 
 export default defineComponent({
     name: 'BaseCardQuestDaily',
-    components: {
-        BaseCardCollapse,
-    },
     props: {
         visible: {
             type: Boolean,
