@@ -2984,7 +2984,7 @@
   resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.1.21.tgz#20c3cef0df280b24bc8e619712ca19e4fc6a7b68"
   integrity sha512-8F/aDZHVt2giBQBaLczC9NqU5VLaZjlkdpHIHAexXrbXr5FpHyiUeg4tyqQtT6Qm6VmFPkD3f+1Jj7bDDJefTw==
 
-"@tkey/common-types@^11.0.3":
+"@tkey/common-types@^11.0.0", "@tkey/common-types@^11.0.3":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@tkey/common-types/-/common-types-11.0.3.tgz#9c666ae67d8cfa4f01e1f1dc9a12077d32e22a28"
   integrity sha512-GW3wMKMnl0WTvg4Hsk5F1HjvYe1mK1XtDSXmvX0mM8+SVc36AhHfSVZqnKfpZB2Y0e+HZVLMnt5/3xSps1hsvg==
@@ -2997,7 +2997,7 @@
     serialize-error "^8.1.0"
     ts-custom-error "^3.3.1"
 
-"@tkey/core@^11.0.3":
+"@tkey/core@^11.0.0":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@tkey/core/-/core-11.0.3.tgz#871697c9404bee1903d7d11090b0fd8a2b471821"
   integrity sha512-fI4a3qs2TqwCReDoFDboLjpbt+uhA02JBIsyLjDpUQUYHGPJAi8tvDYg+eBkav1H6boIcrVeWNDelUji6yIWsA==
@@ -3010,22 +3010,31 @@
     elliptic "^6.5.4"
     json-stable-stringify "^1.0.2"
 
-"@tkey/default@11.0.3":
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/@tkey/default/-/default-11.0.3.tgz#7e932eb47555e58219fee836a32578f1eed951ff"
-  integrity sha512-7m3ORwAUina5Fn+cjJdlSqLGSE4SX/a9Am2blTpFeUhkfkvg7gSLElbc+4T0UqaRTnCRouaeDCkZBZ/vjmoY5A==
+"@tkey/default@11.0.0":
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/@tkey/default/-/default-11.0.0.tgz#43d41d0386d76799b5d1d34cfe6f878f61a4e78a"
+  integrity sha512-hlHW5rzIblk0DWwtv0hCMRiMEIfOgiPnZtOVuy9uVp1fChAEO2VZ4jOtzZ05vqvsX6uV7LB9aw0jJ+VhCYFzag==
   dependencies:
-    "@tkey/common-types" "^11.0.3"
-    "@tkey/core" "^11.0.3"
-    "@tkey/security-questions" "^11.0.3"
-    "@tkey/service-provider-base" "^11.0.3"
-    "@tkey/service-provider-torus" "^11.0.3"
-    "@tkey/share-serialization" "^11.0.3"
-    "@tkey/share-transfer" "^11.0.3"
-    "@tkey/storage-layer-torus" "^11.0.3"
+    "@tkey/common-types" "^11.0.0"
+    "@tkey/core" "^11.0.0"
+    "@tkey/security-questions" "^11.0.0"
+    "@tkey/service-provider-base" "^11.0.0"
+    "@tkey/service-provider-torus" "^11.0.0"
+    "@tkey/share-serialization" "^11.0.0"
+    "@tkey/share-transfer" "^11.0.0"
+    "@tkey/storage-layer-torus" "^11.0.0"
     bn.js "^5.2.1"
 
-"@tkey/security-questions@11.0.3", "@tkey/security-questions@^11.0.3":
+"@tkey/security-questions@11.0.0":
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/@tkey/security-questions/-/security-questions-11.0.0.tgz#75b1a0ad747cf513fae4c56f2219ed762ea2c9dc"
+  integrity sha512-RqwsNo1tOJnB313PEnFv0J8DeUwEPqtIf6kMWnOLLtPEG7Xy2dz/sGeGbRxD3NaT56UNUrlsI8SPTbaeHj1fCg==
+  dependencies:
+    "@tkey/common-types" "^11.0.0"
+    bn.js "^5.2.1"
+    ethereum-cryptography "^2.1.2"
+
+"@tkey/security-questions@^11.0.0":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@tkey/security-questions/-/security-questions-11.0.3.tgz#f46520db0b20874697d4aeaa3e4ac64d4c5f5941"
   integrity sha512-GB00Hd72IouwQmXJIUmbHP2/3D/pc6zREUy7Fr29zYcsfjGuvqIb40OaRkKYcnoVy7gC5TqAyEWBFE3pLArwCg==
@@ -3034,7 +3043,7 @@
     bn.js "^5.2.1"
     ethereum-cryptography "^2.1.2"
 
-"@tkey/service-provider-base@^11.0.3":
+"@tkey/service-provider-base@^11.0.0", "@tkey/service-provider-base@^11.0.3":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@tkey/service-provider-base/-/service-provider-base-11.0.3.tgz#fc2144dda378a1405fee10c00ac3a81b6f087b00"
   integrity sha512-7pmvqBg08viPoPbFKhfGvz3JqDSOuCHknG58bPWfbXXjOOQol2vnJK1INIblEQyxlRn8IMA+MP9mU4cNX7+96g==
@@ -3043,7 +3052,7 @@
     bn.js "^5.2.1"
     elliptic "^6.5.4"
 
-"@tkey/service-provider-torus@^11.0.3":
+"@tkey/service-provider-torus@^11.0.0":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@tkey/service-provider-torus/-/service-provider-torus-11.0.3.tgz#2a9b05fd9e18071660a53ec5a83de6c195d0e437"
   integrity sha512-IYGZ5LATifTsPSes4PuX8oicxurBsG0sF80+WnLjID9LqNO10jdm3W25SWukzHXCUbB23xJ0/7vaT4792X8QLw==
@@ -3055,7 +3064,7 @@
     bn.js "^5.2.1"
     elliptic "^6.5.4"
 
-"@tkey/share-serialization@^11.0.3":
+"@tkey/share-serialization@^11.0.0":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@tkey/share-serialization/-/share-serialization-11.0.3.tgz#9a5f807f70b4880d1c52910e5bb4b30227668877"
   integrity sha512-Cj9oka2DKndtnPrU0S1T3G+88fki17a2e/+CY4yZCClne2B25luwdABQt8CPtXjkdl64Vj+T/vzKlQpSejbDAQ==
@@ -3064,7 +3073,7 @@
     bn.js "^5.2.1"
     ethereum-cryptography "^2.1.2"
 
-"@tkey/share-transfer@^11.0.3":
+"@tkey/share-transfer@^11.0.0":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@tkey/share-transfer/-/share-transfer-11.0.3.tgz#5545c1c0c0c28df7711d016057ee33231824da7e"
   integrity sha512-mUqYiVPXRz1VOqUtVZjexc8OGKMpQ8cF8YBGoO4YyzgAgAOoQQa0l+oGp/LXKQryBeILvAZInIsEhSR7q2RUzw==
@@ -3074,7 +3083,7 @@
     "@toruslabs/http-helpers" "^5.0.0"
     bn.js "^5.2.1"
 
-"@tkey/storage-layer-torus@^11.0.3":
+"@tkey/storage-layer-torus@^11.0.0":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@tkey/storage-layer-torus/-/storage-layer-torus-11.0.3.tgz#2706bd4d579c290dffc26dedba2b56b906469add"
   integrity sha512-CucQSKHLq0/lkJV7Sz/9CX23HR7+NALsWxQl4LACoM1eYJwGmywVec031PKUnxgLBo1COYHLtjQY7OUk0JVT3Q==
@@ -3086,13 +3095,13 @@
     ethereum-cryptography "^2.1.2"
     json-stable-stringify "^1.0.2"
 
-"@tkey/web-storage@11.0.3":
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/@tkey/web-storage/-/web-storage-11.0.3.tgz#87d8ea91d4f53aa3c4ffd24b34455a2f6f8862c0"
-  integrity sha512-tEaDiX+mPKY+3NT74a7ZHX6OLbi4iPS0AIw5AXp+fNAmq/CXb6zNpHbuUd6yVoyTy0f/lfP/PzAgYUZDe9jhqQ==
+"@tkey/web-storage@11.0.0":
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/@tkey/web-storage/-/web-storage-11.0.0.tgz#3e2550069edd6b66bcdfb402ac1d63c7e9ef88de"
+  integrity sha512-wpYDh1srqepxQFuIXRMphYCsDsJ3yA+nIwAyn29lRpGHSPZwVetuXA55cgEDaC46WPMYVDBr5QWBPdi9SBMJsQ==
   dependencies:
-    "@tkey/common-types" "^11.0.3"
-    "@types/bn.js" "^5.1.2"
+    "@tkey/common-types" "^11.0.0"
+    "@types/bn.js" "^5.1.1"
     bn.js "^5.2.1"
 
 "@tootallnate/once@2":
@@ -3253,13 +3262,6 @@
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-5.1.1.tgz#b51e1b55920a4ca26e9285ff79936bbdec910682"
   integrity sha512-qNrYbZqMx0uJAfKnKclPh+dTwK33KfLHYqtyODwd5HnXOjnkhc4qgn3BrK6RWyGZm5+sIFE7Q7Vz6QQtJB7w7g==
-  dependencies:
-    "@types/node" "*"
-
-"@types/bn.js@^5.1.2":
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-5.1.4.tgz#0853d5f92dfdbc8fe1ae60700411a60845fa7d27"
-  integrity sha512-ZtBd9L8hVtoBpPMSWfbwjC4dhQtJdlPS+e1A0Rydb7vg7bDcUwiRklPx24sMYtXcmAMST/k0Wze7JLbNU/5SkA==
   dependencies:
     "@types/node" "*"
 
