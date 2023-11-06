@@ -90,7 +90,7 @@
                     <template #cell(name)="{ item }">
                         <div>
                             <span> {{ item.name.title }}</span>
-                            <i v-if="!item.name.active" class="fas fa-check-circle text-success ms-1" />
+                            <i v-if="item.name.active" class="fas fa-check-circle text-success ms-1" />
                         </div>
                     </template>
 
