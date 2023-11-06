@@ -14,7 +14,12 @@
                     backgroundPosition: 'center center',
                 }"
             >
-                <BImg lazy width="100" height="auto" :src="logoImage" class="m-3" />
+                <BImg
+                    lazy
+                    :src="logoImage"
+                    class="m-3"
+                    style="width: auto; height: auto; max-width: 200px; max-height: 75px"
+                />
             </div>
         </template>
         <div class="d-flex justify-content-between">

@@ -104,6 +104,9 @@ export function getStyles(elements: any, colors: any) {
             '--bs-nav-tabs-link-active-bg': theme.elements.bodyBg,
             '--bs-nav-tabs-link-active-border-color': theme.elements.btnBg,
         },
+        '.gradient-border-xl': {
+            '--thx-gradient-border': `linear-gradient(-45deg, ${theme.elements.btnBg}, ${theme.elements.bodyBg}, ${theme.elements.btnBg})`,
+        },
     };
 
     const sheet = document.createElement('style');

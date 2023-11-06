@@ -96,23 +96,3 @@ export default defineComponent({
     },
 });
 </script>
-<style>
-.gradient-shadow:before {
-    content: '';
-    position: absolute;
-    inset: -15px; /* control the spread */
-    z-index: -1; /* place the element behind */
-    background: linear-gradient(-45deg, rgb(162, 0, 255), rgb(52, 17, 177));
-    filter: blur(15px); /* control the blur */
-}
-
-.gradient-shadow-xl:before {
-    content: '';
-    position: absolute;
-    inset: -35px; /* control the spread */
-    z-index: -1; /* place the element behind */
-    background: linear-gradient(-45deg, rgb(162, 0, 255), #5942c1, rgb(52, 17, 177));
-    filter: blur(35px); /* control the blur */
-    opacity: 0.75;
-}
-</style>

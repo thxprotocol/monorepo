@@ -3,12 +3,23 @@ import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
 import { QuestVariant } from '../types/enums/rewards';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
+import { filterAvailableMap } from '../utils/quests';
 
 export const useRewardStore = defineStore('rewards', {
     state: (): TQuestState => ({
         quests: [],
         leaderboard: [],
     }),
+    getters: {
+        available: (state) => {
+            return state.quests.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q));
+        },
+        availablePoints: (state) => {
+            return state.quests
+                .filter((q: TBaseQuest) => filterAvailableMap[q.variant](q))
+                .reduce((total, item: any) => (Number(total || 0) + Number(item.amount || item.amounts[0])) as any);
+        },
+    },
     actions: {
         async completeWeb3Quest(uuid: string, payload: { signature: string; message: string; chainId: ChainId }) {
             const { api, account, getBalance, poolId, config } = useAccountStore();

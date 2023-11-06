@@ -89,7 +89,7 @@
 
                     <template #cell(name)="{ item }">
                         <div>
-                            <span> {{ item.name.title }}</span>
+                            <span> {{ decodeHTML(item.name.title) }}</span>
                             <i v-if="item.name.active" class="fas fa-check-circle text-success ms-1" />
                         </div>
                     </template>
@@ -140,11 +140,13 @@ import { mapStores } from 'pinia';
 import { format } from 'date-fns';
 import imgJumbotron from '../../assets/thx_token_governance.webp';
 import imgLogo from '../../assets/logo.png';
+import { decodeHTML } from '../../utils/decode-html';
 
 export default defineComponent({
     name: 'Home',
     data(): any {
         return {
+            decodeHTML,
             publicUrl: 'https://www.thx.network',
             questLists: { daily: [], invite: [], social: [], custom: [], web3: [] },
             isLoadingSearch: false,
@@ -276,6 +278,7 @@ export default defineComponent({
 }
 #table-campaigns td:nth-child(2) {
     padding: 0px !important;
+    text-align: center;
 }
 #table-campaigns th:nth-child(3) {
     width: auto;

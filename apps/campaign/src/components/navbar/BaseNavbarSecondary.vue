@@ -5,7 +5,7 @@
         </div>
         <b-link
             @click="onClickRefresh"
-            class="pl-3 py-2 p-lg-0 m-lg-0 text-center text-decoration-none"
+            class="pl-3 py-2 p-lg-0 m-lg-0 text-center text-decoration-none d-block d-lg-none"
             v-if="authStore.oAuthShare && rewardsStore.quests.length"
         >
             <div class="text-accent h1 m-0 d-flex align-items-center">
@@ -26,28 +26,17 @@
             />
         </div>
         <div style="width: 120px; text-align: right">
-            <template
+            <!-- <template
                 v-if="
                     authStore.oAuthShare &&
                     rewardsStore.quests.length &&
                     ['home', 'quests'].includes(String($route.name))
                 "
             >
-                <b-button variant="link" @click="isModalPoolSubscriptionShown = true">
-                    <i class="fas" :class="{ 'fa-bell-slash': isSubscribed, 'fa-bell': !isSubscribed }"></i>
-                    <BaseModalPoolSubscription
-                        id="pool-subscription"
-                        @subscribe="onSubmitSubscription($event)"
-                        @unsubscribe="onSubmitUnsubscription"
-                        @hidden="isModalPoolSubscriptionShown = false"
-                        :show="isModalPoolSubscriptionShown"
-                        :error="error"
-                    />
-                </b-button>
                 <b-button variant="link" v-b-toggle.collapse-filters @click.prevent>
                     <i class="fas fa-sliders-h"></i>
                 </b-button>
-            </template>
+            </template> -->
             <b-button v-if="authStore.oAuthShare && !rewardsStore.quests.length" variant="link" @click="onClickRefresh">
                 <b-spinner v-if="isRefreshing" small variant="white" />
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
@@ -110,7 +99,6 @@ export default defineComponent({
             decodeHTML,
             error: '',
             isRefreshing: false,
-            isModalPoolSubscriptionShown: false,
         };
     },
     computed: {
@@ -119,10 +107,6 @@ export default defineComponent({
         ...mapStores(useRewardStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
-        isSubscribed() {
-            const { subscription } = useAccountStore();
-            return !!subscription;
-        },
         walletAddress() {
             const { wallet } = useWalletStore();
             if (!wallet || !wallet.address) return '';
@@ -136,18 +120,6 @@ export default defineComponent({
         },
     },
     methods: {
-        async onSubmitSubscription(email: string) {
-            try {
-                await this.accountStore.subscribe(email);
-                this.isModalPoolSubscriptionShown = false;
-            } catch (error) {
-                this.error = 'This e-mail is used by someone else.';
-            }
-        },
-        async onSubmitUnsubscription() {
-            await this.accountStore.unsubscribe();
-            this.isModalPoolSubscriptionShown = false;
-        },
         async onClickSignin() {
             this.accountStore.signin();
         },

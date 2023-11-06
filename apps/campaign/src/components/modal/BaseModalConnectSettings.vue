@@ -17,8 +17,58 @@
         <b-form>
             <b-tabs justified content-class="mt-3">
                 <b-tab title="Personal" active>
-                    <BaseFormGroupUsername :username="username" />
+                    <b-form-group class="text-center">
+                        <b-form-file
+                            v-model="profileImgFile"
+                            @input="onChangeProfileImg"
+                            accept="image/*"
+                            size="sm"
+                            class="d-none"
+                        >
+                            <template #label>
+                                <b-avatar
+                                    size="80"
+                                    class="gradient-border-xl"
+                                    :src="profileImg"
+                                    :text="username.substring(0, 1)"
+                                    variant="primary"
+                                />
+                            </template>
+                        </b-form-file>
+                        <br />
+                        <b-link
+                            v-if="!profileImg.includes('https://api.dicebear.com') || profileImgFile"
+                            @click="onClickRemovePicture"
+                            class="text-danger small"
+                        >
+                            Remove
+                        </b-link>
+                    </b-form-group>
+                    <BaseFormGroupUsername :username="username" class="mb-3" />
+                    <b-form-group label="E-mail" :state="isEmailValid" class="mb-3">
+                        <b-form-input
+                            v-model="email"
+                            @change="accountStore.update({ email })"
+                            type="email"
+                            :state="isEmailValid"
+                            placeholder="E-mail"
+                        />
+                    </b-form-group>
+                    <b-alert show variant="info" class="p-2 px-3" v-model="isAlertNotificationsShown">
+                        <i class="fas fa-bell me-2" />You are receiving e-mail notifications when new quests are
+                        published.
+                    </b-alert>
+                    <b-form-group class="mb-0">
+                        <b-form-checkbox
+                            variant="link"
+                            :checked="!!accountStore.subscription"
+                            @change="onChangeSubscription"
+                        >
+                            Quest notifications
+                        </b-form-checkbox>
+                    </b-form-group>
                 </b-tab>
+
                 <b-tab title="Connected">
                     <b-alert v-model="isAlertShown" variant="warning" show class="py-1 px-2">
                         <i class="fas fa-exclamation-circle me-2"></i>
@@ -90,6 +140,9 @@ export default defineComponent({
             platformIconMap,
             RewardConditionPlatform,
             username: '',
+            email: '',
+            profileImg: '',
+            profileImgFile: null,
             platforms: {
                 [RewardConditionPlatform.YouTube]: {
                     platform: RewardConditionPlatform.YouTube,
@@ -120,8 +173,14 @@ export default defineComponent({
         platforms() {
             return {};
         },
+        isAlertNotificationsShown() {
+            return !!this.accountStore.subscription;
+        },
         isErrorShown() {
             return !!this.error;
+        },
+        isEmailValid: function () {
+            return !!this.email;
         },
     },
     props: {
@@ -132,10 +191,23 @@ export default defineComponent({
         },
     },
     methods: {
+        async onChangeProfileImg(event: any) {
+            const profileImg = await this.accountStore.upload(event.target.files[0]);
+            this.accountStore.update({ profileImg });
+            this.profileImg = profileImg;
+            this.profileImgFile = null;
+        },
+        onClickRemovePicture() {
+            this.accountStore.update({ profileImg: '' });
+            this.profileImg = '';
+            this.profileImgFile = null;
+        },
         async onShow() {
             await this.accountStore.getAccount();
-            const { username } = this.accountStore.account as TAccount;
+            const { username, email, profileImg } = this.accountStore.account as TAccount;
             this.username = username || '';
+            this.email = email || '';
+            this.profileImg = profileImg || '';
             this.updateConnectionStatus();
         },
         async onClickConnect(platform: RewardConditionPlatform) {
@@ -181,6 +253,14 @@ export default defineComponent({
                     platformKey,
                 );
                 this.platforms[platform].isSubmitting = false;
+            }
+        },
+        async onChangeSubscription(isChecked: any) {
+            if (!isChecked) return await this.accountStore.unsubscribe();
+            try {
+                await this.accountStore.subscribe();
+            } catch (error) {
+                this.error = 'This e-mail is used by someone else.';
             }
         },
     },

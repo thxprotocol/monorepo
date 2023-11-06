@@ -12,6 +12,7 @@ import { RewardConditionPlatform } from '../types/enums/rewards';
 import { User } from 'oidc-client-ts';
 import { AccountVariant } from '../types/enums/accountVariant';
 import poll from 'promise-poller';
+import { decodeHTML } from '../utils/decode-html';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -38,7 +39,7 @@ export const useAccountStore = defineStore('account', {
             const { title, theme } = config;
             const { elements, colors } = JSON.parse(theme);
             const sheet = getStyles(elements, colors);
-            document.title = title;
+            document.title = decodeHTML(title) as string;
             this.sheet = document.head.appendChild(sheet);
         },
         reset() {
@@ -123,7 +124,10 @@ export const useAccountStore = defineStore('account', {
             const { balance } = await this.api.pointBalance.list();
             this.balance = balance;
         },
-        async subscribe(email: string) {
+        async subscribe() {
+            const email = this.account?.email;
+            if (!email) return;
+
             this.subscription = await this.api.pools.subscription.post({ poolId: this.poolId, email });
 
             track('UserCreates', [
@@ -133,7 +137,11 @@ export const useAccountStore = defineStore('account', {
             ]);
         },
         async unsubscribe() {
-            await this.api.pools.subscription.delete(this.poolId);
+            try {
+                await this.api.pools.subscription.delete(this.poolId);
+            } catch (error) {
+                // No-op as delete is throwing due to missing json response (not a problem though)
+            }
             this.subscription = null;
 
             track('UserCreates', [
@@ -237,8 +245,33 @@ export const useAccountStore = defineStore('account', {
             // Patch the account with the MPC address
             const authRequestMessage = 'validate_account_address_ownership';
             const authRequestSignature = await authStore.sign(authRequestMessage);
-            await this.api.account.patch({ authRequestMessage, authRequestSignature });
+            await this.update({ authRequestMessage, authRequestSignature });
             if (this.account) this.account.address = authStore.wallet.address;
+        },
+        async update(
+            payload: Partial<{
+                email: string;
+                profileImg: string;
+                authRequestMessage: string;
+                authRequestSignature: string;
+            }>,
+        ) {
+            await this.api.account.patch(payload);
+            this.account = { ...this.account, ...(payload as any) };
+        },
+        async upload(file: File) {
+            const body = new FormData();
+            body.append('file', file);
+
+            const res = await fetch(API_URL + '/v1/upload', {
+                method: 'PUT',
+                body: body,
+                headers: {
+                    Authorization: `Bearer ${useAuthStore().user?.access_token}`,
+                },
+            });
+            const { publicUrl } = await res.json();
+            return publicUrl;
         },
     },
 });

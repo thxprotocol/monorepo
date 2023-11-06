@@ -13,14 +13,9 @@
         </b-card-text>
 
         <b-input-group v-if="authStore.oAuthShare">
-            <b-form-input :model-value="referralUrl" />
+            <b-form-input :model-value="inviteUrl" />
             <b-input-group-append>
-                <b-button
-                    size="sm"
-                    variant="primary"
-                    v-clipboard:copy="referralUrl"
-                    v-clipboard:success="onCopySuccess"
-                >
+                <b-button size="sm" variant="primary" v-clipboard:copy="inviteUrl" v-clipboard:success="onCopySuccess">
                     <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
                     <i v-else class="fas fa-clipboard px-2"></i>
                 </b-button>
@@ -31,12 +26,12 @@
             Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
         </b-button>
 
-        <div v-if="authStore.oAuthShare && referralUrl" class="pt-2">
-            <BaseBtnShareTwitter :url="referralUrl" text="Please have a look at this:" class="me-2" />
-            <BaseBtnShareLinkedin :url="referralUrl" class="me-2" />
-            <BaseBtnShareWhatsapp :url="referralUrl" class="me-2" />
-            <BaseBtnShareTelegram :url="referralUrl" text="Please have a look at this!" class="me-2" />
-            <BaseBtnShareEmail :url="referralUrl" subject="Please have a look at this!" class="me-2" />
+        <div v-if="authStore.oAuthShare && inviteUrl" class="pt-2">
+            <BaseBtnShareTwitter :url="inviteUrl" text="Please have a look at this:" class="me-2" />
+            <BaseBtnShareLinkedin :url="inviteUrl" class="me-2" />
+            <BaseBtnShareWhatsapp :url="inviteUrl" class="me-2" />
+            <BaseBtnShareTelegram :url="inviteUrl" text="Please have a look at this!" class="me-2" />
+            <BaseBtnShareEmail :url="inviteUrl" subject="Please have a look at this!" class="me-2" />
         </div>
     </BaseCardCollapse>
 </template>
@@ -57,20 +52,19 @@ export default defineComponent({
         },
     },
     data() {
-        return {
-            isCopied: false,
-        };
+        return { isCopied: false };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
-        referralUrl() {
-            const { config, account, poolId } = useAccountStore();
-            if (!account || !this.reward) return '';
-            if (!config.origin) return '';
-            const hash = window.btoa(JSON.stringify({ sub: account.sub, poolId, uuid: this.reward.uuid }));
-            const url = new URL(`${config.origin}/${this.reward.pathname || ''}`);
+        inviteUrl() {
+            const accountStore = useAccountStore();
+            if (!accountStore.account || !this.reward) return '';
+            const hash = window.btoa(
+                JSON.stringify({ sub: accountStore.account.sub, poolId: accountStore.poolId, uuid: this.reward.uuid }),
+            );
+            const url = new URL(`${accountStore.config.domain}/${this.reward.pathname || ''}`);
             url.searchParams.append('ref', hash);
             return url.toString();
         },

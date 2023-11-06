@@ -1,5 +1,5 @@
 <template>
-    <b-form-group label="Choose a nickname" :state="!errorUsername" :invalid-feedback="errorUsername" class="mb-0">
+    <b-form-group label="Nickname" :state="!errorUsername" :invalid-feedback="errorUsername" class="mb-0">
         <b-input-group>
             <b-form-input :value="username" @input="updateUsername" placeholder="johndoe1337" :state="!errorUsername" />
             <b-input-group-append v-if="isLoadingUsername">

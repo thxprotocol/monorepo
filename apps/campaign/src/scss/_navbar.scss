@@ -1,13 +1,18 @@
 .bg-splash {
-    z-index: -1;
-    height: 40vh;
+    border-radius: 0.375rem;
+    min-height: 250px;
     width: 100%;
-    position: absolute;
-    top: 0;
+    border: 0;
+    position: relative;
     background-size: cover;
     background-position: center center;
+    
+    .card-body {
+        z-index:1;
+    }
 
-    &:after {
+    &:before {
+        z-index:0;
         content: '';
         display: block;
         position: absolute;

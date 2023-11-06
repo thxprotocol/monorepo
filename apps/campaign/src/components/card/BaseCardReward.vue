@@ -26,7 +26,7 @@
             <div class="d-flex pb-3">
                 <div class="d-flex align-items-center">
                     <span class="card-text me-1"> Price: </span>
-                    <b-badge variant="primary" class="ms-1 p-1 text-start bg-primary">
+                    <b-badge variant="primary" class="ms-1 p-1 bg-primary">
                         <span class="text-accent">
                             <template v-if="price && price > 0"> {{ price }} {{ priceCurrency }} </template>
                             <template v-else> {{ pointPrice }}</template>
@@ -35,7 +35,7 @@
                 </div>
                 <div class="d-flex align-items-center ms-auto" v-if="progress && progress.limit">
                     <span class="card-text me-1"> Supply: </span>
-                    <b-badge variant="primary" class="ms-1 p-1 px-2">
+                    <b-badge variant="primary" class="ms-1 p-1 px-2 bg-primary">
                         <span
                             :class="{
                                 'text-danger': progressPercentage >= 0.9,

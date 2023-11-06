@@ -32,8 +32,7 @@
                 style="width: 40px; height: 40px"
                 class="m-1 d-flex flex-column align-items-center justify-content-center"
                 :variant="key < reward.claims.length ? 'success' : 'primary'"
-                :class="key < reward.claims.length ? 'text-white' : 'text-white'"
-                :key="key"
+                :class="key < reward.claims.length ? 'bg-success text-white' : 'bg-primary text-white'"
                 v-for="(amount, key) of reward.amounts"
             >
                 <small>Day {{ key + 1 }}</small>
