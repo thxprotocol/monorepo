@@ -23,7 +23,7 @@
                             <component
                                 v-if="quest"
                                 :is="rewardComponentMap[quest.variant]"
-                                :reward="quest"
+                                :quest="quest"
                                 class="mb-2 mx-lg-0 my-lg-3"
                             />
                         </div>
@@ -37,7 +37,7 @@
                         <div :class="{ 'd-none': !quest.isHidden }" :key="key" v-for="(quest, key) of quests">
                             <component
                                 :is="rewardComponentMap[quest.variant]"
-                                :reward="quest"
+                                :quest="quest"
                                 class="mb-2 mx-lg-0 my-lg-3"
                             />
                         </div>

@@ -1,47 +1,47 @@
 <template>
     <BaseCardCollapse
-        :info-links="reward.infoLinks"
-        :visible="!!authStore.oAuthShare && !reward.isClaimed"
+        :quest="quest"
+        :info-links="quest.infoLinks"
+        :visible="!!authStore.oAuthShare && !quest.isClaimed"
         @modal-close="isModalQuestEntryShown = false"
-        :id="reward._id"
+        :id="quest._id"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="reward.amount"
+        :amount="quest.amount"
         :error="error"
-        :image="reward.image"
-        @cancel="onCancel"
+        :image="quest.image"
     >
         <template #header>
-            <div v-if="reward.platform" class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i :class="platformIconMap[reward.platform]" class="me-2 text-primary"></i>
+            <div v-if="quest.platform" class="d-flex align-items-center justify-content-center" style="width: 25px">
+                <i :class="platformIconMap[quest.platform]" class="me-2 text-primary"></i>
             </div>
-            <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
-            <div class="text-accent fw-bold">{{ reward.amount }}</div>
+            <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
+            <div class="text-accent fw-bold">{{ quest.amount }}</div>
         </template>
 
-        <b-card-text v-if="reward.description">
-            {{ reward.description }}
+        <b-card-text v-if="quest.description">
+            {{ quest.description }}
         </b-card-text>
 
-        <component :is="getInteractionComponent(reward.interaction)" :reward="reward" />
+        <component :is="getInteractionComponent(quest.interaction)" :reward="quest" />
 
         <template #button>
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
-                Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
+                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
-            <b-button v-else-if="reward.isClaimed" variant="primary" block class="w-100" disabled>
+            <b-button v-else-if="quest.isClaimed" variant="primary" block class="w-100" disabled>
                 Quest Completed
             </b-button>
 
-            <BButtonGroup block class="w-100" v-else-if="reward.platform && !isConnected">
+            <BButtonGroup block class="w-100" v-else-if="quest.platform && !isConnected">
                 <b-button variant="primary" @click="onClickConnect" :disabled="isSubmitting">
                     <template v-if="isSubmitting">
                         <b-spinner small class="me-1" />
                         Connecting platform...
                     </template>
                     <template v-else>
-                        Connect <strong>{{ RewardConditionPlatform[reward.platform] }}</strong>
+                        Connect <strong>{{ RewardConditionPlatform[quest.platform] }}</strong>
                     </template>
                 </b-button>
                 <BButton v-if="isSubmitting" @click="onClickCancel" variant="primary" style="max-width: 40px">
@@ -55,7 +55,7 @@
                     Adding points...
                 </template>
                 <template v-else>
-                    Claim <strong>{{ reward.amount }} points</strong>
+                    Claim <strong>{{ quest.amount }} points</strong>
                 </template>
             </b-button>
         </template>
@@ -90,12 +90,12 @@ export default defineComponent({
         BaseBlockquoteDiscordInviteUsed,
     },
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestSocial>,
             required: true,
         },
     },
-    data: function (): any {
+    data() {
         return {
             error: '',
             isSubmitting: false,
@@ -113,24 +113,23 @@ export default defineComponent({
         ...mapStores(useRewardStore),
         isConnected() {
             const { account } = useAccountStore();
-            if (!account || !this.reward) return;
-
-            return getConnectionStatus(account, this.reward.platform);
+            if (!account) return;
+            return getConnectionStatus(account as any, this.quest.platform);
         },
     },
     methods: {
         onClickCancel() {
             this.isSubmitting = false;
         },
-        onClickSignin: function () {
+        onClickSignin() {
             this.accountStore.signin();
         },
-        onClickClaim: async function () {
+        async onClickClaim() {
             try {
                 this.error = '';
                 this.isSubmitting = true;
                 this.isModalQuestEntryShown = true;
-                await this.rewardsStore.completeSocialQuest(this.reward._id);
+                await this.rewardsStore.completeSocialQuest(this.quest._id);
             } catch (error) {
                 const err = error as Error;
                 this.error = err.message ? err.message : 'Could not claim points.';
@@ -143,9 +142,9 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
-                this.accountStore.connect(this.reward.platform);
+                this.accountStore.connect(this.quest.platform);
 
-                await this.accountStore.waitForConnectionStatus(this.reward.platform);
+                await this.accountStore.waitForConnectionStatus(this.quest.platform);
             } catch (error) {
                 this.error = 'Could not connect platform.';
                 console.error(error);

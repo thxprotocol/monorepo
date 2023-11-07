@@ -13,6 +13,9 @@
             >
                 <slot name="header"></slot>
                 <div>
+                    <b-link v-b-tooltip :title="`Ends in ${expiryDate}`" size="sm" class="ms-2" v-if="expiryDate">
+                        <i class="fas fa-clock text-primary" />
+                    </b-link>
                     <b-dropdown
                         v-if="infoLinks && infoLinks.length"
                         variant="link"
@@ -59,6 +62,7 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
+import { formatDistance } from 'date-fns';
 
 export default defineComponent({
     name: 'BaseCardCollapse',
@@ -72,9 +76,18 @@ export default defineComponent({
         error: String,
         amount: Number,
         infoLinks: { type: Object as PropType<{ label: string; url: string }[]>, required: false },
+        quest: { required: true, type: Object as PropType<TBaseQuest> },
     },
     data: function () {
         return { isVisible: false };
+    },
+    computed: {
+        expiryDate() {
+            if (!this.quest.expiryDate) return '';
+            return formatDistance(new Date(this.quest.expiryDate), new Date(), {
+                addSuffix: false,
+            });
+        },
     },
     mounted() {
         this.isVisible = window.innerWidth > 768 || this.visible;

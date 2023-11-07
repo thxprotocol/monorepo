@@ -27,6 +27,7 @@ type TBaseQuest = {
     createdAt: string;
     updatedAt: string;
     isHidden: boolean;
+    expiryDate: Date;
 };
 
 type TAnyQuest = (TQuestSocial | TQuestCustom | TQuestInvite | TQuestDaily | TQuestWeb3) & { isClaimed: boolean };

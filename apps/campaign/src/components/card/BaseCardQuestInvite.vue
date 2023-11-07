@@ -1,15 +1,15 @@
 <template>
-    <BaseCardCollapse :quest="reward" :image="reward.image" :visible="!!authStore.oAuthShare">
+    <BaseCardCollapse :quest="quest" :image="quest.image" :visible="!!authStore.oAuthShare">
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fas fa-comments me-2 text-primary"></i>
             </div>
-            <div class="flex-grow-1">{{ reward.title }}</div>
-            <div class="text-accent fw-bold">{{ reward.amount }}</div>
+            <div class="flex-grow-1">{{ quest.title }}</div>
+            <div class="text-accent fw-bold">{{ quest.amount }}</div>
         </template>
 
         <b-card-text>
-            {{ reward.description }}
+            {{ quest.description }}
         </b-card-text>
 
         <b-input-group v-if="authStore.oAuthShare">
@@ -23,7 +23,7 @@
         </b-input-group>
 
         <b-button v-else variant="primary" block class="w-100" @click="onClickClaim">
-            Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
+            Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
         </b-button>
 
         <div v-if="authStore.oAuthShare && inviteUrl" class="pt-2">
@@ -46,25 +46,24 @@ import { useAuthStore } from '../../stores/Auth';
 export default defineComponent({
     name: 'BaseCardQuestInvite',
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestInvite>,
             required: true,
         },
     },
-    data() {
+    data(): { isCopied: boolean } {
         return { isCopied: false };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
-        inviteUrl() {
+        inviteUrl(): string {
             const accountStore = useAccountStore();
-            if (!accountStore.account || !this.reward) return '';
-            const hash = window.btoa(
-                JSON.stringify({ sub: accountStore.account.sub, poolId: accountStore.poolId, uuid: this.reward.uuid }),
-            );
-            const url = new URL(`${accountStore.config.domain}/${this.reward.pathname || ''}`);
+            if (!accountStore.account) return '';
+            const payload = { sub: accountStore.account.sub, poolId: accountStore.poolId, uuid: this.quest.uuid };
+            const hash = window.btoa(JSON.stringify(payload));
+            const url = new URL(`${accountStore.config.domain}/${this.quest.pathname || ''}`);
             url.searchParams.append('ref', hash);
             return url.toString();
         },

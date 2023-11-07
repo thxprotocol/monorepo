@@ -1,31 +1,32 @@
 <template>
     <BaseCardCollapse
         @modal-close="isModalQuestEntryShown = false"
-        :id="reward._id"
+        :quest="quest"
+        :id="quest._id"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="reward.amount"
+        :amount="quest.amount"
         :error="error"
-        :image="reward.image"
-        :info-links="reward.infoLinks"
-        :visible="!!authStore.oAuthShare && !reward.isClaimed"
+        :image="quest.image"
+        :info-links="quest.infoLinks"
+        :visible="!!authStore.oAuthShare && !quest.isClaimed"
     >
         <template #header>
-            <div class="flex-grow-1 pe-2">{{ reward.title }}</div>
-            <div class="text-accent fw-bold">{{ reward.amount }}</div>
+            <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
+            <div class="text-accent fw-bold">{{ quest.amount }}</div>
         </template>
 
         <b-alert class="p-2" v-model="isAlertDangerShown" variant="danger">
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <b-card-text v-if="reward.description">
-            {{ reward.description }}
+        <b-card-text v-if="quest.description">
+            {{ quest.description }}
         </b-card-text>
 
         <blockquote>
             <b-form-group label="Available On">
-                <div class="d-inline-flex ms-2 align-items-center" v-for="contract of reward.contracts">
+                <div class="d-inline-flex ms-2 align-items-center" v-for="contract of quest.contracts">
                     <b-img
                         :src="chainList[contract.chainId].logo"
                         width="12"
@@ -42,12 +43,12 @@
             <b-row>
                 <b-col>
                     <b-form-group label="Method" class="mb-0">
-                        <code>{{ reward.methodName }}</code>
+                        <code>{{ quest.methodName }}</code>
                     </b-form-group>
                 </b-col>
                 <b-col>
                     <b-form-group label="Threshold" class="mb-0">
-                        <code>{{ reward.threshold }}</code>
+                        <code>{{ quest.threshold }}</code>
                     </b-form-group>
                 </b-col>
             </b-row>
@@ -55,10 +56,10 @@
 
         <template #button>
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
-                Sign in &amp; claim <strong>{{ reward.amount }} points</strong>
+                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
-            <b-button v-else-if="reward.isClaimed" variant="primary" block class="w-100" disabled>
+            <b-button v-else-if="quest.isClaimed" variant="primary" block class="w-100" disabled>
                 Quest Completed
             </b-button>
 
@@ -71,13 +72,13 @@
                         height="18"
                         :alt="chainList[chainId].name"
                     />
-                    Claim <strong>{{ reward.amount }}</strong> points
+                    Claim <strong>{{ quest.amount }}</strong> points
                 </b-button>
                 <b-dropdown end variant="primary" no-caret toggle-class="pe-3">
                     <template #button-content>
                         <i class="fas fa-caret-down"></i>
                     </template>
-                    <BDropdownItem @click="chainId = contract.chainId" v-for="contract of reward.contracts">
+                    <BDropdownItem @click="chainId = contract.chainId" v-for="contract of quest.contracts">
                         <b-img
                             :src="chainList[contract.chainId].logo"
                             width="12"
@@ -103,18 +104,18 @@ import { getModal } from '../../utils/wallet-connect';
 import { chainList, getAddressURL } from '../../utils/chains';
 import { getAccount, GetAccountResult, PublicClient } from '@wagmi/core';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { Web3Modal } from '@web3modal/html';
 import { signMessage } from '@wagmi/core';
+import { Web3Modal } from '@web3modal/html';
 
 export default defineComponent({
     name: 'BaseCardQuestSocial',
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestWeb3>,
             required: true,
         },
     },
-    data: function (): {
+    data(): {
         account: GetAccountResult<PublicClient> | null;
         modal: Web3Modal | null;
         error: string;
@@ -163,10 +164,10 @@ export default defineComponent({
         },
     },
     mounted() {
-        if (this.reward.isClaimed) return;
-        const chains = this.reward.contracts.map((contract: { chainId: ChainId }) => chainList[contract.chainId].chain);
+        if (this.quest.isClaimed) return;
+        const chains = this.quest.contracts.map((contract: { chainId: ChainId }) => chainList[contract.chainId].chain);
         const theme = this.accountStore.getTheme();
-        this.chainId = this.reward.contracts[0].chainId;
+        this.chainId = this.quest.contracts[0].chainId;
         this.modal = getModal(chainList[this.chainId].chain, chains, theme);
         this.unsubscribe = this.modal.subscribeModal(this.onModalStateChange);
     },
@@ -196,10 +197,10 @@ export default defineComponent({
                 await this.modal.openModal();
                 await this.waitForConnected();
 
-                const message = `This signature will be used to validate if the result of calling ${this.reward.methodName} on chain ${this.reward.chainId} with the address used to sign this message is above the threshold of ${this.reward.threshold}.`;
+                const message = `This signature will be used to validate if the result of calling ${this.quest.methodName} on chain ${this.reward.chainId} with the address used to sign this message is above the threshold of ${this.quest.threshold}.`;
                 const signature = await signMessage({ message });
 
-                await this.rewardsStore.completeWeb3Quest(this.reward.uuid, {
+                await this.rewardsStore.completeWeb3Quest(this.quest.uuid, {
                     signature,
                     message,
                     chainId: this.chainId,
