@@ -45,7 +45,7 @@
                                 />
                                 <div class="px-3" style="min-width: 200px">
                                     <h3 class="text-white mb-0">{{ accountStore.account?.username }}</h3>
-                                    <div class="text-opaque mb-1">Rank: #12</div>
+                                    <div class="text-opaque mb-1">Rank: #{{ accountStore.account?.rank }}</div>
                                     <b-progress
                                         style="height: 12px"
                                         variant="success"

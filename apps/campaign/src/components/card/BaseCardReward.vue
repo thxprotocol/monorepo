@@ -13,7 +13,7 @@
             v-b-tooltip.hover.left
             :title="format(expiry.date, 'MMMM do yyyy hh:mm:ss')"
             variant="primary"
-            class="p-1"
+            class="p-1 bg-primary"
         >
             <i v-if="!isExpired" class="fas fa-clock card-text"></i>
             <span :class="{ 'text-accent': !isExpired, 'card-text': isExpired }">{{ expiryDate }}</span>

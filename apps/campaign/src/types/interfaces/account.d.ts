@@ -22,6 +22,7 @@ type TAccount = {
     twitchAccess: boolean;
     githubAccess: boolean;
     profileImg: string;
+    rank: number;
 };
 
 type TAuthState = {
