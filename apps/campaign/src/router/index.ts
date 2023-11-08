@@ -57,6 +57,12 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import(/* webpackChunkName: "quests" */ '../views/campaign/Quests.vue'),
             },
             {
+                path: '/c/:slug/ranking',
+                name: 'ranking',
+                beforeEnter,
+                component: () => import(/* webpackChunkName: "ranking" */ '../views/campaign/Ranking.vue'),
+            },
+            {
                 path: '/c/:slug/rewards',
                 name: 'rewards',
                 beforeEnter,

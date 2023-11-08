@@ -22,7 +22,7 @@
                     <i class="fas fa-trophy me-1" />
                     Quest Spotlight
                 </div>
-                <b-card style="min-height: 352px" body-class="p-0" class="border-0">
+                <b-card style="min-height: 305px" body-class="p-0" class="border-0">
                     <b-carousel fade indicators :interval="1000" ref="carouselQuests" class="gradient-shadow-xl">
                         <b-carousel-slide
                             background="transparent"

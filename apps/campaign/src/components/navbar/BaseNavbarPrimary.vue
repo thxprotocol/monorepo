@@ -14,8 +14,12 @@
                         />
                     </div>
                     <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.config.slug}/quests`">
-                        <i class="fas fa-trophy me-lg-3"></i>
+                        <i class="fas fa-tasks me-lg-3"></i>
                         <div>Quests</div>
+                    </router-link>
+                    <router-link :to="`/c/${accountStore.config.slug}/ranking`">
+                        <i class="fas fa-trophy mr-lg-3"></i>
+                        <div>Ranking</div>
                     </router-link>
                     <router-link v-if="perksStore.rewards.length" :to="`/c/${accountStore.config.slug}/rewards`">
                         <i class="fas fa-store me-lg-3"></i>

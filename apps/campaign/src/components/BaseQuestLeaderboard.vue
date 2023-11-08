@@ -1,18 +1,16 @@
 <template>
-    <b-card class="d-none d-lg-block mb-2 mx-lg-0 mb-lg-3" header-class="p-0" body-class="d-flex flex-column">
-        <template #header>
-            <b-card-title class="d-flex px-3 py-1 m-0 align-items-center">
-                <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                    <i class="fa fa-trophy me-2 text-opaque"></i>
-                </div>
-                <div class="flex-grow-1 pe-2">Leaderboard</div>
-                <div class="text-accent fw-bold">
-                    <b-button variant="link" class="text-opaque" @click="rewardsStore.list()">
-                        <i class="fas fa-sync-alt"></i>
-                    </b-button>
-                </div>
-            </b-card-title>
-        </template>
+    <b-card header-class="p-0" body-class="d-flex flex-column p-2 pt-0">
+        <b-card-title class="d-flex px-3 py-1 m-0 align-items-center">
+            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
+                <i class="fa fa-trophy me-2 text-opaque"></i>
+            </div>
+            <div class="flex-grow-1 pe-2">Ranking</div>
+            <div class="text-accent fw-bold">
+                <b-button variant="link" @click="rewardsStore.list()">
+                    <i class="fas fa-sync-alt"></i>
+                </b-button>
+            </div>
+        </b-card-title>
         <b-list-group>
             <b-list-group-item class="d-flex px-0 pe-3" :key="key" v-for="(entry, key) of rewardsStore.leaderboard">
                 <span class="list-item-field-rank">{{ key + 1 }}</span>
@@ -27,7 +25,8 @@
                     {{ entry.account.username }}
                 </span>
                 <span class="list-item-field-questcount flex-grow-1 text-opaque pe-3">
-                    {{ entry.questsCompleted }} {{ entry.questsCompleted > 1 ? 'quests' : 'quest' }}
+                    {{ entry.questsCompleted }}
+                    <i class="fas fa-tasks ms-1" />
                 </span>
                 <strong class="list-item-field-score">{{ entry.score }}</strong>
             </b-list-group-item>

@@ -45,7 +45,7 @@
                 </b-tabs>
             </b-col>
             <b-col lg="5" xl="4">
-                <BaseQuestLeaderboard />
+                <BaseQuestLeaderboard class="d-none d-lg-block mb-2 mx-lg-0 mb-lg-3" />
             </b-col>
         </b-row>
     </b-container>
