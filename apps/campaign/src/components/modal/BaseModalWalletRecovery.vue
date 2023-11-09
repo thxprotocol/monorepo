@@ -10,7 +10,7 @@
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-key me-2"></i> Wallet Recovery</h5>
-            <b-link class="btn-close" @click="walletStore.isModalWalletSettingsShown = false">
+            <b-link class="btn-close" @click="accountStore.isModalAccountShown = false">
                 <i class="fas fa-times"></i>
             </b-link>
         </template>

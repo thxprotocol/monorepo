@@ -4,7 +4,7 @@
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fa fa-trophy me-2 text-opaque"></i>
             </div>
-            <div class="flex-grow-1 pe-2">Ranking</div>
+            <div class="flex-grow-1 pe-2">Leaderboard</div>
             <div class="text-accent fw-bold">
                 <b-button variant="link" @click="rewardsStore.list()">
                     <i class="fas fa-sync-alt"></i>

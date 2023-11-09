@@ -26,17 +26,6 @@
             />
         </div>
         <div style="width: 120px; text-align: right">
-            <!-- <template
-                v-if="
-                    authStore.oAuthShare &&
-                    rewardsStore.quests.length &&
-                    ['home', 'quests'].includes(String($route.name))
-                "
-            >
-                <b-button variant="link" v-b-toggle.collapse-filters @click.prevent>
-                    <i class="fas fa-sliders-h"></i>
-                </b-button>
-            </template> -->
             <b-button v-if="authStore.oAuthShare && !rewardsStore.quests.length" variant="link" @click="onClickRefresh">
                 <b-spinner v-if="isRefreshing" small variant="white" />
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
@@ -50,22 +39,13 @@
                     <template #button-content>
                         <i class="fas fa-ellipsis-v"></i>
                     </template>
-
-                    <b-dropdown-item-button size="sm" @click="onClickWallet">
+                    <b-dropdown-item-button size="sm" @click="onClickWallet" v-if="!rewardsStore.quests.length">
                         <b-spinner v-if="!walletAddress" small />
-                        <template v-else>
-                            {{ walletAddress }}
-                        </template>
+                        <template v-else>{{ walletAddress }}</template>
                     </b-dropdown-item-button>
-
-                    <b-dropdown-item-button @click="accountStore.isModalConnectSettingsShown = true">
-                        <div class="d-flex align-items-center justify-content-between">Profile</div>
+                    <b-dropdown-item-button @click="accountStore.isModalAccountShown = true">
+                        <div class="d-flex align-items-center justify-content-between">Account</div>
                     </b-dropdown-item-button>
-
-                    <b-dropdown-item-button @click="walletStore.isModalWalletSettingsShown = true">
-                        <div class="d-flex align-items-center justify-content-between">Wallet</div>
-                    </b-dropdown-item-button>
-
                     <b-dropdown-divider />
                     <b-dropdown-item-button size="sm" @click="onClickSignout">
                         <div class="d-flex align-items-center justify-content-between">

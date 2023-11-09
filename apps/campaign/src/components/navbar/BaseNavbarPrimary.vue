@@ -17,13 +17,13 @@
                         <i class="fas fa-tasks me-lg-3"></i>
                         <div>Quests</div>
                     </router-link>
-                    <router-link :to="`/c/${accountStore.config.slug}/ranking`">
-                        <i class="fas fa-trophy mr-lg-3"></i>
-                        <div>Ranking</div>
-                    </router-link>
                     <router-link v-if="perksStore.rewards.length" :to="`/c/${accountStore.config.slug}/rewards`">
                         <i class="fas fa-store me-lg-3"></i>
                         <div>Rewards</div>
+                    </router-link>
+                    <router-link :to="`/c/${accountStore.config.slug}/ranking`">
+                        <i class="fas fa-trophy mr-lg-3"></i>
+                        <div>Rank</div>
                     </router-link>
                     <router-link :to="`/c/${accountStore.config.slug}/wallet`">
                         <i class="fas fa-wallet mr-lg-3"></i>

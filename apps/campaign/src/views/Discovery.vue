@@ -47,18 +47,23 @@
                                         v-if="accountStore.account"
                                         variant="light"
                                         :src="accountStore.account.profileImg"
+                                        class="gradient-border-xl"
+                                        size="50"
                                     />
-                                    <div class="d-inline-flex align-items-center" v-else style="height: 40px">
+                                    <div class="d-inline-flex align-items-center" v-else style="height: 50px">
                                         <b-spinner variant="light" small />
                                     </div>
                                 </template>
-                                <BDropdownItem @click="accountStore.isModalConnectSettingsShown = true">
-                                    Profile
-                                </BDropdownItem>
-                                <BDropdownItem @click="walletStore.isModalWalletSettingsShown = true">
-                                    Wallet
-                                </BDropdownItem>
-                                <BDropdownItem @click="authStore.signout()">Sign Out</BDropdownItem>
+                                <b-dropdown-item @click="accountStore.isModalAccountShown = true">
+                                    Account
+                                </b-dropdown-item>
+                                <b-dropdown-divider />
+                                <b-dropdown-item-button size="sm" @click="authStore.signout()">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        Sign out
+                                        <i class="fas fa-sign-out-alt ml-auto"></i>
+                                    </div>
+                                </b-dropdown-item-button>
                             </b-nav-item-dropdown>
                         </template>
                     </b-navbar-nav>
@@ -89,7 +94,7 @@ export default defineComponent({
     data() {
         return {
             isModalConnectSettingsShown: false,
-            isModalWalletSettingsShown: false,
+            isModalAccountShown: false,
             imgLogo,
             imgBgOverlay,
         };

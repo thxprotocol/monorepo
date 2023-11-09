@@ -23,39 +23,14 @@
             <b-spinner type="grow" variant="primary" small />
         </b-container>
         <template v-else>
-            <b-container class="order-lg-1 d-none d-lg-block">
+            <b-container
+                v-if="rewardsStore.quests.length"
+                class="order-lg-1"
+                :class="{ 'd-none d-lg-block': isRouteRanking }"
+            >
                 <b-row>
                     <b-col xl="10" offset-xl="1">
-                        <b-card
-                            v-if="
-                                authStore.oAuthShare && rewardsStore.quests.length && accountStore.config.backgroundUrl
-                            "
-                            class="bg-splash mx-auto"
-                            body-class="d-flex justify-content-center align-items-center"
-                            :style="{ backgroundImage: `url('${accountStore.config.backgroundUrl}')` }"
-                        >
-                            <div
-                                class="d-flex justify-content-center align-items-center p-3"
-                                style="border-radius: 5px; background: rgba(0, 0, 0, 0.35)"
-                            >
-                                <b-avatar
-                                    size="80"
-                                    :src="accountStore.account?.profileImg"
-                                    class="gradient-border-xl"
-                                />
-                                <div class="px-3" style="min-width: 200px">
-                                    <h3 class="text-white mb-0">{{ accountStore.account?.username }}</h3>
-                                    <div class="text-opaque mb-1">Rank: #{{ accountStore.account?.rank }}</div>
-                                    <b-progress
-                                        style="height: 12px"
-                                        variant="success"
-                                        show-value
-                                        :value="Number(accountStore.balance)"
-                                        :max="Number(accountStore.balance) + Number(rewardsStore.availablePoints)"
-                                    />
-                                </div>
-                            </div>
-                        </b-card>
+                        <BaseCardAccountRank :height="screenWidth < 768 ? 150 : 250" />
                     </b-col>
                 </b-row>
             </b-container>
@@ -80,14 +55,10 @@ import { decodeHTML } from '../utils/decode-html';
 export default defineComponent({
     data() {
         return {
-            decodeHTML,
-            isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
-            isModalPoolSubscriptionShown: false,
-            isModalWalletAccessShown: false,
-            isRefreshing: false,
-            isIframe: window.self !== window.top,
             error: '',
+            decodeHTML,
             screenWidth: window.innerWidth,
+            isIframe: window.self !== window.top,
         };
     },
     computed: {
@@ -96,6 +67,9 @@ export default defineComponent({
         ...mapStores(useRewardStore),
         ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
+        isRouteRanking() {
+            return this.$route.name !== 'ranking';
+        },
         isSubscribed() {
             const { subscription } = useAccountStore();
             return !!subscription;
@@ -125,8 +99,6 @@ export default defineComponent({
         async onMessage(event: MessageEvent) {
             const { origin } = this.accountStore.config;
             const localOrigin = origin && new URL(origin).origin;
-            if (event.origin !== localOrigin) return;
-
             const mapMessage: { [message: string]: () => void } = {
                 'thx.iframe.navigate': () => this.onWidgetNavigate(event.data.path),
                 'thx.iframe.show': () => this.onWidgetShow(origin, event.data.isShown),
@@ -136,6 +108,8 @@ export default defineComponent({
                 'thx.auth.signin': () => this.onSignin,
                 'thx.quests.list': () => this.onQuestsList,
             };
+
+            if (event.origin !== localOrigin || !event.data.message || !mapMessage[event.data.message]) return;
 
             mapMessage[event.data.message]();
         },

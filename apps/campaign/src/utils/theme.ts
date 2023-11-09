@@ -105,7 +105,10 @@ export function getStyles(elements: any, colors: any) {
             '--bs-nav-tabs-link-active-border-color': theme.elements.btnBg,
         },
         '.gradient-border-xl': {
-            '--thx-gradient-border': `linear-gradient(-45deg, ${theme.elements.btnBg}, ${theme.elements.bodyBg}, ${theme.elements.btnBg})`,
+            '--thx-linear-gradient-border': `linear-gradient(-45deg, ${theme.colors.accent}, ${theme.elements.btnBgDark}, ${theme.colors.accent})`,
+        },
+        '.gradient-border-xl, .gradient-shadow:before, .gradient-shadow-xl': {
+            '--thx-linear-gradient-shadow': `linear-gradient(-45deg, ${theme.colors.accent}, ${theme.elements.btnBg}, ${theme.elements.btnBgDarker})`,
         },
     };
 

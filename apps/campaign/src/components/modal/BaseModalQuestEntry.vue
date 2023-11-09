@@ -7,6 +7,7 @@
         centered
         no-close-on-backdrop
         no-close-on-esc
+        content-class="gradient-shadow-xl"
     >
         <template #header>
             <h5 class="modal-title">

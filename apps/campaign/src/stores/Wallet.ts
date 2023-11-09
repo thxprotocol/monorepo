@@ -30,7 +30,7 @@ export const useWalletStore = defineStore('wallet', {
         pendingPoints: 0,
         wallets: [],
         isModalWalletCreateShown: false,
-        isModalWalletSettingsShown: false,
+        isModalAccountShown: false,
         isModalWalletRecoveryShown: false,
     }),
     actions: {

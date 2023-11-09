@@ -1,12 +1,12 @@
 <template>
-    <b-form-group label="Nickname" :state="isValidUsername" :invalid-feedback="String(error)" class="mb-0">
+    <b-form-group label="E-mail" :state="isValidEmail" :invalid-feedback="String(error)" class="mb-0">
         <b-input-group>
             <b-form-input
                 v-model="value"
                 @input="onInput"
                 @change="onChange"
-                :state="isValidUsername"
-                placeholder="JohnDoe123"
+                :state="isValidEmail"
+                placeholder="john@example.io"
             />
             <b-input-group-append v-if="isLoading">
                 <b-button size="sm" variant="primary" class="px-3" :disabled="true">
@@ -35,19 +35,16 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         isInvalidInput() {
-            return !this.value || !this.value.length || this.value.length < 3;
+            return !this.value || !this.value.length || this.value.length < 3 || !this.value.includes('@');
         },
-        isValidUsername() {
+        isValidEmail() {
             if (this.isInvalidInput || this.error.length) return false;
             return;
         },
     },
-    props: {
-        username: String,
-    },
     mounted() {
         if (!this.accountStore.account) return;
-        this.value = this.accountStore.account.username;
+        this.value = this.accountStore.account.email;
     },
     methods: {
         reset() {
@@ -60,6 +57,7 @@ export default defineComponent({
             this.debounce = setTimeout(this.update, 1000) as any;
         },
         onChange() {
+            if (this.isLoading) return;
             this.update();
         },
         async update() {
@@ -67,11 +65,12 @@ export default defineComponent({
                 this.reset();
                 return;
             }
+
             try {
-                await this.accountStore.update({ username: this.value });
+                await this.accountStore.update({ email: this.value });
                 this.error = '';
             } catch (error) {
-                this.error = 'This username is already in use.';
+                this.error = 'This email is not valid.';
             } finally {
                 this.$emit('error', this.error);
                 this.isLoading = false;

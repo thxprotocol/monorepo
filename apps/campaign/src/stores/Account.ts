@@ -25,7 +25,7 @@ export const useAccountStore = defineStore('account', {
         subscription: null,
         config: {},
         sheet: null,
-        isModalConnectSettingsShown: false,
+        isModalAccountShown: false,
         isAuthenticated: null,
         isRewardsLoaded: false,
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
@@ -127,7 +127,7 @@ export const useAccountStore = defineStore('account', {
         async subscribe() {
             const email = this.account?.email;
             if (!email) return;
-
+            debugger;
             this.subscription = await this.api.pools.subscription.post({ poolId: this.poolId, email });
 
             track('UserCreates', [
@@ -250,6 +250,7 @@ export const useAccountStore = defineStore('account', {
         },
         async update(
             payload: Partial<{
+                username: string;
                 email: string;
                 profileImg: string;
                 authRequestMessage: string;

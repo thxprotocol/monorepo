@@ -1,23 +1,39 @@
 <template>
     <b-modal
-        v-model="walletStore.isModalWalletSettingsShown"
+        v-model="accountStore.isModalAccountShown"
         @show="onShow"
-        @hidden="walletStore.isModalWalletSettingsShown = false"
+        @hidden="accountStore.isModalAccountShown = false"
         centered
         no-close-on-backdrop
         no-close-on-esc
     >
         <template #header>
-            <h5 class="modal-title"><i class="fas fa-key me-2"></i> Wallet Settings</h5>
-            <b-link class="btn-close" @click="walletStore.isModalWalletSettingsShown = false">
+            <h5 class="modal-title"><i class="fas fa-user me-2"></i> Account</h5>
+            <b-link class="btn-close" @click="accountStore.isModalAccountShown = false">
                 <i class="fas fa-times"></i>
             </b-link>
         </template>
 
-        <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
-        <b-form>
+        <div v-if="!accountStore.account" class="d-flex justify-content-center">
+            <b-spinner small />
+        </div>
+        <b-form v-else>
+            <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
             <b-tabs justified content-class="mt-3">
-                <b-tab title="About">
+                <b-tab title="Profile">
+                    <b-row>
+                        <b-col cols="8">
+                            <BaseFormGroupUsername class="mb-3" />
+                            <BaseFormGroupEmail class="mb-3" />
+                        </b-col>
+                        <b-col cols="4" class="d-flex align-items-center justify-content-center">
+                            <BaseFormGroupAvatar />
+                        </b-col>
+                    </b-row>
+                    <BaseFormGroupSubscription v-if="accountStore.poolId" class="mb-3" />
+                    <BaseFormGroupConnected class="mb-3" />
+                </b-tab>
+                <b-tab title="Wallet">
                     <b-form-group v-if="walletStore.wallet && !isMetamaskAccount">
                         <template #label>
                             <div class="d-flex align-items-center">
@@ -87,7 +103,7 @@
                         </b-input-group>
                     </b-form-group>
                 </b-tab>
-                <b-tab title="Security Question" v-if="authStore.securityQuestion">
+                <b-tab title="Security" v-if="authStore.securityQuestion">
                     <b-form-group>
                         <b-form-input v-model="question" placeholder="Question" />
                     </b-form-group>
@@ -122,7 +138,7 @@
             </b-tabs>
         </b-form>
         <template #footer>
-            <b-button class="w-100" variant="primary" @click="walletStore.isModalWalletSettingsShown = false">
+            <b-button class="w-100" variant="primary" @click="accountStore.isModalAccountShown = false">
                 Close
             </b-button>
         </template>
@@ -142,7 +158,7 @@ import imgMetamaskLogo from '../../assets/metamask-logo.png';
 import imgWeb3AuthLogo from '../../assets/web3auth-logo.jpeg';
 
 export default defineComponent({
-    name: 'BaseModalWalletSettings',
+    name: 'BaseModalAccount',
     data() {
         return {
             imgSafeLogo,
@@ -194,7 +210,7 @@ export default defineComponent({
         },
     },
     watch: {
-        'walletStore.isModalWalletSettingsShown'() {
+        'accountStore.isModalAccountShown'() {
             this.accountStore.getAccount();
             this.walletStore.getWallet();
         },
@@ -207,6 +223,7 @@ export default defineComponent({
             this.password = '';
             this.passwordCheck = '';
             this.question = this.authStore.securityQuestion;
+            this.accountStore.getAccount();
         },
         async onSubmitDeviceSharePasswordUpdate() {
             const { oAuthShare, isDeviceShareAvailable, updateDeviceShare } = this.authStore;

@@ -53,7 +53,7 @@ type TAccountState = {
     isEthereumBrowser: boolean;
     isRewardsLoaded: boolean;
     isPreview: boolean;
-    isModalConnectSettingsShown: boolean;
+    isModalAccountShown: boolean;
     api: THXClient | null;
     poolId: string;
     migration: {

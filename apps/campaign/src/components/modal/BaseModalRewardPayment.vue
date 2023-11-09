@@ -5,6 +5,7 @@
         @hidden="$emit('hidden')"
         :title="perk.title"
         centered
+        content-class="gradient-shadow-xl"
         no-close-on-backdrop
         no-close-on-esc
     >

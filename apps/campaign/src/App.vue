@@ -4,7 +4,7 @@
         <BaseModalConnectSettings size="lg" />
         <BaseModalWalletCreate />
         <BaseModalWalletRecovery />
-        <BaseModalWalletSettings size="lg" />
+        <BaseModalAccount size="lg" />
     </div>
 </template>
 <script lang="ts">
@@ -21,7 +21,7 @@ export default defineComponent({
     data() {
         return {
             isModalConnectSettingsShown: false,
-            isModalWalletSettingsShown: false,
+            isModalAccountShown: false,
             isModalWalletCreateShown: false,
             isModalWalletRecoveryShown: false,
         };
