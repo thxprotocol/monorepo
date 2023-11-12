@@ -62,7 +62,8 @@
 
         <b-collapse v-model="isVisible">
             <div class="px-3 my-3">
-                <b-alert v-model="isMigrateAvailable" variant="warning">
+                <b-alert v-model="isMigrateAvailable" variant="warning" class="px-3 py-2">
+                    <i class="fas fa-exclamation-circle me-1" />
                     Your wallet is not the owner of this token.
                 </b-alert>
 
