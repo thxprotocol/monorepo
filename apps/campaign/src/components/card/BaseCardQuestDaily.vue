@@ -5,24 +5,21 @@
         :id="quest._id"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="amount"
-        :error="error"
+        :amount="quest.pointsAvailable"
         :image="quest.image"
+        :error="error"
         :info-links="quest.infoLinks"
         :visible="!!authStore.oAuthShare && !waitDuration"
-        :info-url="quest.infoUrl || 'https://example.com'"
     >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fa fa-calendar me-2 text-primary"></i>
             </div>
             <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
-            <div class="text-accent fw-bold">{{ quest.amount }}</div>
+            <div class="text-accent fw-bold">{{ quest.pointsAvailable }}</div>
         </template>
 
-        <b-card-text>
-            {{ quest.description }}
-        </b-card-text>
+        <b-card-text> {{ quest.description }}</b-card-text>
 
         <b-alert class="p-2" v-if="error && !isSubmitting" variant="danger" show>
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
@@ -43,7 +40,7 @@
 
         <template #button>
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" class="w-100" block>
-                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
+                Sign in &amp; claim <strong>{{ quest.pointsAvailable }} points</strong>
             </b-button>
             <b-button
                 v-if="authStore.oAuthShare"
@@ -59,7 +56,7 @@
                 <template v-else-if="quest.isDisabled && !waitDuration"> Not available </template>
                 <template v-else-if="isSubmitting"><b-spinner small></b-spinner> Adding points...</template>
                 <template v-else>
-                    Claim <strong>{{ quest.amount }} points </strong>
+                    Claim <strong>{{ quest.pointsAvailable }} points </strong>
                 </template>
             </b-button>
         </template>

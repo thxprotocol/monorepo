@@ -7,7 +7,7 @@
         :id="quest._id"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="quest.amount"
+        :amount="quest.pointsAvailable"
         :error="error"
         :image="quest.image"
     >
@@ -27,7 +27,7 @@
 
         <template #button>
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
-                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
+                Sign in &amp; claim <strong>{{ quest.pointsAvailable }} points</strong>
             </b-button>
 
             <b-button v-else-if="quest.isClaimed" variant="primary" block class="w-100" disabled>
@@ -49,13 +49,20 @@
                 </BButton>
             </BButtonGroup>
 
-            <b-button v-else variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
+            <b-button
+                v-else
+                variant="primary"
+                block
+                class="w-100"
+                @click="onClickClaim"
+                :disabled="isSubmitting || !quest.pointsAvailable"
+            >
                 <template v-if="isSubmitting">
                     <b-spinner small></b-spinner>
                     Adding points...
                 </template>
                 <template v-else>
-                    Claim <strong>{{ quest.amount }} points</strong>
+                    Claim <strong>{{ quest.pointsAvailable }} points</strong>
                 </template>
             </b-button>
         </template>
@@ -76,6 +83,7 @@ import BaseBlockquoteTwitterUser from '../blockquote/BaseBlockquoteTwitterUser.v
 import BaseBlockquoteYoutubeChannelSubscription from '../../components/blockquote/BaseBlockquoteYoutubeChannelSubscription.vue';
 import BaseBlockquoteVideo from '../../components/blockquote/BaseBlockquoteVideo.vue';
 import BaseBlockquoteDiscordServerJoin from '../../components/blockquote/BaseBlockquoteDiscordServerJoin.vue';
+import BaseBlockquoteDiscordMessage from '../../components/blockquote/BaseBlockquoteDiscordMessage.vue';
 import BaseBlockquoteDiscordInviteUsed from '../../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
 
 export default defineComponent({
@@ -88,6 +96,7 @@ export default defineComponent({
         BaseBlockquoteTwitterUser,
         BaseBlockquoteDiscordServerJoin,
         BaseBlockquoteDiscordInviteUsed,
+        BaseBlockquoteDiscordMessage,
     },
     props: {
         quest: {

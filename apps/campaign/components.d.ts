@@ -10,6 +10,7 @@ declare module 'vue' {
     BAlert: typeof import('bootstrap-vue-next')['BAlert']
     BaseAlertWalletAddress: typeof import('./src/components/alert/BaseAlertWalletAddress.vue')['default']
     BaseBlockquoteDiscordInviteUsed: typeof import('./src/components/blockquote/BaseBlockquoteDiscordInviteUsed.vue')['default']
+    BaseBlockquoteDiscordMessage: typeof import('./src/components/blockquote/BaseBlockquoteDiscordMessage.vue')['default']
     BaseBlockquoteDiscordServerJoin: typeof import('./src/components/blockquote/BaseBlockquoteDiscordServerJoin.vue')['default']
     BaseBlockquoteTwitterMessage: typeof import('./src/components/blockquote/BaseBlockquoteTwitterMessage.vue')['default']
     BaseBlockquoteTwitterTweet: typeof import('./src/components/blockquote/BaseBlockquoteTwitterTweet.vue')['default']

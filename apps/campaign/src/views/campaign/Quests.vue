@@ -81,7 +81,6 @@ export default defineComponent({
             isLgScreen: window.innerWidth > 1000,
             selectedSort: { label: 'Default', key: RewardSortVariant.Default },
             activeFilters: [],
-            isModalQuestEntryShown: false,
             entry: null,
         };
     },

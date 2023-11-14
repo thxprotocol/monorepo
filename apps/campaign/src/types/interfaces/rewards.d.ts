@@ -39,11 +39,16 @@ type TQuestState = {
 
 type TQuestSocial = TBaseQuest & {
     amount: number;
+    pointsAvailable: number;
     platform: RewardConditionPlatform;
     interaction?: RewardConditionInteraction;
     content?: string;
     contentMetadata?: any;
     isClaimed?: boolean;
+    restartDates?: {
+        start: Date;
+        end: Date;
+    };
 };
 
 type TQuestCustom = TBaseQuest & {
@@ -64,6 +69,7 @@ type TQuestDaily = TBaseQuest & {
     claims: TDailyRewardClaim[];
     isDisabled: boolean;
     claimAgainDuration;
+    pointsAvailable: number;
 };
 
 type TQuestWeb3 = TBaseQuest & {

@@ -46,8 +46,8 @@ function getInteractionComponent(interaction: RewardConditionInteraction) {
             return 'BaseBlockquoteTwitterMessage';
         case RewardConditionInteraction.DiscordGuildJoined:
             return 'BaseBlockquoteDiscordServerJoin';
-        case RewardConditionInteraction.DiscordInviteUsed:
-            return 'BaseBlockquoteDiscordInviteUsed';
+        case RewardConditionInteraction.DiscordMessage:
+            return 'BaseBlockquoteDiscordMessage';
         default:
             return null;
     }

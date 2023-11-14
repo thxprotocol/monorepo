@@ -17,12 +17,17 @@
                 <h3 class="text-white mb-0">{{ accountStore.account?.username }}</h3>
                 <div class="text-white text-opaque mb-1">Rank: #{{ accountStore.account?.rank }}</div>
                 <b-progress
-                    style="height: 12px"
-                    variant="success"
-                    show-value
-                    :value="Number(accountStore.balance)"
+                    style="height: 13px"
                     :max="Number(accountStore.balance) + Number(rewardsStore.availablePoints)"
-                />
+                >
+                    <b-progress-bar
+                        variant="success"
+                        :value="Number(accountStore.balance)"
+                        :label="`${accountStore.balance}/${
+                            Number(accountStore.balance) + Number(rewardsStore.availablePoints)
+                        }`"
+                    />
+                </b-progress>
             </div>
         </div>
     </b-card>
