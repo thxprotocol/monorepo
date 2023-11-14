@@ -1,39 +1,33 @@
 <template>
-    <b-container>
-        <b-row>
-            <b-col xl="10" offset-xl="1" class="p-0">
-                <b-navbar
-                    v-if="rewardsStore.quests.length || perksStore.rewards.length"
-                    class="navbar-bottom my-lg-3 px-lg-3 order-lg-0"
-                >
-                    <div v-if="config" class="pl-3 py-2 text-center text-decoration-none d-none d-lg-block me-lg-5">
-                        <b-img
-                            :src="config.logoUrl"
-                            class="navbar-logo"
-                            v-b-tooltip.hover.bottom="{ title: decodeHTML(config.title) }"
-                        />
-                    </div>
-                    <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.config.slug}/quests`">
-                        <i class="fas fa-tasks me-lg-3"></i>
-                        <div>Quests</div>
-                    </router-link>
-                    <router-link v-if="perksStore.rewards.length" :to="`/c/${accountStore.config.slug}/rewards`">
-                        <i class="fas fa-store me-lg-3"></i>
-                        <div>Rewards</div>
-                    </router-link>
-                    <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.config.slug}/ranking`">
-                        <i class="fas fa-trophy mr-lg-3"></i>
-                        <div>Rank</div>
-                    </router-link>
-                    <router-link :to="`/c/${accountStore.config.slug}/wallet`">
-                        <i class="fas fa-wallet mr-lg-3"></i>
-                        <div>Wallet</div>
-                    </router-link>
-                    <BaseNavbarSecondary v-if="isNavbarSecondaryShown" class="ms-auto d-none d-lg-flex" />
-                </b-navbar>
-            </b-col>
-        </b-row>
-    </b-container>
+    <b-navbar
+        v-if="rewardsStore.quests.length || perksStore.rewards.length"
+        class="navbar-bottom my-lg-3 px-lg-3 order-lg-0"
+    >
+        <div v-if="config" class="pl-3 py-2 text-center text-decoration-none d-none d-lg-block me-lg-5">
+            <b-img
+                :src="config.logoUrl"
+                class="navbar-logo"
+                v-b-tooltip.hover.bottom="{ title: decodeHTML(config.title) }"
+            />
+        </div>
+        <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.config.slug}/quests`">
+            <i class="fas fa-tasks me-lg-3"></i>
+            <div>Quests</div>
+        </router-link>
+        <router-link v-if="perksStore.rewards.length" :to="`/c/${accountStore.config.slug}/rewards`">
+            <i class="fas fa-store me-lg-3"></i>
+            <div>Rewards</div>
+        </router-link>
+        <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.config.slug}/ranking`">
+            <i class="fas fa-trophy mr-lg-3"></i>
+            <div>Rank</div>
+        </router-link>
+        <router-link :to="`/c/${accountStore.config.slug}/wallet`">
+            <i class="fas fa-wallet mr-lg-3"></i>
+            <div>Wallet</div>
+        </router-link>
+        <BaseNavbarSecondary v-if="isNavbarSecondaryShown" class="ms-auto d-none d-lg-flex" />
+    </b-navbar>
 </template>
 
 <script lang="ts">

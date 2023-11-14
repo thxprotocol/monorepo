@@ -49,6 +49,7 @@ type TQuestSocial = TBaseQuest & {
         start: Date;
         end: Date;
     };
+    messages: any[];
 };
 
 type TQuestCustom = TBaseQuest & {
