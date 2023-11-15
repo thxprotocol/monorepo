@@ -16,7 +16,6 @@
             <div class="px-3" style="min-width: 200px">
                 <h3 class="text-white mb-0">{{ accountStore.account?.username }}</h3>
                 <div class="text-white text-opaque mb-1">Rank: #{{ accountStore.account?.rank }}</div>
-                {{ rewardsStore.availablePoints }}
                 <b-progress
                     style="height: 13px"
                     :max="Number(accountStore.balance) + Number(rewardsStore.availablePoints)"
