@@ -7,7 +7,7 @@
         <p class="text-opaque mb-2"><strong>Your points</strong></p>
         <b-progress class="bg-primary mb-2" height="12px" :max="reward.amount">
             <b-progress-bar variant="success" show-value :value="reward.pointsClaimed" />
-            <b-progress-bar variant="warning" :value="reward.pointsAvailable" />
+            <b-progress-bar variant="warning" :value="accountStore.account ? reward.pointsAvailable : 0" />
         </b-progress>
         <p class="text-opaque mb-1 d-flex justify-content-between">
             <b-col>
@@ -102,8 +102,9 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         isAlertDiscordShown() {
+            if (!this.accountStore.account) return false;
             const connectedAccount = this.accountStore.account.connectedAccounts.find(
-                ({ kind }) => AccessTokenKind.Discord === kind,
+                ({ kind }) => kind === AccessTokenKind.Discord,
             );
             return !connectedAccount;
         },
