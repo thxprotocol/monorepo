@@ -22,6 +22,7 @@ import BaseCardRewardERC20 from '../../components/card/BaseCardRewardERC20.vue';
 import BaseCardRewardERC721 from '../../components/card/BaseCardRewardERC721.vue';
 import BaseCardRewardCustom from '../../components/card/BaseCardRewardCustom.vue';
 import BaseCardRewardCoupon from '../../components/card/BaseCardRewardCoupon.vue';
+import BaseCardRewardDiscordRole from '../../components/card/BaseCardRewardDiscordRole.vue';
 
 export default defineComponent({
     name: 'Rewards',
@@ -30,6 +31,7 @@ export default defineComponent({
         BaseCardRewardERC721,
         BaseCardRewardCustom,
         BaseCardRewardCoupon,
+        BaseCardRewardDiscordRole,
     },
     computed: {
         ...mapStores(useAccountStore),

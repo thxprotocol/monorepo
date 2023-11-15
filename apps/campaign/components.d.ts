@@ -36,6 +36,7 @@ declare module 'vue' {
     BaseCardReward: typeof import('./src/components/card/BaseCardReward.vue')['default']
     BaseCardRewardCoupon: typeof import('./src/components/card/BaseCardRewardCoupon.vue')['default']
     BaseCardRewardCustom: typeof import('./src/components/card/BaseCardRewardCustom.vue')['default']
+    BaseCardRewardDiscordRole: typeof import('./src/components/card/BaseCardRewardDiscordRole.vue')['default']
     BaseCardRewardERC20: typeof import('./src/components/card/BaseCardRewardERC20.vue')['default']
     BaseCardRewardERC721: typeof import('./src/components/card/BaseCardRewardERC721.vue')['default']
     BaseFooter: typeof import('./src/components/BaseFooter.vue')['default']

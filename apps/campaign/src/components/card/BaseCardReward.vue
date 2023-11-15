@@ -141,3 +141,8 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.card-img-overlay {
+    bottom: auto !important;
+}
+</style>

@@ -64,9 +64,21 @@ export const usePerkStore = defineStore('perks', {
 
             return r;
         },
+        createDiscordRoleRedemption: async function (uuid: string) {
+            const { api, account, poolId, config } = useAccountStore();
+            debugger;
+            const r = await api.rewards.discord.role.redemption.post(uuid);
+            if (r.error) throw r.error;
+
+            this.updateSupply(uuid);
+
+            track('UserCreates', [account?.sub, 'discord role reward redemption', { poolId, origin: config.origin }]);
+
+            return r;
+        },
         async list() {
             const { api } = useAccountStore();
-            const { coin, nft, custom, coupon } = await api.rewards.list();
+            const { coin, nft, custom, coupon, discordRole } = await api.rewards.list();
 
             this.rewards = [
                 ...(coin
@@ -92,6 +104,13 @@ export const usePerkStore = defineStore('perks', {
                 ...(coupon
                     ? Object.values(coupon).map((r: any) => {
                           r.component = 'BaseCardRewardCoupon';
+                          r.price = parseUnitAmount(r.price);
+                          return r;
+                      })
+                    : []),
+                ...(coupon
+                    ? Object.values(discordRole).map((r: any) => {
+                          r.component = 'BaseCardRewardDiscordRole';
                           r.price = parseUnitAmount(r.price);
                           return r;
                       })
