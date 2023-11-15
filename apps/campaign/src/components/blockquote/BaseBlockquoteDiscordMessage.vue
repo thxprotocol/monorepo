@@ -22,7 +22,7 @@
             </b-col>
             <b-col class="flex-grow-1">
                 <strong>Limit Reset</strong><br />
-                In
+                - In
                 {{
                     reward.restartDates &&
                     formatDistance(new Date(reward.restartDates.now), new Date(reward.restartDates.end), {
@@ -30,7 +30,7 @@
                     })
                 }}
                 (Quest)<br />
-                In
+                - In
                 {{
                     reward.restartDates &&
                     formatDistance(new Date(reward.restartDates.now), new Date(reward.restartDates.endDay), {

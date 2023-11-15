@@ -1,8 +1,9 @@
 <template>
     <blockquote>
         <iframe
-            :width="videoWidth"
-            :height="videoHeight"
+            width="100%"
+            :id="id"
+            :height="height"
             :src="`https://www.youtube.com/embed/${reward.contentMetadata.videoId}?controls=0&modestbranding=1`"
         >
         </iframe>
@@ -31,11 +32,14 @@ export default defineComponent({
             required: true,
         },
     },
-    data: function (): any {
-        return {
-            videoWidth: 315,
-            videoHeight: 200,
-        };
+    computed: {
+        id() {
+            return `video-iframe-${this.reward._id}`;
+        },
+        height() {
+            const element = document.getElementById(this.id);
+            return element ? (element.clientWidth / 16) * 9 : 200;
+        },
     },
 });
 </script>

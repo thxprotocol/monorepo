@@ -77,6 +77,7 @@ declare module 'vue' {
     BDropdownDivider: typeof import('bootstrap-vue-next')['BDropdownDivider']
     BDropdownItem: typeof import('bootstrap-vue-next')['BDropdownItem']
     BDropdownItemButton: typeof import('bootstrap-vue-next')['BDropdownItemButton']
+    BEmbed: typeof import('bootstrap-vue-next')['BEmbed']
     BForm: typeof import('bootstrap-vue-next')['BForm']
     BFormCheckbox: typeof import('bootstrap-vue-next')['BFormCheckbox']
     BFormFile: typeof import('bootstrap-vue-next')['BFormFile']
