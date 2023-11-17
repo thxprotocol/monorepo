@@ -73,8 +73,8 @@ export default defineComponent({
             this.error = '';
         },
         onClickRedeem() {
-            if (!this.authStore.oAuthShare) return this.accountStore.signin();
-            this.isModalShown = true;
+            if (!this.authStore.oAuthShare) this.accountStore.signin();
+            else this.isModalShown = true;
         },
         onSubmitRedemption() {
             this.isSubmitting = true;

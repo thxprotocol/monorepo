@@ -30,7 +30,7 @@
                             <BaseFormGroupAvatar />
                         </b-col>
                     </b-row>
-                    <BaseFormGroupSubscription v-if="accountStore.poolId" class="mb-3" />
+                    <BaseFormGroupSubscription v-if="accountStore.poolId && rewardsStore.quests.length" class="mb-3" />
                     <BaseFormGroupConnected class="mb-3" />
                 </b-tab>
                 <b-tab title="Wallet">
@@ -149,6 +149,7 @@
 import { useAuthStore } from '../../stores/Auth';
 import { useAccountStore } from '../../stores/Account';
 import { useWalletStore } from '../../stores/Wallet';
+import { useRewardStore } from '../../stores/Reward';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { AccountVariant } from '../../types/enums/accountVariant';
@@ -183,6 +184,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
+        ...mapStores(useRewardStore),
         ...mapStores(useWalletStore),
         privateKey() {
             if (!this.authStore.privateKey) return '';
