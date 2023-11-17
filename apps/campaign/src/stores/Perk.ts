@@ -66,8 +66,7 @@ export const usePerkStore = defineStore('perks', {
         },
         createDiscordRoleRedemption: async function (uuid: string) {
             const { api, account, poolId, config } = useAccountStore();
-            debugger;
-            const r = await api.rewards.discord.role.redemption.post(uuid);
+            const r = await api.request.post(`/v1/rewards/discord-role/${uuid}/redemption`);
             if (r.error) throw r.error;
 
             this.updateSupply(uuid);

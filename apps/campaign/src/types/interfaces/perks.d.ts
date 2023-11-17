@@ -15,7 +15,6 @@ type TPerk = {
     pointPrice: number;
     priceCurrency: string;
     price: number;
-    isOwned: boolean;
     isPromoted: boolean;
     isDisabled: boolean;
     erc1155Amount: number;
