@@ -104,12 +104,10 @@ export const useAuthStore = defineStore('auth', {
             poll({ taskFn, interval: 5000, retries: 60 });
         },
         async signout() {
-            if (!this.user) return;
-
             const isMobile = getIsMobile();
             await this.userManager[isMobile ? 'signoutRedirect' : 'signoutPopup']({
                 state: { isMobile, origin: window.location.href },
-                id_token_hint: this.user.id_token,
+                id_token_hint: this.user?.id_token,
             })
                 .then(() => {
                     this.user = null;
@@ -119,6 +117,17 @@ export const useAuthStore = defineStore('auth', {
                     if (error.message === 'Popup closed by user') {
                         this.user = null;
                     }
+                });
+        },
+        async signoutSilent() {
+            await this.userManager
+                .signoutSilent()
+                .then(() => {
+                    this.user = null;
+                })
+                .catch((error: Error) => {
+                    console.log(error);
+                    this.user = null;
                 });
         },
         async requestOAuthShareRefresh() {
@@ -138,9 +147,9 @@ export const useAuthStore = defineStore('auth', {
                 })
                 .catch((error: Error) => {
                     console.log(error);
-                    // Should signout because refresh token is no longer valid
-                    if (error.message === 'grant request is invalid') {
-                        this.signout();
+                    // Should signout because refresh token is no longer valid or auth is required
+                    if (['grant request is invalid', 'End-User authentication is required'].includes(error.message)) {
+                        this.signoutSilent();
                     }
                 });
         },

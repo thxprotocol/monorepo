@@ -50,7 +50,6 @@ declare module 'vue' {
     BaseModalAccount: typeof import('./src/components/modal/BaseModalAccount.vue')['default']
     BaseModalCampaignDomain: typeof import('./src/components/modal/BaseModalCampaignDomain.vue')['default']
     BaseModalCampaignExpired: typeof import('./src/components/modal/BaseModalCampaignExpired.vue')['default']
-    BaseModalConnectSettings: typeof import('./src/components/modal/BaseModalConnectSettings.vue')['default']
     BaseModalERC20Transfer: typeof import('./src/components/modal/BaseModalERC20Transfer.vue')['default']
     BaseModalERC721Transfer: typeof import('./src/components/modal/BaseModalERC721Transfer.vue')['default']
     BaseModalPoolSubscription: typeof import('./src/components/modal/BaseModalPoolSubscription.vue')['default']

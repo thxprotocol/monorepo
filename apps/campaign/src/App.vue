@@ -1,7 +1,6 @@
 <template>
     <div id="main">
         <router-view />
-        <BaseModalConnectSettings size="lg" />
         <BaseModalWalletCreate />
         <BaseModalWalletRecovery />
         <BaseModalAccount size="lg" />
@@ -18,14 +17,6 @@ import { useWalletStore } from './stores/Wallet';
 import './scss/main.scss';
 
 export default defineComponent({
-    data() {
-        return {
-            isModalConnectSettingsShown: false,
-            isModalAccountShown: false,
-            isModalWalletCreateShown: false,
-            isModalWalletRecoveryShown: false,
-        };
-    },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),

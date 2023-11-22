@@ -1,9 +1,10 @@
 <template>
     <b-navbar
+        :container="false"
         v-if="rewardsStore.quests.length || perksStore.rewards.length"
-        class="navbar-bottom my-lg-3 px-lg-3 order-lg-0"
+        class="navbar-bottom mb-lg-3 px-lg-3 order-lg-0"
     >
-        <div v-if="config" class="pl-3 py-2 text-center text-decoration-none d-none d-lg-block me-lg-5">
+        <div v-if="config" class="pl-3 py-2 text-center text-decoration-none d-none d-lg-block me-auto">
             <b-img
                 :src="config.logoUrl"
                 class="navbar-logo"
@@ -15,7 +16,7 @@
             <div>Quests</div>
         </router-link>
         <router-link v-if="perksStore.rewards.length" :to="`/c/${accountStore.config.slug}/rewards`">
-            <i class="fas fa-store me-lg-3"></i>
+            <i class="fas fa-gift me-lg-3"></i>
             <div>Rewards</div>
         </router-link>
         <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.config.slug}/ranking`">

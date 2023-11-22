@@ -13,7 +13,7 @@
             <i class="fas fa-external-link-alt ms-1 small" />
         </b-link>
     </div>
-    <div class="d-flex flex-column h-100 container-lg p-0">
+    <div class="d-flex flex-column h-100 p-0">
         <BaseNavbarSecondary class="d-flex d-lg-none" />
         <b-container
             v-if="accountStore.isAuthenticated === false"

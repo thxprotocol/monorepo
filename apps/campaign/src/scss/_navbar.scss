@@ -90,7 +90,8 @@
     padding: 0.5rem;
     border-top: 1px solid var(--thx-navbar-border-color);
     background-color: var(--thx-navbar-bg);
-
+    justify-content: space-between;
+    
     .container-fluid {
         padding: 0;
     }
@@ -131,6 +132,7 @@
     }
     
     @media (min-width: map-get($grid-breakpoints, 'lg')) {
+        justify-content: center;
         flex-direction: row;
         border-radius: 10px;
         
