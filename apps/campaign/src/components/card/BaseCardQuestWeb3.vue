@@ -20,9 +20,7 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <b-card-text v-if="quest.description">
-            {{ quest.description }}
-        </b-card-text>
+        <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
         <blockquote>
             <b-form-group label="Available On">

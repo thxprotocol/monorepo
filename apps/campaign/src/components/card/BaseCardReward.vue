@@ -22,7 +22,7 @@
             <b-card-title class="d-flex">
                 <slot name="title"></slot>
             </b-card-title>
-            <b-card-text> {{ description }} </b-card-text>
+            <b-card-text v-if="description" style="white-space: pre-line" v-html="description" />
             <div class="d-flex pb-3">
                 <div class="d-flex align-items-center">
                     <span class="card-text me-1"> Price: </span>

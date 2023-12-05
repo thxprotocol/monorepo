@@ -19,9 +19,7 @@
             <div class="text-accent fw-bold">{{ quest.amount }}</div>
         </template>
 
-        <b-card-text>
-            {{ quest.description }}
-        </b-card-text>
+        <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
         <b-progress
             v-if="authStore.oAuthShare && quest.claims.length"

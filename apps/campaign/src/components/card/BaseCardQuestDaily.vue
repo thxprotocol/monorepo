@@ -19,7 +19,7 @@
             <div class="text-accent fw-bold">{{ quest.pointsAvailable }}</div>
         </template>
 
-        <b-card-text> {{ quest.description }}</b-card-text>
+        <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
         <b-alert class="p-2" v-if="error && !isSubmitting" variant="danger" show>
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
