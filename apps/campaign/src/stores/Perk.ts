@@ -60,7 +60,7 @@ export const usePerkStore = defineStore('perks', {
 
             this.updateSupply(uuid);
 
-            track('UserCreates', [account?.sub, 'custom reward redemption', { poolId, origin: config.origin }]);
+            track('UserCreates', [account?.sub, 'coupon reward redemption', { poolId, origin: config.origin }]);
 
             return r;
         },
