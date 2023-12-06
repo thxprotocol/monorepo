@@ -1,8 +1,20 @@
 <template>
     <blockquote>
-        <div class="card-text ps-2">
-            {{ interactionLabel[reward.interaction] }}<br />
-            <em>"{{ content }}" (exact match)</em>
+        <div class="card-text ps-2 position-relative">
+            <div class="d-flex pb-1">
+                <b-link
+                    class="position-absolute"
+                    style="right: 0.5rem"
+                    v-b-tooltip
+                    :title="'Do not change this text in your post! Complete the quest right after posting as we only check requirements for your last post on X.'"
+                    v-clipboard:copy="reward.content"
+                    v-clipboard:success="onCopySuccess"
+                >
+                    {{ copyLabel }}
+                </b-link>
+                Post contains:
+            </div>
+            <em>{{ reward.content }}</em>
         </div>
     </blockquote>
 </template>
@@ -22,25 +34,21 @@ export default defineComponent({
             required: true,
         },
     },
-    data: function (): any {
+    data(): any {
         return {
-            interactionLabel: {
-                [RewardConditionInteraction.TwitterLike]: 'Like this tweet',
-                [RewardConditionInteraction.TwitterRetweet]: 'Retweet this tweet',
-                [RewardConditionInteraction.TwitterMessage]: 'Tweet contains: ',
-            },
-            tooltipContent: 'Copy URL',
+            copyLabel: 'Copy Text',
+            RewardConditionInteraction,
         };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
-        content() {
-            if (!this.interactionLabel[this.reward.interaction] || !this.reward.content) return;
-            return this.reward.content;
+    },
+    methods: {
+        onCopySuccess() {
+            this.copyLabel = 'Copied!';
         },
     },
-    methods: {},
 });
 </script>
 <style scoped>
