@@ -6,7 +6,7 @@
             </div>
             <div class="flex-grow-1 pe-2">Leaderboard</div>
             <div class="text-accent fw-bold">
-                <b-button variant="link" @click="rewardsStore.list()">
+                <b-button variant="link" @click="rewardsStore.getLeaderboard()">
                     <i class="fas fa-sync-alt"></i>
                 </b-button>
             </div>

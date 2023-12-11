@@ -5,7 +5,6 @@ export const Sentry = {
         return SentrySDK.init({
             app,
             dsn: 'https://4a7e629280feb526f2dffc489f1d423d@o4504552781905920.ingest.sentry.io/4505946733674496',
-            // dsn: 'https://17d77ca6263c6f4ad5ba4b3abe1b7d2a@o4504552781905920.ingest.sentry.io/4505946476511232', // Dashboard
             integrations: [
                 new SentrySDK.BrowserTracing({
                     // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled

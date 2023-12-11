@@ -84,7 +84,7 @@ export const useRewardStore = defineStore('rewards', {
         },
 
         async list() {
-            const { api } = useAccountStore();
+            const { api, isAuthenticated } = useAccountStore();
             const { leaderboard, invite, social, custom, daily, web3 } = await api.quests.list();
 
             this.leaderboard = leaderboard;
@@ -101,7 +101,7 @@ export const useRewardStore = defineStore('rewards', {
             });
 
             const pointRewardsArray = Object.values(social);
-            const pointRewardsList = pointRewardsArray.map((a: any): TQuestDaily => {
+            const pointRewardsList = pointRewardsArray.map((a: any): TQuestSocial => {
                 a.contentMetadata = a.contentMetadata && JSON.parse(a.contentMetadata);
                 a.variant = QuestVariant.Social;
                 return a;
@@ -126,6 +126,32 @@ export const useRewardStore = defineStore('rewards', {
                 ...referralRewardsList,
                 ...web3QuestsList,
             ];
+
+            // Logic past this point is considered authenticated
+            if (!isAuthenticated) return;
+
+            await Promise.all(pointRewardsList.map((quest) => this.getSocialQuest(quest._id)));
+        },
+
+        setQuestSocial(quest: TQuestSocial) {
+            const index = this.quests.findIndex((q) => q._id === quest._id);
+
+            quest.contentMetadata = quest.contentMetadata && JSON.parse(quest.contentMetadata);
+            quest.variant = QuestVariant.Social;
+
+            this.quests[index] = quest as any;
+        },
+
+        async getSocialQuest(id: string) {
+            const { api } = useAccountStore();
+            const quest = await api.request.get(`/v1/quests/social/${id}`);
+            this.setQuestSocial(quest);
+        },
+
+        async getLeaderboard() {
+            const { api, poolId } = useAccountStore();
+            const leaderboard = await api.request.get(`/v1/leaderboards/${poolId}`);
+            this.leaderboard = leaderboard;
         },
     },
 });
