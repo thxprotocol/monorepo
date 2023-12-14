@@ -62,7 +62,7 @@ import { useAccountStore } from '../../stores/Account';
 import { useRewardStore } from '../../stores/Reward';
 
 export default defineComponent({
-    name: 'BaseCardRewardPayment',
+    name: 'BaseModalQuestEntry',
     data() {
         return {
             isShown: false,

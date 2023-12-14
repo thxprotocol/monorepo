@@ -17,8 +17,8 @@
             <div class="text-accent fw-bold">{{ perk.amount }} {{ perk.erc20.symbol }}</div>
         </template>
     </BaseCardReward>
-    <BaseCardRewardPayment
-        :id="id"
+    <BaseModalRewardPayment
+        :id="`${id}${perk.uuid}`"
         :perk="perk"
         :error="error"
         :show="isModalShown"
