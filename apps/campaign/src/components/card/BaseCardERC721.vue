@@ -33,9 +33,7 @@
                         <template #button-content>
                             <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                         </template>
-                        <b-dropdown-item v-if="isMigrateAvailable" @click="onClickMigrate"> Migrate </b-dropdown-item>
                         <b-dropdown-item
-                            v-else
                             :disabled="
                                 token.nft.variant === NFTVariant.ERC1155 ||
                                 (walletStore.wallet?.version &&
@@ -62,9 +60,10 @@
 
         <b-collapse v-model="isVisible">
             <div class="px-3 my-3">
-                <b-alert v-model="isMigrateAvailable" variant="warning" class="px-3 py-2">
+                <b-alert v-model="isNotOwner" variant="warning" class="px-3 py-2">
                     <i class="fas fa-exclamation-circle me-1" />
-                    Your wallet is not the owner of this token.
+                    This token is currently owned by:
+                    <small>{{ owner }}</small>
                 </b-alert>
 
                 <b-link :href="token.metadata.imageUrl" target="_blank">
@@ -139,6 +138,7 @@ export default defineComponent({
     },
     data: function () {
         return {
+            owner: '',
             NFTVariant,
             balance: '',
             isVisible: false,
@@ -151,23 +151,42 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
-        isMigrateAvailable() {
-            return this.token.recipient !== this.walletStore.wallet?.address;
+        isNotOwner() {
+            if (!this.walletStore.wallet) return;
+            const { address } = this.walletStore.wallet;
+            return this.owner && this.owner !== address;
+        },
+    },
+    watch: {
+        isVisible(state: boolean) {
+            if (!state) return;
+            this.getToken();
         },
     },
     mounted() {
-        if (!this.token.tokenId) {
-            this.waitForMinted();
-        } else {
-            if (this.token.nft.variant === NFTVariant.ERC1155) {
-                const { api } = useAccountStore();
-                api.erc1155.get(this.token._id).then(({ balance }: TERC721Token) => {
-                    this.balance = balance;
-                });
-            }
-        }
+        if (!this.token.tokenId) this.waitForMinted();
     },
     methods: {
+        getToken() {
+            const getTokenMap: { [variant: string]: () => void } = {
+                [NFTVariant.ERC721]: this.getERC721Token.bind(this),
+                [NFTVariant.ERC1155]: this.getERC1155Token.bind(this),
+            };
+
+            getTokenMap[this.token.nft.variant]();
+        },
+        getERC721Token() {
+            const { api } = useAccountStore();
+            api.erc721.get(this.token._id).then(({ owner }: TERC721Token) => {
+                this.owner = owner;
+            });
+        },
+        getERC1155Token() {
+            const { api } = useAccountStore();
+            api.erc1155.get(this.token._id).then(({ balance }: TERC721Token) => {
+                this.balance = balance;
+            });
+        },
         onModalTransferHidden() {
             this.isModalTransferShown = false;
         },
@@ -199,18 +218,6 @@ export default defineComponent({
             };
 
             return poll({ taskFn, interval: 3000, retries: 20 });
-        },
-        async onClickMigrate() {
-            this.isMigratingTokens = true;
-            toast(
-                'Transfer to Safe Wallet...',
-                'dark',
-                15000,
-                async () => await this.accountStore.migrate({ erc721TokenId: this.token._id }),
-                async () => await this.walletStore.list(),
-            );
-
-            this.isMigratingTokens = false;
         },
     },
 });

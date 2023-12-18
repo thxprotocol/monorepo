@@ -26,7 +26,7 @@
         <b-form-group description="This question will be asked when you sign in on another device.">
             <b-form-input v-model="question" placeholder="Question" />
         </b-form-group>
-        <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
+        <b-form-group :state="isPasswordLengthOK" :invalid-feedback="invalidFeedback">
             <b-form-input
                 :state="isPasswordValid"
                 v-model="password"
@@ -35,9 +35,9 @@
                 autocomplete="off"
             />
         </b-form-group>
-        <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
+        <b-form-group :state="isPasswordCheckLengthOK && isPasswordCheckEqualOK" :invalid-feedback="invalidFeedback">
             <b-form-input
-                :state="isPasswordValid"
+                :state="isPasswordCheckLengthOK && isPasswordCheckEqualOK"
                 v-model="passwordCheck"
                 type="password"
                 placeholder="Answer again"
@@ -91,6 +91,30 @@ export default defineComponent({
             if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
             if (this.password.length && this.password.length < 10) return false;
             return undefined;
+        },
+        isPasswordLengthOK() {
+            if (this.password.length >= 10) return true;
+            if (this.password.length && this.password.length < 10) return false;
+            return null;
+        },
+        isPasswordCheckLengthOK() {
+            if (this.passwordCheck.length >= 10) return true;
+            if (this.passwordCheck.length && this.passwordCheck.length < 10) return false;
+            return null;
+        },
+        isPasswordCheckEqualOK() {
+            if (this.password && this.password === this.passwordCheck) return true;
+            if (this.password.length && this.passwordCheck.length && this.password !== this.passwordCheck) return false;
+            return null;
+        },
+        invalidFeedback() {
+            if (this.isPasswordCheckEqualOK === false) return 'Passwords are not equal.';
+            if (this.isPasswordLengthOK === false || this.isPasswordCheckLengthOK === false)
+                return 'Use 10 or more characters.';
+            return '';
+        },
+        invalidCheckFeedback() {
+            //
         },
         isAlertShown() {
             return this.isCreateFailed || (this.isPasswordValid && !this.authStore.isDeviceShareAvailable);
