@@ -26,23 +26,32 @@
         <b-form-group description="This question will be asked when you sign in on another device.">
             <b-form-input v-model="question" placeholder="Question" />
         </b-form-group>
-        <b-form-group :state="isPasswordLengthOK" :invalid-feedback="invalidFeedback">
+        <b-form-group>
             <b-form-input
-                :state="isPasswordValid"
+                :state="isPasswordLengthValid"
                 v-model="password"
                 type="password"
                 placeholder="Answer"
                 autocomplete="off"
             />
+            <span v-if="isPasswordLengthValid === false" class="invalid-feedback d-inline">
+                Use 10 or more characters.
+            </span>
         </b-form-group>
-        <b-form-group :state="isPasswordCheckLengthOK && isPasswordCheckEqualOK" :invalid-feedback="invalidFeedback">
+        <b-form-group>
             <b-form-input
-                :state="isPasswordCheckLengthOK && isPasswordCheckEqualOK"
+                :state="isPasswordCheckLengthValid && isPasswordCheckEqualValid"
                 v-model="passwordCheck"
                 type="password"
                 placeholder="Answer again"
                 autocomplete="off"
             />
+            <span v-if="isPasswordCheckLengthValid === false" class="invalid-feedback d-inline">
+                Use 10 or more characters.
+            </span>
+            <span v-if="isPasswordCheckEqualValid === false" class="invalid-feedback d-inline">
+                Passwords are not equal.
+            </span>
         </b-form-group>
         <template #footer>
             <b-button
@@ -87,34 +96,23 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         ...mapStores(useWalletStore),
-        isPasswordValid() {
-            if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
-            if (this.password.length && this.password.length < 10) return false;
-            return undefined;
-        },
-        isPasswordLengthOK() {
+        isPasswordLengthValid() {
             if (this.password.length >= 10) return true;
             if (this.password.length && this.password.length < 10) return false;
             return null;
         },
-        isPasswordCheckLengthOK() {
+        isPasswordCheckLengthValid() {
             if (this.passwordCheck.length >= 10) return true;
             if (this.passwordCheck.length && this.passwordCheck.length < 10) return false;
             return null;
         },
-        isPasswordCheckEqualOK() {
+        isPasswordCheckEqualValid() {
             if (this.password && this.password === this.passwordCheck) return true;
             if (this.password.length && this.passwordCheck.length && this.password !== this.passwordCheck) return false;
             return null;
         },
-        invalidFeedback() {
-            if (this.isPasswordCheckEqualOK === false) return 'Passwords are not equal.';
-            if (this.isPasswordLengthOK === false || this.isPasswordCheckLengthOK === false)
-                return 'Use 10 or more characters.';
-            return '';
-        },
-        invalidCheckFeedback() {
-            //
+        isPasswordValid() {
+            return this.isPasswordLengthValid && this.isPasswordCheckLengthValid && this.isPasswordCheckEqualValid;
         },
         isAlertShown() {
             return this.isCreateFailed || (this.isPasswordValid && !this.authStore.isDeviceShareAvailable);
