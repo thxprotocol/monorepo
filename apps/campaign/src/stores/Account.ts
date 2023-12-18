@@ -1,6 +1,6 @@
-import { THXClient } from '@thxnetwork/sdk';
+import { THXBrowserClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
-import { API_URL } from '../config/secrets';
+import { API_URL, AUTH_URL } from '../config/secrets';
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
@@ -13,6 +13,7 @@ import { User } from 'oidc-client-ts';
 import { AccountVariant } from '../types/enums/accountVariant';
 import poll from 'promise-poller';
 import { decodeHTML } from '../utils/decode-html';
+import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -44,7 +45,7 @@ export const useAccountStore = defineStore('account', {
         },
         reset() {
             this.poolId = '';
-            this.api.setPoolId('');
+            this.api.setCampaignId('');
             this.sheet?.remove();
         },
         getTheme() {
@@ -52,7 +53,10 @@ export const useAccountStore = defineStore('account', {
         },
         async init(poolIdOrSlug: string, origin: string) {
             if (!this.api) {
-                this.api = new THXClient({ url: API_URL, accessToken: '', poolId: '' });
+                this.api = new THXBrowserClient({
+                    apiUrl: API_URL,
+                    authUrl: AUTH_URL,
+                } as any);
                 this.addEventListeners();
                 this.setStatus(false);
                 this.getUserData();
@@ -61,7 +65,7 @@ export const useAccountStore = defineStore('account', {
             if (poolIdOrSlug) {
                 const config = await this.api.request.get('/v1/widget/' + poolIdOrSlug);
                 this.poolId = config.poolId;
-                this.api.setPoolId(this.poolId);
+                this.api.setCampaignId(this.poolId);
 
                 this.setConfig(config.poolId, { ...config, origin });
                 this.setTheme(config);
@@ -105,7 +109,7 @@ export const useAccountStore = defineStore('account', {
         },
         async onUserLoaded(user: User) {
             const authStore = useAuthStore();
-            if (user.access_token) this.api.setAccessToken(user.access_token);
+            if (user.access_token) this.api.request.setUser(user);
             await authStore.onUserLoadedCallback(user);
 
             this.getUserData();
@@ -127,7 +131,7 @@ export const useAccountStore = defineStore('account', {
         async subscribe() {
             const email = this.account?.email;
             if (!email) return;
-            debugger;
+
             this.subscription = await this.api.pools.subscription.post({ poolId: this.poolId, email });
 
             track('UserCreates', [
@@ -184,9 +188,6 @@ export const useAccountStore = defineStore('account', {
             await signout();
             this.setStatus(null);
             this.account = null;
-        },
-        async migrate(body: { erc20Id?: string; erc721Id?: string; erc721TokenId?: string }) {
-            await this.api.request.post('/v1/account/wallet/migrate', { body: JSON.stringify(body) });
         },
         async getCampaignData() {
             if (!this.poolId) return;

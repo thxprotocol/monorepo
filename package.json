@@ -18,7 +18,7 @@
         "@safe-global/safe-core-sdk-types": "^1.9.2",
         "@sentry/vue": "^7.71.0",
         "@stripe/stripe-js": "^2.1.11",
-        "@thxnetwork/sdk": "1.1.21",
+        "@thxnetwork/sdk": "1.2.9",
         "@tkey/default": "10.1.0",
         "@tkey/security-questions": "10.1.0",
         "@tkey/web-storage": "10.1.0",

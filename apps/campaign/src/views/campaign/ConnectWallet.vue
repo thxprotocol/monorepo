@@ -99,7 +99,7 @@ export default defineComponent({
             this.isLoadingCollect = true;
             try {
                 await this.accountStore.api.request.post('/v1/account/wallet/connect', {
-                    body: JSON.stringify({ code: this.uuid }),
+                    data: JSON.stringify({ code: this.uuid }),
                 });
                 await this.rewardsStore.list();
                 this.$router.push(`/c/${this.accountStore.config.slug}/quests`);
