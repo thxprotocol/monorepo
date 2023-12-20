@@ -13,17 +13,19 @@ export default defineComponent({
     name: 'Signin',
     async mounted() {
         const { userManager } = useAuthStore();
+        const { signin } = useAccountStore();
         const user = await userManager.getUser();
-        if (user) {
-            const uuid = sessionStorage.getItem('thxClaimUuid');
-            if (uuid) {
-                this.$router.push({ name: 'collect', params: { uuid } });
-            } else {
-                this.$router.push({ name: 'quests' });
-            }
-        } else {
-            useAccountStore().signin();
-        }
+        if (!user) return signin();
+
+        this.redirect();
+    },
+    methods: {
+        redirect() {
+            const uuid = window.sessionStorage.getItem('thxClaimUuid');
+            const path = { name: uuid ? 'collect' : 'quests', ...(uuid ? { params: { uuid } } : {}) };
+
+            this.$router.push(path);
+        },
     },
 });
 </script>

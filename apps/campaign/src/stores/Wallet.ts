@@ -102,11 +102,6 @@ export const useWalletStore = defineStore('wallet', {
             await this.confirmTransaction(response.safeTxHash);
             track('UserCreates', [account?.sub, 'erc721 transfer']);
         },
-        async upgrade() {
-            const { api, account } = useAccountStore();
-            await api.walletManager.upgrade(this.wallet?._id);
-            track('UserCreates', [account?.sub, 'wallet upgrade']);
-        },
         getRPC(chainId: ChainId) {
             switch (chainId) {
                 default:

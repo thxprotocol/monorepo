@@ -99,19 +99,29 @@ export default defineComponent({
         async onMessage(event: MessageEvent) {
             const { origin } = this.accountStore.config;
             const localOrigin = origin && new URL(origin).origin;
-            const mapMessage: { [message: string]: () => void } = {
+            const messageMap: { [message: string]: () => void } = {
                 'thx.iframe.navigate': () => this.onWidgetNavigate(event.data.path),
                 'thx.iframe.show': () => this.onWidgetShow(origin, event.data.isShown),
                 'thx.config.ref': () => this.onInviteQuestUpdate(event.data.ref),
                 'thx.referral.claim.create': () => this.onInviteQuestComplete(event.data.uuid),
+                'thx.auth.identity': () => this.onSetIdentity(event.data.identity),
                 'thx.auth.signout': () => this.onSignout,
                 'thx.auth.signin': () => this.onSignin,
                 'thx.quests.list': () => this.onQuestsList,
             };
 
-            if (event.origin !== localOrigin || !event.data.message || !mapMessage[event.data.message]) return;
+            if (event.origin !== localOrigin || !event.data.message || !messageMap[event.data.message]) return;
 
-            mapMessage[event.data.message]();
+            messageMap[event.data.message]();
+        },
+        async onSetIdentity(identity: string) {
+            // Store in localstorage and patch identity on auth success
+            window.sessionStorage.setItem('thx:id', identity);
+
+            // If authenticated already patch immediately
+            if (this.accountStore.isAuthenticated) {
+                await this.accountStore.connectIdentity();
+            }
         },
         onQuestsList() {
             this.rewardsStore.list();

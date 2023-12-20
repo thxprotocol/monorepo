@@ -30,6 +30,7 @@ type TWalletState = {
     couponCodes: any[];
     pendingPoints: number;
     isModalWalletCreateShown: boolean;
+    isModalAccountShown: boolean;
     isModalWalletRecoveryShown: boolean;
 };
 

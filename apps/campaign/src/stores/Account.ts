@@ -13,7 +13,6 @@ import { User } from 'oidc-client-ts';
 import { AccountVariant } from '../types/enums/accountVariant';
 import poll from 'promise-poller';
 import { decodeHTML } from '../utils/decode-html';
-import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -109,14 +108,15 @@ export const useAccountStore = defineStore('account', {
         },
         async onUserLoaded(user: User) {
             const authStore = useAuthStore();
-            if (user.access_token) this.api.request.setUser(user);
+            if (user.access_token) {
+                this.api.request.setUser(user);
+                await this.connectIdentity();
+            }
+
             await authStore.onUserLoadedCallback(user);
 
             this.getUserData();
-
-            if (this.poolId) {
-                this.getCampaignData();
-            }
+            this.getCampaignData();
         },
         onUserUnloaded() {
             return useAuthStore().onUserUnloadedCallback();
@@ -274,6 +274,12 @@ export const useAccountStore = defineStore('account', {
             });
             const { publicUrl } = await res.json();
             return publicUrl;
+        },
+        async connectIdentity() {
+            const identity = window.sessionStorage.getItem('identity');
+            if (!identity) return;
+
+            await this.api.request.patch(`/v1/identity/${identity}`);
         },
     },
 });
