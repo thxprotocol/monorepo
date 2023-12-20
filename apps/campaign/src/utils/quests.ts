@@ -17,9 +17,7 @@ export const filterAvailableMap: any = {
     [QuestVariant.Daily]: (quest: TQuestDaily & { claimAgainDuration: number }) => quest.claimAgainDuration <= 0,
     [QuestVariant.Invite]: (quest: TQuestInvite) => !!quest,
     [QuestVariant.Social]: (quest: TQuestSocial) => !quest.isClaimed,
-    [QuestVariant.Custom]: (quest: TQuestCustom) =>
-        !quest.claims.length ||
-        quest.claims.length - quest.claims.filter((c: TQuestCustomClaim) => c.isClaimed).length > 0,
+    [QuestVariant.Custom]: (quest: TQuestCustom) => !quest.claims.length || quest.limit - quest.claims.length > 0,
     [QuestVariant.Web3]: (quest: TQuestWeb3) => !quest.isClaimed,
 };
 

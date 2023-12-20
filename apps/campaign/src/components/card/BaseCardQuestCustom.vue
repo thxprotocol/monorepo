@@ -22,24 +22,20 @@
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
         <b-progress
-            v-if="authStore.oAuthShare && quest.claims.length"
+            v-if="authStore.oAuthShare"
             class="mb-3"
             variant="success"
-            :value="claimedAmount"
-            :max="quest.claims.length"
+            :value="quest.claims.length"
+            :max="quest.limit"
             show-value
         ></b-progress>
-
-        <b-alert class="p-2" v-if="error && !isSubmitting" variant="danger" show>
-            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
-        </b-alert>
 
         <template #button>
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
                 Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
-            <b-button v-else-if="!quest.claims.length || !pendingClaims" variant="primary" block class="w-100" disabled>
+            <b-button v-else-if="!pendingClaims" variant="primary" class="w-100" block disabled>
                 Not available
             </b-button>
 
@@ -51,7 +47,7 @@
                 <template v-else>
                     Claim
                     <strong>
-                        {{ pendingClaims > 1 ? `${quest.claims.length - claimedAmount} x` : '' }}
+                        {{ `${pendingClaims} x` }}
                         {{ quest.amount }} points
                     </strong>
                 </template>
@@ -82,11 +78,8 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         ...mapStores(useRewardStore),
-        claimedAmount: function () {
-            return this.quest.claims.filter((c: TQuestCustomClaim) => c.isClaimed).length;
-        },
         pendingClaims: function () {
-            return this.quest.claims.length - this.claimedAmount;
+            return this.quest.limit - this.quest.claims.length;
         },
     },
     methods: {

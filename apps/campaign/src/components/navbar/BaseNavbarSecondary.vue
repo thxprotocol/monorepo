@@ -118,7 +118,7 @@ export default defineComponent({
         },
         async onClickRefresh() {
             this.isRefreshing = true;
-            await Promise.all([this.walletStore.list(), this.accountStore.getBalance()]);
+            await Promise.all([this.rewardsStore.list(), this.walletStore.list(), this.accountStore.getBalance()]);
             this.isRefreshing = false;
         },
     },

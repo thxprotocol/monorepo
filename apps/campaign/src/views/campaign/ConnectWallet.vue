@@ -3,12 +3,12 @@
         <b-row>
             <b-col offset-xl="1" xl="6">
                 <b-card class="mx-auto my-2">
-                    <b-alert v-model="isAlertSigninShown" variant="info" show class="p-2">
-                        <i class="fas fa-gift me-1"></i>
-                        Sign in to connect your virtual wallet
-                    </b-alert>
+                    <template #header>
+                        <i class="fas fa-id-badge me-2" />
+                        <strong>THX ID</strong>
+                    </template>
 
-                    <template v-if="!isAlertSigninShown">
+                    <template v-if="accountStore.isAuthenticated">
                         <BaseAlertWalletAddress />
                         <b-alert variant="info" show class="p-2" v-model="isAlertInfoShown">
                             <i class="fas fa-flag me-1"></i> Complete Quests and earn
@@ -16,11 +16,10 @@
                         </b-alert>
                     </template>
 
-                    <b-card-title>Virtual Wallet</b-card-title>
-                    <hr />
-                    <b-form-group description="Provide a wallet code to connect it and complete your quests.">
+                    <b-form-group label="Identity code">
                         <b-form-input :state="isValidUUID" v-model="uuid" placeholder="Code" />
                     </b-form-group>
+
                     <b-button
                         v-if="authStore.oAuthShare"
                         @click="onClickCollect"
@@ -29,7 +28,7 @@
                         :disabled="!!error || isWaitingForWalletAddress || isLoadingCollect"
                     >
                         <b-spinner v-if="isLoadingCollect" small variant="dark" />
-                        Connect Virtual Wallet
+                        Connect Identity
                     </b-button>
                     <b-button v-else @click="onClickSignin" variant="primary" class="w-100">
                         Sign in &amp; Collect
@@ -75,9 +74,6 @@ export default defineComponent({
         isAlertInfoShown() {
             return !!this.walletStore.pendingPoints;
         },
-        isAlertSigninShown() {
-            return !this.authStore.oAuthShare;
-        },
     },
     mounted() {
         this.isLoadingCollect = true;
@@ -98,9 +94,7 @@ export default defineComponent({
         async onClickCollect() {
             this.isLoadingCollect = true;
             try {
-                await this.accountStore.api.request.post('/v1/account/wallet/connect', {
-                    data: JSON.stringify({ code: this.uuid }),
-                });
+                await this.accountStore.api.request.patch(`/v1/identity/${this.uuid}`);
                 await this.rewardsStore.list();
                 this.$router.push(`/c/${this.accountStore.config.slug}/quests`);
             } catch (error) {

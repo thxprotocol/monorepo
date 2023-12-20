@@ -45,15 +45,10 @@ export const useRewardStore = defineStore('rewards', {
             const index = this.quests.findIndex((r) => r._id === id);
             this.quests[index].isClaimed = true;
         },
-        async completeCustomQuest(reward: TQuestCustom) {
+        async completeCustomQuest(quest: TQuestCustom) {
             const { api, account, getBalance, poolId, config } = useAccountStore();
-            const pendingClaims = reward.claims.filter((c) => !c.isClaimed);
-            if (!pendingClaims.length) return;
-
-            const uuid = pendingClaims[0].uuid;
-            const claim = await api.quests.custom.complete(uuid);
-
-            if (claim.error) throw claim.error;
+            const entry = await api.quests.custom.complete(quest.uuid);
+            if (entry.error) throw entry.error;
 
             track('UserCreates', [account?.sub, 'milestone reward claim', { poolId, origin: config.origin }]);
 
@@ -80,6 +75,7 @@ export const useRewardStore = defineStore('rewards', {
                 track('UserCreates', [account?.sub, 'daily reward claim', { poolId, origin: config.origin }]);
 
                 getBalance();
+                this.list();
             }
         },
 

@@ -51,11 +51,19 @@ type TQuestSocial = TBaseQuest & {
     };
     messages: any[];
 };
+type TEvent = {
+    sub: string;
+    identity: string;
+    name: string;
+    poolId: string;
+};
 
 type TQuestCustom = TBaseQuest & {
+    limit: number;
     amount: number;
     isClaimed?: boolean;
     claims: TQuestCustomClaim[];
+    events: TEvent[];
 };
 
 type TQuestInvite = TBaseQuest & {
