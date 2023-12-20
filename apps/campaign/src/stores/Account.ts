@@ -279,7 +279,12 @@ export const useAccountStore = defineStore('account', {
             const identity = this.getIdentity();
             if (!identity) return;
 
-            await this.api.request.patch(`/v1/identity/${identity}`);
+            try {
+                await this.api.request.patch(`/v1/identity/${identity}`);
+                window.sessionStorage.removeItem(`thx:${this.poolId}:id`);
+            } catch (error) {
+                console.error(error);
+            }
         },
         storeIdentity(identity: string) {
             window.sessionStorage.setItem(`thx:${this.poolId}:id`, identity);
