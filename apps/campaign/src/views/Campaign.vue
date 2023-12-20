@@ -116,7 +116,7 @@ export default defineComponent({
         },
         async onSetIdentity(identity: string) {
             // Store in localstorage and patch identity on auth success
-            window.sessionStorage.setItem('thx:id', identity);
+            this.accountStore.storeIdentity(identity);
 
             // If authenticated already patch immediately
             if (this.accountStore.isAuthenticated) {

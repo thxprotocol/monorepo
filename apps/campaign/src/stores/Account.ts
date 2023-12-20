@@ -276,10 +276,16 @@ export const useAccountStore = defineStore('account', {
             return publicUrl;
         },
         async connectIdentity() {
-            const identity = window.sessionStorage.getItem('identity');
+            const identity = this.getIdentity();
             if (!identity) return;
 
             await this.api.request.patch(`/v1/identity/${identity}`);
+        },
+        storeIdentity(identity: string) {
+            window.sessionStorage.setItem(`thx:${this.poolId}:id`, identity);
+        },
+        getIdentity() {
+            return window.sessionStorage.getItem(`thx:${this.poolId}:id`);
         },
     },
 });
