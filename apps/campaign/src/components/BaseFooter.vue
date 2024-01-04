@@ -7,7 +7,7 @@
             <b-col cols="6">
                 <b-nav>
                     <b-nav-item href="https://thx.network" target="_blank" link-class="text-white text-opaque ps-lg-0">
-                        &copy; 2023 THX Network
+                        &copy; 2024 THX Network
                     </b-nav-item>
                     <b-nav-item
                         href="https://thx.network/privacy-policy.pdf"

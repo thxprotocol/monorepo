@@ -2989,10 +2989,10 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@thxnetwork/sdk@1.2.9":
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.2.9.tgz#f201ecce38075b659669830fadd85afd4e345011"
-  integrity sha512-Gb0l1q7zo95cy20pMykFsRdxteEfbnuW60Nl/9MvaB5yZqyYuRrV32ooW+NU2fxgYaIyxd1ubuqe4mBXq4VUoA==
+"@thxnetwork/sdk@1.2.11":
+  version "1.2.11"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.2.11.tgz#c872518ac1036bf3cc667e4165c8adc97350b838"
+  integrity sha512-J9aGeYwOZueQRfLd1qjL0e6Conh5n24nUyFnS2Yp/Xgwth9U1jMplggCUPYx8D2AR8wZfQi/ld6J8LgPHGPeVw==
 
 "@tkey/common-types@^10.1.0":
   version "10.1.0"

@@ -16,8 +16,6 @@
                 </div>
                 <div class="flex-grow-1">
                     <strong>{{ token.metadata.name }}</strong>
-                    <br />
-                    <small>{{ token.owner }}</small>
                 </div>
 
                 <b-spinner small variant="primary" v-if="!token.tokenId" />
