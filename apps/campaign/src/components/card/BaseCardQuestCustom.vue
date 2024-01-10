@@ -35,10 +35,7 @@
                 Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
-            <b-button v-else-if="quest.isLocked" variant="primary" block class="w-100" disabled>
-                <i class="fas fa-lock me-1" />
-                Quest Locked
-            </b-button>
+            <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
             <b-button v-else-if="!pendingClaims" variant="primary" class="w-100" block disabled>
                 Not available

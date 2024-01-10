@@ -29,6 +29,7 @@ export const useAccountStore = defineStore('account', {
         isAuthenticated: null,
         isRewardsLoaded: false,
         isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
+        leaderboard: [],
     }),
     actions: {
         setConfig(poolId: string, config: TWidgetConfig) {
@@ -291,6 +292,10 @@ export const useAccountStore = defineStore('account', {
         },
         getIdentity() {
             return window.sessionStorage.getItem(`thx:${this.poolId}:id`);
+        },
+        async getLeaderboard() {
+            const leaderboard = await this.api.request.get(`/v1/leaderboards/${this.poolId}`);
+            this.leaderboard = leaderboard;
         },
     },
 });

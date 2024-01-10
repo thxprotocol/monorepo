@@ -65,6 +65,7 @@ type TAccountState = {
     account: TAccount | null;
     subscription: TSubscription | null;
     config: any;
+    leaderboard: { score; wallet; questsCompleted }[];
 };
 
 type TWidgetTheme = {

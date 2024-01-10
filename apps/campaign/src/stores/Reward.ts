@@ -111,11 +111,5 @@ export const useRewardStore = defineStore('rewards', {
             const quest = await api.request.get(`/v1/quests/social/${id}`);
             this.setQuestSocial(quest);
         },
-
-        async getLeaderboard() {
-            const { api, poolId } = useAccountStore();
-            const leaderboard = await api.request.get(`/v1/leaderboards/${poolId}`);
-            this.leaderboard = leaderboard;
-        },
     },
 });

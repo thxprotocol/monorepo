@@ -27,8 +27,5 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
     },
-    mounted() {
-        this.rewardsStore.getLeaderboard();
-    },
 });
 </script>

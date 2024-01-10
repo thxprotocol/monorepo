@@ -22,6 +22,7 @@ declare module 'vue' {
     BaseBtnShareTelegram: typeof import('./src/components/button/BaseBtnShareTelegram.vue')['default']
     BaseBtnShareTwitter: typeof import('./src/components/button/BaseBtnShareTwitter.vue')['default']
     BaseBtnShareWhatsapp: typeof import('./src/components/button/BaseBtnShareWhatsapp.vue')['default']
+    BaseButtonQuestLocked: typeof import('./src/components/button/BaseButtonQuestLocked.vue')['default']
     BaseCardAccountRank: typeof import('./src/components/card/BaseCardAccountRank.vue')['default']
     BaseCardCollapse: typeof import('./src/components/card/BaseCardCollapse.vue')['default']
     BaseCardCouponCode: typeof import('./src/components/card/BaseCardCouponCode.vue')['default']

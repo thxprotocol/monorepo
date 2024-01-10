@@ -25,17 +25,17 @@
 
         <template #button>
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
-                Sign in &amp; claim <strong>{{ quest.pointsAvailable }} points</strong>
+                <template v-if="quest.pointsAvailable > 0">
+                    Sign in &amp; claim <strong>{{ quest.pointsAvailable }} points</strong>
+                </template>
+                <template v-else> Sign in &amp; Complete Quest </template>
             </b-button>
 
             <b-button v-else-if="quest.isClaimed" variant="primary" block class="w-100" disabled>
                 Quest Completed
             </b-button>
 
-            <b-button v-else-if="quest.isLocked" variant="primary" block class="w-100" disabled>
-                <i class="fas fa-lock me-1" />
-                Quest Locked
-            </b-button>
+            <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
             <BButtonGroup block class="w-100" v-else-if="quest.platform && !isConnected">
                 <b-button variant="primary" @click="onClickConnect" :disabled="isSubmitting">

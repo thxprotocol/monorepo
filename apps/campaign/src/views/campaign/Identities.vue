@@ -8,15 +8,10 @@
                         <strong>THX ID</strong>
                     </template>
 
-                    <template v-if="accountStore.isAuthenticated">
-                        <BaseAlertWalletAddress />
-                        <b-alert variant="info" show class="p-2" v-model="isAlertInfoShown">
-                            <i class="fas fa-flag me-1"></i> Complete Quests and earn
-                            <strong>{{ walletStore.pendingPoints }}</strong> points!
-                        </b-alert>
-                    </template>
-
-                    <b-form-group label="Identity code">
+                    <b-form-group
+                        label="Identity code"
+                        description="Provide a valid identity code and connect it with your account."
+                    >
                         <b-form-input :state="isValidUUID" v-model="uuid" placeholder="Code" />
                     </b-form-group>
 
@@ -25,9 +20,9 @@
                         @click="onClickCollect"
                         variant="success"
                         class="w-100"
-                        :disabled="!!error || isWaitingForWalletAddress || isLoadingCollect"
+                        :disabled="!!error || isWaitingForWalletAddress || isLoading"
                     >
-                        <b-spinner v-if="isLoadingCollect" small variant="dark" />
+                        <b-spinner v-if="isLoading" small variant="dark" />
                         Connect Identity
                     </b-button>
                     <b-button v-else @click="onClickSignin" variant="primary" class="w-100">
@@ -46,16 +41,14 @@ import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useWalletStore } from '../../stores/Wallet';
 import { useRewardStore } from '../../stores/Reward';
-import { validate } from 'uuid';
 
 export default defineComponent({
-    name: 'ConnectWallet',
+    name: 'Identities',
     data() {
         return {
             uuid: '',
             error: '',
-            isLoadingImage: true,
-            isLoadingCollect: false,
+            isLoading: false,
         };
     },
     computed: {
@@ -69,30 +62,23 @@ export default defineComponent({
         },
         isValidUUID() {
             if (!this.uuid) return null;
-            return validate(this.uuid);
+            try {
+                const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                return uuidRegex.test(this.uuid);
+            } catch (error) {
+                return null;
+            }
         },
         isAlertInfoShown() {
             return !!this.walletStore.pendingPoints;
         },
     },
     mounted() {
-        this.isLoadingCollect = true;
         this.uuid = this.$route.params.uuid as string;
-        this.walletStore.getTransfer(this.uuid).then(() => {
-            this.isLoadingCollect = false;
-        });
-    },
-    watch: {
-        'authStore.oAuthShare'() {
-            this.isLoadingCollect = true;
-            this.walletStore.getTransfer(this.uuid).then(() => {
-                this.isLoadingCollect = false;
-            });
-        },
     },
     methods: {
         async onClickCollect() {
-            this.isLoadingCollect = true;
+            this.isLoading = true;
             try {
                 await this.accountStore.api.request.patch(`/v1/identity/${this.uuid}`);
                 await this.rewardsStore.list();
@@ -100,13 +86,11 @@ export default defineComponent({
             } catch (error) {
                 this.error = (error as Error).message || 'Something went wrong..';
             } finally {
-                this.isLoadingCollect = false;
+                this.isLoading = false;
             }
         },
         async onClickSignin() {
-            this.accountStore.signin({
-                wallet_transfer_token: this.uuid,
-            });
+            this.accountStore.signin();
         },
     },
 });

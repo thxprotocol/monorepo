@@ -64,10 +64,7 @@
                 Quest Completed
             </b-button>
 
-            <b-button v-else-if="quest.isLocked" variant="primary" block class="w-100" disabled>
-                <i class="fas fa-lock me-1" />
-                Quest Locked
-            </b-button>
+            <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
             <b-button-group v-else class="w-100" block>
                 <b-button variant="primary" block class="w-100" @click="onClickClaim">

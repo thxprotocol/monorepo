@@ -43,7 +43,11 @@
                         <b-spinner v-if="!walletAddress" small />
                         <template v-else>{{ walletAddress }}</template>
                     </b-dropdown-item-button>
-                    <b-dropdown-item-button size="sm" @click="onClickIdentities" v-if="rewardsStore.quests.length">
+                    <b-dropdown-item-button
+                        size="sm"
+                        @click="$router.push(`/c/${config.slug}/w/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`)"
+                        v-if="rewardsStore.quests.length"
+                    >
                         Identities
                     </b-dropdown-item-button>
                     <b-dropdown-item-button @click="accountStore.isModalAccountShown = true">

@@ -34,12 +34,6 @@ export const useWalletStore = defineStore('wallet', {
         isModalWalletRecoveryShown: false,
     }),
     actions: {
-        async getTransfer(uuid: string) {
-            const r = await fetch(API_URL + '/v1/webhook/wallet/' + uuid);
-            const { wallet, pointBalance } = await r.json();
-            this.pendingPoints = pointBalance;
-            this.walletTransfer = wallet;
-        },
         async getWallet() {
             const { api, account } = useAccountStore();
             if (!account) return;

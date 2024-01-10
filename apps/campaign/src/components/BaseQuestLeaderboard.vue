@@ -6,13 +6,13 @@
             </div>
             <div class="flex-grow-1 pe-2">Leaderboard</div>
             <div class="text-accent fw-bold">
-                <b-button variant="link" @click="rewardsStore.getLeaderboard()">
+                <b-button variant="link" @click="accountStore.getLeaderboard()">
                     <i class="fas fa-sync-alt"></i>
                 </b-button>
             </div>
         </b-card-title>
         <b-list-group>
-            <b-list-group-item class="d-flex px-0 pe-3" :key="key" v-for="(entry, key) of rewardsStore.leaderboard">
+            <b-list-group-item class="d-flex px-0 pe-3" :key="key" v-for="(entry, key) of accountStore.leaderboard">
                 <span class="list-item-field-rank">{{ key + 1 }}</span>
                 <span class="list-item-field-address flex-grow-1 ps-2">
                     <b-avatar
@@ -48,6 +48,9 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
+    },
+    mounted() {
+        this.accountStore.getLeaderboard();
     },
 });
 </script>

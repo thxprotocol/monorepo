@@ -25,11 +25,24 @@
 
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
-        <blockquote class="d-flex align-items-center">
-            <b-img :src="imgLogoGitcoin" class="ms-1 me-3" />
-            <div>
-                Your address is verified using Gitcoin's <code>Unique Humanity Scorer</code><br />
-                <b-link target="_blank" href="https://passport.gitcoin.co">Create Gitcoin Passport</b-link>
+        <blockquote>
+            <div class="d-flex align-items-center">
+                <b-img :src="imgLogoGitcoin" class="ms-1 me-3" />
+                <p class="mb-0">
+                    <span class="text-opaque">Your address is verified with Gitcoin's </span>
+                    <code>Unique Humanity</code> <span class="text-opaque">scorer.</span>
+                </p>
+            </div>
+            <hr class="mt-2 mb-1" />
+            <div class="text-center">
+                <b-link
+                    class="text-opaque ms-auto text-decoration-none"
+                    target="_blank"
+                    href="https://passport.gitcoin.co"
+                >
+                    Create Gitcoin Passport
+                    <i class="fas fa-external-link-alt ms-1" />
+                </b-link>
             </div>
         </blockquote>
 
@@ -42,10 +55,7 @@
                 Quest Completed
             </b-button>
 
-            <b-button v-else-if="quest.isLocked" variant="primary" block class="w-100" disabled>
-                <i class="fas fa-lock me-1" />
-                Quest Locked
-            </b-button>
+            <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
             <b-button-group v-else class="w-100" block>
                 <b-button variant="primary" block class="w-100" @click="onClickClaim">
