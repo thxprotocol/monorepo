@@ -11,7 +11,7 @@ export function toNumber(value?: boolean) {
     return value === undefined ? 0 : Number(value);
 }
 
-export const rewardComponentMap = {
+export const questComponentMap = {
     [QuestVariant.Daily]: 'BaseCardQuestDaily',
     [QuestVariant.Invite]: 'BaseCardQuestInvite',
     [QuestVariant.Twitter]: 'BaseCardQuestSocial',

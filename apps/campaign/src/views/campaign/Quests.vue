@@ -22,7 +22,7 @@
                         <div :class="{ 'd-none': quest.isHidden }" :key="key" v-for="(quest, key) of quests">
                             <component
                                 v-if="quest"
-                                :is="rewardComponentMap[quest.variant]"
+                                :is="questComponentMap[quest.variant]"
                                 :quest="quest"
                                 class="mb-2 mx-lg-0 my-lg-3"
                             />
@@ -36,7 +36,7 @@
                     <b-tab title="Completed">
                         <div :class="{ 'd-none': !quest.isHidden }" :key="key" v-for="(quest, key) of quests">
                             <component
-                                :is="rewardComponentMap[quest.variant]"
+                                :is="questComponentMap[quest.variant]"
                                 :quest="quest"
                                 @unlock="onClickUnlock"
                                 class="mb-2 mx-lg-0 my-lg-3"
@@ -60,7 +60,7 @@ import { useAccountStore } from '../../stores/Account';
 import { useWalletStore } from '../../stores/Wallet';
 import { usePerkStore } from '../../stores/Perk';
 import { RewardSortVariant } from '../../types/enums/rewards';
-import { filterAvailableMap, rewardComponentMap, sortMap } from '../../utils/quests';
+import { filterAvailableMap, questComponentMap, sortMap } from '../../utils/quests';
 import BaseCardQuestInvite from '../../components/card/BaseCardQuestInvite.vue';
 import BaseCardQuestSocial from '../../components/card/BaseCardQuestSocial.vue';
 import BaseCardQuestCustom from '../../components/card/BaseCardQuestCustom.vue';
@@ -80,7 +80,7 @@ export default defineComponent({
     },
     data(): any {
         return {
-            rewardComponentMap,
+            questComponentMap,
             isLgScreen: window.innerWidth > 1000,
             selectedSort: { label: 'Default', key: RewardSortVariant.Default },
             activeFilters: [],

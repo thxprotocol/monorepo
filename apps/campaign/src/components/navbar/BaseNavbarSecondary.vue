@@ -43,6 +43,9 @@
                         <b-spinner v-if="!walletAddress" small />
                         <template v-else>{{ walletAddress }}</template>
                     </b-dropdown-item-button>
+                    <b-dropdown-item-button size="sm" @click="onClickIdentities" v-if="rewardsStore.quests.length">
+                        Identities
+                    </b-dropdown-item-button>
                     <b-dropdown-item-button @click="accountStore.isModalAccountShown = true">
                         <div class="d-flex align-items-center justify-content-between">Account</div>
                     </b-dropdown-item-button>

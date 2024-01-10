@@ -14,10 +14,7 @@ export const useRewardStore = defineStore('rewards', {
             return state.quests.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q));
         },
         availablePoints: (state) => {
-            const rest = state.quests.filter((q: TBaseQuest) => {
-                console.log(q, q.variant);
-                return filterAvailableMap[q.variant](q);
-            });
+            const rest = state.quests.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q));
             if (!rest.length) return 0;
             return rest.reduce((total: number, quest: any) => total + Number(quest.pointsAvailable), 0);
         },
