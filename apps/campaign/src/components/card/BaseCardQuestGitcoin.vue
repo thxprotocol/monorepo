@@ -13,7 +13,7 @@
     >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i class="fa fa-heartbeat me-2 text-primary"></i>
+                <i class="fas fa-fingerprint me-2 text-primary"></i>
             </div>
             <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
             <div class="text-accent fw-bold">{{ quest.amount }}</div>
@@ -25,9 +25,12 @@
 
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
-        <blockquote>
-            Your address is verified using Gitcoin's <code>Unique Humanity Scorer</code><br />
-            <b-link target="_blank" href="https://passport.gitcoin.co">Create Gitcoin Passport</b-link>
+        <blockquote class="d-flex align-items-center">
+            <b-img :src="imgLogoGitcoin" class="ms-1 me-3" />
+            <div>
+                Your address is verified using Gitcoin's <code>Unique Humanity Scorer</code><br />
+                <b-link target="_blank" href="https://passport.gitcoin.co">Create Gitcoin Passport</b-link>
+            </div>
         </blockquote>
 
         <template #button>
@@ -87,6 +90,7 @@ import { getAccount, GetAccountResult, PublicClient } from '@wagmi/core';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import { signMessage } from '@wagmi/core';
 import { Web3Modal } from '@web3modal/html';
+import imgLogoGitcoin from '../../assets/gitcoin-logo.svg';
 
 export default defineComponent({
     name: 'BaseCardQuestGitcoin',
@@ -97,6 +101,7 @@ export default defineComponent({
         },
     },
     data(): {
+        imgLogoGitcoin: string;
         account: GetAccountResult<PublicClient> | null;
         modal: Web3Modal | null;
         error: string;
@@ -110,6 +115,7 @@ export default defineComponent({
         isModalQuestEntryShown: boolean;
     } {
         return {
+            imgLogoGitcoin,
             error: '',
             account: null,
             modal: null,
