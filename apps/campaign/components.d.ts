@@ -30,6 +30,7 @@ declare module 'vue' {
     BaseCardQuest: typeof import('./src/components/card/BaseCardQuest.vue')['default']
     BaseCardQuestCustom: typeof import('./src/components/card/BaseCardQuestCustom.vue')['default']
     BaseCardQuestDaily: typeof import('./src/components/card/BaseCardQuestDaily.vue')['default']
+    BaseCardQuestGitcoin: typeof import('./src/components/card/BaseCardQuestGitcoin.vue')['default']
     BaseCardQuestInvite: typeof import('./src/components/card/BaseCardQuestInvite.vue')['default']
     BaseCardQuestSocial: typeof import('./src/components/card/BaseCardQuestSocial.vue')['default']
     BaseCardQuestWeb3: typeof import('./src/components/card/BaseCardQuestWeb3.vue')['default']
@@ -103,6 +104,7 @@ declare module 'vue' {
     BTab: typeof import('bootstrap-vue-next')['BTab']
     BTable: typeof import('bootstrap-vue-next')['BTable']
     BTabs: typeof import('bootstrap-vue-next')['BTabs']
+    copy: typeof import('./src/components/card/BaseCardQuestWeb3 copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

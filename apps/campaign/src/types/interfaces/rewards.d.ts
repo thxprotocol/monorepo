@@ -27,6 +27,7 @@ type TBaseQuest = {
     createdAt: string;
     updatedAt: string;
     isHidden: boolean;
+    isLocked: boolean;
     expiryDate: Date;
 };
 

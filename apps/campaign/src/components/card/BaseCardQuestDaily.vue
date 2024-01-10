@@ -42,8 +42,14 @@
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" class="w-100" block>
                 Sign in &amp; claim <strong>{{ quest.pointsAvailable }} points</strong>
             </b-button>
+
+            <b-button v-else-if="quest.isLocked" variant="primary" block class="w-100" disabled>
+                <i class="fas fa-lock me-1" />
+                Quest Locked
+            </b-button>
+
             <b-button
-                v-if="authStore.oAuthShare"
+                v-else
                 class="w-100"
                 block
                 variant="primary"

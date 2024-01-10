@@ -15,3 +15,7 @@ export const sortMilestoneRewards = (a: any, b: any) => {
 export const sortWeb3Rewards = (a: any, b: any) => {
     return (!!a.isClaimed as boolean) ? 1 : (!!b.isClaimed as boolean) ? 1 : -1;
 };
+
+export const sortGitcoinRewards = (a: any, b: any) => {
+    return (!!a.isClaimed as boolean) ? 1 : (!!b.isClaimed as boolean) ? 1 : -1;
+};

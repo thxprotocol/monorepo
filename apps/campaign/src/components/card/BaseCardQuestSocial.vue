@@ -32,6 +32,11 @@
                 Quest Completed
             </b-button>
 
+            <b-button v-else-if="quest.isLocked" variant="primary" block class="w-100" disabled>
+                <i class="fas fa-lock me-1" />
+                Quest Locked
+            </b-button>
+
             <BButtonGroup block class="w-100" v-else-if="quest.platform && !isConnected">
                 <b-button variant="primary" @click="onClickConnect" :disabled="isSubmitting">
                     <template v-if="isSubmitting">

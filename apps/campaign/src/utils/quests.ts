@@ -1,5 +1,11 @@
 import { RewardSortVariant, QuestVariant } from '../types/enums/rewards';
-import { sortDailyRewards, sortConditionalRewards, sortMilestoneRewards, sortWeb3Rewards } from '../utils/sort';
+import {
+    sortDailyRewards,
+    sortConditionalRewards,
+    sortMilestoneRewards,
+    sortWeb3Rewards,
+    sortGitcoinRewards,
+} from '../utils/sort';
 
 export function toNumber(value?: boolean) {
     return value === undefined ? 0 : Number(value);
@@ -8,17 +14,23 @@ export function toNumber(value?: boolean) {
 export const rewardComponentMap = {
     [QuestVariant.Daily]: 'BaseCardQuestDaily',
     [QuestVariant.Invite]: 'BaseCardQuestInvite',
-    [QuestVariant.Social]: 'BaseCardQuestSocial',
+    [QuestVariant.Twitter]: 'BaseCardQuestSocial',
+    [QuestVariant.Discord]: 'BaseCardQuestSocial',
+    [QuestVariant.YouTube]: 'BaseCardQuestSocial',
     [QuestVariant.Custom]: 'BaseCardQuestCustom',
     [QuestVariant.Web3]: 'BaseCardQuestWeb3',
+    [QuestVariant.Gitcoin]: 'BaseCardQuestGitcoin',
 };
 
 export const filterAvailableMap: any = {
     [QuestVariant.Daily]: (quest: TQuestDaily & { claimAgainDuration: number }) => quest.claimAgainDuration <= 0,
     [QuestVariant.Invite]: (quest: TQuestInvite) => !!quest,
-    [QuestVariant.Social]: (quest: TQuestSocial) => !quest.isClaimed,
+    [QuestVariant.Twitter]: (quest: TQuestSocial) => !quest.isClaimed,
+    [QuestVariant.Discord]: (quest: TQuestSocial) => !quest.isClaimed,
+    [QuestVariant.YouTube]: (quest: TQuestSocial) => !quest.isClaimed,
     [QuestVariant.Custom]: (quest: TQuestCustom) => !quest.claims.length || quest.limit - quest.claims.length > 0,
     [QuestVariant.Web3]: (quest: TQuestWeb3) => !quest.isClaimed,
+    [QuestVariant.Gitcoin]: (quest: TQuestWeb3) => !quest.isClaimed,
 };
 
 export const sortMap: { [k: number]: any } = {
@@ -37,6 +49,8 @@ export const sortMap: { [k: number]: any } = {
                 return sortMilestoneRewards(a, b);
             case 'BaseCardQuestWeb3':
                 return sortWeb3Rewards(a, b);
+            case 'BaseCardQuestGitcoin':
+                return sortGitcoinRewards(a, b);
             default:
                 return 0;
         }

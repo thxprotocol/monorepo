@@ -13,7 +13,7 @@
     >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i class="fab fa-ethereum me-2 text-primary"></i>
+                <i class="fa fa-heartbeat me-2 text-primary"></i>
             </div>
             <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
             <div class="text-accent fw-bold">{{ quest.amount }}</div>
@@ -26,33 +26,8 @@
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
         <blockquote>
-            <b-form-group label="Available On">
-                <div class="d-inline-flex ms-2 align-items-center" v-for="contract of quest.contracts">
-                    <b-img
-                        :src="chainList[contract.chainId].logo"
-                        width="12"
-                        height="12"
-                        :alt="chainList[contract.chainId].name"
-                        class="me-2"
-                    />
-
-                    <b-link target="_blank" :href="getAddressURL(contract.chainId, contract.address)">
-                        {{ chainList[contract.chainId].name }}
-                    </b-link>
-                </div>
-            </b-form-group>
-            <b-row>
-                <b-col>
-                    <b-form-group label="Method" class="mb-0">
-                        <code>{{ quest.methodName }}</code>
-                    </b-form-group>
-                </b-col>
-                <b-col>
-                    <b-form-group label="Threshold" class="mb-0">
-                        <code>{{ quest.threshold }}</code>
-                    </b-form-group>
-                </b-col>
-            </b-row>
+            Your address is verified using Gitcoin's <code>Unique Humanity Scorer</code><br />
+            <b-link target="_blank" href="https://passport.gitcoin.co">Create Gitcoin Passport</b-link>
         </blockquote>
 
         <template #button>
@@ -114,7 +89,7 @@ import { signMessage } from '@wagmi/core';
 import { Web3Modal } from '@web3modal/html';
 
 export default defineComponent({
-    name: 'BaseCardQuestSocial',
+    name: 'BaseCardQuestGitcoin',
     props: {
         quest: {
             type: Object as PropType<TQuestWeb3>,
@@ -171,9 +146,9 @@ export default defineComponent({
     },
     mounted() {
         if (this.quest.isClaimed) return;
-        const chains = this.quest.contracts.map((contract: { chainId: ChainId }) => chainList[contract.chainId].chain);
+        const chains = [chainList[ChainId.Polygon].chain];
         const theme = this.accountStore.getTheme();
-        this.chainId = this.quest.contracts[0].chainId;
+        this.chainId = ChainId.Polygon;
         this.modal = getModal(chainList[this.chainId].chain, chains, theme);
         this.unsubscribe = this.modal.subscribeModal(this.onModalStateChange);
     },
@@ -203,10 +178,10 @@ export default defineComponent({
                 await this.modal.openModal();
                 await this.waitForConnected();
 
-                const message = `This signature will be used to validate if the result of calling ${this.quest.methodName} on chain ${this.reward.chainId} with the address used to sign this message is above the threshold of ${this.quest.threshold}.`;
+                const message = `This signature will be used to proof ownership of a web3 account.`;
                 const signature = await signMessage({ message });
 
-                await this.rewardsStore.completeWeb3Quest(this.quest.uuid, {
+                await this.rewardsStore.completeGitcoinQuest(this.quest.uuid, {
                     signature,
                     message,
                     chainId: this.chainId,

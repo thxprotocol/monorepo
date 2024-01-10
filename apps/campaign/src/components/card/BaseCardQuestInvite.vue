@@ -10,7 +10,16 @@
 
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
-        <b-input-group v-if="authStore.oAuthShare">
+        <b-button v-if="!authStore.oAuthShare" variant="primary" block class="w-100" @click="onClickClaim">
+            Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
+        </b-button>
+
+        <b-button v-else-if="quest.isLocked" variant="primary" block class="w-100" disabled>
+            <i class="fas fa-lock me-1" />
+            Quest Locked
+        </b-button>
+
+        <b-input-group v-else>
             <b-form-input :model-value="inviteUrl" />
             <b-input-group-append>
                 <b-button size="sm" variant="primary" v-clipboard:copy="inviteUrl" v-clipboard:success="onCopySuccess">
@@ -19,10 +28,6 @@
                 </b-button>
             </b-input-group-append>
         </b-input-group>
-
-        <b-button v-else variant="primary" block class="w-100" @click="onClickClaim">
-            Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
-        </b-button>
 
         <div v-if="authStore.oAuthShare && inviteUrl" class="pt-2">
             <BaseBtnShareTwitter :url="inviteUrl" text="Please have a look at this:" class="me-2" />

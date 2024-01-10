@@ -38,6 +38,7 @@
                             <component
                                 :is="rewardComponentMap[quest.variant]"
                                 :quest="quest"
+                                @unlock="onClickUnlock"
                                 class="mb-2 mx-lg-0 my-lg-3"
                             />
                         </div>
@@ -65,6 +66,7 @@ import BaseCardQuestSocial from '../../components/card/BaseCardQuestSocial.vue';
 import BaseCardQuestCustom from '../../components/card/BaseCardQuestCustom.vue';
 import BaseCardQuestDaily from '../../components/card/BaseCardQuestDaily.vue';
 import BaseCardQuestWeb3 from '../../components/card/BaseCardQuestWeb3.vue';
+import BaseCardQuestGitcoin from '../../components/card/BaseCardQuestGitcoin.vue';
 
 export default defineComponent({
     name: 'Quests',
@@ -74,6 +76,7 @@ export default defineComponent({
         BaseCardQuestCustom,
         BaseCardQuestDaily,
         BaseCardQuestWeb3,
+        BaseCardQuestGitcoin,
     },
     data(): any {
         return {
