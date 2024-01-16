@@ -215,7 +215,7 @@ export default defineComponent({
         },
         async getCampaigns() {
             const url = new URL(API_URL);
-            url.pathname = '/v1/pools/public';
+            url.pathname = '/v1/leaderboards';
             url.searchParams.append('page', this.page);
             url.searchParams.append('limit', this.limit);
             if (this.search) {
