@@ -6,7 +6,7 @@
                     class="position-absolute"
                     style="right: 0.5rem"
                     v-b-tooltip
-                    :title="'Do not change this text in your post! Complete the quest right after posting as we only check requirements for your last post on X.'"
+                    :title="'Do not change this text in your post! Complete the quest not faster than 10s after posting.'"
                     v-clipboard:copy="reward.content"
                     v-clipboard:success="onCopySuccess"
                 >
@@ -14,7 +14,7 @@
                 </b-link>
                 Post contains:
             </div>
-            <em>{{ reward.content }}</em>
+            <em style="white-space: pre-wrap" v-html="reward.content" />
         </div>
     </blockquote>
 </template>
