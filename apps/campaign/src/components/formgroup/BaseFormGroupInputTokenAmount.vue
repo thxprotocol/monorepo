@@ -6,6 +6,7 @@
                 variant="primary"
                 style="font-size: 1rem; font-weight: normal"
             >
+                <b-img v-if="image" :src="image" :alt="`${symbol} icon`" width="20" height="20" class="me-2" />
                 {{ symbol }}
             </b-badge>
             <b-form-input
@@ -36,6 +37,7 @@ import { defineComponent } from 'vue';
 export default defineComponent({
     name: 'BaseFormGroupInputTokenAmount',
     props: {
+        image: String,
         symbol: String,
         label: String,
         min: Number,
@@ -45,3 +47,8 @@ export default defineComponent({
     },
 });
 </script>
+<style scoped>
+.form-control {
+    border-color: var(--bs-primary);
+}
+</style>

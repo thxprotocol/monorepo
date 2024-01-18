@@ -15,14 +15,47 @@
                 </div>
             </b-col>
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
-                <b-card class="border-0 gradient-shadow-xl" style="min-height: 264px">
+                <b-card class="border-0 gradient-shadow-xl" style="min-height: 415px">
                     <b-tabs pills justified content-class="mt-3" nav-wrapper-class="text-white">
-                        <b-tab title="Invest"> Balancer UI </b-tab>
-                        <b-tab title="Lock" active>
-                            <p>
-                                Deposit liquidity on Balancer, and then stake your received BPT here to earn more BPT in
-                                addition to Balancer's native $BAL rewards.
-                            </p>
+                        <b-tab title="Invest">
+                            <template #title>
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                Liquidity
+                            </template>
+                            <BaseFormGroupInputTokenAmount
+                                image="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+                                symbol="USDC"
+                                :balance="Math.floor(veStore.balances.usdc)"
+                                :value="amountUSDC"
+                                @update="amountUSDC = $event"
+                                :min="0"
+                                :max="Math.floor(veStore.balances.usdc)"
+                                class="mb-4"
+                            >
+                            </BaseFormGroupInputTokenAmount>
+                            <BaseFormGroupInputTokenAmount
+                                image="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
+                                symbol="THX"
+                                :balance="Math.floor(veStore.balances.thx)"
+                                :value="amountTHX"
+                                @update="amountTHX = $event"
+                                :min="0"
+                                :max="Math.floor(veStore.balances.thx)"
+                                class="mb-4"
+                            />
+                            <b-button class="w-100 mt-3" @click="onClickAddLiquidity" variant="success">
+                                Add Liquidity
+                            </b-button>
+                        </b-tab>
+                        <b-tab active>
+                            <template #title>
+                                <i class="fas fa-lock me-1"></i>
+                                Deposit
+                            </template>
+                            <b-alert v-model="isAlertDepositShown" class="py-2 px-3">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Earn additional BPT next to Balancer's native $BAL rewards!
+                            </b-alert>
                             <BaseFormGroupInputTokenAmount
                                 symbol="20USDC-80THX"
                                 :balance="Math.floor(veStore.balances.bpt)"
@@ -42,12 +75,16 @@
                                 :value="lockEnd"
                                 @update="lockEnd = $event"
                             />
-                            {{ lockEnd }}
-
-                            <b-button class="w-100 mt-3" @click="onClickDeposit" variant="primary"> Deposit </b-button>
+                            <b-button class="w-100 mt-3" @click="onClickDeposit" variant="success"> Deposit </b-button>
                         </b-tab>
                         <b-tab>
-                            <template #title> Unlock </template>
+                            <template #title>
+                                <i class="fas fa-unlock me-1"></i>
+                                Withdraw
+                            </template>
+                            <b-button class="w-100 mt-3" @click="onClickWithdraw" variant="primary">
+                                Withdraw
+                            </b-button>
                         </b-tab>
                     </b-tabs>
                 </b-card>
@@ -85,11 +122,14 @@ export default defineComponent({
     name: 'Earn',
     data() {
         return {
+            isAlertDepositShown: true,
             startDate: new Date(),
             lockEnd: new Date(),
             balPrice: 0,
             publicUrl: 'https://thx.network',
             amountDeposit: 0,
+            amountUSDC: 0,
+            amountTHX: 0,
             fromWei,
             toFiat,
         };
@@ -106,6 +146,7 @@ export default defineComponent({
     },
     methods: {
         onClickStart() {},
+        onClickAddLiquidity() {},
         onClickDeposit() {
             this.veStore.deposit({
                 amountInWei: String(this.amountDeposit), // Do wei conversion
