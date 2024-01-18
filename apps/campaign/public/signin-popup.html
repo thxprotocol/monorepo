@@ -27,36 +27,18 @@
             integrity="sha512-v9YAXYIA7sZ48R0CuD5+nKrTrFfSQT4i7iRDSbAhZFYy6mkxom6wvNnkW6fiZ916YoovjrwDlUQLRS7xZuJddw=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        function isBase64(str) {
-            try {
-                const object = JSON.parse(window.atob(str));
-                return typeof object === 'object';
-            } catch {
-                return false;
-            }
-        }
-
         const url = new URL(window.location);
         // Social Connect flow
-        if (!url.searchParams.has('code')) {
-            window.close()
-        }
+        if (!url.searchParams.has('code')) window.close()
+        if (typeof localStorage === 'undefined') alert("Can not authenticate because there is no localStorage API available on this device!");
 
         const iss = url.searchParams.get('iss');
-        const stateString = url.searchParams.get('state');
+        const stateId = url.searchParams.get('state');
+        if (!stateId) alert(`Can not authenticate because there is no state ID in the URL.`);
+        const stateString = window.localStorage.getItem(`oidc.${stateId}`);
+        if (!stateString) alert(`Can not authenticate because there is no state found for state ID ${stateId}`);
 
-        let stateId, returnUrl;
-        // Social callbacks will return a base64 encoded state string that also contains a return_url
-        if (isBase64(stateString)) {
-            const stateSerialized = window.atob(stateString);
-            const state = JSON.parse(stateSerialized);
-            stateId = state.stateId;
-            returnUrl = state.returnUrl;
-        } else {
-            stateId = stateString
-        }
-
-        const state = JSON.parse(localStorage.getItem(`oidc.${stateId}`));
+        const state = JSON.parse(stateString);
         const userManager = new window.oidc.UserManager({
             authority: iss,
             client_id: state && state.data.client_id,
@@ -72,12 +54,12 @@
             // Throws if no state is found for custom base64 state key
             if (error.message === 'No matching state found in storage') {
                 if (isMobile || isCypress) {
-                    // If close fails redirect to return_url
-                    window.location.href = returnUrl
+                    // If close fails redirect to returnUrl
+                    window.location.href = state.data.returnUrl
                 } else {
                     window.close()
-                    // If close fails redirect to return_url
-                    window.location.href = returnUrl
+                    // If close fails redirect to returnUrl
+                    window.location.href = state.data.returnUrl
                 }
             }
 
@@ -85,7 +67,7 @@
             if (!window.opener) {
                 window.close()
                 // If close fails redirect to return_url
-                window.location.href = returnUrl
+                window.location.href = state.data.returnUrl
             }
         }
 
