@@ -76,7 +76,7 @@ export default defineComponent({
         error: String,
         amount: Number,
         infoLinks: { type: Object as PropType<{ label: string; url: string }[]>, required: false },
-        quest: { required: true, type: Object as PropType<TBaseQuest> },
+        quest: { required: true, type: Object as PropType<TBaseQuest & any> },
     },
     data: function () {
         return { isVisible: false };

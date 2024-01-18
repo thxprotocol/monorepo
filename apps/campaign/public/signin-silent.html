@@ -12,27 +12,7 @@
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         const url = new URL(window.location);
-        const stateString = url.searchParams.get('state');
-
-        function isBase64(str) {
-            try {
-                const object = JSON.parse(window.atob(str));
-                return typeof object === 'object';
-            } catch {
-                return false;
-            }
-        }
-
-        let stateId;
-        // Social callbacks will return a base64 encoded state string that also contains a return_url
-        if (isBase64(stateString)) {
-            const stateSerialized = window.atob(stateString);
-            const state = JSON.parse(stateSerialized);
-            stateId = state.stateId;
-        } else {
-            stateId = stateString
-        }
-
+        const stateId = url.searchParams.get('state');
         const state = JSON.parse(localStorage.getItem(`oidc.${stateId}`));
         const userManager = new window.oidc.UserManager({
             authority: url.searchParams.get('iss'),
