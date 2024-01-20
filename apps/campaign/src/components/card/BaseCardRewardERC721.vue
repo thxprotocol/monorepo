@@ -1,28 +1,28 @@
 <template>
     <BaseCardReward
-        :isPromoted="perk.isPromoted"
+        :isPromoted="reward.isPromoted"
         :image="imgUrl"
-        :title="perk.title"
-        :description="perk.description"
-        :price="perk.price"
-        :price-currency="perk.priceCurrency"
-        :point-price="perk.pointPrice"
-        :progress="perk.progress"
-        :expiry="perk.expiry"
-        :isLocked="perk.isLocked"
-        :tokenGatingContractAddress="perk.tokenGatingContractAddress"
+        :title="reward.title"
+        :description="reward.description"
+        :price="reward.price"
+        :price-currency="reward.priceCurrency"
+        :point-price="reward.pointPrice"
+        :progress="reward.progress"
+        :expiry="reward.expiry"
+        :isLocked="reward.isLocked"
+        :tokenGatingContractAddress="reward.tokenGatingContractAddress"
         @submit="onClickRedeem"
     >
         <template #title>
-            <div class="flex-grow-1">{{ perk.title }}</div>
-            <div class="text-success fw-bold" v-if="perk.erc1155Amount">{{ perk.erc1155Amount }}x</div>
+            <div class="flex-grow-1">{{ reward.title }}</div>
+            <div class="text-success fw-bold" v-if="reward.erc1155Amount">{{ reward.erc1155Amount }}x</div>
         </template>
     </BaseCardReward>
     <BaseModalRewardPayment
-        :id="`${id}${perk.uuid}`"
+        :id="`${id}${reward.uuid}`"
         :show="isModalShown"
         :error="error"
-        :perk="perk"
+        :reawrd="reward"
         :is-loading="isSubmitting"
         @hidden="onModalHidden"
         @submit-redemption="onSubmitRedemption"
@@ -33,7 +33,7 @@
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
-import { usePerkStore } from '../../stores/Perk';
+import { useRewardStore } from '../../stores/Reward';
 import { useWalletStore } from '../../stores/Wallet';
 import { useAuthStore } from '../../stores/Auth';
 import { format, formatDistance } from 'date-fns';
@@ -41,27 +41,27 @@ import { format, formatDistance } from 'date-fns';
 export default defineComponent({
     name: 'BaseCardRewardNFT',
     data() {
-        return { format, id: 'modalERC721PerkPayment', error: '', isModalShown: false, isSubmitting: false };
+        return { format, id: 'modalERC721rewardPayment', error: '', isModalShown: false, isSubmitting: false };
     },
     props: {
-        perk: {
-            type: Object as PropType<TPerk>,
+        reward: {
+            type: Object as PropType<TReward>,
             required: true,
         },
     },
     computed: {
-        ...mapStores(usePerkStore),
+        ...mapStores(useRewardStore),
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         imgUrl() {
-            return this.perk.image || (this.perk.metadata && this.perk.metadata.imageUrl);
+            return this.reward.image || (this.reward.metadata && this.reward.metadata.imageUrl);
         },
         isExpired: function () {
-            return this.perk.expiry.now - this.perk.expiry.date > 0;
+            return this.reward.expiry.now - this.reward.expiry.date > 0;
         },
         expiryDate: function () {
             return !this.isExpired
-                ? formatDistance(new Date(this.perk.expiry.date), new Date(this.perk.expiry.now), {
+                ? formatDistance(new Date(this.reward.expiry.date), new Date(this.reward.expiry.now), {
                       addSuffix: false,
                   })
                 : 'expired';
@@ -80,8 +80,8 @@ export default defineComponent({
         },
         onSubmitRedemption() {
             this.isSubmitting = true;
-            this.perksStore
-                .createERC721Redemption(this.perk.uuid)
+            this.rewardStore
+                .createERC721Redemption(this.reward.uuid)
                 .then(async () => {
                     const walletStore = useWalletStore();
                     await this.accountStore.getBalance();

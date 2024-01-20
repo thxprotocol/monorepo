@@ -71,9 +71,9 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 import { useWalletStore } from '../../stores/Wallet';
-import { usePerkStore } from '../../stores/Perk';
+import { useRewardStore } from '../../stores/Reward';
 import { decodeHTML } from '../../utils/decode-html';
 import { AccountVariant } from '../../types/enums/accountVariant';
 import { getIsMobile } from '../../utils/user-agent';
@@ -91,8 +91,8 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
+        ...mapStores(useQuestStore),
         ...mapStores(useRewardStore),
-        ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
         walletAddress() {
             const { wallet } = useWalletStore();

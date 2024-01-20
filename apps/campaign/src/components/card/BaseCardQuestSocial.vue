@@ -77,7 +77,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 import { RewardConditionPlatform, RewardConditionInteraction } from '../../types/enums/rewards';
 import { getInteractionComponent, getConnectionStatus, platformIconMap } from '../../utils/social';
 import BaseBlockquoteTwitterTweet from '../blockquote/BaseBlockquoteTwitterTweet.vue';
@@ -122,7 +122,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useQuestStore),
         isConnected() {
             const { account } = useAccountStore();
             if (!account) return;
@@ -141,7 +141,7 @@ export default defineComponent({
                 this.error = '';
                 this.isSubmitting = true;
                 this.isModalQuestEntryShown = true;
-                await this.rewardsStore.completeSocialQuest(this.quest._id);
+                await this.questStore.completeSocialQuest(this.quest._id);
             } catch (error) {
                 const err = error as Error;
                 this.error = err.message ? err.message : 'Could not claim points.';

@@ -1,7 +1,7 @@
 <template>
     <b-navbar
         :container="false"
-        v-if="rewardsStore.quests.length || perksStore.rewards.length"
+        v-if="questStore.quests.length || rewardStore.rewards.length"
         class="navbar-bottom mb-lg-3 px-lg-3 order-lg-0"
     >
         <div v-if="config" class="pl-3 py-2 text-center text-decoration-none d-none d-lg-block me-auto">
@@ -11,15 +11,15 @@
                 v-b-tooltip.hover.bottom="{ title: decodeHTML(config.title) }"
             />
         </div>
-        <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.config.slug}/quests`">
+        <router-link v-if="questStore.quests.length" :to="`/c/${accountStore.config.slug}/quests`">
             <i class="fas fa-tasks me-lg-3"></i>
             <div>Quests</div>
         </router-link>
-        <router-link v-if="perksStore.rewards.length" :to="`/c/${accountStore.config.slug}/rewards`">
+        <router-link v-if="rewardStore.rewards.length" :to="`/c/${accountStore.config.slug}/rewards`">
             <i class="fas fa-gift me-lg-3"></i>
             <div>Rewards</div>
         </router-link>
-        <router-link v-if="rewardsStore.quests.length" :to="`/c/${accountStore.config.slug}/ranking`">
+        <router-link v-if="questStore.quests.length" :to="`/c/${accountStore.config.slug}/ranking`">
             <i class="fas fa-trophy mr-lg-3"></i>
             <div>Rank</div>
         </router-link>
@@ -35,9 +35,9 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 import { useWalletStore } from '../../stores/Wallet';
-import { usePerkStore } from '../../stores/Perk';
+import { useRewardStore } from '../../stores/Reward';
 import { decodeHTML } from '../../utils/decode-html';
 
 export default defineComponent({
@@ -49,8 +49,8 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useQuestStore),
         ...mapStores(useRewardStore),
-        ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
         isNavbarSecondaryShown() {
             return this.screenWidth > 768;

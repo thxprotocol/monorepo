@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { mapStores } from 'pinia';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -38,7 +38,7 @@ export default defineComponent({
         return { isAlertShown: true, isModalShown: false };
     },
     computed: {
-        ...mapStores(useRewardStore),
+        ...mapStores(useQuestStore),
         modalId() {
             return `modalQuestLock${this.quest._id}`;
         },

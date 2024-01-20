@@ -1,25 +1,25 @@
 <template>
     <BaseCardReward
-        :isDisabled="perk.isDisabled"
-        :isPromoted="perk.isPromoted"
-        :image="perk.image"
-        :title="perk.title"
-        :description="perk.description"
-        :point-price="perk.pointPrice"
-        :progress="perk.progress"
-        :expiry="perk.expiry"
-        :isLocked="perk.isLocked"
-        :tokenGatingContractAddress="perk.tokenGatingContractAddress"
+        :isDisabled="reward.isDisabled"
+        :isPromoted="reward.isPromoted"
+        :image="reward.image"
+        :title="reward.title"
+        :description="reward.description"
+        :point-price="reward.pointPrice"
+        :progress="reward.progress"
+        :expiry="reward.expiry"
+        :isLocked="reward.isLocked"
+        :tokenGatingContractAddress="reward.tokenGatingContractAddress"
         @submit="onClickRedeem"
     >
         <template #title>
-            <div class="flex-grow-1">{{ perk.title }}</div>
-            <div class="text-accent fw-bold">{{ perk.amount }} {{ perk.erc20.symbol }}</div>
+            <div class="flex-grow-1">{{ reward.title }}</div>
+            <div class="text-accent fw-bold">{{ reward.amount }} {{ reward.erc20.symbol }}</div>
         </template>
     </BaseCardReward>
     <BaseModalRewardPayment
-        :id="`${id}${perk.uuid}`"
-        :perk="perk"
+        :id="`${id}${reward.uuid}`"
+        :reward="reward"
         :error="error"
         :show="isModalShown"
         :is-loading="isSubmitting"
@@ -32,7 +32,7 @@
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
-import { usePerkStore } from '../../stores/Perk';
+import { useRewardStore } from '../../stores/Reward';
 import { useWalletStore } from '../../stores/Wallet';
 import { useAuthStore } from '../../stores/Auth';
 
@@ -40,20 +40,20 @@ export default defineComponent({
     name: 'BaseCardRewardCoin',
     data() {
         return {
-            id: 'modalERC20PerkPayment',
+            id: 'modalERC20rewardPayment',
             error: '',
             isSubmitting: false,
             isModalShown: false,
         };
     },
     props: {
-        perk: {
-            type: Object as PropType<TPerk>,
+        reward: {
+            type: Object as PropType<TReward>,
             required: true,
         },
     },
     computed: {
-        ...mapStores(usePerkStore),
+        ...mapStores(useRewardStore),
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
     },
@@ -71,8 +71,8 @@ export default defineComponent({
         },
         onSubmitRedemption() {
             this.isSubmitting = true;
-            this.perksStore
-                .createERC20Redemption(this.perk.uuid)
+            this.rewardStore
+                .createERC20Redemption(this.reward.uuid)
                 .then(async () => {
                     const walletStore = useWalletStore();
                     await this.accountStore.getBalance();

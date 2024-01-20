@@ -70,7 +70,7 @@
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 import { useAuthStore } from '../../stores/Auth';
 import { intervalToDuration, sub } from 'date-fns';
 
@@ -105,7 +105,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useQuestStore),
         waitDuration: function () {
             if (!this.quest.claimAgainDuration) return;
 
@@ -146,7 +146,7 @@ export default defineComponent({
                 this.error = '';
                 this.isSubmitting = true;
                 this.isModalQuestEntryShown = true;
-                await this.rewardsStore.completeDailyQuest(this.quest);
+                await this.questStore.completeDailyQuest(this.quest);
             } catch (error) {
                 this.error = String(error);
             } finally {

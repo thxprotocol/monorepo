@@ -40,7 +40,7 @@ import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useWalletStore } from '../../stores/Wallet';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 
 export default defineComponent({
     name: 'Identities',
@@ -54,7 +54,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useQuestStore),
         ...mapStores(useWalletStore),
         isWaitingForWalletAddress() {
             const { wallet } = useWalletStore();
@@ -81,7 +81,7 @@ export default defineComponent({
             this.isLoading = true;
             try {
                 await this.accountStore.api.request.patch(`/v1/identity/${this.uuid}`);
-                await this.rewardsStore.list();
+                await this.questStore.list();
                 this.$router.push(`/c/${this.accountStore.config.slug}/quests`);
             } catch (error) {
                 this.error = (error as Error).message || 'Something went wrong..';

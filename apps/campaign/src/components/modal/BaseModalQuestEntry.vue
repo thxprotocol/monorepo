@@ -59,7 +59,7 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 
 export default defineComponent({
     name: 'BaseModalQuestEntry',
@@ -86,7 +86,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useQuestStore),
         isAlertErrorShown() {
             return !!this.error || !!this.subscribeError;
         },
@@ -120,7 +120,7 @@ export default defineComponent({
         },
         async onClickContinue() {
             this.isLoadingContinue = true;
-            await this.rewardsStore.list();
+            await this.questStore.list();
             this.isLoadingContinue = false;
             this.$emit('close');
         },

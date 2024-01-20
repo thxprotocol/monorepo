@@ -52,7 +52,7 @@ type TAccountState = {
     isAuthenticated: boolean | null;
     isMobileIFrame: boolean;
     isMobileEthereumBrowser: boolean;
-    isRewardsLoaded: boolean;
+    isQuestsLoaded: boolean;
     isPreview: boolean;
     isModalAccountShown: boolean;
     api: THXClient | null;

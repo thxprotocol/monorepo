@@ -1,8 +1,8 @@
-type TPerkState = {
+type TRewardState = {
     rewards: any[];
 };
 
-type TPerk = {
+type TReward = {
     uuid: string;
     poolId: string;
     image: string;

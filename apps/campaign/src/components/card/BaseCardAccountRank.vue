@@ -18,13 +18,13 @@
                 <div class="text-white text-opaque mb-1">Rank: #{{ accountStore.account?.rank }}</div>
                 <b-progress
                     style="height: 13px"
-                    :max="Number(accountStore.balance) + Number(rewardsStore.availablePoints)"
+                    :max="Number(accountStore.balance) + Number(questStore.availablePoints)"
                 >
                     <b-progress-bar
                         variant="success"
                         :value="Number(accountStore.balance)"
                         :label="`${accountStore.balance}/${
-                            Number(accountStore.balance) + Number(rewardsStore.availablePoints)
+                            Number(accountStore.balance) + Number(questStore.availablePoints)
                         }`"
                     />
                 </b-progress>
@@ -39,7 +39,7 @@ import { decodeHTML } from '../../utils/decode-html';
 import { mapStores } from 'pinia';
 import { useAuthStore } from '../../stores/Auth';
 import { useAccountStore } from '../../stores/Account';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 
 export default defineComponent({
     data() {
@@ -59,7 +59,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAuthStore),
         ...mapStores(useAccountStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useQuestStore),
     },
 });
 </script>

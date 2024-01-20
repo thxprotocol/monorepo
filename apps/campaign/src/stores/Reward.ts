@@ -1,115 +1,122 @@
 import { defineStore } from 'pinia';
+import { toNumber } from '../utils/quests';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
-import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { filterAvailableMap } from '../utils/quests';
+import { parseUnitAmount } from '../utils/price';
 
-export const useRewardStore = defineStore('rewards', {
-    state: (): TQuestState => ({
-        quests: [],
-        leaderboard: [],
+export const useRewardStore = defineStore('reward', {
+    state: (): TRewardState => ({
+        rewards: [],
     }),
-    getters: {
-        available: (state) => {
-            return state.quests.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q));
-        },
-        availablePoints: (state) => {
-            const rest = state.quests.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q));
-            if (!rest.length) return 0;
-            return rest.reduce((total: number, quest: any) => total + Number(quest.pointsAvailable), 0);
-        },
-    },
     actions: {
-        async completeGitcoinQuest(uuid: string, payload: { signature: string; message: string; chainId: ChainId }) {
-            const { api, account, getBalance, poolId, config } = useAccountStore();
-            const claim = await api.quests.gitcoin.entry.create(uuid, payload);
-            if (claim.error) throw new Error(claim.error);
-
-            track('UserCreates', [account?.sub, 'gitcoin quest entry', { poolId, origin: config.origin }]);
-
-            getBalance();
-
-            const index = this.quests.findIndex((r) => r.uuid === uuid);
-            this.quests[index].isClaimed = true;
+        updateSupply: function (uuid: string) {
+            const index = this.rewards.findIndex((reward) => reward.uuid === uuid);
+            this.rewards[index].progress.count = this.rewards[index].progress.count + 1;
         },
-        async completeWeb3Quest(uuid: string, payload: { signature: string; message: string; chainId: ChainId }) {
-            const { api, account, getBalance, poolId, config } = useAccountStore();
-            const claim = await api.quests.web3.entry.create(uuid, payload);
-            if (claim.error) throw new Error(claim.error);
+        createERC20Redemption: async function (uuid: string) {
+            const { api, account, poolId, config } = useAccountStore();
+            const { error } = await api.rewards.coin.redemption.post(uuid);
+            if (error) throw error;
 
-            track('UserCreates', [account?.sub, 'web3 quest entry', { poolId, origin: config.origin }]);
+            this.updateSupply(uuid);
 
-            getBalance();
-
-            const index = this.quests.findIndex((r) => r.uuid === uuid);
-            this.quests[index].isClaimed = true;
+            track('UserCreates', [account?.sub, 'coin reward payment', { poolId, origin: config.origin }]);
         },
-        async completeSocialQuest(id: string) {
-            const { api, account, getBalance, poolId, config } = useAccountStore();
-            const claim = await api.quests.social.entry.create(id);
-            if (claim.error) throw new Error(claim.error);
+        createERC721Redemption: async function (uuid: string) {
+            const { api, account, poolId, config } = useAccountStore();
+            const { error } = await api.rewards.nft.redemption.post(uuid);
+            if (error) throw error;
 
-            track('UserCreates', [account?.sub, 'conditional reward claim', { poolId, origin: config.origin }]);
+            this.updateSupply(uuid);
 
-            getBalance();
-
-            const index = this.quests.findIndex((r) => r._id === id);
-            this.quests[index].isClaimed = true;
+            track('UserCreates', [account?.sub, 'nft reward redemption', { poolId, origin: config.origin }]);
         },
-        async completeCustomQuest(quest: TQuestCustom) {
-            const { api, account, getBalance, poolId, config } = useAccountStore();
-            const entry = await api.quests.custom.entry.create(quest.uuid);
-            if (entry.error) throw entry.error;
+        createERC721Payment: async function (uuid: string) {
+            const { api, account, poolId, config } = useAccountStore();
+            const r = await api.rewards.nft.payment.post(uuid);
+            if (r.error) throw r.error;
 
-            track('UserCreates', [account?.sub, 'milestone reward claim', { poolId, origin: config.origin }]);
+            this.updateSupply(uuid);
 
-            getBalance();
+            track('UserCreates', [account?.sub, 'nft reward payment', { poolId, origin: config.origin }]);
+
+            return r;
         },
-        async completeInviteQuest(uuid: string) {
-            const { account, config, setConfig, poolId, api } = useAccountStore();
-            if (!config.ref) return;
+        createCustomRedemption: async function (uuid: string) {
+            const { api, account, poolId, config } = useAccountStore();
+            const r = await api.rewards.custom.redemption.post(uuid);
+            if (r.error) throw r.error;
 
-            const { sub } = JSON.parse(window.atob(config.ref));
-            await api.quests.invite.entry.create(uuid, { sub });
+            this.updateSupply(uuid);
 
-            setConfig(poolId, { ref: '' } as TWidgetConfig);
+            track('UserCreates', [account?.sub, 'custom reward redemption', { poolId, origin: config.origin }]);
 
-            track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: config.origin }]);
+            return r;
         },
-        async completeDailyQuest(reward: TQuestDaily) {
-            const { api, account, getBalance, poolId, config } = useAccountStore();
-            const claim = await api.quests.daily.entry.create(reward._id);
+        createCouponRedemption: async function (uuid: string) {
+            const { api, account, poolId, config } = useAccountStore();
+            const r = await api.rewards.coupon.redemption.post(uuid);
+            if (r.error) throw r.error;
 
-            if (claim.error) {
-                throw claim.error;
-            } else {
-                track('UserCreates', [account?.sub, 'daily reward claim', { poolId, origin: config.origin }]);
+            this.updateSupply(uuid);
 
-                getBalance();
-                this.list();
-            }
+            track('UserCreates', [account?.sub, 'coupon reward redemption', { poolId, origin: config.origin }]);
+
+            return r;
         },
+        createDiscordRoleRedemption: async function (uuid: string) {
+            const { api, account, poolId, config } = useAccountStore();
+            const r = await api.request.post(`/v1/rewards/discord-role/${uuid}/redemption`);
+            if (r.error) throw r.error;
 
+            this.updateSupply(uuid);
+
+            track('UserCreates', [account?.sub, 'discord role reward redemption', { poolId, origin: config.origin }]);
+
+            return r;
+        },
         async list() {
-            const { api, isAuthenticated } = useAccountStore();
-            const { gitcoin, invite, twitter, discord, youtube, custom, daily, web3 } = await api.quests.list();
-            const pointRewardsList = [...twitter, ...discord, ...youtube];
-            this.quests = [...gitcoin, ...invite, ...pointRewardsList, ...custom, ...daily, ...web3];
-
-            // Logic past this point is considered authenticated
-            if (!isAuthenticated) return;
-            await Promise.all(pointRewardsList.map((quest) => this.getSocialQuest(quest._id)));
-        },
-
-        setQuestSocial(quest: TQuestSocial) {
-            const index = this.quests.findIndex((q) => q._id === quest._id);
-            this.quests[index] = quest as any;
-        },
-
-        async getSocialQuest(id: string) {
             const { api } = useAccountStore();
-            const quest = await api.request.get(`/v1/quests/social/${id}`);
-            this.setQuestSocial(quest);
+            const { coin, nft, custom, coupon, discordRole } = await api.rewards.list();
+
+            this.rewards = [
+                ...(coin
+                    ? Object.values(coin).map((r: any) => {
+                          r.component = 'BaseCardRewardERC20';
+                          return r;
+                      })
+                    : []),
+                ...(nft
+                    ? Object.values(nft).map((r: any) => {
+                          r.component = 'BaseCardRewardERC721';
+                          r.price = parseUnitAmount(r.price);
+                          return r;
+                      })
+                    : []),
+                ...(custom
+                    ? Object.values(custom).map((r: any) => {
+                          r.component = 'BaseCardRewardCustom';
+                          r.price = parseUnitAmount(r.price);
+                          return r;
+                      })
+                    : []),
+                ...(coupon
+                    ? Object.values(coupon).map((r: any) => {
+                          r.component = 'BaseCardRewardCoupon';
+                          r.price = parseUnitAmount(r.price);
+                          return r;
+                      })
+                    : []),
+                ...(coupon
+                    ? Object.values(discordRole).map((r: any) => {
+                          r.component = 'BaseCardRewardDiscordRole';
+                          r.price = parseUnitAmount(r.price);
+                          return r;
+                      })
+                    : []),
+            ]
+                .sort((a: any, b: any) => toNumber(b.createdAt) - toNumber(a.createdAt))
+                .sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
         },
     },
 });

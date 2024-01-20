@@ -24,7 +24,7 @@
         </b-container>
         <template v-else>
             <b-container
-                v-if="rewardsStore.quests.length"
+                v-if="questStore.quests.length"
                 class="order-lg-1"
                 :class="{ 'd-none d-lg-block': isRouteRanking }"
             >
@@ -46,9 +46,9 @@ import { defineComponent } from 'vue';
 import { GTM } from '../config/secrets';
 import { useAuthStore } from '../stores/Auth';
 import { useAccountStore } from '../stores/Account';
-import { useRewardStore } from '../stores/Reward';
+import { useQuestStore } from '../stores/Quest';
 import { useWalletStore } from '../stores/Wallet';
-import { usePerkStore } from '../stores/Perk';
+import { useRewardStore } from '../stores/Reward';
 import { initGTM } from '../utils/ga';
 import { decodeHTML } from '../utils/decode-html';
 
@@ -62,17 +62,17 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAuthStore),
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
+        ...mapStores(useQuestStore),
         ...mapStores(useRewardStore),
-        ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
-        isRouteRanking() {
-            return this.$route.name !== 'ranking';
-        },
         isSubscribed() {
             const { subscription } = useAccountStore();
             return !!subscription;
+        },
+        isRouteRanking() {
+            return this.$route.name !== 'ranking';
         },
         walletAddress() {
             const { wallet } = useWalletStore();
@@ -124,7 +124,7 @@ export default defineComponent({
             }
         },
         onQuestsList() {
-            this.rewardsStore.list();
+            this.questStore.list();
         },
         onSignin() {
             this.accountStore.signin();
@@ -138,7 +138,7 @@ export default defineComponent({
             setConfig(poolId, { ref } as TWidgetConfig);
         },
         onInviteQuestComplete(uuid: string) {
-            this.rewardsStore.completeInviteQuest(uuid);
+            this.questStore.completeInviteQuest(uuid);
         },
         onWidgetShow(origin: string, isShown: boolean) {
             const { account, poolId } = this.accountStore;

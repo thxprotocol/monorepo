@@ -102,7 +102,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 import { getModal } from '../../utils/wallet-connect';
 import { chainList, getAddressURL } from '../../utils/chains';
 import { getAccount, GetAccountResult, PublicClient } from '@wagmi/core';
@@ -148,7 +148,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useQuestStore),
         isAlertDangerShown() {
             return !!this.error && !this.isSubmitting;
         },
@@ -203,7 +203,7 @@ export default defineComponent({
                 const message = `This signature will be used to validate if the result of calling ${this.quest.methodName} on chain ${this.reward.chainId} with the address used to sign this message is above the threshold of ${this.quest.threshold}.`;
                 const signature = await signMessage({ message });
 
-                await this.rewardsStore.completeWeb3Quest(this.quest.uuid, {
+                await this.questStore.completeWeb3Quest(this.quest.uuid, {
                     signature,
                     message,
                     chainId: this.chainId,

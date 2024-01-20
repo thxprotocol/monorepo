@@ -35,7 +35,7 @@ app.use(VueClipboard, {
     autoSetContainer: true,
     appendToBody: true,
 });
-app.config.warnHandler = (msg, instance, trace) => {
-    // `trace` is the component hierarchy trace
+app.config.warnHandler = () => {
+    //
 };
 app.mount('#app');

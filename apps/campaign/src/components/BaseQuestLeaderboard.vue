@@ -38,7 +38,7 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
-import { useRewardStore } from '../stores/Reward';
+import { useQuestStore } from '../stores/Quest';
 
 export default defineComponent({
     name: 'Home',
@@ -47,7 +47,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useQuestStore),
     },
     mounted() {
         this.accountStore.getLeaderboard();

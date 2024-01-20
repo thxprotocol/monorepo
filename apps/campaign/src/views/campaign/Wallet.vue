@@ -3,24 +3,6 @@
         <b-row>
             <b-col lg="10" offset-xl="1">
                 <template v-if="authStore.oAuthShare">
-                    <b-alert
-                        variant="danger"
-                        show
-                        v-if="
-                            walletStore.wallet?.version &&
-                            walletStore.wallet?.version !== walletStore.wallet?.latestVersion
-                        "
-                        class="p-1 px-2 align-items-center d-flex"
-                    >
-                        <i class="fas fa-tools me-2"></i>
-                        Your Wallet{{ walletStore.wallet?.version ? ` (v${walletStore.wallet?.version})` : '' }} is out
-                        of date.
-                        <b-button class="ms-auto" size="sm" variant="primary" @click="onClickUpgrade">
-                            <b-spinner v-if="isSubmitting" small variant="light" />
-                            <template v-else>Upgrade</template>
-                        </b-button>
-                    </b-alert>
-
                     <b-alert v-if="!list.length" variant="info" show class="p-2 px-3">
                         <i class="fas fa-question-circle me-2"></i> No tokens found for your account...
                     </b-alert>
@@ -89,12 +71,6 @@ export default defineComponent({
         },
     },
     methods: {
-        async onClickUpgrade() {
-            this.isSubmitting = true;
-            await this.walletStore.upgrade();
-            await this.walletStore.getWallet();
-            this.isSubmitting = false;
-        },
         onClickSignin() {
             this.accountStore.signin();
         },

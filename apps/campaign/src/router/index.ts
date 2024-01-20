@@ -37,11 +37,6 @@ const routes: Array<RouteRecordRaw> = [
         ],
     },
     {
-        path: '/maintenance',
-        name: 'maintenance',
-        component: () => import(/* webpackChunkName: "maintenance" */ '../views/Maintenance.vue'),
-    },
-    {
         path: '/c/:slug',
         name: 'campaign',
         component: () => import(/* webpackChunkName: "campaign" */ '../views/Campaign.vue'),
@@ -90,19 +85,6 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'Identities',
                 beforeEnter,
                 component: () => import(/* webpackChunkName: "identities" */ '../views/campaign/Identities.vue'),
-            },
-            {
-                path: '/c/:slug/checkout/:uuid',
-                name: 'checkout',
-                beforeEnter,
-                component: () => import(/* webpackChunkName: "checkout" */ '../views/campaign/Checkout.vue'),
-            },
-            {
-                path: '/c/:slug/checkout/:uuid/complete',
-                name: 'checkout_complete',
-                beforeEnter,
-                component: () =>
-                    import(/* webpackChunkName: "checkoutcomplete" */ '../views/campaign/CheckoutComplete.vue'),
             },
         ],
     },

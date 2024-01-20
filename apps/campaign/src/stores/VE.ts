@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
-import { BPT_ADDRESS, VE_ADDRESS } from '../config/secrets';
 import { useWalletStore } from './Wallet';
 
 type TVeState = {

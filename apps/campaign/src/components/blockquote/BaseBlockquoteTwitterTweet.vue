@@ -31,7 +31,7 @@
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 import { RewardConditionInteraction } from '../../types/enums/rewards';
 
 export default defineComponent({
@@ -54,7 +54,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useQuestStore),
         content() {
             if (!this.interactionLabel[this.reward.interaction] || !this.reward.content) return;
             return this.getChannelActionURL(this.reward.interaction, this.reward.content);

@@ -4,7 +4,7 @@
         <b-row>
             <b-col lg="10" offset-xl="1">
                 <b-row>
-                    <b-col lg="4" :key="key" v-for="(perk, key) of perksStore.rewards">
+                    <b-col lg="4" :key="key" v-for="(perk, key) of rewardStore.rewards">
                         <component :is="perk.component" :perk="perk" class="mb-2" />
                     </b-col>
                 </b-row>
@@ -16,7 +16,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { usePerkStore } from '../../stores/Perk';
+import { useRewardStore } from '../../stores/Reward';
 import { useAccountStore } from '../../stores/Account';
 import BaseCardRewardERC20 from '../../components/card/BaseCardRewardERC20.vue';
 import BaseCardRewardERC721 from '../../components/card/BaseCardRewardERC721.vue';
@@ -35,10 +35,10 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
-        ...mapStores(usePerkStore),
+        ...mapStores(useRewardStore),
     },
     created() {
-        this.perksStore.list();
+        this.rewardStore.list();
     },
 });
 </script>

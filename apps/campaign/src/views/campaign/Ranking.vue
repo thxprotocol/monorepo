@@ -10,22 +10,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { mapStores } from 'pinia';
-import { useWalletStore } from '../../stores/Wallet';
-import { useAuthStore } from '../../stores/Auth';
-import { useAccountStore } from '../../stores/Account';
-import { useRewardStore } from '../../stores/Reward';
 
 export default defineComponent({
     name: 'Ranking',
-    data: function () {
-        return { error: '', isSubmitting: false, isModalUpgradeShown: false };
-    },
-    computed: {
-        ...mapStores(useWalletStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useAccountStore),
-        ...mapStores(useRewardStore),
-    },
 });
 </script>

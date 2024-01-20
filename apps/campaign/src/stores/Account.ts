@@ -1,8 +1,8 @@
 import { THXBrowserClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
 import { API_URL, AUTH_URL, WIDGET_URL } from '../config/secrets';
-import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
+import { useQuestStore } from './Quest';
 import { useWalletStore } from './Wallet';
 import { track } from '@thxnetwork/mixpanel';
 import { getStyles } from '../utils/theme';
@@ -28,7 +28,7 @@ export const useAccountStore = defineStore('account', {
         leaderboard: [],
         isModalAccountShown: false,
         isAuthenticated: null,
-        isRewardsLoaded: false,
+        isQuestsLoaded: false,
         isMobileIFrame: window.top !== window.self && window.matchMedia('(pointer:coarse)').matches,
         isMobileEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
@@ -201,8 +201,8 @@ export const useAccountStore = defineStore('account', {
         },
         async getCampaignData() {
             if (!this.poolId) return;
-            const questStore = useRewardStore();
-            const rewardStore = usePerkStore();
+            const questStore = useQuestStore();
+            const rewardStore = useRewardStore();
             const authStore = useAuthStore();
 
             questStore.list().then(() => {

@@ -55,10 +55,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useRewardStore } from '../../stores/Reward';
 import { useAccountStore } from '../../stores/Account';
 import { useWalletStore } from '../../stores/Wallet';
-import { usePerkStore } from '../../stores/Perk';
+import { useQuestStore } from '../../stores/Quest';
+import { useRewardStore } from '../../stores/Reward';
 import { RewardSortVariant } from '../../types/enums/rewards';
 import { filterAvailableMap, questComponentMap, sortMap } from '../../utils/quests';
 import BaseCardQuestInvite from '../../components/card/BaseCardQuestInvite.vue';
@@ -89,8 +89,8 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useQuestStore),
         ...mapStores(useRewardStore),
-        ...mapStores(usePerkStore),
         ...mapStores(useWalletStore),
         isSubscribed() {
             const { subscription } = useAccountStore();
@@ -100,11 +100,11 @@ export default defineComponent({
             return !this.availableQuestCount;
         },
         availableQuestCount() {
-            const { quests } = useRewardStore();
+            const { quests } = useQuestStore();
             return quests.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q)).length;
         },
         quests() {
-            const { quests } = useRewardStore();
+            const { quests } = useQuestStore();
             return quests
                 .map((q: TBaseQuest) => ({ ...q, isHidden: !filterAvailableMap[q.variant](q) }))
                 .filter((q: TBaseQuest) =>
@@ -125,10 +125,10 @@ export default defineComponent({
             },
             immediate: true,
         },
-        // This redirects the user to the wallet of there are no rewards and perks
-        'accountStore.isRewardsLoaded': {
-            handler(isRewardsLoaded) {
-                if (isRewardsLoaded && !this.rewardsStore.quests.length && !this.perksStore.rewards.length) {
+        // This redirects the user to the wallet if there are no quest and rewards
+        'accountStore.isQuestsLoaded': {
+            handler(isQuestsLoaded) {
+                if (isQuestsLoaded && !this.questStore.quests.length && !this.rewardStore.rewards.length) {
                     this.$router.push(`/c/${this.accountStore.config.slug}/wallet`);
                 }
             },

@@ -40,7 +40,7 @@
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
-import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
 import { useAuthStore } from '../../stores/Auth';
 
 export default defineComponent({
@@ -57,7 +57,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useQuestStore),
         inviteUrl(): string {
             const accountStore = useAccountStore();
             if (!accountStore.account) return '';

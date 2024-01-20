@@ -33,7 +33,7 @@
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
-import { usePerkStore } from '../../stores/Perk';
+import { useRewardStore } from '../../stores/Reward';
 import { useWalletStore } from '../../stores/Wallet';
 import { useAuthStore } from '../../stores/Auth';
 import { format, formatDistance } from 'date-fns';
@@ -45,12 +45,12 @@ export default defineComponent({
     },
     props: {
         perk: {
-            type: Object as PropType<TPerk>,
+            type: Object as PropType<TReward>,
             required: true,
         },
     },
     computed: {
-        ...mapStores(usePerkStore),
+        ...mapStores(useRewardStore),
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         imgUrl() {
@@ -78,7 +78,7 @@ export default defineComponent({
         },
         onSubmitRedemption() {
             this.isSubmitting = true;
-            this.perksStore
+            this.rewardStore
                 .createCustomRedemption(this.perk.uuid)
                 .then(async () => {
                     const walletStore = useWalletStore();
