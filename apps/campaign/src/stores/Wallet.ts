@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
-import { HARDHAT_RPC, POLYGON_RPC } from '../config/secrets';
+import { BPT_ADDRESS, HARDHAT_RPC, POLYGON_RPC, VE_ADDRESS } from '../config/secrets';
 import { useAuthStore } from './Auth';
 import { EthersAdapter, SafeConfig } from '@safe-global/protocol-kit';
 import { ethers } from 'ethers';
@@ -9,6 +9,18 @@ import Safe from '@safe-global/protocol-kit';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import { AccountVariant } from '../types/enums/accountVariant';
 import { MODE } from '../config/secrets';
+
+type TRequestParamsAllowance = {
+    tokenAddress: string;
+    spender: string;
+    amountInWei: string;
+};
+
+type TRequestBodyApproval = {
+    tokenAddress: string;
+    spender: string;
+    amountInWei: string;
+};
 
 // Safe Contracts
 const GnosisSafeProxyFactoryAddress = '0x1122fD9eBB2a8E7c181Cc77705d2B4cA5D72988A';
@@ -21,6 +33,8 @@ const GnosisSafeL2Address = '0xC44951780f195Ed71145e3d0d2F25726A097C348';
 
 export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
+        allowances: {},
+        balances: {},
         wallet: null,
         walletTransfer: null,
         erc20: [],
@@ -139,6 +153,26 @@ export const useWalletStore = defineStore('wallet', {
             return await api.request.post(`/v1/account/wallet/confirm`, {
                 data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature: signature.data }),
             });
+        },
+        async getBalance(tokenAddress: string) {
+            const { api } = useAccountStore();
+            const { balanceInWei } = await api.request.get('/v1/erc20/balance', {
+                params: { tokenAddress },
+            });
+            this.balances[tokenAddress] = Number(balanceInWei);
+        },
+        async getApproval(params: TRequestParamsAllowance) {
+            const { api } = useAccountStore();
+            const { allowanceInWei } = await api.request.get('/v1/erc20/allowance', { params });
+            if (!this.allowances[params.tokenAddress]) this.allowances[params.tokenAddress] = {};
+            this.allowances[params.tokenAddress][params.spender] = Number(allowanceInWei);
+        },
+        async approve(data: TRequestBodyApproval) {
+            const { api } = useAccountStore();
+            const tx = await api.request.post('/v1/ve/approve', {
+                data,
+            });
+            await useWalletStore().confirmTransaction(tx.safeTxHash);
         },
     },
 });

@@ -10,6 +10,7 @@
                 {{ symbol }}
             </b-badge>
             <b-form-input
+                :disabled="disabled"
                 class="ms-3"
                 :min="min"
                 :max="max"
@@ -19,7 +20,7 @@
                 style="text-align: right"
             />
         </div>
-        <template #description>
+        <template #description v-if="balance">
             <div class="d-flex mb-1 justify-content-between mt-1 text-opaque">
                 <div>
                     Balance: {{ balance }}
@@ -42,8 +43,9 @@ export default defineComponent({
         label: String,
         min: Number,
         max: Number,
+        disabled: Boolean,
         value: { type: Number, required: true },
-        balance: { type: Number, required: true },
+        balance: { type: Number },
     },
 });
 </script>

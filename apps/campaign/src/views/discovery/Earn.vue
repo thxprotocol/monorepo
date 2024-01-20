@@ -25,22 +25,22 @@
                             <BaseFormGroupInputTokenAmount
                                 image="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
                                 symbol="USDC"
-                                :balance="Math.floor(veStore.balances.usdc)"
+                                :balance="Math.floor(walletStore.balances[usdcAddress])"
                                 :value="amountUSDC"
                                 @update="amountUSDC = $event"
                                 :min="0"
-                                :max="Math.floor(veStore.balances.usdc)"
+                                :max="Math.floor(walletStore.balances[usdcAddress])"
                                 class="mb-4"
                             >
                             </BaseFormGroupInputTokenAmount>
                             <BaseFormGroupInputTokenAmount
                                 image="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
                                 symbol="THX"
-                                :balance="Math.floor(veStore.balances.thx)"
+                                :balance="Math.floor(walletStore.balances[thxAddress])"
                                 :value="amountTHX"
                                 @update="amountTHX = $event"
                                 :min="0"
-                                :max="Math.floor(veStore.balances.thx)"
+                                :max="Math.floor(walletStore.balances[thxAddress])"
                                 class="mb-4"
                             />
                             <b-button class="w-100 mt-3" @click="onClickAddLiquidity" variant="success">
@@ -54,34 +54,50 @@
                             </template>
                             <b-alert v-model="isAlertDepositShown" class="py-2 px-3">
                                 <i class="fas fa-info-circle me-1"></i>
-                                Earn additional BPT next to Balancer's native $BAL rewards!
+                                Earn additional BPT next to the native $BAL rewards you receive when
+                                <b-link
+                                    href="https://app.balancer.fi/#/polygon/pool/0xb204bf10bc3a5435017d3db247f56da601dfe08a0002000000000000000000fe"
+                                    target="_blank"
+                                >
+                                    providing liquidity on Balancer
+                                </b-link>
+                                !
                             </b-alert>
                             <BaseFormGroupInputTokenAmount
                                 symbol="20USDC-80THX"
-                                :balance="Math.floor(veStore.balances.bpt)"
+                                :balance="Math.floor(walletStore.balances[bptAddress])"
                                 :value="amountDeposit"
                                 @update="amountDeposit = $event"
                                 :min="0"
-                                :max="Math.floor(veStore.balances.bpt)"
+                                :max="Math.floor(walletStore.balances[bptAddress])"
                                 class="mb-4"
                             />
 
                             <BaseFormGroupInputDate
                                 label="Lock duration"
-                                description="You will be able to withdraw early, but a penalty will be applied."
+                                description="You will be able to withdraw early, but a penalty will be applied!"
                                 :enable-time-picker="false"
                                 :min-date="startDate"
                                 :start-date="startDate"
                                 :value="lockEnd"
                                 @update="lockEnd = $event"
                             />
-                            <b-button class="w-100 mt-3" @click="onClickDeposit" variant="success"> Deposit </b-button>
+                            <b-button @click="isModalDepositShown = true" class="w-100 mt-3" variant="success">
+                                Deposit
+                            </b-button>
+                            <BaseModalDeposit
+                                :amount="amountDeposit"
+                                :show="isModalDepositShown"
+                                :lock-end="lockEnd"
+                                @hidden="isModalDepositShown = false"
+                            />
                         </b-tab>
                         <b-tab>
                             <template #title>
                                 <i class="fas fa-unlock me-1"></i>
                                 Withdraw
                             </template>
+                            {{ veStore.lock }}
                             <b-button class="w-100 mt-3" @click="onClickWithdraw" variant="primary">
                                 Withdraw
                             </b-button>
@@ -99,39 +115,25 @@ import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
 import { useVeStore } from '../../stores/VE';
-import { fromWei } from 'web3-utils';
-
-// import { BalancerSDK, BalancerSdkConfig, Network } from '@balancer-labs/sdk';
-
-// const config: BalancerSdkConfig = {
-//     network: Network.POLYGON,
-//     rpcUrl: 'https://polygon-rpc.com',
-// };
-// const balancer = new BalancerSDK(config);
-
-function toFiat(amount: number | string) {
-    const formatter = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2,
-    });
-    return formatter.format(Number(amount));
-}
+import { BPT_ADDRESS } from '../../config/secrets';
+import { THX_POLYGON_ADDRESS, USDC_POLYGON_ADDRESS } from '../../config/constants';
 
 export default defineComponent({
     name: 'Earn',
     data() {
         return {
+            usdcAddress: USDC_POLYGON_ADDRESS,
+            thxAddress: THX_POLYGON_ADDRESS,
+            bptAddress: BPT_ADDRESS,
+            publicUrl: 'https://thx.network',
+            isModalDepositShown: false,
             isAlertDepositShown: true,
             startDate: new Date(),
             lockEnd: new Date(),
             balPrice: 0,
-            publicUrl: 'https://thx.network',
             amountDeposit: 0,
             amountUSDC: 0,
             amountTHX: 0,
-            fromWei,
-            toFiat,
         };
     },
     computed: {
@@ -141,18 +143,13 @@ export default defineComponent({
     },
     watch: {
         'accountStore.isAuthenticated'() {
-            this.veStore.getBPTBalance();
+            this.walletStore.getBalance(BPT_ADDRESS);
+            this.veStore.getLocks();
         },
     },
     methods: {
         onClickStart() {},
         onClickAddLiquidity() {},
-        onClickDeposit() {
-            this.veStore.deposit({
-                amountInWei: String(this.amountDeposit), // Do wei conversion
-                lockEndTimestamp: this.lockEnd.toISOString(), // Do ISO conversion
-            });
-        },
         onClickWithdraw() {},
     },
 });

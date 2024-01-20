@@ -1,30 +1,29 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
+import { BPT_ADDRESS, VE_ADDRESS } from '../config/secrets';
+import { useWalletStore } from './Wallet';
 
 type TVeState = {
-    balances: { usdc: number; thx: number; bpt: number };
+    lock: { amount: string; endTime: number } | null;
 };
 
-type TDepositRequestBody = {
-    lockEndTimestamp: string;
+type TRequestBodyDeposit = {
+    lockEndTimestamp: number;
     amountInWei: string;
 };
 
 export const useVeStore = defineStore('ve', {
     state: (): TVeState => ({
-        balances: {
-            usdc: 0,
-            thx: 0,
-            bpt: 0,
-        },
+        lock: null,
     }),
     actions: {
-        async getBPTBalance() {
+        async getLocks() {
             const { api } = useAccountStore();
-            const balanceInWei = await api.request.get('/v1/ve/bpt/balance');
-            this.balances.bpt = Number(balanceInWei);
+            const locks = await api.request.get('/v1/ve');
+
+            this.lock = locks[0];
         },
-        async deposit({ lockEndTimestamp, amountInWei }: TDepositRequestBody) {
+        async deposit({ lockEndTimestamp, amountInWei }: TRequestBodyDeposit) {
             const { api } = useAccountStore();
             const tx = await api.request.post('/v1/ve/deposit', {
                 data: {
@@ -32,7 +31,7 @@ export const useVeStore = defineStore('ve', {
                     lockEndTimestamp,
                 },
             });
-            console.log({ tx });
+            await useWalletStore().confirmTransaction(tx.safeTxHash);
         },
         async withdraw() {
             //

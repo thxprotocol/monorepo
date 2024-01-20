@@ -27,6 +27,8 @@ type TWalletState = {
     erc20: any[];
     erc721: any[];
     erc1155: any[];
+    allowances: { [tokenAddress: string]: { [spender: string]: number } };
+    balances: { [tokenAddress: string]: number };
     couponCodes: any[];
     pendingPoints: number;
     isModalWalletCreateShown: boolean;
