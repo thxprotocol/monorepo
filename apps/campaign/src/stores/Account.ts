@@ -22,13 +22,13 @@ export const useAccountStore = defineStore('account', {
         account: null,
         balance: 0,
         migration: null,
-        subscription: null,
         config: {},
-        sheet: null,
+        css: null,
+        subscription: null,
+        leaderboard: [],
         isModalAccountShown: false,
         isAuthenticated: null,
         isRewardsLoaded: false,
-        leaderboard: [],
         isMobileIFrame: window.top !== window.self && window.matchMedia('(pointer:coarse)').matches,
         isMobileEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
@@ -40,19 +40,19 @@ export const useAccountStore = defineStore('account', {
         setTheme(config: TWidgetConfig) {
             const { title, theme } = config;
             const { elements, colors } = JSON.parse(theme);
-            const sheet = getStyles(elements, colors);
+            const css = getStyles(elements, colors);
             document.title = decodeHTML(title) as string;
-            this.sheet = document.head.appendChild(sheet);
+            this.css = document.head.appendChild(css);
         },
         reset() {
             this.poolId = '';
             this.api.setCampaignId('');
-            this.sheet?.remove();
+            this.css?.remove();
         },
         getTheme() {
             return JSON.parse(this.config.theme);
         },
-        async init(poolIdOrSlug: string, origin: string) {
+        async init(slug: string, origin: string) {
             if (!this.api) {
                 this.api = new THXBrowserClient({
                     apiUrl: API_URL,
@@ -63,8 +63,8 @@ export const useAccountStore = defineStore('account', {
                 this.getUserData();
             }
 
-            if (poolIdOrSlug) {
-                const config = await this.api.request.get('/v1/widget/' + poolIdOrSlug);
+            if (slug) {
+                const config = await this.api.request.get('/v1/widget/' + slug);
                 this.poolId = config.poolId;
                 this.api.setCampaignId(this.poolId);
 
@@ -275,14 +275,12 @@ export const useAccountStore = defineStore('account', {
             const body = new FormData();
             body.append('file', file);
 
-            const res = await fetch(API_URL + '/v1/upload', {
-                method: 'PUT',
-                body: body,
+            const { publicUrl } = await this.api.request.put('/v1/upload', {
                 headers: {
-                    Authorization: `Bearer ${useAuthStore().user?.access_token}`,
+                    'Content-Type': undefined,
                 },
+                data: body,
             });
-            const { publicUrl } = await res.json();
             return publicUrl;
         },
         async connectIdentity() {

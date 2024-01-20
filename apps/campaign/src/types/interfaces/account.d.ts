@@ -48,7 +48,7 @@ type TAuthState = {
 };
 
 type TAccountState = {
-    sheet: HTMLStyleElement | null;
+    css: HTMLStyleElement | null;
     isAuthenticated: boolean | null;
     isMobileIFrame: boolean;
     isMobileEthereumBrowser: boolean;
