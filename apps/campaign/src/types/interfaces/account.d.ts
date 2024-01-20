@@ -50,7 +50,8 @@ type TAuthState = {
 type TAccountState = {
     sheet: HTMLStyleElement | null;
     isAuthenticated: boolean | null;
-    isEthereumBrowser: boolean;
+    isMobileIFrame: boolean;
+    isMobileEthereumBrowser: boolean;
     isRewardsLoaded: boolean;
     isPreview: boolean;
     isModalAccountShown: boolean;

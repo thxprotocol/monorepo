@@ -45,7 +45,6 @@ export default defineComponent({
     data() {
         return {
             decodeHTML,
-            isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches,
             isModalPoolSubscriptionShown: false,
             isModalWalletAccessShown: false,
             isRefreshing: false,

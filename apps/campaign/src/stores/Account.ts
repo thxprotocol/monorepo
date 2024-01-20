@@ -1,6 +1,6 @@
 import { THXBrowserClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
-import { API_URL, AUTH_URL } from '../config/secrets';
+import { API_URL, AUTH_URL, WIDGET_URL } from '../config/secrets';
 import { usePerkStore } from './Perk';
 import { useRewardStore } from './Reward';
 import { useWalletStore } from './Wallet';
@@ -28,8 +28,9 @@ export const useAccountStore = defineStore('account', {
         isModalAccountShown: false,
         isAuthenticated: null,
         isRewardsLoaded: false,
-        isEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
         leaderboard: [],
+        isMobileIFrame: window.top !== window.self && window.matchMedia('(pointer:coarse)').matches,
+        isMobileEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
     }),
     actions: {
         setConfig(poolId: string, config: TWidgetConfig) {
@@ -180,9 +181,17 @@ export const useAccountStore = defineStore('account', {
                 retries: 20, // 3s * 20 = 60s
             });
         },
+        signinParent() {
+            const url = `${WIDGET_URL}/c/${this.config.slug}/signin`;
+            this.postMessage({ message: 'thx.auth.signin', url });
+        },
         signin(extraQueryParams?: { [key: string]: string }) {
             this.setStatus(false);
-            return useAuthStore().requestOAuthShare(extraQueryParams);
+            if (this.isMobileIFrame) {
+                this.signinParent();
+            } else {
+                useAuthStore().requestOAuthShare(extraQueryParams);
+            }
         },
         async signout() {
             const { signout } = useAuthStore();
