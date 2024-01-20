@@ -4,8 +4,8 @@
         <b-row>
             <b-col lg="10" offset-xl="1">
                 <b-row>
-                    <b-col lg="4" :key="key" v-for="(perk, key) of rewardStore.rewards">
-                        <component :is="perk.component" :perk="perk" class="mb-2" />
+                    <b-col lg="4" :key="key" v-for="(reward, key) of rewardStore.rewards">
+                        <component :is="reward.component" :reward="reward" class="mb-2" />
                     </b-col>
                 </b-row>
             </b-col>

@@ -1,28 +1,28 @@
 <template>
     <BaseCardReward
-        :isDisabled="perk.isDisabled"
-        :isPromoted="perk.isPromoted"
+        :isDisabled="reward.isDisabled"
+        :isPromoted="reward.isPromoted"
         :image="imgUrl"
-        :title="perk.title"
-        :description="perk.description"
-        :price="perk.price"
-        :price-currency="perk.priceCurrency"
-        :point-price="perk.pointPrice"
-        :progress="perk.progress"
-        :expiry="perk.expiry"
-        :isLocked="perk.isLocked"
-        :tokenGatingContractAddress="perk.tokenGatingContractAddress"
+        :title="reward.title"
+        :description="reward.description"
+        :price="reward.price"
+        :price-currency="reward.priceCurrency"
+        :point-price="reward.pointPrice"
+        :progress="reward.progress"
+        :expiry="reward.expiry"
+        :isLocked="reward.isLocked"
+        :tokenGatingContractAddress="reward.tokenGatingContractAddress"
         @submit="onClickRedeem"
     >
         <template #title>
-            <div class="flex-grow-1">{{ perk.title }}</div>
+            <div class="flex-grow-1">{{ reward.title }}</div>
         </template>
     </BaseCardReward>
     <BaseModalRewardPayment
-        :id="`${id}${perk.uuid}`"
+        :id="`${id}${reward.uuid}`"
         :show="isModalShown"
         :error="error"
-        :perk="perk"
+        :reward="reward"
         :is-loading="isSubmitting"
         @hidden="onModalHidden"
         @submit-redemption="onSubmitRedemption"
@@ -41,10 +41,10 @@ import { format, formatDistance } from 'date-fns';
 export default defineComponent({
     name: 'BaseCardRewardCustom',
     data() {
-        return { format, id: 'modalCustomPerkPayment', error: '', isModalShown: false, isSubmitting: false };
+        return { format, id: 'modalCustomrewardPayment', error: '', isModalShown: false, isSubmitting: false };
     },
     props: {
-        perk: {
+        reward: {
             type: Object as PropType<TReward>,
             required: true,
         },
@@ -54,14 +54,14 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         imgUrl() {
-            return this.perk.image;
+            return this.reward.image;
         },
         isExpired: function () {
-            return this.perk.expiry.now - this.perk.expiry.date > 0;
+            return this.reward.expiry.now - this.reward.expiry.date > 0;
         },
         expiryDate: function () {
             return !this.isExpired
-                ? formatDistance(new Date(this.perk.expiry.date), new Date(this.perk.expiry.now), {
+                ? formatDistance(new Date(this.reward.expiry.date), new Date(this.reward.expiry.now), {
                       addSuffix: false,
                   })
                 : 'expired';
@@ -79,7 +79,7 @@ export default defineComponent({
         onSubmitRedemption() {
             this.isSubmitting = true;
             this.rewardStore
-                .createCustomRedemption(this.perk.uuid)
+                .createCustomRedemption(this.reward.uuid)
                 .then(async () => {
                     const walletStore = useWalletStore();
                     await this.accountStore.getBalance();
