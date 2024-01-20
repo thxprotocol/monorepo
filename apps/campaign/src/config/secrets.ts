@@ -15,3 +15,5 @@ export const HARDHAT_RPC = import.meta.env.VITE_HARDHAT_RPC || '';
 export const POLYGON_RPC = import.meta.env.VITE_POLYGON_RPC || '';
 export const WALLET_CONNECT_PROJECT_ID = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || '';
 export const SENTRY_AUTH_TOKEN = import.meta.env.VITE_SENTRY_AUTH_TOKEN || '';
+export const VE_ADDRESS = import.meta.env.VITE_VE_ADDRESS || '';
+export const BPT_ADDRESS = import.meta.env.VITE_BPT_ADDRESS || '';
