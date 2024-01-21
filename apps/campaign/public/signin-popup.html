@@ -34,10 +34,10 @@
 
         const iss = url.searchParams.get('iss');
         const stateId = url.searchParams.get('state');
-        if (!stateId) alert(`Can not authenticate because there is no state ID in the URL.`);
+        // if (!stateId) alert(`Can not authenticate because there is no state ID in the URL.`);
 
         const stateString = window.localStorage.getItem(`oidc.${stateId}`);
-        if (!stateString) alert(`Can not authenticate because there is no state found for state ID ${stateId}`);
+        // if (!stateString) alert(`Can not authenticate because there is no state found for state ID ${stateId}`);
 
         const state = JSON.parse(stateString);
         const userManager = new window.oidc.UserManager({
