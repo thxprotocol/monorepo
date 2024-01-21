@@ -122,11 +122,10 @@
                                         </strong>
                                     </b-form-group>
                                 </b-col>
-                                <b-form-group
-                                    label="Withdraw Penalty"
-                                    v-if="Number(veStore.lock.end) < Number(veStore.lock.now)"
-                                >
-                                    <b-form-checkbox>I accept a penalty of ...</b-form-checkbox>
+                                <b-form-group v-if="isAlertWithdrawShown" label="Withdraw Penalty">
+                                    <b-form-checkbox v-model="isEarlyAttempt">
+                                        I accept a penalty of ...
+                                    </b-form-checkbox>
                                 </b-form-group>
                             </b-row>
                             <b-button class="w-100 mt-3" @click="onClickWithdraw" variant="primary">
