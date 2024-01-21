@@ -1,17 +1,5 @@
 <template>
-    <BaseCardReward
-        :isDisabled="reward.isDisabled"
-        :isPromoted="reward.isPromoted"
-        :image="reward.image"
-        :title="reward.title"
-        :description="reward.description"
-        :point-price="reward.pointPrice"
-        :progress="reward.progress"
-        :expiry="reward.expiry"
-        :isLocked="reward.isLocked"
-        :tokenGatingContractAddress="reward.tokenGatingContractAddress"
-        @submit="onClickRedeem"
-    >
+    <BaseCardReward :reward="reward" :image="reward.image" @submit="onClickRedeem">
         <template #title>
             <div class="flex-grow-1">{{ reward.title }}</div>
             <div class="text-accent fw-bold">{{ reward.amount }} {{ reward.erc20.symbol }}</div>

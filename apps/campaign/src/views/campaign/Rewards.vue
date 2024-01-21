@@ -17,7 +17,6 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useRewardStore } from '../../stores/Reward';
-import { useAccountStore } from '../../stores/Account';
 import BaseCardRewardERC20 from '../../components/card/BaseCardRewardERC20.vue';
 import BaseCardRewardERC721 from '../../components/card/BaseCardRewardERC721.vue';
 import BaseCardRewardCustom from '../../components/card/BaseCardRewardCustom.vue';
@@ -34,7 +33,6 @@ export default defineComponent({
         BaseCardRewardDiscordRole,
     },
     computed: {
-        ...mapStores(useAccountStore),
         ...mapStores(useRewardStore),
     },
     created() {

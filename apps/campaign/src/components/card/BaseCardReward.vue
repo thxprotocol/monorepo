@@ -2,16 +2,16 @@
     <b-card
         body-class="d-flex align-items-start justify-content-start"
         footer-class="py-3"
-        :no-body="!expiry.date && !image"
+        :no-body="!reward.expiry.date && !image"
         :img-src="image"
         :overlay="!!image"
         class="mb-2 x-lg-0 my-lg-3"
-        :class="{ 'card-promoted': isPromoted }"
+        :class="{ 'card-promoted': reward.isPromoted }"
     >
         <b-badge
-            v-if="expiry && expiry.date"
+            v-if="reward.expiry && reward.expiry.date"
             v-b-tooltip.hover.left
-            :title="format(expiry.date, 'MMMM do yyyy hh:mm:ss')"
+            :title="format(reward.expiry.date, 'MMMM do yyyy hh:mm:ss')"
             variant="primary"
             class="p-1 bg-primary"
         >
@@ -22,18 +22,17 @@
             <b-card-title class="d-flex">
                 <slot name="title"></slot>
             </b-card-title>
-            <b-card-text v-if="description" style="white-space: pre-line" v-html="description" />
+            <b-card-text v-if="reward.description" style="white-space: pre-line" v-html="reward.description" />
             <div class="d-flex pb-3">
                 <div class="d-flex align-items-center">
                     <span class="card-text me-1"> Price: </span>
                     <b-badge variant="primary" class="ms-1 p-1 bg-primary">
                         <span class="text-accent">
-                            <template v-if="price && price > 0"> {{ price }} {{ priceCurrency }} </template>
-                            <template v-else> {{ pointPrice }}</template>
+                            {{ reward.pointPrice }}
                         </span>
                     </b-badge>
                 </div>
-                <div class="d-flex align-items-center ms-auto" v-if="progress && progress.limit">
+                <div class="d-flex align-items-center ms-auto" v-if="reward.progress && reward.progress.limit">
                     <span class="card-text me-1"> Supply: </span>
                     <b-badge variant="primary" class="ms-1 p-1 px-2 bg-primary">
                         <span
@@ -45,7 +44,7 @@
                         >
                             {{ progressCount }}
                         </span>
-                        <span class="card-text">/{{ progress.limit }}</span>
+                        <span class="card-text">/{{ reward.progress.limit }}</span>
                     </b-badge>
                 </div>
             </div>
@@ -54,35 +53,20 @@
                     variant="primary"
                     block
                     class="w-100"
-                    :disabled="isSoldOut || isExpired || isLocked || isDisabled"
+                    :disabled="isSoldOut || isExpired || reward.isLocked || reward.isDisabled"
                     @click="$emit('submit')"
                 >
                     <template v-if="isSoldOut">Sold out</template>
-                    <template v-else-if="isDisabled">Not available</template>
+                    <template v-else-if="reward.isDisabled">Not available</template>
                     <template v-else-if="isExpired">Expired</template>
-                    <template v-else-if="price && price > 0">
-                        <strong>{{ price }} {{ priceCurrency }}</strong>
-                        <small v-if="pointPrice">
-                            / {{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}
-                        </small>
-                    </template>
-                    <template v-else-if="isLocked"> <i class="fas fa-lock me-1"></i> Locked </template>
+                    <template v-else-if="reward.isLocked"> <i class="fas fa-lock me-1"></i> Locked </template>
                     <template v-else>
-                        <strong>{{ `${pointPrice} point${pointPrice && pointPrice > 1 ? 's' : ''}` }}</strong>
+                        <strong>{{
+                            `${reward.pointPrice} point${reward.pointPrice && reward.pointPrice > 1 ? 's' : ''}`
+                        }}</strong>
                     </template>
                 </b-button>
             </span>
-            <div class="text-center" v-if="isLocked">
-                <b-link
-                    target="_blank"
-                    :href="`https://polygonscan.com/token/${tokenGatingContractAddress}`"
-                    v-b-tooltip.top
-                    :title="`Contract: ${tokenGatingContractAddress}`"
-                    class="text-white text-opaque"
-                >
-                    This perk is exclusive to token holders
-                </b-link>
-            </div>
         </template>
     </b-card>
 </template>
@@ -98,42 +82,29 @@ export default defineComponent({
     },
     props: {
         image: String,
-        isDisabled: Boolean,
-        isPromoted: Boolean,
-        title: String,
-        description: String,
-        price: Number,
-        priceCurrency: String,
-        pointPrice: Number,
-        isLocked: Boolean,
-        tokenGatingContractAddress: String,
-        progress: {
+        reward: {
+            type: Object as PropType<TReward>,
             required: true,
-            type: Object as PropType<{ count: number; limit: number }>,
-        },
-        expiry: {
-            required: true,
-            type: Object as PropType<{ date: number; now: number }>,
         },
     },
     computed: {
         progressCount: function () {
-            if (!this.progress) return 0;
-            return this.progress.limit - this.progress.count;
+            if (!this.reward.progress) return 0;
+            return this.reward.progress.limit - this.reward.progress.count;
         },
         progressPercentage: function () {
-            if (!this.progress) return 100;
-            return this.progress.count / this.progress.limit;
+            if (!this.reward.progress) return 100;
+            return this.reward.progress.count / this.reward.progress.limit;
         },
         isSoldOut: function () {
-            return this.progress.limit > 0 ? this.progress.count >= this.progress.limit : false;
+            return this.reward.progress.limit > 0 ? this.reward.progress.count >= this.reward.progress.limit : false;
         },
         isExpired: function () {
-            return this.expiry.date ? this.expiry.now - this.expiry.date > 0 : false;
+            return this.reward.expiry.date ? this.reward.expiry.now - this.reward.expiry.date > 0 : false;
         },
         expiryDate: function () {
-            return !this.isExpired && this.expiry
-                ? formatDistance(new Date(this.expiry.date), new Date(this.expiry.now), {
+            return !this.isExpired && this.reward.expiry
+                ? formatDistance(new Date(this.reward.expiry.date), new Date(this.reward.expiry.now), {
                       addSuffix: false,
                   })
                 : 'expired';

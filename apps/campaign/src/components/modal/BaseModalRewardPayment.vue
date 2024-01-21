@@ -3,7 +3,7 @@
         :id="id"
         v-model="isShown"
         @hidden="$emit('hidden')"
-        :title="reward.title"
+        :title="reward && reward.title"
         centered
         content-class="gradient-shadow-xl"
         no-close-on-backdrop
