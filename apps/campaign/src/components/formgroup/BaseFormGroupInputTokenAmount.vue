@@ -21,10 +21,13 @@
             />
         </div>
         <template #description v-if="balance">
-            <div class="d-flex mb-1 justify-content-between mt-1 text-opaque">
+            <div class="d-flex mb-1 justify-content-between mt-1 text-muted">
                 <div>
-                    Balance: {{ balance }}
-                    <span v-if="value >= balance" class="text-muted"> Maxed </span>
+                    Balance: {{ balance }} {{ symbol }}
+                    <span v-if="value >= balance" class="text-muted"> (Maxed) </span>
+                    <b-badge v-else @click="$emit('update', balance)" class="cursor-pointer ms-1" variant="primary">
+                        Max
+                    </b-badge>
                 </div>
             </div>
             <b-progress variant="success" class="bg-primary" :value="value" :max="balance" style="height: 5px" />

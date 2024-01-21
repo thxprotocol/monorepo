@@ -43,9 +43,9 @@ export default defineComponent({
             return `modalQuestLock${this.quest._id}`;
         },
         locks() {
-            if (!this.rewardsStore.quests.length) return;
+            if (!this.questStore.quests.length) return;
             return this.quest.locks.map((lock: { questId: string }) =>
-                this.rewardsStore.quests.find((q) => lock.questId === q._id),
+                this.questStore.quests.find((q) => lock.questId === q._id),
             );
         },
     },

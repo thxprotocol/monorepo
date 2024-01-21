@@ -81,11 +81,19 @@ export default defineComponent({
                 this.isPolling = false;
             }
         },
-        onClickDeposit() {
-            this.veStore.deposit({
-                amountInWei: String(this.amountDeposit), // Do wei conversion
-                lockEndTimestamp: Math.ceil(new Date(this.lockEnd).getTime() / 1000), // Do ISO conversion
-            });
+        async onClickDeposit() {
+            this.isPolling = true;
+            try {
+                await this.veStore.deposit({
+                    amountInWei: String(this.amountDeposit), // Do wei conversion
+                    lockEndTimestamp: Math.ceil(new Date(this.lockEnd).getTime() / 1000), // Do ISO conversion
+                });
+                this.isModalDepositShown = false;
+            } catch (error) {
+                console.log(error);
+            } finally {
+                this.isPolling = false;
+            }
         },
     },
 });

@@ -6,7 +6,7 @@
         <b-link
             @click="onClickRefresh"
             class="pl-3 py-2 p-lg-0 m-lg-0 text-center text-decoration-none d-block d-lg-none"
-            v-if="authStore.oAuthShare && rewardsStore.quests.length"
+            v-if="authStore.oAuthShare && questStore.quests.length"
         >
             <div class="text-accent h1 m-0 d-flex align-items-center">
                 <strong>{{ accountStore.balance }}</strong>
@@ -26,7 +26,7 @@
             />
         </div>
         <div style="width: 120px; text-align: right">
-            <b-button v-if="authStore.oAuthShare && !rewardsStore.quests.length" variant="link" @click="onClickRefresh">
+            <b-button v-if="authStore.oAuthShare && !questStore.quests.length" variant="link" @click="onClickRefresh">
                 <b-spinner v-if="isRefreshing" small variant="white" />
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
             </b-button>
@@ -39,14 +39,14 @@
                     <template #button-content>
                         <i class="fas fa-ellipsis-v"></i>
                     </template>
-                    <b-dropdown-item-button size="sm" @click="onClickWallet" v-if="!rewardsStore.quests.length">
+                    <b-dropdown-item-button size="sm" @click="onClickWallet" v-if="!questStore.quests.length">
                         <b-spinner v-if="!walletAddress" small />
                         <template v-else>{{ walletAddress }}</template>
                     </b-dropdown-item-button>
                     <b-dropdown-item-button
                         size="sm"
                         @click="$router.push(`/c/${config.slug}/w/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`)"
-                        v-if="rewardsStore.quests.length"
+                        v-if="questStore.quests.length"
                     >
                         Identities
                     </b-dropdown-item-button>
@@ -125,7 +125,12 @@ export default defineComponent({
         },
         async onClickRefresh() {
             this.isRefreshing = true;
-            await Promise.all([this.rewardsStore.list(), this.walletStore.list(), this.accountStore.getBalance()]);
+            await Promise.all([
+                this.accountStore.getBalance(),
+                this.questStore.list(),
+                this.rewardStore.list(),
+                this.walletStore.list(),
+            ]);
             this.isRefreshing = false;
         },
     },

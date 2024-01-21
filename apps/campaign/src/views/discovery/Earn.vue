@@ -97,7 +97,38 @@
                                 <i class="fas fa-unlock me-1"></i>
                                 Withdraw
                             </template>
-                            {{ veStore.lock }}
+                            <b-alert v-model="isAlertWithdrawShown" class="p-2" variant="danger">
+                                <i class="fas fa-info-circle me-1"></i>
+                                A penalty will be applied on early withdrawals!
+                            </b-alert>
+                            <b-row v-if="veStore.lock">
+                                <b-col>
+                                    <b-form-group label="Amount">
+                                        <strong>{{ veStore.lock.amount }}</strong>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col>
+                                    <b-form-group label="Lock End">
+                                        <strong>
+                                            7 days
+                                            <i
+                                                v-b-tooltip
+                                                :title="`${format(
+                                                    new Date(Number(veStore.lock.end)),
+                                                    'MMMM do yyyy hh:mm:ss',
+                                                )}`"
+                                                class="fas fa-info-circle me-1 cursor-pointer text-opaque"
+                                            />
+                                        </strong>
+                                    </b-form-group>
+                                </b-col>
+                                <b-form-group
+                                    label="Withdraw Penalty"
+                                    v-if="Number(veStore.lock.end) < Number(veStore.lock.now)"
+                                >
+                                    <b-form-checkbox>I accept a penalty of ...</b-form-checkbox>
+                                </b-form-group>
+                            </b-row>
                             <b-button class="w-100 mt-3" @click="onClickWithdraw" variant="primary">
                                 Withdraw
                             </b-button>
@@ -117,11 +148,13 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useVeStore } from '../../stores/VE';
 import { BPT_ADDRESS } from '../../config/secrets';
 import { THX_POLYGON_ADDRESS, USDC_POLYGON_ADDRESS } from '../../config/constants';
+import { format } from 'date-fns';
 
 export default defineComponent({
     name: 'Earn',
     data() {
         return {
+            format,
             usdcAddress: USDC_POLYGON_ADDRESS,
             thxAddress: THX_POLYGON_ADDRESS,
             bptAddress: BPT_ADDRESS,
@@ -134,12 +167,18 @@ export default defineComponent({
             amountDeposit: 0,
             amountUSDC: 0,
             amountTHX: 0,
+            isEarlyAttempt: false,
         };
     },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
         ...mapStores(useVeStore),
+        isAlertWithdrawShown() {
+            if (!this.veStore.lock) return;
+            const { now, end } = this.veStore.lock;
+            return Number(now) > Number(end);
+        },
     },
     watch: {
         'accountStore.isAuthenticated'() {
@@ -150,7 +189,11 @@ export default defineComponent({
     methods: {
         onClickStart() {},
         onClickAddLiquidity() {},
-        onClickWithdraw() {},
+        onClickWithdraw() {
+            // Should only be true is the isEarlyAttempt is intentional
+            // use a checkbox for this
+            this.veStore.withdraw(this.isEarlyAttempt);
+        },
     },
 });
 </script>

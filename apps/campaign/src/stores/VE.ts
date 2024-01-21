@@ -3,7 +3,7 @@ import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
 
 type TVeState = {
-    lock: { amount: string; endTime: number } | null;
+    lock: { amount: string; end: number; now: number } | null;
 };
 
 type TRequestBodyDeposit = {
@@ -32,8 +32,17 @@ export const useVeStore = defineStore('ve', {
             });
             await useWalletStore().confirmTransaction(tx.safeTxHash);
         },
-        async withdraw() {
-            //
+        async withdraw(isEarlyAttempt: boolean) {
+            if (!this.lock) return;
+
+            const { api } = useAccountStore();
+            const isEarly = this.lock.end <= this.lock.now;
+            const tx = await api.request.post('/v1/ve/withdraw', {
+                data: {
+                    isEarlyAttempt: isEarly && isEarlyAttempt,
+                },
+            });
+            await useWalletStore().confirmTransaction(tx.safeTxHash);
         },
     },
 });
