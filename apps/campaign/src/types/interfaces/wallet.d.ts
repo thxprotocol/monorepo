@@ -102,8 +102,10 @@ type TERC20TransferConfig = {
     chainId: number;
 };
 
-type TERC721TransferConfig = {
+type TNFTTransferConfig = {
     erc721Id: string;
     erc721TokenId: string;
+    erc1155Id: string;
+    erc1155Amount: number;
     to: string;
 };

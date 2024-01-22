@@ -31,20 +31,10 @@
                         <template #button-content>
                             <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                         </template>
-                        <b-dropdown-item
-                            :disabled="
-                                token.nft.variant === NFTVariant.ERC1155 ||
-                                (walletStore.wallet?.version &&
-                                    walletStore.wallet?.version !== walletStore.wallet?.latestVersion)
-                            "
-                            @click.stop="isModalTransferShown = true"
-                        >
-                            Transfer
-                        </b-dropdown-item>
+                        <b-dropdown-item @click.stop="isModalTransferShown = true"> Transfer </b-dropdown-item>
                     </b-dropdown>
                     <BaseModalERC721Transfer
-                        v-if="token.nft.variant === NFTVariant.ERC721"
-                        :id="`modalERC721Transfer${token.nft._id}`"
+                        :id="`modalNFTTransfer${token.nft._id}`"
                         :show="isModalTransferShown"
                         :error="error"
                         :token="token"
@@ -58,7 +48,12 @@
 
         <b-collapse v-model="isVisible">
             <div class="px-3 my-3">
-                <b-alert v-model="isNotOwner" variant="warning" class="px-3 py-2">
+                <b-alert
+                    v-if="token.nft.variant === NFTVariant.ERC721"
+                    v-model="isNotOwner"
+                    variant="warning"
+                    class="px-3 py-2"
+                >
                     <i class="fas fa-exclamation-circle me-1" />
                     This token is currently owned by:
                     <small>{{ owner }}</small>
@@ -76,7 +71,7 @@
                         <span>Contract</span>
                         <b-link
                             class="ms-auto text-accent"
-                            :href="`https://polygonscan.com/address/${token.nft.address}`"
+                            :href="`https://polygonscan.com/token/${token.nft.address}`"
                             target="_blank"
                         >
                             <strong v-b-tooltip :title="token.nft.description" class="ms-auto">
@@ -163,6 +158,7 @@ export default defineComponent({
     },
     mounted() {
         if (!this.token.tokenId) this.waitForMinted();
+        this.getToken();
     },
     methods: {
         getToken() {
@@ -170,38 +166,29 @@ export default defineComponent({
                 [NFTVariant.ERC721]: this.getERC721Token.bind(this),
                 [NFTVariant.ERC1155]: this.getERC1155Token.bind(this),
             };
-
             getTokenMap[this.token.nft.variant]();
         },
-        getERC721Token() {
+        async getERC721Token() {
             const { api } = useAccountStore();
-            api.erc721.get(this.token._id).then(({ owner }: TERC721Token) => {
-                this.owner = owner;
-            });
+            const token = await api.erc721.get(this.token._id);
+            this.owner = token.owner;
         },
-        getERC1155Token() {
+        async getERC1155Token() {
             const { api } = useAccountStore();
-            api.erc1155.get(this.token._id).then(({ balance }: TERC721Token) => {
-                this.balance = balance;
-            });
+            const token = await api.erc1155.get(this.token._id);
+            this.balance = token.balance;
         },
         onModalTransferHidden() {
             this.isModalTransferShown = false;
         },
-        async onSubmitTransfer(config: TERC721TransferConfig) {
+        async transferERC721() {},
+        async transferERC1155() {},
+        async onSubmitTransfer(config: TNFTTransferConfig) {
             try {
                 this.isSubmitting = true;
-                await this.walletStore.transferERC721(config);
+                await this.walletStore.transfer(config);
                 this.isModalTransferShown = false;
-                toast(
-                    'Processing transaction...',
-                    'dark',
-                    45000,
-                    () => {},
-                    async () => {
-                        await this.walletStore.list();
-                    },
-                );
+                toast('Processing transaction...', 'dark', 45000, () => {}, this.walletStore.list);
             } catch (error) {
                 this.error = 'Transaction failed';
                 console.error(error);

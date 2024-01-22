@@ -21,6 +21,10 @@
             <b-form-group label="Receiver" :state="isReceiverValid">
                 <b-form-input v-model="receiver" :state="isReceiverValid" placeholder="0x0" />
             </b-form-group>
+
+            <b-form-group v-if="token.nft.variant === NFTVariant.ERC1155" label="Amount" :state="isReceiverValid">
+                <b-form-input v-model="erc1155Amount" :state="isReceiverValid" placeholder="0x0" />
+            </b-form-group>
         </template>
         <template #footer>
             <b-button variant="primary" class="w-100 rounded-pill" :disabled="isSubmitDisabled" @click="onClickSubmit">
@@ -35,11 +39,12 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { isAddress } from 'web3-utils';
 import { AccountVariant } from '../../types/enums/accountVariant';
+import { NFTVariant } from '../../types/enums/nft';
 
 export default defineComponent({
     name: 'BaseModalERC721Transfer',
     data() {
-        return { isShown: false, amount: 0, receiver: '' };
+        return { NFTVariant, isShown: false, amount: 0, erc1155Amount: 0, receiver: '' };
     },
     computed: {
         isSubmitDisabled: function () {
@@ -82,12 +87,19 @@ export default defineComponent({
     },
     methods: {
         onClickSubmit() {
-            const config: TERC721TransferConfig = {
-                erc721Id: this.token.nft._id,
-                erc721TokenId: this.token._id,
+            const payload = {
+                ...(this.token.nft.variant === NFTVariant.ERC721 && {
+                    erc721Id: this.token.nft._id,
+                    erc721TokenId: this.token._id,
+                }),
+                ...(this.token.nft.variant === NFTVariant.ERC1155 && {
+                    erc1155Id: this.token.nft._id,
+                    erc1155TokenId: this.token._id,
+                    erc1155Amount: this.erc1155Amount,
+                }),
                 to: this.receiver,
             };
-            this.$emit('submit', config);
+            this.$emit('submit', payload);
         },
     },
 });

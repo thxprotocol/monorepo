@@ -104,11 +104,20 @@ export const useWalletStore = defineStore('wallet', {
             await this.confirmTransaction(response.safeTxHash);
             track('UserCreates', [account?.sub, 'erc20 transfer']);
         },
-        async transferERC721(config: TERC721TransferConfig) {
+        async transfer(config: TNFTTransferConfig) {
             const { api, account } = useAccountStore();
-            const response = await api.erc721.transfer(config);
+
+            let response;
+            if (config.erc1155Id) {
+                response = await api.erc1155.transfer(config);
+                track('UserCreates', [account?.sub, 'ERC1155 transfer']);
+            }
+            if (config.erc721Id) {
+                response = await api.erc721.transfer(config);
+                track('UserCreates', [account?.sub, 'ERC721 transfer']);
+            }
+
             await this.confirmTransaction(response.safeTxHash);
-            track('UserCreates', [account?.sub, 'erc721 transfer']);
         },
         getRPC(chainId: ChainId) {
             switch (chainId) {
