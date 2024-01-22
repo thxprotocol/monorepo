@@ -45,7 +45,7 @@
                     </b-dropdown-item-button>
                     <b-dropdown-item-button
                         size="sm"
-                        @click="$router.push(`/c/${config.slug}/w/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`)"
+                        @click="$router.push(`/c/${config.slug}/w`)"
                         v-if="questStore.quests.length"
                     >
                         Identities
