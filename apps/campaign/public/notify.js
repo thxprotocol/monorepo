@@ -3,8 +3,8 @@ const args = process.argv.slice(2);
 const [branch, version, webhook] = args;
 
 if (!branch || !version || !webhook) {
-    console.error('Usage: yarn notify :app :version :webhook');
-    process.exit(1);
+    console.error('Usage: nx run campaign:notify --branch=:branch --version=:version --webhook=:webhook');
+    process.exit(0);
 }
 
 const app = branch === 'main' ? 'AppProd' : 'AppDev';
