@@ -8,9 +8,14 @@
                         <strong>THX ID</strong>
                     </template>
 
+                    <b-alert v-model="isAlertDangerShown" variant="danger" class="p-2">
+                        <i class="fas fa-exclamation-circle mx-1" />
+                        {{ error }}
+                    </b-alert>
+
                     <b-form-group
                         label="Identity code"
-                        description="Provide a valid identity code and connect it with your account."
+                        description="Identity codes are used for connecting account in other apps."
                     >
                         <b-form-input :state="isValidUUID" v-model="uuid" placeholder="Code" />
                     </b-form-group>
@@ -69,8 +74,8 @@ export default defineComponent({
                 return null;
             }
         },
-        isAlertInfoShown() {
-            return !!this.walletStore.pendingPoints;
+        isAlertDangerShown() {
+            return !!this.error;
         },
     },
     mounted() {
@@ -83,8 +88,8 @@ export default defineComponent({
                 await this.accountStore.api.request.patch(`/v1/identity/${this.uuid}`);
                 await this.questStore.list();
                 this.$router.push(`/c/${this.accountStore.config.slug}/quests`);
-            } catch (error) {
-                this.error = (error as Error).message || 'Something went wrong..';
+            } catch (res) {
+                this.error = (res as any).error.message || 'Something went wrong..';
             } finally {
                 this.isLoading = false;
             }
