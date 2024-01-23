@@ -128,7 +128,7 @@
                                     </b-form-checkbox>
                                 </b-form-group>
                             </b-row>
-                            <b-button class="w-100 mt-3" @click="onClickWithdraw" variant="primary">
+                            <b-button class="w-100 mt-3" @click="isModalWithdrawShown = true" variant="primary">
                                 Withdraw
                             </b-button>
                         </b-tab>
@@ -160,6 +160,7 @@ export default defineComponent({
             publicUrl: 'https://thx.network',
             isModalDepositShown: false,
             isAlertDepositShown: true,
+            isModalWithdrawShown: false,
             startDate: new Date(),
             lockEnd: new Date(),
             balPrice: 0,

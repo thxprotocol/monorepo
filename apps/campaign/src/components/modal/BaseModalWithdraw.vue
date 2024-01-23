@@ -5,22 +5,21 @@
             {{ error }}
         </b-alert>
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
-            <b-tab title="1. Approve">
-                <b-form-group label="Approve a deposit of" description="We cover the gas costs for this transaction.">
-                    <b-form-input type="number" v-model="amountApproval" />
+            <b-tab title="1. Lock">
+                <b-form-group v-if="isEarly" label="Withdraw Penalty">
+                    <b-form-checkbox v-model="isEarlyAttempt"> I accept a penalty of ... </b-form-checkbox>
                 </b-form-group>
-                <b-button variant="primary" @click="onClickApprove" class="w-100" :disabled="isPolling">
-                    <b-spinner v-if="isPolling" small />
-                    <template v-else>Approve</template>
+                <b-button variant="primary" @click="tabIndex = 1" class="w-100" :disabled="isPolling">
+                    Continue
                 </b-button>
             </b-tab>
-            <b-tab title="2. Deposit">
+            <b-tab title="2. Withdraw">
                 <b-form-group>
                     <b-form-input type="number" v-model="amountDeposit" />
                 </b-form-group>
                 <b-button variant="primary" @click="onClickDeposit" class="w-100" :disabled="isPolling">
                     <b-spinner v-if="isPolling" small />
-                    <template v-else>Deposit</template>
+                    <template v-else>Withdraw</template>
                 </b-button>
             </b-tab>
         </b-tabs>
