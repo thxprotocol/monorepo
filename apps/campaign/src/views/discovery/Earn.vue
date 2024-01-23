@@ -181,7 +181,11 @@ export default defineComponent({
     watch: {
         'accountStore.isAuthenticated'() {
             this.walletStore.getBalance(BPT_ADDRESS);
-            this.veStore.getLocks();
+            this.veStore.getLocks().then(() => {
+                if (!this.veStore.lock) return;
+                // Update minDate if there is a lock already
+                this.minDate = new Date(this.veStore.lock.end);
+            });
         },
     },
     methods: {
@@ -200,6 +204,10 @@ export default defineComponent({
 }
 </style>
 <style>
+.nav-pills .nav-link:not(.active) {
+    color: white;
+    opacity: 0.75;
+}
 .placeholder {
     border-radius: 3px !important;
 }
