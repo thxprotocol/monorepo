@@ -54,14 +54,7 @@
                             </template>
                             <b-alert v-model="isAlertDepositShown" class="py-2 px-3">
                                 <i class="fas fa-info-circle me-1"></i>
-                                Earn additional BPT next to the native $BAL rewards you receive when
-                                <b-link
-                                    href="https://app.balancer.fi/#/polygon/pool/0xb204bf10bc3a5435017d3db247f56da601dfe08a0002000000000000000000fe"
-                                    target="_blank"
-                                >
-                                    providing liquidity on Balancer
-                                </b-link>
-                                !
+                                Earn additional BPT next to your native $BAL rewards!
                             </b-alert>
                             <BaseFormGroupInputTokenAmount
                                 symbol="20USDC-80THX"
@@ -72,13 +65,13 @@
                                 :max="Math.floor(walletStore.balances[bptAddress])"
                                 class="mb-4"
                             />
-
                             <BaseFormGroupInputDate
                                 label="Lock duration"
-                                description="You will be able to withdraw early, but a penalty will be applied!"
+                                tooltip="You will be able to withdraw early, but a penalty will be applied!"
                                 :enable-time-picker="false"
-                                :min-date="startDate"
-                                :start-date="startDate"
+                                :min-date="minDate"
+                                :max-date="maxDate"
+                                :start-date="minDate"
                                 :value="lockEnd"
                                 @update="lockEnd = $event"
                             />
@@ -97,7 +90,7 @@
                                 <i class="fas fa-unlock me-1"></i>
                                 Withdraw
                             </template>
-                            <b-alert v-model="isAlertWithdrawShown" class="p-2" variant="danger">
+                            <b-alert v-model="isEarly" class="py-2 px-3" variant="danger">
                                 <i class="fas fa-info-circle me-1"></i>
                                 A penalty will be applied on early withdrawals!
                             </b-alert>
@@ -110,11 +103,11 @@
                                 <b-col>
                                     <b-form-group label="Lock End">
                                         <strong>
-                                            7 days
+                                            {{ differenceInDays(veStore.lock.end, new Date()) }} days
                                             <i
                                                 v-b-tooltip
                                                 :title="`${format(
-                                                    new Date(Number(veStore.lock.end)),
+                                                    new Date(veStore.lock.end),
                                                     'MMMM do yyyy hh:mm:ss',
                                                 )}`"
                                                 class="fas fa-info-circle me-1 cursor-pointer text-opaque"
@@ -122,15 +115,15 @@
                                         </strong>
                                     </b-form-group>
                                 </b-col>
-                                <b-form-group v-if="isAlertWithdrawShown" label="Withdraw Penalty">
-                                    <b-form-checkbox v-model="isEarlyAttempt">
-                                        I accept a penalty of ...
-                                    </b-form-checkbox>
-                                </b-form-group>
                             </b-row>
                             <b-button class="w-100 mt-3" @click="isModalWithdrawShown = true" variant="primary">
                                 Withdraw
                             </b-button>
+                            <BaseModalWithdraw
+                                :show="isModalWithdrawShown"
+                                :is-early="isEarly"
+                                @hidden="isModalWithdrawShown = false"
+                            />
                         </b-tab>
                     </b-tabs>
                 </b-card>
@@ -147,13 +140,17 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useVeStore } from '../../stores/VE';
 import { BPT_ADDRESS } from '../../config/secrets';
 import { THX_POLYGON_ADDRESS, USDC_POLYGON_ADDRESS } from '../../config/constants';
-import { format } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
+
+const OneDayInMs = 60 * 60 * 24 * 1000;
+const NinetyDaysInMs = OneDayInMs * 90;
 
 export default defineComponent({
     name: 'Earn',
     data() {
         return {
             format,
+            differenceInDays,
             usdcAddress: USDC_POLYGON_ADDRESS,
             thxAddress: THX_POLYGON_ADDRESS,
             bptAddress: BPT_ADDRESS,
@@ -161,7 +158,8 @@ export default defineComponent({
             isModalDepositShown: false,
             isAlertDepositShown: true,
             isModalWithdrawShown: false,
-            startDate: new Date(),
+            minDate: new Date(Date.now() + OneDayInMs),
+            maxDate: new Date(Date.now() + NinetyDaysInMs),
             lockEnd: new Date(),
             balPrice: 0,
             amountDeposit: 0,
@@ -174,10 +172,10 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
         ...mapStores(useVeStore),
-        isAlertWithdrawShown() {
+        isEarly() {
             if (!this.veStore.lock) return;
             const { now, end } = this.veStore.lock;
-            return Number(now) > Number(end);
+            return Number(now) < Number(end);
         },
     },
     watch: {
@@ -189,11 +187,6 @@ export default defineComponent({
     methods: {
         onClickStart() {},
         onClickAddLiquidity() {},
-        onClickWithdraw() {
-            // Should only be true is the isEarlyAttempt is intentional
-            // use a checkbox for this
-            this.veStore.withdraw(this.isEarlyAttempt);
-        },
     },
 });
 </script>

@@ -1,11 +1,15 @@
 <template>
-    <b-modal v-model="show" @hidden="$emit('hidden')" @show="onShow" centered hide-footer title="Lock 20USDC-80THX">
+    <b-modal v-model="isShown" @hidden="$emit('hidden')" @show="onShow" centered hide-footer title="Lock 20USDC-80THX">
+        <b-alert v-model="isAlertInfoShown" variant="info" class="py-2 px-3">
+            <i class="fas fa-exclamation-circle me-1"></i>
+            {{ error }}
+        </b-alert>
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab title="1. Approve">
-                <b-form-group label="Approve a deposit of" description="We cover the gas costs for this transaction.">
+                <b-form-group label="Amount" :description="`Current allowance: ${allowance}`">
                     <b-form-input type="number" v-model="amountApproval" />
                 </b-form-group>
-                <b-button variant="primary" @click="onClickApprove" class="w-100">
+                <b-button variant="primary" @click="onClickApprove" class="w-100" :disabled="isPolling">
                     <b-spinner v-if="isPolling" small />
                     <template v-else>Approve</template>
                 </b-button>
@@ -14,12 +18,15 @@
                 <b-form-group>
                     <b-form-input type="number" v-model="amountDeposit" />
                 </b-form-group>
-                <b-button variant="primary" @click="onClickDeposit" class="w-100">
+                <b-button variant="primary" @click="onClickDeposit" class="w-100" :disabled="isPolling">
                     <b-spinner v-if="isPolling" small />
                     <template v-else>Deposit</template>
                 </b-button>
             </b-tab>
         </b-tabs>
+        <p class="text-muted text-center mt-3 mb-0">
+            ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
+        </p>
     </b-modal>
 </template>
 
@@ -29,11 +36,14 @@ import { mapStores } from 'pinia';
 import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { BPT_ADDRESS, VE_ADDRESS } from '../../config/secrets';
+import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseModalDeposit',
     data() {
         return {
+            isShown: false,
+            error: '',
             isPolling: false,
             tabIndex: 0,
             isModalDepositShown: false,
@@ -49,20 +59,49 @@ export default defineComponent({
     computed: {
         ...mapStores(useWalletStore),
         ...mapStores(useVeStore),
+        allowance() {
+            if (!this.walletStore.allowances[BPT_ADDRESS]) return 0;
+            if (!this.walletStore.allowances[BPT_ADDRESS][VE_ADDRESS]) return 0;
+            return this.walletStore.allowances[BPT_ADDRESS][VE_ADDRESS];
+        },
+        isAlertInfoShown() {
+            return !!this.error;
+        },
+        isSufficientAllowance() {
+            if (this.allowance >= this.amountDeposit) return true;
+            return false;
+        },
+    },
+    watch: {
+        show(show: boolean) {
+            this.isShown = show;
+        },
+        tabIndex() {
+            this.error = '';
+        },
     },
     methods: {
         async onShow() {
             this.amountApproval = this.amount;
             this.amountDeposit = this.amount;
-            await this.walletStore.getApproval({
+            await this.getApproval();
+            if (this.isSufficientAllowance) {
+                this.tabIndex = 1;
+            }
+        },
+        getApproval() {
+            return this.walletStore.getApproval({
                 tokenAddress: BPT_ADDRESS,
                 spender: VE_ADDRESS,
                 amountInWei: String(this.amountDeposit),
             });
-            const allowance = this.walletStore.allowances[BPT_ADDRESS][VE_ADDRESS];
-            if (allowance >= this.amountDeposit) {
-                this.tabIndex = 1;
-            }
+        },
+        waitForApproval() {
+            const taskFn = async () => {
+                await this.getApproval();
+                return this.isSufficientAllowance ? Promise.resolve() : Promise.reject('x');
+            };
+            return poll({ taskFn, interval: 3000, retries: 20 });
         },
         async onClickApprove() {
             this.isPolling = true;
@@ -73,27 +112,46 @@ export default defineComponent({
                     amountInWei: String(this.amountDeposit), // Do wei conversion
                 });
                 // poll for allowance to increase
+                await this.waitForApproval();
                 // then change tab index to 1
                 this.tabIndex = 1;
-            } catch (error) {
-                console.log(error);
+            } catch (response) {
+                this.onError(response);
             } finally {
                 this.isPolling = false;
             }
         },
+        waitForLock() {
+            const getLatestAmount = () => (this.veStore.lock ? Number(this.veStore.lock.amount) : 0);
+            const currentAmount = getLatestAmount();
+            const taskFn = async () => {
+                await this.veStore.getLocks();
+                return getLatestAmount() > currentAmount ? Promise.resolve() : Promise.reject('x');
+            };
+            return poll({ taskFn, interval: 3000, retries: 20 });
+        },
         async onClickDeposit() {
             this.isPolling = true;
             try {
-                await this.veStore.deposit({
-                    amountInWei: String(this.amountDeposit), // Do wei conversion
-                    lockEndTimestamp: Math.ceil(new Date(this.lockEnd).getTime() / 1000), // Do ISO conversion
-                });
-                this.isModalDepositShown = false;
-            } catch (error) {
-                console.log(error);
+                const amountInWei = String(this.amountDeposit); // Do wei conversion
+                const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
+
+                // Make deposit
+                await this.veStore.deposit({ amountInWei, lockEndTimestamp });
+                // Start polling
+                await this.waitForLock();
+
+                // Hide modal (or cast "success" and switch parent tab to withdrawal/rewards)
+                this.$emit('hidden');
+            } catch (response) {
+                this.onError(response);
             } finally {
                 this.isPolling = false;
             }
+        },
+        onError(response: any) {
+            console.log(response);
+            this.error = response && response.error ? response.error.message : 'Something went wrong...';
         },
     },
 });

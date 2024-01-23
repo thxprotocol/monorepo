@@ -1,12 +1,19 @@
 <template>
-    <b-form-group :label="label" :description="description">
+    <b-form-group :description="description">
+        <template #label>
+            {{ label }}
+            <b-link class="text-opaque text-white" v-b-tooltip :title="tooltip">
+                <i class="fas fa-question-circle" />
+            </b-link>
+        </template>
         <VueDatePicker
-            v-model="value"
+            v-model="date"
             :enable-time-picker="enableTimePicke"
             :min-date="minDate"
-            :start-date="startDate"
+            :max-date="maxDate"
+            :start-date="date"
             @date-update="$emit('update', $event)"
-            :placeholder="placeholder || null"
+            :placeholder="placeholder"
             auto-apply
             input-class-name="form-control"
         />
@@ -23,14 +30,29 @@ export default defineComponent({
     components: {
         VueDatePicker,
     },
+    data() {
+        return {
+            date: new Date(),
+        };
+    },
     props: {
         label: String,
         description: String,
+        tooltip: String,
         placeholder: String,
         minDate: Date,
+        maxDate: Date,
         startDate: Date,
         enableTimePicke: Boolean,
         value: { type: Date, required: true },
+    },
+    watch: {
+        startDate: {
+            handler(date) {
+                this.date = date;
+            },
+            immediate: true,
+        },
     },
 });
 </script>
@@ -44,7 +66,7 @@ export default defineComponent({
     --dp-primary-color: var(--bs-primary);
     --dp-primary-disabled-color: #6bacea;
     --dp-primary-text-color: #f8f5f5;
-    --dp-secondary-color: #c0c4cc;
+    --dp-secondary-color: var(--bs-primary);
     --dp-border-color: var(--bs-primary);
     --dp-menu-border-color: var(--bs-primary);
     --dp-border-color-hover: #aaaeb7;

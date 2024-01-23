@@ -1,23 +1,28 @@
 <template>
-    <b-modal v-model="show" @hidden="$emit('hidden')" @show="onShow" centered hide-footer title="Lock 20USDC-80THX">
+    <b-modal v-model="show" @hidden="$emit('hidden')" @show="onShow" centered hide-footer title="Unlock 20USDC-80THX">
         <b-alert v-model="isAlertInfoShown" variant="info" class="py-2 px-3">
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
         </b-alert>
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab title="1. Lock">
-                <b-form-group v-if="isEarly" label="Withdraw Penalty">
-                    <b-form-checkbox v-model="isEarlyAttempt"> I accept a penalty of ... </b-form-checkbox>
+                <p class="text-opaque">A penalty is applied to early withdraws.</p>
+                <b-form-group v-if="isEarly">
+                    <b-form-checkbox v-model="isEarlyAttempt"> I accept a penalty of {{ penalty }} </b-form-checkbox>
                 </b-form-group>
-                <b-button variant="primary" @click="tabIndex = 1" class="w-100" :disabled="isPolling">
+                <p v-else>You are ready to unlock (or relock!)</p>
+                <b-button
+                    variant="primary"
+                    @click="tabIndex = 1"
+                    class="w-100"
+                    :disabled="isPolling || (isEarly && !isEarlyAttempt)"
+                >
                     Continue
                 </b-button>
             </b-tab>
             <b-tab title="2. Withdraw">
-                <b-form-group>
-                    <b-form-input type="number" v-model="amountDeposit" />
-                </b-form-group>
-                <b-button variant="primary" @click="onClickDeposit" class="w-100" :disabled="isPolling">
+                <p>{{ withdrawAmount }}</p>
+                <b-button variant="primary" @click="onClickWithdraw" class="w-100" :disabled="isPolling">
                     <b-spinner v-if="isPolling" small />
                     <template v-else>Withdraw</template>
                 </b-button>
@@ -31,25 +36,37 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
-import { BPT_ADDRESS, VE_ADDRESS } from '../../config/secrets';
-import poll from 'promise-poller';
+import { MAX_LOCK_TIME } from '../../config/constants';
+
+function calculatePenalty(lockAmount: number, penaltyCoefficient = 1, leftTimeToUnlock: number, maxLockTime: number) {
+    if (penaltyCoefficient < 0 || penaltyCoefficient > 5) {
+        throw new Error('penaltyCoefficient must be between 0 and 5');
+    }
+    if (leftTimeToUnlock < 0 || maxLockTime <= 0) {
+        throw new Error(
+            'Invalid time values. leftTimeToUnlock should be non-negative, and maxLockTime should be positive',
+        );
+    }
+
+    // Ensure leftTimeToUnlock does not exceed maxLockTime
+    leftTimeToUnlock = Math.min(leftTimeToUnlock, maxLockTime);
+
+    return lockAmount * penaltyCoefficient * (leftTimeToUnlock / maxLockTime);
+}
 
 export default defineComponent({
-    name: 'BaseModalDeposit',
+    name: 'BaseModalWithdraw',
     data() {
         return {
             error: '',
             isPolling: false,
             tabIndex: 0,
-            isModalDepositShown: false,
-            amountApproval: 0,
-            amountDeposit: 0,
+            isEarlyAttempt: false,
         };
     },
     props: {
         show: Boolean,
-        amount: { type: Number, required: true },
-        lockEnd: { type: Date, required: true },
+        isEarly: Boolean,
     },
     computed: {
         ...mapStores(useWalletStore),
@@ -57,10 +74,23 @@ export default defineComponent({
         isAlertInfoShown() {
             return !!this.error;
         },
-        isApproved() {
-            const allowance = this.walletStore.allowances[BPT_ADDRESS][VE_ADDRESS];
-            if (allowance >= this.amountDeposit) return true;
-            return false;
+        penalty() {
+            const lock = this.veStore.lock;
+            if (!lock) return 0;
+
+            const end = Math.floor(lock.end / 1000);
+            const now = Math.floor(lock.now / 1000);
+
+            try {
+                return calculatePenalty(Number(lock.amount), 1, end - now, MAX_LOCK_TIME);
+            } catch (error) {
+                return 0;
+            }
+        },
+        withdrawAmount() {
+            const lock = this.veStore.lock;
+            if (!lock) return 0;
+            return Number(lock.amount) - this.penalty;
         },
     },
     watch: {
@@ -70,53 +100,22 @@ export default defineComponent({
     },
     methods: {
         async onShow() {
-            this.amountApproval = this.amount;
-            this.amountDeposit = this.amount;
-            await this.getApproval();
-            if (this.isApproved) this.tabIndex = 1;
+            //
         },
-        getApproval() {
-            return this.walletStore.getApproval({
-                tokenAddress: BPT_ADDRESS,
-                spender: VE_ADDRESS,
-                amountInWei: String(this.amountDeposit),
-            });
+        async waitForWithdrawal() {
+            //
         },
-        waitForApproval() {
-            const taskFn = async () => {
-                this.getApproval();
-                return this.isApproved ? Promise.resolve() : Promise.reject('Could not find token for ID');
-            };
-            return poll({ taskFn, interval: 3000, retries: 20 });
-        },
-        async onClickApprove() {
+        async onClickWithdraw() {
             this.isPolling = true;
             try {
-                await this.walletStore.approve({
-                    tokenAddress: BPT_ADDRESS,
-                    spender: VE_ADDRESS,
-                    amountInWei: String(this.amountDeposit), // Do wei conversion
-                });
+                await this.veStore.withdraw(this.isEarlyAttempt);
+
                 // Wait for allowance to increase to the suffucient
                 // amount for this deposit.
-                await this.waitForApproval();
+                await this.waitForWithdrawal();
 
                 // Next tab view
-                this.tabIndex = 1;
-            } catch (response) {
-                this.onError(response);
-            } finally {
-                this.isPolling = false;
-            }
-        },
-        async onClickDeposit() {
-            this.isPolling = true;
-            try {
-                await this.veStore.deposit({
-                    amountInWei: String(this.amountDeposit), // Do wei conversion
-                    lockEndTimestamp: Math.ceil(new Date(this.lockEnd).getTime() / 1000), // Do ISO conversion
-                });
-                this.$emit('hidden');
+                this.$emit('hidden'); // Or display a message and change to a close button
             } catch (response) {
                 this.onError(response);
             } finally {
