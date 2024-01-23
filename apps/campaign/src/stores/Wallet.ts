@@ -163,6 +163,11 @@ export const useWalletStore = defineStore('wallet', {
                 data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature: signature.data }),
             });
         },
+        async confirmTransactions(transactions: TTransaction[]) {
+            for (const tx of transactions) {
+                await this.confirmTransaction(tx.safeTxHash);
+            }
+        },
         async getBalance(tokenAddress: string) {
             const { api } = useAccountStore();
             const { balanceInWei } = await api.request.get('/v1/erc20/balance', {

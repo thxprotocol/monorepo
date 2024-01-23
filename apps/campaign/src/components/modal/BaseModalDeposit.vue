@@ -109,10 +109,12 @@ export default defineComponent({
                 await this.walletStore.approve({
                     tokenAddress: BPT_ADDRESS,
                     spender: VE_ADDRESS,
-                    amountInWei: String(this.amountDeposit), // Do wei conversion
+                    amountInWei: String(this.amountDeposit),
                 });
+
                 // poll for allowance to increase
                 await this.waitForApproval();
+
                 // then change tab index to 1
                 this.tabIndex = 1;
             } catch (response) {
@@ -121,25 +123,19 @@ export default defineComponent({
                 this.isPolling = false;
             }
         },
-        waitForLock() {
-            const getLatestAmount = () => (this.veStore.lock ? Number(this.veStore.lock.amount) : 0);
-            const currentAmount = getLatestAmount();
-            const taskFn = async () => {
-                await this.veStore.getLocks();
-                return getLatestAmount() > currentAmount ? Promise.resolve() : Promise.reject('x');
-            };
-            return poll({ taskFn, interval: 3000, retries: 20 });
-        },
         async onClickDeposit() {
             this.isPolling = true;
             try {
-                const amountInWei = String(this.amountDeposit); // Do wei conversion
+                const amountInWei = String(this.amountDeposit);
                 const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
 
                 // Make deposit
                 await this.veStore.deposit({ amountInWei, lockEndTimestamp });
-                // Start polling
-                await this.waitForLock();
+
+                // Wait for amount and/or endDate to be updated if it changed
+                await this.veStore.waitForLock(amountInWei, lockEndTimestamp);
+
+                this.walletStore.getBalance(BPT_ADDRESS);
 
                 // Hide modal (or cast "success" and switch parent tab to withdrawal/rewards)
                 this.$emit('hidden');

@@ -17,7 +17,7 @@
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
                 <b-card class="border-0 gradient-shadow-xl" style="min-height: 415px">
                     <b-tabs pills justified content-class="mt-3" nav-wrapper-class="text-white">
-                        <b-tab title="Invest">
+                        <!-- <b-tab title="Invest">
                             <template #title>
                                 <i class="fas fa-dollar-sign me-1"></i>
                                 Liquidity
@@ -45,6 +45,16 @@
                             />
                             <b-button class="w-100 mt-3" @click="onClickAddLiquidity" variant="success">
                                 Add Liquidity
+                            </b-button>
+                        </b-tab> -->
+                        <b-tab>
+                            <template #title>
+                                <i class="fas fa-gift me-1"></i>
+                                Rewards
+                            </template>
+
+                            <b-button class="w-100 mt-3" @click="onClickAddLiquidity" variant="success">
+                                Claim Tokens
                             </b-button>
                         </b-tab>
                         <b-tab active>
@@ -85,7 +95,7 @@
                                 @hidden="isModalDepositShown = false"
                             />
                         </b-tab>
-                        <b-tab>
+                        <b-tab v-if="veStore.lock && veStore.lock.amount > 0">
                             <template #title>
                                 <i class="fas fa-unlock me-1"></i>
                                 Withdraw
@@ -94,25 +104,22 @@
                                 <i class="fas fa-info-circle me-1"></i>
                                 A penalty will be applied on early withdrawals!
                             </b-alert>
-                            <b-row v-if="veStore.lock">
+                            <b-row>
                                 <b-col>
                                     <b-form-group label="Amount">
-                                        <strong>{{ veStore.lock.amount }}</strong>
+                                        <strong class="h3">{{ veStore.lock.amount }}</strong>
                                     </b-form-group>
                                 </b-col>
                                 <b-col>
                                     <b-form-group label="Lock End">
-                                        <strong>
+                                        <strong class="h3">
                                             {{ differenceInDays(veStore.lock.end, new Date()) }} days
-                                            <i
-                                                v-b-tooltip
-                                                :title="`${format(
-                                                    new Date(veStore.lock.end),
-                                                    'MMMM do yyyy hh:mm:ss',
-                                                )}`"
-                                                class="fas fa-info-circle me-1 cursor-pointer text-opaque"
-                                            />
                                         </strong>
+                                        <i
+                                            v-b-tooltip
+                                            :title="`${format(new Date(veStore.lock.end), 'MMMM do yyyy hh:mm:ss')}`"
+                                            class="fas fa-info-circle me-1 cursor-pointer text-opaque"
+                                        />
                                     </b-form-group>
                                 </b-col>
                             </b-row>
@@ -182,9 +189,10 @@ export default defineComponent({
         'accountStore.isAuthenticated'() {
             this.walletStore.getBalance(BPT_ADDRESS);
             this.veStore.getLocks().then(() => {
-                if (!this.veStore.lock) return;
                 // Update minDate if there is a lock already
-                this.minDate = new Date(this.veStore.lock.end);
+                if (this.veStore.lock?.end) {
+                    this.minDate = new Date(this.veStore.lock.end);
+                }
             });
         },
     },

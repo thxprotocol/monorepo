@@ -109,9 +109,6 @@ export default defineComponent({
             this.isPolling = true;
             try {
                 await this.veStore.withdraw(this.isEarlyAttempt);
-
-                // Wait for allowance to increase to the suffucient
-                // amount for this deposit.
                 await this.waitForWithdrawal();
 
                 // Next tab view
