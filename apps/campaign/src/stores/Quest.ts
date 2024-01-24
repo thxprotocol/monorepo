@@ -90,14 +90,10 @@ export const useQuestStore = defineStore('quest', {
         },
 
         async list() {
-            const { api, isAuthenticated } = useAccountStore();
+            const { api } = useAccountStore();
             const { gitcoin, invite, twitter, discord, youtube, custom, daily, web3 } = await api.quests.list();
             const pointRewardsList = [...twitter, ...discord, ...youtube];
             this.quests = [...gitcoin, ...invite, ...pointRewardsList, ...custom, ...daily, ...web3];
-
-            // Logic past this point is considered authenticated
-            if (!isAuthenticated) return;
-            await Promise.all(pointRewardsList.map((quest) => this.getSocialQuest(quest._id)));
         },
 
         setQuestSocial(quest: TQuestSocial) {
