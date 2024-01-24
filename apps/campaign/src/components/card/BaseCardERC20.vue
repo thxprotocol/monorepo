@@ -8,20 +8,11 @@
         </div>
         <div class="text-success fw-bold">{{ token.walletBalance }} {{ token.erc20.symbol }}</div>
         <div>
-            <b-dropdown variant="link" size="sm" no-caret toggle-class="py-0">
+            <b-dropdown variant="link" size="sm" no-caret end toggle-class="py-0">
                 <template #button-content>
                     <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                 </template>
-                <b-dropdown-item @click="onClickMigrate" v-if="isMigrateAvailable"> Migrate </b-dropdown-item>
-                <b-dropdown-item
-                    v-else
-                    @click="isModalTransferShown = true"
-                    :disabled="
-                        walletStore.wallet?.version && walletStore.wallet?.version !== walletStore.wallet?.latestVersion
-                    "
-                >
-                    Transfer
-                </b-dropdown-item>
+                <b-dropdown-item @click="isModalTransferShown = true"> Transfer </b-dropdown-item>
             </b-dropdown>
             <BaseModalERC20Transfer
                 :id="`modalERC20Transfer${token.erc20._id}`"

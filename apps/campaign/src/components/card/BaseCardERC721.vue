@@ -27,7 +27,7 @@
                 </div>
 
                 <div>
-                    <b-dropdown variant="link" size="sm" no-caret toggle-class="py-0">
+                    <b-dropdown variant="link" size="sm" no-caret end toggle-class="py-0">
                         <template #button-content>
                             <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                         </template>

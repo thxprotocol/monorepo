@@ -39,27 +39,30 @@
                     <template #button-content>
                         <i class="fas fa-ellipsis-v"></i>
                     </template>
-                    <b-dropdown-item-button size="sm" @click="onClickWallet" v-if="!questStore.quests.length">
+                    <b-dropdown-item @click="$router.push(`/c/${accountStore.config.slug}/about`)">
+                        About
+                    </b-dropdown-item>
+                    <b-dropdown-item @click="onClickWallet" v-if="!questStore.quests.length">
                         <b-spinner v-if="!walletAddress" small />
                         <template v-else>{{ walletAddress }}</template>
-                    </b-dropdown-item-button>
-                    <b-dropdown-item-button
+                    </b-dropdown-item>
+                    <b-dropdown-item @click="accountStore.isModalAccountShown = true"> Account </b-dropdown-item>
+                    <b-dropdown-item
+                        v-if="questStore.quests.length"
                         size="sm"
                         @click="$router.push(`/c/${config.slug}/w`)"
-                        v-if="questStore.quests.length"
                     >
                         Identities
-                    </b-dropdown-item-button>
-                    <b-dropdown-item-button @click="accountStore.isModalAccountShown = true">
-                        <div class="d-flex align-items-center justify-content-between">Account</div>
-                    </b-dropdown-item-button>
+                    </b-dropdown-item>
                     <b-dropdown-divider />
-                    <b-dropdown-item-button size="sm" @click="onClickSignout">
-                        <div class="d-flex align-items-center justify-content-between">
-                            Sign out
-                            <i class="fas fa-sign-out-alt ml-auto"></i>
-                        </div>
-                    </b-dropdown-item-button>
+                    <b-dropdown-item
+                        size="sm"
+                        @click="onClickSignout"
+                        link-class="d-flex align-items-center justify-content-between"
+                    >
+                        Sign out
+                        <i class="fas fa-sign-out-alt ml-auto"></i>
+                    </b-dropdown-item>
                 </b-dropdown>
             </template>
         </div>

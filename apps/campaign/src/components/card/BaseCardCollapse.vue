@@ -22,6 +22,7 @@
                         size="sm"
                         no-caret
                         toggle-class="py-0"
+                        end
                     >
                         <template #button-content>
                             <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
@@ -30,7 +31,7 @@
                             @click="onClickLink(link.url)"
                             :key="key"
                             v-for="(link, key) of infoLinks"
-                            class="d-flex align-items-center justify-content-between"
+                            link-class="d-flex align-items-center justify-content-between"
                         >
                             <div>
                                 {{ link.label }}

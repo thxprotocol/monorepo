@@ -45,6 +45,12 @@ const routes: Array<RouteRecordRaw> = [
         },
         children: [
             {
+                path: '/c/:slug/about',
+                name: 'about',
+                beforeEnter,
+                component: () => import(/* webpackChunkName: "about" */ '../views/campaign/About.vue'),
+            },
+            {
                 path: '/c/:slug/signin',
                 name: 'signin',
                 beforeEnter,
