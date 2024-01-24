@@ -100,6 +100,7 @@ declare module 'vue' {
     BNavbarNav: typeof import('bootstrap-vue-next')['BNavbarNav']
     BNavItem: typeof import('bootstrap-vue-next')['BNavItem']
     BNavItemDropdown: typeof import('bootstrap-vue-next')['BNavItemDropdown']
+    BOffcanvas: typeof import('bootstrap-vue-next')['BOffcanvas']
     BPagination: typeof import('bootstrap-vue-next')['BPagination']
     BProgress: typeof import('bootstrap-vue-next')['BProgress']
     BProgressBar: typeof import('bootstrap-vue-next')['BProgressBar']

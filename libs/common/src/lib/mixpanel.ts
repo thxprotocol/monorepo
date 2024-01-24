@@ -53,7 +53,11 @@ export const init = (mixpanelToken: string, proxyBaseUrl: string) => {
 
 export const client = () => mixpanel;
 export const track = (event: string, params: any[]) => {
-    trackers[event](...params);
+    try {
+        trackers[event](...params);
+    } catch (error) {
+        //
+    }
 };
 
 export default { init, client, track };
