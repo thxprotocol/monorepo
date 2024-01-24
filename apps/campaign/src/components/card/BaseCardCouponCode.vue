@@ -3,13 +3,24 @@
         <div class="pe-3">
             <i class="fas fa-tags text-primary"></i>
         </div>
-        <div class="flex-grow-1"></div>
-        <blockquote class="mb-0 d-flex align-items-center w-100 text-accent">
-            <strong style="letter-spacing: 0.25rem">{{ code }}</strong>
-            <b-button variant="primary" size="sm" class="ms-auto" @click="isVisible = !isVisible">
-                <i class="fas fa-eye" />
-            </b-button>
-        </blockquote>
+        <div class="flex-grow-1">
+            <b-link
+                v-if="isURL"
+                @click="isModalURLShown = true"
+                size="sm"
+                style="text-align: left"
+                class="d-flex align-items-center text-accent text-decoration-underline"
+            >
+                <div class="truncate-text-ellipsis">{{ token.code }}</div>
+                <i class="fas fa-external-link-alt ms-3" />
+            </b-link>
+            <blockquote v-else class="mb-0 d-flex align-items-center w-100 text-accent">
+                <strong class="truncate-text" style="letter-spacing: 0.25rem">{{ code }}</strong>
+                <b-button variant="primary" size="sm" class="ms-auto" @click="isVisible = !isVisible">
+                    <i class="fas fa-eye" />
+                </b-button>
+            </blockquote>
+        </div>
         <b-dropdown variant="link" size="sm" no-caret end>
             <template #button-content>
                 <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
@@ -24,6 +35,7 @@
             </b-dropdown-item>
         </b-dropdown>
     </b-card>
+    <BaseModalExternalURL :show="isModalURLShown" @hidden="isModalURLShown = false" :url="token.code" />
 </template>
 
 <script lang="ts">
@@ -31,21 +43,23 @@ import { defineComponent, PropType } from 'vue';
 import { useWalletStore } from '../../stores/Wallet';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
+import BaseModalExternalURL from '../../components/modal/BaseModalExternalURL.vue';
 
 export default defineComponent({
-    name: 'BaseCardCustom',
+    name: 'BaseCardCouponCode',
+    components: {
+        BaseModalExternalURL,
+    },
     props: {
         token: {
             type: Object as PropType<TCouponRewardPayment>,
             required: true,
         },
     },
-    data: function () {
+    data() {
         return {
             isVisible: false,
-            isModalTransferShown: false,
-            isSubmitting: false,
-            error: '',
+            isModalURLShown: false,
         };
     },
     computed: {
@@ -63,20 +77,25 @@ export default defineComponent({
             if (this.isVisible) return this.token.code;
             return this.token.code
                 .split('')
-                .map(() => '●')
+                .map(() => '•')
                 .join('');
         },
-    },
-    async mounted() {
-        //
-    },
-    methods: {
-        //
     },
 });
 </script>
 <style>
-a.text-accent {
-    text-decoration: none;
+.truncate-text {
+    display: inline-block;
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.truncate-text-ellipsis {
+    display: inline-block;
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

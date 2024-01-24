@@ -52,8 +52,12 @@ export default defineComponent({
         BaseCardERC721,
         BaseCardCouponCode,
     },
-    data: function () {
-        return { error: '', isSubmitting: false, isModalUpgradeShown: false };
+    data() {
+        return {
+            error: '',
+            isSubmitting: false,
+            isModalUpgradeShown: false,
+        };
     },
     computed: {
         ...mapStores(useWalletStore),

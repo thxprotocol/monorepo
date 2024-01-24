@@ -48,9 +48,9 @@
             <b-button class="w-100" :to="`/c/${quest.poolId}`" variant="primary">
                 Earn <strong>{{ quest.amount }}</strong> points!
             </b-button>
-            <BaseModalCampaignDomain
+            <BaseModalExternalURL
                 :show="isModalCampaignDomainShown"
-                :campaign="{ domain: quest.domain }"
+                :url="quest ? quest.domain : ''"
                 @hidden="isModalCampaignDomainShown = false"
             />
         </template>
@@ -65,11 +65,11 @@ export default defineComponent({
     name: 'BaseCardQuest',
     props: {
         quest: {
-            type: Object as PropType<TBaseQuest>,
+            type: Object as PropType<TBaseQuest & { domain: string; amount: number; brand: any }>,
             required: true,
         },
     },
-    data(): any {
+    data() {
         return { format, isModalCampaignDomainShown: false };
     },
     computed: {

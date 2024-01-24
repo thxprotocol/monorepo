@@ -1,5 +1,4 @@
 <template>
-    <BaseModalCampaignExpired :id="'modalCampaignExpiredRewards'" />
     <b-container class="flex-grow-1 overflow-auto order-lg-2">
         <b-row>
             <b-col lg="7" xl="6" offset-xl="1">

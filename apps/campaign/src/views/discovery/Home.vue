@@ -116,7 +116,7 @@
                             {{ item.domain.host }}
                             <i class="fas fa-external-link-alt ms-1" />
                         </b-button>
-                        <BaseModalCampaignDomain :campaign="item.domain.campaign" />
+                        <BaseModalExternalURL :campaign="item.domain.campaign" />
                     </template>
 
                     <template #cell(isSubscribed)="{ item }">

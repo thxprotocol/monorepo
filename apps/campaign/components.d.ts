@@ -55,6 +55,7 @@ declare module 'vue' {
     BaseModalDeposit: typeof import('./src/components/modal/BaseModalDeposit.vue')['default']
     BaseModalERC20Transfer: typeof import('./src/components/modal/BaseModalERC20Transfer.vue')['default']
     BaseModalERC721Transfer: typeof import('./src/components/modal/BaseModalERC721Transfer.vue')['default']
+    BaseModalExternalURL: typeof import('./src/components/modal/BaseModalExternalURL.vue')['default']
     BaseModalPoolSubscription: typeof import('./src/components/modal/BaseModalPoolSubscription.vue')['default']
     BaseModalQuestEntry: typeof import('./src/components/modal/BaseModalQuestEntry.vue')['default']
     BaseModalRewardPayment: typeof import('./src/components/modal/BaseModalRewardPayment.vue')['default']
