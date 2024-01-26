@@ -109,7 +109,14 @@ export default defineComponent({
         },
     },
     watch: {
-        availableQuestCount: {
+        'accountStore.isAuthenticated': {
+            handler(isAuthenticated: boolean) {
+                if (!isAuthenticated) return;
+                this.questStore.list();
+            },
+            immediate: true,
+        },
+        'availableQuestCount': {
             handler(amount: number) {
                 // Return if not in iframe
                 if (window.top === window.self) return;

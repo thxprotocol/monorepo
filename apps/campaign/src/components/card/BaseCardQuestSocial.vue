@@ -129,15 +129,6 @@ export default defineComponent({
             return getConnectionStatus(account as any, this.quest.platform);
         },
     },
-    watch: {
-        'accountStore.isAuthenticated': {
-            handler(isAuthenticated: boolean) {
-                if (!isAuthenticated) return;
-                this.questStore.list();
-            },
-            immediate: true,
-        },
-    },
     methods: {
         onClickCancel() {
             this.isSubmitting = false;
