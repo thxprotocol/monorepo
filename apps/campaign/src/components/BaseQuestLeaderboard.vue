@@ -1,12 +1,12 @@
 <template>
     <b-card header-class="p-0" body-class="d-flex flex-column p-2 pt-0">
-        <b-card-title class="d-flex px-3 py-1 m-0 align-items-center">
+        <b-card-title class="d-flex px-1 py-1 m-0 align-items-center">
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fa fa-trophy me-2 text-opaque"></i>
             </div>
             <div class="flex-grow-1 pe-2">Leaderboard</div>
-            <div class="text-accent fw-bold">
-                <b-button variant="link" @click="accountStore.getLeaderboard()">
+            <div class="text-accent text-right fw-bold">
+                <b-button variant="link" @click="onClickRefresh">
                     <b-spinner small v-if="isLoading" />
                     <i v-else class="fas fa-sync-alt"></i>
                 </b-button>
@@ -54,6 +54,13 @@ export default defineComponent({
     },
     mounted() {
         this.accountStore.getLeaderboard();
+    },
+    methods: {
+        async onClickRefresh() {
+            this.isLoading = true;
+            await this.accountStore.getLeaderboard();
+            this.isLoading = false;
+        },
     },
 });
 </script>

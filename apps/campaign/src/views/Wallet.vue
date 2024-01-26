@@ -1,5 +1,9 @@
 <template>
-    <b-tabs class="tabs-rewards" nav-class="px-3" content-class="p-2">
+    <b-alert v-if="isEmpty" variant="primary" class="px-3 py-2 mx-3" v-model="isEmpty">
+        <i class="fas fa-gift me-2" />
+        Nothing to see here... Yet!
+    </b-alert>
+    <b-tabs v-else class="tabs-rewards" nav-class="px-3" content-class="p-2">
         <template #tabs-end>
             <b-button class="ms-auto" v-if="authStore.oAuthShare" size="sm" variant="link" @click="onClickRefresh">
                 <b-spinner v-if="isRefreshing" small />
@@ -64,6 +68,14 @@ export default defineComponent({
             ]
                 .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
                 .reverse();
+        },
+        isEmpty() {
+            return ![
+                ...this.walletStore.couponCodes,
+                ...this.walletStore.erc20,
+                ...this.walletStore.erc721,
+                ...this.walletStore.erc1155,
+            ].length;
         },
     },
     methods: {

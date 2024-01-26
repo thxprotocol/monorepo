@@ -4,7 +4,7 @@
             <b-col xl="10" offset-xl="1">
                 <b-card
                     class="bg-splash mx-auto"
-                    body-class="d-flex justify-content-center align-items-center"
+                    body-class="d-flex justify-content-center align-items-center py-5"
                     :style="{
                         minHeight: `${height}px`,
                         backgroundImage:

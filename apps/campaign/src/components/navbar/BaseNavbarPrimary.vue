@@ -27,7 +27,12 @@
             <i class="fas fa-trophy mr-lg-3"></i>
             <div>Rank</div>
         </router-link>
-        <b-link v-if="isQuestCampaign && accountStore.isMobile" @click="accountStore.isSidebarShown = true">
+        <b-link
+            v-if="isQuestCampaign && accountStore.isMobile"
+            :class="{ 'text-opaque': !accountStore.isAuthenticated }"
+            :disabled="!accountStore.isAuthenticated"
+            @click="accountStore.isSidebarShown = true"
+        >
             <i class="fas fa-wallet mr-lg-3"></i>
             <div>Wallet</div>
         </b-link>

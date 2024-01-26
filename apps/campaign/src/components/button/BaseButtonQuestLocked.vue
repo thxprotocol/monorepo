@@ -5,7 +5,7 @@
     </b-button>
     <b-modal title="Quest is locked!" :id="modalId" v-model="isModalShown" centered no-close-on-backdrop>
         <p class="text-opaque">To unlock this quest, complete these quests:</p>
-        <template v-for="(lock, key) of locks">
+        <template v-for="lock of locks">
             <div v-if="lock" class="d-flex justify-content-between">
                 {{ lock.title }}
                 <strong class="text-accent">{{ lock.pointsAvailable }}</strong>

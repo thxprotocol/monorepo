@@ -89,7 +89,6 @@
 .navbar-bottom {
     margin-top: auto;
     padding: 0.5rem;
-    border-top: 1px solid var(--thx-navbar-border-color);
     background-color: var(--thx-navbar-bg);
     justify-content: space-between;
     
@@ -113,12 +112,12 @@
 
         i {
             font-size: 1.3rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.5rem;           
             opacity: 0.5;
             transition: opacity ease 0.2s;
         }
 
-        &:hover i {
+        &:not(.text-opaque):hover i {
             opacity: 1;
         }
 
@@ -133,6 +132,7 @@
     }
     
     @media (min-width: map-get($grid-breakpoints, 'lg')) {
+        border-top: 0;
         margin-top: 0;
         justify-content: center;
         flex-direction: row;

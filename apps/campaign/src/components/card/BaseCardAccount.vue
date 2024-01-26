@@ -1,7 +1,8 @@
 <template>
-    <b-card class="bg-splash">
+    <b-card class="bg-splash" style="border-radius: 0">
         <div
-            class="d-flex justify-content-center align-items-center p-3"
+            @click="accountStore.isModalAccountShown = true"
+            class="d-flex justify-content-center align-items-center p-3 cursor-pointer"
             style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.35); width: 100%; height: 90px"
         >
             <template v-if="accountStore.account">

@@ -61,13 +61,13 @@ export const useAuthStore = defineStore('auth', {
             this.oAuthShare = '';
         },
         async requestOAuthShare(extraQueryParams?: { [key: string]: string }) {
-            const { poolId, config, isMobile } = useAccountStore();
+            const { poolId, config, isMobileDevice } = useAccountStore();
             const { claim } = useClaimStore();
             const returnUrl = window.location.href;
 
-            this.user = await this.userManager[isMobile ? 'signinRedirect' : 'signinPopup']({
+            this.user = await this.userManager[isMobileDevice ? 'signinRedirect' : 'signinPopup']({
                 state: {
-                    isMobile,
+                    isMobile: isMobileDevice,
                     returnUrl,
                     client_id: CLIENT_ID,
                     origin: config.origin,
@@ -102,9 +102,9 @@ export const useAuthStore = defineStore('auth', {
             poll({ taskFn, interval: 5000, retries: 60 });
         },
         async signout() {
-            const { isMobile } = useAccountStore();
-            await this.userManager[isMobile ? 'signoutRedirect' : 'signoutPopup']({
-                state: { isMobile, origin: window.location.href },
+            const { isMobileDevice } = useAccountStore();
+            await this.userManager[isMobileDevice ? 'signoutRedirect' : 'signoutPopup']({
+                state: { isMobile: isMobileDevice, origin: window.location.href },
                 id_token_hint: this.user?.id_token,
             })
                 .then(() => {

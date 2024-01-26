@@ -2,7 +2,7 @@
     <b-container>
         <b-row>
             <b-col lg="7" xl="6" offset-xl="1">
-                <b-tabs content-class="mt-3 tab-scrollable" justified>
+                <b-tabs content-class="mt-3" justified>
                     <b-tab active>
                         <template #title>
                             Available

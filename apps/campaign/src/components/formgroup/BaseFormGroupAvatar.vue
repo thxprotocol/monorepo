@@ -4,7 +4,7 @@
             <template #label>
                 <b-avatar size="100" class="cursor-pointer gradient-border-xl" :src="profileImg" variant="primary" />
                 <br />
-                <b-link class="text-primary" v-if="!profileImg"> Upload </b-link>
+                <div class="mt-2 cursor-pointer text-primary" v-if="!isRemoveable">Upload</div>
             </template>
         </b-form-file>
         <br />
@@ -29,25 +29,24 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         profileImg() {
-            if (!this.accountStore.account) return;
+            if (!this.accountStore.account) return '';
             return this.accountStore.account.profileImg || '';
         },
+        isPlaceholder() {
+            return this.profileImg.includes('https://api.dicebear.com');
+        },
         isRemoveable() {
-            if (!this.accountStore.account) return;
-            if (!this.accountStore.account.profileImg) return;
-            return !this.accountStore.account.profileImg.includes('https://api.dicebear.com') || this.profileImgFile;
+            return (this.profileImg && !this.isPlaceholder) || this.profileImgFile;
         },
     },
     methods: {
         async onChangeProfileImg(event: any) {
             const profileImg = await this.accountStore.upload(event.target.files[0]);
             this.accountStore.update({ profileImg });
-            this.profileImg = profileImg;
             this.profileImgFile = null;
         },
         onClickRemovePicture() {
             this.accountStore.update({ profileImg: '' });
-            this.profileImg = '';
             this.profileImgFile = null;
         },
         onClickUpload() {
