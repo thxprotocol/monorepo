@@ -93,6 +93,7 @@ export default defineComponent({
 <style>
 .tabs-rewards .tab-content {
     overflow-y: auto;
-    max-height: 400px;
+    height: 100%;
+    max-height: calc(100vh - 160px);
 }
 </style>
