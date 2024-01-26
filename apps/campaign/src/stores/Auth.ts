@@ -102,7 +102,7 @@ export const useAuthStore = defineStore('auth', {
             poll({ taskFn, interval: 5000, retries: 60 });
         },
         async signout() {
-            const isMobile = getIsMobile();
+            const { isMobile } = useAccountStore();
             await this.userManager[isMobile ? 'signoutRedirect' : 'signoutPopup']({
                 state: { isMobile, origin: window.location.href },
                 id_token_hint: this.user?.id_token,
