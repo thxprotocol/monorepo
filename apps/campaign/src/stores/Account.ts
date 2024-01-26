@@ -5,7 +5,7 @@ import { useRewardStore } from './Reward';
 import { useQuestStore } from './Quest';
 import { useWalletStore } from './Wallet';
 import { track } from '@thxnetwork/mixpanel';
-import { getStyles } from '../utils/theme';
+import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
 import { useAuthStore } from './Auth';
 import { getAccessTokenKindForPlatform, getConnectionStatus } from '../utils/social';
 import { RewardConditionPlatform } from '../types/enums/rewards';
@@ -13,6 +13,10 @@ import { User } from 'oidc-client-ts';
 import { AccountVariant } from '../types/enums/accountVariant';
 import poll from 'promise-poller';
 import { decodeHTML } from '../utils/decode-html';
+
+const BREAKPOINT_LG = 992;
+// Feature only available on mobile devices
+const isMobileDevice = !!window.matchMedia('(pointer:coarse)').matches;
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -26,11 +30,16 @@ export const useAccountStore = defineStore('account', {
         css: null,
         subscription: null,
         leaderboard: [],
+        isSidebarShown: false,
         isModalAccountShown: false,
+        isModalWalletShown: false,
         isAuthenticated: null,
         isQuestsLoaded: false,
-        isMobileIFrame: window.top !== window.self && window.matchMedia('(pointer:coarse)').matches,
-        isMobileEthereumBrowser: window.ethereum && window.matchMedia('(pointer:coarse)').matches, // Feature only available on mobile devices
+        isIFrame: window.top !== window.self,
+        isMobile: window.innerWidth < BREAKPOINT_LG,
+        isMobileDevice: isMobileDevice,
+        isMobileIFrame: window.top !== window.self && isMobileDevice,
+        isMobileEthereumBrowser: window.ethereum && isMobileDevice,
     }),
     actions: {
         setConfig(poolId: string, config: TWidgetConfig) {
@@ -47,7 +56,11 @@ export const useAccountStore = defineStore('account', {
         reset() {
             this.poolId = '';
             this.api.setCampaignId('');
-            this.css?.remove();
+            this.setTheme({
+                title: 'THX Network',
+                theme: JSON.stringify({ elements: DEFAULT_ELEMENTS, colors: DEFAULT_COLORS }),
+            } as TWidgetConfig);
+            this.config = {};
         },
         getTheme() {
             return JSON.parse(this.config.theme);
@@ -89,6 +102,9 @@ export const useAccountStore = defineStore('account', {
         },
         onLoad() {
             // debugger;
+        },
+        onResize() {
+            this.isMobile = window.innerWidth < BREAKPOINT_LG;
         },
         addEventListeners() {
             const authStore = useAuthStore();
@@ -206,11 +222,13 @@ export const useAccountStore = defineStore('account', {
             const authStore = useAuthStore();
 
             questStore.list().then(() => {
-                const amount = questStore.quests.filter((r: any) => !r.isClaimed).length;
-                this.isRewardsLoaded = true;
+                this.isQuestsLoaded = true;
+
                 // Send the amount of unclaimed rewards to the parent window and update the launcher
+                const amount = questStore.quests.filter((r: any) => !r.isClaimed).length;
                 this.postMessage({ message: 'thx.reward.amount', amount });
             });
+
             rewardStore.list();
 
             // Guard HTTP requests that do require auth

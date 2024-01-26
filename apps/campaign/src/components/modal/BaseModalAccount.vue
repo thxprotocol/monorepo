@@ -30,110 +30,12 @@
                             <BaseFormGroupAvatar />
                         </b-col>
                     </b-row>
-                    <BaseFormGroupSubscription v-if="accountStore.poolId && questStore.quests.length" class="mb-3" />
+                </b-tab>
+                <b-tab title="Connections">
                     <BaseFormGroupConnected class="mb-3" />
                 </b-tab>
-                <b-tab title="Wallet">
-                    <b-form-group v-if="walletStore.wallet && !isMetamaskAccount">
-                        <template #label>
-                            <div class="d-flex align-items-center">
-                                <img
-                                    v-b-tooltip
-                                    title="Secured by Safe (f.k.a. Gnosis Safe)"
-                                    :src="imgSafeLogo"
-                                    width="15"
-                                    height="15"
-                                    style="border-radius: 3px"
-                                    class="me-2"
-                                    alt="Safe Logo"
-                                />
-                                Wallet Address
-                            </div>
-                        </template>
-                        <code>{{ walletStore.wallet.address }}</code>
-                    </b-form-group>
-                    <b-form-group v-if="accountStore.account">
-                        <template #label>
-                            <div class="d-flex align-items-center">
-                                <img
-                                    v-b-tooltip
-                                    title="Secured by Metamask"
-                                    v-if="isMetamaskAccount"
-                                    :src="imgMetamaskLogo"
-                                    width="15"
-                                    height="15"
-                                    style="border-radius: 3px"
-                                    class="me-2"
-                                    alt="Metamask Logo"
-                                />
-                                <img
-                                    v-b-tooltip
-                                    title="Secured by Web3Auth"
-                                    v-if="!isMetamaskAccount"
-                                    :src="imgWeb3AuthLogo"
-                                    width="15"
-                                    height="15"
-                                    style="border-radius: 3px"
-                                    class="me-2"
-                                    alt="Web3Auth Logo"
-                                />
-                                Account Address
-                            </div>
-                        </template>
-                        <code>{{ accountStore.account.address }}</code>
-                    </b-form-group>
-                    <b-form-group v-if="!isMetamaskAccount" :label="`Account Private Key (${currentKeyTreshold})`">
-                        <b-input-group>
-                            <b-form-input :value="privateKey" />
-                            <b-input-group-append>
-                                <b-button size="sm" variant="primary" @click="isPrivateKeyHidden = !isPrivateKeyHidden">
-                                    <i v-if="isPrivateKeyHidden" class="fas fa-eye px-2"></i>
-                                    <i v-else class="fas fa-eye-slash px-2"></i>
-                                </b-button>
-                                <b-button
-                                    size="sm"
-                                    variant="primary"
-                                    v-clipboard:copy="authStore.privateKey"
-                                    v-clipboard:success="onCopySuccess"
-                                >
-                                    <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
-                                    <i v-else class="fas fa-clipboard px-2"></i>
-                                </b-button>
-                            </b-input-group-append>
-                        </b-input-group>
-                    </b-form-group>
-                </b-tab>
-                <b-tab title="Security" v-if="authStore.securityQuestion">
-                    <b-form-group>
-                        <b-form-input v-model="question" placeholder="Question" />
-                    </b-form-group>
-                    <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
-                        <b-form-input
-                            :state="isPasswordValid"
-                            v-model="password"
-                            type="password"
-                            placeholder="Answer"
-                            autocomplete="off"
-                        />
-                    </b-form-group>
-                    <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
-                        <b-form-input
-                            :state="isPasswordValid"
-                            v-model="passwordCheck"
-                            type="password"
-                            placeholder="Answer again"
-                            autocomplete="off"
-                        />
-                    </b-form-group>
-                    <b-button
-                        :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable"
-                        class="w-100"
-                        variant="primary"
-                        @click="onSubmitDeviceSharePasswordUpdate"
-                    >
-                        <b-spinner small variant="light" v-if="isLoadingPasswordChange" />
-                        <template v-else> Change Security Question </template>
-                    </b-button>
+                <b-tab title="Subscriptions">
+                    <BaseFormGroupSubscription v-if="accountStore.poolId && questStore.quests.length" class="mb-3" />
                 </b-tab>
             </b-tabs>
         </b-form>

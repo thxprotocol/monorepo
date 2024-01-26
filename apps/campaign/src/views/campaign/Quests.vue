@@ -2,12 +2,6 @@
     <b-container class="flex-grow-1 overflow-auto order-lg-2">
         <b-row>
             <b-col lg="7" xl="6" offset-xl="1">
-                <BaseQuestFilters
-                    :filter="activeFilters"
-                    :sort="selectedSort"
-                    @change-filter="onChangeFilter"
-                    @change-sort="onChangeSort"
-                />
                 <b-tabs content-class="mt-3" justified>
                     <b-tab active>
                         <template #title>
@@ -115,7 +109,7 @@ export default defineComponent({
         },
     },
     watch: {
-        'availableQuestCount': {
+        availableQuestCount: {
             handler(amount: number) {
                 // Return if not in iframe
                 if (window.top === window.self) return;
@@ -123,26 +117,6 @@ export default defineComponent({
                 window.top?.postMessage({ message: 'thx.reward.amount', amount }, this.accountStore.config.origin);
             },
             immediate: true,
-        },
-        // This redirects the user to the wallet if there are no quest and rewards
-        'accountStore.isQuestsLoaded': {
-            handler(isQuestsLoaded) {
-                if (isQuestsLoaded && !this.questStore.quests.length && !this.rewardStore.rewards.length) {
-                    this.$router.push(`/c/${this.accountStore.config.slug}/wallet`);
-                }
-            },
-            deep: true,
-            immediate: true,
-        },
-    },
-    methods: {
-        onChangeFilter(filter: any) {
-            const filterArr = Object.values(this.activeFilters);
-            const filterIndex = filterArr.findIndex((f: any) => f.key == filter.key);
-            this.activeFilters = filterIndex > -1 ? filterArr.splice(filterIndex, -1) : [...filterArr, filter];
-        },
-        onChangeSort(sort: any) {
-            this.selectedSort = sort;
         },
     },
 });

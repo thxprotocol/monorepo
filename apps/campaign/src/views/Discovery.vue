@@ -33,38 +33,18 @@
                             Earn
                         </b-button>
                     </b-navbar-nav>
-                    <b-navbar-nav class="ms-auto mb-2 mb-lg-0 justify-content-end" style="width: 120px">
+                    <b-navbar-nav class="ms-auto mb-2 mb-lg-0 justify-content-end">
                         <template v-if="!authStore.user">
-                            <b-button class="px-4" variant="primary" href="#" @click="accountStore.signin()">
+                            <b-button class="px-4" variant="primary" @click="accountStore.signin()">
                                 Sign in
                                 <i class="fas fa-sign-in-alt ms-2" />
                             </b-button>
                         </template>
                         <template v-else>
-                            <b-nav-item-dropdown end no-caret>
-                                <template #button-content>
-                                    <b-avatar
-                                        v-if="accountStore.account"
-                                        variant="light"
-                                        :src="accountStore.account.profileImg"
-                                        class="gradient-border-xl"
-                                        size="50"
-                                    />
-                                    <div class="d-inline-flex align-items-center" v-else style="height: 50px">
-                                        <b-spinner variant="light" small />
-                                    </div>
-                                </template>
-                                <b-dropdown-item @click="accountStore.isModalAccountShown = true">
-                                    Account
-                                </b-dropdown-item>
-                                <b-dropdown-divider />
-                                <b-dropdown-item-button size="sm" @click="authStore.signout()">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        Sign out
-                                        <i class="fas fa-sign-out-alt ml-auto"></i>
-                                    </div>
-                                </b-dropdown-item-button>
-                            </b-nav-item-dropdown>
+                            <b-button class="px-4" variant="primary" @click="accountStore.signout()">
+                                Sign out
+                                <i class="fas fa-sign-out-alt ml-auto"></i>
+                            </b-button>
                         </template>
                     </b-navbar-nav>
                 </b-collapse>

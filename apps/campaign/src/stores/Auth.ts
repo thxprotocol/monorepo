@@ -4,7 +4,6 @@ import { useClaimStore } from './Claim';
 import { tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
 import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
-import { getIsMobile } from '../utils/user-agent';
 import { Wallet } from '@ethersproject/wallet';
 import { track } from '@thxnetwork/mixpanel';
 import poll from 'promise-poller';
@@ -62,9 +61,8 @@ export const useAuthStore = defineStore('auth', {
             this.oAuthShare = '';
         },
         async requestOAuthShare(extraQueryParams?: { [key: string]: string }) {
-            const { poolId, config } = useAccountStore();
+            const { poolId, config, isMobile } = useAccountStore();
             const { claim } = useClaimStore();
-            const isMobile = getIsMobile();
             const returnUrl = window.location.href;
 
             this.user = await this.userManager[isMobile ? 'signinRedirect' : 'signinPopup']({

@@ -138,6 +138,11 @@ export default defineComponent({
             immediate: true,
         },
     },
+    mounted() {
+        if (this.accountStore.isAuthenticated) {
+            this.questStore.getSocialQuest(this.quest._id);
+        }
+    },
     methods: {
         onClickCancel() {
             this.isSubmitting = false;

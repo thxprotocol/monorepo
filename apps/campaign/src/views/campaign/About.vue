@@ -2,11 +2,17 @@
     <b-container class="flex-grow-1 overflow-auto order-lg-1">
         <b-row>
             <b-col offset-xl="2" xl="8">
-                <b-card class="mx-auto my-2">
+                <b-card class="mx-auto my-2" :img-src="accountStore.config.backgroundUrl" img-top>
                     <template #header>
                         <strong>{{ accountStore.config.title }}</strong>
                     </template>
                     <p style="white-space: pre-line" v-html="accountStore.config.description"></p>
+                    <template #footer v-if="isWalletButtonShown">
+                        <b-button @click="accountStore.isSidebarShown = true" variant="primary" class="w-100">
+                            Show Wallet
+                            <i class="fas fa-chevron-right ms-2" />
+                        </b-button>
+                    </template>
                 </b-card>
             </b-col>
         </b-row>
@@ -14,12 +20,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useWalletStore } from '../../stores/Wallet';
 import { useQuestStore } from '../../stores/Quest';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'Identities',
@@ -35,21 +41,8 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useQuestStore),
         ...mapStores(useWalletStore),
-        isWaitingForWalletAddress() {
-            const { wallet } = useWalletStore();
-            return !wallet || !wallet.address;
-        },
-        isValidUUID() {
-            if (!this.uuid) return null;
-            try {
-                const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-                return uuidRegex.test(this.uuid);
-            } catch (error) {
-                return null;
-            }
-        },
-        isAlertDangerShown() {
-            return !!this.error;
+        isWalletButtonShown() {
+            return this.accountStore.isAuthenticated;
         },
     },
     mounted() {

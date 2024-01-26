@@ -23,6 +23,7 @@ type TAccount = {
     githubAccess: boolean;
     profileImg: string;
     rank: number;
+    isEmailVerified?: boolean;
 };
 
 type TAuthState = {
@@ -50,11 +51,16 @@ type TAuthState = {
 type TAccountState = {
     css: HTMLStyleElement | null;
     isAuthenticated: boolean | null;
+    isIFrame: boolean;
+    isMobile: boolean;
+    isMobileDevice: boolean;
     isMobileIFrame: boolean;
     isMobileEthereumBrowser: boolean;
     isQuestsLoaded: boolean;
     isPreview: boolean;
+    isSidebarShown: boolean;
     isModalAccountShown: boolean;
+    isModalWalletShown: boolean;
     api: THXClient | null;
     poolId: string;
     migration: {
@@ -66,7 +72,7 @@ type TAccountState = {
     account: TAccount | null;
     subscription: TSubscription | null;
     config: any;
-    leaderboard: { score; wallet; questsCompleted }[];
+    leaderboard: { score: number; wallet: TWallet; questsCompleted: number; account: TAccount }[];
 };
 
 type TWidgetTheme = {

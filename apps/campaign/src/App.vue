@@ -1,9 +1,14 @@
 <template>
-    <div id="main">
-        <router-view />
+    <div id="main" :class="{ 'overflow-hidden': accountStore.isSidebarShown && accountStore.isMobile }">
+        <BaseNavbarTop />
+        <div class="d-flex justify-content-end h-100">
+            <router-view class="flex-grow-1" />
+            <BaseSidebar />
+        </div>
+        <BaseModalAccount size="lg" />
+        <BaseModalWallet size="lg" />
         <BaseModalWalletCreate />
         <BaseModalWalletRecovery />
-        <BaseModalAccount size="lg" />
     </div>
 </template>
 <script lang="ts">
@@ -14,6 +19,7 @@ import { mapStores } from 'pinia';
 import { useAuthStore } from './stores/Auth';
 import { useAccountStore } from './stores/Account';
 import { useWalletStore } from './stores/Wallet';
+
 import './scss/main.scss';
 
 export default defineComponent({
@@ -23,6 +29,9 @@ export default defineComponent({
         ...mapStores(useWalletStore),
     },
     watch: {
+        'accountStore.isSidebarShown'() {
+            document.body.classList[this.accountStore.isMobile ? 'add' : 'remove']('overflow-hidden');
+        },
         // OAuthshare retrieved but device share and security quesiton not found
         'authStore.isSecurityQuestionAvailable'(isSecurityQuestionAvailable) {
             const { oAuthShare, isDeviceShareAvailable } = this.authStore;

@@ -1,18 +1,4 @@
 <template>
-    <div v-if="!isIframe" class="px-3 p-1 bg-dark text-white d-none d-lg-flex justify-content-between">
-        <b-link to="/" class="text-white text-opaque text-decoration-none">
-            <i class="fas fa-caret-left me-1" />
-            Back
-        </b-link>
-        <b-link :href="accountStore.config.domain" class="text-white text-opaque text-decoration-none">
-            {{ decodeHTML(accountStore.config.title) }}
-            <i v-if="!accountStore.config.active" class="fas fa-check-circle text-success" />
-        </b-link>
-        <b-link :href="accountStore.config.domain" target="_blank" class="text-white text-opaque text-decoration-none">
-            {{ domain }}
-            <i class="fas fa-external-link-alt ms-1 small" />
-        </b-link>
-    </div>
     <div class="d-flex flex-column h-100 p-0">
         <BaseNavbarSecondary class="d-flex d-lg-none" />
         <b-container
@@ -30,7 +16,7 @@
             >
                 <b-row>
                     <b-col xl="10" offset-xl="1">
-                        <BaseCardAccountRank :height="screenWidth < 768 ? 150 : 250" />
+                        <BaseCardAccountRank />
                     </b-col>
                 </b-row>
             </b-container>
@@ -50,15 +36,12 @@ import { useQuestStore } from '../stores/Quest';
 import { useWalletStore } from '../stores/Wallet';
 import { useRewardStore } from '../stores/Reward';
 import { initGTM } from '../utils/ga';
-import { decodeHTML } from '../utils/decode-html';
 
 export default defineComponent({
     data() {
         return {
             error: '',
-            decodeHTML,
             screenWidth: window.innerWidth,
-            isIframe: window.self !== window.top,
         };
     },
     computed: {
@@ -74,27 +57,36 @@ export default defineComponent({
         isRouteRanking() {
             return this.$route.name !== 'ranking';
         },
-        walletAddress() {
-            const { wallet } = useWalletStore();
-            if (!wallet || !wallet.address) return '';
-            return `${wallet.address.substring(0, 6)}...${wallet.address.substring(
-                wallet.address.length - 4,
-                wallet.address.length,
-            )}`;
+    },
+    watch: {
+        'accountStore.isAuthenticated'() {
+            const { isAuthenticated, isQuestsLoaded } = this.accountStore;
+            this.redirect(isAuthenticated, isQuestsLoaded);
         },
-        domain() {
-            return new URL(this.accountStore.config.domain).hostname;
+        'accountStore.isQuestsLoaded'() {
+            const { isAuthenticated, isQuestsLoaded } = this.accountStore;
+            this.redirect(isAuthenticated, isQuestsLoaded);
         },
     },
     async created() {
         if (GTM) initGTM();
-        window.addEventListener('resize', this.onResize.bind(this));
+        window.addEventListener('resize', this.accountStore.onResize);
         window.onmessage = this.onMessage;
+        this.accountStore.onResize();
         this.accountStore.postMessage({ message: 'thx.widget.ready' });
     },
     methods: {
-        onResize() {
-            this.screenWidth = window.innerWidth;
+        // This redirects the user to the wallet if there are no quest and rewards
+        redirect(isAuthenticated: boolean | null, isQuestsLoaded: boolean) {
+            if (
+                isAuthenticated &&
+                isQuestsLoaded &&
+                !this.questStore.quests.length &&
+                !this.rewardStore.rewards.length
+            ) {
+                this.$router.push(`/c/${this.accountStore.config.slug}/about`);
+                this.accountStore.isSidebarShown = true;
+            }
         },
         async onMessage(event: MessageEvent) {
             const { origin } = this.accountStore.config;

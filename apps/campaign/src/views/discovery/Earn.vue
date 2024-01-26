@@ -4,7 +4,10 @@
             <b-col lg="4" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex">
                 <div>
                     <h1>Lock & Earn</h1>
-                    <p class="lead mb-4">Earn additional rewards by locking your 80THX-20USD in VeTHX.</p>
+                    <p class="lead mb-4">
+                        Earn additional BPT next to your native $BAL rewards! You will also receive VeTHX allowing you
+                        to partake in protocol governance.
+                    </p>
                     <b-button @click="onClickStart" variant="primary" class="me-3 px-5">
                         Claim
                         <i class="fas fa-chevron-right ms-2" />
@@ -17,44 +20,57 @@
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
                 <b-card class="border-0 gradient-shadow-xl" style="min-height: 415px">
                     <b-tabs pills justified content-class="mt-3" nav-wrapper-class="text-white">
-                        <!-- <b-tab title="Invest">
+                        <b-tab title="Invest">
                             <template #title>
                                 <i class="fas fa-dollar-sign me-1"></i>
                                 Liquidity
                             </template>
                             <BaseFormGroupInputTokenAmount
-                                image="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
-                                symbol="USDC"
+                                @update="amountUSDC = $event"
+                                :usd="veStore.pricing['USDC']"
                                 :balance="Math.floor(walletStore.balances[usdcAddress])"
                                 :value="amountUSDC"
-                                @update="amountUSDC = $event"
                                 :min="0"
                                 :max="Math.floor(walletStore.balances[usdcAddress])"
                                 class="mb-4"
                             >
+                                <template #label>
+                                    <div class="d-flex align-items-center" style="width: 65px">
+                                        <b-img
+                                            src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+                                            alt="USDC icon"
+                                            width="20"
+                                            height="20"
+                                            class="me-2"
+                                        />
+                                        USDC
+                                    </div>
+                                </template>
                             </BaseFormGroupInputTokenAmount>
                             <BaseFormGroupInputTokenAmount
-                                image="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
-                                symbol="THX"
+                                @update="amountTHX = $event"
+                                :usd="veStore.pricing['THX']"
                                 :balance="Math.floor(walletStore.balances[thxAddress])"
                                 :value="amountTHX"
-                                @update="amountTHX = $event"
                                 :min="0"
                                 :max="Math.floor(walletStore.balances[thxAddress])"
                                 class="mb-4"
-                            />
-                            <b-button class="w-100 mt-3" @click="onClickAddLiquidity" variant="success">
+                            >
+                                <template #label>
+                                    <div class="d-flex align-items-center" style="width: 65px">
+                                        <b-img
+                                            src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
+                                            alt="THX icon"
+                                            width="20"
+                                            height="20"
+                                            class="me-2"
+                                        />
+                                        THX
+                                    </div>
+                                </template>
+                            </BaseFormGroupInputTokenAmount>
+                            <b-button disabled class="w-100 mt-3" @click="onClickAddLiquidity" variant="success">
                                 Add Liquidity
-                            </b-button>
-                        </b-tab> -->
-                        <b-tab>
-                            <template #title>
-                                <i class="fas fa-gift me-1"></i>
-                                Rewards
-                            </template>
-
-                            <b-button class="w-100 mt-3" @click="onClickAddLiquidity" variant="success">
-                                Claim Tokens
                             </b-button>
                         </b-tab>
                         <b-tab active>
@@ -62,30 +78,70 @@
                                 <i class="fas fa-lock me-1"></i>
                                 Deposit
                             </template>
-                            <b-alert v-model="isAlertDepositShown" class="py-2 px-3">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Earn additional BPT next to your native $BAL rewards!
-                            </b-alert>
                             <BaseFormGroupInputTokenAmount
                                 symbol="20USDC-80THX"
+                                :usd="veStore.pricing['20USDC-80THX']"
                                 :balance="Math.floor(walletStore.balances[bptAddress])"
                                 :value="amountDeposit"
                                 @update="amountDeposit = $event"
-                                :min="0"
+                                :min="minBPTValue / veStore.pricing['20USDC-80THX']"
                                 :max="Math.floor(walletStore.balances[bptAddress])"
                                 class="mb-4"
-                            />
+                            >
+                                <template #label>
+                                    <div class="d-flex align-items-center">
+                                        <b-img
+                                            src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+                                            alt="USDC icon"
+                                            width="20"
+                                            height="20"
+                                            class="me-2"
+                                        />
+                                        20% USDC
+                                        <b-img
+                                            src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
+                                            alt="THX icon"
+                                            width="20"
+                                            height="20"
+                                            class="mx-2"
+                                        />
+                                        80% THX
+                                    </div>
+                                </template>
+                            </BaseFormGroupInputTokenAmount>
                             <BaseFormGroupInputDate
                                 label="Lock duration"
-                                tooltip="You will be able to withdraw early, but a penalty will be applied!"
+                                tooltip="The longer you lock, the more rewards you get. You will be able to withdraw early, but a penalty will be applied."
                                 :enable-time-picker="false"
                                 :min-date="minDate"
                                 :max-date="maxDate"
+                                :allowed-dates="allowedDates"
                                 :start-date="minDate"
                                 :value="lockEnd"
                                 @update="lockEnd = $event"
-                            />
-                            <b-button @click="isModalDepositShown = true" class="w-100 mt-3" variant="success">
+                            >
+                                <template #description>
+                                    <div class="d-flex justify-content-start">
+                                        <b-button
+                                            v-for="{ timestamp, label } of suggestedDates"
+                                            @click="lockEnd = new Date(timestamp)"
+                                            size="sm"
+                                            variant="primary"
+                                            class="rounded-pill me-2 mt-2 mb-0"
+                                            :disabled="lockEnd.getTime() === timestamp"
+                                        >
+                                            {{ label }}
+                                        </b-button>
+                                    </div>
+                                </template>
+                            </BaseFormGroupInputDate>
+
+                            <b-button
+                                :disabled="isDisabledDeposit"
+                                @click="isModalDepositShown = true"
+                                class="w-100 mt-3"
+                                variant="success"
+                            >
                                 Deposit
                             </b-button>
                             <BaseModalDeposit
@@ -151,6 +207,26 @@ import { format, differenceInDays } from 'date-fns';
 
 const OneDayInMs = 60 * 60 * 24 * 1000;
 const NinetyDaysInMs = OneDayInMs * 90;
+const MaxDuration = Date.now() + NinetyDaysInMs;
+
+function getThursdaysUntilTimestamp(futureTimestamp: number) {
+    const thursdays = [];
+
+    // Get the current timestamp
+    const timestampTomorrow = Date.now() + OneDayInMs;
+
+    // Start from the current date and iterate until the future timestamp
+    for (let timestamp = timestampTomorrow; timestamp <= futureTimestamp; timestamp += OneDayInMs) {
+        const currentDate = new Date(timestamp);
+
+        // Check if the current day is Thursday (day index 4 in JavaScript, where Sunday is 0 and Saturday is 6)
+        if (currentDate.getDay() === 4) {
+            thursdays.push(timestamp);
+        }
+    }
+
+    return thursdays;
+}
 
 export default defineComponent({
     name: 'Earn',
@@ -165,9 +241,10 @@ export default defineComponent({
             isModalDepositShown: false,
             isAlertDepositShown: true,
             isModalWithdrawShown: false,
-            minDate: new Date(Date.now() + OneDayInMs),
-            maxDate: new Date(Date.now() + NinetyDaysInMs),
+            maxDuration: MaxDuration,
+            maxDate: new Date(MaxDuration),
             lockEnd: new Date(),
+            minBPTValue: 3,
             balPrice: 0,
             amountDeposit: 0,
             amountUSDC: 0,
@@ -179,21 +256,55 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
         ...mapStores(useVeStore),
+        suggestedDates() {
+            if (!this.allowedDates.length) return [];
+            return [
+                {
+                    label: '2 Weeks',
+                    timestamp: this.allowedDates[1],
+                },
+                {
+                    label: '4 Weeks',
+                    timestamp: this.allowedDates[3],
+                },
+                {
+                    label: '8 Weeks',
+                    timestamp: this.allowedDates[7],
+                },
+                {
+                    label: '12 Weeks',
+                    timestamp: this.allowedDates[11],
+                },
+            ];
+        },
         isEarly() {
             if (!this.veStore.lock) return;
             const { now, end } = this.veStore.lock;
             return Number(now) < Number(end);
         },
+        isDisabledDeposit() {
+            return this.amountDeposit * this.veStore.pricing['20USDC-80THX'] < this.minBPTValue;
+        },
+        allowedDates() {
+            return getThursdaysUntilTimestamp(Date.now() + NinetyDaysInMs);
+        },
+        minDate() {
+            if (!this.allowedDates.length) return new Date();
+            return new Date(this.allowedDates[0]);
+        },
     },
     watch: {
         'accountStore.isAuthenticated'() {
-            this.walletStore.getBalance(BPT_ADDRESS);
+            this.walletStore.getBalance(BPT_ADDRESS).then(() => {
+                this.amountDeposit = this.walletStore.balances[this.bptAddress];
+            });
             this.veStore.getLocks().then(() => {
                 // Update minDate if there is a lock already
                 if (this.veStore.lock?.end) {
                     this.minDate = new Date(this.veStore.lock.end);
                 }
             });
+            this.veStore.getSpotPrice();
         },
     },
     methods: {

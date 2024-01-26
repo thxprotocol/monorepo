@@ -1,7 +1,7 @@
 <template>
     <b-container class="flex-grow-1 overflow-auto order-lg-1">
         <b-row>
-            <b-col lg="10" offset-xl="1">
+            <b-col lg="6" offset-xl="3">
                 <BaseQuestLeaderboard />
             </b-col>
         </b-row>

@@ -6,8 +6,7 @@
                 variant="primary"
                 style="font-size: 1rem; font-weight: normal"
             >
-                <b-img v-if="image" :src="image" :alt="`${symbol} icon`" width="20" height="20" class="me-2" />
-                {{ symbol }}
+                <slot name="label"></slot>
             </b-badge>
             <b-form-input
                 :disabled="disabled"
@@ -23,14 +22,23 @@
         <template #description v-if="balance">
             <div class="d-flex mb-1 justify-content-between mt-1 text-muted">
                 <div>
-                    Balance: {{ balance }} {{ symbol }}
+                    Balance: {{ balance }}
                     <span v-if="value >= balance" class="text-muted"> (Maxed) </span>
                     <b-badge v-else @click="$emit('update', balance)" class="cursor-pointer ms-1" variant="primary">
                         Max
                     </b-badge>
                 </div>
+                <div>
+                    {{ toFiatPrice(usd * value) }}
+                </div>
             </div>
-            <b-progress variant="success" class="bg-primary" :value="value" :max="balance" style="height: 5px" />
+            <b-progress
+                :variant="value > min ? 'success' : 'danger'"
+                class="bg-primary"
+                :value="value"
+                :max="balance"
+                style="height: 5px"
+            />
         </template>
     </b-form-group>
 </template>
@@ -38,17 +46,30 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+function toFiatPrice(number: number) {
+    // Replace 'en-US' with the appropriate locale for your application
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD', // Change this to the desired currency code
+        minimumFractionDigits: 2,
+    });
+
+    return formatter.format(number);
+}
+
 export default defineComponent({
     name: 'BaseFormGroupInputTokenAmount',
     props: {
-        image: String,
-        symbol: String,
         label: String,
-        min: Number,
+        min: { type: Number, required: true },
         max: Number,
         disabled: Boolean,
+        usd: { type: Number, required: true },
         value: { type: Number, required: true },
         balance: { type: Number },
+    },
+    data() {
+        return { toFiatPrice };
     },
 });
 </script>

@@ -111,7 +111,7 @@ export default defineComponent({
         },
         async onClickSubscribe() {
             try {
-                await this.accountStore.subscribe(this.email);
+                await this.accountStore.subscribe();
                 this.onClickContinue();
             } catch (error) {
                 this.subscribeError = 'This e-mail is used by someone else.';
@@ -121,6 +121,7 @@ export default defineComponent({
         async onClickContinue() {
             this.isLoadingContinue = true;
             await this.questStore.list();
+            // Complete quest in local state
             this.isLoadingContinue = false;
             this.$emit('close');
         },

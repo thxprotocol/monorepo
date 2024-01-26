@@ -13,6 +13,16 @@
                     <b-spinner small />
                 </b-button>
             </b-input-group-append>
+            <b-input-group-append v-if="isVerified">
+                <b-button
+                    size="sm"
+                    :variant="accountStore.account?.isEmailVerified ? 'primary' : 'danger'"
+                    class="px-3"
+                    :disabled="true"
+                >
+                    <b-spinner small />
+                </b-button>
+            </b-input-group-append>
         </b-input-group>
     </b-form-group>
 </template>
@@ -40,6 +50,11 @@ export default defineComponent({
         isValidEmail() {
             if (this.isInvalidInput || this.error.length) return false;
             return;
+        },
+        isVerified() {
+            if (!this.accountStore.account) return;
+            if (!this.accountStore.account.email) return;
+            return this.accountStore.account.isEmailVerified;
         },
     },
     mounted() {

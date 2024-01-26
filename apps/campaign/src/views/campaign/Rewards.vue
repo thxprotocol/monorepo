@@ -1,7 +1,7 @@
 <template>
     <b-container class="flex-grow-1 overflow-auto order-lg-1">
         <b-row>
-            <b-col lg="10" offset-xl="1">
+            <b-col lg="10" offset-lg="1">
                 <b-row>
                     <b-col lg="4" :key="key" v-for="(reward, key) of rewardStore.rewards">
                         <component :is="reward.component" :reward="reward" class="mb-2" />

@@ -6,12 +6,12 @@
         <b-link
             @click="onClickRefresh"
             class="pl-3 py-2 p-lg-0 m-lg-0 text-center text-decoration-none d-block d-lg-none"
-            v-if="authStore.oAuthShare && questStore.quests.length"
+            v-if="authStore.oAuthShare && (questStore.quests.length || rewardStore.rewards.length)"
         >
             <div class="text-accent h1 m-0 d-flex align-items-center">
                 <strong>{{ accountStore.balance }}</strong>
                 <span class="ms-2 text-white" style="font-size: 16px !important">
-                    <b-spinner v-if="isRefreshing" small variant="white" />
+                    <b-spinner v-if="isRefreshing" small />
                     <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
                 </span>
             </div>
@@ -19,52 +19,14 @@
         </b-link>
         <div v-else class="pl-3 py-2 text-center text-decoration-none d-lg-none">
             <b-img
-                v-if="config"
+                v-if="accountStore.config.config"
+                :src="accountStore.config.config.logoUrl"
                 class="navbar-logo"
-                :src="config.logoUrl"
-                v-b-tooltip.hover.bottom="{ title: decodeHTML(config.title) }"
+                v-b-tooltip.hover.bottom="{ title: decodeHTML(accountStore.config.title) }"
             />
         </div>
         <div style="width: 120px; text-align: right">
-            <b-button v-if="authStore.oAuthShare && !questStore.quests.length" variant="link" @click="onClickRefresh">
-                <b-spinner v-if="isRefreshing" small variant="white" />
-                <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
-            </b-button>
-            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="link">
-                <b-spinner v-if="accountStore.isAuthenticated === false" small variant="white" />
-                <template v-else>Sign in</template>
-            </b-button>
-            <template v-else>
-                <b-dropdown variant="link" no-caret right>
-                    <template #button-content>
-                        <i class="fas fa-ellipsis-v"></i>
-                    </template>
-                    <b-dropdown-item @click="$router.push(`/c/${accountStore.config.slug}/about`)">
-                        About
-                    </b-dropdown-item>
-                    <b-dropdown-item @click="onClickWallet" v-if="!questStore.quests.length">
-                        <b-spinner v-if="!walletAddress" small />
-                        <template v-else>{{ walletAddress }}</template>
-                    </b-dropdown-item>
-                    <b-dropdown-item @click="accountStore.isModalAccountShown = true"> Account </b-dropdown-item>
-                    <b-dropdown-item
-                        v-if="questStore.quests.length"
-                        size="sm"
-                        @click="$router.push(`/c/${config.slug}/w`)"
-                    >
-                        Identities
-                    </b-dropdown-item>
-                    <b-dropdown-divider />
-                    <b-dropdown-item
-                        size="sm"
-                        @click="onClickSignout"
-                        link-class="d-flex align-items-center justify-content-between"
-                    >
-                        Sign out
-                        <i class="fas fa-sign-out-alt ml-auto"></i>
-                    </b-dropdown-item>
-                </b-dropdown>
-            </template>
+            <BaseDropdownUserMenu />
         </div>
     </b-navbar>
 </template>
@@ -78,14 +40,11 @@ import { useQuestStore } from '../../stores/Quest';
 import { useWalletStore } from '../../stores/Wallet';
 import { useRewardStore } from '../../stores/Reward';
 import { decodeHTML } from '../../utils/decode-html';
-import { AccountVariant } from '../../types/enums/accountVariant';
-import { getIsMobile } from '../../utils/user-agent';
 
 export default defineComponent({
     name: 'BaseNavbarSecondary',
-    data(): any {
+    data() {
         return {
-            AccountVariant,
             decodeHTML,
             error: '',
             isRefreshing: false,
@@ -105,26 +64,14 @@ export default defineComponent({
                 wallet.address.length,
             )}`;
         },
-        config() {
-            return this.accountStore.config;
-        },
     },
     methods: {
-        async onClickSignin() {
-            this.accountStore.signin();
-        },
-        onClickSignout() {
-            this.accountStore.signout();
-        },
         onClickClose() {
-            if (getIsMobile()) {
-                window.open(this.accountStore.config.origin, '_self');
-            } else {
+            if (this.accountStore.isIFrame) {
                 window.top?.postMessage({ message: 'thx.widget.toggle' }, this.accountStore.config.origin);
+            } else if (this.accountStore.isMobileDevice) {
+                window.open(this.accountStore.config.origin, '_self');
             }
-        },
-        onClickWallet() {
-            this.$router.push(`/c/${this.accountStore.config.slug}/wallet`);
         },
         async onClickRefresh() {
             this.isRefreshing = true;

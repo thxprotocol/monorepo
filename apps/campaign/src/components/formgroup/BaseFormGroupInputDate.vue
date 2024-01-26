@@ -12,11 +12,15 @@
             :min-date="minDate"
             :max-date="maxDate"
             :start-date="date"
+            :allowed-dates="(allowedDates as unknown as string[])"
             @date-update="$emit('update', $event)"
             :placeholder="placeholder"
             auto-apply
             input-class-name="form-control"
         />
+        <template #description>
+            <slot name="description"></slot>
+        </template>
     </b-form-group>
 </template>
 
@@ -43,6 +47,7 @@ export default defineComponent({
         minDate: Date,
         maxDate: Date,
         startDate: Date,
+        allowedDates: Array as () => number[],
         enableTimePicke: Boolean,
         value: { type: Date, required: true },
     },
@@ -52,6 +57,11 @@ export default defineComponent({
                 this.date = date;
             },
             immediate: true,
+        },
+        value: {
+            handler(date) {
+                this.date = date;
+            },
         },
     },
 });

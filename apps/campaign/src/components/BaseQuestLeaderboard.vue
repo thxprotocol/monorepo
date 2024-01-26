@@ -7,7 +7,8 @@
             <div class="flex-grow-1 pe-2">Leaderboard</div>
             <div class="text-accent fw-bold">
                 <b-button variant="link" @click="accountStore.getLeaderboard()">
-                    <i class="fas fa-sync-alt"></i>
+                    <b-spinner small v-if="isLoading" />
+                    <i v-else class="fas fa-sync-alt"></i>
                 </b-button>
             </div>
         </b-card-title>
@@ -41,9 +42,11 @@ import { useAccountStore } from '../stores/Account';
 import { useQuestStore } from '../stores/Quest';
 
 export default defineComponent({
-    name: 'Home',
-    data(): any {
-        return {};
+    name: 'BaseQuestLeaderboard',
+    data() {
+        return {
+            isLoading: false,
+        };
     },
     computed: {
         ...mapStores(useAccountStore),

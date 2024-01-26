@@ -1,7 +1,7 @@
 <template>
     <b-container class="flex-grow-1 overflow-auto order-lg-1">
         <b-row>
-            <b-col offset-xl="1" xl="6">
+            <b-col lg="6" offset-xl="3">
                 <b-card class="mx-auto my-2">
                     <template #header>
                         <i class="fas fa-id-badge me-2" />
@@ -25,7 +25,7 @@
                         @click="onClickCollect"
                         variant="success"
                         class="w-100"
-                        :disabled="!!error || isWaitingForWalletAddress || isLoading"
+                        :disabled="!!error || isWaitingForWalletAddress || isLoading || !isValidUUID"
                     >
                         <b-spinner v-if="isLoading" small variant="dark" />
                         Connect Identity

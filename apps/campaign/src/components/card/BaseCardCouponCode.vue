@@ -86,14 +86,14 @@ export default defineComponent({
 <style>
 .truncate-text {
     display: inline-block;
-    width: 200px;
+    width: 175px;
     white-space: nowrap;
     overflow: hidden;
 }
 
 .truncate-text-ellipsis {
     display: inline-block;
-    width: 200px;
+    width: 175px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
