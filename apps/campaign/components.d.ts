@@ -53,8 +53,6 @@ declare module 'vue' {
     BaseFormGroupSubscription: typeof import('./src/components/formgroup/BaseFormGroupSubscription.vue')['default']
     BaseFormGroupUsername: typeof import('./src/components/formgroup/BaseFormGroupUsername.vue')['default']
     BaseModalAccount: typeof import('./src/components/modal/BaseModalAccount.vue')['default']
-    BaseModalCampaignDomain: typeof import('./src/components/modal/BaseModalCampaignDomain.vue')['default']
-    BaseModalCampaignExpired: typeof import('./src/components/modal/BaseModalCampaignExpired.vue')['default']
     BaseModalDeposit: typeof import('./src/components/modal/BaseModalDeposit.vue')['default']
     BaseModalERC20Transfer: typeof import('./src/components/modal/BaseModalERC20Transfer.vue')['default']
     BaseModalERC721Transfer: typeof import('./src/components/modal/BaseModalERC721Transfer.vue')['default']
@@ -117,7 +115,6 @@ declare module 'vue' {
     BTab: typeof import('bootstrap-vue-next')['BTab']
     BTable: typeof import('bootstrap-vue-next')['BTable']
     BTabs: typeof import('bootstrap-vue-next')['BTabs']
-    copy: typeof import('./src/components/BaseFooter copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

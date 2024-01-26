@@ -33,6 +33,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         isShown() {
+            if (!this.accountStore.isAuthenticated) return false;
             if (!this.accountStore.isMobile) return true;
             return this.accountStore.isSidebarShown;
         },
@@ -71,7 +72,7 @@ export default defineComponent({
         width: 400px;
         max-width: 400px;
         background: var(--bs-body-bg);
-        border-left: 3px solid var(--bs-primary);
+        border-left: 3px solid var(--thx-navbar-bg);
 
         @media (max-width: 991px) {
             border: 0;

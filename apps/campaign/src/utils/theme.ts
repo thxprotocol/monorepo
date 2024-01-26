@@ -158,7 +158,7 @@ export function getStyles(elements: any, colors: any) {
             '--bs-btn-disabled-bg': theme.elements.btnBg,
             '--bs-btn-disabled-border-color': theme.elements.btnBg,
         },
-        '.navbar-top,.navbar-bottom': {
+        '.navbar-top,.navbar-bottom,.sidebar': {
             '--thx-navbar-bg': theme.elements.navbarBg,
             '--thx-navbar-btn-bg': theme.elements.navbarBtnBg,
             '--thx-navbar-btn-color': theme.elements.navbarBtnText,

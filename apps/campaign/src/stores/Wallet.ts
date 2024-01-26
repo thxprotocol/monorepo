@@ -77,26 +77,25 @@ export const useWalletStore = defineStore('wallet', {
 
             this.erc721[index] = { ...token, component: 'BaseCardERC721' };
         },
-        list() {
+        async list() {
             const { api } = useAccountStore();
             if (!this.wallet) return;
+
             const options = { chainId: this.wallet.chainId };
+            const [erc20, erc721, erc1155, couponCodes] = await Promise.all([
+                api.erc20.list(options),
+                api.erc721.list(options),
+                api.erc1155.list(options),
+                api.couponCodes.list(options),
+            ]);
 
-            api.erc20.list(options).then((list: TERC20Token[]) => {
-                this.erc20 = list.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' }));
-            });
-
-            api.erc721.list(options).then((list: TERC721Token[]) => {
-                this.erc721 = list.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
-            });
-
-            api.erc1155.list(options).then((list: TERC721Token[]) => {
-                this.erc1155 = list.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
-            });
-
-            api.couponCodes.list(options).then((list: TERC721Token[]) => {
-                this.couponCodes = list.map((t: any) => ({ ...t, component: 'BaseCardCouponCode' }));
-            });
+            this.erc20 = erc20.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' }));
+            this.erc721 = erc721.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
+            this.erc1155 = erc1155.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
+            this.couponCodes = couponCodes.map((t: TCouponRewardPayment[]) => ({
+                ...t,
+                component: 'BaseCardCouponCode',
+            }));
         },
         async transferERC20(config: TERC20TransferConfig) {
             const { api, account } = useAccountStore();

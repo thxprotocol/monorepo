@@ -33,8 +33,6 @@ import { mapStores } from 'pinia';
 import { useWalletStore } from '../stores/Wallet';
 import { useAuthStore } from '../stores/Auth';
 import { useAccountStore } from '../stores/Account';
-import { useQuestStore } from '../stores/Quest';
-import { useRewardStore } from '../stores/Reward';
 import BaseCardERC20 from '../components/card/BaseCardERC20.vue';
 import BaseCardERC721 from '../components/card/BaseCardERC721.vue';
 import BaseCardCouponCode from '../components/card/BaseCardCouponCode.vue';
@@ -54,11 +52,9 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useWalletStore),
         ...mapStores(useAuthStore),
         ...mapStores(useAccountStore),
-        ...mapStores(useQuestStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useWalletStore),
         list() {
             return [
                 ...this.walletStore.couponCodes,
@@ -76,12 +72,7 @@ export default defineComponent({
         },
         async onClickRefresh() {
             this.isRefreshing = true;
-            await Promise.all([
-                this.accountStore.getBalance(),
-                this.questStore.list(),
-                this.rewardStore.list(),
-                this.walletStore.list(),
-            ]);
+            await this.walletStore.list();
             this.isRefreshing = false;
         },
     },
