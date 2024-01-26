@@ -133,15 +133,10 @@ export default defineComponent({
         'accountStore.isAuthenticated': {
             handler(isAuthenticated: boolean) {
                 if (!isAuthenticated) return;
-                this.questStore.getSocialQuest(this.quest._id);
+                this.questStore.list();
             },
             immediate: true,
         },
-    },
-    mounted() {
-        if (this.accountStore.isAuthenticated) {
-            this.questStore.getSocialQuest(this.quest._id);
-        }
     },
     methods: {
         onClickCancel() {

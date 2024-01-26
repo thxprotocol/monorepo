@@ -93,7 +93,12 @@ export const useQuestStore = defineStore('quest', {
             const { api } = useAccountStore();
             const { gitcoin, invite, twitter, discord, youtube, custom, daily, web3 } = await api.quests.list();
             const pointRewardsList = [...twitter, ...discord, ...youtube];
+
             this.quests = [...gitcoin, ...invite, ...pointRewardsList, ...custom, ...daily, ...web3];
+
+            for (const quest of pointRewardsList) {
+                this.getSocialQuest(quest._id);
+            }
         },
 
         setQuestSocial(quest: TQuestSocial) {
@@ -102,7 +107,9 @@ export const useQuestStore = defineStore('quest', {
         },
 
         async getSocialQuest(id: string) {
-            const { api } = useAccountStore();
+            const { api, isAuthenticated } = useAccountStore();
+            if (!isAuthenticated) return;
+
             const quest = await api.request.get(`/v1/quests/social/${id}`);
             this.setQuestSocial(quest);
         },
