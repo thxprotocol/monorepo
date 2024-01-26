@@ -5,9 +5,9 @@
             <BaseCardAccount />
             <BaseViewWallet />
             <footer class="d-flex px-3 py-2 mt-auto" v-if="accountStore.isMobile">
-                <b-link @click="accountStore.isSidebarShown = false" class="text-white ms-auto btn-close">
+                <b-button @click="accountStore.isSidebarShown = false" class="text-white ms-auto btn-close">
                     <i class="fas fa-times" />
-                </b-link>
+                </b-button>
             </footer>
         </aside>
     </div>
@@ -77,16 +77,17 @@ export default defineComponent({
         @media (max-width: 991px) {
             border: 0;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.75);
-            width: 100%;
+            width: 90%;
             overflow-y: auto;
 
             .btn-close {
+                opacity: 1;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 position: absolute;
                 bottom: 1rem;
-                right: 0.5rem;
+                right: 1rem;
                 width: 40px;
                 height: 40px;
                 background: var(--bs-primary);
