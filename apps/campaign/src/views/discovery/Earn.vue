@@ -1,5 +1,5 @@
 <template>
-    <b-container class="flex-grow-1 overflow-auto order-lg-1 pt-0 pb-5">
+    <b-container>
         <b-row class="py-md-5">
             <b-col lg="4" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex">
                 <div>

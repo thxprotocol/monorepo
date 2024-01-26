@@ -38,7 +38,7 @@
         </b-row>
         <hr class="my-5" />
     </b-container>
-    <b-container class="flex-grow-1 overflow-auto order-lg-1 pt-0 pb-5">
+    <b-container class="flex-grow-1">
         <b-row class="mt-5 mb-3">
             <b-col xs="12" md="4">
                 <b-input-group class="mb-3 mb-md-0">

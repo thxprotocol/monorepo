@@ -1,5 +1,5 @@
 <template>
-    <b-container class="flex-grow-1 overflow-auto order-lg-1">
+    <b-container>
         <b-row>
             <b-col offset-xl="2" xl="8">
                 <b-card class="mx-auto my-2" :img-src="accountStore.config.backgroundUrl" img-top>

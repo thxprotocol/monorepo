@@ -9,18 +9,8 @@
             <b-spinner type="grow" variant="primary" small />
         </b-container>
         <template v-else>
-            <b-container
-                v-if="questStore.quests.length"
-                class="order-lg-1"
-                :class="{ 'd-none d-lg-block': isRouteRanking }"
-            >
-                <b-row>
-                    <b-col xl="10" offset-xl="1">
-                        <BaseCardAccountRank />
-                    </b-col>
-                </b-row>
-            </b-container>
-            <router-view />
+            <BaseCardAccountRank />
+            <router-view class="order-lg-2 overflow-mobile" />
         </template>
         <BaseNavbarPrimary :screen-width="screenWidth" />
     </div>
@@ -33,7 +23,6 @@ import { GTM } from '../config/secrets';
 import { useAuthStore } from '../stores/Auth';
 import { useAccountStore } from '../stores/Account';
 import { useQuestStore } from '../stores/Quest';
-import { useWalletStore } from '../stores/Wallet';
 import { useRewardStore } from '../stores/Reward';
 import { initGTM } from '../utils/ga';
 
@@ -49,14 +38,6 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useQuestStore),
         ...mapStores(useRewardStore),
-        ...mapStores(useWalletStore),
-        isSubscribed() {
-            const { subscription } = useAccountStore();
-            return !!subscription;
-        },
-        isRouteRanking() {
-            return this.$route.name !== 'ranking';
-        },
     },
     watch: {
         'accountStore.isAuthenticated'() {
@@ -142,3 +123,11 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+@media (max-width: 992px) {
+    .overflow-mobile {
+        overflow-x: none;
+        overflow-y: auto;
+    }
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-    <b-container class="flex-grow-1 overflow-auto order-lg-1">
+    <b-container>
         <b-row>
             <b-col offset-xl="1" xl="6">
                 <b-card v-if="claimsStore.claim && claimsStore.metadata && claimsStore.erc721" class="mx-auto my-2">
