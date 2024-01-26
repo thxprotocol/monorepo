@@ -1,5 +1,5 @@
 <template>
-    <b-tabs nav-class="px-3" content-class="p-2">
+    <b-tabs class="tabs-rewards" nav-class="px-3" content-class="p-2">
         <template #tabs-end>
             <b-button class="ms-auto" v-if="authStore.oAuthShare" size="sm" variant="link" @click="onClickRefresh">
                 <b-spinner v-if="isRefreshing" small />
@@ -78,3 +78,9 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.tabs-rewards .tab-content {
+    overflow-y: auto;
+    max-height: 400px;
+}
+</style>

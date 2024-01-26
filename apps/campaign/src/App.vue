@@ -2,7 +2,7 @@
     <div id="main" :class="{ 'overflow-hidden': accountStore.isSidebarShown && accountStore.isMobile }">
         <BaseNavbarTop />
         <div class="d-flex justify-content-end h-100">
-            <router-view class="flex-grow-1" />
+            <router-view class="flex-grow-1 overflow-auto" />
             <BaseSidebar />
         </div>
         <BaseModalAccount size="lg" />

@@ -161,9 +161,9 @@
     }
 }
 
-.flex-grow-1.overflow-auto  {
-    @media (min-width: map-get($grid-breakpoints, 'lg')) {
-        flex-grow: 0 !important;
-        overflow: visible !important;
-    }
-}
+// .flex-grow-1.overflow-auto  {
+//     @media (min-width: map-get($grid-breakpoints, 'lg')) {
+//         flex-grow: 0 !important;
+//         overflow: visible !important;
+//     }
+// }
