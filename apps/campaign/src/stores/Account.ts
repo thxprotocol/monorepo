@@ -85,12 +85,6 @@ export const useAccountStore = defineStore('account', {
                 this.setTheme(config);
                 this.getCampaignData();
 
-                track('UserVisits', [
-                    this.account?.sub || '',
-                    'page with widget',
-                    { origin: this.config.origin, poolId: this.poolId },
-                ]);
-
                 if (window.top === window.self) {
                     track('UserOpens', [
                         this.account?.sub || '',
