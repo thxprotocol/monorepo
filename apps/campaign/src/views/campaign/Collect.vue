@@ -147,7 +147,8 @@ export default defineComponent({
             this.accountStore.signin();
         },
         onClickGoToWallet() {
-            this.$router.push(`/c/${this.accountStore.config.slug}/wallet`);
+            this.accountStore.isSidebarShown = true;
+            this.$router.push(`/c/${this.accountStore.config.slug}/about`);
         },
         async onClickCollect() {
             this.isLoadingCollect = true;
