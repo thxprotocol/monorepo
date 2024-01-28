@@ -2,10 +2,10 @@
     <b-container>
         <b-row>
             <b-col lg="6" offset-lg="3">
-                <div v-if="walletStore.isLoading" class="d-flex justify-content-center py-5">
+                <!-- <div v-if="walletStore.isLoading" class="d-flex justify-content-center py-5">
                     <b-spinner variant="primary" small />
-                </div>
-                <BaseCardRewards v-else />
+                </div> -->
+                <BaseCardRewards />
             </b-col>
         </b-row>
     </b-container>

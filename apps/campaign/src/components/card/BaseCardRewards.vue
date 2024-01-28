@@ -1,11 +1,14 @@
 <template>
-    <div v-if="walletStore.isLoading" class="d-flex justify-content-center py-5">
-        <b-spinner variant="primary" small />
-    </div>
-    <b-tabs v-else-if="!walletStore.isLoading && !isEmpty" nav-class="px-3" content-class="p-2">
+    <b-tabs v-if="!isEmpty" nav-class="px-3" content-class="p-2">
         <template #tabs-end>
-            <b-button class="ms-auto" v-if="authStore.oAuthShare" size="sm" variant="link" @click="onClickRefresh">
-                <b-spinner v-if="isRefreshing" small />
+            <b-button
+                class="text-primary ms-auto"
+                v-if="authStore.oAuthShare"
+                size="sm"
+                variant="link"
+                @click="onClickRefresh"
+            >
+                <b-spinner v-if="walletStore.isLoading" small />
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
             </b-button>
         </template>
