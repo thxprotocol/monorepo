@@ -1,13 +1,14 @@
 import { BootstrapVueNext, vBTooltip } from 'bootstrap-vue-next';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+import { Sentry } from '@thxnetwork/common';
 import { MODE, API_URL, MIXPANEL_TOKEN, AUTH_URL, WIDGET_URL } from './config/secrets';
+import { BREAKPOINT_LG } from './config/constants';
+import App from './App.vue';
 import VueClipboard from 'vue3-clipboard';
 import Vue3Toastify from 'vue3-toastify';
-import App from './App.vue';
 import router from './router';
 import Mixpanel from '@thxnetwork/mixpanel';
-import { Sentry } from '@thxnetwork/common';
 import PerfectScrollbar from 'vue3-perfect-scrollbar';
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css';
 
@@ -27,12 +28,16 @@ if (MODE === 'production') {
 Mixpanel.init(MIXPANEL_TOKEN, API_URL);
 
 app.directive('b-tooltip', vBTooltip);
-app.use(PerfectScrollbar, {
-    watchOptions: true,
-    options: {
-        suppressScrollX: true,
-    },
-});
+
+if (window.innerHeight > BREAKPOINT_LG) {
+    app.use(PerfectScrollbar, {
+        watchOptions: true,
+        options: {
+            suppressScrollX: true,
+        },
+    });
+}
+
 app.use(pinia);
 app.use(router);
 app.use(BootstrapVueNext);

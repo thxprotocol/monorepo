@@ -70,7 +70,7 @@ export const DEFAULT_COLORS = {
     },
     glow: {
         label: 'Glow',
-        color: 'rgb(52, 17, 177)',
+        color: '#a200ff',
     },
 };
 
@@ -183,7 +183,7 @@ export function getStyles(elements: any, colors: any) {
             '--thx-linear-gradient-border': `linear-gradient(-45deg, ${theme.colors.accent}, ${theme.elements.btnBgDark}, ${theme.colors.glow})`,
         },
         '.gradient-border-xl, .gradient-shadow:before, .gradient-shadow-xl': {
-            '--thx-linear-gradient-shadow': `linear-gradient(-45deg, ${theme.colors.accent}, ${theme.elements.btnBg}, ${theme.elements.btnBgDarker})`,
+            '--thx-linear-gradient-shadow': `linear-gradient(-45deg, ${theme.colors.glow}, ${theme.elements.btnBg}, ${theme.elements.btnBgDarker})`,
         },
     };
 

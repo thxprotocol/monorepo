@@ -1,18 +1,18 @@
-import { THXBrowserClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
-import { API_URL, AUTH_URL, WIDGET_URL } from '../config/secrets';
-import { useWalletStore } from './Wallet';
 import { track } from '@thxnetwork/mixpanel';
+import { THXBrowserClient } from '@thxnetwork/sdk';
+import { API_URL, AUTH_URL, WIDGET_URL } from '../config/secrets';
 import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
+import { BREAKPOINT_LG } from '../config/constants';
+import { useWalletStore } from './Wallet';
 import { useAuthStore } from './Auth';
 import { getAccessTokenKindForPlatform, getConnectionStatus } from '../utils/social';
 import { RewardConditionPlatform } from '../types/enums/rewards';
 import { User } from 'oidc-client-ts';
 import { AccountVariant } from '../types/enums/accountVariant';
-import poll from 'promise-poller';
 import { decodeHTML } from '../utils/decode-html';
+import poll from 'promise-poller';
 
-const BREAKPOINT_LG = 992;
 // Feature only available on mobile devices
 const isMobileDevice = !!window.matchMedia('(pointer:coarse)').matches;
 
