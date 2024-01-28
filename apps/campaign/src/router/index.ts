@@ -34,6 +34,12 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'earn',
                 component: () => import(/* webpackChunkName: "earn" */ '../views/discovery/Earn.vue'),
             },
+            {
+                path: '/wallets',
+                name: 'wallets',
+                beforeEnter,
+                component: () => import(/* webpackChunkName: "wallets" */ '../views/Wallets.vue'),
+            },
         ],
     },
     {
@@ -61,12 +67,6 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'quests',
                 beforeEnter,
                 component: () => import(/* webpackChunkName: "quests" */ '../views/campaign/Quests.vue'),
-            },
-            {
-                path: '/c/:slug/wallets',
-                name: 'wallets',
-                beforeEnter,
-                component: () => import(/* webpackChunkName: "wallets" */ '../views/campaign/Wallets.vue'),
             },
             {
                 path: '/c/:slug/ranking',

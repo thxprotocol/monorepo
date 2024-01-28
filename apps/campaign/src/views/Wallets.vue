@@ -14,7 +14,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useWalletStore } from '../../stores/Wallet';
+import { useWalletStore } from '../stores/Wallet';
 
 export default defineComponent({
     name: 'BaseCardRewardStore',

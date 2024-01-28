@@ -32,6 +32,15 @@
                             <i class="fas fa-rocket me-1"></i>
                             Earn
                         </b-button>
+                        <b-button
+                            v-if="accountStore.isMobile"
+                            class="me-lg-3 mb-3 mb-lg-0 px-4"
+                            variant="outline-light"
+                            to="/wallets"
+                        >
+                            <i class="fas fa-wallet me-1"></i>
+                            Wallet
+                        </b-button>
                     </b-navbar-nav>
                     <b-navbar-nav class="ms-auto mb-2 mb-lg-0 justify-content-end">
                         <template v-if="!authStore.user">

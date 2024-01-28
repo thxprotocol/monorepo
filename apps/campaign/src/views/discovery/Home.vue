@@ -69,7 +69,7 @@
                 <p v-if="!isLoading && !campaigns.results.length" class="text-opaque">
                     Could not find a campaign with that name...
                 </p>
-                <b-table id="table-campaigns" hover :items="campaignData" @row-clicked="onRowClicked">
+                <b-table responsive="lg" id="table-campaigns" hover :items="campaignData" @row-clicked="onRowClicked">
                     <template #head(rank)>#</template>
                     <template #head(logo)></template>
                     <template #head(name)></template>

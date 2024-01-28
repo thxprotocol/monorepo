@@ -1,5 +1,5 @@
 <template>
-    <div id="main" :class="{ 'overflow-hidden': accountStore.isSidebarShown && accountStore.isMobile }">
+    <div id="main" :class="{ 'overflow-hidden': accountStore.isMobile }">
         <BaseNavbarTop />
         <div class="d-flex justify-content-end h-100">
             <perfect-scrollbar class="router-view-app order-lg-0" :style="scrollHeight">

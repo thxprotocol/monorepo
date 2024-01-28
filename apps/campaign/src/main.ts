@@ -27,7 +27,12 @@ if (MODE === 'production') {
 Mixpanel.init(MIXPANEL_TOKEN, API_URL);
 
 app.directive('b-tooltip', vBTooltip);
-app.use(PerfectScrollbar);
+app.use(PerfectScrollbar, {
+    watchOptions: true,
+    options: {
+        suppressScrollX: true,
+    },
+});
 app.use(pinia);
 app.use(router);
 app.use(BootstrapVueNext);
