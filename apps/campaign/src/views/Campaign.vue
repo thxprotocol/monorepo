@@ -64,11 +64,16 @@ export default defineComponent({
     methods: {
         // This redirects the user to the wallet if there are no quest and rewards
         redirect() {
+            const basePath = `/c/${this.accountStore.config.slug}`;
+            const isQuestCampaign = this.questStore.quests.length || this.rewardStore.rewards.length;
+            if (isQuestCampaign) return;
+
             if (!this.accountStore.isAuthenticated) {
-                return this.$router.push(`/c/${this.accountStore.config.slug}/about`);
+                return this.$router.push(`${basePath}/about`);
             }
-            if (!this.questStore.isLoading && !this.questStore.quests.length && !this.rewardStore.rewards.length) {
-                return this.$router.push(`/c/${this.accountStore.config.slug}/wallets`);
+
+            if (!this.questStore.isLoading) {
+                return this.$router.push(`${basePath}/wallets`);
             }
         },
         async onMessage(event: MessageEvent) {
