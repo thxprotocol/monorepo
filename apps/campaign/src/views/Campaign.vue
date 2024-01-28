@@ -9,7 +9,7 @@
             <b-spinner type="grow" variant="primary" small />
         </b-container>
         <template v-else>
-            <BaseCardAccountRank />
+            <BaseCardAccountRank :height="200" />
             <router-view class="order-lg-2 overflow-mobile" />
         </template>
         <BaseNavbarPrimary :screen-width="screenWidth" />

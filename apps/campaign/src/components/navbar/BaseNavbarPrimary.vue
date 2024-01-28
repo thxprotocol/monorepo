@@ -1,9 +1,5 @@
 <template>
-    <b-navbar
-        :container="false"
-        v-if="questStore.quests.length || rewardStore.rewards.length"
-        class="navbar-bottom mb-lg-3 px-lg-3 order-lg-0"
-    >
+    <b-navbar v-if="isQuestCampaign" :container="false" class="navbar-bottom mb-lg-3 px-lg-3 order-lg-0">
         <div
             v-if="accountStore.config"
             style="width: 120px"
@@ -15,19 +11,19 @@
                 v-b-tooltip.hover.bottom="{ title: decodeHTML(accountStore.config.title) }"
             />
         </div>
-        <router-link v-if="isQuestCampaign" :to="`/c/${accountStore.config.slug}/quests`">
+        <router-link :to="`/c/${accountStore.config.slug}/quests`">
             <i class="fas fa-tasks me-lg-3"></i>
             <div>Quests</div>
         </router-link>
-        <router-link v-if="isQuestCampaign" :to="`/c/${accountStore.config.slug}/rewards`">
+        <router-link :to="`/c/${accountStore.config.slug}/rewards`">
             <i class="fas fa-gift me-lg-3"></i>
             <div>Rewards</div>
         </router-link>
-        <router-link v-if="isQuestCampaign" :to="`/c/${accountStore.config.slug}/ranking`">
+        <router-link :to="`/c/${accountStore.config.slug}/ranking`">
             <i class="fas fa-trophy mr-lg-3"></i>
             <div>Rank</div>
         </router-link>
-        <router-link v-if="isQuestCampaign && accountStore.isMobile" :to="`/c/${accountStore.config.slug}/wallets`">
+        <router-link v-if="accountStore.isMobile" :to="`/c/${accountStore.config.slug}/wallets`">
             <i class="fas fa-wallet mr-lg-3"></i>
             <div>Wallet</div>
         </router-link>

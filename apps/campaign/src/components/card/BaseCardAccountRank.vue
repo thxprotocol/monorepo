@@ -12,7 +12,7 @@
                     }"
                 >
                     <div
-                        v-if="authStore.oAuthShare"
+                        v-if="accountStore.isAuthenticated"
                         class="d-flex justify-content-center align-items-center p-3"
                         style="border-radius: 5px; background: rgba(0, 0, 0, 0.35)"
                     >
@@ -44,7 +44,6 @@
 import { defineComponent } from 'vue';
 import { decodeHTML } from '../../utils/decode-html';
 import { mapStores } from 'pinia';
-import { useAuthStore } from '../../stores/Auth';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
 
@@ -64,7 +63,6 @@ export default defineComponent({
         height: Number,
     },
     computed: {
-        ...mapStores(useAuthStore),
         ...mapStores(useAccountStore),
         ...mapStores(useQuestStore),
         isRouteRanking() {

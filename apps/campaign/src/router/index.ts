@@ -81,6 +81,12 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import(/* webpackChunkName: "rewards" */ '../views/campaign/Rewards.vue'),
             },
             {
+                path: '/c/:slug/wallets',
+                name: 'campaignwallets',
+                beforeEnter,
+                component: () => import(/* webpackChunkName: "campaignwallets" */ '../views/campaign/Wallets.vue'),
+            },
+            {
                 path: '/c/:slug/c/:uuid',
                 name: 'collect',
                 beforeEnter,
