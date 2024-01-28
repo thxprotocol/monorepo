@@ -22,9 +22,6 @@
 <script lang="ts">
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
-import { useAuthStore } from '../../stores/Auth';
-import { useWalletStore } from '../../stores/Wallet';
-import { useQuestStore } from '../../stores/Quest';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -38,31 +35,8 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useQuestStore),
-        ...mapStores(useWalletStore),
         isWalletButtonShown() {
             return this.accountStore.isAuthenticated;
-        },
-    },
-    mounted() {
-        this.uuid = this.$route.params.uuid as string;
-    },
-    methods: {
-        async onClickCollect() {
-            this.isLoading = true;
-            try {
-                await this.accountStore.api.request.patch(`/v1/identity/${this.uuid}`);
-                await this.questStore.list();
-                this.$router.push(`/c/${this.accountStore.config.slug}/quests`);
-            } catch (res) {
-                this.error = (res as any).error.message || 'Something went wrong..';
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        async onClickSignin() {
-            this.accountStore.signin();
         },
     },
 });

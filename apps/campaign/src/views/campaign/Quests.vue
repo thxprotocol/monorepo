@@ -2,7 +2,7 @@
     <b-container>
         <b-row>
             <b-col lg="7" xl="6" offset-xl="1">
-                <div v-if="isLoadingQuests" class="d-flex justify-content-center py-5">
+                <div v-if="questStore.isLoading" class="d-flex justify-content-center py-5">
                     <b-spinner variant="primary" small />
                 </div>
                 <b-tabs v-else content-class="mt-3" justified>
@@ -75,7 +75,6 @@ export default defineComponent({
     },
     data() {
         return {
-            isLoadingQuests: false,
             questComponentMap,
             isLgScreen: window.innerWidth > 1000,
             selectedSort: { label: 'Default', key: RewardSortVariant.Default },
@@ -112,16 +111,7 @@ export default defineComponent({
         },
     },
     watch: {
-        'accountStore.isAuthenticated': {
-            async handler(isAuthenticated: boolean) {
-                if (!isAuthenticated) return;
-                this.isLoadingQuests = true;
-                await this.questStore.list();
-                this.isLoadingQuests = false;
-            },
-            immediate: true,
-        },
-        'availableQuestCount': {
+        availableQuestCount: {
             handler(amount: number) {
                 // Return if not in iframe
                 if (window.top === window.self) return;

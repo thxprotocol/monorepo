@@ -1,5 +1,6 @@
 type TRewardState = {
     rewards: any[];
+    isLoading: boolean;
 };
 
 type TReward = {

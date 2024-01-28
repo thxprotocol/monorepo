@@ -43,6 +43,7 @@ export const useWalletStore = defineStore('wallet', {
         couponCodes: [],
         pendingPoints: 0,
         wallets: [],
+        isLoading: true,
         isModalWalletCreateShown: false,
         isModalAccountShown: false,
         isModalWalletRecoveryShown: false,
@@ -81,6 +82,8 @@ export const useWalletStore = defineStore('wallet', {
             const { api } = useAccountStore();
             if (!this.wallet) return;
 
+            this.isLoading = true;
+
             const options = { chainId: this.wallet.chainId };
             const [erc20, erc721, erc1155, couponCodes] = await Promise.all([
                 api.erc20.list(options),
@@ -96,6 +99,8 @@ export const useWalletStore = defineStore('wallet', {
                 ...t,
                 component: 'BaseCardCouponCode',
             }));
+
+            this.isLoading = false;
         },
         async transferERC20(config: TERC20TransferConfig) {
             const { api, account } = useAccountStore();

@@ -47,9 +47,8 @@
             <b-button v-if="!isSubscribed" @click="onClickSubscribe" variant="primary" class="w-100 rounded-pill">
                 Subscribe
             </b-button>
-            <b-button :variant="isSubscribed ? 'primary' : 'link'" class="w-100 rounded-pill" @click="onClickContinue">
-                <b-spinner v-if="isLoadingContinue" small variant="primary" />
-                <template v-else>Continue</template>
+            <b-button :variant="isSubscribed ? 'primary' : 'link'" class="w-100 rounded-pill" @click="$emit('hidden')">
+                Continue
             </b-button>
         </template>
     </b-modal>
@@ -116,28 +115,10 @@ export default defineComponent({
         async onClickSubscribe() {
             try {
                 await this.accountStore.subscribe();
-                this.onClickContinue();
             } catch (error) {
                 this.subscribeError = 'This e-mail is used by someone else.';
                 console.error(error);
             }
-        },
-        async onClickContinue() {
-            this.isLoadingContinue = true;
-
-            // Continue without error is considered successful claim
-            if (!this.error) {
-                // Set local isClaimed state false
-                this.questStore.setQuestSocial({ ...this.quest, isClaimed: true } as TQuestSocial);
-
-                // TODO Check for unlocked quests
-                // Iterate over available quests
-                // Iterate over quests in locks
-            }
-
-            // Complete quest in local state
-            this.isLoadingContinue = false;
-            this.$emit('close');
         },
     },
 });

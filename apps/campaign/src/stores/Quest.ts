@@ -7,6 +7,7 @@ import { filterAvailableMap } from '../utils/quests';
 export const useQuestStore = defineStore('quest', {
     state: (): TQuestState => ({
         quests: [],
+        isLoading: true,
     }),
     getters: {
         available: (state) => {
@@ -85,23 +86,25 @@ export const useQuestStore = defineStore('quest', {
                 track('UserCreates', [account?.sub, 'daily reward claim', { poolId, origin: config.origin }]);
 
                 getBalance();
-                this.list();
             }
         },
 
         async list() {
             const { api } = useAccountStore();
+            this.isLoading = true;
+
             const { gitcoin, invite, twitter, discord, youtube, custom, daily, web3 } = await api.quests.list();
             const socialQuestList = [...twitter, ...discord, ...youtube];
 
             this.quests = [...gitcoin, ...invite, ...socialQuestList, ...custom, ...daily, ...web3];
-
             await Promise.all(socialQuestList.map((quest) => this.getSocialQuest(quest._id)));
+
+            this.isLoading = false;
         },
 
         setQuestSocial(quest: TQuestSocial) {
             const index = this.quests.findIndex((q) => q._id === quest._id);
-            this.quests[index] = quest as any;
+            this.quests[index] = quest as TAnyQuest;
         },
 
         async getSocialQuest(id: string) {
