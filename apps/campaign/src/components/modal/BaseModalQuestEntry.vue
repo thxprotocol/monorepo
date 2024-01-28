@@ -11,7 +11,7 @@
     >
         <template #header>
             <h5 class="modal-title">
-                {{ loading ? 'Loading...' : error ? 'Quest verification failed' : 'Quest completed!' }}
+                {{ loading ? 'Loading...' : error ? 'Quest validation' : 'Quest completed!' }}
             </h5>
             <b-link class="btn-close" @click="isShown = false"><i class="fas fa-times"></i></b-link>
         </template>
@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { PropType, defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
@@ -78,6 +78,10 @@ export default defineComponent({
         error: String,
         loading: Boolean,
         show: Boolean,
+        quest: {
+            type: Object as PropType<TBaseQuest>,
+            required: true,
+        },
     },
     watch: {
         show(value) {
@@ -120,7 +124,17 @@ export default defineComponent({
         },
         async onClickContinue() {
             this.isLoadingContinue = true;
-            await this.questStore.list();
+
+            // Continue without error is considered successful claim
+            if (!this.error) {
+                // Set local isClaimed state false
+                this.questStore.setQuestSocial({ ...this.quest, isClaimed: true } as TQuestSocial);
+
+                // TODO Check for unlocked quests
+                // Iterate over available quests
+                // Iterate over quests in locks
+            }
+
             // Complete quest in local state
             this.isLoadingContinue = false;
             this.$emit('close');

@@ -2,7 +2,10 @@
     <b-container>
         <b-row>
             <b-col lg="7" xl="6" offset-xl="1">
-                <b-tabs content-class="mt-3" justified>
+                <div v-if="isLoadingQuests" class="d-flex justify-content-center py-5">
+                    <b-spinner variant="primary" small />
+                </div>
+                <b-tabs v-else content-class="mt-3" justified>
                     <b-tab active>
                         <template #title>
                             Available
@@ -31,7 +34,6 @@
                             <component
                                 :is="questComponentMap[quest.variant]"
                                 :quest="quest"
-                                @unlock="onClickUnlock"
                                 class="mb-2 mx-lg-0 my-lg-3"
                             />
                         </div>
@@ -71,8 +73,9 @@ export default defineComponent({
         BaseCardQuestWeb3,
         BaseCardQuestGitcoin,
     },
-    data(): any {
+    data() {
         return {
+            isLoadingQuests: false,
             questComponentMap,
             isLgScreen: window.innerWidth > 1000,
             selectedSort: { label: 'Default', key: RewardSortVariant.Default },
@@ -109,7 +112,16 @@ export default defineComponent({
         },
     },
     watch: {
-        availableQuestCount: {
+        'accountStore.isAuthenticated': {
+            async handler(isAuthenticated: boolean) {
+                if (!isAuthenticated) return;
+                this.isLoadingQuests = true;
+                await this.questStore.list();
+                this.isLoadingQuests = false;
+            },
+            immediate: true,
+        },
+        'availableQuestCount': {
             handler(amount: number) {
                 // Return if not in iframe
                 if (window.top === window.self) return;

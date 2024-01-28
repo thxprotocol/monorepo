@@ -92,13 +92,11 @@ export const useQuestStore = defineStore('quest', {
         async list() {
             const { api } = useAccountStore();
             const { gitcoin, invite, twitter, discord, youtube, custom, daily, web3 } = await api.quests.list();
-            const pointRewardsList = [...twitter, ...discord, ...youtube];
+            const socialQuestList = [...twitter, ...discord, ...youtube];
 
-            this.quests = [...gitcoin, ...invite, ...pointRewardsList, ...custom, ...daily, ...web3];
+            this.quests = [...gitcoin, ...invite, ...socialQuestList, ...custom, ...daily, ...web3];
 
-            for (const quest of pointRewardsList) {
-                this.getSocialQuest(quest._id);
-            }
+            await Promise.all(socialQuestList.map((quest) => this.getSocialQuest(quest._id)));
         },
 
         setQuestSocial(quest: TQuestSocial) {
