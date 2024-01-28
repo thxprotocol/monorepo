@@ -15,32 +15,28 @@
                                 </b-badge>
                             </sup>
                         </template>
-                        <perfect-scrollbar>
-                            <div :class="{ 'd-none': quest.isHidden }" :key="key" v-for="(quest, key) of quests">
-                                <component
-                                    v-if="quest"
-                                    :is="questComponentMap[quest.variant]"
-                                    :quest="quest"
-                                    class="mb-2 mx-lg-0 my-lg-3"
-                                />
-                            </div>
-                            <div class="text-center mt-5" v-if="!availableQuestCount">
-                                <i class="h1 fas fa-trophy text-accent" />
-                                <p class="lead text-accent">Well done!</p>
-                                <p class="text-opaque">You have completed all available quests</p>
-                            </div>
-                        </perfect-scrollbar>
+                        <div :class="{ 'd-none': quest.isHidden }" :key="key" v-for="(quest, key) of quests">
+                            <component
+                                v-if="quest"
+                                :is="questComponentMap[quest.variant]"
+                                :quest="quest"
+                                class="mb-2 mx-lg-0 my-lg-3"
+                            />
+                        </div>
+                        <div class="text-center mt-5" v-if="!availableQuestCount">
+                            <i class="h1 fas fa-trophy text-accent" />
+                            <p class="lead text-accent">Well done!</p>
+                            <p class="text-opaque">You have completed all available quests</p>
+                        </div>
                     </b-tab>
                     <b-tab title="Completed">
-                        <perfect-scrollbar>
-                            <div :class="{ 'd-none': !quest.isHidden }" :key="key" v-for="(quest, key) of quests">
-                                <component
-                                    :is="questComponentMap[quest.variant]"
-                                    :quest="quest"
-                                    class="mb-2 mx-lg-0 my-lg-3"
-                                />
-                            </div>
-                        </perfect-scrollbar>
+                        <div :class="{ 'd-none': !quest.isHidden }" :key="key" v-for="(quest, key) of quests">
+                            <component
+                                :is="questComponentMap[quest.variant]"
+                                :quest="quest"
+                                class="mb-2 mx-lg-0 my-lg-3"
+                            />
+                        </div>
                     </b-tab>
                 </b-tabs>
             </b-col>

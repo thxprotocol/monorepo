@@ -60,6 +60,7 @@ type TAccountState = {
     isSidebarShown: boolean;
     isModalAccountShown: boolean;
     isModalWalletShown: boolean;
+    windowHeight: number;
     api: THXClient | null;
     poolId: string;
     migration: {

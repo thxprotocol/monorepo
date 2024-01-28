@@ -1,6 +1,7 @@
 <template>
     <div
         v-if="accountStore.config.domain && !isIframe"
+        style="height: 30px"
         class="px-3 p-1 bg-dark text-white d-none d-lg-flex justify-content-between"
     >
         <b-link to="/" class="text-white text-opaque text-decoration-none">

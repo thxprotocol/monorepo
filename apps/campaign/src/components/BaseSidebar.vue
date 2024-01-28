@@ -1,11 +1,10 @@
 <template>
-    <div class="sidebar" v-if="isShown">
-        <div class="sidebar-backdrop" @click.stop="onClickBackdrop"></div>
-        <aside class="sidebar-panel h-100">
+    <aside class="sidebar" v-if="isShown">
+        <perfect-scrollbar class="sidebar-panel h-100 router-view-app order-lg-0" :style="scrollHeight">
             <BaseCardAccount />
             <BaseCardRewards />
-        </aside>
-    </div>
+        </perfect-scrollbar>
+    </aside>
 </template>
 
 <script lang="ts">
@@ -26,10 +25,13 @@ export default defineComponent({
             if (!this.accountStore.isMobile) return true;
             return this.accountStore.isSidebarShown;
         },
-    },
-    methods: {
-        onClickBackdrop() {
-            this.accountStore.isSidebarShown = false;
+        scrollHeight() {
+            const { windowHeight, isMobile } = this.accountStore;
+            // Return null to disable custom scroller
+            if (isMobile) return null;
+            const mobileOffset = 30;
+            const height = windowHeight - mobileOffset;
+            return { height: `${height}px` };
         },
     },
 });
@@ -48,15 +50,9 @@ export default defineComponent({
             border: 0;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.75);
             width: 90%;
+            overflow-x: hidden;
             overflow-y: auto;
         }
     }
-}
-</style>
-
-<style>
-.sidebar .tabs-rewards .tab-content {
-    overflow-y: auto;
-    max-height: calc(100vh - 191px);
 }
 </style>

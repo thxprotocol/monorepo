@@ -2,7 +2,9 @@
     <div id="main" :class="{ 'overflow-hidden': accountStore.isSidebarShown && accountStore.isMobile }">
         <BaseNavbarTop />
         <div class="d-flex justify-content-end h-100">
-            <router-view class="router-view-app order-lg-0" />
+            <perfect-scrollbar class="router-view-app order-lg-0" :style="scrollHeight">
+                <router-view />
+            </perfect-scrollbar>
             <BaseSidebar />
         </div>
         <BaseModalAccount size="lg" />
@@ -27,6 +29,14 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         ...mapStores(useWalletStore),
+        scrollHeight() {
+            const { windowHeight, isMobile } = this.accountStore;
+            // Return null to disable custom scroller
+            if (isMobile) return null;
+            const mobileOffset = 30;
+            const height = windowHeight - mobileOffset;
+            return { height: `${height}px` };
+        },
     },
     watch: {
         'accountStore.isSidebarShown'() {
@@ -57,11 +67,14 @@ export default defineComponent({
     },
 });
 </script>
-<style>
+<style lang="scss">
 .router-view-app {
-    overflow-y: auto;
-    overflow-x: hidden;
     flex-grow: 1;
     flex-direction: column;
+
+    @media (max-width: 992px) {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
 }
 </style>

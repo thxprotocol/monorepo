@@ -1,8 +1,6 @@
 import { THXBrowserClient } from '@thxnetwork/sdk';
 import { defineStore } from 'pinia';
 import { API_URL, AUTH_URL, WIDGET_URL } from '../config/secrets';
-import { useRewardStore } from './Reward';
-import { useQuestStore } from './Quest';
 import { useWalletStore } from './Wallet';
 import { track } from '@thxnetwork/mixpanel';
 import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
@@ -30,10 +28,11 @@ export const useAccountStore = defineStore('account', {
         css: null,
         subscription: null,
         leaderboard: [],
+        windowHeight: 0,
         isSidebarShown: false,
+        isAuthenticated: null,
         isModalAccountShown: false,
         isModalWalletShown: false,
-        isAuthenticated: null,
         isIFrame: window.top !== window.self,
         isMobile: window.innerWidth < BREAKPOINT_LG,
         isMobileDevice: isMobileDevice,
@@ -98,6 +97,7 @@ export const useAccountStore = defineStore('account', {
         },
         onResize() {
             this.isMobile = window.innerWidth < BREAKPOINT_LG;
+            this.windowHeight = window.innerHeight;
         },
         addEventListeners() {
             const authStore = useAuthStore();
