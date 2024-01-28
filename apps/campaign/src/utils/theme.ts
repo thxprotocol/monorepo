@@ -68,6 +68,10 @@ export const DEFAULT_COLORS = {
         label: 'Info',
         color: '#17a2b8',
     },
+    glow: {
+        label: 'Glow',
+        color: 'rgb(52, 17, 177)',
+    },
 };
 
 export function getStyles(elements: any, colors: any) {
@@ -93,6 +97,7 @@ export function getStyles(elements: any, colors: any) {
             warning: colors['warning'].color,
             danger: colors['danger'].color,
             info: colors['info'].color,
+            glow: colors['glow'] ? colors['glow'].color : colors['accent'].color,
         },
     };
     const styles: any = {
@@ -175,7 +180,7 @@ export function getStyles(elements: any, colors: any) {
             '--bs-nav-tabs-link-active-border-color': theme.elements.btnBg,
         },
         '.gradient-border-xl': {
-            '--thx-linear-gradient-border': `linear-gradient(-45deg, ${theme.colors.accent}, ${theme.elements.btnBgDark}, ${theme.colors.accent})`,
+            '--thx-linear-gradient-border': `linear-gradient(-45deg, ${theme.colors.accent}, ${theme.elements.btnBgDark}, ${theme.colors.glow})`,
         },
         '.gradient-border-xl, .gradient-shadow:before, .gradient-shadow-xl': {
             '--thx-linear-gradient-shadow': `linear-gradient(-45deg, ${theme.colors.accent}, ${theme.elements.btnBg}, ${theme.elements.btnBgDarker})`,

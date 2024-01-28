@@ -1,7 +1,7 @@
 
 :root {
-    --thx-linear-gradient-border: linear-gradient(-45deg, rgb(162, 0, 255), #5942c1, rgb(162, 0, 255));
-    --thx-linear-gradient-shadow: linear-gradient(-45deg, rgb(162, 0, 255), #5942c1, rgb(52, 17, 177));
+    --thx-linear-gradient-border: linear-gradient(-45deg, rgb(162, 0, 255), #5942c1, rgb(162, 0, 255)) !important;
+    --thx-linear-gradient-shadow: linear-gradient(-45deg, rgb(162, 0, 255), #5942c1, rgb(52, 17, 177)) !important;
 }
 
 .gradient-border-xl {

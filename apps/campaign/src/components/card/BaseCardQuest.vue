@@ -4,12 +4,12 @@
             <div
                 class="d-flex bg-dark rounded"
                 :class="{
-                    'justify-content-end align-items-end': !!quest.image,
-                    'justify-content-center align-items-center': !quest.image,
+                    'justify-content-end align-items-end': !!backgroundImage,
+                    'justify-content-center align-items-center': !backgroundImage,
                 }"
                 :style="{
                     height: '180px',
-                    backgroundImage: `url(${quest.image})`,
+                    backgroundImage: `url(${backgroundImage})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center center',
                 }"
@@ -17,8 +17,8 @@
                 <BImg
                     lazy
                     :src="logoImage"
-                    class="m-3"
-                    style="width: auto; height: auto; max-width: 200px; max-height: 75px"
+                    class="m-3 rounded"
+                    style="width: auto; height: auto; max-width: 150px; max-height: 50px"
                 />
             </div>
         </template>
@@ -73,6 +73,9 @@ export default defineComponent({
         return { format, isModalCampaignDomainShown: false };
     },
     computed: {
+        backgroundImage() {
+            return this.quest.image || (this.quest.brand && this.quest.brand.backgroundImgUrl);
+        },
         logoImage() {
             return this.quest.brand && this.quest.brand.logoImgUrl;
         },
