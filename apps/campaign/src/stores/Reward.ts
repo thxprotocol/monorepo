@@ -7,6 +7,7 @@ import { parseUnitAmount } from '../utils/price';
 export const useRewardStore = defineStore('reward', {
     state: (): TRewardState => ({
         rewards: [],
+        isLoading: true,
     }),
     actions: {
         updateSupply: function (uuid: string) {
@@ -77,8 +78,9 @@ export const useRewardStore = defineStore('reward', {
         },
         async list() {
             const { api } = useAccountStore();
-            const { coin, nft, custom, coupon, discordRole } = await api.rewards.list();
+            this.isLoading = true;
 
+            const { coin, nft, custom, coupon, discordRole } = await api.rewards.list();
             this.rewards = [
                 ...(coin
                     ? Object.values(coin).map((r: any) => {
@@ -117,6 +119,7 @@ export const useRewardStore = defineStore('reward', {
             ]
                 .sort((a: any, b: any) => toNumber(b.createdAt) - toNumber(a.createdAt))
                 .sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
+            this.isLoading = false;
         },
     },
 });

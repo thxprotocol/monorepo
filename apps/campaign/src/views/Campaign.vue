@@ -40,13 +40,18 @@ export default defineComponent({
         ...mapStores(useRewardStore),
     },
     watch: {
-        'accountStore.isAuthenticated'() {
-            const { isAuthenticated, isQuestsLoaded } = this.accountStore;
-            this.redirect(isAuthenticated, isQuestsLoaded);
+        'accountStore.isAuthenticated': {
+            handler() {
+                this.questStore.list();
+                this.redirect();
+            },
+            immediate: true,
         },
-        'accountStore.isQuestsLoaded'() {
-            const { isAuthenticated, isQuestsLoaded } = this.accountStore;
-            this.redirect(isAuthenticated, isQuestsLoaded);
+        'questStore.isLoading'() {
+            this.redirect();
+
+            const amount = this.questStore.quests.filter((r) => !r.isClaimed).length;
+            this.accountStore.postMessage({ message: 'thx.reward.amount', amount });
         },
     },
     async created() {
@@ -58,13 +63,10 @@ export default defineComponent({
     },
     methods: {
         // This redirects the user to the wallet if there are no quest and rewards
-        redirect(isAuthenticated: boolean | null, isQuestsLoaded: boolean) {
-            if (
-                isAuthenticated &&
-                isQuestsLoaded &&
-                !this.questStore.quests.length &&
-                !this.rewardStore.rewards.length
-            ) {
+        redirect() {
+            const { isAuthenticated } = this.accountStore;
+            const { isLoading } = this.questStore;
+            if (isAuthenticated && !isLoading && !this.questStore.quests.length && !this.rewardStore.rewards.length) {
                 this.$router.push(`/c/${this.accountStore.config.slug}/about`);
                 this.accountStore.isSidebarShown = true;
             }
@@ -80,7 +82,6 @@ export default defineComponent({
                 'thx.auth.identity': () => this.onSetIdentity(event.data.identity),
                 'thx.auth.signout': () => this.onSignout,
                 'thx.auth.signin': () => this.onSignin,
-                'thx.quests.list': () => this.onQuestsList,
             };
 
             if (event.origin !== localOrigin || !event.data.message || !messageMap[event.data.message]) return;
@@ -95,9 +96,6 @@ export default defineComponent({
             if (this.accountStore.isAuthenticated) {
                 await this.accountStore.connectIdentity();
             }
-        },
-        onQuestsList() {
-            this.questStore.list();
         },
         onSignin() {
             this.accountStore.signin();

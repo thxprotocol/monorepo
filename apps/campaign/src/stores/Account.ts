@@ -34,7 +34,6 @@ export const useAccountStore = defineStore('account', {
         isModalAccountShown: false,
         isModalWalletShown: false,
         isAuthenticated: null,
-        isQuestsLoaded: false,
         isIFrame: window.top !== window.self,
         isMobile: window.innerWidth < BREAKPOINT_LG,
         isMobileDevice: isMobileDevice,
@@ -206,29 +205,15 @@ export const useAccountStore = defineStore('account', {
         async signout() {
             const { signout } = useAuthStore();
             await signout();
+
             this.setStatus(null);
             this.account = null;
         },
         async getCampaignData() {
-            if (!this.poolId) return;
-            const questStore = useQuestStore();
-            const rewardStore = useRewardStore();
-            const authStore = useAuthStore();
+            if (!this.poolId || !useAuthStore().oAuthShare) return;
 
-            questStore.list().then(() => {
-                this.isQuestsLoaded = true;
-
-                // Send the amount of unclaimed rewards to the parent window and update the launcher
-                const amount = questStore.quests.filter((r: any) => !r.isClaimed).length;
-                this.postMessage({ message: 'thx.reward.amount', amount });
-            });
-
-            rewardStore.list();
-
-            // Guard HTTP requests that do require auth
-            if (!authStore.oAuthShare) return;
-
-            await Promise.all([this.getBalance(), this.getSubscription()]);
+            this.getBalance();
+            this.getSubscription();
         },
         async getUserData() {
             const walletStore = useWalletStore();

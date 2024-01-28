@@ -27,15 +27,10 @@
             <i class="fas fa-trophy mr-lg-3"></i>
             <div>Rank</div>
         </router-link>
-        <b-link
-            v-if="isQuestCampaign && accountStore.isMobile"
-            :class="{ 'text-opaque': !accountStore.isAuthenticated }"
-            :disabled="!accountStore.isAuthenticated"
-            @click="accountStore.isSidebarShown = true"
-        >
+        <router-link v-if="isQuestCampaign && accountStore.isMobile" :to="`/c/${accountStore.config.slug}/wallets`">
             <i class="fas fa-wallet mr-lg-3"></i>
             <div>Wallet</div>
-        </b-link>
+        </router-link>
         <BaseNavbarSecondary class="ms-auto d-none d-lg-flex" />
     </b-navbar>
 </template>

@@ -2,7 +2,10 @@
     <b-container>
         <b-row>
             <b-col lg="7" xl="6" offset-xl="1">
-                <b-tabs content-class="mt-3" justified>
+                <div v-if="questStore.isLoading" class="d-flex justify-content-center py-5">
+                    <b-spinner variant="primary" small />
+                </div>
+                <b-tabs v-else content-class="mt-3" justified>
                     <b-tab active>
                         <template #title>
                             Available
@@ -31,7 +34,6 @@
                             <component
                                 :is="questComponentMap[quest.variant]"
                                 :quest="quest"
-                                @unlock="onClickUnlock"
                                 class="mb-2 mx-lg-0 my-lg-3"
                             />
                         </div>
@@ -71,7 +73,7 @@ export default defineComponent({
         BaseCardQuestWeb3,
         BaseCardQuestGitcoin,
     },
-    data(): any {
+    data() {
         return {
             questComponentMap,
             isLgScreen: window.innerWidth > 1000,

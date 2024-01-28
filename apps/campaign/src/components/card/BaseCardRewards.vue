@@ -1,12 +1,14 @@
 <template>
-    <b-alert v-if="isEmpty" variant="primary" class="px-3 py-2 mx-3" v-model="isEmpty">
-        <i class="fas fa-gift me-2" />
-        Nothing to see here... Yet!
-    </b-alert>
-    <b-tabs v-else class="tabs-rewards" nav-class="px-3" content-class="p-2">
+    <b-tabs v-if="!isEmpty" nav-class="px-3" content-class="p-2">
         <template #tabs-end>
-            <b-button class="ms-auto" v-if="authStore.oAuthShare" size="sm" variant="link" @click="onClickRefresh">
-                <b-spinner v-if="isRefreshing" small />
+            <b-button
+                class="text-primary ms-auto"
+                v-if="authStore.oAuthShare"
+                size="sm"
+                variant="link"
+                @click="onClickRefresh"
+            >
+                <b-spinner v-if="walletStore.isLoading" small />
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
             </b-button>
         </template>
@@ -34,12 +36,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useWalletStore } from '../stores/Wallet';
-import { useAuthStore } from '../stores/Auth';
-import { useAccountStore } from '../stores/Account';
-import BaseCardERC20 from '../components/card/BaseCardERC20.vue';
-import BaseCardERC721 from '../components/card/BaseCardERC721.vue';
-import BaseCardCouponCode from '../components/card/BaseCardCouponCode.vue';
+import { useWalletStore } from '../../stores/Wallet';
+import { useAuthStore } from '../../stores/Auth';
+import { useAccountStore } from '../../stores/Account';
+import BaseCardERC20 from '../../components/card/BaseCardERC20.vue';
+import BaseCardERC721 from '../../components/card/BaseCardERC721.vue';
+import BaseCardCouponCode from '../../components/card/BaseCardCouponCode.vue';
 
 export default defineComponent({
     name: 'BaseViewWallet',
@@ -90,10 +92,3 @@ export default defineComponent({
     },
 });
 </script>
-<style>
-.tabs-rewards .tab-content {
-    overflow-y: auto;
-    height: 100%;
-    max-height: calc(100vh - 160px);
-}
-</style>

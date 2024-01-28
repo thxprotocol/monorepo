@@ -14,7 +14,7 @@
             <b-link class="btn-close" @click="isShown = false"><i class="fas fa-times"></i></b-link>
         </template>
         <div v-if="isLoading" class="text-center">
-            <b-spinner show size="sm" />
+            <b-spinner show small variant="primary" />
         </div>
         <template v-else>
             <b-alert v-model="isAlertDangerShown" show variant="danger" class="p-2">

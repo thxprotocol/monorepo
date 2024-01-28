@@ -52,7 +52,8 @@
         </b-collapse>
     </b-card>
     <BaseModalQuestEntry
-        @close="$emit('modal-close')"
+        @hidden="$emit('modal-close')"
+        :quest="quest"
         :id="id"
         :loading="loading"
         :show="completing"

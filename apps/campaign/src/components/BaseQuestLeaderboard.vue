@@ -5,12 +5,10 @@
                 <i class="fa fa-trophy me-2 text-opaque"></i>
             </div>
             <div class="flex-grow-1 pe-2">Leaderboard</div>
-            <div class="text-accent text-right fw-bold">
-                <b-button variant="link" @click="onClickRefresh">
-                    <b-spinner small v-if="isLoading" />
-                    <i v-else class="fas fa-sync-alt"></i>
-                </b-button>
-            </div>
+            <b-button class="text-primary" variant="link" @click="onClickRefresh">
+                <b-spinner small v-if="isLoading" />
+                <i v-else class="fas fa-sync-alt"></i>
+            </b-button>
         </b-card-title>
         <b-list-group>
             <b-list-group-item class="d-flex px-0 pe-3" :key="key" v-for="(entry, key) of accountStore.leaderboard">

@@ -11,7 +11,7 @@
     >
         <template #header>
             <h5 class="modal-title">
-                {{ loading ? 'Loading...' : error ? 'Quest verification failed' : 'Quest completed!' }}
+                {{ loading ? 'Loading...' : error ? 'Quest validation' : 'Quest completed!' }}
             </h5>
             <b-link class="btn-close" @click="isShown = false"><i class="fas fa-times"></i></b-link>
         </template>
@@ -47,16 +47,15 @@
             <b-button v-if="!isSubscribed" @click="onClickSubscribe" variant="primary" class="w-100 rounded-pill">
                 Subscribe
             </b-button>
-            <b-button :variant="isSubscribed ? 'primary' : 'link'" class="w-100 rounded-pill" @click="onClickContinue">
-                <b-spinner v-if="isLoadingContinue" small variant="primary" />
-                <template v-else>Continue</template>
+            <b-button :variant="isSubscribed ? 'primary' : 'link'" class="w-100 rounded-pill" @click="$emit('hidden')">
+                Continue
             </b-button>
         </template>
     </b-modal>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { PropType, defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
@@ -78,6 +77,10 @@ export default defineComponent({
         error: String,
         loading: Boolean,
         show: Boolean,
+        quest: {
+            type: Object as PropType<TBaseQuest>,
+            required: true,
+        },
     },
     watch: {
         show(value) {
@@ -112,18 +115,10 @@ export default defineComponent({
         async onClickSubscribe() {
             try {
                 await this.accountStore.subscribe();
-                this.onClickContinue();
             } catch (error) {
                 this.subscribeError = 'This e-mail is used by someone else.';
                 console.error(error);
             }
-        },
-        async onClickContinue() {
-            this.isLoadingContinue = true;
-            await this.questStore.list();
-            // Complete quest in local state
-            this.isLoadingContinue = false;
-            this.$emit('close');
         },
     },
 });

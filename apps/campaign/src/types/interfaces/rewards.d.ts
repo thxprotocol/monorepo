@@ -35,6 +35,7 @@ type TAnyQuest = (TQuestSocial | TQuestCustom | TQuestInvite | TQuestDaily | TQu
 
 type TQuestState = {
     quests: TAnyQuest[];
+    isLoading: boolean;
 };
 
 type TQuestSocial = TBaseQuest & {

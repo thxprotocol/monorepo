@@ -31,6 +31,7 @@ type TWalletState = {
     balances: { [tokenAddress: string]: number };
     couponCodes: any[];
     pendingPoints: number;
+    isLoading: boolean;
     isModalWalletCreateShown: boolean;
     isModalAccountShown: boolean;
     isModalWalletRecoveryShown: boolean;

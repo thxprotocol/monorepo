@@ -56,7 +56,6 @@ type TAccountState = {
     isMobileDevice: boolean;
     isMobileIFrame: boolean;
     isMobileEthereumBrowser: boolean;
-    isQuestsLoaded: boolean;
     isPreview: boolean;
     isSidebarShown: boolean;
     isModalAccountShown: boolean;
