@@ -41,8 +41,8 @@ export default defineComponent({
     },
     watch: {
         'accountStore.isAuthenticated': {
-            handler() {
-                this.questStore.list();
+            async handler() {
+                await this.questStore.list();
                 this.redirect();
             },
             immediate: true,
