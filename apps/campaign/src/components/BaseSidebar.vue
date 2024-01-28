@@ -53,3 +53,10 @@ export default defineComponent({
     }
 }
 </style>
+
+<style>
+.sidebar .tabs-rewards .tab-content {
+    overflow-y: auto;
+    max-height: calc(100vh - 191px);
+}
+</style>

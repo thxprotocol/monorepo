@@ -1,5 +1,5 @@
 <template>
-    <b-tabs v-if="!isEmpty" nav-class="px-3" content-class="p-2">
+    <b-tabs class="tabs-rewards" v-if="!isEmpty" nav-class="px-3" content-class="p-2">
         <template #tabs-end>
             <b-button
                 class="text-primary ms-auto"
