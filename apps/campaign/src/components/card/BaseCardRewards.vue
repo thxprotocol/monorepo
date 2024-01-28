@@ -31,10 +31,6 @@
             </div>
         </b-tab>
     </b-tabs>
-    <b-alert v-else variant="primary" class="px-3 py-2 mx-3" v-model="isEmpty">
-        <i class="fas fa-gift me-2" />
-        Nothing to see here... Yet!
-    </b-alert>
 </template>
 
 <script lang="ts">
