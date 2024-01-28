@@ -66,9 +66,10 @@ export default defineComponent({
         redirect() {
             const basePath = `/c/${this.accountStore.config.slug}`;
             const isQuestCampaign = this.questStore.quests.length || this.rewardStore.rewards.length;
-            if (isQuestCampaign) return;
+            // Skip redirect for regular campaigns and the NFT collect page
+            if (isQuestCampaign || this.$route.name === 'collect') return;
 
-            if (!this.accountStore.isAuthenticated) {
+            if (this.accountStore.isAuthenticated === null) {
                 return this.$router.push(`${basePath}/about`);
             }
 

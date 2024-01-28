@@ -81,7 +81,7 @@
                         @click="onClickGoToWallet"
                         class="w-100"
                     >
-                        Go to wallet
+                        Continue
                     </b-button>
                     <b-button
                         v-else-if="authStore.oAuthShare && !isLoadingCollectComplete"
@@ -147,7 +147,6 @@ export default defineComponent({
             this.accountStore.signin();
         },
         onClickGoToWallet() {
-            this.accountStore.isSidebarShown = true;
             this.$router.push(`/c/${this.accountStore.config.slug}/about`);
         },
         async onClickCollect() {
