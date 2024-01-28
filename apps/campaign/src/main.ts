@@ -8,6 +8,8 @@ import App from './App.vue';
 import router from './router';
 import Mixpanel from '@thxnetwork/mixpanel';
 import { Sentry } from '@thxnetwork/common';
+import PerfectScrollbar from 'vue3-perfect-scrollbar';
+import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css';
 
 declare global {
     interface Window {
@@ -25,6 +27,7 @@ if (MODE === 'production') {
 Mixpanel.init(MIXPANEL_TOKEN, API_URL);
 
 app.directive('b-tooltip', vBTooltip);
+app.use(PerfectScrollbar);
 app.use(pinia);
 app.use(router);
 app.use(BootstrapVueNext);

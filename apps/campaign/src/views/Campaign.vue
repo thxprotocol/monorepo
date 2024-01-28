@@ -67,8 +67,7 @@ export default defineComponent({
             const { isAuthenticated } = this.accountStore;
             const { isLoading } = this.questStore;
             if (isAuthenticated && !isLoading && !this.questStore.quests.length && !this.rewardStore.rewards.length) {
-                this.$router.push(`/c/${this.accountStore.config.slug}/about`);
-                this.accountStore.isSidebarShown = true;
+                this.$router.push(`/c/${this.accountStore.config.slug}/wallets`);
             }
         },
         async onMessage(event: MessageEvent) {

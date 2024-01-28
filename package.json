@@ -49,6 +49,7 @@
         "vue-confetti-explosion": "^1.0.2",
         "vue-router": "^4.0.0-0",
         "vue3-clipboard": "^1.0.0",
+        "vue3-perfect-scrollbar": "^1.6.1",
         "vue3-toastify": "^0.1.11",
         "web3-utils": "^1.8.2"
     },

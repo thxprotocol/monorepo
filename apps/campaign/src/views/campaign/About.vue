@@ -8,8 +8,8 @@
                     </template>
                     <p style="white-space: pre-line" v-html="accountStore.config.description"></p>
                     <template #footer v-if="isWalletButtonShown">
-                        <b-button @click="accountStore.isSidebarShown = true" variant="primary" class="w-100">
-                            Show Wallet
+                        <b-button :to="`/c/${accountStore.config.slug}/wallets`" variant="primary" class="w-100">
+                            My Wallet
                             <i class="fas fa-chevron-right ms-2" />
                         </b-button>
                     </template>
