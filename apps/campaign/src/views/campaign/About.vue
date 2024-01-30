@@ -4,9 +4,9 @@
             <b-col offset-xl="2" xl="8">
                 <b-card class="mx-auto my-2" :img-src="accountStore.config.backgroundUrl" img-top>
                     <template #header>
-                        <strong>{{ accountStore.config.title }}</strong>
+                        <strong>{{ decodeHTML(accountStore.config.title) }}</strong>
                     </template>
-                    <p style="white-space: pre-line" v-html="accountStore.config.description"></p>
+                    <p style="white-space: pre-line" v-html="decodeHTML(accountStore.config.description)"></p>
                     <b-button
                         v-if="!isQuestCampaign && accountStore.isAuthenticated"
                         :to="`/c/${accountStore.config.slug}/wallets`"
@@ -37,6 +37,7 @@ import { useAccountStore } from '../../stores/Account';
 import { defineComponent } from 'vue';
 import { useQuestStore } from '../../stores/Quest';
 import { useRewardStore } from '../../stores/Reward';
+import { decodeHTML } from '../../utils/decode-html';
 
 export default defineComponent({
     name: 'Identities',
@@ -45,6 +46,7 @@ export default defineComponent({
             uuid: '',
             error: '',
             isLoading: false,
+            decodeHTML,
         };
     },
     computed: {
