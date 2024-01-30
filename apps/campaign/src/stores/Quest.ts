@@ -94,7 +94,7 @@ export const useQuestStore = defineStore('quest', {
                 throw new Error(error);
             } else {
                 track('UserCreates', [account?.sub, 'daily reward claim', { poolId, origin: config.origin }]);
-                this.waitForQuestEntryJob(jobId);
+                await this.waitForQuestEntryJob(jobId);
             }
         },
 
@@ -123,18 +123,13 @@ export const useQuestStore = defineStore('quest', {
             const quest = await api.request.get(`/v1/quests/social/${id}`);
             this.setQuestSocial(quest);
         },
-        async getQuestEntryJob(jobId: string) {
-            const { api } = useAccountStore();
-            this.jobs[jobId] = await api.request.get(`/v1/jobs/${jobId}`);
-        },
         async waitForQuestEntryJob(jobId: string) {
+            const { api } = useAccountStore();
             const taskFn = async () => {
-                () => this.getQuestEntryJob(jobId);
-                return this.jobs[jobId].lastRunAt ? Promise.resolve() : Promise.reject('Job not finished');
+                const job = await api.request.get(`/v1/jobs/${jobId}`);
+                return job && !!job.lastRunAt ? Promise.resolve() : Promise.reject('Job not finished');
             };
-
-            await poll({ taskFn, interval: 3000, retries: 20 });
-
+            await poll({ taskFn, interval: 1000, retries: 5 });
             useAccountStore().getBalance();
         },
     },
