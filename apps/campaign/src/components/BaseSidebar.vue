@@ -1,9 +1,9 @@
 <template>
     <aside class="sidebar" v-if="isShown">
-        <perfect-scrollbar class="sidebar-panel h-100 router-view-app order-lg-0" :style="scrollHeight">
+        <div class="sidebar-panel h-100">
             <BaseCardAccount />
             <BaseCardRewards />
-        </perfect-scrollbar>
+        </div>
     </aside>
 </template>
 
@@ -45,13 +45,13 @@ export default defineComponent({
         max-width: 400px;
         background: var(--bs-body-bg);
         border-left: 3px solid var(--thx-navbar-bg);
+        overflow-x: hidden;
+        overflow-y: auto;
 
         @media (max-width: 991px) {
             border: 0;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.75);
             width: 90%;
-            overflow-x: hidden;
-            overflow-y: auto;
         }
     }
 }

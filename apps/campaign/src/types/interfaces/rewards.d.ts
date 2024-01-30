@@ -33,7 +33,17 @@ type TBaseQuest = {
 
 type TAnyQuest = (TQuestSocial | TQuestCustom | TQuestInvite | TQuestDaily | TQuestWeb3) & { isClaimed: boolean };
 
+type TJob = {
+    name: string;
+    lastRunAt: Date;
+};
+
+type TJobState = {
+    [jobId: string]: TJob;
+};
+
 type TQuestState = {
+    jobs: TJobState;
     quests: TAnyQuest[];
     isLoading: boolean;
 };

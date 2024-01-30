@@ -2,9 +2,7 @@
     <div id="main" :class="{ 'overflow-hidden': accountStore.isMobile }">
         <BaseNavbarTop />
         <div class="d-flex justify-content-end h-100">
-            <perfect-scrollbar class="router-view-app order-lg-0" :style="scrollHeight">
-                <router-view />
-            </perfect-scrollbar>
+            <router-view class="router-view-app order-lg-0" />
             <BaseSidebar />
         </div>
         <BaseModalAccount size="lg" />
@@ -71,10 +69,7 @@ export default defineComponent({
 .router-view-app {
     flex-grow: 1;
     flex-direction: column;
-
-    @media (max-width: 992px) {
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 </style>
