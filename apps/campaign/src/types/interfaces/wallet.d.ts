@@ -110,3 +110,19 @@ type TNFTTransferConfig = {
     erc1155Amount: number;
     to: string;
 };
+
+type TVeLock = {
+    amount: number;
+    end: number;
+    now: number;
+};
+
+type TVeState = {
+    lock: TVeLock | null;
+    pricing: { '20USDC-80THX': number; 'THX': number; 'USDC': number };
+};
+
+type TRequestBodyDeposit = {
+    lockEndTimestamp: number;
+    amountInWei: string;
+};

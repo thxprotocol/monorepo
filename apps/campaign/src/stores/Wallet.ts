@@ -187,7 +187,7 @@ export const useWalletStore = defineStore('wallet', {
         },
         async approve(data: TRequestBodyApproval) {
             const { api } = useAccountStore();
-            const tx = await api.request.post('/v1/ve/approve', {
+            const [tx] = await api.request.post('/v1/ve/approve', {
                 data,
             });
             await useWalletStore().confirmTransaction(tx.safeTxHash);

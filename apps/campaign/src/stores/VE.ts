@@ -3,16 +3,6 @@ import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
 import poll from 'promise-poller';
 
-type TVeState = {
-    lock: { amount: number; end: number; now: number } | null;
-    pricing: { '20USDC-80THX': number; 'THX': number; 'USDC': number };
-};
-
-type TRequestBodyDeposit = {
-    lockEndTimestamp: number;
-    amountInWei: string;
-};
-
 export const useVeStore = defineStore('ve', {
     state: (): TVeState => ({
         lock: null,
@@ -50,13 +40,12 @@ export const useVeStore = defineStore('ve', {
             const pricing = await api.request.get('/v1/ve/price');
             this.pricing = pricing;
         },
-        waitForLock(amountInWei: string, lockEndTimestamp: number) {
+        waitForLock(amountInWei: number, lockEndTimestamp: number) {
             const getLatestLockAmount = () => (this.lock ? this.lock.amount : 0);
             const getLatestLockEnd = () => (this.lock ? this.lock.end : 0);
             const taskFn = async () => {
                 await this.getLocks();
-                console.log(getLatestLockAmount(), Number(amountInWei), getLatestLockEnd(), lockEndTimestamp);
-                return getLatestLockAmount() === Number(amountInWei) && getLatestLockEnd() === lockEndTimestamp
+                return getLatestLockAmount() === amountInWei && getLatestLockEnd() === lockEndTimestamp
                     ? Promise.resolve()
                     : Promise.reject('Amount');
             };

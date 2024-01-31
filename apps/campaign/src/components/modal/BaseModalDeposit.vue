@@ -126,14 +126,20 @@ export default defineComponent({
         async onClickDeposit() {
             this.isPolling = true;
             try {
+                // Values to send
                 const amountInWei = String(this.amountDeposit);
                 const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
+
+                // Values to check
+                const { amount, end } = this.veStore.lock as TVeLock;
+                const totalAmount = amount + this.amountDeposit;
+                const latestLockEndTimestamp = end < lockEndTimestamp ? lockEndTimestamp : end;
 
                 // Make deposit
                 await this.veStore.deposit({ amountInWei, lockEndTimestamp });
 
                 // Wait for amount and/or endDate to be updated if it changed
-                await this.veStore.waitForLock(amountInWei, lockEndTimestamp);
+                await this.veStore.waitForLock(totalAmount, latestLockEndTimestamp);
 
                 this.walletStore.getBalance(BPT_ADDRESS);
 
