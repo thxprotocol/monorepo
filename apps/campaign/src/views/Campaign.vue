@@ -40,17 +40,10 @@ export default defineComponent({
         ...mapStores(useRewardStore),
     },
     watch: {
-        'accountStore.isAuthenticated': {
-            async handler() {
-                await this.questStore.list();
-                this.redirect();
-            },
-            immediate: true,
-        },
         'questStore.isLoading'() {
             this.redirect();
 
-            const amount = this.questStore.quests.filter((r) => !r.isClaimed).length;
+            const amount = this.questStore.quests.filter((r) => r.isAvailable).length;
             this.accountStore.postMessage({ message: 'thx.reward.amount', amount });
         },
     },
@@ -60,6 +53,9 @@ export default defineComponent({
         window.onmessage = this.onMessage;
         this.accountStore.onResize();
         this.accountStore.postMessage({ message: 'thx.widget.ready' });
+
+        // TODO Check user state here and only list quests if there is no token or no expired token
+        await this.questStore.list();
     },
     methods: {
         // This redirects the user to the wallet if there are no quest and rewards
