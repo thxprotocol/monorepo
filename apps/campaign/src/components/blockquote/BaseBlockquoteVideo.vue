@@ -4,13 +4,13 @@
             width="100%"
             :id="id"
             :height="height"
-            :src="`https://www.youtube.com/embed/${reward.contentMetadata.videoId}?controls=0&modestbranding=1`"
+            :src="`https://www.youtube.com/embed/${quest.contentMetadata.videoId}?controls=0&modestbranding=1`"
         >
         </iframe>
         <hr class="my-2" />
         <div class="text-center card-text">
             <b-link
-                :href="`https://youtu.be/${reward.contentMetadata.videoId}`"
+                :href="`https://youtu.be/${quest.contentMetadata.videoId}`"
                 target="_blank"
                 class="text-opaque ms-auto"
             >
@@ -27,14 +27,14 @@ import { defineComponent, PropType } from 'vue';
 export default defineComponent({
     name: 'BaseBlockquoteVideo',
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestSocial>,
             required: true,
         },
     },
     computed: {
         id() {
-            return `video-iframe-${this.reward._id}`;
+            return `video-iframe-${this.quest._id}`;
         },
         height() {
             const element = document.getElementById(this.id);

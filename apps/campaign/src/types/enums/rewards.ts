@@ -27,7 +27,7 @@ export enum RewardConditionPlatform {
     Shopify = 7,
 }
 
-export enum RewardConditionInteraction {
+export enum QuestConditionInteraction {
     None = -1,
     YouTubeLike = 0,
     YouTubeSubscribe = 1,

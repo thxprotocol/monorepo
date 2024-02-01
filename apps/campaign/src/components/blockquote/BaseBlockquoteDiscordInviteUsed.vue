@@ -3,10 +3,10 @@
         <div class="text-center">
             <b-link
                 class="text-opaque ms-auto"
-                :href="reward.contentMetadata.inviteURL ? reward.contentMetadata.inviteURL : null"
+                :href="quest.contentMetadata.inviteURL ? quest.contentMetadata.inviteURL : null"
                 target="_blank"
             >
-                At least <strong>{{ reward.contentMetadata.treshold }}</strong> users are joined through this invite
+                At least <strong>{{ quest.contentMetadata.treshold }}</strong> users are joined through this invite
                 <i class="fas fa-external-link-alt"></i>
             </b-link>
         </div>
@@ -19,7 +19,7 @@ import { defineComponent, PropType } from 'vue';
 export default defineComponent({
     name: 'BaseBlockquoteDiscordServerJoin',
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestSocial>,
             required: true,
         },

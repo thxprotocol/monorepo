@@ -1,4 +1,4 @@
-import { RewardConditionInteraction, RewardConditionPlatform } from '../types/enums/rewards';
+import { QuestConditionInteraction, RewardConditionPlatform } from '../types/enums/rewards';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { AccountVariant } from '../types/enums/accountVariant';
 
@@ -30,23 +30,23 @@ function getConnectionStatus(account: { [accessKey: string]: boolean }, platform
     return account[accessKey];
 }
 
-function getInteractionComponent(interaction: RewardConditionInteraction) {
+function getInteractionComponent(interaction: QuestConditionInteraction) {
     switch (interaction) {
-        case RewardConditionInteraction.YouTubeLike:
+        case QuestConditionInteraction.YouTubeLike:
             return 'BaseBlockquoteVideo';
-        case RewardConditionInteraction.YouTubeSubscribe:
+        case QuestConditionInteraction.YouTubeSubscribe:
             return 'BaseBlockquoteYoutubeChannelSubscription';
-        case RewardConditionInteraction.TwitterLike:
-        case RewardConditionInteraction.TwitterRetweet:
-        case RewardConditionInteraction.TwitterLikeRetweet:
+        case QuestConditionInteraction.TwitterLike:
+        case QuestConditionInteraction.TwitterRetweet:
+        case QuestConditionInteraction.TwitterLikeRetweet:
             return 'BaseBlockquoteTwitterTweet';
-        case RewardConditionInteraction.TwitterFollow:
+        case QuestConditionInteraction.TwitterFollow:
             return 'BaseBlockquoteTwitterUser';
-        case RewardConditionInteraction.TwitterMessage:
+        case QuestConditionInteraction.TwitterMessage:
             return 'BaseBlockquoteTwitterMessage';
-        case RewardConditionInteraction.DiscordGuildJoined:
+        case QuestConditionInteraction.DiscordGuildJoined:
             return 'BaseBlockquoteDiscordServerJoin';
-        case RewardConditionInteraction.DiscordMessage:
+        case QuestConditionInteraction.DiscordMessage:
             return 'BaseBlockquoteDiscordMessage';
         default:
             return null;

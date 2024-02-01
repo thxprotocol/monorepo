@@ -7,14 +7,14 @@
                     style="right: 0.5rem"
                     v-b-tooltip
                     :title="'Do not change this text in your post! Complete the quest not faster than 10s after posting.'"
-                    v-clipboard:copy="reward.content"
+                    v-clipboard:copy="quest.content"
                     v-clipboard:success="onCopySuccess"
                 >
                     {{ copyLabel }}
                 </b-link>
                 Post contains:
             </div>
-            <em style="white-space: pre-wrap" v-html="reward.content" />
+            <em style="white-space: pre-wrap" v-html="quest.content" />
         </div>
     </blockquote>
 </template>
@@ -24,12 +24,12 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
-import { RewardConditionInteraction } from '../../types/enums/rewards';
+import { QuestConditionInteraction } from '../../types/enums/rewards';
 
 export default defineComponent({
     name: 'BaseBlockquoteTweet',
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestSocial>,
             required: true,
         },
@@ -37,7 +37,7 @@ export default defineComponent({
     data(): any {
         return {
             copyLabel: 'Copy Text',
-            RewardConditionInteraction,
+            QuestConditionInteraction,
         };
     },
     computed: {

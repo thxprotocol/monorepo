@@ -3,7 +3,7 @@
         <div class="text-center">
             <b-link
                 class="text-opaque ms-auto"
-                :href="reward.contentMetadata.inviteURL ? reward.contentMetadata.inviteURL : null"
+                :href="quest.contentMetadata.inviteURL ? quest.contentMetadata.inviteURL : null"
                 target="_blank"
             >
                 Join Discord server
@@ -19,7 +19,7 @@ import { defineComponent, PropType } from 'vue';
 export default defineComponent({
     name: 'BaseBlockquoteDiscordServerJoin',
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestSocial>,
             required: true,
         },

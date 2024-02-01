@@ -23,15 +23,17 @@ type TBaseQuest = {
     image: string;
     variant: QuestVariant;
     infoLinks: TInfoLink[];
+    amount: number;
     component: string;
     createdAt: string;
     updatedAt: string;
     locks: { questId: string; variant: QuestVariant }[];
-    isHidden: boolean;
+    isAvailable: boolean;
+    isCompleted: boolean;
     expiryDate: Date;
 };
 
-type TAnyQuest = (TQuestSocial | TQuestCustom | TQuestInvite | TQuestDaily | TQuestWeb3) & { isClaimed: boolean };
+type TAnyQuest = TQuestSocial | TQuestCustom | TQuestInvite | TQuestDaily | TQuestWeb3 | TQuestGitcoin;
 
 type TJob = {
     name: string;
@@ -49,13 +51,10 @@ type TQuestState = {
 };
 
 type TQuestSocial = TBaseQuest & {
-    amount: number;
-    pointsAvailable: number;
     platform: RewardConditionPlatform;
-    interaction?: RewardConditionInteraction;
+    interaction?: QuestConditionInteraction;
     content?: string;
     contentMetadata?: any;
-    isClaimed?: boolean;
     restartDates?: {
         start: Date;
         end: Date;
@@ -71,7 +70,6 @@ type TEvent = {
 
 type TQuestCustom = TBaseQuest & {
     limit: number;
-    amount: number;
     isClaimed?: boolean;
     claims: TQuestCustomClaim[];
     events: TEvent[];
@@ -79,25 +77,23 @@ type TQuestCustom = TBaseQuest & {
 
 type TQuestInvite = TBaseQuest & {
     pathname: string;
-    amount: number;
     referralUrl?: string;
 };
 
 type TQuestDaily = TBaseQuest & {
-    amount: number;
     amounts: number[];
-    claims: TDailyRewardClaim[];
-    isDisabled: boolean;
+    entries: TDailyRewardClaim[];
     claimAgainDuration;
-    pointsAvailable: number;
 };
 
 type TQuestWeb3 = TBaseQuest & {
-    amount: number;
     contracts: { chainId: ChainId; address: string }[];
     methodName: string;
     threshold: number;
-    isClaimed: boolean;
+};
+
+type TQuestGitcoin = TBaseQuest & {
+    score: number;
 };
 
 type TQuestCustomClaim = {
@@ -105,7 +101,6 @@ type TQuestCustomClaim = {
     sub: string;
     uuid: string;
     amount: string;
-    isClaimed: boolean;
 };
 
 type TQuestDailyClaim = {
@@ -113,7 +108,6 @@ type TQuestDailyClaim = {
     sub: string;
     uuid: string;
     amount: string;
-    isClaimed?: boolean;
 };
 
 type TCouponRewardPayment = {

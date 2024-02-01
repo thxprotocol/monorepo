@@ -1,18 +1,18 @@
 <template>
-    <blockquote v-if="reward.contentMetadata">
+    <blockquote v-if="quest.contentMetadata">
         <div class="d-flex align-items-center">
-            <b-avatar :src="reward.contentMetadata.profileImgUrl" class="me-2" />
+            <b-avatar :src="quest.contentMetadata.profileImgUrl" class="me-2" />
             <div>
                 <div>
-                    <strong>{{ reward.contentMetadata.name }}</strong>
+                    <strong>{{ quest.contentMetadata.name }}</strong>
                 </div>
-                <span class="text-muted">@{{ reward.contentMetadata.username }}</span>
+                <span class="text-muted">@{{ quest.contentMetadata.username }}</span>
             </div>
         </div>
         <hr class="my-2" />
         <div class="text-center card-text">
             <b-link
-                :href="`https://twitter.com/${reward.contentMetadata.username}`"
+                :href="`https://twitter.com/${quest.contentMetadata.username}`"
                 target="_blank"
                 class="text-opaque ms-auto"
             >
@@ -29,7 +29,7 @@ import { defineComponent, PropType } from 'vue';
 export default defineComponent({
     name: 'BaseBlockquoteTweet',
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestSocial>,
             required: true,
         },

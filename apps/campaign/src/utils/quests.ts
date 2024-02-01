@@ -22,17 +22,6 @@ export const questComponentMap: any = {
     [QuestVariant.Gitcoin]: 'BaseCardQuestGitcoin',
 };
 
-export const filterAvailableMap: any = {
-    [QuestVariant.Daily]: (quest: TQuestDaily & { claimAgainDuration: number }) => quest.claimAgainDuration <= 0,
-    [QuestVariant.Invite]: (quest: TQuestInvite) => !!quest,
-    [QuestVariant.Twitter]: (quest: TQuestSocial) => !quest.isClaimed,
-    [QuestVariant.Discord]: (quest: TQuestSocial) => !quest.isClaimed,
-    [QuestVariant.YouTube]: (quest: TQuestSocial) => !quest.isClaimed,
-    [QuestVariant.Custom]: (quest: TQuestCustom) => !quest.claims.length || quest.limit - quest.claims.length > 0,
-    [QuestVariant.Web3]: (quest: TQuestWeb3) => !quest.isClaimed,
-    [QuestVariant.Gitcoin]: (quest: TQuestWeb3) => !quest.isClaimed,
-};
-
 export const sortMap: { [k: number]: any } = {
     [RewardSortVariant.Default]: (a: any, b: any): any => {
         return a.index - b.index;

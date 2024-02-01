@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { filterAvailableMap } from '../utils/quests';
 import poll from 'promise-poller';
 
 export const useQuestStore = defineStore('quest', {
@@ -13,89 +12,69 @@ export const useQuestStore = defineStore('quest', {
     }),
     getters: {
         available: (state) => {
-            return state.quests.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q));
+            return state.quests.filter((q: TBaseQuest) => q.isAvailable);
         },
         availablePoints: (state) => {
-            const rest = state.quests.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q));
-            if (!rest.length) return 0;
-            return rest.reduce((total: number, quest: any) => total + Number(quest.pointsAvailable), 0);
+            const quests = state.quests.filter((q: TBaseQuest) => q.isAvailable);
+            if (!quests.length) return 0;
+            return quests.reduce((total: number, quest: any) => total + Number(quest.amount), 0);
         },
     },
     actions: {
-        async completeGitcoinQuest(uuid: string, payload: { signature: string; message: string; chainId: ChainId }) {
+        async completeGitcoinQuest(
+            quest: TQuestGitcoin,
+            payload: { signature: string; message: string; chainId: ChainId },
+        ) {
             const { api, account, poolId, config } = useAccountStore();
-            const { error, jobId } = await api.quests.gitcoin.entry.create(uuid, payload);
-            if (error) {
-                throw new Error(error);
-            } else {
-                track('UserCreates', [account?.sub, 'gitcoin quest entry', { poolId, origin: config.origin }]);
-                await this.waitForQuestEntryJob(jobId);
+            const { error, jobId } = await api.quests.gitcoin.entry.create(quest._id, payload);
+            if (error) throw new Error(error);
 
-                const index = this.quests.findIndex((r) => r.uuid === uuid);
-                this.quests[index].isClaimed = true;
-            }
+            track('UserCreates', [account?.sub, 'gitcoin quest entry', { poolId, origin: config.origin }]);
+            await this.waitForQuestEntryJob(quest._id, jobId);
         },
-        async completeWeb3Quest(uuid: string, payload: { signature: string; message: string; chainId: ChainId }) {
+        async completeWeb3Quest(quest: TQuestWeb3, payload: { signature: string; message: string; chainId: ChainId }) {
             const { api, account, poolId, config } = useAccountStore();
-            const { error, jobId } = await api.quests.web3.entry.create(uuid, payload);
-            if (error) {
-                throw new Error(error);
-            } else {
-                track('UserCreates', [account?.sub, 'web3 quest entry', { poolId, origin: config.origin }]);
-                await this.waitForQuestEntryJob(jobId);
+            const { error, jobId } = await api.quests.web3.entry.create(quest._id, payload);
+            if (error) throw new Error(error);
 
-                const index = this.quests.findIndex((r) => r.uuid === uuid);
-                this.quests[index].isClaimed = true;
-            }
+            track('UserCreates', [account?.sub, 'web3 quest entry', { poolId, origin: config.origin }]);
+            await this.waitForQuestEntryJob(quest._id, jobId);
         },
-        async completeSocialQuest(id: string) {
+        async completeSocialQuest(quest: TQuestSocial) {
             const { api, account, poolId, config } = useAccountStore();
-            const { error, jobId } = await api.quests.social.entry.create(id);
-            if (error) {
-                throw new Error(error);
-            } else {
-                track('UserCreates', [account?.sub, 'conditional reward claim', { poolId, origin: config.origin }]);
+            const { error, jobId } = await api.quests.social.entry.create(quest._id);
+            if (error) throw new Error(error);
 
-                await this.waitForQuestEntryJob(jobId);
-
-                const index = this.quests.findIndex((r) => r._id === id);
-                this.quests[index].isClaimed = true;
-            }
+            track('UserCreates', [account?.sub, 'conditional reward claim', { poolId, origin: config.origin }]);
+            await this.waitForQuestEntryJob(quest._id, jobId);
         },
         async completeCustomQuest(quest: TQuestCustom) {
             const { api, account, poolId, config } = useAccountStore();
             const { error, jobId } = await api.quests.custom.entry.create(quest.uuid);
-            if (error) {
-                throw new Error(error);
-            } else {
-                track('UserCreates', [account?.sub, 'milestone reward claim', { poolId, origin: config.origin }]);
-                await this.waitForQuestEntryJob(jobId);
-            }
+            if (error) throw new Error(error);
+
+            track('UserCreates', [account?.sub, 'milestone reward claim', { poolId, origin: config.origin }]);
+            await this.waitForQuestEntryJob(quest._id, jobId);
         },
-        async completeInviteQuest(uuid: string) {
+        async completeInviteQuest(quest: TQuestInvite) {
             const { account, config, setConfig, poolId, api } = useAccountStore();
             if (!config.ref) return;
 
             const { sub } = JSON.parse(window.atob(config.ref));
-            const { error, jobId } = await api.quests.invite.entry.create(uuid, { sub });
-            if (error) {
-                throw new Error(error);
-            } else {
-                setConfig(poolId, { ref: '' } as TWidgetConfig);
-                track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: config.origin }]);
-                this.waitForQuestEntryJob(jobId);
-            }
-        },
-        async completeDailyQuest(reward: TQuestDaily) {
-            const { api, account, poolId, config } = useAccountStore();
-            const { error, jobId } = await api.quests.daily.entry.create(reward._id);
+            const { error, jobId } = await api.quests.invite.entry.create(quest.uuid, { sub });
+            if (error) throw new Error(error);
 
-            if (error) {
-                throw new Error(error);
-            } else {
-                track('UserCreates', [account?.sub, 'daily reward claim', { poolId, origin: config.origin }]);
-                await this.waitForQuestEntryJob(jobId);
-            }
+            setConfig(poolId, { ref: '' } as TWidgetConfig);
+            track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: config.origin }]);
+            await this.waitForQuestEntryJob(quest._id, jobId);
+        },
+        async completeDailyQuest(quest: TQuestDaily) {
+            const { api, account, poolId, config } = useAccountStore();
+            const { error, jobId } = await api.quests.daily.entry.create(quest._id);
+            if (error) throw new Error(error);
+
+            track('UserCreates', [account?.sub, 'daily reward claim', { poolId, origin: config.origin }]);
+            await this.waitForQuestEntryJob(quest._id, jobId);
         },
 
         async list() {
@@ -109,24 +88,17 @@ export const useQuestStore = defineStore('quest', {
             this.isLoading = false;
         },
 
-        setQuestSocial(quest: TQuestSocial) {
-            const index = this.quests.findIndex((q) => q._id === quest._id);
-            this.quests[index] = quest as TAnyQuest;
-        },
-
-        async getSocialQuest(id: string) {
-            const { api, isAuthenticated } = useAccountStore();
-            if (!isAuthenticated) return;
-
-            const quest = await api.request.get(`/v1/quests/social/${id}`);
-            this.setQuestSocial(quest);
-        },
-        async waitForQuestEntryJob(jobId: string) {
+        async waitForQuestEntryJob(questId: string, jobId: string) {
             const { api } = useAccountStore();
             const taskFn = async () => {
                 const job = await api.request.get(`/v1/jobs/${jobId}`);
                 return job && !!job.lastRunAt ? Promise.resolve() : Promise.reject('Job not finished');
             };
+
+            const index = this.quests.findIndex((r) => r._id === questId);
+            this.quests[index].isAvailable = false;
+
+            // Poll for job to finish
             await poll({ taskFn, interval: 1000, retries: 5 });
             useAccountStore().getBalance();
         },

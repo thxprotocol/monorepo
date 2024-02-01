@@ -3,15 +3,15 @@
         <b-link
             target="_blank"
             class="fw-bold text-accent"
-            :href="`https://www.twitter.com/${reward.contentMetadata.username}`"
+            :href="`https://www.twitter.com/${quest.contentMetadata.username}`"
         >
-            @{{ reward.contentMetadata.username }}
+            @{{ quest.contentMetadata.username }}
         </b-link>
         -
-        <span v-if="reward.contentMetadata.text"> {{ reward.contentMetadata.text.substring(0, 110) }}</span>
+        <span v-if="quest.contentMetadata.text"> {{ quest.contentMetadata.text.substring(0, 110) }}</span>
         <b-link
-            v-if="reward.contentMetadata.text.length > 110"
-            :href="reward.contentMetadata.url"
+            v-if="quest.contentMetadata.text.length > 110"
+            :href="quest.contentMetadata.url"
             target="_blank"
             class="text-accent"
         >
@@ -19,8 +19,8 @@
         </b-link>
         <hr class="my-2" />
         <div class="text-center card-text">
-            <b-link :href="reward.contentMetadata.url" target="_blank" class="text-opaque ms-auto">
-                {{ interactionLabel[reward.interaction] }}
+            <b-link :href="quest.contentMetadata.url" target="_blank" class="text-opaque ms-auto">
+                {{ interactionLabel[quest.interaction] }}
                 <i class="fas fa-external-link-alt"></i>
             </b-link>
         </div>
@@ -32,12 +32,12 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
-import { RewardConditionInteraction } from '../../types/enums/rewards';
+import { QuestConditionInteraction } from '../../types/enums/rewards';
 
 export default defineComponent({
     name: 'BaseBlockquoteTweet',
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestSocial>,
             required: true,
         },
@@ -45,9 +45,9 @@ export default defineComponent({
     data: function (): any {
         return {
             interactionLabel: {
-                [RewardConditionInteraction.TwitterLike]: 'Like this post',
-                [RewardConditionInteraction.TwitterRetweet]: 'Repost this post',
-                [RewardConditionInteraction.TwitterLikeRetweet]: 'Repost & Like this post',
+                [QuestConditionInteraction.TwitterLike]: 'Like this post',
+                [QuestConditionInteraction.TwitterRetweet]: 'Repost this post',
+                [QuestConditionInteraction.TwitterLikeRetweet]: 'Repost & Like this post',
             },
             tooltipContent: 'Copy URL',
         };
@@ -56,16 +56,16 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useQuestStore),
         content() {
-            if (!this.interactionLabel[this.reward.interaction] || !this.reward.content) return;
-            return this.getChannelActionURL(this.reward.interaction, this.reward.content);
+            if (!this.interactionLabel[this.quest.interaction] || !this.quest.content) return;
+            return this.getChannelActionURL(this.quest.interaction, this.quest.content);
         },
     },
     methods: {
-        getChannelActionURL(interaction: RewardConditionInteraction, content: string) {
+        getChannelActionURL(interaction: QuestConditionInteraction, content: string) {
             switch (interaction) {
-                case RewardConditionInteraction.TwitterLike:
-                case RewardConditionInteraction.TwitterRetweet:
-                case RewardConditionInteraction.TwitterLikeRetweet:
+                case QuestConditionInteraction.TwitterLike:
+                case QuestConditionInteraction.TwitterRetweet:
+                case QuestConditionInteraction.TwitterLikeRetweet:
                     return { url: `https://www.twitter.com/twitter/status/${content}` };
                 default:
                     return '';

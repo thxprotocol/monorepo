@@ -2,12 +2,12 @@
     <BaseCardCollapse
         :quest="quest"
         :info-links="quest.infoLinks"
-        :visible="!!authStore.oAuthShare && !quest.isClaimed"
+        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         @modal-close="isModalQuestEntryShown = false"
         :id="quest._id"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="quest.pointsAvailable"
+        :amount="quest.amount"
         :error="error"
         :image="quest.image"
     >
@@ -21,17 +21,14 @@
 
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
-        <component :is="getInteractionComponent(quest.interaction)" :reward="quest" />
+        <component :is="getInteractionComponent(quest.interaction)" :quest="quest" />
 
         <template #button>
-            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
-                <template v-if="quest.pointsAvailable > 0">
-                    Sign in &amp; claim <strong>{{ quest.pointsAvailable }} points</strong>
-                </template>
-                <template v-else> Sign in &amp; Complete Quest </template>
+            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
+                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
-            <b-button v-else-if="quest.isClaimed" variant="primary" block class="w-100" disabled>
+            <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>
                 Quest Completed
             </b-button>
 
@@ -52,20 +49,13 @@
                 </BButton>
             </BButtonGroup>
 
-            <b-button
-                v-else
-                variant="primary"
-                block
-                class="w-100"
-                @click="onClickClaim"
-                :disabled="isSubmitting || !quest.pointsAvailable"
-            >
+            <b-button v-else variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
                 <template v-if="isSubmitting">
                     <b-spinner small></b-spinner>
                     Adding points...
                 </template>
                 <template v-else>
-                    Claim <strong>{{ quest.pointsAvailable }} points</strong>
+                    Claim <strong>{{ quest.amount }} points</strong>
                 </template>
             </b-button>
         </template>
@@ -78,7 +68,7 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useQuestStore } from '../../stores/Quest';
-import { RewardConditionPlatform, RewardConditionInteraction } from '../../types/enums/rewards';
+import { RewardConditionPlatform, QuestConditionInteraction } from '../../types/enums/rewards';
 import { getInteractionComponent, getConnectionStatus, platformIconMap } from '../../utils/social';
 import BaseBlockquoteTwitterTweet from '../blockquote/BaseBlockquoteTwitterTweet.vue';
 import BaseBlockquoteTwitterMessage from '../blockquote/BaseBlockquoteTwitterMessage.vue';
@@ -112,7 +102,7 @@ export default defineComponent({
             error: '',
             isSubmitting: false,
             RewardConditionPlatform,
-            RewardConditionInteraction,
+            QuestConditionInteraction,
             getInteractionComponent,
             platformIconMap,
             tooltipContent: 'Copy URL',

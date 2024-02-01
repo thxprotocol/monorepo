@@ -5,17 +5,17 @@
             Connect a Discord account for this quest
         </b-alert>
         <p class="text-opaque mb-2"><strong>Your points</strong></p>
-        <b-progress class="bg-primary mb-2" height="12px" :max="reward.amount">
-            <b-progress-bar variant="success" show-value :value="reward.pointsClaimed" />
-            <b-progress-bar variant="warning" :value="accountStore.account ? reward.pointsAvailable : 0" />
+        <b-progress class="bg-primary mb-2" height="12px" :max="quest.amount">
+            <b-progress-bar variant="success" show-value :value="quest.pointsClaimed" />
+            <b-progress-bar variant="warning" :value="accountStore.account ? quest.pointsAvailable : 0" />
         </b-progress>
         <p class="text-opaque mb-1 d-flex justify-content-between">
             <b-col>
                 <p class="mb-0">
                     <strong>Message Limit</strong><br />
-                    - Max. {{ reward.contentMetadata.limit }}/day<br />
-                    - Max. {{ reward.contentMetadata.days * reward.contentMetadata.limit }}/{{
-                        reward.contentMetadata.limit
+                    - Max. {{ quest.contentMetadata.limit }}/day<br />
+                    - Max. {{ quest.contentMetadata.days * quest.contentMetadata.limit }}/{{
+                        quest.contentMetadata.limit
                     }}
                     days
                 </p>
@@ -24,16 +24,16 @@
                 <strong>Limit Reset</strong><br />
                 - In
                 {{
-                    reward.restartDates &&
-                    formatDistance(new Date(reward.restartDates.now), new Date(reward.restartDates.end), {
+                    quest.restartDates &&
+                    formatDistance(new Date(quest.restartDates.now), new Date(quest.restartDates.end), {
                         addSuffix: false,
                     })
                 }}
                 (Quest)<br />
                 - In
                 {{
-                    reward.restartDates &&
-                    formatDistance(new Date(reward.restartDates.now), new Date(reward.restartDates.endDay), {
+                    quest.restartDates &&
+                    formatDistance(new Date(quest.restartDates.now), new Date(quest.restartDates.endDay), {
                         addSuffix: false,
                     })
                 }}
@@ -67,7 +67,7 @@ export default defineComponent({
         BarChart,
     },
     props: {
-        reward: {
+        quest: {
             type: Object as PropType<TQuestSocial>,
             required: true,
         },
@@ -109,9 +109,9 @@ export default defineComponent({
             return !connectedAccount;
         },
         chartData() {
-            if (!this.reward.restartDates || !this.reward.messages) return;
-            let currentDate = new Date(this.reward.restartDates.start);
-            const endDate = new Date(this.reward.restartDates.end);
+            if (!this.quest.restartDates || !this.quest.messages) return;
+            let currentDate = new Date(this.quest.restartDates.start);
+            const endDate = new Date(this.quest.restartDates.end);
             const group: any = {};
 
             while (currentDate.getTime() <= endDate.getTime()) {
@@ -119,7 +119,7 @@ export default defineComponent({
                 group[day] = [];
                 currentDate.setDate(currentDate.getDate() + 1);
             }
-            for (const message of this.reward.messages) {
+            for (const message of this.quest.messages) {
                 const day = new Date(message.createdAt).toISOString().split('T')[0];
                 group[day] = group[day] || [];
                 group[day].push(message);

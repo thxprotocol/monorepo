@@ -15,7 +15,7 @@
                                 </b-badge>
                             </sup>
                         </template>
-                        <div :class="{ 'd-none': quest.isHidden }" :key="key" v-for="(quest, key) of quests">
+                        <div :class="{ 'd-none': !quest.isAvailable }" :key="key" v-for="(quest, key) of quests">
                             <component
                                 v-if="quest"
                                 :is="questComponentMap[quest.variant]"
@@ -30,7 +30,7 @@
                         </div>
                     </b-tab>
                     <b-tab title="Completed">
-                        <div :class="{ 'd-none': !quest.isHidden }" :key="key" v-for="(quest, key) of quests">
+                        <div :class="{ 'd-none': quest.isAvailable }" :key="key" v-for="(quest, key) of quests">
                             <component
                                 :is="questComponentMap[quest.variant]"
                                 :quest="quest"
@@ -55,7 +55,7 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useQuestStore } from '../../stores/Quest';
 import { useRewardStore } from '../../stores/Reward';
 import { RewardSortVariant } from '../../types/enums/rewards';
-import { filterAvailableMap, questComponentMap, sortMap } from '../../utils/quests';
+import { questComponentMap, sortMap } from '../../utils/quests';
 import BaseCardQuestInvite from '../../components/card/BaseCardQuestInvite.vue';
 import BaseCardQuestSocial from '../../components/card/BaseCardQuestSocial.vue';
 import BaseCardQuestCustom from '../../components/card/BaseCardQuestCustom.vue';
@@ -95,25 +95,16 @@ export default defineComponent({
             return !this.availableQuestCount;
         },
         availableQuestCount() {
-            const { quests } = useQuestStore();
-            return quests.filter((q: TBaseQuest) => filterAvailableMap[q.variant](q)).length;
+            return this.questStore.quests.filter((q: TBaseQuest) => q.isAvailable).length;
         },
         quests() {
-            const { quests } = useQuestStore();
-            return quests
-                .map((q: TBaseQuest) => ({ ...q, isHidden: !filterAvailableMap[q.variant](q) }))
-                .filter((q: TBaseQuest) =>
-                    this.activeFilters.length
-                        ? this.activeFilters.map((f: TQuestFilter) => f.key).includes(q.variant)
-                        : true,
-                )
-                .sort(sortMap[this.selectedSort.key]);
+            return this.questStore.quests.sort(sortMap[this.selectedSort.key]);
         },
     },
     watch: {
         'accountStore.isAuthenticated': {
             handler(isAuthenticated: boolean) {
-                if (!isAuthenticated) return;
+                if (!isAuthenticated || isAuthenticated === null) return;
                 this.questStore.list();
             },
             immediate: true,

@@ -5,11 +5,11 @@
         :id="quest._id"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="quest.pointsAvailable"
+        :amount="quest.amount"
         :image="quest.image"
         :error="error"
         :info-links="quest.infoLinks"
-        :visible="!!authStore.oAuthShare && !waitDuration"
+        :visible="!!accountStore.isAuthenticated && !waitDuration"
     >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
@@ -29,8 +29,8 @@
             <b-badge
                 style="width: 40px; height: 40px"
                 class="m-1 d-flex flex-column align-items-center justify-content-center"
-                :variant="key < quest.claims.length ? 'success' : 'primary'"
-                :class="key < quest.claims.length ? 'bg-success text-white' : 'bg-primary text-white'"
+                :variant="key < quest.entries.length ? 'success' : 'primary'"
+                :class="key < quest.entries.length ? 'bg-success text-white' : 'bg-primary text-white'"
                 v-for="(amount, key) of quest.amounts"
             >
                 <small>Day {{ key + 1 }}</small>
@@ -39,8 +39,8 @@
         </div>
 
         <template #button>
-            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" class="w-100" block>
-                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
+            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" class="w-100" block>
+                Sign in &amp; claim <strong>{{ quest.amounts[0] }} points</strong>
             </b-button>
 
             <BaseButtonQuestLocked v-else-if="quest.locks.length" :quest="quest" />
@@ -51,12 +51,12 @@
                 block
                 variant="primary"
                 @click="onClickClaim"
-                :disabled="isSubmitting || quest.isDisabled"
+                :disabled="isSubmitting || !quest.isAvailable"
             >
-                <template v-if="quest.isDisabled && waitDuration">
+                <template v-if="!quest.isAvailable && waitDuration">
                     Wait for {{ waitDuration.hours }}: {{ waitDuration.minutes }}:{{ waitDuration.seconds }}
                 </template>
-                <template v-else-if="quest.isDisabled && !waitDuration"> Not available </template>
+                <template v-else-if="!quest.isAvailable && !waitDuration"> Not available </template>
                 <template v-else-if="isSubmitting"><b-spinner small></b-spinner> Adding points...</template>
                 <template v-else>
                     Claim <strong>{{ quest.amount }} points </strong>
@@ -120,13 +120,6 @@ export default defineComponent({
                 minutes: String(minutes).padStart(2, '0'),
                 seconds: String(seconds).padStart(2, '0'),
             };
-        },
-        amount() {
-            const amountIndex =
-                this.quest.claims.length >= this.quest.amounts.length
-                    ? this.quest.claims.length % this.quest.amounts.length
-                    : this.quest.claims.length;
-            return this.quest.amounts[amountIndex];
         },
     },
     created() {
