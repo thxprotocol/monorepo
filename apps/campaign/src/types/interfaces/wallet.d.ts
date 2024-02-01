@@ -115,6 +115,7 @@ type TVeLock = {
     amount: number;
     end: number;
     now: number;
+    rewards: [];
 };
 
 type TVeState = {

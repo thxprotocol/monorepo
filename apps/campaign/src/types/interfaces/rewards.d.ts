@@ -26,8 +26,8 @@ type TBaseQuest = {
     component: string;
     createdAt: string;
     updatedAt: string;
+    locks: { questId: string; variant: QuestVariant }[];
     isHidden: boolean;
-    isLocked: boolean;
     expiryDate: Date;
 };
 

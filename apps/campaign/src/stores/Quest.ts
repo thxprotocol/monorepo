@@ -106,8 +106,6 @@ export const useQuestStore = defineStore('quest', {
             const socialQuestList = [...twitter, ...discord, ...youtube];
 
             this.quests = [...gitcoin, ...invite, ...socialQuestList, ...custom, ...daily, ...web3];
-            await Promise.all(socialQuestList.map((quest) => this.getSocialQuest(quest._id)));
-
             this.isLoading = false;
         },
 

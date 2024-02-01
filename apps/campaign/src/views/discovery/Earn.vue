@@ -151,7 +151,7 @@
                                 @hidden="isModalDepositShown = false"
                             />
                         </b-tab>
-                        <b-tab v-if="veStore.lock && veStore.lock.amount > 0">
+                        <b-tab v-if="veStore.lock">
                             <template #title>
                                 <i class="fas fa-unlock me-1"></i>
                                 Withdraw
@@ -160,6 +160,12 @@
                                 <i class="fas fa-info-circle me-1"></i>
                                 A penalty will be applied on early withdrawals!
                             </b-alert>
+                            <!-- 
+                            {{ new Date(veStore.lock.now) }}
+                            <pre>
+                                {{ veStore.lock }}
+                            </pre> -->
+
                             <b-row>
                                 <b-col>
                                     <b-form-group label="Amount">
@@ -169,7 +175,7 @@
                                 <b-col>
                                     <b-form-group label="Lock End">
                                         <strong class="h3">
-                                            {{ differenceInDays(veStore.lock.end, new Date()) }} days
+                                            {{ differenceInDays(veStore.lock.end, veStore.lock.now) }} days
                                         </strong>
                                         <i
                                             v-b-tooltip

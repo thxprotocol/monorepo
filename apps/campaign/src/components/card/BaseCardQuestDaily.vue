@@ -16,7 +16,7 @@
                 <i class="fa fa-calendar me-2 text-primary"></i>
             </div>
             <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
-            <div class="text-accent fw-bold">{{ quest.pointsAvailable }}</div>
+            <div class="text-accent fw-bold">{{ quest.amount }}</div>
         </template>
 
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
@@ -40,10 +40,10 @@
 
         <template #button>
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" class="w-100" block>
-                Sign in &amp; claim <strong>{{ quest.pointsAvailable }} points</strong>
+                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
-            <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
+            <BaseButtonQuestLocked v-else-if="quest.locks.length" :quest="quest" />
 
             <b-button
                 v-else
@@ -59,7 +59,7 @@
                 <template v-else-if="quest.isDisabled && !waitDuration"> Not available </template>
                 <template v-else-if="isSubmitting"><b-spinner small></b-spinner> Adding points...</template>
                 <template v-else>
-                    Claim <strong>{{ quest.pointsAvailable }} points </strong>
+                    Claim <strong>{{ quest.amount }} points </strong>
                 </template>
             </b-button>
         </template>

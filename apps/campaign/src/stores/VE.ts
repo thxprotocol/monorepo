@@ -12,7 +12,6 @@ export const useVeStore = defineStore('ve', {
         async getLocks() {
             const { api } = useAccountStore();
             const locks = await api.request.get('/v1/ve');
-
             this.lock = locks[0];
         },
         async deposit({ lockEndTimestamp, amountInWei }: TRequestBodyDeposit) {
