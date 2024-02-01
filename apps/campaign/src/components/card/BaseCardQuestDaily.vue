@@ -9,7 +9,7 @@
         :image="quest.image"
         :error="error"
         :info-links="quest.infoLinks"
-        :visible="!!accountStore.isAuthenticated && !waitDuration"
+        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
     >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">

@@ -9,7 +9,7 @@
         :completing="isModalQuestEntryShown"
         :error="error"
         :info-links="quest.infoLinks"
-        :visible="!!authStore.oAuthShare && pendingClaims > 0"
+        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
     >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">

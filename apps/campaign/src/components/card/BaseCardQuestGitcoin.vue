@@ -9,7 +9,7 @@
         :error="error"
         :image="quest.image"
         :info-links="quest.infoLinks"
-        :visible="!!authStore.oAuthShare && !quest.isClaimed"
+        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
     >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
@@ -47,43 +47,19 @@
         </blockquote>
 
         <template #button>
-            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
+            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
                 Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
-            <b-button v-else-if="quest.isClaimed" variant="primary" block class="w-100" disabled>
+            <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>
                 Quest Completed
             </b-button>
 
             <BaseButtonQuestLocked v-else-if="quest.locks.length" :quest="quest" />
 
-            <b-button-group v-else class="w-100" block>
-                <b-button variant="primary" block class="w-100" @click="onClickClaim">
-                    <b-img
-                        :src="chainList[chainId].logo"
-                        class="me-2"
-                        width="18"
-                        height="18"
-                        :alt="chainList[chainId].name"
-                    />
-                    Claim <strong>{{ quest.amount }}</strong> points
-                </b-button>
-                <b-dropdown end variant="primary" no-caret toggle-class="pe-3">
-                    <template #button-content>
-                        <i class="fas fa-caret-down"></i>
-                    </template>
-                    <BDropdownItem @click="chainId = contract.chainId" v-for="contract of quest.contracts">
-                        <b-img
-                            :src="chainList[contract.chainId].logo"
-                            width="12"
-                            height="12"
-                            :alt="chainList[contract.chainId].name"
-                            class="me-2"
-                        />
-                        {{ chainList[contract.chainId].name }}
-                    </BDropdownItem>
-                </b-dropdown>
-            </b-button-group>
+            <b-button v-else variant="primary" block class="w-100" @click="onClickClaim">
+                Claim <strong>{{ quest.amount }}</strong> points
+            </b-button>
         </template>
     </BaseCardCollapse>
 </template>
@@ -106,7 +82,7 @@ export default defineComponent({
     name: 'BaseCardQuestGitcoin',
     props: {
         quest: {
-            type: Object as PropType<TQuestWeb3>,
+            type: Object as PropType<TQuestGitcoin>,
             required: true,
         },
     },
@@ -161,7 +137,7 @@ export default defineComponent({
         },
     },
     mounted() {
-        if (this.quest.isClaimed) return;
+        if (!this.quest.isAvailable) return;
         const chains = [chainList[ChainId.Polygon].chain];
         const theme = this.accountStore.getTheme();
         this.chainId = ChainId.Polygon;
@@ -197,7 +173,7 @@ export default defineComponent({
                 const message = `This signature will be used to proof ownership of a web3 account.`;
                 const signature = await signMessage({ message });
 
-                await this.questStore.completeGitcoinQuest(this.quest.uuid, {
+                await this.questStore.completeGitcoinQuest(this.quest, {
                     signature,
                     message,
                     chainId: this.chainId,

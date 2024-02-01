@@ -9,7 +9,7 @@
         :error="error"
         :image="quest.image"
         :info-links="quest.infoLinks"
-        :visible="!!authStore.oAuthShare && !quest.isClaimed"
+        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
     >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
@@ -56,15 +56,15 @@
         </blockquote>
 
         <template #button>
-            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
+            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
                 Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
-            <b-button v-else-if="quest.isClaimed" variant="primary" block class="w-100" disabled>
+            <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>
                 Quest Completed
             </b-button>
 
-            <BaseButtonQuestLocked v-else-if="quest.locks.length" :quest="quest" />
+            <BaseButtonQuestLocked v-else-if="!quest.locks.length" :quest="quest" />
 
             <b-button-group v-else class="w-100" block>
                 <b-button variant="primary" block class="w-100" @click="onClickClaim">
@@ -167,7 +167,7 @@ export default defineComponent({
         },
     },
     mounted() {
-        if (this.quest.isClaimed) return;
+        if (!this.quest.isAvailable) return;
         const chains = this.quest.contracts.map((contract: { chainId: ChainId }) => chainList[contract.chainId].chain);
         const theme = this.accountStore.getTheme();
         this.chainId = this.quest.contracts[0].chainId;
@@ -200,10 +200,10 @@ export default defineComponent({
                 await this.modal.openModal();
                 await this.waitForConnected();
 
-                const message = `This signature will be used to validate if the result of calling ${this.quest.methodName} on chain ${this.reward.chainId} with the address used to sign this message is above the threshold of ${this.quest.threshold}.`;
+                const message = `This signature will be used to validate if the result of calling ${this.quest.methodName} on chain ${this.chainId} with the address used to sign this message is above the threshold of ${this.quest.threshold}.`;
                 const signature = await signMessage({ message });
 
-                await this.questStore.completeWeb3Quest(this.quest.uuid, {
+                await this.questStore.completeWeb3Quest(this.quest, {
                     signature,
                     message,
                     chainId: this.chainId,
