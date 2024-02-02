@@ -103,8 +103,8 @@ export default defineComponent({
         async onClickDisconnect(platform: RewardConditionPlatform) {
             this.platforms[platform].isSubmitting = true;
             try {
-                const accessKey: string = platformAccessKeyMap[platform];
-                await this.accountStore.api.account.patch({ [accessKey]: false });
+                const kind = platformAccessKeyMap[platform];
+                await this.accountStore.disconnect(kind);
                 await this.accountStore.getAccount();
             } catch (error) {
                 this.error = 'Could not disconnect platform.';

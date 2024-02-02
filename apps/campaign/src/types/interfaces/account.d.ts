@@ -14,16 +14,10 @@ type TAccount = {
     address: string;
     plan: number;
     variant: AccountVariant;
-    googleAccess: boolean;
-    youtubeViewAccess: boolean;
-    youtubeManageAccess: boolean;
-    twitterAccess: boolean;
-    discordAccess: boolean;
-    twitchAccess: boolean;
-    githubAccess: boolean;
     profileImg: string;
     rank: number;
     isEmailVerified?: boolean;
+    tokens: { kind: AccessTokenKind; userId: string }[];
 };
 
 type TAuthState = {

@@ -103,10 +103,8 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         isAlertDiscordShown() {
             if (!this.accountStore.account) return false;
-            const connectedAccount = this.accountStore.account.connectedAccounts.find(
-                ({ kind }) => kind === AccessTokenKind.Discord,
-            );
-            return !connectedAccount;
+            const token = this.accountStore.account.tokens.find(({ kind }) => kind === AccessTokenKind.Discord);
+            return !token;
         },
         chartData() {
             if (!this.quest.restartDates || !this.quest.messages) return;

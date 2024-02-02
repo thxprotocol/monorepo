@@ -10,12 +10,11 @@ const platformIconMap: any = {
 };
 
 const platformAccessKeyMap: any = {
-    [RewardConditionPlatform.None]: '',
-    [RewardConditionPlatform.YouTube]: 'youtubeManageAccess',
-    [RewardConditionPlatform.Twitter]: 'twitterAccess',
-    [RewardConditionPlatform.Discord]: 'discordAccess',
-    [RewardConditionPlatform.Github]: 'githubAccess',
-    [RewardConditionPlatform.Twitch]: 'twitchAccess',
+    [RewardConditionPlatform.YouTube]: AccessTokenKind.YoutubeManage,
+    [RewardConditionPlatform.Twitter]: AccessTokenKind.Twitter,
+    [RewardConditionPlatform.Discord]: AccessTokenKind.Discord,
+    [RewardConditionPlatform.Github]: AccessTokenKind.Github,
+    [RewardConditionPlatform.Twitch]: AccessTokenKind.Twitch,
 };
 
 const platformAccountVariantMap: any = {
@@ -25,9 +24,8 @@ const platformAccountVariantMap: any = {
     [RewardConditionPlatform.Twitch]: AccountVariant.SSOTwitch,
 };
 
-function getConnectionStatus(account: { [accessKey: string]: boolean }, platform: RewardConditionPlatform) {
-    const accessKey: string = platformAccessKeyMap[platform];
-    return account[accessKey];
+function getConnectionStatus(account: TAccount, platform: RewardConditionPlatform) {
+    return account.tokens.find((token) => token.kind === platformAccessKeyMap[platform]);
 }
 
 function getInteractionComponent(interaction: QuestConditionInteraction) {
@@ -53,24 +51,7 @@ function getInteractionComponent(interaction: QuestConditionInteraction) {
     }
 }
 
-function getAccessTokenKindForPlatform(platform: RewardConditionPlatform) {
-    switch (platform) {
-        case RewardConditionPlatform.YouTube: {
-            return AccessTokenKind.YoutubeManage;
-        }
-        case RewardConditionPlatform.Twitter: {
-            return AccessTokenKind.Twitter;
-        }
-        case RewardConditionPlatform.Discord: {
-            return AccessTokenKind.Discord;
-        }
-        default:
-            return null;
-    }
-}
-
 export {
-    getAccessTokenKindForPlatform,
     getConnectionStatus,
     getInteractionComponent,
     platformIconMap,

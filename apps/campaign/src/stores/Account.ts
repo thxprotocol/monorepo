@@ -6,7 +6,8 @@ import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
 import { BREAKPOINT_LG } from '../config/constants';
 import { useWalletStore } from './Wallet';
 import { useAuthStore } from './Auth';
-import { getAccessTokenKindForPlatform, getConnectionStatus } from '../utils/social';
+import { getConnectionStatus, platformAccessKeyMap } from '../utils/social';
+import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { RewardConditionPlatform } from '../types/enums/rewards';
 import { User } from 'oidc-client-ts';
 import { AccountVariant } from '../types/enums/accountVariant';
@@ -172,15 +173,18 @@ export const useAccountStore = defineStore('account', {
             return useAuthStore().requestOAuthShare({
                 prompt: 'connect',
                 channel: String(platform),
-                access_token_kind: String(getAccessTokenKindForPlatform(platform)),
+                access_token_kind: platformAccessKeyMap[platform],
             });
+        },
+        disconnect(kind: AccessTokenKind) {
+            return this.api.request.post('/v1/account/disconnect', { data: { kind } });
         },
         waitForConnectionStatus(platform: RewardConditionPlatform) {
             const taskFn = async () => {
                 if (!this.account) return;
                 await this.getAccount();
 
-                return getConnectionStatus(this.account as unknown as { [accessKey: string]: boolean }, platform)
+                return getConnectionStatus(this.account, platform)
                     ? Promise.resolve()
                     : Promise.reject('Could no validate connection status...');
             };

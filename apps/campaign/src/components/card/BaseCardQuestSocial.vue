@@ -116,7 +116,7 @@ export default defineComponent({
         isConnected() {
             const { account } = useAccountStore();
             if (!account) return;
-            return getConnectionStatus(account as any, this.quest.platform);
+            return getConnectionStatus(account, this.quest.platform);
         },
     },
     methods: {
