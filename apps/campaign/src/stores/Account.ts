@@ -7,7 +7,7 @@ import { BREAKPOINT_LG } from '../config/constants';
 import { useWalletStore } from './Wallet';
 import { useAuthStore } from './Auth';
 import { getConnectionStatus, platformAccessKeyMap } from '../utils/social';
-import { AccessTokenKind } from '../types/enums/accessTokenKind';
+import { AccessTokenKind, OAuthScope, OAuthVariant } from '../types/enums/accessTokenKind';
 import { RewardConditionPlatform } from '../types/enums/rewards';
 import { User } from 'oidc-client-ts';
 import { AccountVariant } from '../types/enums/accountVariant';
@@ -172,8 +172,10 @@ export const useAccountStore = defineStore('account', {
         connect(platform: RewardConditionPlatform) {
             return useAuthStore().requestOAuthShare({
                 prompt: 'connect',
-                channel: String(platform),
-                access_token_kind: platformAccessKeyMap[platform],
+                oauth_scope: OAuthScope.TwitterValidateLike,
+                oauth_variant: OAuthVariant.Twitter,
+                // channel: String(platform),
+                // access_token_kind: platformAccessKeyMap[platform],
             });
         },
         disconnect(kind: AccessTokenKind) {
