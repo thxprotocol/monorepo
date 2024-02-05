@@ -51,9 +51,9 @@ type TQuestState = {
 };
 
 type TQuestSocial = TBaseQuest & {
-    platform: RewardConditionPlatform;
-    interaction?: QuestConditionInteraction;
-    content?: string;
+    kind: AccessTokenKind;
+    interaction: QuestSocialRequirement;
+    content: string;
     contentMetadata?: any;
     restartDates?: {
         start: Date;

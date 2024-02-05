@@ -6,9 +6,8 @@ import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
 import { BREAKPOINT_LG } from '../config/constants';
 import { useWalletStore } from './Wallet';
 import { useAuthStore } from './Auth';
-import { getConnectionStatus, platformAccessKeyMap } from '../utils/social';
-import { AccessTokenKind, OAuthScope, OAuthVariant } from '../types/enums/accessTokenKind';
-import { RewardConditionPlatform } from '../types/enums/rewards';
+import { getConnectionStatus } from '../utils/social';
+import { AccessTokenKind, OAuthScope } from '../types/enums/accessTokenKind';
 import { User } from 'oidc-client-ts';
 import { AccountVariant } from '../types/enums/accountVariant';
 import { decodeHTML } from '../utils/decode-html';
@@ -169,24 +168,21 @@ export const useAccountStore = defineStore('account', {
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
-        connect(platform: RewardConditionPlatform) {
+        connect(kind: AccessTokenKind, scopes: OAuthScope[]) {
             return useAuthStore().requestOAuthShare({
                 prompt: 'connect',
-                oauth_scope: OAuthScope.TwitterValidateLike,
-                oauth_variant: OAuthVariant.Twitter,
-                // channel: String(platform),
-                // access_token_kind: platformAccessKeyMap[platform],
+                access_token_kind: kind,
+                provider_scope: scopes.join(' '),
             });
         },
         disconnect(kind: AccessTokenKind) {
             return this.api.request.post('/v1/account/disconnect', { data: { kind } });
         },
-        waitForConnectionStatus(platform: RewardConditionPlatform) {
+        waitForConnectionStatus(kind: AccessTokenKind, scopes: OAuthScope[]) {
             const taskFn = async () => {
                 if (!this.account) return;
                 await this.getAccount();
-
-                return getConnectionStatus(this.account, platform)
+                return getConnectionStatus(this.account, kind, scopes)
                     ? Promise.resolve()
                     : Promise.reject('Could no validate connection status...');
             };

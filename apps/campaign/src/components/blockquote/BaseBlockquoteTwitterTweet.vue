@@ -32,7 +32,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
-import { QuestConditionInteraction } from '../../types/enums/rewards';
+import { QuestSocialRequirement } from '../../types/enums/rewards';
 
 export default defineComponent({
     name: 'BaseBlockquoteTweet',
@@ -45,9 +45,9 @@ export default defineComponent({
     data: function (): any {
         return {
             interactionLabel: {
-                [QuestConditionInteraction.TwitterLike]: 'Like this post',
-                [QuestConditionInteraction.TwitterRetweet]: 'Repost this post',
-                [QuestConditionInteraction.TwitterLikeRetweet]: 'Repost & Like this post',
+                [QuestSocialRequirement.TwitterLike]: 'Like this post',
+                [QuestSocialRequirement.TwitterRetweet]: 'Repost this post',
+                [QuestSocialRequirement.TwitterLikeRetweet]: 'Repost & Like this post',
             },
             tooltipContent: 'Copy URL',
         };
@@ -61,11 +61,11 @@ export default defineComponent({
         },
     },
     methods: {
-        getChannelActionURL(interaction: QuestConditionInteraction, content: string) {
+        getChannelActionURL(interaction: QuestSocialRequirement, content: string) {
             switch (interaction) {
-                case QuestConditionInteraction.TwitterLike:
-                case QuestConditionInteraction.TwitterRetweet:
-                case QuestConditionInteraction.TwitterLikeRetweet:
+                case QuestSocialRequirement.TwitterLike:
+                case QuestSocialRequirement.TwitterRetweet:
+                case QuestSocialRequirement.TwitterLikeRetweet:
                     return { url: `https://www.twitter.com/twitter/status/${content}` };
                 default:
                     return '';

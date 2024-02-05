@@ -21,7 +21,7 @@
 
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
-        <component :is="getInteractionComponent(quest.interaction)" :quest="quest" />
+        <component :is="interactionComponentMap[quest.interaction]" :quest="quest" />
 
         <template #button>
             <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
@@ -34,14 +34,14 @@
 
             <BaseButtonQuestLocked v-else-if="quest.locks.length" :quest="quest" />
 
-            <BButtonGroup block class="w-100" v-else-if="quest.platform && !isConnected">
+            <BButtonGroup block class="w-100" v-else-if="!isConnected">
                 <b-button variant="primary" @click="onClickConnect" :disabled="isSubmitting">
                     <template v-if="isSubmitting">
                         <b-spinner small class="me-1" />
                         Connecting platform...
                     </template>
                     <template v-else>
-                        Connect <strong>{{ RewardConditionPlatform[quest.platform] }}</strong>
+                        Connect <strong>{{ RewardConditionPlatform[quest.kind] }}</strong>
                     </template>
                 </b-button>
                 <BButton v-if="isSubmitting" @click="onClickCancel" variant="primary" style="max-width: 40px">
@@ -68,8 +68,8 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useQuestStore } from '../../stores/Quest';
-import { RewardConditionPlatform, QuestConditionInteraction } from '../../types/enums/rewards';
-import { getInteractionComponent, getConnectionStatus, platformIconMap } from '../../utils/social';
+import { RewardConditionPlatform, QuestSocialRequirement } from '../../types/enums/rewards';
+import { interactionComponentMap, getConnectionStatus, platformIconMap, tokenInteractionMap } from '../../utils/social';
 import BaseBlockquoteTwitterTweet from '../blockquote/BaseBlockquoteTwitterTweet.vue';
 import BaseBlockquoteTwitterMessage from '../blockquote/BaseBlockquoteTwitterMessage.vue';
 import BaseBlockquoteTwitterUser from '../blockquote/BaseBlockquoteTwitterUser.vue';
@@ -102,8 +102,8 @@ export default defineComponent({
             error: '',
             isSubmitting: false,
             RewardConditionPlatform,
-            QuestConditionInteraction,
-            getInteractionComponent,
+            QuestSocialRequirement,
+            interactionComponentMap,
             platformIconMap,
             tooltipContent: 'Copy URL',
             isModalQuestEntryShown: false,
@@ -116,7 +116,8 @@ export default defineComponent({
         isConnected() {
             const { account } = useAccountStore();
             if (!account) return;
-            return getConnectionStatus(account, this.quest.platform);
+            const { kind, scopes } = tokenInteractionMap[this.quest.interaction];
+            return getConnectionStatus(account, kind, scopes);
         },
     },
     methods: {
@@ -144,9 +145,9 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
-                this.accountStore.connect(this.quest.platform);
-
-                await this.accountStore.waitForConnectionStatus(this.quest.platform);
+                const { kind, scopes } = tokenInteractionMap[this.quest.interaction];
+                await this.accountStore.connect(kind, scopes);
+                await this.accountStore.waitForConnectionStatus(kind, scopes);
             } catch (error) {
                 this.error = 'Could not connect platform.';
                 console.error(error);

@@ -24,7 +24,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
-import { QuestConditionInteraction } from '../../types/enums/rewards';
+import { QuestSocialRequirement } from '../../types/enums/rewards';
 
 export default defineComponent({
     name: 'BaseBlockquoteTweet',
@@ -37,7 +37,7 @@ export default defineComponent({
     data(): any {
         return {
             copyLabel: 'Copy Text',
-            QuestConditionInteraction,
+            QuestSocialRequirement,
         };
     },
     computed: {

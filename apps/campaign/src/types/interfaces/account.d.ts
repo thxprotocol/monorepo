@@ -17,7 +17,7 @@ type TAccount = {
     profileImg: string;
     rank: number;
     isEmailVerified?: boolean;
-    tokens: { kind: AccessTokenKind; userId: string }[];
+    tokens: { kind: AccessTokenKind; userId: string; scopes: string[] }[];
 };
 
 type TAuthState = {
@@ -86,3 +86,5 @@ type TWidgetConfig = {
     ref?: string;
     expired: boolean;
 };
+
+type TOAuthScope = OAuthGoogleScope | OAuthTwitterScope | OAuthDiscordScope | OAuthTwitchScope | OAuthGithubScope;
