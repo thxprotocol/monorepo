@@ -61,7 +61,8 @@ export const useAuthStore = defineStore('auth', {
             this.oAuthShare = '';
         },
         async requestOAuthShare(extraQueryParams?: { [key: string]: string }) {
-            const { poolId, config, isMobileDevice } = useAccountStore();
+            // const { poolId, config, isMobileDevice } = useAccountStore();
+            const { config, isMobileDevice } = useAccountStore();
             const { claim } = useClaimStore();
             const returnUrl = window.location.href;
 
@@ -74,7 +75,7 @@ export const useAuthStore = defineStore('auth', {
                 },
                 extraQueryParams: {
                     return_url: returnUrl,
-                    pool_id: poolId,
+                    // pool_id: poolId,
                     claim_id: claim ? claim.uuid : '',
                     ...extraQueryParams,
                 },
