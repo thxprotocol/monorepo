@@ -12,8 +12,8 @@
         :image="quest.image"
     >
         <template #header>
-            <div v-if="quest.platform" class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i :class="platformIconMap[quest.platform]" class="me-2 text-primary"></i>
+            <div v-if="quest.kind" class="d-flex align-items-center justify-content-center" style="width: 25px">
+                <i :class="platformIconMap[quest.kind]" class="me-2 text-primary"></i>
             </div>
             <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
             <div class="text-accent fw-bold">{{ quest.amount }}</div>
@@ -41,7 +41,7 @@
                         Connecting platform...
                     </template>
                     <template v-else>
-                        Connect <strong>{{ RewardConditionPlatform[quest.kind] }}</strong>
+                        Connect <strong>{{ kinds[quest.kind] }}</strong>
                     </template>
                 </b-button>
                 <BButton v-if="isSubmitting" @click="onClickCancel" variant="primary" style="max-width: 40px">
@@ -69,7 +69,13 @@ import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useQuestStore } from '../../stores/Quest';
 import { RewardConditionPlatform, QuestSocialRequirement } from '../../types/enums/rewards';
-import { interactionComponentMap, getConnectionStatus, platformIconMap, tokenInteractionMap } from '../../utils/social';
+import {
+    interactionComponentMap,
+    getConnectionStatus,
+    platformIconMap,
+    tokenInteractionMap,
+    AccessTokenKind,
+} from '../../utils/social';
 import BaseBlockquoteTwitterTweet from '../blockquote/BaseBlockquoteTwitterTweet.vue';
 import BaseBlockquoteTwitterMessage from '../blockquote/BaseBlockquoteTwitterMessage.vue';
 import BaseBlockquoteTwitterUser from '../blockquote/BaseBlockquoteTwitterUser.vue';
@@ -99,6 +105,11 @@ export default defineComponent({
     },
     data() {
         return {
+            kinds: {
+                [AccessTokenKind.Google]: 'YouTube',
+                [AccessTokenKind.Twitter]: 'Twitter',
+                [AccessTokenKind.Discord]: 'Discord',
+            },
             error: '',
             isSubmitting: false,
             RewardConditionPlatform,
