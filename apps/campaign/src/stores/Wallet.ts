@@ -173,6 +173,8 @@ export const useWalletStore = defineStore('wallet', {
             }
         },
         async getBalance(tokenAddress: string) {
+            if (!tokenAddress) return;
+
             const { api } = useAccountStore();
             const { balanceInWei } = await api.request.get('/v1/erc20/balance', {
                 params: { tokenAddress },
