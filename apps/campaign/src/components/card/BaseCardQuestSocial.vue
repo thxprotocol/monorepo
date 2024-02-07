@@ -109,7 +109,7 @@ export default defineComponent({
                 [AccessTokenKind.Google]: 'YouTube',
                 [AccessTokenKind.Twitter]: 'Twitter',
                 [AccessTokenKind.Discord]: 'Discord',
-            },
+            } as any,
             error: '',
             isSubmitting: false,
             RewardConditionPlatform,
