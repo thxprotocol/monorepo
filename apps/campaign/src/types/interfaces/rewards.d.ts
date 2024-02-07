@@ -29,6 +29,7 @@ type TBaseQuest = {
     updatedAt: string;
     locks: { questId: string; variant: QuestVariant }[];
     isAvailable: boolean;
+    isLocked: boolean;
     isCompleted: boolean;
     expiryDate: Date;
 };

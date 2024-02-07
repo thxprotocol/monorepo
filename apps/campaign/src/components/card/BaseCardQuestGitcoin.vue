@@ -55,7 +55,7 @@
                 Quest Completed
             </b-button>
 
-            <BaseButtonQuestLocked v-else-if="quest.locks.length" :quest="quest" />
+            <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
             <b-button v-else variant="primary" block class="w-100" @click="onClickClaim">
                 Claim <strong>{{ quest.amount }}</strong> points

@@ -35,7 +35,7 @@
                 Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
-            <BaseButtonQuestLocked v-else-if="quest.locks.length" :quest="quest" />
+            <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
             <b-button v-else-if="!pendingClaims" variant="primary" class="w-100" block disabled>
                 Not available
