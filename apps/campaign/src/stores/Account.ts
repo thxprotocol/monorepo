@@ -7,7 +7,7 @@ import { BREAKPOINT_LG } from '../config/constants';
 import { useWalletStore } from './Wallet';
 import { useAuthStore } from './Auth';
 import { getConnectionStatus } from '../utils/social';
-import { AccessTokenKind, OAuthScope } from '../types/enums/accessTokenKind';
+import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { User } from 'oidc-client-ts';
 import { AccountVariant } from '../types/enums/accountVariant';
 import { decodeHTML } from '../utils/decode-html';
@@ -168,7 +168,7 @@ export const useAccountStore = defineStore('account', {
         async getSubscription() {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
-        connect(kind: AccessTokenKind, scopes: OAuthScope[]) {
+        connect(kind: AccessTokenKind, scopes: TOAuthScope[]) {
             return useAuthStore().requestOAuthShare({
                 prompt: 'connect',
                 access_token_kind: kind,
@@ -178,7 +178,7 @@ export const useAccountStore = defineStore('account', {
         disconnect(kind: AccessTokenKind) {
             return this.api.request.post('/v1/account/disconnect', { data: { kind } });
         },
-        waitForConnectionStatus(kind: AccessTokenKind, scopes: OAuthScope[]) {
+        waitForConnectionStatus(kind: AccessTokenKind, scopes: TOAuthScope[]) {
             const taskFn = async () => {
                 if (!this.account) return;
                 await this.getAccount();

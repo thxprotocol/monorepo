@@ -32,7 +32,7 @@ import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { OAuthRequiredScopes, getConnectionStatus, kindAccountVariantMap, platformIconMap } from '../../utils/social';
-import { AccessTokenKind, OAuthScope } from '../../types/enums/accessTokenKind';
+import { AccessTokenKind } from '../../types/enums/accessTokenKind';
 
 export default defineComponent({
     name: 'BaseFormGroupUsername',
@@ -87,7 +87,7 @@ export default defineComponent({
         this.updateConnectionStatus();
     },
     methods: {
-        async onClickConnect({ kind, scopes }: { kind: AccessTokenKind; scopes: OAuthScope[] }) {
+        async onClickConnect({ kind, scopes }: { kind: AccessTokenKind; scopes: TOAuthScope[] }) {
             this.error = '';
             this.providers[kind].isSubmitting = true;
 

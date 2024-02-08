@@ -132,4 +132,5 @@ const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; sco
         scopes: OAuthRequiredScopes.DiscordAuth,
     },
 };
+
 export { getConnectionStatus, interactionComponentMap, platformIconMap, kindAccountVariantMap, tokenInteractionMap };

@@ -120,7 +120,6 @@ export default defineComponent({
             }
         },
         onError(response: any) {
-            console.log(response);
             this.error = response && response.error ? response.error.message : 'Something went wrong...';
         },
     },
