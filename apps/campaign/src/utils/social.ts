@@ -17,11 +17,11 @@ export enum AccessTokenKind {
 }
 
 const interactionLabelMap: { [i: number]: string } = {
-    [QuestSocialRequirement.TwitterFollow]: 'Follow this user',
-    [QuestSocialRequirement.TwitterLike]: 'Like this post',
-    [QuestSocialRequirement.TwitterRetweet]: 'Repost this post',
-    [QuestSocialRequirement.TwitterLikeRetweet]: 'Repost & Like this post',
-    [QuestSocialRequirement.TwitterMessage]: 'Post this message',
+    [QuestSocialRequirement.TwitterFollow]: 'Follow on 𝕏',
+    [QuestSocialRequirement.TwitterLike]: 'Like on 𝕏',
+    [QuestSocialRequirement.TwitterRetweet]: 'Repost on 𝕏',
+    [QuestSocialRequirement.TwitterLikeRetweet]: 'Repost & Like on 𝕏',
+    [QuestSocialRequirement.TwitterMessage]: 'Post on 𝕏',
 };
 
 const platformIconMap: { [kind: string]: string } = {
