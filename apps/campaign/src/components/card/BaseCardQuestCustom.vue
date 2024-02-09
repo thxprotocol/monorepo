@@ -21,14 +21,10 @@
 
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
-        <b-progress
-            v-if="authStore.oAuthShare"
-            class="mb-3"
-            variant="success"
-            :value="quest.claims.length"
-            :max="quest.limit"
-            show-value
-        ></b-progress>
+        <b-progress v-if="accountStore.isAuthenticated && quest.limit" class="mb-3" :max="quest.limit" show-value>
+            <b-progress-bar variant="primary" :value="quest.entries.length" :label="`${quest.events.length}`" />
+            <b-progress-bar variant="success" :value="pendingCount" :label="`${pendingCount}`" />
+        </b-progress>
 
         <template #button>
             <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
@@ -37,7 +33,7 @@
 
             <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
-            <b-button v-else-if="!pendingClaims" variant="primary" class="w-100" block disabled>
+            <b-button v-else-if="!pendingCount" variant="primary" class="w-100" block disabled>
                 Not available
             </b-button>
 
@@ -49,7 +45,7 @@
                 <template v-else>
                     Claim
                     <strong>
-                        {{ `${pendingClaims} x` }}
+                        {{ `${pendingCount} x` }}
                         {{ quest.amount }} points
                     </strong>
                 </template>
@@ -80,8 +76,10 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         ...mapStores(useQuestStore),
-        pendingClaims: function () {
-            return this.quest.limit - this.quest.claims.length;
+        pendingCount() {
+            const pendingCount = this.quest.events.length - this.quest.entries.length;
+            if (!this.quest.limit) return this.quest.limit - pendingCount;
+            return pendingCount;
         },
     },
     methods: {
