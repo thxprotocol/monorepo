@@ -48,7 +48,14 @@
                     <i class="fas fa-times text-opaque" />
                 </BButton>
             </BButtonGroup>
-            <b-button v-else-if="!isViewed" variant="primary" block class="w-100" @click="onClickView">
+            <b-button
+                v-else-if="!isViewed"
+                @click="onClickView"
+                variant="primary"
+                block
+                class="w-100"
+                :disabled="isLoadingView"
+            >
                 <b-spinner v-if="isLoadingView" small></b-spinner>
                 <template v-else>
                     {{ interactionLabelMap[quest.interaction] }}
