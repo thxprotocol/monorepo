@@ -16,13 +16,21 @@ export enum AccessTokenKind {
     Github = 'github',
 }
 
-const platformIconMap: any = {
+const interactionLabelMap: { [i: number]: string } = {
+    [QuestSocialRequirement.TwitterFollow]: 'Follow this user',
+    [QuestSocialRequirement.TwitterLike]: 'Like this post',
+    [QuestSocialRequirement.TwitterRetweet]: 'Repost this post',
+    [QuestSocialRequirement.TwitterLikeRetweet]: 'Repost & Like this post',
+    [QuestSocialRequirement.TwitterMessage]: 'Post this message',
+};
+
+const platformIconMap: { [kind: string]: string } = {
     [AccessTokenKind.Google]: 'fab fa-youtube',
     [AccessTokenKind.Twitter]: 'fab fa-twitter',
     [AccessTokenKind.Discord]: 'fab fa-discord',
 };
 
-const kindAccountVariantMap: any = {
+const kindAccountVariantMap: { [kind: string]: number } = {
     [AccessTokenKind.Google]: AccountVariant.SSOGoogle,
     [AccessTokenKind.Twitter]: AccountVariant.SSOTwitter,
     [AccessTokenKind.Discord]: AccountVariant.SSODiscord,
@@ -30,7 +38,7 @@ const kindAccountVariantMap: any = {
     [AccessTokenKind.Twitch]: AccountVariant.SSOTwitch,
 };
 
-const interactionComponentMap: any = {
+const interactionComponentMap: { [req: number]: string } = {
     [QuestSocialRequirement.YouTubeLike]: 'BaseBlockquoteVideo',
     [QuestSocialRequirement.YouTubeSubscribe]: 'BaseBlockquoteYoutubeChannelSubscription',
     [QuestSocialRequirement.TwitterLike]: 'BaseBlockquoteTwitterTweet',
@@ -133,4 +141,11 @@ const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; sco
     },
 };
 
-export { getConnectionStatus, interactionComponentMap, platformIconMap, kindAccountVariantMap, tokenInteractionMap };
+export {
+    interactionLabelMap,
+    getConnectionStatus,
+    interactionComponentMap,
+    platformIconMap,
+    kindAccountVariantMap,
+    tokenInteractionMap,
+};

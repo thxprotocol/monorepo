@@ -17,13 +17,6 @@
         >
             ...
         </b-link>
-        <hr class="my-2" />
-        <div class="text-center card-text">
-            <b-link :href="quest.contentMetadata.url" target="_blank" class="text-opaque ms-auto">
-                {{ interactionLabel[quest.interaction] }}
-                <i class="fas fa-external-link-alt"></i>
-            </b-link>
-        </div>
     </blockquote>
 </template>
 
@@ -33,6 +26,7 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
 import { QuestSocialRequirement } from '../../types/enums/rewards';
+import { interactionLabelMap } from '../../utils/social';
 
 export default defineComponent({
     name: 'BaseBlockquoteTweet',
@@ -44,11 +38,7 @@ export default defineComponent({
     },
     data: function (): any {
         return {
-            interactionLabel: {
-                [QuestSocialRequirement.TwitterLike]: 'Like this post',
-                [QuestSocialRequirement.TwitterRetweet]: 'Repost this post',
-                [QuestSocialRequirement.TwitterLikeRetweet]: 'Repost & Like this post',
-            },
+            interactionLabelMap,
             tooltipContent: 'Copy URL',
         };
     },

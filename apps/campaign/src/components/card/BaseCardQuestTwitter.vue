@@ -48,7 +48,13 @@
                     <i class="fas fa-times text-opaque" />
                 </BButton>
             </BButtonGroup>
-
+            <b-button v-else-if="!isViewed" variant="primary" block class="w-100" @click="onClickView">
+                <b-spinner v-if="isLoadingView" small></b-spinner>
+                <template v-else>
+                    {{ interactionLabelMap[quest.interaction] }}
+                    <i class="fas fa-external-link-alt ms-1"></i>
+                </template>
+            </b-button>
             <b-button v-else variant="primary" block class="w-100" @click="onClickComplete" :disabled="isSubmitting">
                 <template v-if="isSubmitting">
                     <b-spinner small></b-spinner>
@@ -84,6 +90,7 @@ import BaseBlockquoteVideo from '../../components/blockquote/BaseBlockquoteVideo
 import BaseBlockquoteDiscordServerJoin from '../../components/blockquote/BaseBlockquoteDiscordServerJoin.vue';
 import BaseBlockquoteDiscordMessage from '../../components/blockquote/BaseBlockquoteDiscordMessage.vue';
 import BaseBlockquoteDiscordInviteUsed from '../../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
+import { interactionLabelMap } from '../../utils/social';
 
 export default defineComponent({
     name: 'BaseCardQuestSocial',
@@ -111,6 +118,8 @@ export default defineComponent({
                 [AccessTokenKind.Discord]: 'Discord',
             } as any,
             error: '',
+            isLoadingView: false,
+            isViewed: false,
             isSubmitting: false,
             RewardConditionPlatform,
             QuestSocialRequirement,
@@ -118,6 +127,7 @@ export default defineComponent({
             platformIconMap,
             tooltipContent: 'Copy URL',
             isModalQuestEntryShown: false,
+            interactionLabelMap,
         };
     },
     computed: {
@@ -137,6 +147,26 @@ export default defineComponent({
         },
         onClickSignin() {
             this.accountStore.signin();
+        },
+        getContentURL(interaction: QuestSocialRequirement) {
+            const map: { [i: number]: string } = {
+                [QuestSocialRequirement.TwitterFollow]: `https://www.x.com/${this.quest.contentMetadata.username}`,
+                [QuestSocialRequirement.TwitterLikeRetweet]: this.quest.contentMetadata.url,
+                [QuestSocialRequirement.TwitterLike]: this.quest.contentMetadata.url,
+                [QuestSocialRequirement.TwitterRetweet]: this.quest.contentMetadata.url,
+                [QuestSocialRequirement.TwitterMessage]: 'https://www.x.com',
+            };
+            return map[interaction];
+        },
+        async onClickView() {
+            const url = this.getContentURL(this.quest.interaction);
+            this.isLoadingView = true;
+
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            window.open(url, '_blank');
+            this.isLoadingView = false;
+            this.isViewed = true;
         },
         async onClickComplete() {
             try {
