@@ -14,7 +14,7 @@ export function toNumber(value?: boolean) {
 export const questComponentMap: any = {
     [QuestVariant.Daily]: 'BaseCardQuestDaily',
     [QuestVariant.Invite]: 'BaseCardQuestInvite',
-    [QuestVariant.Twitter]: 'BaseCardQuestTwitter',
+    [QuestVariant.Twitter]: 'BaseCardQuestSocial',
     [QuestVariant.Discord]: 'BaseCardQuestSocial',
     [QuestVariant.YouTube]: 'BaseCardQuestSocial',
     [QuestVariant.Custom]: 'BaseCardQuestCustom',

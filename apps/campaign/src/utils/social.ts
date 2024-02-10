@@ -22,6 +22,10 @@ const interactionLabelMap: { [i: number]: string } = {
     [QuestSocialRequirement.TwitterRetweet]: 'Repost on 𝕏',
     [QuestSocialRequirement.TwitterLikeRetweet]: 'Repost & Like on 𝕏',
     [QuestSocialRequirement.TwitterMessage]: 'Post on 𝕏',
+    [QuestSocialRequirement.YouTubeLike]: 'Watch & Like on YouTube',
+    [QuestSocialRequirement.YouTubeSubscribe]: 'Subscribe on YouTube',
+    [QuestSocialRequirement.DiscordGuildJoined]: 'Join Discord',
+    [QuestSocialRequirement.DiscordMessage]: '',
 };
 
 const platformIconMap: { [kind: string]: string } = {

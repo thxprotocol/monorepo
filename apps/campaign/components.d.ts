@@ -35,7 +35,6 @@ declare module 'vue' {
     BaseCardQuestGitcoin: typeof import('./src/components/card/BaseCardQuestGitcoin.vue')['default']
     BaseCardQuestInvite: typeof import('./src/components/card/BaseCardQuestInvite.vue')['default']
     BaseCardQuestSocial: typeof import('./src/components/card/BaseCardQuestSocial.vue')['default']
-    BaseCardQuestTwitter: typeof import('./src/components/card/BaseCardQuestTwitter.vue')['default']
     BaseCardQuestWeb3: typeof import('./src/components/card/BaseCardQuestWeb3.vue')['default']
     BaseCardReward: typeof import('./src/components/card/BaseCardReward.vue')['default']
     BaseCardRewardCoupon: typeof import('./src/components/card/BaseCardRewardCoupon.vue')['default']

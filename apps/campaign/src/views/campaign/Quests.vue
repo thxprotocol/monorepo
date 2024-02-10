@@ -58,7 +58,6 @@ import { RewardSortVariant } from '../../types/enums/rewards';
 import { questComponentMap, sortMap } from '../../utils/quests';
 import BaseCardQuestInvite from '../../components/card/BaseCardQuestInvite.vue';
 import BaseCardQuestSocial from '../../components/card/BaseCardQuestSocial.vue';
-import BaseCardQuestTwitter from '../../components/card/BaseCardQuestTwitter.vue';
 import BaseCardQuestCustom from '../../components/card/BaseCardQuestCustom.vue';
 import BaseCardQuestDaily from '../../components/card/BaseCardQuestDaily.vue';
 import BaseCardQuestWeb3 from '../../components/card/BaseCardQuestWeb3.vue';
@@ -69,7 +68,6 @@ export default defineComponent({
     components: {
         BaseCardQuestInvite,
         BaseCardQuestSocial,
-        BaseCardQuestTwitter,
         BaseCardQuestCustom,
         BaseCardQuestDaily,
         BaseCardQuestWeb3,

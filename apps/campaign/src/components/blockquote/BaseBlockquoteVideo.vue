@@ -4,20 +4,18 @@
             width="100%"
             :id="id"
             :height="height"
-            :src="`https://www.youtube.com/embed/${quest.contentMetadata.videoId}?controls=0&modestbranding=1`"
+            :src="`https://www.youtube.com/embed/${quest.content}?controls=0&modestbranding=1`"
         >
         </iframe>
         <hr class="my-2" />
-        <div class="text-center card-text">
-            <b-link
-                :href="`https://youtu.be/${quest.contentMetadata.videoId}`"
-                target="_blank"
-                class="text-opaque ms-auto"
-            >
-                Like this Youtube video
-                <i class="fas fa-external-link-alt"></i>
+        <p class="text-opaque mb-0">
+            <i class="fas fa-info-circle me-2" />
+            We will only check the last 50 likes of your connected account.
+            <b-link target="_blank" :href="`https://www.youtube.com/watch?v=${quest.content}`">
+                YouTube
+                <i class="fas fa-external-link-alt ms-1" />
             </b-link>
-        </div>
+        </p>
     </blockquote>
 </template>
 
