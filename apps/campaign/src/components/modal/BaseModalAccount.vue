@@ -46,6 +46,10 @@
             <b-button class="w-100" variant="primary" @click="accountStore.isModalAccountShown = false">
                 Close
             </b-button>
+            <b-button variant="link" class="w-100 text-white" @click="onClickSignout">
+                <b-spinner small variant="light" v-if="isLoadingReset" />
+                <template v-else>Sign out</template>
+            </b-button>
         </template>
     </b-modal>
 </template>
@@ -119,7 +123,6 @@ export default defineComponent({
     watch: {
         'accountStore.isModalAccountShown'() {
             this.accountStore.getAccount();
-            this.walletStore.getWallet();
         },
     },
     methods: {
@@ -146,6 +149,10 @@ export default defineComponent({
             this.isLoadingReset = true;
             await this.authStore.reset();
             this.isLoadingReset = false;
+        },
+        async onClickSignout() {
+            await this.accountStore.signout();
+            this.walletStore.isModalWalletCreateShown = false;
         },
         // async onSubmitCreateMnemonic() {
         //     this.isLoadingMnemonic = true;

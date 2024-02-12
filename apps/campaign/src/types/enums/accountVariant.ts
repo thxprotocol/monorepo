@@ -8,3 +8,9 @@ export enum AccountVariant {
     SSODiscord = 6,
     SSOTwitch = 7,
 }
+
+export enum WalletVariant {
+    Safe = 'safe',
+    WalletConnect = 'walletconnect',
+    Web3Auth = 'web3auth',
+}

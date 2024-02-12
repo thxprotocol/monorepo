@@ -138,6 +138,7 @@ export default defineComponent({
     },
     mounted() {
         if (!this.quest.isAvailable) return;
+
         const chains = [chainList[ChainId.Polygon].chain];
         const theme = this.accountStore.getTheme();
         this.chainId = ChainId.Polygon;
@@ -170,7 +171,7 @@ export default defineComponent({
                 await this.modal.openModal();
                 await this.waitForConnected();
 
-                const message = `This signature will be used to proof ownership of a web3 account.`;
+                const message = `This signed message will be used to proof ownership of your web3 account.`;
                 const signature = await signMessage({ message });
 
                 await this.questStore.completeGitcoinQuest(this.quest, {

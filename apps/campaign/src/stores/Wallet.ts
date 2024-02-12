@@ -5,10 +5,12 @@ import { HARDHAT_RPC, POLYGON_RPC } from '../config/secrets';
 import { useAuthStore } from './Auth';
 import { EthersAdapter, SafeConfig } from '@safe-global/protocol-kit';
 import { ethers } from 'ethers';
-import Safe from '@safe-global/protocol-kit';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { AccountVariant } from '../types/enums/accountVariant';
-import { MODE } from '../config/secrets';
+import { WalletVariant } from '../types/enums/accountVariant';
+import Safe from '@safe-global/protocol-kit';
+import imgSafeLogo from '../assets/safe-logo.jpg';
+import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
+import imgWeb3AuthLogo from '../assets/web3auth-logo.jpeg';
 
 type TRequestParamsAllowance = {
     tokenAddress: string;
@@ -20,6 +22,12 @@ type TRequestBodyApproval = {
     tokenAddress: string;
     spender: string;
     amountInWei: string;
+};
+
+export const walletLogoMap: { [variant: string]: string } = {
+    [WalletVariant.WalletConnect]: imgWalletConnectLogo,
+    [WalletVariant.Safe]: imgSafeLogo,
+    [WalletVariant.Web3Auth]: imgWeb3AuthLogo,
 };
 
 // Safe Contracts
@@ -35,7 +43,6 @@ export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
         allowances: {},
         balances: {},
-        wallet: null,
         walletTransfer: null,
         erc20: [],
         erc721: [],
@@ -49,25 +56,25 @@ export const useWalletStore = defineStore('wallet', {
         isModalWalletRecoveryShown: false,
     }),
     actions: {
-        async getWallet() {
+        async create({ variant, message, signature }: { variant: WalletVariant; message: string; signature: string }) {
+            const { api } = useAccountStore();
+            await api.request.post('/v1/account/wallets', {
+                data: { variant, message, signature },
+            });
+            await this.listWallets();
+        },
+        async listWallets() {
             const { api, account } = useAccountStore();
             if (!account) return;
-
-            const isMetamask = account.variant === AccountVariant.Metamask;
-            const predicate = isMetamask
-                ? (w: TWallet) => !w.safeVersion && !w.version && w.address
-                : (w: TWallet) => w.safeVersion;
-            const chainId = MODE === 'development' ? ChainId.Hardhat : ChainId.Polygon;
-            this.wallets = await api.request.get(`/v1/account/wallet?chainId=${chainId}`);
-            this.wallet = this.wallets.find(predicate) as TWallet;
-            if (!this.wallet) return;
-
-            for (const tx of this.wallet.pendingTransactions) {
-                try {
-                    if (!tx.safeTxHash) continue;
-                    await this.confirmTransaction(tx.safeTxHash);
-                } catch (error) {
-                    console.error(error);
+            this.wallets = await api.request.get(`/v1/account/wallets`);
+            for (const wallet of this.wallets) {
+                for (const tx of wallet.pendingTransactions) {
+                    try {
+                        if (!tx.safeTxHash) continue;
+                        await this.confirmTransaction(wallet, tx.safeTxHash);
+                    } catch (error) {
+                        console.error(error);
+                    }
                 }
             }
         },
@@ -78,13 +85,13 @@ export const useWalletStore = defineStore('wallet', {
 
             this.erc721[index] = { ...token, component: 'BaseCardERC721' };
         },
-        async list() {
+        async list(wallet: TWallet) {
             const { api } = useAccountStore();
-            if (!this.wallet) return;
+            if (!wallet) return;
 
             this.isLoading = true;
 
-            const options = { chainId: this.wallet.chainId };
+            const options = { chainId: wallet.chainId };
             const [erc20, erc721, erc1155, couponCodes] = await Promise.all([
                 api.erc20.list(options),
                 api.erc721.list(options),
@@ -102,13 +109,13 @@ export const useWalletStore = defineStore('wallet', {
 
             this.isLoading = false;
         },
-        async transferERC20(config: TERC20TransferConfig) {
+        async transferERC20(wallet: TWallet, config: TERC20TransferConfig) {
             const { api, account } = useAccountStore();
             const response = await api.erc20.transfer(config);
-            await this.confirmTransaction(response.safeTxHash);
+            await this.confirmTransaction(wallet, response.safeTxHash);
             track('UserCreates', [account?.sub, 'erc20 transfer']);
         },
-        async transfer(config: TNFTTransferConfig) {
+        async transfer(wallet: TWallet, config: TNFTTransferConfig) {
             const { api, account } = useAccountStore();
 
             let response;
@@ -121,7 +128,7 @@ export const useWalletStore = defineStore('wallet', {
                 track('UserCreates', [account?.sub, 'ERC721 transfer']);
             }
 
-            await this.confirmTransaction(response.safeTxHash);
+            await this.confirmTransaction(wallet, response.safeTxHash);
         },
         getRPC(chainId: ChainId) {
             switch (chainId) {
@@ -146,30 +153,30 @@ export const useWalletStore = defineStore('wallet', {
                     return { url: POLYGON_RPC };
             }
         },
-        async confirmTransaction(safeTxHash: string) {
+        async confirmTransaction(wallet: TWallet, safeTxHash: string) {
             const { api } = useAccountStore();
             const { privateKey } = useAuthStore();
-            if (!this.wallet || !privateKey) return;
+            if (!wallet || !privateKey || wallet.variant !== WalletVariant.Safe) return;
 
-            const rpc = this.getRPC(this.wallet.chainId);
+            const rpc = this.getRPC(wallet.chainId);
             const provider = new ethers.providers.JsonRpcProvider(rpc.url);
             const signer = new ethers.Wallet(privateKey, provider);
             const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer }) as any;
             const config: SafeConfig = {
                 ethAdapter,
-                safeAddress: this.wallet.address,
+                safeAddress: wallet.address,
                 contractNetworks: rpc.contractNetworks,
             };
             const safe = await Safe.create(config);
             const signature = await safe.signTransactionHash(safeTxHash);
 
             return await api.request.post(`/v1/account/wallet/confirm`, {
-                data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature: signature.data }),
+                data: JSON.stringify({ chainId: wallet.chainId, safeTxHash, signature: signature.data }),
             });
         },
-        async confirmTransactions(transactions: TTransaction[]) {
+        async confirmTransactions(wallet: TWallet, transactions: TTransaction[]) {
             for (const tx of transactions) {
-                await this.confirmTransaction(tx.safeTxHash);
+                await this.confirmTransaction(wallet, tx.safeTxHash);
             }
         },
         async getBalance(tokenAddress: string) {
@@ -187,12 +194,12 @@ export const useWalletStore = defineStore('wallet', {
             if (!this.allowances[params.tokenAddress]) this.allowances[params.tokenAddress] = {};
             this.allowances[params.tokenAddress][params.spender] = Number(allowanceInWei);
         },
-        async approve(data: TRequestBodyApproval) {
+        async approve(wallet: TWallet, data: TRequestBodyApproval) {
             const { api } = useAccountStore();
             const [tx] = await api.request.post('/v1/ve/approve', {
                 data,
             });
-            await useWalletStore().confirmTransaction(tx.safeTxHash);
+            await useWalletStore().confirmTransaction(wallet, tx.safeTxHash);
         },
     },
 });

@@ -38,25 +38,6 @@ export const useAuthStore = defineStore('auth', {
         isSecurityQuestionAvailable: null,
     }),
     actions: {
-        async onUserLoadedCallback(user: User) {
-            if (!user.access_token || !user.id_token) return;
-
-            const requestConfig = {
-                verifier: VERIFIER_ID,
-                clientId: CLIENT_ID,
-                typeOfLogin: 'jwt',
-                enableLogging: false,
-                hash: `#state=state&access_token=${user?.access_token}&id_token=${user?.id_token}`,
-                queryParameters: new URLSearchParams({ code: '', iss: AUTH_URL, state: 'state' } as any).toString(),
-                jwtParams: {
-                    domain: AUTH_URL,
-                    accessToken: user?.access_token,
-                    idToken: user?.id_token,
-                    user_info_route: 'me',
-                },
-            };
-            await this.triggerLogin(requestConfig);
-        },
         onUserUnloadedCallback() {
             this.oAuthShare = '';
         },
@@ -152,7 +133,24 @@ export const useAuthStore = defineStore('auth', {
                     }
                 });
         },
-        async triggerLogin(requestConfig: any) {
+        async triggerLogin() {
+            if (!this.user || !this.user.access_token || !this.user.id_token) return;
+
+            const requestConfig = {
+                verifier: VERIFIER_ID,
+                clientId: CLIENT_ID,
+                typeOfLogin: 'jwt',
+                enableLogging: false,
+                hash: `#state=state&access_token=${this.user?.access_token}&id_token=${this.user?.id_token}`,
+                queryParameters: new URLSearchParams({ code: '', iss: AUTH_URL, state: 'state' } as any).toString(),
+                jwtParams: {
+                    domain: AUTH_URL,
+                    accessToken: this.user?.access_token,
+                    idToken: this.user?.id_token,
+                    user_info_route: 'me',
+                },
+            };
+
             await tKey.serviceProvider.init({ skipSw: true });
             await tKey.modules.securityQuestions.initialize();
 

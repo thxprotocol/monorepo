@@ -10,8 +10,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { mapStores } from 'pinia';
+import { useWalletStore } from '../../stores/Wallet';
 
 export default defineComponent({
     name: 'BaseViewCampaignWallets',
+    computed: {
+        ...mapStores(useWalletStore),
+    },
 });
 </script>

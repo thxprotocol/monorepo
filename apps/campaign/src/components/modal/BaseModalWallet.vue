@@ -1,33 +1,29 @@
 <template>
     <b-modal
-        v-model="accountStore.isModalWalletShown"
+        :id="id"
+        v-model="isShown"
         @show="onShow"
-        @hidden="accountStore.isModalWalletShown = false"
+        @hidden="isShown = false"
         centered
         no-close-on-backdrop
         no-close-on-esc
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-wallet me-2"></i> Wallet</h5>
-            <b-link class="btn-close" @click="accountStore.isModalWalletShown = false">
+            <b-link class="btn-close" @click="isShown = false">
                 <i class="fas fa-times"></i>
             </b-link>
         </template>
 
-        <div v-if="!accountStore.account" class="d-flex justify-content-center">
-            <b-spinner small />
-        </div>
-        <b-form v-else>
+        <b-form>
             <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
             <b-tabs justified content-class="mt-3">
                 <b-tab title="Wallet" active>
-                    <b-form-group v-if="walletStore.wallet && !isMetamaskAccount">
+                    <b-form-group>
                         <template #label>
                             <div class="d-flex align-items-center">
                                 <img
-                                    v-b-tooltip
-                                    title="Secured by Safe (f.k.a. Gnosis Safe)"
-                                    :src="imgSafeLogo"
+                                    :src="walletLogoMap[wallet.variant]"
                                     width="15"
                                     height="15"
                                     style="border-radius: 3px"
@@ -37,39 +33,12 @@
                                 Wallet Address
                             </div>
                         </template>
-                        <code>{{ walletStore.wallet.address }}</code>
+                        <code>{{ wallet.address }}</code>
                     </b-form-group>
-                    <b-form-group v-if="accountStore.account">
-                        <template #label>
-                            <div class="d-flex align-items-center">
-                                <img
-                                    v-b-tooltip
-                                    title="Secured by Metamask"
-                                    v-if="isMetamaskAccount"
-                                    :src="imgMetamaskLogo"
-                                    width="15"
-                                    height="15"
-                                    style="border-radius: 3px"
-                                    class="me-2"
-                                    alt="Metamask Logo"
-                                />
-                                <img
-                                    v-b-tooltip
-                                    title="Secured by Web3Auth"
-                                    v-if="!isMetamaskAccount"
-                                    :src="imgWeb3AuthLogo"
-                                    width="15"
-                                    height="15"
-                                    style="border-radius: 3px"
-                                    class="me-2"
-                                    alt="Web3Auth Logo"
-                                />
-                                Account Address
-                            </div>
-                        </template>
-                        <code>{{ accountStore.account.address }}</code>
-                    </b-form-group>
-                    <b-form-group v-if="!isMetamaskAccount" :label="`Account Private Key (${currentKeyTreshold})`">
+                    <b-form-group
+                        v-if="wallet.variant === WalletVariant.Web3Auth"
+                        :label="`Account Private Key (${currentKeyTreshold})`"
+                    >
                         <b-input-group>
                             <b-form-input :value="privateKey" />
                             <b-input-group-append>
@@ -125,9 +94,7 @@
             </b-tabs>
         </b-form>
         <template #footer>
-            <b-button class="w-100" variant="primary" @click="accountStore.isModalAccountShown = false">
-                Close
-            </b-button>
+            <b-button class="w-100" variant="primary" @click="isShown = false"> Close </b-button>
         </template>
     </b-modal>
 </template>
@@ -135,11 +102,11 @@
 <script lang="ts">
 import { useAuthStore } from '../../stores/Auth';
 import { useAccountStore } from '../../stores/Account';
-import { useWalletStore } from '../../stores/Wallet';
+import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useQuestStore } from '../../stores/Quest';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-import { AccountVariant } from '../../types/enums/accountVariant';
+import { AccountVariant, WalletVariant } from '../../types/enums/accountVariant';
 import { fromWei } from 'web3-utils';
 import imgSafeLogo from '../../assets/safe-logo.jpg';
 import imgMetamaskLogo from '../../assets/metamask-logo.png';
@@ -149,9 +116,12 @@ export default defineComponent({
     name: 'BaseModalWallet',
     data() {
         return {
+            isShown: false,
+            walletLogoMap,
             imgSafeLogo,
             imgMetamaskLogo,
             imgWeb3AuthLogo,
+            WalletVariant,
             error: '',
             isCopied: false,
             isPrivateKeyHidden: true,
@@ -167,6 +137,15 @@ export default defineComponent({
             erc721TokenMigrationCount: 0,
             fromWei,
         };
+    },
+    props: {
+        id: String,
+        wallet: { type: Object, required: true },
+    },
+    watch: {
+        show(show: boolean) {
+            this.isShown = show;
+        },
     },
     computed: {
         ...mapStores(useAccountStore),
@@ -196,12 +175,6 @@ export default defineComponent({
             if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
             if (this.password.length && this.password.length < 10) return false;
             return undefined;
-        },
-    },
-    watch: {
-        'accountStore.isModalAccountShown'() {
-            this.accountStore.getAccount();
-            this.walletStore.getWallet();
         },
     },
     methods: {

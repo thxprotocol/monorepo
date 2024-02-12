@@ -13,7 +13,6 @@
                         {{ error || claimsStore.error }}
                     </b-alert>
 
-                    <BaseAlertWalletAddress />
                     <div class="d-flex justify-content-center">
                         <ConfettiExplosion
                             v-if="isLoadingCollectComplete"

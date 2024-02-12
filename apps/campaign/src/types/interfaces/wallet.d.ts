@@ -5,8 +5,11 @@ type TWallet = {
     chainId: number;
     pendingTransactions: TTransaction[];
     token?: string;
+    variant: WalletVariant;
     safeVersion: string;
     latestVersion: string;
+    logo: string;
+    short: string;
 };
 
 type TTransaction = {
@@ -21,7 +24,6 @@ type TTransaction = {
 };
 
 type TWalletState = {
-    wallet: TWallet | null;
     walletTransfer: TWallet | null;
     wallets: TWallet[];
     erc20: any[];

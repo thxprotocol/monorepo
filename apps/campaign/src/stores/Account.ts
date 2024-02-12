@@ -118,13 +118,13 @@ export const useAccountStore = defineStore('account', {
                 });
         },
         async onUserLoaded(user: User) {
-            const authStore = useAuthStore();
+            // const authStore = useAuthStore();
             if (user.access_token) {
                 this.api.request.setUser(user);
                 await this.connectIdentity();
             }
 
-            await authStore.onUserLoadedCallback(user);
+            // await authStore.onUserLoadedCallback(user);
 
             this.getUserData();
             this.getCampaignData();
@@ -221,17 +221,17 @@ export const useAccountStore = defineStore('account', {
             const walletStore = useWalletStore();
             const authStore = useAuthStore();
 
-            // Guard HTTP requests that do require auth
-            if (!authStore.oAuthShare) return;
+            // // Guard HTTP requests that do require auth
+            if (!authStore.user) return;
 
             await this.getAccount();
 
-            if (this.account && this.account.variant !== AccountVariant.Metamask) {
-                authStore.getPrivateKey();
-            }
+            // if (this.account && this.account.variant !== AccountVariant.Metamask) {
+            //     authStore.getPrivateKey();
+            // }
 
-            await walletStore.getWallet();
-            walletStore.list();
+            await walletStore.listWallets();
+            walletStore.list(walletStore.wallets[0]);
 
             this.setStatus(true);
         },

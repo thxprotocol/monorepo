@@ -2,6 +2,7 @@
     <aside class="sidebar" v-if="isShown">
         <div class="sidebar-panel h-100">
             <BaseCardAccount />
+            <BaseCardWallets />
             <BaseCardRewards />
         </div>
     </aside>
