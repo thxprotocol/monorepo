@@ -40,6 +40,10 @@ export const useAuthStore = defineStore('auth', {
     actions: {
         onUserUnloadedCallback() {
             this.oAuthShare = '';
+            this.user = null;
+        },
+        onUserLoadedCallback(user: Partial<User>) {
+            this.user = user;
         },
         async requestOAuthShare(extraQueryParams?: { [key: string]: string }) {
             // const { poolId, config, isMobileDevice } = useAccountStore();

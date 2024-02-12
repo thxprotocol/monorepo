@@ -81,7 +81,6 @@ export const useAccountStore = defineStore('account', {
 
                 this.setConfig(config.poolId, { ...config, origin });
                 this.setTheme(config);
-                this.getCampaignData();
 
                 if (window.top === window.self) {
                     track('UserOpens', [
@@ -118,16 +117,15 @@ export const useAccountStore = defineStore('account', {
                 });
         },
         async onUserLoaded(user: User) {
-            // const authStore = useAuthStore();
+            useAuthStore().onUserLoadedCallback(user);
+
+            // Set user in API SDK
             if (user.access_token) {
                 this.api.request.setUser(user);
                 await this.connectIdentity();
             }
 
-            // await authStore.onUserLoadedCallback(user);
-
             this.getUserData();
-            this.getCampaignData();
         },
         onUserUnloaded() {
             return useAuthStore().onUserUnloadedCallback();
@@ -211,24 +209,16 @@ export const useAccountStore = defineStore('account', {
             this.setStatus(null);
             this.account = null;
         },
-        async getCampaignData() {
-            if (!this.poolId || !useAuthStore().oAuthShare) return;
-
-            this.getBalance();
-            this.getSubscription();
-        },
         async getUserData() {
             const walletStore = useWalletStore();
             const authStore = useAuthStore();
 
-            // // Guard HTTP requests that do require auth
+            // Guard HTTP requests that do require auth
             if (!authStore.user) return;
 
-            await this.getAccount();
-
-            // if (this.account && this.account.variant !== AccountVariant.Metamask) {
-            //     authStore.getPrivateKey();
-            // }
+            this.getBalance();
+            this.getSubscription();
+            this.getAccount();
 
             await walletStore.listWallets();
             walletStore.list(walletStore.wallets[0]);
