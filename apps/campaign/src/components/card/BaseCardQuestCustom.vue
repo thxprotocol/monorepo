@@ -77,9 +77,10 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useQuestStore),
         pendingCount() {
-            const pendingCount = this.quest.events.length - this.quest.entries.length;
-            if (!this.quest.limit) return this.quest.limit - pendingCount;
-            return pendingCount;
+            // If there is a limit subtract the amount of entries from the amount of events
+            if (this.quest.limit > 0) return this.quest.events.length - this.quest.entries.length;
+            // Else return the amount of events
+            return this.quest.events.length - this.quest.entries.length;
         },
     },
     methods: {
