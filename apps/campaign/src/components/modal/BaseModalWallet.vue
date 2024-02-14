@@ -17,81 +17,80 @@
 
         <b-form>
             <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
-            <b-tabs justified content-class="mt-3">
-                <b-tab title="Wallet" active>
-                    <b-form-group>
-                        <template #label>
-                            <div class="d-flex align-items-center">
-                                <img
-                                    :src="walletLogoMap[wallet.variant]"
-                                    width="15"
-                                    height="15"
-                                    style="border-radius: 3px"
-                                    class="me-2"
-                                    alt="Safe Logo"
-                                />
-                                Wallet Address
-                            </div>
-                        </template>
-                        <code>{{ wallet.address }}</code>
-                    </b-form-group>
-                    <b-form-group
-                        v-if="wallet.variant === WalletVariant.Web3Auth"
-                        :label="`Account Private Key (${currentKeyTreshold})`"
-                    >
-                        <b-input-group>
-                            <b-form-input :value="privateKey" />
-                            <b-input-group-append>
-                                <b-button size="sm" variant="primary" @click="isPrivateKeyHidden = !isPrivateKeyHidden">
-                                    <i v-if="isPrivateKeyHidden" class="fas fa-eye px-2"></i>
-                                    <i v-else class="fas fa-eye-slash px-2"></i>
-                                </b-button>
-                                <b-button
-                                    size="sm"
-                                    variant="primary"
-                                    v-clipboard:copy="authStore.privateKey"
-                                    v-clipboard:success="onCopySuccess"
-                                >
-                                    <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
-                                    <i v-else class="fas fa-clipboard px-2"></i>
-                                </b-button>
-                            </b-input-group-append>
-                        </b-input-group>
-                    </b-form-group>
-                </b-tab>
-                <b-tab title="Security" v-if="authStore.securityQuestion">
-                    <b-form-group>
-                        <b-form-input v-model="question" placeholder="Question" />
-                    </b-form-group>
-                    <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
-                        <b-form-input
-                            :state="isPasswordValid"
-                            v-model="password"
-                            type="password"
-                            placeholder="Answer"
-                            autocomplete="off"
+
+            <b-form-group>
+                <template #label>
+                    <div class="d-flex align-items-center">
+                        <img
+                            :src="walletLogoMap[wallet.variant]"
+                            width="15"
+                            height="15"
+                            style="border-radius: 3px"
+                            class="me-2"
+                            alt="Safe Logo"
                         />
-                    </b-form-group>
-                    <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
-                        <b-form-input
-                            :state="isPasswordValid"
-                            v-model="passwordCheck"
-                            type="password"
-                            placeholder="Answer again"
-                            autocomplete="off"
-                        />
-                    </b-form-group>
-                    <b-button
-                        :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable"
-                        class="w-100"
-                        variant="primary"
-                        @click="onSubmitDeviceSharePasswordUpdate"
-                    >
-                        <b-spinner small variant="light" v-if="isLoadingPasswordChange" />
-                        <template v-else> Change Security Question </template>
-                    </b-button>
-                </b-tab>
-            </b-tabs>
+                        Wallet Address
+                    </div>
+                </template>
+                <code>{{ wallet.address }}</code>
+            </b-form-group>
+
+            <b-form-group
+                v-if="wallet.variant === WalletVariant.Web3Auth"
+                :label="`Account Private Key (${currentKeyTreshold})`"
+            >
+                <b-input-group>
+                    <b-form-input :value="privateKey" />
+                    <b-input-group-append>
+                        <b-button size="sm" variant="primary" @click="isPrivateKeyHidden = !isPrivateKeyHidden">
+                            <i v-if="isPrivateKeyHidden" class="fas fa-eye px-2"></i>
+                            <i v-else class="fas fa-eye-slash px-2"></i>
+                        </b-button>
+                        <b-button
+                            size="sm"
+                            variant="primary"
+                            v-clipboard:copy="authStore.privateKey"
+                            v-clipboard:success="onCopySuccess"
+                        >
+                            <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
+                            <i v-else class="fas fa-clipboard px-2"></i>
+                        </b-button>
+                    </b-input-group-append>
+                </b-input-group>
+            </b-form-group>
+
+            <template v-if="wallet.variant === WalletVariant.Safe && authStore.securityQuestion">
+                <b-form-group>
+                    <b-form-input v-model="question" placeholder="Question" />
+                </b-form-group>
+                <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
+                    <b-form-input
+                        :state="isPasswordValid"
+                        v-model="password"
+                        type="password"
+                        placeholder="Answer"
+                        autocomplete="off"
+                    />
+                </b-form-group>
+                <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
+                    <b-form-input
+                        :state="isPasswordValid"
+                        v-model="passwordCheck"
+                        type="password"
+                        placeholder="Answer again"
+                        autocomplete="off"
+                    />
+                </b-form-group>
+                <b-button
+                    :disabled="!isPasswordValid || !authStore.isDeviceShareAvailable"
+                    class="w-100"
+                    variant="primary"
+                    @click="onSubmitDeviceSharePasswordUpdate"
+                >
+                    <b-spinner small variant="light" v-if="isLoadingPasswordChange" />
+                    <template v-else> Change Security Question </template>
+                </b-button>
+            </template>
         </b-form>
         <template #footer>
             <b-button class="w-100" variant="primary" @click="isShown = false"> Close </b-button>

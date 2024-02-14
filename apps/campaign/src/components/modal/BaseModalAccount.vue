@@ -133,7 +133,8 @@ export default defineComponent({
             this.password = '';
             this.passwordCheck = '';
             this.question = this.authStore.securityQuestion;
-            this.accountStore.getAccount();
+            await this.accountStore.getAccount();
+            this.accountStore.getSubscription();
         },
         async onSubmitDeviceSharePasswordUpdate() {
             const { oAuthShare, isDeviceShareAvailable, updateDeviceShare } = this.authStore;

@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex flex-column h-100 p-0">
-        <BaseNavbarSecondary class="d-flex d-lg-none" />
+        <BaseNavbarSecondary v-if="accountStore.isMobile" />
         <b-container
             v-if="accountStore.isAuthenticated === false"
             style="max-width: none"

@@ -21,7 +21,7 @@
                     </b-form-group>
 
                     <b-button
-                        v-if="authStore.oAuthShare"
+                        v-if="accountStore.isAuthenticated"
                         @click="onClickCollect"
                         variant="success"
                         class="w-100"

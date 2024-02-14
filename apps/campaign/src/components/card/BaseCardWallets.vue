@@ -89,5 +89,15 @@ export default defineComponent({
     computed: {
         ...mapStores(useWalletStore, useAccountStore),
     },
+    watch: {
+        'accountStore.account': {
+            async handler(account: TAccount | null) {
+                if (!account) return;
+                await this.walletStore.listWallets();
+                this.walletStore.list(this.walletStore.wallets[0]);
+            },
+            immediate: true,
+        },
+    },
 });
 </script>

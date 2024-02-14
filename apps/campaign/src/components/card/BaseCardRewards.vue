@@ -3,7 +3,7 @@
         <template #tabs-end>
             <b-button
                 class="text-primary ms-auto"
-                v-if="authStore.oAuthShare"
+                v-if="accountStore.isAuthenticated"
                 size="sm"
                 variant="link"
                 @click="onClickRefresh"

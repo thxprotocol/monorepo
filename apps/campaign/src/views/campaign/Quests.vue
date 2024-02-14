@@ -103,8 +103,11 @@ export default defineComponent({
     },
     watch: {
         'accountStore.isAuthenticated': {
-            handler(isAuthenticated: boolean) {
-                if (!isAuthenticated || isAuthenticated === null) return;
+            async handler(isAuthenticated: boolean) {
+                if (!isAuthenticated) return;
+                if (!this.accountStore.account) {
+                    await this.accountStore.getAccount();
+                }
                 this.questStore.list();
             },
             immediate: true,

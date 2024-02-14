@@ -9,7 +9,6 @@ import { useAuthStore } from './Auth';
 import { getConnectionStatus } from '../utils/social';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { User } from 'oidc-client-ts';
-import { AccountVariant } from '../types/enums/accountVariant';
 import { decodeHTML } from '../utils/decode-html';
 import poll from 'promise-poller';
 
@@ -81,14 +80,6 @@ export const useAccountStore = defineStore('account', {
 
                 this.setConfig(config.poolId, { ...config, origin });
                 this.setTheme(config);
-
-                if (window.top === window.self) {
-                    track('UserOpens', [
-                        this.account?.sub || '',
-                        `widget iframe`,
-                        { origin: this.config.origin, poolId: this.poolId, isShown: true },
-                    ]);
-                }
             }
         },
         onLoad() {
@@ -117,10 +108,9 @@ export const useAccountStore = defineStore('account', {
                 });
         },
         async onUserLoaded(user: User) {
-            useAuthStore().onUserLoadedCallback(user);
-
             // Set user in API SDK
             if (user.access_token) {
+                useAuthStore().onUserLoadedCallback(user);
                 this.api.request.setUser(user);
                 await this.connectIdentity();
             }
@@ -210,20 +200,8 @@ export const useAccountStore = defineStore('account', {
             this.account = null;
         },
         async getUserData() {
-            const walletStore = useWalletStore();
             const authStore = useAuthStore();
-
-            // Guard HTTP requests that do require auth
-            if (!authStore.user) return;
-
-            this.getBalance();
-            this.getSubscription();
-            this.getAccount();
-
-            await walletStore.listWallets();
-            walletStore.list(walletStore.wallets[0]);
-
-            this.setStatus(true);
+            this.setStatus(!!authStore.user);
         },
         setStatus(isAuthenticated: boolean | null) {
             this.isAuthenticated = isAuthenticated;
@@ -237,16 +215,6 @@ export const useAccountStore = defineStore('account', {
             if (this.config.origin && window.self !== window.top) {
                 window.top?.postMessage(payload, this.config.origin);
             }
-        },
-        async updateAccountAddress() {
-            const authStore = useAuthStore();
-            if (!authStore.privateKey) return;
-
-            // Patch the account with the MPC address
-            const authRequestMessage = 'validate_account_address_ownership';
-            const authRequestSignature = await authStore.sign(authRequestMessage);
-            await this.update({ authRequestMessage, authRequestSignature });
-            if (this.account) this.account.address = authStore.wallet.address;
         },
         async update(
             payload: Partial<{

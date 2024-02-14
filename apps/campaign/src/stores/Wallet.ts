@@ -85,8 +85,9 @@ export const useWalletStore = defineStore('wallet', {
 
             this.erc721[index] = { ...token, component: 'BaseCardERC721' };
         },
-        async list(wallet: TWallet) {
+        async list(wallet?: TWallet) {
             const { api } = useAccountStore();
+            if (!wallet) wallet = this.wallets[0];
             if (!wallet) return;
 
             this.isLoading = true;

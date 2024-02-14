@@ -8,6 +8,9 @@
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-wallet me-2"></i> Add a new wallet</h5>
+            <b-link class="btn-close" @click="walletStore.isModalWalletCreateShown = false">
+                <i class="fas fa-times"></i>
+            </b-link>
         </template>
 
         <b-tabs v-model="tabIndex" pills justified content-class="pt-3">

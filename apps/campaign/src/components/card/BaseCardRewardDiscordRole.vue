@@ -46,7 +46,7 @@ export default defineComponent({
             this.error = '';
         },
         onClickRedeem() {
-            if (!this.authStore.oAuthShare) return this.accountStore.signin();
+            if (!this.accountStore.isAuthenticated) return this.accountStore.signin();
             this.isModalShown = true;
             return null;
         },

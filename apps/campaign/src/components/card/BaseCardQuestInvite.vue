@@ -14,7 +14,7 @@
 
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
-        <b-button v-if="!authStore.oAuthShare" variant="primary" block class="w-100" @click="onClickClaim">
+        <b-button v-if="!accountStore.isAuthenticated" variant="primary" block class="w-100" @click="onClickClaim">
             Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
         </b-button>
 
@@ -30,7 +30,7 @@
             </b-input-group-append>
         </b-input-group>
 
-        <div v-if="authStore.oAuthShare && inviteUrl" class="pt-2">
+        <div v-if="accountStore.isAuthenticated && inviteUrl" class="pt-2">
             <BaseBtnShareTwitter :url="inviteUrl" text="Please have a look at this:" class="me-2" />
             <BaseBtnShareLinkedin :url="inviteUrl" class="me-2" />
             <BaseBtnShareWhatsapp :url="inviteUrl" class="me-2" />

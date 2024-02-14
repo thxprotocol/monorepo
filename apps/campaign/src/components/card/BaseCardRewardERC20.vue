@@ -51,7 +51,7 @@ export default defineComponent({
             this.error = '';
         },
         onClickRedeem() {
-            if (!this.authStore.oAuthShare) {
+            if (!this.accountStore.isAuthenticated) {
                 this.accountStore.signin();
             } else {
                 this.isModalShown = true;

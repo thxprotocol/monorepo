@@ -27,7 +27,7 @@
             <i class="fas fa-wallet mr-lg-3"></i>
             <div>Wallet</div>
         </router-link>
-        <BaseNavbarSecondary class="ms-auto d-none d-lg-flex" />
+        <BaseNavbarSecondary v-if="!accountStore.isMobile" class="ms-auto" />
     </b-navbar>
 </template>
 

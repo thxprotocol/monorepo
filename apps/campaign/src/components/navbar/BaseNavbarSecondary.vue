@@ -4,9 +4,9 @@
             <b-button variant="link" @click="onClickClose"> <i class="fas fa-times"></i></b-button>
         </div>
         <b-link
+            v-if="accountStore.isAuthenticated && (questStore.quests.length || rewardStore.rewards.length)"
             @click="onClickRefresh"
             class="pl-3 py-2 p-lg-0 m-lg-0 text-center text-decoration-none d-block d-lg-none"
-            v-if="authStore.oAuthShare && (questStore.quests.length || rewardStore.rewards.length)"
         >
             <div class="text-accent h1 m-0 d-flex align-items-center">
                 <strong>{{ accountStore.balance }}</strong>
@@ -51,18 +51,15 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useQuestStore),
-        ...mapStores(useRewardStore),
-        ...mapStores(useWalletStore),
-        walletAddress() {
-            const { wallet } = useWalletStore();
-            if (!wallet || !wallet.address) return '';
-            return `${wallet.address.substring(0, 6)}...${wallet.address.substring(
-                wallet.address.length - 4,
-                wallet.address.length,
-            )}`;
+        ...mapStores(useAccountStore, useAuthStore, useQuestStore, useRewardStore, useWalletStore),
+    },
+    watch: {
+        'accountStore.account': {
+            handler(account: TAccount | null) {
+                if (!account) return;
+                this.accountStore.getBalance();
+            },
+            immediate: true,
         },
     },
     methods: {

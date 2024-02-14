@@ -83,11 +83,11 @@
                         Continue
                     </b-button>
                     <b-button
-                        v-else-if="authStore.oAuthShare && !isLoadingCollectComplete"
+                        v-else-if="accountStore.isAuthenticated && !isLoadingCollectComplete"
                         @click="onClickCollect"
                         variant="success"
                         class="w-100"
-                        :disabled="!!error || !!claimsStore.error || isWaitingForWalletAddress || isLoadingCollect"
+                        :disabled="!!error || !!claimsStore.error || isLoadingCollect"
                     >
                         <b-spinner v-if="isLoadingCollect" small variant="dark" />
                         <template v-else>Collect</template>
@@ -118,11 +118,8 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useClaimStore),
         ...mapStores(useWalletStore),
-        isWaitingForWalletAddress() {
-            return !this.walletStore.wallet?.address;
-        },
         isAlertInfoShown() {
-            return !this.authStore.oAuthShare && !this.claimsStore.error;
+            return !this.accountStore.isAuthenticated && !this.claimsStore.error;
         },
         isAlertErrorShown() {
             return !!this.error || !!this.claimsStore.error;

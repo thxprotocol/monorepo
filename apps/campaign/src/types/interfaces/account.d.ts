@@ -26,18 +26,6 @@ type TAuthState = {
     isSecurityQuestionAvailable: boolean | null;
     userManager: UserManager;
     user: Partial<User> | null;
-    // {
-    //     id_token?: string;
-    //     expired: boolean;
-    //     session_state: string | null;
-    //     access_token: string;
-    //     refresh_token?: string;
-    //     token_type: string;
-    //     scope?: string;
-    //     profile: UserProfile;
-    //     expires_at?: number;
-    //     state: unknown;
-    // } | null;
     privateKey: string;
     oAuthShare: string;
     securityQuestion: string;

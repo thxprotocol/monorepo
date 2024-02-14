@@ -21,13 +21,13 @@
 
         <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
 
-        <b-progress v-if="accountStore.isAuthenticated && quest.limit" class="mb-3" :max="quest.limit" show-value>
+        <b-progress v-if="accountStore.isAuthenticated && quest.limit > 0" class="mb-3" :max="quest.limit" show-value>
             <b-progress-bar variant="primary" :value="quest.entries.length" :label="`${quest.events.length}`" />
             <b-progress-bar variant="success" :value="pendingCount" :label="`${pendingCount}`" />
         </b-progress>
 
         <template #button>
-            <b-button v-if="!authStore.oAuthShare" @click="onClickSignin" variant="primary" block class="w-100">
+            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
                 Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
