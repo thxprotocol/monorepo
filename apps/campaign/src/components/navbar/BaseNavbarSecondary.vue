@@ -9,7 +9,7 @@
             v-if="authStore.oAuthShare && (questStore.quests.length || rewardStore.rewards.length)"
         >
             <div class="text-accent h1 m-0 d-flex align-items-center">
-                <strong>{{ accountStore.balance }}</strong>
+                <strong>{{ balance }}</strong>
                 <span class="ms-2 text-white" style="font-size: 16px !important">
                     <b-spinner v-if="isRefreshing" small />
                     <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
@@ -64,6 +64,11 @@ export default defineComponent({
                 wallet.address.length,
             )}`;
         },
+        balance() {
+            const participant = this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
+            if (!participant || !participant.balance) return 0;
+            return participant.balance;
+        },
     },
     methods: {
         onClickClose() {
@@ -76,7 +81,7 @@ export default defineComponent({
         async onClickRefresh() {
             this.isRefreshing = true;
             await Promise.all([
-                this.accountStore.getBalance(),
+                this.accountStore.getParticipants(),
                 this.questStore.list(),
                 this.rewardStore.list(),
                 this.walletStore.list(),

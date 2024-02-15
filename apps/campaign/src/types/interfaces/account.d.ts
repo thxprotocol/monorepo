@@ -42,6 +42,14 @@ type TAuthState = {
     securityQuestion: string;
 };
 
+type TParticipant = {
+    sub: string;
+    balance: number;
+    rank: number;
+    score: number;
+    questEntriesCompleted: number;
+};
+
 type TAccountState = {
     css: HTMLStyleElement | null;
     isAuthenticated: boolean | null;
@@ -55,17 +63,13 @@ type TAccountState = {
     isModalAccountShown: boolean;
     isModalWalletShown: boolean;
     windowHeight: number;
+    config: any;
     api: THXClient | null;
     poolId: string;
-    migration: {
-        wallet: TWallet;
-        erc20Tokens: TERC20Token[];
-        erc721Tokens: TERC721Token[];
-    } | null;
     balance: number;
     account: TAccount | null;
     subscription: TSubscription | null;
-    config: any;
+    participants: TParticipant[];
     leaderboard: { score: number; wallet: TWallet; questsCompleted: number; account: TAccount }[];
 };
 

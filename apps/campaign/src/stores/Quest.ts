@@ -3,7 +3,6 @@ import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import poll from 'promise-poller';
-import { useWalletStore } from './Wallet';
 
 export const useQuestStore = defineStore('quest', {
     state: (): TQuestState => ({
@@ -120,7 +119,7 @@ export const useQuestStore = defineStore('quest', {
         },
 
         async waitForQuestEntryJob(jobId: string) {
-            const { api } = useAccountStore();
+            const { api, poolId } = useAccountStore();
             const taskFn = async () => {
                 const job = await api.request.get(`/v1/jobs/${jobId}`);
                 return job && !!job.lastRunAt ? Promise.resolve() : Promise.reject('Job not finished');
@@ -128,7 +127,7 @@ export const useQuestStore = defineStore('quest', {
 
             // Poll for job to finish
             await poll({ taskFn, interval: 1000, retries: 5 });
-            useAccountStore().getBalance();
+            useAccountStore().getParticipants(poolId);
         },
     },
 });

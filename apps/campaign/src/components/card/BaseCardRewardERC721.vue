@@ -62,7 +62,7 @@ export default defineComponent({
                 .createERC721Redemption(this.reward.uuid)
                 .then(async () => {
                     const walletStore = useWalletStore();
-                    await this.accountStore.getBalance();
+                    await this.accountStore.getParticipants();
                     walletStore.list();
                     this.isModalShown = false;
                 })
