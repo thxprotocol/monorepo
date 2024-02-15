@@ -12,22 +12,24 @@
                     }"
                 >
                     <div
-                        v-if="accountStore.isAuthenticated"
+                        v-if="accountStore.isAuthenticated && participant"
                         class="d-flex justify-content-center align-items-center p-3"
                         style="border-radius: 5px; background: rgba(0, 0, 0, 0.35)"
                     >
                         <b-avatar size="80" :src="accountStore.account?.profileImg" class="gradient-border-xl" />
                         <div class="px-3" style="min-width: 200px">
                             <h3 class="text-white mb-0">{{ accountStore.account?.username }}</h3>
-                            <div class="text-white text-opaque mb-1">Rank: #{{ accountStore.account?.rank }}</div>
+                            <div class="text-white text-opaque mb-1">Rank: #{{ participant.rank }}</div>
                             <b-progress
                                 style="height: 13px"
-                                :max="Number(balance) + Number(questStore.availablePoints)"
+                                :max="Number(participant.balance) + Number(questStore.availablePoints)"
                             >
                                 <b-progress-bar
                                     variant="success"
-                                    :value="Number(balance)"
-                                    :label="`${balance}/${Number(balance) + Number(questStore.availablePoints)}`"
+                                    :value="Number(participant.balance)"
+                                    :label="`${participant.balance}/${
+                                        Number(participant.balance) + Number(questStore.availablePoints)
+                                    }`"
                                 />
                             </b-progress>
                         </div>
@@ -65,10 +67,8 @@ export default defineComponent({
         isRouteRanking() {
             return this.$route.name !== 'ranking';
         },
-        balance() {
-            const participant = this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
-            if (!participant || !participant.balance) return 0;
-            return participant.balance;
+        participant() {
+            return this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
         },
     },
 });

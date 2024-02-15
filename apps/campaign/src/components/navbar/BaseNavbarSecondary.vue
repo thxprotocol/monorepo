@@ -9,7 +9,7 @@
             class="pl-3 py-2 p-lg-0 m-lg-0 text-center text-decoration-none d-block d-lg-none"
         >
             <div class="text-accent h1 m-0 d-flex align-items-center">
-                <strong>{{ balance }}</strong>
+                <strong>{{ participant ? participant.balance : 0 }}</strong>
                 <span class="ms-2 text-white" style="font-size: 16px !important">
                     <b-spinner v-if="isRefreshing" small />
                     <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
@@ -52,10 +52,8 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore, useRewardStore, useWalletStore),
-        balance() {
-            const participant = this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
-            if (!participant || !participant.balance) return 0;
-            return participant.balance;
+        participant() {
+            return this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
         },
     },
     watch: {
