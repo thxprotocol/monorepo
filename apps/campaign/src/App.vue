@@ -1,5 +1,9 @@
 <template>
-    <div id="main" :class="{ 'overflow-hidden': accountStore.isMobile }">
+    <b-alert v-if="isOffline" class="m-3" variant="primary" v-model="isOffline">
+        <i class="fas fa-tools me-2" />
+        We are running some maintenance and will be back shortly. See you soon! ❤️
+    </b-alert>
+    <div v-else id="main" :class="{ 'overflow-hidden': accountStore.isMobile }">
         <BaseNavbarTop />
         <div class="d-flex justify-content-end h-100">
             <router-view class="router-view-app order-lg-0" />
@@ -13,7 +17,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { GTM } from './config/secrets';
+import { GTM, MAINTENANCE } from './config/secrets';
 import { initGTM } from './utils/ga';
 import { mapStores } from 'pinia';
 import { useAuthStore } from './stores/Auth';
@@ -27,6 +31,13 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         ...mapStores(useWalletStore),
+        isOffline() {
+            try {
+                return JSON.parse(MAINTENANCE);
+            } catch (error) {
+                return false;
+            }
+        },
         scrollHeight() {
             const { windowHeight, isMobile } = this.accountStore;
             // Return null to disable custom scroller
