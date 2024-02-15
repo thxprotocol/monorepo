@@ -50,8 +50,7 @@
             </BButtonGroup>
             <b-button
                 v-else-if="contentURL && !isViewed"
-                :href="contentURL"
-                target="_blank"
+                @click="onClickView"
                 variant="primary"
                 block
                 class="w-100"
