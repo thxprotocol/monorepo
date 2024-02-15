@@ -22,14 +22,12 @@
                             <div class="text-white text-opaque mb-1">Rank: #{{ accountStore.account?.rank }}</div>
                             <b-progress
                                 style="height: 13px"
-                                :max="Number(accountStore.balance) + Number(questStore.availablePoints)"
+                                :max="Number(balance) + Number(questStore.availablePoints)"
                             >
                                 <b-progress-bar
                                     variant="success"
-                                    :value="Number(accountStore.balance)"
-                                    :label="`${accountStore.balance}/${
-                                        Number(accountStore.balance) + Number(questStore.availablePoints)
-                                    }`"
+                                    :value="Number(balance)"
+                                    :label="`${balance}/${Number(balance) + Number(questStore.availablePoints)}`"
                                 />
                             </b-progress>
                         </div>
@@ -63,10 +61,14 @@ export default defineComponent({
         height: Number,
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useQuestStore),
+        ...mapStores(useAccountStore, useQuestStore),
         isRouteRanking() {
             return this.$route.name !== 'ranking';
+        },
+        balance() {
+            const participant = this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
+            if (!participant || !participant.balance) return 0;
+            return participant.balance;
         },
     },
 });

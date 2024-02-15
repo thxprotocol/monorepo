@@ -22,11 +22,11 @@ export const useAccountStore = defineStore('account', {
         api: null,
         account: null,
         balance: 0,
-        migration: null,
         config: {},
         css: null,
         subscription: null,
         leaderboard: [],
+        participants: [],
         windowHeight: 0,
         isSidebarShown: false,
         isAuthenticated: null,
@@ -112,7 +112,8 @@ export const useAccountStore = defineStore('account', {
             if (user.access_token) {
                 useAuthStore().onUserLoadedCallback(user);
                 this.api.request.setUser(user);
-                await this.connectIdentity();
+                await this.getAccount();
+                this.connectIdentity();
             }
 
             this.getUserData();
@@ -123,9 +124,10 @@ export const useAccountStore = defineStore('account', {
         async getAccount() {
             this.account = await this.api.request.get('/v1/account');
         },
-        async getBalance() {
-            const { balance } = await this.api.pointBalance.list();
-            this.balance = balance;
+        async getParticipants() {
+            const params: { poolId?: string } = {};
+            if (this.poolId) params['poolId'] = this.poolId;
+            this.participants = await this.api.request.get('/v1/participants', { params });
         },
         async subscribe() {
             const email = this.account?.email;
@@ -200,8 +202,8 @@ export const useAccountStore = defineStore('account', {
             this.account = null;
         },
         async getUserData() {
-            const authStore = useAuthStore();
-            this.setStatus(!!authStore.user);
+            const { user } = useAuthStore();
+            this.setStatus(!!user);
         },
         setStatus(isAuthenticated: boolean | null) {
             this.isAuthenticated = isAuthenticated;
