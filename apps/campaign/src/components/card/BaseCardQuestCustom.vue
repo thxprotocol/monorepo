@@ -80,7 +80,9 @@ export default defineComponent({
             // If there is a limit subtract the amount of entries from the amount of events
             if (this.quest.limit > 0) return this.quest.events.length - this.quest.entries.length;
             // Else return the amount of events
-            return this.quest.events.length - this.quest.entries.length;
+            const pending = this.quest.events.length - this.quest.entries.length;
+            // In case it's less than 0 return 0
+            return pending < 0 ? 0 : pending;
         },
     },
     methods: {
