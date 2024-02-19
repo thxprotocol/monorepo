@@ -35,6 +35,11 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import(/* webpackChunkName: "earn" */ '../views/discovery/Earn.vue'),
             },
             {
+                path: '/connect/:uuid',
+                name: 'connect',
+                component: () => import(/* webpackChunkName: "connect" */ '../views/Connect.vue'),
+            },
+            {
                 path: '/wallets',
                 name: 'wallets',
                 beforeEnter,

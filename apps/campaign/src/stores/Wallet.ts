@@ -56,11 +56,14 @@ export const useWalletStore = defineStore('wallet', {
         isModalWalletRecoveryShown: false,
     }),
     actions: {
-        async create({ variant, message, signature }: { variant: WalletVariant; message: string; signature: string }) {
+        async create(data: { variant: WalletVariant; message?: string; signature?: string }) {
             const { api } = useAccountStore();
-            await api.request.post('/v1/account/wallets', {
-                data: { variant, message, signature },
-            });
+            await api.request.post('/v1/account/wallets', { data });
+            await this.listWallets();
+        },
+        async connect(data: { uuid: string; variant: WalletVariant; message: string; signature: string }) {
+            const { api } = useAccountStore();
+            await api.request.post('/v1/connect', { data });
             await this.listWallets();
         },
         async listWallets() {

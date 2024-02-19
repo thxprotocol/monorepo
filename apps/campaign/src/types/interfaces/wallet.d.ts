@@ -1,5 +1,6 @@
 type TWallet = {
     _id: string;
+    uuid: string;
     address: string;
     version: string;
     chainId: number;

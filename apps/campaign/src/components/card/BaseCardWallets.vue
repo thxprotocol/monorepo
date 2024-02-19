@@ -92,7 +92,6 @@ export default defineComponent({
     watch: {
         'accountStore.account': {
             async handler(account: TAccount | null) {
-                console.log(account);
                 if (!account) return;
                 await this.walletStore.listWallets();
                 this.walletStore.list(this.walletStore.wallets[0]);
