@@ -35,6 +35,13 @@ const chainList: { [chainId: number]: ChainInfo } = {
         blockExplorer: 'https://polygonscan.com',
         chain: polygon,
     },
+    [ChainId.PolygonZK]: {
+        chainId: ChainId.PolygonZK,
+        name: 'Polygon zkEVM',
+        logo: ImgLogoPolygon,
+        blockExplorer: 'https://zkevm.polygonscan.com',
+        chain: polygonZkEvm,
+    },
 };
 
 if (process.env.NODE_ENV !== 'production') {
