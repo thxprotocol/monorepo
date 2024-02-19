@@ -1,16 +1,6 @@
 <template>
     <div class="d-flex ps-3">
-        <div class="d-flex align-items-center">
-            Wallet
-            <!-- <b-img
-                :src="walletLogoMap[walletStore.wallet?.variant]"
-                width="15"
-                height="15"
-                style="border-radius: 3px"
-                class="me-2"
-            />
-            {{ walletStore.wallet?.short }} -->
-        </div>
+        <div class="d-flex align-items-center">Your Wallet</div>
         <b-dropdown class="ms-auto me-3" size="sm" v-model="isOpen" variant="primary" no-caret>
             <template #button-content>
                 <i class="fas fa-ellipsis-v ms-0" />
@@ -28,7 +18,7 @@
                     class="me-2"
                 />
                 {{ wallet.short }}
-                <BaseModalWallet :id="`modalWallet${wallet._id}`" :wallet="wallet" size="lg" />
+                <component :is="getComponentName(wallet)" :id="`modalWallet${wallet._id}`" :wallet="wallet" size="lg" />
             </b-dropdown-item>
             <b-dropdown-divider />
             <b-dropdown-item
@@ -48,28 +38,20 @@ import { mapStores } from 'pinia';
 import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { WalletVariant } from '../../types/enums/accountVariant';
-import { GetAccountResult, PublicClient } from '@wagmi/core';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { Web3Modal } from '@web3modal/html';
 import { chainList, getAddressURL } from '../../utils/chains';
+import BaseModalWallet from '../modal/BaseModalWallet.vue';
+import BaseModalWalletSafe from '../modal/BaseModalWalletSafe.vue';
+import BaseModalWalletWeb3Auth from '../modal/BaseModalWalletWeb3Auth.vue';
 
 export default defineComponent({
     name: 'BaseViewCampaignWallets',
-    data(): {
-        account: GetAccountResult<PublicClient> | null;
-        modal: Web3Modal | null;
-        error: string;
-        isModalOpen: boolean;
-        isSubmitting: boolean;
-        chainList: { [chainId: number]: ChainInfo };
-        getAddressURL: any;
-        show: boolean;
-        chainId: ChainId;
-        unsubscribe: any;
-        walletLogoMap: { [variant: string]: string };
-        isOpen: boolean;
-        variant: WalletVariant;
-    } {
+    components: {
+        BaseModalWallet,
+        BaseModalWalletSafe,
+        BaseModalWalletWeb3Auth,
+    },
+    data() {
         return {
             error: '',
             account: null,
@@ -97,6 +79,16 @@ export default defineComponent({
                 this.walletStore.list(this.walletStore.wallets[0]);
             },
             immediate: true,
+        },
+    },
+    methods: {
+        getComponentName(wallet: TWallet) {
+            const map: { [variant: string]: string } = {
+                [WalletVariant.WalletConnect]: 'BaseModalWallet',
+                [WalletVariant.Safe]: 'BaseModalWalletSafe',
+                [WalletVariant.Web3Auth]: 'BaseModalWalletWeb3Auth',
+            };
+            return map[wallet.variant];
         },
     },
 });

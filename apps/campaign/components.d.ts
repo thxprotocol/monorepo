@@ -66,6 +66,8 @@ declare module 'vue' {
     BaseModalWallet: typeof import('./src/components/modal/BaseModalWallet.vue')['default']
     BaseModalWalletCreate: typeof import('./src/components/modal/BaseModalWalletCreate.vue')['default']
     BaseModalWalletRecovery: typeof import('./src/components/modal/BaseModalWalletRecovery.vue')['default']
+    BaseModalWalletSafe: typeof import('./src/components/modal/BaseModalWalletSafe.vue')['default']
+    BaseModalWalletWeb3Auth: typeof import('./src/components/modal/BaseModalWalletWeb3Auth.vue')['default']
     BaseModalWithdraw: typeof import('./src/components/modal/BaseModalWithdraw.vue')['default']
     BaseNavbarPrimary: typeof import('./src/components/navbar/BaseNavbarPrimary.vue')['default']
     BaseNavbarSecondary: typeof import('./src/components/navbar/BaseNavbarSecondary.vue')['default']

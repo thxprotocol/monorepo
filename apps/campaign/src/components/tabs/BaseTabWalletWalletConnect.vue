@@ -12,7 +12,7 @@
         </b-form-group>
     </b-form-group>
     <b-button
-        v-if="!accountStore.isMobileEthereumBrowser"
+        v-if="accountStore.isMobileEthereumBrowser"
         @click="onClickDeeplink"
         :disabled="isLoading"
         variant="primary"
