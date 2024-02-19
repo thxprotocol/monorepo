@@ -57,9 +57,13 @@
 
             <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
-            <b-button v-else variant="primary" block class="w-100" @click="onClickClaim">
+            <BaseButtonWalletConnect
+                v-else
+                @signed="onSigned"
+                message="This signed message will be used to proof ownership of your web3 account and verify the quest requirements."
+            >
                 Claim <strong>{{ quest.amount }}</strong> points
-            </b-button>
+            </BaseButtonWalletConnect>
         </template>
     </BaseCardCollapse>
 </template>
@@ -70,13 +74,8 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useQuestStore } from '../../stores/Quest';
-import { getModal } from '../../utils/wallet-connect';
-import { chainList, getAddressURL } from '../../utils/chains';
-import { getAccount, GetAccountResult, PublicClient } from '@wagmi/core';
-import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { signMessage } from '@wagmi/core';
-import { Web3Modal } from '@web3modal/html';
 import imgLogoGitcoin from '../../assets/gitcoin-logo.svg';
+import { ChainId } from '@thxnetwork/sdk';
 
 export default defineComponent({
     name: 'BaseCardQuestGitcoin',
@@ -86,104 +85,40 @@ export default defineComponent({
             required: true,
         },
     },
-    data(): {
-        imgLogoGitcoin: string;
-        account: GetAccountResult<PublicClient> | null;
-        modal: Web3Modal | null;
-        error: string;
-        isModalOpen: boolean;
-        isSubmitting: boolean;
-        chainList: { [chainId: number]: ChainInfo };
-        getAddressURL: any;
-        show: boolean;
-        chainId: ChainId;
-        unsubscribe: any;
-        isModalQuestEntryShown: boolean;
-    } {
+    data() {
         return {
+            isModalQuestEntryShown: false,
             imgLogoGitcoin,
             error: '',
-            account: null,
-            modal: null,
-            isModalOpen: false,
             isSubmitting: false,
-            chainList,
-            getAddressURL,
             show: false,
-            chainId: ChainId.Polygon,
-            unsubscribe: null,
-            isModalQuestEntryShown: false,
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useQuestStore),
+        ...mapStores(useAccountStore, useAuthStore, useQuestStore),
         isAlertDangerShown() {
             return !!this.error && !this.isSubmitting;
-        },
-        accountStatus() {
-            if (!this.account) return 'text-opaque';
-            switch (this.account.status) {
-                case 'connected':
-                    return 'text-success';
-                case 'connecting':
-                    return 'text-warning';
-                case 'disconnected':
-                    return 'text-danger';
-                default:
-                    return 'text-opaque';
-            }
         },
     },
     mounted() {
         if (!this.quest.isAvailable) return;
-
-        const chains = [chainList[ChainId.Polygon].chain];
-        const theme = this.accountStore.getTheme();
-        this.chainId = ChainId.Polygon;
-        this.modal = getModal(chainList[this.chainId].chain, chains, theme);
-        this.unsubscribe = this.modal.subscribeModal(this.onModalStateChange);
     },
     methods: {
-        onModalStateChange({ open }: { open: boolean }) {
-            this.isModalOpen = open;
-            this.account = getAccount();
-        },
         onClickSignin: function () {
             this.accountStore.signin();
         },
-        waitForConnected() {
-            return new Promise((resolve) => {
-                setInterval(() => {
-                    if (this.account?.isConnected) resolve('connected');
-                }, 500);
-            });
-        },
-        onClickClaim: async function () {
-            if (!this.modal) return;
-
+        async onSigned({ signature, message }: { signature: string; message: string; address: string }) {
             this.error = '';
             this.isSubmitting = true;
-
             try {
-                this.modal.setDefaultChain(this.chainList[this.chainId].chain);
-                await this.modal.openModal();
-                await this.waitForConnected();
-
-                const message = `This signed message will be used to proof ownership of your web3 account.`;
-                const signature = await signMessage({ message });
-
                 await this.questStore.completeGitcoinQuest(this.quest, {
                     signature,
                     message,
-                    chainId: this.chainId,
+                    chainId: ChainId.Polygon,
                 });
-
                 this.isModalQuestEntryShown = true;
             } catch (error) {
                 this.error = error as string;
-                this.modal.closeModal();
             } finally {
                 this.isSubmitting = false;
             }

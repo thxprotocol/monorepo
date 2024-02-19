@@ -1,58 +1,30 @@
 <template>
-    <b-modal
-        :id="id"
-        v-model="isShown"
-        @show="onShow"
-        @hidden="isShown = false"
-        centered
-        no-close-on-backdrop
-        no-close-on-esc
-    >
+    <b-modal :id="id" v-model="isShown" @show="onShow" @hidden="isShown = false" centered hide-footer>
         <template #header>
             <h5 class="modal-title"><i class="fas fa-wallet me-2"></i> Wallet</h5>
             <b-link class="btn-close" @click="isShown = false">
                 <i class="fas fa-times"></i>
             </b-link>
         </template>
-
         <b-form>
-            <b-form-group>
-                <template #label>
-                    <div class="d-flex align-items-center">
-                        <img
-                            :src="walletLogoMap[wallet.variant]"
-                            width="15"
-                            height="15"
-                            style="border-radius: 3px"
-                            class="me-2"
-                            alt="Safe Logo"
-                        />
-                        Wallet Address
-                    </div>
-                </template>
-                <code>{{ wallet.address }}</code>
-            </b-form-group>
+            <BaseFormGroupWalletAddress :wallet="wallet">
+                <template #description> You have imported this wallet using WalletConnect. </template>
+            </BaseFormGroupWalletAddress>
         </b-form>
-        <template #footer>
-            <b-button class="w-100" variant="primary" @click="isShown = false"> Close </b-button>
-        </template>
     </b-modal>
 </template>
 
 <script lang="ts">
 import { useAccountStore } from '../../stores/Account';
-import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
+import { useWalletStore } from '../../stores/Wallet';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-import { WalletVariant } from '../../types/enums/accountVariant';
 
 export default defineComponent({
     name: 'BaseModalWallet',
     data() {
         return {
             isShown: false,
-            walletLogoMap,
-            WalletVariant,
             error: '',
         };
     },
@@ -69,8 +41,8 @@ export default defineComponent({
         ...mapStores(useAccountStore, useWalletStore),
     },
     methods: {
-        onShow() {
-            this.accountStore.getAccount();
+        async onShow() {
+            // Show signers
         },
     },
 });

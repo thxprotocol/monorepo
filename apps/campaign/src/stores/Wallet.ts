@@ -43,13 +43,13 @@ export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
         allowances: {},
         balances: {},
-        walletTransfer: null,
         erc20: [],
         erc721: [],
         erc1155: [],
         couponCodes: [],
         pendingPoints: 0,
         wallets: [],
+        wallet: null,
         isLoading: true,
         isModalWalletCreateShown: false,
         isModalAccountShown: false,
@@ -88,19 +88,15 @@ export const useWalletStore = defineStore('wallet', {
 
             this.erc721[index] = { ...token, component: 'BaseCardERC721' };
         },
-        async list(wallet?: TWallet) {
+        async list() {
             const { api } = useAccountStore();
-            if (!wallet) wallet = this.wallets[0];
-            if (!wallet) return;
-
             this.isLoading = true;
 
-            const options = { chainId: wallet.chainId };
             const [erc20, erc721, erc1155, couponCodes] = await Promise.all([
-                api.erc20.list(options),
-                api.erc721.list(options),
-                api.erc1155.list(options),
-                api.couponCodes.list(options),
+                api.erc20.list({ walletId: this.wallet?._id }),
+                api.erc721.list({ walletId: this.wallet?._id }),
+                api.erc1155.list({ walletId: this.wallet?._id }),
+                api.couponCodes.list(),
             ]);
 
             this.erc20 = erc20.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' }));

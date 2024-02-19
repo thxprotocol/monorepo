@@ -25,8 +25,8 @@ type TTransaction = {
 };
 
 type TWalletState = {
-    walletTransfer: TWallet | null;
     wallets: TWallet[];
+    wallet: TWallet | null;
     erc20: any[];
     erc721: any[];
     erc1155: any[];

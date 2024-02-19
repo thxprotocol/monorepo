@@ -4,6 +4,7 @@ type TRewardState = {
 };
 
 type TReward = {
+    _id: string;
     uuid: string;
     poolId: string;
     image: string;
@@ -14,8 +15,7 @@ type TReward = {
     amount: string;
     description: string;
     pointPrice: number;
-    priceCurrency: string;
-    price: number;
+    chainId: ChainId;
     isPromoted: boolean;
     isDisabled: boolean;
     erc1155Amount: number;

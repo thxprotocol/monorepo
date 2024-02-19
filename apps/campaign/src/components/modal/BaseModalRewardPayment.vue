@@ -6,8 +6,6 @@
         :title="reward.title"
         centered
         content-class="gradient-shadow-xl"
-        no-close-on-backdrop
-        no-close-on-esc
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-gift me-2"></i> {{ reward.title }}</h5>
@@ -21,41 +19,25 @@
                 <i class="fas fa-exclamation-circle me-2"></i>
                 {{ error }}
             </b-alert>
-            <p class="m-0">
-                Do you want to redeem {{ reward.pointPrice }} points for <strong>{{ reward.title }} </strong>?
+            <p :class="!reward.chainId && 'mb-0'">
+                Do you want to use {{ reward.pointPrice }} points for <strong>{{ reward.title }} </strong>?
             </p>
-            <div id="payment-element"></div>
+            <BaseFormGroupWalletSelect
+                v-if="reward.chainId"
+                :chain-id="reward.chainId"
+                @update="wallet = $event"
+                class="mb-0"
+            />
         </template>
         <template #footer>
-            <template v-if="reward.price > 0">
-                <b-button
-                    variant="success"
-                    class="w-100 rounded-pill"
-                    :disabled="isLoading"
-                    :to="`/c/${accountStore.config.slug}/checkout/${reward.uuid}`"
-                >
-                    <b-spinner small variant="primary" v-if="isSubmitting" />
-                    {{ reward.price }} {{ reward.priceCurrency }}
-                </b-button>
-                <b-button
-                    variant="primary"
-                    class="w-100 rounded-pill"
-                    :disabled="isLoading"
-                    @click="$emit('submit-redemption')"
-                >
-                    {{ reward.pointPrice }} points
-                </b-button>
-            </template>
             <b-button
-                v-else
                 variant="success"
                 class="w-100 rounded-pill"
-                :disabled="isLoading || reward.isLocked"
-                @click="$emit('submit-redemption')"
+                :disabled="isDisabled"
+                @click="$emit('submit-redemption', wallet)"
             >
                 <b-spinner small variant="primary" v-if="isSubmitting" />
                 <template v-else-if="reward.isLocked"> <i class="fas fa-lock"></i></template>
-
                 <template v-else> {{ reward.pointPrice }} points</template>
             </b-button>
         </template>
@@ -72,6 +54,7 @@ export default defineComponent({
     name: 'BaseModalRewardPayment',
     data() {
         return {
+            wallet: null,
             isShown: false,
             isSubmitting: false,
         };
@@ -101,8 +84,10 @@ export default defineComponent({
         },
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useAccountStore, useRewardStore),
+        isDisabled() {
+            return this.isLoading || this.reward.isLocked || (this.reward.chainId && !this.wallet);
+        },
         isAlertDangerShown() {
             return !!this.error;
         },

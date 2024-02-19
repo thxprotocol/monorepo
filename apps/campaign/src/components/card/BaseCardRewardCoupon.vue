@@ -51,7 +51,7 @@ export default defineComponent({
         onSubmitRedemption() {
             this.isSubmitting = true;
             this.rewardStore
-                .createCouponRedemption(this.reward.uuid)
+                .createCouponRedemption(this.reward._id)
                 .then(async () => {
                     const walletStore = useWalletStore();
                     await this.accountStore.getParticipants();

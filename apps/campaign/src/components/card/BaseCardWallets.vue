@@ -1,23 +1,45 @@
 <template>
-    <div class="d-flex ps-3">
-        <div class="d-flex align-items-center">Your Wallet</div>
-        <b-dropdown class="ms-auto me-3" size="sm" v-model="isOpen" variant="primary" no-caret>
+    <div class="d-flex px-3 pb-3">
+        <b-dropdown
+            class="w-100"
+            menu-class="w-100"
+            toggle-class="rounded d-flex align-items-center justify-content-between"
+            v-model="isOpen"
+            variant="outline-primary"
+            no-caret
+        >
             <template #button-content>
-                <i class="fas fa-ellipsis-v ms-0" />
+                <div class="d-flex align-items-center" v-if="walletStore.wallet">
+                    <b-img
+                        :src="walletLogoMap[walletStore.wallet.variant]"
+                        width="15"
+                        height="15"
+                        style="border-radius: 3px"
+                        class="me-2"
+                    />
+                    {{ walletStore.wallet.short }}
+                </div>
+                <div v-else>Select your wallet</div>
+                <i class="fas fa-ellipsis-v ms-auto" />
             </template>
             <b-dropdown-item
                 v-for="wallet of walletStore.wallets"
-                link-class="d-flex align-items-center"
-                v-b-modal="`modalWallet${wallet._id}`"
+                link-class="d-flex align-items-center justify-content-between pe-1"
+                @click="onClickWallet(wallet)"
             >
-                <b-img
-                    :src="walletLogoMap[wallet.variant]"
-                    width="15"
-                    height="15"
-                    style="border-radius: 3px"
-                    class="me-2"
-                />
-                {{ wallet.short }}
+                <div class="d-flex align-items-center">
+                    <b-img
+                        :src="walletLogoMap[wallet.variant]"
+                        width="15"
+                        height="15"
+                        style="border-radius: 3px"
+                        class="me-2"
+                    />
+                    {{ wallet.short }}
+                </div>
+                <b-button v-b-modal="`modalWallet${wallet._id}`" size="sm" variant="link">
+                    <i class="fas fa-cog text-white text-opaque" />
+                </b-button>
                 <component :is="getComponentName(wallet)" :id="`modalWallet${wallet._id}`" :wallet="wallet" size="lg" />
             </b-dropdown-item>
             <b-dropdown-divider />
@@ -38,8 +60,6 @@ import { mapStores } from 'pinia';
 import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { WalletVariant } from '../../types/enums/accountVariant';
-import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { chainList, getAddressURL } from '../../utils/chains';
 import BaseModalWallet from '../modal/BaseModalWallet.vue';
 import BaseModalWalletSafe from '../modal/BaseModalWalletSafe.vue';
 import BaseModalWalletWeb3Auth from '../modal/BaseModalWalletWeb3Auth.vue';
@@ -51,21 +71,10 @@ export default defineComponent({
         BaseModalWalletSafe,
         BaseModalWalletWeb3Auth,
     },
-    data() {
+    data(): { isOpen: boolean; walletLogoMap: any } {
         return {
-            error: '',
-            account: null,
-            modal: null,
-            isModalOpen: false,
-            isSubmitting: false,
-            chainList,
-            getAddressURL,
-            show: false,
-            chainId: ChainId.Polygon,
-            unsubscribe: null,
             walletLogoMap,
             isOpen: false,
-            variant: WalletVariant.Safe,
         };
     },
     computed: {
@@ -75,13 +84,27 @@ export default defineComponent({
         'accountStore.account': {
             async handler(account: TAccount | null) {
                 if (!account) return;
+
                 await this.walletStore.listWallets();
-                this.walletStore.list(this.walletStore.wallets[0]);
+                // Pick the safe multisig if any and a walletconnect one otherwise
+                this.walletStore.wallet =
+                    this.walletStore.wallets.find(
+                        (wallet) =>
+                            wallet.variant === WalletVariant.Safe || wallet.variant === WalletVariant.WalletConnect,
+                    ) || null;
+                this.listRewards();
             },
             immediate: true,
         },
     },
     methods: {
+        listRewards() {
+            this.walletStore.list(this.walletStore.wallet);
+        },
+        onClickWallet(wallet: TWallet) {
+            this.walletStore.wallet = wallet;
+            this.listRewards();
+        },
         getComponentName(wallet: TWallet) {
             const map: { [variant: string]: string } = {
                 [WalletVariant.WalletConnect]: 'BaseModalWallet',
@@ -93,3 +116,8 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.dropdown-toggle .fa-ellipsis-v {
+    color: var(--bs-body-color);
+}
+</style>

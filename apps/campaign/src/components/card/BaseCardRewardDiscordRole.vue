@@ -53,7 +53,7 @@ export default defineComponent({
         onSubmitRedemption() {
             this.isSubmitting = true;
             this.rewardStore
-                .createDiscordRoleRedemption(this.reward.uuid)
+                .createDiscordRoleRedemption(this.reward._id)
                 .then(async () => {
                     const walletStore = useWalletStore();
                     await this.accountStore.getParticipants();

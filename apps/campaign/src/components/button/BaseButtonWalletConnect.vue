@@ -1,7 +1,7 @@
 <template>
     <b-button @click="onClickConnect" :disabled="isLoading" variant="primary" class="w-100">
         <b-spinner small v-if="isLoading" />
-        <template v-else> Connect Wallet </template>
+        <slot v-else> Connect Wallet </slot>
     </b-button>
 </template>
 
@@ -84,7 +84,7 @@ export default defineComponent({
 
                 if (!this.account) throw new Error('Not able to get the account.');
 
-                this.$emit('signed', { signature, address: this.account.address });
+                this.$emit('signed', { signature, message: this.message, address: this.account.address });
             } catch (error) {
                 this.$emit('error', error as string);
                 this.modal.closeModal();

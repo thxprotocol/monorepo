@@ -10,49 +10,41 @@ export const useRewardStore = defineStore('reward', {
         isLoading: true,
     }),
     actions: {
-        updateSupply: function (uuid: string) {
-            const index = this.rewards.findIndex((reward) => reward.uuid === uuid);
+        updateSupply: function (id: string) {
+            const index = this.rewards.findIndex((reward) => reward._id === id);
             this.rewards[index].progress.count = this.rewards[index].progress.count + 1;
         },
-        createERC20Redemption: async function (uuid: string) {
+        createERC20Redemption: async function (id: string, wallet: TWallet) {
             const { api, account, poolId, config } = useAccountStore();
-            const { error } = await api.rewards.coin.redemption.post(uuid);
-            if (error) throw error;
+            console.log(id, wallet._id);
+            const r = await api.request.post(`/v1/rewards/coin/${id}/payments`, {
+                data: { walletId: wallet._id },
+            });
+            if (r.error) throw r.error;
 
-            this.updateSupply(uuid);
+            this.updateSupply(id);
 
             track('UserCreates', [account?.sub, 'coin reward payment', { poolId, origin: config.origin }]);
         },
-        createERC721Redemption: async function (uuid: string) {
+        createERC721Redemption: async function (id: string, wallet: TWallet) {
             const { api, account, poolId, config } = useAccountStore();
-            const { error } = await api.rewards.nft.redemption.post(uuid);
-            if (error) throw error;
+            const r = await api.request.post(`/v1/rewards/nft/${id}/payments`, {
+                data: { walletId: wallet._id },
+            });
+            if (r.error) throw r.error;
 
-            this.updateSupply(uuid);
+            this.updateSupply(id);
 
             track('UserCreates', [account?.sub, 'nft reward redemption', { poolId, origin: config.origin }]);
         },
-        createERC721Payment: async function (uuid: string) {
+        createCustomRedemption: async function (id: string) {
             const { api, account, poolId, config } = useAccountStore();
-            const r = await api.rewards.nft.payment.post(uuid);
+            const r = await api.request.post(`/v1/rewards/custom/${id}/oayments`);
             if (r.error) throw r.error;
 
-            this.updateSupply(uuid);
-
-            track('UserCreates', [account?.sub, 'nft reward payment', { poolId, origin: config.origin }]);
-
-            return r;
-        },
-        createCustomRedemption: async function (uuid: string) {
-            const { api, account, poolId, config } = useAccountStore();
-            const r = await api.rewards.custom.redemption.post(uuid);
-            if (r.error) throw r.error;
-
-            this.updateSupply(uuid);
+            this.updateSupply(id);
 
             track('UserCreates', [account?.sub, 'custom reward redemption', { poolId, origin: config.origin }]);
-
-            return r;
         },
         createCouponRedemption: async function (uuid: string) {
             const { api, account, poolId, config } = useAccountStore();
@@ -62,19 +54,15 @@ export const useRewardStore = defineStore('reward', {
             this.updateSupply(uuid);
 
             track('UserCreates', [account?.sub, 'coupon reward redemption', { poolId, origin: config.origin }]);
-
-            return r;
         },
-        createDiscordRoleRedemption: async function (uuid: string) {
+        createDiscordRoleRedemption: async function (id: string) {
             const { api, account, poolId, config } = useAccountStore();
-            const r = await api.request.post(`/v1/rewards/discord-role/${uuid}/redemption`);
+            const r = await api.request.post(`/v1/rewards/discord-role/${id}/payments`);
             if (r.error) throw r.error;
 
-            this.updateSupply(uuid);
+            this.updateSupply(id);
 
             track('UserCreates', [account?.sub, 'discord role reward redemption', { poolId, origin: config.origin }]);
-
-            return r;
         },
         async list() {
             const { api } = useAccountStore();

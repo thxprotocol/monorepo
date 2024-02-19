@@ -56,10 +56,10 @@ export default defineComponent({
             }
             this.isModalShown = true;
         },
-        onSubmitRedemption() {
+        onSubmitRedemption(wallet: TWallet) {
             this.isSubmitting = true;
             this.rewardStore
-                .createERC721Redemption(this.reward.uuid)
+                .createERC721Redemption(this.reward._id, wallet)
                 .then(async () => {
                     const walletStore = useWalletStore();
                     await this.accountStore.getParticipants();
