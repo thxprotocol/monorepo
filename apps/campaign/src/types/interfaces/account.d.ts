@@ -39,6 +39,10 @@ type TParticipant = {
     questEntriesCompleted: number;
 };
 
+type TAccountGlobals = {
+    activeWalletId: string;
+};
+
 type TAccountState = {
     css: HTMLStyleElement | null;
     isAuthenticated: boolean | null;
@@ -77,7 +81,6 @@ type TWidgetConfig = {
     returnUrl: string;
     backgroundUrl: string;
     ref?: string;
-    expired: boolean;
 };
 
 type TOAuthScope = OAuthGoogleScope | OAuthTwitterScope | OAuthDiscordScope | OAuthTwitchScope | OAuthGithubScope;

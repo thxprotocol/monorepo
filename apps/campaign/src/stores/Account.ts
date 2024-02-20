@@ -4,7 +4,6 @@ import { THXBrowserClient } from '@thxnetwork/sdk';
 import { API_URL, AUTH_URL, WIDGET_URL } from '../config/secrets';
 import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
 import { BREAKPOINT_LG } from '../config/constants';
-import { useWalletStore } from './Wallet';
 import { useAuthStore } from './Auth';
 import { getConnectionStatus } from '../utils/social';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
@@ -39,6 +38,16 @@ export const useAccountStore = defineStore('account', {
         isMobileEthereumBrowser: window.ethereum && isMobileDevice,
     }),
     actions: {
+        setGlobals(config: { activeWalletId: string }) {
+            config = { ...this.globals(), ...config };
+            const storageString = JSON.stringify(config);
+            localStorage.setItem('thx:app:config', storageString);
+        },
+        globals(): TAccountGlobals {
+            const storedString = localStorage.getItem('thx:app:config');
+            if (!storedString) return {};
+            return JSON.parse(storedString);
+        },
         setConfig(poolId: string, config: TWidgetConfig) {
             this.poolId = poolId;
             this.config = { ...this.config, ...config };

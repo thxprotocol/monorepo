@@ -85,24 +85,43 @@ export default defineComponent({
             async handler(account: TAccount | null) {
                 if (!account) return;
 
+                // List all wallets for the account
                 await this.walletStore.listWallets();
-                // Pick the safe multisig if any and a walletconnect one otherwise
-                this.walletStore.wallet =
-                    this.walletStore.wallets.find(
-                        (wallet) =>
-                            wallet.variant === WalletVariant.Safe || wallet.variant === WalletVariant.WalletConnect,
-                    ) || null;
+
+                // Check if there a preferred wallet in global config
+                this.setActiveWallet();
+
+                // If no preferred wallet is set pick the safe multisig
+                // and a walletconnect one otherwise
+                if (!this.walletStore.wallet) {
+                    this.setDefaultWallet();
+                }
+
                 this.listRewards();
             },
             immediate: true,
         },
     },
     methods: {
+        setActiveWallet() {
+            const { activeWalletId } = this.accountStore.globals();
+            if (activeWalletId) {
+                const wallet = this.walletStore.wallets.find((wallet) => wallet._id === activeWalletId);
+                this.walletStore.wallet = wallet || null;
+            }
+        },
+        setDefaultWallet() {
+            const wallet = this.walletStore.wallets.find(
+                (wallet) => wallet.variant === WalletVariant.Safe || wallet.variant === WalletVariant.WalletConnect,
+            );
+            this.walletStore.wallet = wallet || null;
+        },
         listRewards() {
-            this.walletStore.list(this.walletStore.wallet);
+            this.walletStore.list();
         },
         onClickWallet(wallet: TWallet) {
             this.walletStore.wallet = wallet;
+            this.accountStore.setGlobals({ activeWalletId: wallet._id });
             this.listRewards();
         },
         getComponentName(wallet: TWallet) {
