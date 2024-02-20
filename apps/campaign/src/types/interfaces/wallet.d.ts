@@ -70,6 +70,7 @@ type TNFTMetadata = {
 
 type TERC721 = {
     _id: string;
+    chainId: ChainId;
     variant: NFTVariant;
     name: string;
     symbol: string;

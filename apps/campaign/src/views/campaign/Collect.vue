@@ -74,6 +74,8 @@
                         <strong class="ms-auto">{{ claimsStore.erc721.symbol }}</strong>
                     </p>
 
+                    <BaseFormGroupWalletSelect @update="wallet = $event" :chain-id="claimsStore.erc721.chainId" />
+
                     <b-button
                         v-if="isLoadingCollectComplete"
                         variant="primary"
@@ -87,7 +89,7 @@
                         @click="onClickCollect"
                         variant="success"
                         class="w-100"
-                        :disabled="!!error || !!claimsStore.error || isLoadingCollect"
+                        :disabled="!!error || !!claimsStore.error || isLoadingCollect || !wallet"
                     >
                         <b-spinner v-if="isLoadingCollect" small variant="dark" />
                         <template v-else>Collect</template>
@@ -114,10 +116,7 @@ export default defineComponent({
     name: 'Home',
     components: { ConfettiExplosion },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useClaimStore),
-        ...mapStores(useWalletStore),
+        ...mapStores(useAccountStore, useAuthStore, useClaimStore, useWalletStore),
         isAlertInfoShown() {
             return !this.accountStore.isAuthenticated && !this.claimsStore.error;
         },
@@ -129,6 +128,7 @@ export default defineComponent({
         return {
             uuid: '',
             error: '',
+            wallet: null,
             isLoadingImage: true,
             isLoadingCollect: false,
             isLoadingCollectComplete: false,
@@ -143,12 +143,14 @@ export default defineComponent({
             this.accountStore.signin();
         },
         onClickGoToWallet() {
-            this.$router.push(`/c/${this.accountStore.config.slug}/about`);
+            this.$router.push(`/c/${this.accountStore.config.slug}/wallets`);
         },
         async onClickCollect() {
+            if (!this.wallet) return;
+
             this.isLoadingCollect = true;
             try {
-                await this.claimsStore.collect(this.uuid);
+                await this.claimsStore.collect(this.uuid, this.wallet);
                 this.walletStore.list();
 
                 this.isLoadingCollectComplete = true;

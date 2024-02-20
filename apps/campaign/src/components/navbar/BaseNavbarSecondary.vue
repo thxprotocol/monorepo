@@ -61,6 +61,7 @@ export default defineComponent({
             handler(account: TAccount | null) {
                 if (!account) return;
                 this.accountStore.getParticipants();
+                this.walletStore.listWallets();
             },
             immediate: true,
         },

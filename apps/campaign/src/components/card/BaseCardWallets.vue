@@ -49,7 +49,6 @@
             >
                 New Wallet
             </b-dropdown-item>
-            <BaseModalWalletCreate size="lg" />
         </b-dropdown>
     </div>
 </template>
@@ -81,13 +80,8 @@ export default defineComponent({
         ...mapStores(useWalletStore, useAccountStore),
     },
     watch: {
-        'accountStore.account': {
-            async handler(account: TAccount | null) {
-                if (!account) return;
-
-                // List all wallets for the account
-                await this.walletStore.listWallets();
-
+        'walletStore.wallets': {
+            async handler() {
                 // Check if there a preferred wallet in global config
                 this.setActiveWallet();
 
@@ -106,21 +100,22 @@ export default defineComponent({
         setActiveWallet() {
             const { activeWalletId } = this.accountStore.globals();
             if (activeWalletId) {
-                const wallet = this.walletStore.wallets.find((wallet) => wallet._id === activeWalletId);
-                this.walletStore.wallet = wallet || null;
+                const wallet = this.walletStore.wallets.find((wallet) => wallet._id === activeWalletId) || null;
+                this.walletStore.setWallet(wallet);
             }
         },
         setDefaultWallet() {
-            const wallet = this.walletStore.wallets.find(
-                (wallet) => wallet.variant === WalletVariant.Safe || wallet.variant === WalletVariant.WalletConnect,
-            );
-            this.walletStore.wallet = wallet || null;
+            const wallet =
+                this.walletStore.wallets.find(
+                    (wallet) => wallet.variant === WalletVariant.Safe || wallet.variant === WalletVariant.WalletConnect,
+                ) || null;
+            this.walletStore.setWallet(wallet);
         },
         listRewards() {
             this.walletStore.list();
         },
         onClickWallet(wallet: TWallet) {
-            this.walletStore.wallet = wallet;
+            this.walletStore.setWallet(wallet);
             this.accountStore.setGlobals({ activeWalletId: wallet._id });
             this.listRewards();
         },

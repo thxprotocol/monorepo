@@ -79,6 +79,8 @@ export default defineComponent({
                     message: this.message,
                     signature: this.signature,
                 });
+
+                this.$emit('close');
             } catch (error) {
                 this.error = error as string;
             } finally {

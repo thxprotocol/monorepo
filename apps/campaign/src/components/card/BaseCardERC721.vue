@@ -113,13 +113,14 @@
 </template>
 
 <script lang="ts">
+import poll from 'promise-poller';
 import { defineComponent, PropType } from 'vue';
 import { useWalletStore } from '../../stores/Wallet';
 import { mapStores } from 'pinia';
-import poll from 'promise-poller';
 import { NFTVariant } from '../../types/enums/nft';
 import { useAccountStore } from '../../stores/Account';
 import { toast } from '../../utils/toast';
+import { WalletVariant } from '../../types/enums/accountVariant';
 
 export default defineComponent({
     name: 'BaseCardERC721',
@@ -145,9 +146,13 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
         isNotOwner() {
-            if (!this.walletStore.wallet) return;
+            if (!this.walletStore.wallet) return false;
             const { address } = this.walletStore.wallet;
-            return this.owner && this.owner !== address;
+            return this.owner ? this.owner !== address : false;
+        },
+        isDisabledTransfer() {
+            if (!this.walletStore.wallet) return true;
+            return this.walletStore.wallet.variant !== WalletVariant.Safe;
         },
     },
     watch: {
@@ -169,26 +174,28 @@ export default defineComponent({
             getTokenMap[this.token.nft.variant]();
         },
         async getERC721Token() {
-            const { api } = useAccountStore();
-            const token = await api.erc721.get(this.token._id);
+            if (!this.walletStore.wallet) return;
+            const token = await this.accountStore.api.request.get(`/v1/erc721/token/${this.token._id}`, {
+                params: { walletId: this.walletStore.wallet._id },
+            });
             this.owner = token.owner;
         },
         async getERC1155Token() {
-            const { api } = useAccountStore();
-            const token = await api.erc1155.get(this.token._id);
+            if (!this.walletStore.wallet) return;
+            const token = await this.accountStore.api.request.get(`/v1/erc1155/token/${this.token._id}`, {
+                params: { walletId: this.walletStore.wallet._id },
+            });
             this.balance = token.balance;
         },
         onModalTransferHidden() {
             this.isModalTransferShown = false;
         },
-        async transferERC721() {},
-        async transferERC1155() {},
         async onSubmitTransfer(config: TNFTTransferConfig) {
             try {
                 this.isSubmitting = true;
                 await this.walletStore.transfer(config);
                 this.isModalTransferShown = false;
-                toast('Processing transaction...', 'dark', 45000, () => {}, this.walletStore.list);
+                toast('Processing transaction...', 'dark', 45000, this.walletStore.list);
             } catch (error) {
                 this.error = 'Transaction failed';
                 console.error(error);

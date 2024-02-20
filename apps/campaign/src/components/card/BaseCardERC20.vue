@@ -73,33 +73,13 @@ export default defineComponent({
                 this.isPendingTransfer = true;
                 await this.walletStore.transferERC20(config);
                 this.isModalTransferShown = false;
-                toast(
-                    'Executing transaction...',
-                    'dark',
-                    45000,
-                    () => {},
-                    async () => {
-                        await this.walletStore.list();
-                    },
-                );
+                toast('Executing transaction...', 'dark', 45000, this.walletStore.list);
             } catch (error) {
                 this.error = 'Transaction failed.';
                 console.error(error);
             } finally {
                 this.isPendingTransfer = false;
             }
-        },
-        async onClickMigrate() {
-            this.isMigratingTokens = true;
-            toast(
-                'Transfer to Safe Wallet...',
-                'dark',
-                15000,
-                async () => await this.accountStore.migrate({ erc20Id: this.token.erc20._id }),
-                async () => await this.walletStore.list(),
-            );
-
-            this.isMigratingTokens = false;
         },
     },
 });

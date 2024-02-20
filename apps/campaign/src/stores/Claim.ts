@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
-// import { track } from '@thxnetwork/mixpanel';
 
 export const useClaimStore = defineStore('claims', {
     state: (): TClaimState => ({
@@ -27,11 +26,11 @@ export const useClaimStore = defineStore('claims', {
 
             return r;
         },
-        async collect(uuid: string) {
+        async collect(uuid: string, wallet: TWallet) {
             const { api, account, poolId, config } = useAccountStore();
             if (!this.claim) this.getClaim(uuid);
 
-            await api.claims.collect({ poolId, claimUuid: uuid });
+            await api.request.post(`/v1/claims/${uuid}/collect`, { params: { walletId: wallet._id } });
 
             sessionStorage.removeItem('thxClaimUuid');
 

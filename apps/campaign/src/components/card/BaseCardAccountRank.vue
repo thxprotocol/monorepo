@@ -20,16 +20,11 @@
                         <div class="px-3" style="min-width: 200px">
                             <h3 class="text-white mb-0">{{ accountStore.account?.username }}</h3>
                             <div class="text-white text-opaque mb-1">Rank: #{{ participant.rank }}</div>
-                            <b-progress
-                                style="height: 13px"
-                                :max="Number(participant.balance) + Number(questStore.availablePoints)"
-                            >
+                            <b-progress style="height: 13px" :max="balance + Number(questStore.availablePoints)">
                                 <b-progress-bar
                                     variant="success"
-                                    :value="Number(participant.balance)"
-                                    :label="`${participant.balance}/${
-                                        Number(participant.balance) + Number(questStore.availablePoints)
-                                    }`"
+                                    :value="balance"
+                                    :label="`${balance}/${balance + Number(questStore.availablePoints)}`"
                                 />
                             </b-progress>
                         </div>
@@ -69,6 +64,10 @@ export default defineComponent({
         },
         participant() {
             return this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
+        },
+        balance() {
+            if (!this.participant) return 0;
+            return Number(this.participant.balance);
         },
     },
 });

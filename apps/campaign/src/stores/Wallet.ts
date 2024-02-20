@@ -66,20 +66,24 @@ export const useWalletStore = defineStore('wallet', {
             await api.request.post('/v1/connect', { data });
             await this.listWallets();
         },
+        async setWallet(wallet: TWallet | null) {
+            const authStore = useAuthStore();
+            this.wallet = wallet;
+
+            // Check if there are pending transactions and confirm them
+            if (this.wallet && this.wallet.pendingTransactions.length) {
+                // Trigger login and get private key
+                if (!authStore.privateKey) {
+                    await authStore.triggerLogin();
+                    await authStore.getPrivateKey();
+                }
+                await this.confirmTransactions(this.wallet.pendingTransactions);
+            }
+        },
         async listWallets() {
             const { api, account } = useAccountStore();
             if (!account) return;
             this.wallets = await api.request.get(`/v1/account/wallets`);
-            for (const wallet of this.wallets) {
-                for (const tx of wallet.pendingTransactions) {
-                    try {
-                        if (!tx.safeTxHash) continue;
-                        await this.confirmTransaction(wallet, tx.safeTxHash);
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }
-            }
         },
         async getERC721Token({ _id }: TERC721Token) {
             const { api } = useAccountStore();
@@ -89,13 +93,14 @@ export const useWalletStore = defineStore('wallet', {
             this.erc721[index] = { ...token, component: 'BaseCardERC721' };
         },
         async list() {
+            if (!this.wallet) return;
             const { api } = useAccountStore();
             this.isLoading = true;
 
             const [erc20, erc721, erc1155, couponCodes] = await Promise.all([
-                api.erc20.list({ walletId: this.wallet?._id }),
-                api.erc721.list({ walletId: this.wallet?._id }),
-                api.erc1155.list({ walletId: this.wallet?._id }),
+                api.erc20.list({ walletId: this.wallet._id }),
+                api.erc721.list({ walletId: this.wallet._id }),
+                api.erc1155.list({ walletId: this.wallet._id }),
                 api.couponCodes.list(),
             ]);
 
@@ -109,26 +114,32 @@ export const useWalletStore = defineStore('wallet', {
 
             this.isLoading = false;
         },
-        async transferERC20(wallet: TWallet, config: TERC20TransferConfig) {
+        async transferERC20(config: TERC20TransferConfig) {
+            if (!this.wallet) return;
+
             const { api, account } = useAccountStore();
-            const response = await api.erc20.transfer(config);
-            await this.confirmTransaction(wallet, response.safeTxHash);
+            const data = { walletId: this.wallet._id, ...config };
+            const response = await api.request.post('/v1/erc20/transfer', { data });
+            await this.confirmTransaction(response.safeTxHash);
             track('UserCreates', [account?.sub, 'erc20 transfer']);
         },
-        async transfer(wallet: TWallet, config: TNFTTransferConfig) {
+        async transfer(config: TNFTTransferConfig) {
+            if (!this.wallet) return;
+
             const { api, account } = useAccountStore();
+            const data = { walletId: this.wallet._id, ...config };
 
             let response;
             if (config.erc1155Id) {
-                response = await api.erc1155.transfer(config);
+                response = await api.request.post('/v1/erc1155/transfer', { data });
                 track('UserCreates', [account?.sub, 'ERC1155 transfer']);
             }
             if (config.erc721Id) {
-                response = await api.erc721.transfer(config);
+                response = await api.request.post('/v1/erc721/transfer', { data });
                 track('UserCreates', [account?.sub, 'ERC721 transfer']);
             }
 
-            await this.confirmTransaction(wallet, response.safeTxHash);
+            await this.confirmTransaction(response.safeTxHash);
         },
         getRPC(chainId: ChainId) {
             switch (chainId) {
@@ -153,30 +164,32 @@ export const useWalletStore = defineStore('wallet', {
                     return { url: POLYGON_RPC };
             }
         },
-        async confirmTransaction(wallet: TWallet, safeTxHash: string) {
-            const { api } = useAccountStore();
-            const { privateKey } = useAuthStore();
-            if (!wallet || !privateKey || wallet.variant !== WalletVariant.Safe) return;
+        async confirmTransaction(safeTxHash: string) {
+            if (!this.wallet || this.wallet.variant !== WalletVariant.Safe) return;
 
-            const rpc = this.getRPC(wallet.chainId);
+            const { api } = useAccountStore();
+            const authStore = useAuthStore();
+            if (!authStore.privateKey) return;
+
+            const rpc = this.getRPC(this.wallet.chainId);
             const provider = new ethers.providers.JsonRpcProvider(rpc.url);
-            const signer = new ethers.Wallet(privateKey, provider);
+            const signer = new ethers.Wallet(authStore.privateKey, provider);
             const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer }) as any;
             const config: SafeConfig = {
                 ethAdapter,
-                safeAddress: wallet.address,
+                safeAddress: this.wallet.address,
                 contractNetworks: rpc.contractNetworks,
             };
             const safe = await Safe.create(config);
             const signature = await safe.signTransactionHash(safeTxHash);
 
-            return await api.request.post(`/v1/account/wallet/confirm`, {
-                data: JSON.stringify({ chainId: wallet.chainId, safeTxHash, signature: signature.data }),
+            return await api.request.post(`/v1/account/wallets/confirm`, {
+                data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature: signature.data }),
             });
         },
-        async confirmTransactions(wallet: TWallet, transactions: TTransaction[]) {
+        async confirmTransactions(transactions: TTransaction[]) {
             for (const tx of transactions) {
-                await this.confirmTransaction(wallet, tx.safeTxHash);
+                await this.confirmTransaction(tx.safeTxHash);
             }
         },
         async getBalance(tokenAddress: string) {
@@ -194,12 +207,12 @@ export const useWalletStore = defineStore('wallet', {
             if (!this.allowances[params.tokenAddress]) this.allowances[params.tokenAddress] = {};
             this.allowances[params.tokenAddress][params.spender] = Number(allowanceInWei);
         },
-        async approve(wallet: TWallet, data: TRequestBodyApproval) {
+        async approve(data: TRequestBodyApproval) {
             const { api } = useAccountStore();
             const [tx] = await api.request.post('/v1/ve/approve', {
                 data,
             });
-            await useWalletStore().confirmTransaction(wallet, tx.safeTxHash);
+            await useWalletStore().confirmTransaction(tx.safeTxHash);
         },
     },
 });

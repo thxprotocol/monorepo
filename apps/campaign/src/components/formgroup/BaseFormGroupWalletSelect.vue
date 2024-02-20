@@ -1,5 +1,9 @@
 <template>
-    <b-form-group description="This reward requires a crypto wallet for your account.">
+    <b-form-group>
+        <template #description>
+            This reward requires a crypto wallet for your account.
+            <b-link @click="onClickAdd">Add a new wallet</b-link>
+        </template>
         <b-form-select v-model="wallet" placeholder="Choose a wallet">
             <b-form-select-option :value="null" disabled>Choose a wallet...</b-form-select-option>
             <b-form-select-option v-for="wallet in wallets" :value="wallet" :disabled="chainId !== wallet.chainId">
@@ -25,7 +29,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useWalletStore),
         wallets() {
-            return this.walletStore.wallets.filter((wallet) =>
+            return this.walletStore.wallets.filter((wallet: TWallet) =>
                 [WalletVariant.Safe, WalletVariant.WalletConnect].includes(wallet.variant),
             );
         },
@@ -39,6 +43,11 @@ export default defineComponent({
         chainId: {
             type: Number,
             required: true,
+        },
+    },
+    methods: {
+        onClickAdd() {
+            this.walletStore.isModalWalletCreateShown = true;
         },
     },
 });

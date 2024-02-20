@@ -8,9 +8,9 @@
             <b-spinner show size="sm" />
         </div>
         <template v-else>
-            <b-alert v-model="isVariantMetamask" variant="warning" class="py-1 px-2">
+            <b-alert v-model="isDisabledTransfer" variant="primary" class="p-2">
                 <i class="fas fa-exclamation-circle me-1"></i>
-                Please use Metamask to transfer this token.
+                Transfer this token using another wallet like Metamask.
             </b-alert>
 
             <b-alert v-model="isAlertErrorShown" variant="danger" class="p-2">
@@ -36,10 +36,11 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { useAccountStore } from '../../stores/Account';
 import { isAddress } from 'web3-utils';
-import { AccountVariant } from '../../types/enums/accountVariant';
 import { NFTVariant } from '../../types/enums/nft';
+import { mapStores } from 'pinia';
+import { useWalletStore } from '../../stores/Wallet';
+import { WalletVariant } from '../../types/enums/accountVariant';
 
 export default defineComponent({
     name: 'BaseModalERC721Transfer',
@@ -47,18 +48,19 @@ export default defineComponent({
         return { NFTVariant, isShown: false, amount: 0, erc1155Amount: 0, receiver: '' };
     },
     computed: {
+        ...mapStores(useWalletStore),
         isSubmitDisabled: function () {
-            return this.isLoading || !this.isReceiverValid || this.isVariantMetamask;
+            return this.isLoading || !this.isReceiverValid || this.isDisabledTransfer;
         },
         isReceiverValid: function () {
             return this.receiver ? isAddress(this.receiver) : undefined;
         },
-        isVariantMetamask: function () {
-            const { account } = useAccountStore();
-            return account?.variant === AccountVariant.Metamask;
-        },
         isAlertErrorShown() {
             return !!this.error;
+        },
+        isDisabledTransfer() {
+            if (!this.walletStore.wallet) return true;
+            return this.walletStore.wallet.variant !== WalletVariant.Safe;
         },
     },
     props: {
@@ -66,19 +68,13 @@ export default defineComponent({
             type: String,
             required: true,
         },
-        error: {
-            type: String,
-        },
-        show: {
-            type: Boolean,
-        },
-        isLoading: {
-            type: Boolean,
-        },
         token: {
             type: Object as PropType<TERC721Token>,
             required: true,
         },
+        error: String,
+        show: Boolean,
+        isLoading: Boolean,
     },
     watch: {
         show(value) {

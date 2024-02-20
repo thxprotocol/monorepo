@@ -119,12 +119,12 @@ export default defineComponent({
                     signature: this.signature,
                 });
 
-                this.isLoading = false;
                 this.$emit('close');
             } catch (error) {
-                this.isLoading = false;
                 this.isCreateFailed = true;
                 console.error(error);
+            } finally {
+                this.isLoading = false;
             }
         },
     },

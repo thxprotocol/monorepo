@@ -10,6 +10,7 @@
             <BaseSidebar />
         </div>
         <BaseModalAccount size="lg" />
+        <BaseModalWalletCreate size="lg" />
     </div>
 </template>
 <script lang="ts">
@@ -25,9 +26,7 @@ import './scss/main.scss';
 
 export default defineComponent({
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useWalletStore),
+        ...mapStores(useAccountStore, useAuthStore, useWalletStore),
         isOffline() {
             try {
                 return JSON.parse(MAINTENANCE);

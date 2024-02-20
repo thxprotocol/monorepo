@@ -43,7 +43,7 @@ export const useAccountStore = defineStore('account', {
             const storageString = JSON.stringify(config);
             localStorage.setItem('thx:app:config', storageString);
         },
-        globals(): TAccountGlobals {
+        globals(): Partial<TAccountGlobals> {
             const storedString = localStorage.getItem('thx:app:config');
             if (!storedString) return {};
             return JSON.parse(storedString);
