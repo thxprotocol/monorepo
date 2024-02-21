@@ -20,7 +20,7 @@
                     {{ walletStore.wallet.short }}
                 </div>
                 <div v-else>Select your wallet</div>
-                <i class="fas fa-ellipsis-v ms-auto" />
+                <i class="fas fa-caret-down ms-auto"></i>
             </template>
             <b-dropdown-item
                 v-for="wallet of walletStore.wallets"
@@ -80,8 +80,11 @@ export default defineComponent({
         ...mapStores(useWalletStore, useAccountStore),
     },
     watch: {
-        'walletStore.wallets': {
-            async handler() {
+        'accountStore.account': {
+            async handler(account) {
+                if (!account) return;
+                await this.walletStore.listWallets();
+
                 // Check if there a preferred wallet in global config
                 this.setActiveWallet();
 

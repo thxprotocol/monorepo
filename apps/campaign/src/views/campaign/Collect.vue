@@ -134,6 +134,15 @@ export default defineComponent({
             isLoadingCollectComplete: false,
         };
     },
+    watch: {
+        'accountStore.account': {
+            async handler(account) {
+                if (!account) return;
+                this.walletStore.listWallets();
+            },
+            immediate: true,
+        },
+    },
     async mounted() {
         this.uuid = this.$route.params.uuid as string;
         this.claimsStore.getClaim(this.uuid);

@@ -16,7 +16,6 @@ export const useRewardStore = defineStore('reward', {
         },
         createERC20Redemption: async function (id: string, wallet: TWallet) {
             const { api, account, poolId, config } = useAccountStore();
-            console.log(id, wallet._id);
             const r = await api.request.post(`/v1/rewards/coin/${id}/payments`, {
                 data: { walletId: wallet._id },
             });

@@ -1,7 +1,8 @@
 <template>
     <b-container>
         <b-row>
-            <b-col lg="6" offset-lg="3">
+            <b-col lg="6" offset-lg="3" class="px-0">
+                <BaseCardWallets />
                 <BaseCardRewards />
             </b-col>
         </b-row>

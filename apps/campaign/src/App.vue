@@ -59,5 +59,10 @@ export default defineComponent({
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
+
+    @media (min-width: 991px) {
+        // 100% minus navbar top
+        height: calc(100% - 30px) !important;
+    }
 }
 </style>

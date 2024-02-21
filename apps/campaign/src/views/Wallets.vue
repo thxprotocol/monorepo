@@ -2,6 +2,7 @@
     <b-container>
         <b-row>
             <b-col lg="6" offset-lg="3">
+                <BaseCardWallets />
                 <BaseCardRewards />
             </b-col>
         </b-row>

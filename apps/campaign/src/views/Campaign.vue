@@ -10,7 +10,7 @@
         </b-container>
         <template v-else>
             <BaseCardAccountRank :height="200" />
-            <router-view class="order-lg-2 overflow-mobile" />
+            <router-view class="order-lg-2 overflow-mobile flex-grow-1" />
         </template>
         <BaseNavbarPrimary :screen-width="screenWidth" />
     </div>
