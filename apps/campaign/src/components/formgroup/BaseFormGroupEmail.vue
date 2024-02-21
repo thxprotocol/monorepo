@@ -1,7 +1,12 @@
 <template>
-    <b-form-group label="E-mail" :state="isEmailValid" :invalid-feedback="String(error)" class="mb-0">
+    <b-form-group :state="isEmailValid" :invalid-feedback="String(error)" class="mb-0" label-class="d-flex">
+        <template #label>
+            E-mail
+            <b-spinner v-if="isLoadingResend" class="ms-auto" small variant="primary" />
+            <b-link v-else @click="onClickResend" class="ms-auto">Re-send e-mail</b-link>
+        </template>
         <template #description v-if="!isEmailVerified">
-            <span class="text-danger"> E-mail is not verified! <b-link>Re-send verification e-mail</b-link> </span>
+            <span class="text-danger"> E-mail is not verified</span>
         </template>
         <b-input-group>
             <b-form-input
@@ -37,6 +42,7 @@ export default defineComponent({
             value: '',
             error: '',
             debounce: 0,
+            isLoadingResend: false,
             isLoading: false,
         };
     },
@@ -50,7 +56,6 @@ export default defineComponent({
             return;
         },
         isEmailVerified() {
-            console.log(this.accountStore.account);
             if (!this.accountStore.account) return false;
             if (!this.accountStore.account.email) return false;
             return this.accountStore.account.isEmailVerified;
@@ -72,6 +77,11 @@ export default defineComponent({
         onChange() {
             if (this.isLoading) return;
             this.update();
+        },
+        async onClickResend() {
+            this.isLoadingResend = true;
+            await this.accountStore.update({ email: this.value });
+            this.isLoadingResend = false;
         },
         async update() {
             if (this.isInvalidInput) {

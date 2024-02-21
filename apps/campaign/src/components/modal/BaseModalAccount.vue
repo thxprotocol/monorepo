@@ -19,36 +19,40 @@
         </div>
         <b-form v-else>
             <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
-            <b-tabs justified content-class="mt-3">
-                <b-tab title="Settings">
-                    <b-row>
-                        <b-col cols="8">
-                            <BaseFormGroupUsername class="mb-3" />
-                            <BaseFormGroupEmail class="mb-3" />
-                        </b-col>
-                        <b-col cols="4" class="d-flex align-items-center justify-content-center">
-                            <BaseFormGroupAvatar />
-                        </b-col>
-                    </b-row>
-                    <hr />
-                    <BaseFormGroupAccountVariant v-if="isMetamaskAccount" class="mb-3" />
-                    <b-form-group label="Account ID">
-                        <code>{{ accountStore.account.sub }}</code>
-                    </b-form-group>
-                </b-tab>
-                <b-tab title="Connected">
-                    <BaseFormGroupConnected class="mb-3" />
-                </b-tab>
-                <!-- <b-tab title="Subscriptions">
-                    <BaseFormGroupSubscription v-if="accountStore.poolId && questStore.quests.length" class="mb-3" />
-                </b-tab> -->
-            </b-tabs>
+            <b-row>
+                <b-col cols="8">
+                    <BaseFormGroupUsername class="mb-3" />
+                    <BaseFormGroupEmail class="mb-3" />
+                </b-col>
+                <b-col cols="4" class="d-flex align-items-center justify-content-center">
+                    <BaseFormGroupAvatar />
+                </b-col>
+            </b-row>
+            <BaseFormGroupAccountVariant v-if="isMetamaskAccount" class="mb-3" />
+            <BaseFormGroupConnected class="mb-3" />
+            <b-form-group label="Account ID">
+                <b-input-group>
+                    <b-form-input v-model="accountStore.account.sub" disabled />
+                    <b-input-group-append>
+                        <b-button
+                            size="sm"
+                            variant="primary"
+                            v-clipboard:copy="accountStore.account.sub"
+                            v-clipboard:success="onCopySuccess"
+                        >
+                            <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
+                            <i v-else class="fas fa-clipboard px-2"></i>
+                        </b-button>
+                    </b-input-group-append>
+                </b-input-group>
+            </b-form-group>
+            <!-- <BaseFormGroupSubscription v-if="accountStore.poolId && questStore.quests.length" class="mb-3" /> -->
         </b-form>
         <template #footer>
             <b-button
                 class="w-100"
                 variant="primary"
-                :disabled="isMetamaskAccount"
+                :disabled="isMetamaskAccount || !isEmailVerified"
                 @click="accountStore.isModalAccountShown = false"
             >
                 Close
@@ -76,6 +80,7 @@ export default defineComponent({
         return {
             AccountVariant,
             error: '',
+            isCopied: false,
             isLoadingReset: false,
         };
     },
@@ -84,6 +89,10 @@ export default defineComponent({
         isMetamaskAccount() {
             if (!this.accountStore.account) return false;
             return this.accountStore.account.variant === AccountVariant.Metamask;
+        },
+        isEmailVerified() {
+            if (!this.accountStore.account) return false;
+            return this.accountStore.account.isEmailVerified;
         },
     },
     methods: {
@@ -94,6 +103,9 @@ export default defineComponent({
         onClickSignout() {
             this.accountStore.signout();
             this.accountStore.isModalAccountShown = false;
+        },
+        onCopySuccess() {
+            this.isCopied = true;
         },
     },
 });

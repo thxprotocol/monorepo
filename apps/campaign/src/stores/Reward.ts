@@ -45,12 +45,12 @@ export const useRewardStore = defineStore('reward', {
 
             track('UserCreates', [account?.sub, 'custom reward redemption', { poolId, origin: config.origin }]);
         },
-        createCouponRedemption: async function (uuid: string) {
+        createCouponRedemption: async function (id: string) {
             const { api, account, poolId, config } = useAccountStore();
-            const r = await api.rewards.coupon.redemption.post(uuid);
+            const r = await api.request.post(`/v1/rewards/coupon/${id}/payments`);
             if (r.error) throw r.error;
 
-            this.updateSupply(uuid);
+            this.updateSupply(id);
 
             track('UserCreates', [account?.sub, 'coupon reward redemption', { poolId, origin: config.origin }]);
         },

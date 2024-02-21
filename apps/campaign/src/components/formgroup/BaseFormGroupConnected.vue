@@ -1,8 +1,5 @@
 <template>
-    <b-form-group
-        label="Your connected accounts"
-        description="Connections used for signing in can not be disconnected!"
-    >
+    <b-form-group label="Connected accounts">
         <b-alert v-model="isErrorShown" show variant="danger" class="p-2">{{ error }}</b-alert>
         <template v-for="provider of providers">
             <div class="px-3 py-2 d-flex align-items-center">
@@ -16,7 +13,7 @@
                         :disabled="provider.isDisabled"
                         @click="onClickDisconnect(provider.kind)"
                         variant="link"
-                        class="text-danger text-decoration-none"
+                        class="text-decoration-none"
                         size="sm"
                         v-if="provider.isConnected"
                     >
