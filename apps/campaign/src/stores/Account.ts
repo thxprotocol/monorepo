@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { track } from '@thxnetwork/mixpanel';
 import { THXBrowserClient } from '@thxnetwork/sdk';
-import { API_URL, AUTH_URL, WIDGET_URL } from '../config/secrets';
+import { API_URL, AUTH_URL, CLIENT_ID, WIDGET_URL } from '../config/secrets';
 import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
 import { BREAKPOINT_LG } from '../config/constants';
 import { useAuthStore } from './Auth';
@@ -202,6 +202,23 @@ export const useAccountStore = defineStore('account', {
             } else {
                 useAuthStore().requestOAuthShare(extraQueryParams);
             }
+        },
+        async verifyEmail(token: string, returnUrl: string) {
+            const { userManager } = useAuthStore();
+            await userManager.signinRedirect({
+                state: {
+                    isMobile: isMobileDevice,
+                    returnUrl,
+                    client_id: CLIENT_ID,
+                    origin: this.config.origin,
+                },
+                extraQueryParams: {
+                    prompt: 'verify_email',
+                    pool_id: this.poolId,
+                    return_url: returnUrl,
+                    verifyEmailToken: token,
+                },
+            });
         },
         async signout() {
             const { signout } = useAuthStore();

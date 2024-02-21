@@ -1,11 +1,14 @@
 <template>
-    <b-form-group label="E-mail" :state="isValidEmail" :invalid-feedback="String(error)" class="mb-0">
+    <b-form-group label="E-mail" :state="isEmailValid" :invalid-feedback="String(error)" class="mb-0">
+        <template #description v-if="!isEmailVerified">
+            <span class="text-danger"> E-mail is not verified! <b-link>Re-send verification e-mail</b-link> </span>
+        </template>
         <b-input-group>
             <b-form-input
                 v-model="value"
                 @input="onInput"
                 @change="onChange"
-                :state="isValidEmail"
+                :state="isEmailValid"
                 placeholder="john@example.io"
             />
             <b-input-group-append v-if="isLoading">
@@ -13,14 +16,9 @@
                     <b-spinner small />
                 </b-button>
             </b-input-group-append>
-            <b-input-group-append v-if="isVerified">
-                <b-button
-                    size="sm"
-                    :variant="accountStore.account?.isEmailVerified ? 'primary' : 'danger'"
-                    class="px-3"
-                    :disabled="true"
-                >
-                    <b-spinner small />
+            <b-input-group-append v-if="!isEmailVerified">
+                <b-button size="sm" variant="primary" class="px-3" @click="accountStore.getAccount()">
+                    <i class="fas fa-redo-alt"></i>
                 </b-button>
             </b-input-group-append>
         </b-input-group>
@@ -47,19 +45,19 @@ export default defineComponent({
         isInvalidInput() {
             return !this.value || !this.value.length || this.value.length < 3 || !this.value.includes('@');
         },
-        isValidEmail() {
+        isEmailValid() {
             if (this.isInvalidInput || this.error.length) return false;
             return;
         },
-        isVerified() {
-            if (!this.accountStore.account) return;
-            if (!this.accountStore.account.email) return;
+        isEmailVerified() {
+            console.log(this.accountStore.account);
+            if (!this.accountStore.account) return false;
+            if (!this.accountStore.account.email) return false;
             return this.accountStore.account.isEmailVerified;
         },
     },
     mounted() {
-        if (!this.accountStore.account) return;
-        this.value = this.accountStore.account.email;
+        this.value = this.accountStore.account ? this.accountStore.account.email : '';
     },
     methods: {
         reset() {
@@ -83,6 +81,8 @@ export default defineComponent({
 
             try {
                 await this.accountStore.update({ email: this.value });
+                await this.accountStore.getAccount();
+
                 this.error = '';
             } catch (error) {
                 this.error = 'This email is not valid.';

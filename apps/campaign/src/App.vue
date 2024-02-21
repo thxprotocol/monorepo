@@ -21,6 +21,7 @@ import { mapStores } from 'pinia';
 import { useAuthStore } from './stores/Auth';
 import { useAccountStore } from './stores/Account';
 import { useWalletStore } from './stores/Wallet';
+import { AccountVariant } from './types/enums/accountVariant';
 
 import './scss/main.scss';
 
@@ -46,6 +47,12 @@ export default defineComponent({
     watch: {
         'accountStore.isSidebarShown'() {
             document.body.classList[this.accountStore.isMobile ? 'add' : 'remove']('overflow-hidden');
+        },
+        'accountStore.account'(account: TAccount) {
+            if (!account) return;
+            if (account.variant === AccountVariant.Metamask) {
+                this.accountStore.isModalAccountShown = true;
+            }
         },
     },
     async created() {

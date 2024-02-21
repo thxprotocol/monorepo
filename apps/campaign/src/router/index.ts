@@ -1,3 +1,4 @@
+import { useAuthStore } from '../stores/Auth';
 import { useAccountStore } from '../stores/Account';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
@@ -24,6 +25,7 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'home',
                 component: () => import(/* webpackChunkName: "home" */ '../views/discovery/Home.vue'),
             },
+
             {
                 path: '/learn',
                 name: 'learn',
@@ -46,6 +48,15 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import(/* webpackChunkName: "wallets" */ '../views/Wallets.vue'),
             },
         ],
+    },
+    {
+        path: '/verify_email',
+        name: '',
+        beforeEnter: async (to) => {
+            const { verifyEmailToken, return_url } = to.query;
+            await useAccountStore().verifyEmail(verifyEmailToken as string, return_url as string);
+        },
+        component: () => import(/* webpackChunkName: "home" */ '../views/discovery/Home.vue'),
     },
     {
         path: '/c/:slug',

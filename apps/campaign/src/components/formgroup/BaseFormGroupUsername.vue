@@ -1,5 +1,5 @@
 <template>
-    <b-form-group label="Nickname" :state="isValidUsername" :invalid-feedback="String(error)" class="mb-0">
+    <b-form-group label="Username" :state="isValidUsername" :invalid-feedback="String(error)" class="mb-0">
         <b-input-group>
             <b-form-input
                 v-model="value"
