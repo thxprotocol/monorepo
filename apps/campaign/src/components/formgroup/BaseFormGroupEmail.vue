@@ -81,6 +81,7 @@ export default defineComponent({
         async onClickResend() {
             this.isLoadingResend = true;
             await this.accountStore.update({ email: this.value });
+            await this.accountStore.getAccount();
             this.isLoadingResend = false;
         },
         async update() {
