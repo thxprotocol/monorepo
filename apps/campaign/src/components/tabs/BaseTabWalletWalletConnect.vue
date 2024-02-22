@@ -1,4 +1,5 @@
 <template>
+    <b-alert v-model="isAlertShown" variant="primary" class="p-2">{{ error }}</b-alert>
     <b-form-group>
         <strong>Proof ownership</strong>
         <p class="text-opaque">Sign this message using your wallet to confirm it's address.</p>
@@ -22,7 +23,7 @@
         <template v-else> Open WalletConnect </template>
     </b-button>
     <BaseButtonWalletConnect v-else @signed="onSigned" /> -->
-    <BaseButtonWalletConnect @signed="onSigned" />
+    <BaseButtonWalletConnect @signed="onSigned" @error="error = $event" />
 </template>
 
 <script lang="ts">
@@ -50,6 +51,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useWalletStore),
+        isAlertShown() {
+            return !!this.error;
+        },
     },
     methods: {
         deeplink(uuid: string) {

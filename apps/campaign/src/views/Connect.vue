@@ -3,8 +3,11 @@
         <b-row>
             <b-col xl="6" offset-xl="3">
                 <b-card>
-                    <b-alert v-model="isSuccess" variant="success" show dismissible>
-                        <p class="mb-0">Wallet connected successfully.</p>
+                    <b-alert v-model="isSuccess" variant="success" dismissible class="p-2">
+                        Your wallet is now connected!
+                    </b-alert>
+                    <b-alert v-model="isAlertErrorShown" variant="primary" dismissible class="p-2">
+                        {{ error }}
                     </b-alert>
                     <b-form-group>
                         <strong>Proof ownership</strong>
@@ -18,7 +21,7 @@
                             <span class="text-opaque">{{ address }}</span>
                         </b-form-group>
                     </b-form-group>
-                    <BaseButtonWalletConnect @signed="onSigned" />
+                    <BaseButtonWalletConnect @signed="onSigned" @error="error = $event" />
                 </b-card>
             </b-col>
         </b-row>
@@ -50,6 +53,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useWalletStore, useAccountStore),
+        isAlertErrorShown() {
+            return !!this.error;
+        },
     },
     mounted() {
         if (!this.$route.params.uuid) {
