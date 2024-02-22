@@ -11,7 +11,7 @@
             <span class="text-opaque">{{ address }}</span>
         </b-form-group>
     </b-form-group>
-    <b-button
+    <!-- <b-button
         v-if="accountStore.isMobileEthereumBrowser"
         @click="onClickDeeplink"
         :disabled="isLoading"
@@ -21,7 +21,8 @@
         <b-spinner small v-if="isLoading" />
         <template v-else> Open WalletConnect </template>
     </b-button>
-    <BaseButtonWalletConnect v-else @signed="onSigned" />
+    <BaseButtonWalletConnect v-else @signed="onSigned" /> -->
+    <BaseButtonWalletConnect @signed="onSigned" />
 </template>
 
 <script lang="ts">
