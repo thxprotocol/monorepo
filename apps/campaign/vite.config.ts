@@ -18,6 +18,7 @@ const config: UserConfigExport = {
     ],
     server: {
         https: true,
+        // host: '192.168.178.12',
         host: 'localhost',
         port: 8080,
     },

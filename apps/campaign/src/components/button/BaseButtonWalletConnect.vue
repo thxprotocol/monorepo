@@ -11,29 +11,24 @@ import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
-import { GetAccountResult, PublicClient, getAccount } from '@wagmi/core';
-import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { signMessage } from '@wagmi/core';
 import { chainList } from '../../utils/chains';
-import { getModal } from '../../utils/wallet-connect';
-import { Web3Modal } from '@web3modal/html';
+import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
+import { WALLET_CONNECT_PROJECT_ID } from '../../config/secrets';
+import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
+import { watchAccount, disconnect, signMessage } from '@wagmi/core';
+
+const projectId = WALLET_CONNECT_PROJECT_ID;
 
 export default defineComponent({
     name: 'BaseButtonWalletConnect',
-    data(): {
-        account: GetAccountResult<PublicClient> | null;
-        modal: Web3Modal | null;
-        isModalOpen: boolean;
-        chainList: { [chainId: number]: ChainInfo };
-        unsubscribe: any;
-        isLoading: boolean;
-    } {
+    data() {
         return {
-            account: null,
-            modal: null,
+            signature: '',
+            account: null as any,
+            modal: null as any,
+            wagmiConfig: null,
             isModalOpen: false,
             chainList,
-            unsubscribe: null,
             isLoading: false,
         };
     },
@@ -43,7 +38,7 @@ export default defineComponent({
     props: {
         chainId: {
             type: Number,
-            default: ChainId.Polygon,
+            default: ChainId.Ethereum,
         },
         message: {
             type: String,
@@ -51,23 +46,47 @@ export default defineComponent({
         },
     },
     mounted() {
-        const chains = [chainList[this.chainId].chain];
-        const theme = this.accountStore.poolId && this.accountStore.getTheme();
+        const wagmiConfig = defaultWagmiConfig({
+            chains: [chainList[this.chainId].chain],
+            projectId,
+            metadata: {
+                name: 'THX Network',
+                description: 'THX Network is a quest and reward ecosystem.',
+                url: 'https://thx.network', // origin must match your domain & subdomain
+                icons: ['https://auth.thx.network/img/logo.png'],
+            },
+            enableWalletConnect: true, // Optional - true by default
+            enableInjected: true, // Optional - true by default
+            enableEIP6963: true, // Optional - true by default
+            enableCoinbase: true, // Optional - true by default
+        });
 
-        this.modal = getModal(chainList[this.chainId].chain, chains, theme);
-        this.unsubscribe = this.modal.subscribeModal(this.onModalStateChange);
+        disconnect(wagmiConfig);
+
+        this.modal = createWeb3Modal({
+            wagmiConfig,
+            projectId,
+            defaultChain: chainList[this.chainId].chain,
+            themeMode: 'dark',
+            privacyPolicyUrl: '',
+        });
+
+        watchAccount(wagmiConfig, {
+            onChange: (account) => {
+                this.account = account;
+            },
+        });
     },
     methods: {
-        waitForConnected() {
-            return new Promise((resolve) => {
-                setInterval(() => {
-                    if (this.account?.isConnected) resolve('connected');
-                }, 500);
+        awaitAccount() {
+            return new Promise((resolve: any) => {
+                const interval = setInterval(() => {
+                    if (this.account && this.account.isConnected) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 100);
             });
-        },
-        onModalStateChange({ open }: { open: boolean }) {
-            this.isModalOpen = open;
-            this.account = getAccount();
         },
         async onClickConnect() {
             if (!this.modal) return;
@@ -75,19 +94,23 @@ export default defineComponent({
             this.isLoading = true;
 
             try {
-                this.modal.setDefaultChain(this.chainList[this.chainId].chain);
+                if (!this.account) await this.modal.open();
+                await this.awaitAccount();
+                if (!this.account) throw new Error('Could not connect to wallet');
 
-                await this.modal.openModal();
-                await this.waitForConnected();
+                this.signature = await signMessage(this.modal.wagmiConfig, {
+                    account: this.account,
+                    message: this.message,
+                });
 
-                const signature = await signMessage({ message: this.message });
-
-                if (!this.account) throw new Error('Not able to get the account.');
-
-                this.$emit('signed', { signature, message: this.message, address: this.account.address });
+                this.$emit('signed', {
+                    signature: this.signature,
+                    message: this.message,
+                    address: this.account.address,
+                });
             } catch (error) {
                 this.$emit('error', error as string);
-                this.modal.closeModal();
+                this.modal.close();
             } finally {
                 this.isLoading = false;
             }

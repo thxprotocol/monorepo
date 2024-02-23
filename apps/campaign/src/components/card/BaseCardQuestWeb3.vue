@@ -67,7 +67,7 @@
             <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
             <b-button-group v-else class="w-100" block>
-                <b-button variant="primary" block class="w-100" @click="onClickClaim">
+                <BaseButtonWalletConnect :chainId="chainId" @signed="onSigned">
                     <b-img
                         :src="chainList[chainId].logo"
                         class="me-2"
@@ -76,7 +76,7 @@
                         :alt="chainList[chainId].name"
                     />
                     Claim <strong>{{ quest.amount }}</strong> points
-                </b-button>
+                </BaseButtonWalletConnect>
                 <b-dropdown end variant="primary" no-caret toggle-class="pe-3">
                     <template #button-content>
                         <i class="fas fa-caret-down"></i>
@@ -103,12 +103,8 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useQuestStore } from '../../stores/Quest';
-import { getModal } from '../../utils/wallet-connect';
 import { chainList, getAddressURL } from '../../utils/chains';
-import { getAccount, GetAccountResult, PublicClient } from '@wagmi/core';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { signMessage } from '@wagmi/core';
-import { Web3Modal } from '@web3modal/html';
 
 export default defineComponent({
     name: 'BaseCardQuestSocial',
@@ -118,30 +114,14 @@ export default defineComponent({
             required: true,
         },
     },
-    data(): {
-        account: GetAccountResult<PublicClient> | null;
-        modal: Web3Modal | null;
-        error: string;
-        isModalOpen: boolean;
-        isSubmitting: boolean;
-        chainList: { [chainId: number]: ChainInfo };
-        getAddressURL: any;
-        show: boolean;
-        chainId: ChainId;
-        unsubscribe: any;
-        isModalQuestEntryShown: boolean;
-    } {
+    data() {
         return {
             error: '',
-            account: null,
-            modal: null,
-            isModalOpen: false,
+            message: '',
             isSubmitting: false,
             chainList,
             getAddressURL,
-            show: false,
             chainId: ChainId.Polygon,
-            unsubscribe: null,
             isModalQuestEntryShown: false,
         };
     },
@@ -152,57 +132,20 @@ export default defineComponent({
         isAlertDangerShown() {
             return !!this.error && !this.isSubmitting;
         },
-        accountStatus() {
-            if (!this.account) return 'text-opaque';
-            switch (this.account.status) {
-                case 'connected':
-                    return 'text-success';
-                case 'connecting':
-                    return 'text-warning';
-                case 'disconnected':
-                    return 'text-danger';
-                default:
-                    return 'text-opaque';
-            }
-        },
     },
     mounted() {
         if (!this.quest.isAvailable) return;
-        const chains = this.quest.contracts.map((contract: { chainId: ChainId }) => chainList[contract.chainId].chain);
-        const theme = this.accountStore.getTheme();
         this.chainId = this.quest.contracts[0].chainId;
-        this.modal = getModal(chainList[this.chainId].chain, chains, theme);
-        this.unsubscribe = this.modal.subscribeModal(this.onModalStateChange);
+        this.message = `This signature will be used to validate if the result of calling ${this.quest.methodName} on chain ${this.chainId} with the address used to sign this message is above the threshold of ${this.quest.threshold}.`;
     },
     methods: {
-        onModalStateChange({ open }: { open: boolean }) {
-            this.isModalOpen = open;
-            this.account = getAccount();
-        },
         onClickSignin: function () {
             this.accountStore.signin();
         },
-        waitForConnected() {
-            return new Promise((resolve) => {
-                setInterval(() => {
-                    if (this.account?.isConnected) resolve('connected');
-                }, 500);
-            });
-        },
-        onClickClaim: async function () {
-            if (!this.modal) return;
-
+        async onSigned({ signature, message }: { signature: string; message: string }) {
             this.error = '';
             this.isSubmitting = true;
-
             try {
-                this.modal.setDefaultChain(this.chainList[this.chainId].chain);
-                await this.modal.openModal();
-                await this.waitForConnected();
-
-                const message = `This signature will be used to validate if the result of calling ${this.quest.methodName} on chain ${this.chainId} with the address used to sign this message is above the threshold of ${this.quest.threshold}.`;
-                const signature = await signMessage({ message });
-
                 await this.questStore.completeWeb3Quest(this.quest, {
                     signature,
                     message,
@@ -212,7 +155,6 @@ export default defineComponent({
                 this.isModalQuestEntryShown = true;
             } catch (error) {
                 this.error = error as string;
-                this.modal.closeModal();
             } finally {
                 this.isSubmitting = false;
             }

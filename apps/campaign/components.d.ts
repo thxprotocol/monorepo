@@ -55,7 +55,6 @@ declare module 'vue' {
     BaseFormGroupInputTokenAmount: typeof import('./src/components/formgroup/BaseFormGroupInputTokenAmount.vue')['default']
     BaseFormGroupSubscription: typeof import('./src/components/formgroup/BaseFormGroupSubscription.vue')['default']
     BaseFormGroupUsername: typeof import('./src/components/formgroup/BaseFormGroupUsername.vue')['default']
-    BaseFormGroupVariant: typeof import('./src/components/formgroup/BaseFormGroupVariant.vue')['default']
     BaseFormGroupWalletAddress: typeof import('./src/components/formgroup/BaseFormGroupWalletAddress.vue')['default']
     BaseFormGroupWalletSelect: typeof import('./src/components/formgroup/BaseFormGroupWalletSelect.vue')['default']
     BaseModalAccount: typeof import('./src/components/modal/BaseModalAccount.vue')['default']
@@ -96,7 +95,6 @@ declare module 'vue' {
     BDropdown: typeof import('bootstrap-vue-next')['BDropdown']
     BDropdownDivider: typeof import('bootstrap-vue-next')['BDropdownDivider']
     BDropdownItem: typeof import('bootstrap-vue-next')['BDropdownItem']
-    BDropdownItemButton: typeof import('bootstrap-vue-next')['BDropdownItemButton']
     BForm: typeof import('bootstrap-vue-next')['BForm']
     BFormCheckbox: typeof import('bootstrap-vue-next')['BFormCheckbox']
     BFormFile: typeof import('bootstrap-vue-next')['BFormFile']
@@ -125,7 +123,6 @@ declare module 'vue' {
     BTab: typeof import('bootstrap-vue-next')['BTab']
     BTable: typeof import('bootstrap-vue-next')['BTable']
     BTabs: typeof import('bootstrap-vue-next')['BTabs']
-    copy: typeof import('./src/components/formgroup/BaseFormGroupEmail copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

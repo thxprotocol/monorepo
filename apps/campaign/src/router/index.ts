@@ -1,4 +1,3 @@
-import { useAuthStore } from '../stores/Auth';
 import { useAccountStore } from '../stores/Account';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
@@ -35,11 +34,6 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/earn',
                 name: 'earn',
                 component: () => import(/* webpackChunkName: "earn" */ '../views/discovery/Earn.vue'),
-            },
-            {
-                path: '/connect/:uuid',
-                name: 'connect',
-                component: () => import(/* webpackChunkName: "connect" */ '../views/Connect.vue'),
             },
             {
                 path: '/wallets',
