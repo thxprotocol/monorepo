@@ -5,7 +5,7 @@
     "scripts": {
         "postinstall": "node node_modules/@nx-plus/vue/patch-nx-dep-graph.js",
         "start": "nx serve",
-        "build": "NODE_OPTIONS='--openssl-legacy-provider --max-old-space-size=8192' && nx build",
+        "build": "NODE_OPTIONS='--openssl-legacy-provider --max-old-space-size=8192' nx build",
         "test": "nx test",
         "serve:app": "nx serve campaign"
     },
