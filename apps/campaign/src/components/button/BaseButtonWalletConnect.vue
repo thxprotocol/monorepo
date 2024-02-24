@@ -13,11 +13,9 @@ import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { chainList } from '../../utils/chains';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
-import { WALLET_CONNECT_PROJECT_ID } from '../../config/secrets';
+import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 import { watchAccount, disconnect, signMessage } from '@wagmi/core';
-
-const projectId = WALLET_CONNECT_PROJECT_ID;
 
 export default defineComponent({
     name: 'BaseButtonWalletConnect',
@@ -45,40 +43,36 @@ export default defineComponent({
             default: 'This signature will be used to proof ownership of a web3 account.',
         },
     },
-    mounted() {
+    async mounted() {
         const wagmiConfig = defaultWagmiConfig({
             chains: [chainList[this.chainId].chain],
-            projectId,
+            projectId: WALLET_CONNECT_PROJECT_ID,
             metadata: {
                 name: 'THX Network',
-                description: 'THX Network is a quest and reward ecosystem.',
-                url: 'https://thx.network', // origin must match your domain & subdomain
-                icons: ['https://auth.thx.network/img/logo.png'],
+                description: 'THX Network Campaign Discovery',
+                url: WIDGET_URL,
+                icons: [AUTH_URL + '/img/logo.png'],
             },
-            enableWalletConnect: true, // Optional - true by default
-            enableInjected: true, // Optional - true by default
-            enableEIP6963: true, // Optional - true by default
-            enableCoinbase: true, // Optional - true by default
         });
 
-        disconnect(wagmiConfig);
+        await disconnect(wagmiConfig);
 
         this.modal = createWeb3Modal({
             wagmiConfig,
-            projectId,
+            projectId: WALLET_CONNECT_PROJECT_ID,
             defaultChain: chainList[this.chainId].chain,
             themeMode: 'dark',
             privacyPolicyUrl: '',
         });
 
         watchAccount(wagmiConfig, {
-            onChange: (account) => {
-                this.account = account;
+            onChange: (a) => {
+                this.account = a;
             },
         });
     },
     methods: {
-        awaitAccount() {
+        waitForAccount() {
             return new Promise((resolve: any) => {
                 const interval = setInterval(() => {
                     if (this.account && this.account.isConnected) {
@@ -95,7 +89,7 @@ export default defineComponent({
 
             try {
                 if (!this.account) await this.modal.open();
-                await this.awaitAccount();
+                await this.waitForAccount();
                 if (!this.account) throw new Error('Could not connect to wallet');
 
                 this.signature = await signMessage(this.modal.wagmiConfig, {
