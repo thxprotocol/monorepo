@@ -34,6 +34,7 @@ export const useAuthStore = defineStore('auth', {
         privateKey: '',
         oAuthShare: '',
         securityQuestion: '',
+        isModalLoginShown: false,
         isDeviceShareAvailable: null,
         isSecurityQuestionAvailable: null,
     }),
@@ -44,13 +45,14 @@ export const useAuthStore = defineStore('auth', {
         },
         onUserLoadedCallback(user: Partial<User>) {
             this.user = user;
+            this.isModalLoginShown = false;
         },
-        async requestOAuthShare(extraQueryParams?: { [key: string]: string }) {
+        signin(extraQueryParams?: { [key: string]: any }) {
             const { poolId, config, isMobileDevice } = useAccountStore();
             const { claim } = useClaimStore();
             const returnUrl = window.location.href;
 
-            this.user = await this.userManager[isMobileDevice ? 'signinRedirect' : 'signinPopup']({
+            return this.userManager[isMobileDevice ? 'signinRedirect' : 'signinPopup']({
                 state: {
                     isMobile: isMobileDevice,
                     returnUrl,

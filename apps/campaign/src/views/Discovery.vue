@@ -44,7 +44,7 @@
                     </b-navbar-nav>
                     <b-navbar-nav class="ms-auto mb-2 mb-lg-0 justify-content-end">
                         <template v-if="!authStore.user">
-                            <b-button class="px-4" variant="primary" @click="accountStore.signin()">
+                            <b-button class="px-4" variant="primary" v-b-modal="'modalLogin'">
                                 Sign in
                                 <i class="fas fa-sign-in-alt ms-2" />
                             </b-button>

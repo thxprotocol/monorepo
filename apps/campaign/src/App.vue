@@ -9,6 +9,7 @@
             <router-view class="router-view-app order-lg-0" />
             <BaseSidebar />
         </div>
+        <BaseModalLogin />
         <BaseModalAccount size="lg" />
         <BaseModalWalletCreate size="lg" />
     </div>
@@ -21,7 +22,6 @@ import { mapStores } from 'pinia';
 import { useAuthStore } from './stores/Auth';
 import { useAccountStore } from './stores/Account';
 import { useWalletStore } from './stores/Wallet';
-import { AccountVariant } from './types/enums/accountVariant';
 
 import './scss/main.scss';
 
@@ -50,7 +50,9 @@ export default defineComponent({
         },
         'accountStore.account'(account: TAccount) {
             if (!account) return;
-            if (account.variant === AccountVariant.Metamask) {
+
+            // If an e-mail is set, but not verified then show the account modal
+            if (account.email && !account.isEmailVerified) {
                 this.accountStore.isModalAccountShown = true;
             }
         },

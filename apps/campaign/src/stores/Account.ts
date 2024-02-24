@@ -168,7 +168,7 @@ export const useAccountStore = defineStore('account', {
             this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
         connect(kind: AccessTokenKind, scopes: TOAuthScope[]) {
-            return useAuthStore().requestOAuthShare({
+            return useAuthStore().signin({
                 prompt: 'connect',
                 access_token_kind: kind,
                 provider_scope: scopes.join(' '),
@@ -200,7 +200,7 @@ export const useAccountStore = defineStore('account', {
             if (this.isMobileIFrame) {
                 this.signinParent();
             } else {
-                useAuthStore().requestOAuthShare(extraQueryParams);
+                useAuthStore().signin(extraQueryParams);
             }
         },
         async verifyEmail(token: string, returnUrl: string) {

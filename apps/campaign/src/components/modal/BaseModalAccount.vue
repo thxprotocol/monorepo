@@ -4,12 +4,10 @@
         @hidden="accountStore.isModalAccountShown = false"
         @show="onShow"
         centered
-        :no-close-on-backdrop="isMetamaskAccount"
-        :no-close-on-esc="isMetamaskAccount"
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-user me-2"></i> Account</h5>
-            <b-link class="btn-close" @click="accountStore.isModalAccountShown = false" v-if="!isMetamaskAccount">
+            <b-link class="btn-close" @click="accountStore.isModalAccountShown = false">
                 <i class="fas fa-times"></i>
             </b-link>
         </template>
@@ -28,7 +26,6 @@
                     <BaseFormGroupAvatar />
                 </b-col>
             </b-row>
-            <BaseFormGroupAccountVariant v-if="isMetamaskAccount" class="mb-3" />
             <BaseFormGroupConnected class="mb-3" />
             <b-form-group label="Account ID">
                 <b-input-group>
@@ -52,7 +49,7 @@
             <b-button
                 class="w-100"
                 variant="primary"
-                :disabled="isMetamaskAccount || !isEmailVerified"
+                :disabled="!isEmailVerified"
                 @click="accountStore.isModalAccountShown = false"
             >
                 Close

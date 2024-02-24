@@ -1,5 +1,5 @@
 <template>
-    <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="link">
+    <b-button v-if="!accountStore.isAuthenticated" variant="link" v-b-modal="'modalLogin'">
         <b-spinner v-if="accountStore.isAuthenticated === false" small />
         <template v-else>Sign in</template>
     </b-button>

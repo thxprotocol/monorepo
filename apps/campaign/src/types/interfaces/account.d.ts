@@ -22,6 +22,7 @@ type TAccount = {
 
 type TAuthState = {
     wallet: Wallet;
+    isModalLoginShown: boolean;
     isDeviceShareAvailable: boolean | null;
     isSecurityQuestionAvailable: boolean | null;
     userManager: UserManager;

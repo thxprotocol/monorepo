@@ -62,6 +62,7 @@ declare module 'vue' {
     BaseModalERC20Transfer: typeof import('./src/components/modal/BaseModalERC20Transfer.vue')['default']
     BaseModalERC721Transfer: typeof import('./src/components/modal/BaseModalERC721Transfer.vue')['default']
     BaseModalExternalURL: typeof import('./src/components/modal/BaseModalExternalURL.vue')['default']
+    BaseModalLogin: typeof import('./src/components/modal/BaseModalLogin.vue')['default']
     BaseModalQuestEntry: typeof import('./src/components/modal/BaseModalQuestEntry.vue')['default']
     BaseModalRewardPayment: typeof import('./src/components/modal/BaseModalRewardPayment.vue')['default']
     BaseModalWallet: typeof import('./src/components/modal/BaseModalWallet.vue')['default']
@@ -123,6 +124,7 @@ declare module 'vue' {
     BTab: typeof import('bootstrap-vue-next')['BTab']
     BTable: typeof import('bootstrap-vue-next')['BTable']
     BTabs: typeof import('bootstrap-vue-next')['BTabs']
+    copy: typeof import('./src/components/modal/BaseModalAccount copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
