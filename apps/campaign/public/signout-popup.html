@@ -22,7 +22,7 @@
                 if (window.opener) {
                     window.close();
                 } else {
-                    window.open(url.origin, '_self');
+                    window.location.href = url.origin
                 }
             }).catch(console.error);
         } else {
