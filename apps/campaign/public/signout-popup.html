@@ -15,7 +15,6 @@
     <script>
         const url = new URL(window.location);
         const isMobile = window.matchMedia('(pointer:coarse)').matches;
-        const state = JSON.parse(localStorage.getItem(`oidc.${url.searchParams.get('state')}`));
         const mgr = new window.oidc.UserManager({});
 
         if (isMobile) {
@@ -23,7 +22,7 @@
                 if (window.opener) {
                     window.close();
                 } else {
-                    window.open(state.data.origin, '_self');
+                    window.open(url.origin, '_self');
                 }
             }).catch(console.error);
         } else {
