@@ -12,18 +12,7 @@
             <span class="text-opaque">{{ address }}</span>
         </b-form-group>
     </b-form-group>
-    <!-- <b-button
-        v-if="accountStore.isMobileEthereumBrowser"
-        @click="onClickDeeplink"
-        :disabled="isLoading"
-        variant="primary"
-        class="w-100"
-    >
-        <b-spinner small v-if="isLoading" />
-        <template v-else> Open WalletConnect </template>
-    </b-button>
-    <BaseButtonWalletConnect v-else @signed="onSigned" /> -->
-    <BaseButtonWalletConnect @signed="onSigned" @error="error = $event" />
+    <BaseButtonWalletConnect :message="message" @signed="onSigned" @error="error = $event" />
 </template>
 
 <script lang="ts">
@@ -33,7 +22,6 @@ import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { WalletVariant } from '../../types/enums/accountVariant';
-import { WIDGET_URL } from '../../config/secrets';
 
 export default defineComponent({
     name: 'BaseTabWalletWalletConnect',
@@ -56,24 +44,6 @@ export default defineComponent({
         },
     },
     methods: {
-        deeplink(uuid: string) {
-            const url = new URL(WIDGET_URL);
-            const deeplink = `https://metamask.app.link/dapp/${url.host}/connect/${uuid}`;
-            window.open(deeplink, '_blank');
-        },
-        async onClickDeeplink() {
-            try {
-                await this.walletStore.create({ variant: WalletVariant.WalletConnect });
-                const wallet = this.walletStore.wallets.find(
-                    (wallet) => wallet.variant === WalletVariant.WalletConnect && !wallet.address,
-                );
-                if (!wallet) throw new Error('Failed to create wallet');
-
-                this.deeplink(wallet.uuid);
-            } catch (error) {
-                this.$emit('error', error as string);
-            }
-        },
         async onSigned({ address, signature }: { signature: string; address: string; message: string }) {
             this.address = address;
             this.signature = signature;

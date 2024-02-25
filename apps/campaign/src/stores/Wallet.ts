@@ -61,11 +61,6 @@ export const useWalletStore = defineStore('wallet', {
             await api.request.post('/v1/account/wallets', { data });
             await this.listWallets();
         },
-        async connect(data: { uuid: string; variant: WalletVariant; message: string; signature: string }) {
-            const { api } = useAccountStore();
-            await api.request.post('/v1/connect', { data });
-            await this.listWallets();
-        },
         async setWallet(wallet: TWallet | null) {
             const authStore = useAuthStore();
             this.wallet = wallet;

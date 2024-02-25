@@ -43,9 +43,6 @@ export default defineComponent({
         ...mapStores(useAuthStore, useAccountStore, useQuestStore),
     },
     methods: {
-        onClickSignin() {
-            this.accountStore.signin();
-        },
         onClickSignout() {
             this.accountStore.signout();
         },

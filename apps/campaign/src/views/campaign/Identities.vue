@@ -30,8 +30,8 @@
                         <b-spinner v-if="isLoading" small variant="dark" />
                         Connect Identity
                     </b-button>
-                    <b-button v-else @click="onClickSignin" variant="primary" class="w-100">
-                        Sign in &amp; Collect
+                    <b-button v-else v-b-modal="'modalLogin'" variant="primary" class="w-100">
+                        Sign in &amp; Connect
                     </b-button>
                 </b-card>
             </b-col>

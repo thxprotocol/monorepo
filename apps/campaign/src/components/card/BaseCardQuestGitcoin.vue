@@ -47,7 +47,13 @@
         </blockquote>
 
         <template #button>
-            <b-button v-if="!accountStore.isAuthenticated" @click="onClickSignin" variant="primary" block class="w-100">
+            <b-button
+                v-if="!accountStore.isAuthenticated"
+                v-b-modal="'modalLogin'"
+                variant="primary"
+                block
+                class="w-100"
+            >
                 Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
             </b-button>
 
