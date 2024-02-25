@@ -13,6 +13,7 @@
             placement="start"
             backdrop
             class="offcanvas"
+            header-class="pt-4"
             body-class="p-3"
         >
             <template #title>
