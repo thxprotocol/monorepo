@@ -7,14 +7,56 @@
         }"
         class="pt-3"
     >
+        <b-offcanvas
+            v-model="isNavbarOffcanvasShown"
+            :no-header-close="true"
+            placement="start"
+            backdrop
+            class="offcanvas"
+            body-class="p-3"
+        >
+            <template #title>
+                <b-link to="/" class="d-flex align-items-center font-weight-bold text-decoration-none text-white">
+                    <b-img :src="imgLogo" height="30" alt="" class="me-3" />
+                    THX Network
+                </b-link>
+            </template>
+            <b-list-group class="w-100" style="border-radius: 0">
+                <b-list-group-item @click="onClickRoute('/')"
+                    ><i class="fas fa-home me-1"></i> Discovery
+                </b-list-group-item>
+                <b-list-group-item @click="onClickRoute('/learn')">
+                    <i class="fas fa-graduation-cap me-1"></i> Learn
+                </b-list-group-item>
+                <b-list-group-item @click="onClickRoute('/earn')">
+                    <i class="fas fa-rocket me-1"></i> Earn
+                </b-list-group-item>
+                <b-list-group-item @click="onClickRoute('/wallets')">
+                    <i class="fas fa-wallet me-1"></i>
+                    Wallet
+                </b-list-group-item>
+            </b-list-group>
+            <hr />
+            <b-button variant="primary" v-if="!accountStore.isAuthenticated" v-b-modal="'modalLogin'">
+                Sign in
+                <i class="fas fa-sign-in-alt ml-auto"></i>
+            </b-button>
+            <b-button variant="primary" @click="accountStore.signout()" v-else>
+                Sign out
+                <i class="fas fa-sign-out-alt ml-auto"></i>
+            </b-button>
+        </b-offcanvas>
         <b-container>
-            <b-navbar toggleable="lg" type="dark" :container="false">
+            <b-navbar toggleable="lg" type="dark" :container="true">
                 <b-navbar-brand href="#" style="width: 120px">
                     <b-link to="/">
                         <b-img :src="imgLogo" height="50" alt="" />
                     </b-link>
                 </b-navbar-brand>
-                <b-button variant="link" v-b-toggle="'nav-collapse'" class="d-block d-lg-none">
+                <!-- <b-button variant="link" v-b-toggle="'nav-collapse'" class="d-block d-lg-none">
+                    <i class="fas fa-bars text-white"></i>
+                </b-button> -->
+                <b-button variant="link" @click="isNavbarOffcanvasShown = true" class="d-block d-lg-none">
                     <i class="fas fa-bars text-white"></i>
                 </b-button>
                 <b-collapse id="nav-collapse" is-nav class="pt-3">
@@ -74,19 +116,39 @@ import { useAuthStore } from '../stores/Auth';
 import { useWalletStore } from '../stores/Wallet';
 
 export default defineComponent({
-    name: 'Public',
+    name: 'ViewDiscovery',
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useWalletStore),
+        ...mapStores(useAccountStore, useAuthStore, useWalletStore),
     },
     data() {
         return {
+            isNavbarOffcanvasShown: false,
             isModalConnectSettingsShown: false,
             isModalAccountShown: false,
             imgLogo,
             imgBgOverlay,
         };
     },
+    methods: {
+        onClickRoute(path: string) {
+            this.$router.push(path);
+            this.isNavbarOffcanvasShown = false;
+        },
+    },
 });
 </script>
+
+<style lang="scss">
+.offcanvas {
+    background: var(--bs-body-bg);
+    border-right: 3px solid var(--thx-navbar-bg);
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-width: 90%;
+
+    .offcanvas-body {
+        display: flex;
+        flex-direction: column;
+    }
+}
+</style>

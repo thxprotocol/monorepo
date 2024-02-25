@@ -44,9 +44,11 @@ export default defineComponent({
             this.error = '';
         },
         onClickRedeem() {
-            if (!this.accountStore.isAuthenticated) return this.accountStore.signin();
-            this.isModalShown = true;
-            return null;
+            if (!this.accountStore.isAuthenticated) {
+                this.authStore.isModalLoginShown = true;
+            } else {
+                this.isModalShown = true;
+            }
         },
         onSubmitRedemption() {
             this.isSubmitting = true;

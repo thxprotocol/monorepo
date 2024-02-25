@@ -70,8 +70,8 @@ export default defineComponent({
         onClickClose() {
             if (this.accountStore.isIFrame) {
                 window.top?.postMessage({ message: 'thx.widget.toggle' }, this.accountStore.config.origin);
-            } else if (this.accountStore.isMobileDevice) {
-                window.open(this.accountStore.config.origin, '_self');
+            } else {
+                this.$router.push('/');
             }
         },
         async onClickRefresh() {

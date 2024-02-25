@@ -34,11 +34,14 @@ type TAuthState = {
 };
 
 type TParticipant = {
+    _id: string;
     sub: string;
     balance: number;
     rank: number;
     score: number;
     questEntriesCompleted: number;
+    poolId: string;
+    isSubscribed: boolean;
 };
 
 type TAccountGlobals = {

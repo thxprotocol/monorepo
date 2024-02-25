@@ -3,7 +3,7 @@
         <template #label>
             E-mail
             <b-spinner v-if="isLoadingResend" class="ms-auto" small variant="primary" />
-            <b-link v-else @click="onClickResend" class="ms-auto">Re-send e-mail</b-link>
+            <b-link v-else @click="onClickResend" class="ms-auto text-primary">Re-send e-mail</b-link>
         </template>
         <template #description v-if="!isEmailVerified">
             <span class="text-danger"> E-mail is not verified</span>

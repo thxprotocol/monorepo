@@ -34,10 +34,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useQuestStore),
-        ...mapStores(useRewardStore),
+        ...mapStores(useAccountStore, useAuthStore, useQuestStore, useRewardStore),
     },
     watch: {
         'questStore.isLoading'() {
@@ -64,6 +61,7 @@ export default defineComponent({
             const isQuestCampaign =
                 (!this.questStore.isLoading && this.questStore.quests.length) ||
                 (!this.rewardStore.isLoading && this.rewardStore.rewards.length);
+
             // Skip redirect for regular campaigns and the NFT collect page
             if (isQuestCampaign || this.$route.name === 'collect') return;
 
@@ -81,8 +79,6 @@ export default defineComponent({
             const messageMap: { [message: string]: () => void } = {
                 'thx.iframe.navigate': () => this.onWidgetNavigate(event.data.path),
                 'thx.iframe.show': () => this.onWidgetShow(origin, event.data.isShown),
-                'thx.config.ref': () => this.onInviteQuestUpdate(event.data.ref),
-                'thx.referral.claim.create': () => this.onInviteQuestComplete(event.data.uuid),
                 'thx.auth.identity': () => this.onSetIdentity(event.data.identity),
                 'thx.auth.signout': () => this.onSignout,
                 'thx.auth.signin': () => this.onSignin,
@@ -106,14 +102,6 @@ export default defineComponent({
         },
         onSignout() {
             this.accountStore.signout();
-        },
-        onInviteQuestUpdate(ref: string) {
-            if (!ref) return;
-            const { setConfig, poolId } = this.accountStore;
-            setConfig(poolId, { ref } as TWidgetConfig);
-        },
-        onInviteQuestComplete(uuid: string) {
-            this.questStore.completeInviteQuest(uuid);
         },
         onWidgetShow(origin: string, isShown: boolean) {
             const { account, poolId } = this.accountStore;

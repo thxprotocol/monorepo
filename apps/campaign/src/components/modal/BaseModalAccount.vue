@@ -43,7 +43,6 @@
                     </b-input-group-append>
                 </b-input-group>
             </b-form-group>
-            <!-- <BaseFormGroupSubscription v-if="accountStore.poolId && questStore.quests.length" class="mb-3" /> -->
         </b-form>
         <template #footer>
             <b-button
@@ -93,9 +92,8 @@ export default defineComponent({
         },
     },
     methods: {
-        async onShow() {
-            await this.accountStore.getAccount();
-            this.accountStore.getSubscription();
+        onShow() {
+            this.accountStore.getAccount();
         },
         onClickSignout() {
             this.accountStore.signout();

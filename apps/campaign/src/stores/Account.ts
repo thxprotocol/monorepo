@@ -140,34 +140,24 @@ export const useAccountStore = defineStore('account', {
             if (this.poolId) params['poolId'] = this.poolId;
             this.participants = await this.api.request.get('/v1/participants', { params });
         },
-        async subscribe() {
-            const email = this.account?.email;
-            if (!email) return;
+        async updateParticipant({ email, isSubscribed }: Partial<TParticipant> & { email: string }) {
+            const participant = this.participants.find((p) => p.poolId === this.poolId);
+            if (!participant) return;
 
-            this.subscription = await this.api.pools.subscription.post({ poolId: this.poolId, email });
+            await this.api.request.patch(`/v1/participants/${participant._id}`, {
+                data: { isSubscribed, email },
+            });
 
-            track('UserCreates', [
-                this.account?.sub,
-                'pool subscription',
-                { poolId: this.poolId, origin: this.config.origin },
-            ]);
-        },
-        async unsubscribe() {
-            try {
-                await this.api.pools.subscription.delete(this.poolId);
-            } catch (error) {
-                // No-op as delete is throwing due to missing json response (not a problem though)
+            this.getParticipants();
+
+            // If isSubscribed is a boolean, then track the event
+            if (typeof isSubscribed === 'boolean') {
+                track('UserCreates', [
+                    this.account?.sub,
+                    isSubscribed ? 'pool subscription' : 'pool unsubscription',
+                    { poolId: this.poolId },
+                ]);
             }
-            this.subscription = null;
-
-            track('UserCreates', [
-                this.account?.sub,
-                'pool unsubscription',
-                { poolId: this.poolId, origin: this.config.origin },
-            ]);
-        },
-        async getSubscription() {
-            this.subscription = await this.api.pools.subscription.get(this.poolId);
         },
         connect(kind: AccessTokenKind, scopes: TOAuthScope[]) {
             return useAuthStore().signin({
