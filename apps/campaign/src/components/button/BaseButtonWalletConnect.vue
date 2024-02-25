@@ -64,8 +64,6 @@ export default defineComponent({
             },
         });
 
-        await disconnect(wagmiConfig);
-
         this.modal = createWeb3Modal({
             wagmiConfig,
             projectId: WALLET_CONNECT_PROJECT_ID,
@@ -73,6 +71,8 @@ export default defineComponent({
             themeMode: 'dark',
             privacyPolicyUrl: '',
         });
+
+        await disconnect(wagmiConfig);
 
         watchAccount(wagmiConfig, {
             onChange: this.onAccountChanged,

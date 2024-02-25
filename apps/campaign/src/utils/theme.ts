@@ -128,7 +128,8 @@ export function getStyles(elements: any, colors: any) {
             '--bs-modal-color': theme.elements.text,
             '--bs-modal-border-color': theme.elements.btnBg,
         },
-        '.form-control,.form-control:focus': {
+        '.form-control,.form-control:focus,.form-select': {
+            '--bs-border-color': theme.elements.btnBg,
             '--bs-body-bg': theme.elements.bodyBg,
             '--bs-btn-bg': theme.elements.btnBg,
         },
