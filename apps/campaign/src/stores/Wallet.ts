@@ -52,8 +52,6 @@ export const useWalletStore = defineStore('wallet', {
         wallet: null,
         isLoading: true,
         isModalWalletCreateShown: false,
-        isModalAccountShown: false,
-        isModalWalletRecoveryShown: false,
     }),
     actions: {
         async create(data: { variant: WalletVariant; message?: string; signature?: string }) {

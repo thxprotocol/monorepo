@@ -3,7 +3,7 @@
         <b-dropdown
             class="w-100"
             menu-class="w-100"
-            toggle-class="rounded d-flex align-items-center justify-content-between"
+            toggle-class="rounded d-flex align-items-center justify-content-between bg-body-secondary border-0 text-body"
             v-model="isOpen"
             variant="outline-primary"
             no-caret
@@ -37,7 +37,7 @@
                     />
                     {{ wallet.short }}
                 </div>
-                <b-button v-b-modal="`modalWallet${wallet._id}`" size="sm" variant="link">
+                <b-button v-b-modal.stop="`modalWallet${wallet._id}`" size="sm" variant="link">
                     <i class="fas fa-cog text-white text-opaque" />
                 </b-button>
                 <component :is="getComponentName(wallet)" :id="`modalWallet${wallet._id}`" :wallet="wallet" size="lg" />
@@ -61,14 +61,12 @@ import { useAccountStore } from '../../stores/Account';
 import { WalletVariant } from '../../types/enums/accountVariant';
 import BaseModalWallet from '../modal/BaseModalWallet.vue';
 import BaseModalWalletSafe from '../modal/BaseModalWalletSafe.vue';
-import BaseModalWalletWeb3Auth from '../modal/BaseModalWalletWeb3Auth.vue';
 
 export default defineComponent({
     name: 'BaseViewCampaignWallets',
     components: {
         BaseModalWallet,
         BaseModalWalletSafe,
-        BaseModalWalletWeb3Auth,
     },
     data(): { isOpen: boolean; walletLogoMap: any } {
         return {
@@ -126,7 +124,6 @@ export default defineComponent({
             const map: { [variant: string]: string } = {
                 [WalletVariant.WalletConnect]: 'BaseModalWallet',
                 [WalletVariant.Safe]: 'BaseModalWalletSafe',
-                [WalletVariant.Web3Auth]: 'BaseModalWalletWeb3Auth',
             };
             return map[wallet.variant];
         },

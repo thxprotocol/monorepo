@@ -1,8 +1,8 @@
 <template>
     <b-modal
-        v-model="walletStore.isModalWalletRecoveryShown"
+        v-model="authStore.isModalWalletRecoveryShown"
         @show="onShow"
-        @hidden="walletStore.isModalWalletRecoveryShown = false"
+        @hidden="authStore.isModalWalletRecoveryShown = false"
         no-close-on-backdrop
         centered
         hide-footer
@@ -10,7 +10,7 @@
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-key me-2"></i> Wallet Recovery</h5>
-            <b-link class="btn-close" @click="accountStore.isModalAccountShown = false">
+            <b-link class="btn-close" @click="authStore.isModalWalletRecoveryShown = false">
                 <i class="fas fa-times"></i>
             </b-link>
         </template>
@@ -77,18 +77,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useWalletStore),
-        currentKeyTreshold() {
-            const { oAuthShare, isDeviceShareAvailable } = useAuthStore();
-
-            let i = 0;
-            if (oAuthShare) i++;
-            if (isDeviceShareAvailable) i++;
-
-            return `${i}/3`;
-        },
+        ...mapStores(useAccountStore, useAuthStore, useWalletStore),
     },
     methods: {
         async onShow() {
@@ -101,7 +90,7 @@ export default defineComponent({
             try {
                 await this.authStore.recoverDeviceShare(this.passwordRecovery);
                 this.passwordRecovery = '';
-                this.walletStore.isModalWalletRecoveryShown = false;
+                this.authStore.isModalWalletRecoveryShown = false;
             } catch (error) {
                 this.error = (error as Error).message;
                 this.isFailedRecovery = true;

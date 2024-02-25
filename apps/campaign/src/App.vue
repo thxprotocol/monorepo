@@ -12,6 +12,7 @@
         <BaseModalLogin />
         <BaseModalAccount size="lg" />
         <BaseModalWalletCreate size="lg" />
+        <BaseModalWalletRecovery size="lg" />
     </div>
 </template>
 <script lang="ts">
