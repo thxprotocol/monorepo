@@ -89,6 +89,8 @@ export const useAccountStore = defineStore('account', {
 
                 this.setConfig(config.poolId, { ...config, origin });
                 this.setTheme(config);
+
+                track('UserVisits', [this.account?.sub, slug, { poolId: this.poolId }]);
             }
         },
         onLoad() {
