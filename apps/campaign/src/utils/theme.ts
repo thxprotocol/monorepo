@@ -147,10 +147,12 @@ export function getStyles(elements: any, colors: any) {
             '--bs-badge-color': theme.elements.btnText,
             '--thx-card-header-hover-bg': theme.elements.cardHeaderHoverBg,
         },
-        '.btn-primary': {
+        '.btn-outline-primary,.btn-primary': {
             '--bs-btn-color': theme.elements.btnText,
-            '--bs-btn-bg': theme.elements.btnBg,
             '--bs-btn-border-color': theme.elements.btnBg,
+        },
+        '.btn-primary': {
+            '--bs-btn-bg': theme.elements.btnBg,
             '--bs-btn-hover-color': theme.elements.btnText,
             '--bs-btn-hover-bg': theme.elements.btnBgDark,
             '--bs-btn-hover-border-color': theme.elements.btnBgDark,
@@ -169,6 +171,12 @@ export function getStyles(elements: any, colors: any) {
             '--thx-navbar-btn-bg': theme.elements.navbarBtnBg,
             '--thx-navbar-btn-color': theme.elements.navbarBtnText,
             '--thx-navbar-border-color': theme.elements.navbarBgDarker,
+        },
+        '.nav-pills': {
+            '--bs-nav-pills-link-active-bg': theme.elements.btnBg,
+        },
+        '.nav-link': {
+            '--bs-nav-link-color': theme.elements.text,
         },
         '.nav-tabs': {
             '--bs-nav-tabs-border-color': theme.elements.btnBg,

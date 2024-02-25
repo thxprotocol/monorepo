@@ -121,7 +121,8 @@ export default defineComponent({
                 });
             } catch (error) {
                 this.$emit('error', error as string);
-                this.modal.close();
+                await disconnect(this.modal.wagmiConfig);
+                await this.modal.close();
             } finally {
                 this.isLoading = false;
             }
