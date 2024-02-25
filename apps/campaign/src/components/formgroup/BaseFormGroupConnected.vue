@@ -9,17 +9,17 @@
                 </strong>
                 <b-spinner v-if="provider.isSubmitting" small />
                 <template v-else>
-                    <BButton
+                    <b-button
                         :disabled="provider.isDisabled"
                         @click="onClickDisconnect(provider.kind)"
                         variant="link"
-                        class="text-decoration-none"
+                        class="text-decoration-none text-primary"
                         size="sm"
                         v-if="provider.isConnected"
                     >
                         Disconnect
-                    </BButton>
-                    <BButton @click="onClickConnect(provider)" variant="primary" size="sm" v-else> Connect </BButton>
+                    </b-button>
+                    <b-button @click="onClickConnect(provider)" variant="primary" size="sm" v-else> Connect </b-button>
                 </template>
             </div>
             <hr class="my-1" />

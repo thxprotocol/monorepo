@@ -30,7 +30,7 @@
                     You have earned {{ amount }} points
                 </b-alert>
 
-                <div v-if="!isSubscribed">
+                <div v-if="participant && !participant.isSubscribed">
                     <b-form-group
                         class="mb-0"
                         :state="isEmailValid"
@@ -44,10 +44,19 @@
         </template>
 
         <template #footer>
-            <b-button v-if="!isSubscribed" @click="onClickSubscribe" variant="primary" class="w-100 rounded-pill">
+            <b-button
+                v-if="participant && !participant.isSubscribed"
+                @click="onClickSubscribe"
+                variant="primary"
+                class="w-100 rounded-pill"
+            >
                 Subscribe
             </b-button>
-            <b-button :variant="isSubscribed ? 'primary' : 'link'" class="w-100 rounded-pill" @click="$emit('hidden')">
+            <b-button
+                :variant="participant && participant.isSubscribed ? 'primary' : 'link'"
+                class="w-100 rounded-pill"
+                @click="$emit('hidden')"
+            >
                 Continue
             </b-button>
         </template>
@@ -100,24 +109,26 @@ export default defineComponent({
             if (!this.email) return null;
             return !!this.email;
         },
-        isSubscribed() {
-            const { subscription } = useAccountStore();
-            return !!subscription;
+        participant() {
+            const { participants, poolId } = useAccountStore();
+            return participants.find((p) => p.poolId === poolId);
         },
     },
     methods: {
-        onShow() {
+        async onShow() {
             if (this.accountStore.account) {
                 const { email } = this.accountStore.account;
                 this.email = email;
             }
         },
         async onClickSubscribe() {
+            this.subscribeError = '';
+
             try {
-                await this.accountStore.subscribe();
-            } catch (error) {
-                this.subscribeError = 'This e-mail is used by someone else.';
-                console.error(error);
+                await this.accountStore.updateParticipant({ email: this.email, isSubscribed: true });
+            } catch (response) {
+                const { error } = response as any;
+                this.subscribeError = error.message;
             }
         },
     },

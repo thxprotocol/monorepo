@@ -52,7 +52,7 @@ export default defineComponent({
         },
         onClickRedeem() {
             if (!this.accountStore.isAuthenticated) {
-                this.accountStore.signin();
+                this.authStore.isModalLoginShown = true;
             } else {
                 this.isModalShown = true;
             }

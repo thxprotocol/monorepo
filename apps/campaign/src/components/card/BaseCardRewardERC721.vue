@@ -52,9 +52,10 @@ export default defineComponent({
         },
         onClickRedeem() {
             if (!this.accountStore.isAuthenticated) {
-                return this.accountStore.signin();
+                this.authStore.isModalLoginShown = true;
+            } else {
+                this.isModalShown = true;
             }
-            this.isModalShown = true;
         },
         onSubmitRedemption(wallet: TWallet) {
             this.isSubmitting = true;
