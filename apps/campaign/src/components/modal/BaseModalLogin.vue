@@ -7,6 +7,7 @@
             </h5>
             <b-link class="btn-close" @click="authStore.isModalLoginShown = false"><i class="fas fa-times"></i></b-link>
         </template>
+        <b-alert v-model="isAlertErrorShown" class="p-2" variant="primary">{{ error }}</b-alert>
         <b-form-group>
             <b-form-input :state="isEmailVerified" v-model="email" placeholder="E-mail" />
         </b-form-group>
@@ -17,7 +18,7 @@
         <hr />
         <b-form-group>
             <BaseButtonWalletConnect message="This message is used for authentication purposes." @signed="onSigned">
-                <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" />
+                <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" @error="error = $event" />
                 Continue with WalletConnect
             </BaseButtonWalletConnect>
         </b-form-group>
@@ -66,6 +67,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore, useWalletStore),
+        isAlertErrorShown() {
+            return !!this.error;
+        },
         isEmailVerified() {
             if (!this.email) return null;
             return !!this.email;

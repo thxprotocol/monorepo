@@ -1,6 +1,6 @@
 <template>
-    <b-button @click="onClickConnect" :disabled="isLoading" variant="primary" class="w-100">
-        <b-spinner small v-if="isLoading" />
+    <b-button @click="onClickConnect" :disabled="isConnecting" variant="primary" class="w-100">
+        <b-spinner small v-if="isConnecting" />
         <slot v-else> Connect Wallet </slot>
     </b-button>
 </template>
@@ -17,6 +17,11 @@ import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../../config/se
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 import { watchAccount, disconnect, signMessage } from '@wagmi/core';
 
+enum WCModalEvent {
+    Open = 'MODAL_OPEN',
+    Close = 'MODAL_CLOSE',
+}
+
 export default defineComponent({
     name: 'BaseButtonWalletConnect',
     data() {
@@ -25,13 +30,17 @@ export default defineComponent({
             account: null as any,
             modal: null as any,
             wagmiConfig: null,
-            isModalOpen: false,
             chainList,
             isLoading: false,
+            isModalOpen: false,
+            interval: null as any,
         };
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useWalletStore),
+        isConnecting() {
+            return this.isModalOpen && this.isLoading;
+        },
     },
     props: {
         chainId: {
@@ -66,31 +75,39 @@ export default defineComponent({
         });
 
         watchAccount(wagmiConfig, {
-            onChange: (a) => {
-                this.account = a;
-            },
+            onChange: this.onAccountChanged,
+        });
+
+        this.modal.subscribeEvents(async (event: { data: { event: string } }) => {
+            const map: { [event: string]: () => Promise<void> } = {
+                [WCModalEvent.Open]: this.onModalOpen.bind(this),
+                [WCModalEvent.Close]: this.onModalClose.bind(this),
+            };
+            if (map[event.data.event]) await map[event.data.event]();
         });
     },
     methods: {
-        waitForAccount() {
-            return new Promise((resolve: any) => {
-                const interval = setInterval(() => {
-                    if (this.account && this.account.isConnected) {
-                        clearInterval(interval);
-                        resolve();
-                    }
-                }, 100);
-            });
+        async onModalOpen() {
+            this.isModalOpen = true;
+        },
+        async onModalClose() {
+            this.isModalOpen = false;
+        },
+        async onAccountChanged(account: any) {
+            if (!account || !account.isConnected) return;
+            this.account = account;
+            await this.sign();
         },
         async onClickConnect() {
-            if (!this.modal) return;
-
-            this.isLoading = true;
-
+            if (this.account) {
+                await this.sign();
+            } else {
+                await this.modal.open();
+            }
+        },
+        async sign() {
             try {
-                if (!this.account) await this.modal.open();
-                await this.waitForAccount();
-                if (!this.account) throw new Error('Could not connect to wallet');
+                this.isLoading = true;
 
                 this.signature = await signMessage(this.modal.wagmiConfig, {
                     account: this.account,
