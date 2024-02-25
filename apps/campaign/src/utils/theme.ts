@@ -108,6 +108,7 @@ export function getStyles(elements: any, colors: any) {
             '--bs-primary-rgb': theme.elements.btnBg,
         },
         'body,.bg-splash,.card-header-bg': {
+            '--bs-secondary-bg': theme.elements.bodyBg,
             '--bs-body-bg': theme.elements.bodyBg,
             '--bs-body-color': theme.elements.text,
             '--bs-btn-bg': theme.elements.btnBg,

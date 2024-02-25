@@ -3,9 +3,9 @@
         <b-dropdown
             class="w-100"
             menu-class="w-100"
-            toggle-class="rounded d-flex align-items-center justify-content-between bg-body-secondary border-0 text-body"
+            toggle-class="rounded d-flex align-items-center justify-content-between"
             v-model="isOpen"
-            variant="outline-primary"
+            variant="primary"
             no-caret
         >
             <template #button-content>
