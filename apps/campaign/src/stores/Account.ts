@@ -82,14 +82,14 @@ export const useAccountStore = defineStore('account', {
                 this.getUserData();
             }
 
-            if (slug) {
-                const config = await this.api.request.get('/v1/widget/' + slug);
-                this.poolId = config.poolId;
-                this.api.setCampaignId(this.poolId);
+            if (!slug) return;
 
-                this.setConfig(config.poolId, { ...config, origin });
-                this.setTheme(config);
-            }
+            const config = await this.api.request.get('/v1/widget/' + slug);
+            this.poolId = config.poolId;
+            this.api.setCampaignId(this.poolId);
+
+            this.setConfig(config.poolId, { ...config, origin });
+            this.setTheme(config);
         },
         onLoad() {
             // debugger;
@@ -122,6 +122,8 @@ export const useAccountStore = defineStore('account', {
                 useAuthStore().onUserLoadedCallback(user);
                 this.api.request.setUser(user);
                 await this.getAccount();
+                track('UserSignsIn', [this.account, { poolId: this.poolId }]);
+
                 this.connectIdentity();
             }
 
