@@ -136,7 +136,7 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useQuestStore),
         isAlertDangerShown() {
-            return !!this.error && !this.isSubmitting;
+            return !!this.error;
         },
     },
     mounted() {
