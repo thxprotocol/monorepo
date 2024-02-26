@@ -15,7 +15,7 @@ import { chainList } from '../../utils/chains';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
-import { watchAccount, disconnect, signMessage } from '@wagmi/core';
+import { watchAccount, disconnect, signMessage, getAccount } from '@wagmi/core';
 
 enum WCModalEvent {
     Open = 'MODAL_OPEN',
@@ -103,10 +103,13 @@ export default defineComponent({
             }
         },
         async onClickConnect() {
-            if (this.account) {
-                await this.sign();
-            } else {
-                await this.modal.open();
+            await this.disconnect();
+            await this.modal.open();
+        },
+        async disconnect() {
+            this.account = getAccount(this.modal.wagmiConfig);
+            if (this.account && this.account.isConnected) {
+                await disconnect(this.modal.wagmiConfig);
             }
         },
         async sign() {
@@ -125,9 +128,7 @@ export default defineComponent({
                 });
             } catch (error) {
                 this.$emit('error', error as string);
-                if (this.account.isConnected) {
-                    await disconnect(this.modal.wagmiConfig);
-                }
+                await this.disconnect();
                 await this.modal.close();
             } finally {
                 this.isLoading = false;

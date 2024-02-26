@@ -10,6 +10,7 @@
         :image="quest.image"
         :info-links="quest.infoLinks"
         :visible="!!accountStore.isAuthenticated && quest.isAvailable"
+        :key="quest._id"
     >
         <template #header>
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
@@ -19,11 +20,11 @@
             <div class="text-accent fw-bold">{{ quest.amount }}</div>
         </template>
 
-        <b-alert class="p-2" v-model="isAlertDangerShown" variant="danger">
+        <b-alert v-model="isAlertDangerShown" variant="primary" class="p-2">
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </b-alert>
 
-        <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
+        <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description"></b-card-text>
 
         <blockquote>
             <b-form-group label="Available On">
@@ -73,7 +74,7 @@
             <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
             <b-button-group v-else class="w-100" block>
-                <BaseButtonWalletConnect :chainId="chainId" @signed="onSigned" @error="error = $event">
+                <BaseButtonWalletConnect :chainId="chainId" :message="message" @signed="onSigned">
                     <b-img
                         :src="chainList[chainId].logo"
                         class="me-2"
@@ -132,9 +133,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useQuestStore),
+        ...mapStores(useAccountStore, useAuthStore, useQuestStore),
         isAlertDangerShown() {
             return !!this.error;
         },
@@ -145,9 +144,6 @@ export default defineComponent({
         this.message = `This signature will be used to validate if the result of calling ${this.quest.methodName} on chain ${this.chainId} with the address used to sign this message is above the threshold of ${this.quest.threshold}.`;
     },
     methods: {
-        onClickSignin: function () {
-            this.accountStore.signin();
-        },
         async onSigned({ signature, message }: { signature: string; message: string }) {
             this.error = '';
             this.isSubmitting = true;
@@ -160,7 +156,8 @@ export default defineComponent({
 
                 this.isModalQuestEntryShown = true;
             } catch (error) {
-                this.error = error as string;
+                this.error = (error as Error).message;
+                alert(this.error);
             } finally {
                 this.isSubmitting = false;
             }
