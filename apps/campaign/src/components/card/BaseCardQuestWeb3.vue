@@ -73,7 +73,7 @@
             <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
 
             <b-button-group v-else class="w-100" block>
-                <BaseButtonWalletConnect :chainId="chainId" @signed="onSigned">
+                <BaseButtonWalletConnect :chainId="chainId" @signed="onSigned" @error="error = $event">
                     <b-img
                         :src="chainList[chainId].logo"
                         class="me-2"
