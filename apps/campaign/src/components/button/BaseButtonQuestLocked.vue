@@ -1,14 +1,14 @@
 <template>
     <b-button variant="primary" block class="w-100" @click="isModalShown = true">
         <i class="fas fa-lock me-1" />
-        Quest Locked
+        Locked
     </b-button>
-    <b-modal title="Quest is locked!" :id="modalId" v-model="isModalShown" centered no-close-on-backdrop>
+    <b-modal title="Locked!" :id="`modalQuestLock${id}`" v-model="isModalShown" centered no-close-on-backdrop>
         <p class="text-opaque">To unlock this quest, complete these quests:</p>
-        <template v-for="lock of locks">
+        <template v-for="lock of locked">
             <div v-if="lock" class="d-flex justify-content-between">
                 {{ lock.title }}
-                <strong class="text-accent">{{ lock.pointsAvailable }}</strong>
+                <strong class="text-accent">{{ lock.amount }}</strong>
             </div>
             <b-alert v-else v-model="isAlertShown" show variant="info" class="p-2 px-3">
                 <i class="fas fa-info-circle me-1" />
@@ -24,13 +24,14 @@
 <script lang="ts">
 import { mapStores } from 'pinia';
 import { useQuestStore } from '../../stores/Quest';
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
     name: 'BaseButtonQuestLocked',
     props: {
-        quest: {
-            type: Object,
+        id: String,
+        locks: {
+            type: Array as PropType<{ questId: string; variant: number }[]>,
             required: true,
         },
     },
@@ -39,22 +40,11 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useQuestStore),
-        modalId() {
-            return `modalQuestLock${this.quest._id}`;
-        },
-        locks() {
+        locked() {
             if (!this.questStore.quests.length) return;
-            return this.quest.locks.map((lock: { questId: string }) =>
-                this.questStore.quests.find((q) => lock.questId === q._id),
-            );
-        },
-    },
-    mounted() {
-        // debugger;
-    },
-    methods: {
-        open() {
-            //
+            return this.locks.map((lock: { questId: string }) => {
+                return this.questStore.quests.find((q) => lock.questId === q._id);
+            });
         },
     },
 });

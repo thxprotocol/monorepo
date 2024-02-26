@@ -44,17 +44,22 @@
                 </div>
             </div>
             <span id="disabled-wrapper" class="d-block" tabindex="0">
+                <BaseButtonQuestLocked
+                    v-if="reward.isLocked"
+                    :locks="reward.locks"
+                    :id="`modalQuestLock${reward._id}`"
+                />
                 <b-button
                     variant="primary"
                     block
                     class="w-100"
                     :disabled="isSoldOut || isExpired || reward.isLocked || reward.isDisabled"
                     @click="$emit('submit')"
+                    v-else
                 >
                     <template v-if="isSoldOut">Sold out</template>
                     <template v-else-if="reward.isDisabled">Not available</template>
                     <template v-else-if="isExpired">Expired</template>
-                    <template v-else-if="reward.isLocked"> <i class="fas fa-lock me-1"></i> Locked </template>
                     <template v-else>
                         <strong>{{
                             `${reward.pointPrice} point${reward.pointPrice && reward.pointPrice > 1 ? 's' : ''}`
