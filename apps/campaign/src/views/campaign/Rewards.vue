@@ -37,7 +37,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useRewardStore),
     },
-    created() {
+    mounted() {
         this.rewardStore.list();
     },
 });
