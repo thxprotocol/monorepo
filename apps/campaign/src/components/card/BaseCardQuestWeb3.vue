@@ -70,7 +70,7 @@
                 Quest Completed
             </b-button>
 
-            <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
+            <BaseButtonQuestLocked v-else-if="quest.isLocked" :locks="quest.locks" :id="quest._id" />
 
             <b-button-group v-else class="w-100" block>
                 <BaseButtonWalletConnect :chainId="chainId" @signed="onSigned">

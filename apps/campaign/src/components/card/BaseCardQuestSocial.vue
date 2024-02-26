@@ -38,7 +38,7 @@
                 Quest Completed
             </b-button>
 
-            <BaseButtonQuestLocked v-else-if="quest.isLocked" :quest="quest" />
+            <BaseButtonQuestLocked v-else-if="quest.isLocked" :locks="quest.locks" :id="quest._id" />
 
             <BButtonGroup block class="w-100" v-else-if="!isConnected">
                 <b-button variant="primary" @click="onClickConnect" :disabled="isSubmitting">

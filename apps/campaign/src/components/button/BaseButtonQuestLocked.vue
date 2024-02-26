@@ -3,7 +3,7 @@
         <i class="fas fa-lock me-1" />
         Locked
     </b-button>
-    <b-modal title="Locked!" :id="id" v-model="isModalShown" centered no-close-on-backdrop>
+    <b-modal title="Locked!" :id="`modalQuestLock${id}`" v-model="isModalShown" centered no-close-on-backdrop>
         <p class="text-opaque">To unlock this quest, complete these quests:</p>
         <template v-for="lock of locked">
             <div v-if="lock" class="d-flex justify-content-between">
@@ -42,9 +42,9 @@ export default defineComponent({
         ...mapStores(useQuestStore),
         locked() {
             if (!this.questStore.quests.length) return;
-            return this.locks.map((lock: { questId: string }) =>
-                this.questStore.quests.find((q) => lock.questId === q._id),
-            );
+            return this.locks.map((lock: { questId: string }) => {
+                return this.questStore.quests.find((q) => lock.questId === q._id);
+            });
         },
     },
 });
