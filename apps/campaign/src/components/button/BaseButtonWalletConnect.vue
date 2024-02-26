@@ -64,6 +64,8 @@ export default defineComponent({
             },
         });
 
+        await disconnect(wagmiConfig);
+
         this.modal = createWeb3Modal({
             wagmiConfig,
             projectId: WALLET_CONNECT_PROJECT_ID,
@@ -71,8 +73,6 @@ export default defineComponent({
             themeMode: 'dark',
             privacyPolicyUrl: '',
         });
-
-        await disconnect(wagmiConfig);
 
         watchAccount(wagmiConfig, {
             onChange: this.onAccountChanged,
@@ -96,7 +96,11 @@ export default defineComponent({
         async onAccountChanged(account: any) {
             if (!account || !account.isConnected) return;
             this.account = account;
-            await this.sign();
+
+            // Only sign immediately if the modal is open
+            if (this.isModalOpen) {
+                await this.sign();
+            }
         },
         async onClickConnect() {
             if (this.account) {
@@ -121,7 +125,9 @@ export default defineComponent({
                 });
             } catch (error) {
                 this.$emit('error', error as string);
-                await disconnect(this.modal.wagmiConfig);
+                if (this.account.isConnected) {
+                    await disconnect(this.modal.wagmiConfig);
+                }
                 await this.modal.close();
             } finally {
                 this.isLoading = false;

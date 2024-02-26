@@ -18,7 +18,7 @@
                     </b-button>
                     <b-button
                         v-if="!isQuestCampaign && !accountStore.isAuthenticated"
-                        :to="`/c/${accountStore.config.slug}/signin`"
+                        v-b-modal="'modalLogin'"
                         variant="primary"
                         class="w-100"
                     >
