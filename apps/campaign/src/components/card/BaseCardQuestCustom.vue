@@ -1,49 +1,20 @@
 <template>
-    <BaseCardCollapse
+    <BaseCardQuest
         @modal-close="isModalQuestEntryShown = false"
-        :id="quest._id"
         :quest="quest"
-        :amount="quest.amount"
-        :image="quest.image"
+        :id="quest._id"
+        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
         :error="error"
-        :info-links="quest.infoLinks"
-        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
     >
-        <template #header>
-            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i class="fas fa-flag me-2 text-primary"></i>
-            </div>
-            <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
-            <div class="text-accent fw-bold">{{ quest.amount }}</div>
-        </template>
-
-        <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
-
         <b-progress v-if="accountStore.isAuthenticated && quest.limit > 0" class="mb-3" :max="quest.limit" show-value>
             <b-progress-bar variant="primary" :value="quest.entries.length" :label="`${quest.events.length}`" />
             <b-progress-bar variant="success" :value="pendingCount" :label="`${pendingCount}`" />
         </b-progress>
 
         <template #button>
-            <b-button
-                v-if="!accountStore.isAuthenticated"
-                v-b-modal="'modalLogin'"
-                variant="primary"
-                block
-                class="w-100"
-            >
-                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
-            </b-button>
-
-            <BaseButtonQuestLocked v-else-if="quest.isLocked" :locks="quest.locks" :id="quest._id" />
-
-            <b-button v-else-if="!pendingCount" variant="primary" class="w-100" block disabled>
-                Not available
-            </b-button>
-
-            <b-button v-else variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
+            <b-button variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
                 <template v-if="isSubmitting">
                     <b-spinner small></b-spinner>
                     Adding points...
@@ -57,7 +28,7 @@
                 </template>
             </b-button>
         </template>
-    </BaseCardCollapse>
+    </BaseCardQuest>
 </template>
 
 <script lang="ts">
@@ -75,13 +46,11 @@ export default defineComponent({
             type: Object as PropType<TQuestCustom>,
         },
     },
-    data(): { error: string; isSubmitting: boolean; isModalQuestEntryShown: boolean } {
+    data() {
         return { error: '', isSubmitting: false, isModalQuestEntryShown: false };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useQuestStore),
+        ...mapStores(useAccountStore, useAuthStore, useQuestStore),
         pendingCount() {
             // If there is a limit subtract the amount of entries from the amount of events
             if (this.quest.limit > 0) return this.quest.events.length - this.quest.entries.length;

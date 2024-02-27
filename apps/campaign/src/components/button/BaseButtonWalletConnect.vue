@@ -97,7 +97,7 @@ export default defineComponent({
             if (!account || !account.isConnected) return;
             this.account = account;
 
-            // Only sign immediately if the modal is open
+            // Only sign immediately if the modal is open and the account changed
             if (this.isModalOpen) {
                 await this.sign();
             }
@@ -115,7 +115,6 @@ export default defineComponent({
         async sign() {
             try {
                 this.isLoading = true;
-
                 this.signature = await signMessage(this.modal.wagmiConfig, {
                     account: this.account,
                     message: this.message,

@@ -30,7 +30,7 @@
                             img-blank-color="primary"
                             v-for="quest of questLists"
                         >
-                            <BaseCardQuest :quest="quest" />
+                            <BaseCardQuestSpotlight :quest="quest" />
                         </b-carousel-slide>
                     </b-carousel>
                 </b-card>

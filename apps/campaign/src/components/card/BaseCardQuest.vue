@@ -1,90 +1,142 @@
 <template>
-    <b-card header-class="p-0" body-class="justify-content-start" class="w-100">
+    <b-card
+        class="mb-1"
+        header-class="p-0"
+        body-class="d-flex flex-column p-0"
+        :class="{ 'card-collapsed': isVisible, 'card-promoted': quest.isPromoted }"
+    >
         <template #header>
-            <div
-                class="d-flex bg-dark rounded"
-                :class="{
-                    'justify-content-end align-items-end': !!backgroundImage,
-                    'justify-content-center align-items-center': !backgroundImage,
-                }"
-                :style="{
-                    height: '180px',
-                    backgroundImage: `url(${backgroundImage})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center center',
-                }"
+            <b-card-title
+                @click.stop="isVisible = !isVisible"
+                class="d-flex p-3 m-0 align-items-center"
+                style="cursor: pointer"
             >
-                <BImg
-                    lazy
-                    :src="logoImage"
-                    class="m-3 rounded"
-                    style="width: auto; height: auto; max-width: 150px; max-height: 50px"
-                />
-            </div>
-        </template>
-        <div class="d-flex justify-content-between">
-            <strong class="text-success">{{ quest.title }} </strong>
-            <div class="flex-shrink-0">
-                <b-badge
-                    variant="primary"
-                    class="p-2"
-                    v-b-tooltip
-                    :title="`Created: ${quest.createdAt && format(new Date(quest.createdAt), 'dd-MM-yyyy HH:mm')}`"
-                >
-                    <i class="fas fa-clock text-opaque me-0" />
-                </b-badge>
-                <b-badge variant="primary" class="p-2 ms-1" v-b-tooltip title="Twitter Quest">
-                    <i class="fab fa-twitter text-opaque me-0" />
-                </b-badge>
-                <b-badge variant="primary" class="p-2 ms-1" v-b-tooltip :title="`Visit ${quest.domain}`">
-                    <b-link @click.stop="isModalCampaignDomainShown = true" class="text-white">
-                        <i class="fas fa-external-link-alt text-opaque me-0" />
+                <div class="d-flex align-items-center justify-content-center" style="width: 25px">
+                    <i class="me-2 text-primary" :class="iconMap[quest.variant]"></i>
+                </div>
+                <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
+                <div class="text-accent fw-bold">{{ quest.amount }}</div>
+                <div>
+                    <b-link v-b-tooltip :title="`Ends in ${expiryDate}`" size="sm" class="ms-2" v-if="expiryDate">
+                        <i class="fas fa-clock text-primary" />
                     </b-link>
-                </b-badge>
-            </div>
-        </div>
-        <p class="mb-0">{{ quest.description }}</p>
-        <template #footer>
-            <b-button class="w-100" :to="`/c/${quest.poolId}`" variant="primary">
-                Earn <strong>{{ quest.amount }}</strong> points!
-            </b-button>
-            <BaseModalExternalURL
-                :show="isModalCampaignDomainShown"
-                :url="quest ? quest.domain : ''"
-                @hidden="isModalCampaignDomainShown = false"
-            />
+                    <b-dropdown v-if="quest.infoLinks.length" variant="link" size="sm" no-caret toggle-class="py-0" end>
+                        <template #button-content>
+                            <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
+                        </template>
+                        <b-dropdown-item
+                            @click="onClickLink(link.url)"
+                            :key="key"
+                            v-for="(link, key) of quest.infoLinks"
+                            link-class="d-flex align-items-center justify-content-between"
+                        >
+                            <div>
+                                {{ link.label }}
+                            </div>
+                            <i class="fas fa-caret-right text-opaque"></i>
+                        </b-dropdown-item>
+                    </b-dropdown>
+                </div>
+            </b-card-title>
         </template>
+
+        <b-collapse v-model="isVisible">
+            <img v-if="quest.image" class="img-fluid" :src="quest.image" alt="header image" />
+            <div class="px-3 my-3">
+                <b-alert v-model="isAlertDangerShown" variant="primary" class="p-2">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+                </b-alert>
+
+                <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
+
+                <slot></slot>
+
+                <b-button
+                    v-if="!accountStore.isAuthenticated"
+                    v-b-modal="'modalLogin'"
+                    variant="primary"
+                    block
+                    class="w-100"
+                >
+                    Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
+                </b-button>
+
+                <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>
+                    Quest Completed
+                </b-button>
+
+                <BaseButtonQuestLocked v-else-if="quest.isLocked" :locks="quest.locks" :id="quest._id" />
+
+                <slot v-else name="button"></slot>
+            </div>
+        </b-collapse>
     </b-card>
+    <BaseModalQuestEntry
+        @hidden="$emit('modal-close')"
+        :quest="quest"
+        :id="id"
+        :loading="loading"
+        :show="completing"
+        :amount="quest.amount"
+        :error="error"
+    />
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import { format } from 'date-fns';
+import { PropType, defineComponent } from 'vue';
+import { formatDistance } from 'date-fns';
+import { QuestVariant } from '@thxnetwork/sdk';
+import { mapStores } from 'pinia';
+import { useAccountStore } from '../../stores/Account';
 
 export default defineComponent({
-    name: 'BaseCardQuest',
+    name: 'BaseCardCollapse',
     props: {
-        quest: {
-            type: Object as PropType<TBaseQuest & { domain: string; amount: number; brand: any }>,
-            required: true,
-        },
+        id: String,
+        visible: Boolean,
+        loading: Boolean,
+        completing: Boolean,
+        error: String,
+        quest: { required: true, type: Object as PropType<TBaseQuest & any> },
     },
     data() {
-        return { format, isModalCampaignDomainShown: false };
+        return {
+            isVisible: false,
+            iconMap: {
+                [QuestVariant.Daily]: 'fas fa-calendar',
+                [QuestVariant.Discord]: 'fab fa-discord',
+                [QuestVariant.Twitter]: 'fab fa-twitter',
+                [QuestVariant.YouTube]: 'fab fa-youtube',
+                [QuestVariant.Custom]: 'fas fa-flag',
+                [QuestVariant.Web3]: 'fab fa-ethereum',
+                [QuestVariant.Gitcoin]: 'fas fa-fingerprint',
+            } as { [variant: string]: string },
+        };
     },
     computed: {
-        backgroundImage() {
-            return this.quest.image || (this.quest.brand && this.quest.brand.backgroundImgUrl);
+        ...mapStores(useAccountStore),
+        expiryDate() {
+            if (!this.quest.expiryDate) return '';
+            return formatDistance(new Date(this.quest.expiryDate), new Date(), {
+                addSuffix: false,
+            });
         },
-        logoImage() {
-            return this.quest.brand && this.quest.brand.logoImgUrl;
+        isAlertDangerShown() {
+            return !!this.error;
+        },
+    },
+    mounted() {
+        this.isVisible = window.innerWidth > 768 || this.visible;
+    },
+    watch: {
+        visible(value: boolean) {
+            this.isVisible = window.innerWidth > 768 || value;
+        },
+    },
+    methods: {
+        onClickLink(url: string) {
+            window.open(url, '_blank');
         },
     },
 });
 </script>
-<style>
-.card-quest-header {
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-</style>

@@ -1,5 +1,5 @@
 <template>
-    <BaseCardCollapse
+    <BaseCardQuest
         :quest="quest"
         :info-links="quest.infoLinks"
         :visible="!!accountStore.isAuthenticated && quest.isAvailable"
@@ -78,7 +78,7 @@
                 </template>
             </b-button>
         </template>
-    </BaseCardCollapse>
+    </BaseCardQuest>
 </template>
 
 <script lang="ts">

@@ -1,30 +1,13 @@
 <template>
-    <BaseCardCollapse
+    <BaseCardQuest
         @modal-close="isModalQuestEntryShown = false"
         :quest="quest"
         :id="quest._id"
+        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="quest.amount"
-        :image="quest.image"
         :error="error"
-        :info-links="quest.infoLinks"
-        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
     >
-        <template #header>
-            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i class="fa fa-calendar me-2 text-primary"></i>
-            </div>
-            <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
-            <div class="text-accent fw-bold">{{ quest.amount }}</div>
-        </template>
-
-        <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
-
-        <b-alert class="p-2" v-if="error && !isSubmitting" variant="danger" show>
-            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
-        </b-alert>
-
         <div class="d-flex flex-wrap pb-3 justify-content-between">
             <b-badge
                 style="width: 40px; height: 40px"
@@ -40,19 +23,6 @@
 
         <template #button>
             <b-button
-                v-if="!accountStore.isAuthenticated"
-                v-b-modal="'modalLogin'"
-                variant="primary"
-                class="w-100"
-                block
-            >
-                Sign in &amp; claim <strong>{{ quest.amounts[0] }} points</strong>
-            </b-button>
-
-            <BaseButtonQuestLocked v-else-if="quest.isLocked" :locks="quest.locks" :id="quest._id" />
-
-            <b-button
-                v-else
                 class="w-100"
                 block
                 variant="primary"
@@ -69,7 +39,7 @@
                 </template>
             </b-button>
         </template>
-    </BaseCardCollapse>
+    </BaseCardQuest>
 </template>
 
 <script lang="ts">
@@ -109,9 +79,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        ...mapStores(useQuestStore),
+        ...mapStores(useAccountStore, useAuthStore, useQuestStore),
         waitDuration: function () {
             if (!this.quest.claimAgainDuration) return;
 

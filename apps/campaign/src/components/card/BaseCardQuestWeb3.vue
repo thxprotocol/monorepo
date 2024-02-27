@@ -1,34 +1,16 @@
 <template>
-    <BaseCardCollapse
+    <BaseCardQuest
         @modal-close="isModalQuestEntryShown = false"
         :quest="quest"
         :id="quest._id"
+        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="quest.amount"
         :error="error"
-        :image="quest.image"
-        :info-links="quest.infoLinks"
-        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
-        :key="quest._id"
     >
-        <template #header>
-            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i class="fab fa-ethereum me-2 text-primary"></i>
-            </div>
-            <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
-            <div class="text-accent fw-bold">{{ quest.amount }}</div>
-        </template>
-
-        <b-alert v-model="isAlertDangerShown" variant="primary" class="p-2">
-            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
-        </b-alert>
-
-        <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description"></b-card-text>
-
         <blockquote>
             <b-form-group label="Available On">
-                <div class="d-inline-flex ms-2 align-items-center" v-for="contract of quest.contracts">
+                <div v-for="contract of quest.contracts" class="d-inline-flex ms-2 align-items-center">
                     <b-img
                         :src="chainList[contract.chainId].logo"
                         width="12"
@@ -57,23 +39,7 @@
         </blockquote>
 
         <template #button>
-            <b-button
-                v-if="!accountStore.isAuthenticated"
-                v-b-modal="'modalLogin'"
-                variant="primary"
-                block
-                class="w-100"
-            >
-                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
-            </b-button>
-
-            <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>
-                Quest Completed
-            </b-button>
-
-            <BaseButtonQuestLocked v-else-if="quest.isLocked" :locks="quest.locks" :id="quest._id" />
-
-            <b-button-group v-else class="w-100" block>
+            <b-button-group class="w-100" block>
                 <BaseButtonWalletConnect :chainId="chainId" :message="message" @signed="onSigned">
                     <b-img
                         :src="chainList[chainId].logo"
@@ -101,7 +67,7 @@
                 </b-dropdown>
             </b-button-group>
         </template>
-    </BaseCardCollapse>
+    </BaseCardQuest>
 </template>
 
 <script lang="ts">
@@ -134,9 +100,6 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore),
-        isAlertDangerShown() {
-            return !!this.error;
-        },
     },
     mounted() {
         if (!this.quest.isAvailable) return;

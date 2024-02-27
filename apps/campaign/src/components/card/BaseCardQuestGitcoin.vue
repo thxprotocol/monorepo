@@ -1,30 +1,13 @@
 <template>
-    <BaseCardCollapse
+    <BaseCardQuest
         @modal-close="isModalQuestEntryShown = false"
         :quest="quest"
         :id="quest._id"
+        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="quest.amount"
         :error="error"
-        :image="quest.image"
-        :info-links="quest.infoLinks"
-        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
     >
-        <template #header>
-            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i class="fas fa-fingerprint me-2 text-primary"></i>
-            </div>
-            <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
-            <div class="text-accent fw-bold">{{ quest.amount }}</div>
-        </template>
-
-        <b-alert class="p-2" v-model="isAlertDangerShown" variant="danger">
-            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
-        </b-alert>
-
-        <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
-
         <blockquote>
             <div class="d-flex align-items-center">
                 <b-img :src="imgLogoGitcoin" class="ms-1 me-3" />
@@ -47,24 +30,7 @@
         </blockquote>
 
         <template #button>
-            <b-button
-                v-if="!accountStore.isAuthenticated"
-                v-b-modal="'modalLogin'"
-                variant="primary"
-                block
-                class="w-100"
-            >
-                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
-            </b-button>
-
-            <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>
-                Quest Completed
-            </b-button>
-
-            <BaseButtonQuestLocked v-else-if="quest.isLocked" :locks="quest.locks" :id="quest._id" />
-
             <BaseButtonWalletConnect
-                v-else
                 @signed="onSigned"
                 @error="error = $event"
                 message="This signed message will be used to proof ownership of your web3 account and verify the quest requirements."
@@ -72,7 +38,7 @@
                 Claim <strong>{{ quest.amount }}</strong> points
             </BaseButtonWalletConnect>
         </template>
-    </BaseCardCollapse>
+    </BaseCardQuest>
 </template>
 
 <script lang="ts">
