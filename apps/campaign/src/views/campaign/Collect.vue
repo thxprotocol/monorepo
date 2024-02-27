@@ -74,7 +74,11 @@
                         <strong class="ms-auto">{{ claimsStore.erc721.symbol }}</strong>
                     </p>
 
-                    <BaseFormGroupWalletSelect @update="wallet = $event" :chain-id="claimsStore.erc721.chainId" />
+                    <BaseFormGroupWalletSelect
+                        v-if="accountStore.isAuthenticated"
+                        @update="wallet = $event"
+                        :chain-id="claimsStore.erc721.chainId"
+                    />
 
                     <b-button
                         v-if="isLoadingCollectComplete"
