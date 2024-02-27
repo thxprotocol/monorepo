@@ -1,46 +1,17 @@
 <template>
     <BaseCardQuest
-        :quest="quest"
-        :info-links="quest.infoLinks"
-        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         @modal-close="isModalQuestEntryShown = false"
+        :quest="quest"
         :id="quest._id"
+        :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
-        :amount="quest.amount"
         :error="error"
-        :image="quest.image"
     >
-        <template #header>
-            <div v-if="quest.kind" class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i :class="platformIconMap[quest.kind]" class="me-2 text-primary"></i>
-            </div>
-            <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
-            <div class="text-accent fw-bold">{{ quest.amount }}</div>
-        </template>
-
-        <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
-
         <component :is="interactionComponentMap[quest.interaction]" :quest="quest" />
 
         <template #button>
-            <b-button
-                v-if="!accountStore.isAuthenticated"
-                v-b-modal="'modalLogin'"
-                variant="primary"
-                block
-                class="w-100"
-            >
-                Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
-            </b-button>
-
-            <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>
-                Quest Completed
-            </b-button>
-
-            <BaseButtonQuestLocked v-else-if="quest.isLocked" :locks="quest.locks" :id="quest._id" />
-
-            <BButtonGroup block class="w-100" v-else-if="!isConnected">
+            <BButtonGroup block class="w-100" v-if="!isConnected">
                 <b-button variant="primary" @click="onClickConnect" :disabled="isSubmitting">
                     <template v-if="isSubmitting">
                         <b-spinner small class="me-1" />
@@ -170,9 +141,6 @@ export default defineComponent({
     methods: {
         onClickCancel() {
             this.isSubmitting = false;
-        },
-        onClickSignin() {
-            this.accountStore.signin();
         },
         async onClickView() {
             this.isLoadingView = true;
