@@ -103,7 +103,8 @@ export default defineComponent({
                 if (!this.authStore.oAuthShare) throw new Error('Could not create the OAuthshare.');
 
                 // Construct the private key
-                await this.authStore.getPrivateKey();
+                await this.authStore.getDeviceShare();
+                await this.authStore.reconstructKey();
                 if (!this.authStore.wallet) throw new Error('Could not construct your private key.');
 
                 // Create Device Share with security question
