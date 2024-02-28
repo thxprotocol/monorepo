@@ -58,7 +58,7 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useQuestStore } from '../../stores/Quest';
-import { RewardConditionPlatform, QuestSocialRequirement } from '../../types/enums/rewards';
+import { QuestSocialRequirement } from '../../types/enums/rewards';
 import {
     interactionComponentMap,
     getConnectionStatus,
@@ -105,7 +105,6 @@ export default defineComponent({
             isLoadingView: false,
             isViewed: false,
             isSubmitting: false,
-            RewardConditionPlatform,
             QuestSocialRequirement,
             interactionComponentMap,
             platformIconMap,

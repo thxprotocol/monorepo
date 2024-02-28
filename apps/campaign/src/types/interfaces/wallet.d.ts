@@ -25,6 +25,10 @@ type TTransaction = {
 };
 
 type TWalletState = {
+    modal: any | null;
+    account: any | null;
+    isWeb3ModalOpen: boolean;
+    chainId: ChainId;
     wallets: TWallet[];
     wallet: TWallet | null;
     erc20: any[];

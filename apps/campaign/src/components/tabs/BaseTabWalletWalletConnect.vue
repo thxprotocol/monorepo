@@ -12,7 +12,9 @@
             <span class="text-opaque">{{ address }}</span>
         </b-form-group>
     </b-form-group>
-    <BaseButtonWalletConnect :message="message" @signed="onSigned" @error="error = $event" />
+    <BaseButtonWalletConnect :message="message" @signed="onSigned" @error="error = $event">
+        Create Wallet
+    </BaseButtonWalletConnect>
 </template>
 
 <script lang="ts">

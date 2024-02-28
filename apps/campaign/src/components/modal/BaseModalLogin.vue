@@ -17,9 +17,16 @@
         </b-button>
         <hr />
         <b-form-group>
-            <BaseButtonWalletConnect message="This message is used for authentication purposes." @signed="onSigned">
-                <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" @error="error = $event" />
-                Continue with WalletConnect
+            <BaseButtonWalletConnect
+                message="This message is used for authentication purposes."
+                @signed="onSigned"
+                @error="error = $event"
+            >
+                <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" />
+                <span
+                    >Connect
+                    <strong>{{ walletStore.account && shortenAddress(walletStore.account.address) }}</strong></span
+                >
             </BaseButtonWalletConnect>
         </b-form-group>
         <hr class="or-separator" />
@@ -53,16 +60,21 @@ import { defineComponent } from 'vue';
 import { AccountVariant } from '../../types/enums/accountVariant';
 import imgWalletConnect from '../../assets/walletconnect-logo.png';
 
+function shortenAddress(address: string) {
+    return `${address.substring(0, 5)}...${address.substring(address.length - 5, address.length)}`;
+}
+
 export default defineComponent({
     name: 'BaseModalAccount',
     data() {
         return {
-            imgWalletConnect,
             AccountVariant,
+            imgWalletConnect,
             error: '',
             email: '',
             isShown: false,
             isLoading: false,
+            shortenAddress,
         };
     },
     computed: {

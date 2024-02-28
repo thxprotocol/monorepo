@@ -10,7 +10,11 @@ import { WalletVariant } from '../types/enums/accountVariant';
 import Safe from '@safe-global/protocol-kit';
 import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
-import imgWeb3AuthLogo from '../assets/web3auth-logo.jpeg';
+import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
+import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
+import { watchAccount, signMessage, switchChain } from '@wagmi/core';
+import { Chain, mainnet } from 'viem/chains';
+import { chainList } from '../utils/chains';
 
 type TRequestParamsAllowance = {
     tokenAddress: string;
@@ -27,7 +31,6 @@ type TRequestBodyApproval = {
 export const walletLogoMap: { [variant: string]: string } = {
     [WalletVariant.WalletConnect]: imgWalletConnectLogo,
     [WalletVariant.Safe]: imgSafeLogo,
-    [WalletVariant.Web3Auth]: imgWeb3AuthLogo,
 };
 
 // Safe Contracts
@@ -39,8 +42,23 @@ const MultiSendCallOnlyAddress = '0x75Cbb6C4Db4Bb4f6F8D5F56072A6cF4Bf4C5413C';
 const SignMessageLibAddress = '0x658FAD2acB6d1E615f295E566ee9a6d32Cc97b10';
 const GnosisSafeL2Address = '0xC44951780f195Ed71145e3d0d2F25726A097C348';
 
+const wagmiConfig = defaultWagmiConfig({
+    chains: [mainnet, ...Object.values(chainList).map((item) => item.chain)],
+    projectId: WALLET_CONNECT_PROJECT_ID,
+    metadata: {
+        name: 'THX Network',
+        description: 'THX Network Campaign Discovery',
+        url: WIDGET_URL,
+        icons: [AUTH_URL + '/img/logo.png'],
+    },
+});
+
 export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
+        modal: null,
+        account: null,
+        isWeb3ModalOpen: false,
+        chainId: null,
         allowances: {},
         balances: {},
         erc20: [],
@@ -54,6 +72,32 @@ export const useWalletStore = defineStore('wallet', {
         isModalWalletCreateShown: false,
     }),
     actions: {
+        createWeb3Modal() {
+            if (this.modal) return;
+
+            watchAccount(wagmiConfig, {
+                onChange: (account) => {
+                    this.account = account;
+                },
+            });
+
+            this.modal = createWeb3Modal({
+                wagmiConfig,
+                projectId: WALLET_CONNECT_PROJECT_ID,
+                themeMode: 'dark',
+            });
+
+            this.modal.subscribeState((state: { open: boolean; selectedNetworkId: ChainId }) => {
+                this.isWeb3ModalOpen = state.open;
+                this.chainId = state.selectedNetworkId;
+            });
+        },
+        switchChain(chainId: ChainId) {
+            switchChain(wagmiConfig, { chainId });
+        },
+        signMessage(message: string) {
+            return signMessage(wagmiConfig, { message });
+        },
         async create(data: { variant: WalletVariant; message?: string; signature?: string }) {
             const { api } = useAccountStore();
             await api.request.post('/v1/account/wallets', { data });

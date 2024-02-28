@@ -40,15 +40,16 @@
 
         <template #button>
             <b-button-group class="w-100" block>
-                <BaseButtonWalletConnect :chainId="chainId" :message="message" @signed="onSigned">
-                    <b-img
-                        :src="chainList[chainId].logo"
-                        class="me-2"
-                        width="18"
-                        height="18"
-                        :alt="chainList[chainId].name"
-                    />
-                    Claim <strong>{{ quest.amount }}</strong> points
+                <BaseButtonWalletConnect
+                    :message="message"
+                    :chainId="chainId"
+                    @signed="onSigned"
+                    @chain-change="chainId = $event"
+                    @error="error = $event"
+                >
+                    <span>
+                        Claim <strong>{{ quest.amount }}</strong> points on {{ chainList[chainId].name }}
+                    </span>
                 </BaseButtonWalletConnect>
                 <b-dropdown end variant="primary" no-caret toggle-class="pe-3">
                     <template #button-content>
@@ -120,7 +121,6 @@ export default defineComponent({
                 this.isModalQuestEntryShown = true;
             } catch (error) {
                 this.error = (error as Error).message;
-                alert(this.error);
             } finally {
                 this.isSubmitting = false;
             }
