@@ -9,9 +9,14 @@
         </template>
         <b-alert v-model="isAlertErrorShown" class="p-2" variant="primary">{{ error }}</b-alert>
         <b-form-group>
-            <b-form-input :state="isEmailVerified" v-model="email" placeholder="E-mail" />
+            <b-form-input :state="isEmailValid" v-model="email" placeholder="E-mail" />
         </b-form-group>
-        <b-button @click="onClickSignin(AccountVariant.EmailPassword)" variant="primary" class="w-100">
+        <b-button
+            @click="onClickSignin(AccountVariant.EmailPassword)"
+            variant="primary"
+            :disabled="!isEmailValid"
+            class="w-100"
+        >
             Send one-time password
             <i class="fas fa-chevron-right ms-2"></i>
         </b-button>
@@ -82,9 +87,9 @@ export default defineComponent({
         isAlertErrorShown() {
             return !!this.error;
         },
-        isEmailVerified() {
+        isEmailValid() {
             if (!this.email) return null;
-            return !!this.email;
+            return this.email.length && this.email.length > 3 && this.email.includes('@') && this.email.includes('.');
         },
     },
     methods: {
