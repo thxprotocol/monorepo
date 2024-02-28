@@ -93,12 +93,13 @@ export default defineComponent({
                     message: this.message,
                 });
             } catch (error) {
-                console.dir(error);
                 const { code, details, message } = error as any;
                 // Indicates connect state in w3modal but not connected in wallet
                 if (message === 'connection.connector.getProvider is not a function') {
                     this.$emit('error', 'No wallet connection, please disconnect and try again.');
-                } else {
+                }
+                // Other exceptions are checked for a code to be present, indicating metamask errors
+                else {
                     this.$emit('error', code ? details : message);
                 }
             } finally {
