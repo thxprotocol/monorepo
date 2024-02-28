@@ -1,23 +1,34 @@
 <template>
-    <b-button
-        @click="onClick"
-        class="d-flex align-items-center justify-content-center w-100"
-        variant="primary"
-        :disabled="isConnecting"
-    >
-        <template v-if="!walletStore.account">
-            <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" />
-            Continue with WalletConnect
-        </template>
-        <template v-else-if="chainId && walletStore.chainId !== chainId">
-            <b-img :src="chainList[chainId].logo" width="20" class="me-2 rounded" />
-            Switch to {{ chainList[chainId].name }}
-        </template>
-        <template v-else>
-            <b-spinner small v-if="isConnecting" />
-            <slot v-else />
-        </template>
-    </b-button>
+    <b-button-group class="w-100">
+        <b-button
+            @click="onClick"
+            class="d-flex align-items-center justify-content-center"
+            variant="primary"
+            :disabled="isConnecting"
+        >
+            <template v-if="!isConnected">
+                <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" />
+                Continue with WalletConnect
+            </template>
+            <template v-else-if="chainId && walletStore.chainId !== chainId">
+                <b-img :src="chainList[chainId].logo" width="20" class="me-2 rounded" />
+                Switch to {{ chainList[chainId].name }}
+            </template>
+            <template v-else>
+                <b-spinner small v-if="isConnecting" />
+                <slot v-else />
+            </template>
+        </b-button>
+        <b-button
+            v-if="isConnected"
+            class="flex-grow-0"
+            @click="onClickDisconnect"
+            variant="primary"
+            style="width: 50px"
+        >
+            <i class="fas fa-times" />
+        </b-button>
+    </b-button-group>
 </template>
 
 <script lang="ts">
@@ -43,7 +54,10 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useWalletStore),
         isConnecting() {
-            return this.walletStore.isWeb3ModalOpen || this.isLoading;
+            return this.isLoading;
+        },
+        isConnected() {
+            return this.walletStore.account && this.walletStore.account.isConnected;
         },
     },
     props: {
@@ -57,6 +71,9 @@ export default defineComponent({
         this.walletStore.createWeb3Modal();
     },
     methods: {
+        onClickDisconnect() {
+            window.location.reload();
+        },
         onClick() {
             if (!this.walletStore.account) {
                 this.walletStore.modal.open();

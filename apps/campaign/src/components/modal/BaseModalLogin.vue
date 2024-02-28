@@ -23,10 +23,10 @@
                 @error="error = $event"
             >
                 <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" />
-                <span
-                    >Connect
-                    <strong>{{ walletStore.account && shortenAddress(walletStore.account.address) }}</strong></span
-                >
+                <span>
+                    Connect
+                    <strong>{{ walletStore.account && shortenAddress(walletStore.account.address) }}</strong>
+                </span>
             </BaseButtonWalletConnect>
         </b-form-group>
         <hr class="or-separator" />

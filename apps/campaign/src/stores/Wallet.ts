@@ -12,8 +12,8 @@ import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
 import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
-import { watchAccount, signMessage, switchChain } from '@wagmi/core';
-import { Chain, mainnet } from 'viem/chains';
+import { watchAccount, signMessage, switchChain, disconnect } from '@wagmi/core';
+import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
 
 type TRequestParamsAllowance = {
@@ -57,7 +57,6 @@ export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
         modal: null,
         account: null,
-        isWeb3ModalOpen: false,
         chainId: null,
         allowances: {},
         balances: {},
@@ -77,6 +76,7 @@ export const useWalletStore = defineStore('wallet', {
 
             watchAccount(wagmiConfig, {
                 onChange: (account) => {
+                    console.log(account);
                     this.account = account;
                 },
             });
@@ -88,12 +88,11 @@ export const useWalletStore = defineStore('wallet', {
             });
 
             this.modal.subscribeState((state: { open: boolean; selectedNetworkId: ChainId }) => {
-                this.isWeb3ModalOpen = state.open;
                 this.chainId = state.selectedNetworkId;
             });
         },
         switchChain(chainId: ChainId) {
-            switchChain(wagmiConfig, { chainId });
+            return switchChain(wagmiConfig, { chainId });
         },
         signMessage(message: string) {
             return signMessage(wagmiConfig, { message });
