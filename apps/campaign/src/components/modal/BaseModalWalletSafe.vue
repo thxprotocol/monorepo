@@ -144,9 +144,9 @@ export default defineComponent({
             this.passwordCheck = '';
 
             if (!this.authStore.privateKey) {
-                await this.authStore.triggerLogin();
                 await this.authStore.getPrivateKey();
             }
+
             this.question = this.authStore.securityQuestion;
         },
     },

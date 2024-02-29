@@ -103,16 +103,10 @@ export const useWalletStore = defineStore('wallet', {
             await this.listWallets();
         },
         async setWallet(wallet: TWallet | null) {
-            const authStore = useAuthStore();
             this.wallet = wallet;
 
             // Check if there are pending transactions and confirm them
             if (this.wallet && this.wallet.pendingTransactions.length) {
-                // Trigger login and get private key
-                if (!authStore.privateKey) {
-                    await authStore.triggerLogin();
-                    await authStore.getPrivateKey();
-                }
                 await this.confirmTransactions(this.wallet.pendingTransactions);
             }
         },
@@ -205,7 +199,10 @@ export const useWalletStore = defineStore('wallet', {
 
             const { api } = useAccountStore();
             const authStore = useAuthStore();
-            if (!authStore.privateKey) return;
+
+            if (!authStore.privateKey) {
+                await authStore.getPrivateKey();
+            }
 
             const rpc = this.getRPC(this.wallet.chainId);
             const provider = new ethers.providers.JsonRpcProvider(rpc.url);

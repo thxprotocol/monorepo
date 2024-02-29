@@ -175,8 +175,7 @@ export const useAuthStore = defineStore('auth', {
             await this.requestOAuthShareRefresh();
         },
         async getPrivateKey() {
-            if (!this.oAuthShare) return;
-
+            await this.triggerLogin();
             await this.getDeviceShare();
             await this.getSecurityQuestion();
 
@@ -184,13 +183,24 @@ export const useAuthStore = defineStore('auth', {
             // show the recovery modal to recover the device share
             if (!this.isDeviceShareAvailable && this.isSecurityQuestionAvailable) {
                 this.isModalWalletRecoveryShown = true;
-                return;
+                // Wait for the device share to become available
+                await this.waitForWalletRecovery();
             }
 
             // If both the device and security question are available, reconstruct the key
             if (this.isDeviceShareAvailable && this.isSecurityQuestionAvailable) {
-                this.reconstructKey();
+                await this.reconstructKey();
             }
+        },
+        waitForWalletRecovery() {
+            return new Promise((resolve: any) => {
+                const interval = setInterval(() => {
+                    if (this.isDeviceShareAvailable) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 500);
+            });
         },
         async sign(message: string) {
             if (!this.wallet) return;
