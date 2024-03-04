@@ -112,7 +112,7 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
-import { useClaimStore } from '../../stores/Claim';
+import { useQRCodeStore } from '../../stores/QRCode';
 import { useWalletStore } from '../../stores/Wallet';
 import ConfettiExplosion from 'vue-confetti-explosion';
 
@@ -120,7 +120,7 @@ export default defineComponent({
     name: 'Home',
     components: { ConfettiExplosion },
     computed: {
-        ...mapStores(useAccountStore, useAuthStore, useClaimStore, useWalletStore),
+        ...mapStores(useAccountStore, useAuthStore, useQRCodeStore, useWalletStore),
         isAlertInfoShown() {
             return !this.accountStore.isAuthenticated && !this.claimsStore.error;
         },
@@ -177,3 +177,4 @@ export default defineComponent({
     },
 });
 </script>
+../../stores/QRCode

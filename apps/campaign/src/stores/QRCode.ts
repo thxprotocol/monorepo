@@ -2,8 +2,8 @@ import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
 
-export const useClaimStore = defineStore('claims', {
-    state: (): TClaimState => ({
+export const useQRCodeStore = defineStore('claims', {
+    state: (): TQRCodeState => ({
         error: '',
         claim: null,
         metadata: null,
@@ -12,7 +12,7 @@ export const useClaimStore = defineStore('claims', {
     actions: {
         async getClaim(uuid: string) {
             const { api, account, poolId, config } = useAccountStore();
-            const r = await api.claims.get(uuid);
+            const r = await api.qrCodes.get(uuid);
             this.error = r.error;
             this.claim = r.claim;
             this.metadata = r.metadata;
@@ -30,7 +30,7 @@ export const useClaimStore = defineStore('claims', {
             const { api, account, poolId, config } = useAccountStore();
             if (!this.claim) this.getClaim(uuid);
 
-            await api.request.post(`/v1/claims/${uuid}/collect`, { params: { walletId: wallet._id } });
+            await api.qrCodes.entry.create(uuid, { params: { walletId: wallet._id } });
 
             sessionStorage.removeItem('thxClaimUuid');
 

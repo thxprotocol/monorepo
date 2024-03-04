@@ -14,13 +14,6 @@ export const useRewardStore = defineStore('reward', {
             const index = this.rewards.findIndex((reward) => reward._id === id);
             this.rewards[index].progress.count = this.rewards[index].progress.count + 1;
         },
-        async createPayment(variant: RewardVariant, id: string, wallet?: TWallet) {
-            await useAccountStore().api.request.post(`/v1/rewards/${variant}/${id}/payments`, {
-                data: { walletId: wallet?._id },
-            });
-            this.updateSupply(id);
-            this.trackEvent(variant);
-        },
         trackEvent(variant: RewardVariant) {
             const { account, poolId } = useAccountStore();
             const eventMap = {
@@ -31,6 +24,13 @@ export const useRewardStore = defineStore('reward', {
                 [RewardVariant.DiscordRole]: 'discord role reward redemption',
             };
             track('UserCreates', [account?.sub, eventMap[variant], { poolId }]);
+        },
+        async createPayment(variant: RewardVariant, id: string, wallet?: TWallet) {
+            await useAccountStore().api.request.post(`/v1/rewards/${variant}/${id}/payments`, {
+                data: { walletId: wallet?._id },
+            });
+            this.updateSupply(id);
+            this.trackEvent(variant);
         },
         async list() {
             const { api } = useAccountStore();
