@@ -15,6 +15,7 @@
         </header>
         <b-card-body>
             <b-card-title class="d-flex">
+                <i class="me-2" :class="iconMap[reward.variant]"></i>
                 <slot name="title"></slot>
             </b-card-title>
             <b-card-text class="card-description" v-html="reward.description" />
@@ -53,13 +54,13 @@
                     variant="primary"
                     block
                     class="w-100"
-                    :disabled="isSoldOut || isExpired || reward.isLocked || reward.isDisabled"
-                    @click="$emit('submit')"
+                    :disabled="!reward.isStocked || reward.isExpired || reward.isLocked || reward.isDisabled"
+                    v-b-modal="`modalRewardPayment${reward._id}`"
                     v-else
                 >
-                    <template v-if="isSoldOut">Sold out</template>
+                    <template v-if="!reward.isStocked">Sold out</template>
+                    <template v-else-if="reward.isExpired">Expired</template>
                     <template v-else-if="reward.isDisabled">Not available</template>
-                    <template v-else-if="isExpired">Expired</template>
                     <template v-else>
                         <strong>{{
                             `${reward.pointPrice} point${reward.pointPrice && reward.pointPrice > 1 ? 's' : ''}`
@@ -69,6 +70,7 @@
             </span>
         </b-card-body>
     </b-card>
+    <BaseModalRewardPayment :id="`modalRewardPayment${reward._id}`" :reward="reward" />
 </template>
 
 <script lang="ts">
@@ -76,18 +78,26 @@ import { defineComponent, PropType } from 'vue';
 import { format, formatDistance } from 'date-fns';
 import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
+import { RewardVariant } from '../../types/enums/rewards';
 
 export default defineComponent({
-    name: 'BaseCardRewardCustom',
-    data() {
-        return { format, id: 'modalERC721PerkPayment', error: '', isModalShown: false, isSubmitting: false };
-    },
+    name: 'BaseCardReward',
     props: {
-        image: String,
         reward: {
             type: Object as PropType<TReward>,
             required: true,
         },
+    },
+    data() {
+        return {
+            iconMap: {
+                [RewardVariant.Coin]: 'fas fa-coins',
+                [RewardVariant.NFT]: 'fas fa-palette',
+                [RewardVariant.Coupon]: 'fas fa-tags',
+                [RewardVariant.Custom]: 'fas fa-gift',
+                [RewardVariant.DiscordRole]: 'fab fa-discord',
+            } as { [variant: string]: string },
+        };
     },
     computed: {
         ...mapStores(useAccountStore),
@@ -98,12 +108,6 @@ export default defineComponent({
         progressPercentage: function () {
             if (!this.reward.progress) return 100;
             return this.reward.progress.count / this.reward.progress.limit;
-        },
-        isSoldOut: function () {
-            return this.reward.progress.limit > 0 ? this.reward.progress.count >= this.reward.progress.limit : false;
-        },
-        isExpired: function () {
-            return this.reward.expiry.date ? this.reward.expiry.now - this.reward.expiry.date > 0 : false;
         },
         expiryDate: function () {
             return !this.isExpired && this.reward.expiry

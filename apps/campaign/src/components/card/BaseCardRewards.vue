@@ -30,6 +30,11 @@
                 <component :is="token.component" :token="token" />
             </div>
         </b-tab>
+        <b-tab title="Discord" v-if="walletStore.discordRoles.length">
+            <div :key="key" v-for="(token, key) of walletStore.discordRoles" class="mb-1">
+                <component :is="token.component" :token="token" />
+            </div>
+        </b-tab>
     </b-tabs>
 </template>
 
@@ -42,6 +47,7 @@ import { useAccountStore } from '../../stores/Account';
 import BaseCardERC20 from '../../components/card/BaseCardERC20.vue';
 import BaseCardERC721 from '../../components/card/BaseCardERC721.vue';
 import BaseCardCouponCode from '../../components/card/BaseCardCouponCode.vue';
+import BaseCardDiscordRole from '../../components/card/BaseCardDiscordRole.vue';
 
 export default defineComponent({
     name: 'BaseViewWallet',
@@ -49,6 +55,7 @@ export default defineComponent({
         BaseCardERC20,
         BaseCardERC721,
         BaseCardCouponCode,
+        BaseCardDiscordRole,
     },
     data() {
         return {
@@ -58,9 +65,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAuthStore),
-        ...mapStores(useAccountStore),
-        ...mapStores(useWalletStore),
+        ...mapStores(useAuthStore, useAccountStore, useWalletStore),
         list() {
             return [
                 ...this.walletStore.couponCodes,

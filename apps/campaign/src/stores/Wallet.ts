@@ -12,9 +12,10 @@ import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
 import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
-import { watchAccount, signMessage, switchChain, disconnect } from '@wagmi/core';
+import { watchAccount, signMessage, switchChain } from '@wagmi/core';
 import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
+import { RewardVariant } from '../types/enums/rewards';
 
 type TRequestParamsAllowance = {
     tokenAddress: string;
@@ -64,6 +65,7 @@ export const useWalletStore = defineStore('wallet', {
         erc721: [],
         erc1155: [],
         couponCodes: [],
+        discordRoles: [],
         pendingPoints: 0,
         wallets: [],
         wallet: null,
@@ -127,20 +129,28 @@ export const useWalletStore = defineStore('wallet', {
             const { api } = useAccountStore();
             this.isLoading = true;
 
-            const [erc20, erc721, erc1155, couponCodes] = await Promise.all([
+            const [erc20, erc721, erc1155, payments] = await Promise.all([
                 api.erc20.list({ walletId: this.wallet._id }),
                 api.erc721.list({ walletId: this.wallet._id }),
                 api.erc1155.list({ walletId: this.wallet._id }),
-                api.couponCodes.list(),
+                api.request.get('/v1/rewards/payments'),
             ]);
 
             this.erc20 = erc20.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' }));
             this.erc721 = erc721.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
             this.erc1155 = erc1155.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
-            this.couponCodes = couponCodes.map((t: TCouponRewardPayment[]) => ({
-                ...t,
-                component: 'BaseCardCouponCode',
-            }));
+            this.couponCodes = payments
+                .filter((p) => p.rewardVariant === RewardVariant.Coupon)
+                .map((t: TRewardCouponPayment[]) => ({
+                    ...t,
+                    component: 'BaseCardCouponCode',
+                }));
+            this.discordRoles = payments
+                .filter((p) => p.rewardVariant === RewardVariant.DiscordRole)
+                .map((t: TRewardDiscordRolePayment[]) => ({
+                    ...t,
+                    component: 'BaseCardDiscordRole',
+                }));
 
             this.isLoading = false;
         },

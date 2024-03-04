@@ -16,6 +16,14 @@ export enum QuestVariant {
     Gitcoin = 7,
 }
 
+export enum RewardVariant {
+    Coin = 0,
+    NFT = 1,
+    Custom = 2,
+    Coupon = 3,
+    DiscordRole = 4,
+}
+
 export enum RewardConditionPlatform {
     None = 0,
     YouTube = 1,

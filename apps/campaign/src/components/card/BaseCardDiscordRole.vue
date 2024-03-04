@@ -1,41 +1,31 @@
 <template>
     <b-card body-class="d-flex align-items-center py-2">
         <div class="pe-3">
-            <i class="fas fa-tags text-primary"></i>
+            <i class="fab fa-discord text-primary"></i>
         </div>
         <div class="flex-grow-1">
-            <b-link
-                v-if="isURL"
-                @click="isModalURLShown = true"
-                size="sm"
-                style="text-align: left"
-                class="d-flex align-items-center text-accent text-decoration-underline"
+            <strong
+                :style="{
+                    color: `${token.role.color}`,
+                }"
             >
-                <div class="truncate-text-ellipsis">{{ token.code }}</div>
-                <i class="fas fa-external-link-alt ms-3" />
-            </b-link>
-            <blockquote v-else class="mb-0 d-flex align-items-center w-100 text-accent">
-                <strong class="truncate-text" style="letter-spacing: 0.25rem">{{ code }}</strong>
-                <b-button variant="primary" size="sm" class="ms-auto" @click="isVisible = !isVisible">
-                    <i class="fas fa-eye" />
-                </b-button>
-            </blockquote>
+                {{ token.role.name }}
+            </strong>
         </div>
-        <b-dropdown variant="link" size="sm" no-caret end>
+        <!-- <b-dropdown variant="link" size="sm" no-caret end>
             <template #button-content>
                 <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
             </template>
             <b-dropdown-item
                 target="_blank"
-                :href="token.webshopURL"
+                :href="token.discordServerURL"
                 link-class="d-flex justify-content-between align-items-center"
             >
-                Use this code
+                Server Link
                 <i class="fas fa-caret-right text-opaque"></i>
             </b-dropdown-item>
-        </b-dropdown>
+        </b-dropdown> -->
     </b-card>
-    <BaseModalExternalURL :show="isModalURLShown" @hidden="isModalURLShown = false" :url="token.code" />
 </template>
 
 <script lang="ts">
@@ -52,7 +42,7 @@ export default defineComponent({
     },
     props: {
         token: {
-            type: Object as PropType<TCouponRewardPayment>,
+            type: Object as PropType<TRewardDiscordRolePayment>,
             required: true,
         },
     },

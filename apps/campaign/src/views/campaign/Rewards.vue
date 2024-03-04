@@ -7,7 +7,7 @@
                 </div>
                 <b-row v-else>
                     <b-col lg="4" :key="key" v-for="(reward, key) of rewardStore.rewards">
-                        <component :is="reward.component" :reward="reward" class="mb-2" />
+                        <component :is="componentMap[reward.variant]" :reward="reward" class="mb-2" />
                     </b-col>
                 </b-row>
             </b-col>
@@ -19,20 +19,34 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useRewardStore } from '../../stores/Reward';
-import BaseCardRewardERC20 from '../../components/card/BaseCardRewardERC20.vue';
-import BaseCardRewardERC721 from '../../components/card/BaseCardRewardERC721.vue';
+import { RewardVariant } from '../../types/enums/rewards';
+import BaseCardRewardCoin from '../../components/card/BaseCardRewardCoin.vue';
+import BaseCardRewardNFT from '../../components/card/BaseCardRewardNFT.vue';
 import BaseCardRewardCustom from '../../components/card/BaseCardRewardCustom.vue';
 import BaseCardRewardCoupon from '../../components/card/BaseCardRewardCoupon.vue';
 import BaseCardRewardDiscordRole from '../../components/card/BaseCardRewardDiscordRole.vue';
 
+const componentMap = {
+    [RewardVariant.Coin]: 'BaseCardRewardCoin',
+    [RewardVariant.NFT]: 'BaseCardRewardNFT',
+    [RewardVariant.Custom]: 'BaseCardRewardCustom',
+    [RewardVariant.Coupon]: 'BaseCardRewardCoupon',
+    [RewardVariant.DiscordRole]: 'BaseCardRewardDiscordRole',
+};
+
 export default defineComponent({
     name: 'Rewards',
     components: {
-        BaseCardRewardERC20,
-        BaseCardRewardERC721,
+        BaseCardRewardCoin,
+        BaseCardRewardNFT,
         BaseCardRewardCustom,
         BaseCardRewardCoupon,
         BaseCardRewardDiscordRole,
+    },
+    data() {
+        return {
+            componentMap,
+        };
     },
     computed: {
         ...mapStores(useRewardStore),
