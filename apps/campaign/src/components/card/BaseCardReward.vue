@@ -4,12 +4,14 @@
             <b-badge
                 v-if="reward.expiry && reward.expiry.date"
                 v-b-tooltip.hover.left
-                :title="format(reward.expiry.date, 'MMMM do yyyy hh:mm:ss')"
+                :title="format(new Date(reward.expiry.date), 'MMMM do yyyy hh:mm:ss')"
                 variant="primary"
                 class="badge-expiry p-1 bg-primary"
             >
-                <i v-if="!isExpired" class="fas fa-clock card-text"></i>
-                <span :class="{ 'text-accent': !isExpired, 'card-text': isExpired }">{{ expiryDate }}</span>
+                <i v-if="!reward.isExpired" class="fas fa-clock card-text"></i>
+                <span :class="{ 'text-accent': !reward.isExpired, 'card-text': reward.isExpired }">{{
+                    expiryDate
+                }}</span>
             </b-badge>
             <b-img class="card-img-logo" v-if="!image" :src="accountStore.config.logoUrl" widht="auto" height="100" />
         </header>
@@ -83,6 +85,7 @@ import { RewardVariant } from '../../types/enums/rewards';
 export default defineComponent({
     name: 'BaseCardReward',
     props: {
+        image: String,
         reward: {
             type: Object as PropType<TReward>,
             required: true,
@@ -90,6 +93,7 @@ export default defineComponent({
     },
     data() {
         return {
+            format,
             iconMap: {
                 [RewardVariant.Coin]: 'fas fa-coins',
                 [RewardVariant.NFT]: 'fas fa-palette',
@@ -110,7 +114,7 @@ export default defineComponent({
             return this.reward.progress.count / this.reward.progress.limit;
         },
         expiryDate: function () {
-            return !this.isExpired && this.reward.expiry
+            return !this.reward.isExpired && this.reward.expiry
                 ? formatDistance(new Date(this.reward.expiry.date), new Date(this.reward.expiry.now), {
                       addSuffix: false,
                   })

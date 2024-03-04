@@ -14,7 +14,7 @@ export default defineComponent({
     name: 'BaseCardRewardCoin',
     props: {
         reward: {
-            type: Object as PropType<TReward>,
+            type: Object as PropType<TRewardCoin>,
             required: true,
         },
     },

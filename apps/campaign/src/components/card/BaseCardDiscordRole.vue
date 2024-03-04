@@ -1,18 +1,21 @@
 <template>
     <b-card body-class="d-flex align-items-center py-2">
-        <div class="pe-3">
-            <i class="fab fa-discord text-primary"></i>
+        <div class="pe-3" v-b-tooltip :title="token.guild.name">
+            <b-img v-if="token.guild.icon" :src="token.guild.icon" height="30" class="rounded" />
+            <i v-else class="fab fa-discord text-primary"></i>
         </div>
         <div class="flex-grow-1">
-            <strong
+            <b-badge
+                class="p-2"
                 :style="{
-                    color: `${token.role.color}`,
+                    color: 'white !important',
+                    backgroundColor: `${token.role.color} !important`,
                 }"
             >
                 {{ token.role.name }}
-            </strong>
+            </b-badge>
         </div>
-        <!-- <b-dropdown variant="link" size="sm" no-caret end>
+        <b-dropdown variant="link" size="sm" no-caret end>
             <template #button-content>
                 <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
             </template>
@@ -21,10 +24,10 @@
                 :href="token.discordServerURL"
                 link-class="d-flex justify-content-between align-items-center"
             >
-                Server Link
+                Server URL
                 <i class="fas fa-caret-right text-opaque"></i>
             </b-dropdown-item>
-        </b-dropdown> -->
+        </b-dropdown>
     </b-card>
 </template>
 
