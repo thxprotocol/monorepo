@@ -26,7 +26,7 @@ import BaseCardRewardCustom from '../../components/card/BaseCardRewardCustom.vue
 import BaseCardRewardCoupon from '../../components/card/BaseCardRewardCoupon.vue';
 import BaseCardRewardDiscordRole from '../../components/card/BaseCardRewardDiscordRole.vue';
 
-const componentMap = {
+const componentMap: { [variant: string]: string } = {
     [RewardVariant.Coin]: 'BaseCardRewardCoin',
     [RewardVariant.NFT]: 'BaseCardRewardNFT',
     [RewardVariant.Custom]: 'BaseCardRewardCustom',

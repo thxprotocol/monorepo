@@ -33,7 +33,9 @@
             <b-button variant="success" class="w-100 rounded-pill" :disabled="isDisabled" @click="onSubmit">
                 <b-spinner small variant="primary" v-if="isSubmitting" />
                 <template v-else-if="reward.isLocked"> <i class="fas fa-lock"></i></template>
-                <template v-else> {{ reward.pointPrice }} points</template>
+                <template v-else>
+                    Pay {{ reward.pointPrice }} {{ reward.pointPrice === 1 ? 'point' : 'points' }}</template
+                >
             </b-button>
         </template>
     </b-modal>
@@ -50,6 +52,7 @@ export default defineComponent({
     name: 'BaseModalRewardPayment',
     data() {
         return {
+            error: '',
             wallet: null,
             isModalShown: false,
             isSubmitting: false,
@@ -64,7 +67,6 @@ export default defineComponent({
             type: Object as PropType<TReward>,
             required: true,
         },
-        error: String,
         show: Boolean,
         isLoading: Boolean,
     },
@@ -75,8 +77,18 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useRewardStore),
+        participantBalance() {
+            const participant = this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
+            if (!participant) return 0;
+            return participant.balance;
+        },
         isDisabled() {
-            return this.isLoading || (this.reward.chainId && !this.wallet);
+            return (
+                this.isLoading ||
+                this.isSubmitting ||
+                (this.reward.chainId && !this.wallet) ||
+                this.participantBalance < this.reward.pointPrice
+            );
         },
         isAlertDangerShown() {
             return !!this.error;
@@ -87,15 +99,14 @@ export default defineComponent({
             this.isSubmitting = true;
             try {
                 const walletStore = useWalletStore();
-
                 await this.rewardStore.createPayment(this.reward.variant, this.reward._id, this.wallet);
                 await this.accountStore.getParticipants();
 
                 walletStore.list();
 
                 this.isModalShown = false;
-            } catch (error) {
-                this.error = error && error.message;
+            } catch (res) {
+                this.error = (res as { error: { message: string } }).error.message;
             } finally {
                 this.isSubmitting = false;
             }
