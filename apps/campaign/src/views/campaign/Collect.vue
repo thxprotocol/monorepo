@@ -1,16 +1,19 @@
 <template>
     <b-container>
         <b-row>
-            <b-col offset-xl="1" xl="6">
-                <b-card v-if="claimsStore.claim && claimsStore.metadata && claimsStore.erc721" class="mx-auto my-2">
-                    <b-alert v-model="isAlertInfoShown" variant="info" show class="p-2">
-                        <i class="fas fa-gift me-1"></i>
-                        Sign in to collect your NFT
-                    </b-alert>
-
+            <b-col offset-xl="3" xl="6">
+                <b-alert v-if="!qrcodeStore.entry" v-model="isAlertErrorShown" variant="danger" show class="p-2">
+                    <i class="fas fa-exclamation-circle me-1"></i>
+                    {{ error }}
+                </b-alert>
+                <b-alert v-else v-model="isAlertInfoShown" variant="info" show class="p-2">
+                    <i class="fas fa-gift me-1"></i>
+                    Sign in to collect your NFT
+                </b-alert>
+                <b-card v-if="qrcodeStore.entry && qrcodeStore.metadata && qrcodeStore.erc721" class="mx-auto my-2">
                     <b-alert v-model="isAlertErrorShown" variant="danger" show class="p-2">
                         <i class="fas fa-exclamation-circle me-1"></i>
-                        {{ error || claimsStore.error }}
+                        {{ error }}
                     </b-alert>
 
                     <div class="d-flex justify-content-center">
@@ -31,7 +34,7 @@
                             <div>
                                 <b-spinner v-if="isLoadingImage" small variant="light" />
                                 <b-img
-                                    :src="claimsStore.metadata.imageUrl"
+                                    :src="qrcodeStore.metadata.imageUrl"
                                     width="60"
                                     class="me-3 rounded shadow-sm"
                                     :class="{ 'd-none': isLoadingImage }"
@@ -40,8 +43,8 @@
                             </div>
                         </div>
                         <div>
-                            <b-card-title> {{ claimsStore.metadata.name }}</b-card-title>
-                            <p class="m-0">{{ claimsStore.metadata.description }}</p>
+                            <b-card-title> {{ qrcodeStore.metadata.name }}</b-card-title>
+                            <p class="m-0">{{ qrcodeStore.metadata.description }}</p>
                         </div>
                     </div>
                     <hr />
@@ -49,17 +52,17 @@
                         <span>Contract</span>
                         <b-link
                             class="ms-auto text-accent"
-                            :href="`https://polygonscan.com/address/${claimsStore.erc721.address}`"
+                            :href="`https://polygonscan.com/address/${qrcodeStore.erc721.address}`"
                             target="_blank"
                         >
-                            <strong v-b-tooltip :title="claimsStore.erc721.description" class="ms-auto">
-                                {{ claimsStore.erc721.name }}
+                            <strong v-b-tooltip :title="qrcodeStore.erc721.description" class="ms-auto">
+                                {{ qrcodeStore.erc721.name }}
                             </strong>
                         </b-link>
                     </p>
                     <p class="d-flex align-items-center small">
                         <span>Website</span>
-                        <b-link class="ms-auto text-accent" :href="claimsStore.metadata.externalUrl" target="_blank">
+                        <b-link class="ms-auto text-accent" :href="qrcodeStore.metadata.externalUrl" target="_blank">
                             <strong>
                                 <i class="fas fa-external-link-alt"></i>
                             </strong>
@@ -71,17 +74,17 @@
                     </p>
                     <p class="d-flex align-items-center small">
                         <span>Symbol</span>
-                        <strong class="ms-auto">{{ claimsStore.erc721.symbol }}</strong>
+                        <strong class="ms-auto">{{ qrcodeStore.erc721.symbol }}</strong>
                     </p>
 
                     <BaseFormGroupWalletSelect
                         v-if="accountStore.isAuthenticated"
                         @update="wallet = $event"
-                        :chain-id="claimsStore.erc721.chainId"
+                        :chain-id="qrcodeStore.erc721.chainId"
                     />
 
                     <b-button
-                        v-if="isLoadingCollectComplete"
+                        v-if="isLoadingCollectComplete && accountStore.isMobile"
                         variant="primary"
                         @click="onClickGoToWallet"
                         class="w-100"
@@ -93,7 +96,7 @@
                         @click="onClickCollect"
                         variant="success"
                         class="w-100"
-                        :disabled="!!error || !!claimsStore.error || isLoadingCollect || !wallet"
+                        :disabled="!!error || isLoadingCollect || !wallet"
                     >
                         <b-spinner v-if="isLoadingCollect" small variant="dark" />
                         <template v-else>Collect</template>
@@ -122,10 +125,10 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQRCodeStore, useWalletStore),
         isAlertInfoShown() {
-            return !this.accountStore.isAuthenticated && !this.claimsStore.error;
+            return !this.accountStore.isAuthenticated;
         },
         isAlertErrorShown() {
-            return !!this.error || !!this.claimsStore.error;
+            return !!this.error;
         },
     },
     data() {
@@ -147,11 +150,22 @@ export default defineComponent({
             immediate: true,
         },
     },
-    async mounted() {
+    mounted() {
         this.uuid = this.$route.params.uuid as string;
-        this.claimsStore.getClaim(this.uuid);
+        this.getEntry();
     },
     methods: {
+        async getEntry() {
+            try {
+                await this.qrcodeStore.getEntry(this.uuid);
+                if (this.qrcodeStore.entry && this.qrcodeStore.entry.sub) {
+                    this.error = 'This QR code has been used already.';
+                }
+            } catch (res) {
+                const { error } = res as { error: { message: string } };
+                this.error = error.message;
+            }
+        },
         onClickSignin() {
             this.accountStore.signin();
         },
@@ -163,7 +177,7 @@ export default defineComponent({
 
             this.isLoadingCollect = true;
             try {
-                await this.claimsStore.collect(this.uuid, this.wallet);
+                await this.qrcodeStore.collect(this.uuid, this.wallet);
                 this.walletStore.list();
 
                 this.isLoadingCollectComplete = true;
@@ -177,4 +191,3 @@ export default defineComponent({
     },
 });
 </script>
-../../stores/QRCode

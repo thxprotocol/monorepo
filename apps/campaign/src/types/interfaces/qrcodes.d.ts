@@ -1,12 +1,11 @@
 type TQRCodeState = {
-    error: string;
-    claim: TClaim | null;
+    entry: TQRCodeEntry | null;
     erc721: TERC721 | null;
     metadata: TNFTMetadata | null;
 };
 
-type TQRCode = {
+type TQRCodeEntry = {
     uuid: string;
-    poolId: string;
-    error: string;
+    rewardId: string;
+    sub: string;
 };
