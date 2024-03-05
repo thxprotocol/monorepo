@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { mapStores } from 'pinia';
-import { PropType, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 import { chainList } from '../../utils/chains';
 import { WalletVariant } from '../../types/enums/accountVariant';
 import { useWalletStore } from '../../stores/Wallet';
@@ -39,8 +39,11 @@ export default defineComponent({
         },
     },
     watch: {
-        wallet(wallet: TWallet) {
-            this.$emit('update', wallet);
+        wallet: {
+            handler(wallet: TWallet) {
+                this.$emit('update', wallet);
+            },
+            immediate: true,
         },
     },
     props: {

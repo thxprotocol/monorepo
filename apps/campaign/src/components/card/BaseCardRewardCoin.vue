@@ -2,6 +2,7 @@
     <BaseCardReward :reward="reward" :image="reward.image">
         <template #title>
             <div class="flex-grow-1">{{ reward.title }}</div>
+            <div class="text-accent fw-bold">{{ reward.amount }} {{ reward.erc20.symbol }}</div>
         </template>
     </BaseCardReward>
 </template>
@@ -10,10 +11,10 @@
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
-    name: 'BaseCardRewardCustom',
+    name: 'BaseCardRewardCoin',
     props: {
         reward: {
-            type: Object as PropType<TReward>,
+            type: Object as PropType<TRewardCoin>,
             required: true,
         },
     },

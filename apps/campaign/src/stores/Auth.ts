@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL, VERIFIER_ID, API_URL } from '../config/secrets';
-import { useClaimStore } from './Claim';
+import { useQRCodeStore } from './QRCode';
 import { tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
 import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
@@ -50,7 +50,7 @@ export const useAuthStore = defineStore('auth', {
         },
         signin(extraQueryParams?: { [key: string]: any }) {
             const { poolId, config, isMobileDevice } = useAccountStore();
-            const { claim } = useClaimStore();
+            const { claim } = useQRCodeStore();
             const returnUrl = window.location.href;
 
             return this.userManager[isMobileDevice ? 'signinRedirect' : 'signinPopup']({

@@ -36,6 +36,7 @@ type TWalletState = {
     allowances: { [tokenAddress: string]: { [spender: string]: number } };
     balances: { [tokenAddress: string]: number };
     couponCodes: any[];
+    discordRoles: any[];
     pendingPoints: number;
     isLoading: boolean;
     isModalWalletCreateShown: boolean;

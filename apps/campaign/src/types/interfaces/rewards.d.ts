@@ -30,5 +30,43 @@ type TReward = {
     };
     isLocked: boolean;
     isOwner: boolean;
-    tokenGatingContractAddress: string;
 };
+
+type TBaseRewardPayment = {
+    _id: string;
+    rewardId: string;
+    poolId: string;
+    amount: number;
+    sub: string;
+    createdAt: Date;
+};
+
+type TRewardCoinPayment = TBaseRewardPayment & {
+    //
+};
+type TRewardNFTPayment = TBaseRewardPayment & {
+    //
+};
+
+type TRewardCustomPayment = TBaseRewardPayment & {
+    //
+};
+
+type TRewardCouponPayment = TBaseRewardPayment & {
+    code: string;
+    webshopURL: string;
+    couponCodeId: string;
+};
+
+type TRewardDiscordRolePayment = TRewardPayment & {
+    discordRoleId: string;
+    discordServerURL: string;
+    role: { color: string; name: string };
+};
+
+type TRewardPayment =
+    | TRewardCoinPayment
+    | TRewardNFTPayment
+    | TRewardCustomPayment
+    | TRewardCouponPayment
+    | TRewardDiscordRolePayment;
