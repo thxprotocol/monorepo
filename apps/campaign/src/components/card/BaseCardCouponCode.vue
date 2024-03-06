@@ -14,14 +14,15 @@
                 <div class="truncate-text-ellipsis">{{ token.code }}</div>
                 <i class="fas fa-external-link-alt ms-3" />
             </b-link>
-            <blockquote v-else class="mb-0 d-flex align-items-center w-100 text-accent">
+            <blockquote v-else-if="code" class="mb-0 d-flex align-items-center w-100 text-accent">
                 <strong class="truncate-text" style="letter-spacing: 0.25rem">{{ code }}</strong>
                 <b-button variant="primary" size="sm" class="ms-auto" @click="isVisible = !isVisible">
                     <i class="fas fa-eye" />
                 </b-button>
             </blockquote>
+            <blockquote v-else class="mb-0 d-flex align-items-center w-100">Code not found.</blockquote>
         </div>
-        <b-dropdown variant="link" size="sm" no-caret end>
+        <b-dropdown v-if="token.webshopURL" variant="link" size="sm" no-caret end>
             <template #button-content>
                 <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
             </template>
@@ -52,7 +53,7 @@ export default defineComponent({
     },
     props: {
         token: {
-            type: Object as PropType<TCouponRewardPayment>,
+            type: Object as PropType<TRewardCouponPayment>,
             required: true,
         },
     },
@@ -65,6 +66,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore, useWalletStore),
         isURL() {
+            if (!this.token.code) return '';
             try {
                 new URL(this.token.code);
                 return true;
@@ -73,6 +75,7 @@ export default defineComponent({
             }
         },
         code() {
+            if (!this.token.code) return '';
             if (this.isVisible) return this.token.code;
             return this.token.code
                 .split('')
