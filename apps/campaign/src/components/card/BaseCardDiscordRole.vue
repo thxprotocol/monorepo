@@ -1,11 +1,12 @@
 <template>
     <b-card body-class="d-flex align-items-center py-2">
-        <div class="pe-3" v-b-tooltip :title="token.guild.name">
+        <div class="pe-3" v-b-tooltip :title="token.guild.name" v-if="token.guild">
             <b-img v-if="token.guild.icon" :src="token.guild.icon" height="30" class="rounded" />
             <i v-else class="fab fa-discord text-primary"></i>
         </div>
         <div class="flex-grow-1">
             <b-badge
+                v-if="token.role"
                 class="p-2"
                 :style="{
                     color: 'white !important',
@@ -14,8 +15,16 @@
             >
                 {{ token.role.name }}
             </b-badge>
+            <b-badge v-else variant="dark" class="p-2">
+                Role not found
+                <i
+                    class="fas fa-info-circle"
+                    v-b-tooltip
+                    title="THX Bot is no longerin this server or the role has been removed."
+                />
+            </b-badge>
         </div>
-        <b-dropdown variant="link" size="sm" no-caret end>
+        <b-dropdown v-if="token.discordServerURL" variant="link" size="sm" no-caret end>
             <template #button-content>
                 <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
             </template>
