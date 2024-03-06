@@ -25,6 +25,48 @@
                                 <i class="fas fa-dollar-sign me-1"></i>
                                 Liquidity
                             </template>
+
+                            <BaseFormGroupInputTokenAmount
+                                @update="amountBPT = $event"
+                                :usd="veStore.pricing['THX']"
+                                :balance="Math.floor(walletStore.balances[bptAddress])"
+                                :value="amountBPT"
+                                :min="0"
+                                :max="Math.floor(walletStore.balances[bptAddress])"
+                                class="mb-4"
+                            >
+                                <template #label>
+                                    <div class="d-flex align-items-center">
+                                        <b-img
+                                            src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+                                            alt="USDC icon"
+                                            width="20"
+                                            height="20"
+                                            class="me-2"
+                                        />
+                                        USDC <span class="text-opaque ms-1">20%</span>
+                                        <b-img
+                                            src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
+                                            alt="THX icon"
+                                            width="20"
+                                            height="20"
+                                            class="mx-2"
+                                        />
+                                        THX <span class="text-opaque ms-1">80%</span>
+                                    </div>
+                                </template>
+                            </BaseFormGroupInputTokenAmount>
+                            <b-button
+                                :disabled="!amountBPT"
+                                class="w-100 mt-3"
+                                @click="onClickStakeLiquidity"
+                                :variant="!amountBPT ? 'primary' : 'success'"
+                            >
+                                Stake Liquidity
+                            </b-button>
+
+                            <hr />
+
                             <BaseFormGroupInputTokenAmount
                                 @update="amountUSDC = $event"
                                 :usd="veStore.pricing['USDC']"
@@ -69,14 +111,14 @@
                                     </div>
                                 </template>
                             </BaseFormGroupInputTokenAmount>
-                            <b-button disabled class="w-100 mt-3" @click="onClickAddLiquidity" variant="success">
-                                Add Liquidity
+                            <b-button disabled class="w-100 mt-3" @click="onClickAddLiquidity" variant="primary">
+                                Create Liquidity
                             </b-button>
                         </b-tab>
                         <b-tab active>
                             <template #title>
                                 <i class="fas fa-lock me-1"></i>
-                                Deposit
+                                Lock
                             </template>
                             <BaseFormGroupInputTokenAmount
                                 symbol="20USDC-80THX"
@@ -97,7 +139,7 @@
                                             height="20"
                                             class="me-2"
                                         />
-                                        20% USDC
+                                        USDC <span class="text-opaque ms-1">20%</span>
                                         <b-img
                                             src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
                                             alt="THX icon"
@@ -105,7 +147,7 @@
                                             height="20"
                                             class="mx-2"
                                         />
-                                        80% THX
+                                        THX <span class="text-opaque ms-1">80%</span>
                                     </div>
                                 </template>
                             </BaseFormGroupInputTokenAmount>
@@ -255,13 +297,12 @@ export default defineComponent({
             amountDeposit: 0,
             amountUSDC: 0,
             amountTHX: 0,
+            amountBPT: 0,
             isEarlyAttempt: false,
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useWalletStore),
-        ...mapStores(useVeStore),
+        ...mapStores(useAccountStore, useWalletStore, useVeStore),
         suggestedDates() {
             if (!this.allowedDates.length) return [];
             return [
@@ -316,6 +357,7 @@ export default defineComponent({
     methods: {
         onClickStart() {},
         onClickAddLiquidity() {},
+        onClickStakeLiquidity() {},
     },
 });
 </script>

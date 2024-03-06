@@ -1,12 +1,12 @@
 <template>
     <b-card body-class="d-flex align-items-center" class="mb-1">
         <div class="pe-3" v-if="token.erc20">
-            <img height="25" :src="token.erc20.logoImgUrl" />
+            <img height="20" :src="token.erc20.logoImgUrl" />
         </div>
         <div class="flex-grow-1">
-            <strong>{{ token.erc20.name }}</strong>
+            <strong>{{ token.erc20.symbol }}</strong>
         </div>
-        <div class="text-success fw-bold">{{ token.walletBalance }} {{ token.erc20.symbol }}</div>
+        <div class="text-success fw-bold">{{ token.walletBalance }}</div>
         <div>
             <b-dropdown variant="link" size="sm" no-caret end toggle-class="py-0">
                 <template #button-content>
@@ -54,8 +54,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useWalletStore),
+        ...mapStores(useAccountStore, useWalletStore),
         isMigrateAvailable() {
             return this.token.migrationBalance ? Number(fromWei(this.token.migrationBalance)) > 0 : false;
         },

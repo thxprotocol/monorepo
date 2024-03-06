@@ -131,9 +131,15 @@ export default defineComponent({
                 const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
 
                 // Values to check
-                const { amount, end } = this.veStore.lock as TVeLock;
-                const totalAmount = amount + this.amountDeposit;
-                const latestLockEndTimestamp = end < lockEndTimestamp ? lockEndTimestamp : end;
+                const lock = this.veStore.lock;
+                const totalAmount = lock ? lock.amount + this.amountDeposit : this.amountDeposit;
+                const latestLockEndTimestamp = lock
+                    ? lock.end < lockEndTimestamp
+                        ? lockEndTimestamp
+                        : lock.end
+                    : lockEndTimestamp;
+
+                // Stake the BPT
 
                 // Make deposit
                 await this.veStore.deposit({ amountInWei, lockEndTimestamp });

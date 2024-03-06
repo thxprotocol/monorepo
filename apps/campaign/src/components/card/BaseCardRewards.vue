@@ -12,7 +12,7 @@
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
             </b-button>
         </template>
-        <b-tab title="Coins" v-if="walletStore.erc20.length">
+        <b-tab title="Coins">
             <div :key="key" v-for="(token, key) of walletStore.erc20" class="mb-1">
                 <component :is="token.component" :token="token" />
             </div>
