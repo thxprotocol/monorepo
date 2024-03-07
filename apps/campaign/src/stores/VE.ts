@@ -20,24 +20,27 @@ export const useVeStore = defineStore('ve', {
             this.lock = locks[0].end ? locks[0] : null;
         },
         async deposit({ lockEndTimestamp, amountInWei }: TRequestBodyDeposit) {
+            const { wallet, confirmTransactions } = useWalletStore();
+            if (!wallet) return;
+
             const { api } = useAccountStore();
             const txs = await api.request.post('/v1/ve/deposit', {
-                data: {
-                    amountInWei,
-                    lockEndTimestamp,
-                },
+                data: { amountInWei, lockEndTimestamp },
+                params: { walletId: wallet._id },
             });
-            await useWalletStore().confirmTransactions(txs);
+
+            await confirmTransactions(txs);
         },
         async withdraw(isEarlyAttempt: boolean) {
-            if (!this.lock) return;
+            const { wallet, confirmTransactions } = useWalletStore();
+            if (!wallet || !this.lock) return;
+
             const { api } = useAccountStore();
             const txs = await api.request.post('/v1/ve/withdraw', {
-                data: {
-                    isEarlyAttempt: isEarlyAttempt,
-                },
+                data: { isEarlyAttempt: isEarlyAttempt },
+                params: { walletId: wallet._id },
             });
-            await useWalletStore().confirmTransactions(txs);
+            await confirmTransactions(txs);
         },
         waitForLock(amountInWei: number, lockEndTimestamp: number) {
             const getLatestLockAmount = () => (this.lock ? this.lock.amount : 0);

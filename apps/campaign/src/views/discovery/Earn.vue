@@ -184,7 +184,7 @@
                                 :disabled="isDisabledDeposit"
                                 @click="isModalDepositShown = true"
                                 class="w-100 mt-3"
-                                variant="success"
+                                :variant="!amountDeposit ? 'primary' : 'success'"
                             >
                                 Deposit
                             </b-button>
@@ -213,7 +213,7 @@
                             <b-row>
                                 <b-col>
                                     <b-form-group label="Amount">
-                                        <strong class="h3">{{ veStore.lock.amount }}</strong>
+                                        <strong class="h3">{{ amount }}</strong>
                                     </b-form-group>
                                 </b-col>
                                 <b-col>
@@ -254,6 +254,7 @@ import { useLiquidityStore } from '../../stores/Liquidity';
 import { getChainId, useVeStore } from '../../stores/VE';
 import { format, differenceInDays } from 'date-fns';
 import { contractNetworks } from '../../config/constants';
+import { fromWei } from 'web3-utils';
 
 const { USDC, THX, BPT, BPTGauge } = contractNetworks[getChainId()];
 const OneDayInMs = 60 * 60 * 24 * 1000;
@@ -344,9 +345,15 @@ export default defineComponent({
             if (!this.allowedDates.length) return new Date();
             return new Date(this.allowedDates[0]);
         },
+        amount() {
+            if (!this.veStore.lock) return;
+            return fromWei(String(this.veStore.lock.amount));
+        },
     },
     watch: {
-        'accountStore.isAuthenticated'() {
+        'walletStore.wallet'(wallet) {
+            if (!wallet) return;
+
             this.walletStore.getBalance(this.bptAddress).then(() => {
                 this.amountStake = this.walletStore.balances[this.bptAddress];
             });

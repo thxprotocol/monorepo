@@ -229,6 +229,7 @@ export const useWalletStore = defineStore('wallet', {
 
             return await api.request.post(`/v1/account/wallets/confirm`, {
                 data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature: signature.data }),
+                params: { walletId: this.wallet._id },
             });
         },
         async confirmTransactions(transactions: TTransaction[]) {
@@ -256,9 +257,12 @@ export const useWalletStore = defineStore('wallet', {
             this.allowances[params.tokenAddress][params.spender] = Number(allowanceInWei);
         },
         async approve(data: TRequestBodyApproval) {
+            if (!this.wallet) return;
+
             const { api } = useAccountStore();
             const [tx] = await api.request.post('/v1/ve/approve', {
                 data,
+                params: { walletId: this.wallet?._id },
             });
             await useWalletStore().confirmTransaction(tx.safeTxHash);
         },
