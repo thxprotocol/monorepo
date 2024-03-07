@@ -237,17 +237,21 @@ export const useWalletStore = defineStore('wallet', {
             }
         },
         async getBalance(tokenAddress: string) {
-            if (!tokenAddress) return;
+            if (!this.wallet || !tokenAddress) return;
 
             const { api } = useAccountStore();
             const { balanceInWei } = await api.request.get('/v1/erc20/balance', {
-                params: { tokenAddress },
+                params: { tokenAddress, walletId: this.wallet._id },
             });
             this.balances[tokenAddress] = Number(formatUnits(balanceInWei, 'ether'));
         },
         async getApproval(params: TRequestParamsAllowance) {
+            if (!this.wallet) return;
+
             const { api } = useAccountStore();
-            const { allowanceInWei } = await api.request.get('/v1/erc20/allowance', { params });
+            const { allowanceInWei } = await api.request.get('/v1/erc20/allowance', {
+                params: { ...params, walletId: this.wallet._id },
+            });
             if (!this.allowances[params.tokenAddress]) this.allowances[params.tokenAddress] = {};
             this.allowances[params.tokenAddress][params.spender] = Number(allowanceInWei);
         },

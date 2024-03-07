@@ -28,7 +28,7 @@
 
                             <BaseFormGroupInputTokenAmount
                                 @update="amountStake = $event"
-                                :usd="veStore.pricing['20USDC-80THX']"
+                                :usd="liquidityStore.pricing['20USDC-80THX']"
                                 :balance="Math.floor(walletStore.balances[bptAddress])"
                                 :value="amountStake"
                                 :min="0"
@@ -69,11 +69,11 @@
                                 :amount="amountStake"
                                 @hidden="isModalStakeShown = false"
                             />
-                            <hr />
+                            <!-- <hr />
 
                             <BaseFormGroupInputTokenAmount
                                 @update="amountUSDC = $event"
-                                :usd="veStore.pricing['USDC']"
+                                :usd="liquidityStore.pricing['USDC']"
                                 :balance="Math.floor(walletStore.balances[usdcAddress])"
                                 :value="amountUSDC"
                                 :min="0"
@@ -95,7 +95,7 @@
                             </BaseFormGroupInputTokenAmount>
                             <BaseFormGroupInputTokenAmount
                                 @update="amountTHX = $event"
-                                :usd="veStore.pricing['THX']"
+                                :usd="liquidityStore.pricing['THX']"
                                 :balance="Math.floor(walletStore.balances[thxAddress])"
                                 :value="amountTHX"
                                 :min="0"
@@ -115,7 +115,7 @@
                                     </div>
                                 </template>
                             </BaseFormGroupInputTokenAmount>
-                            <b-button disabled class="w-100 mt-3" variant="primary"> Create Liquidity </b-button>
+                            <b-button disabled class="w-100 mt-3" variant="primary"> Create Liquidity </b-button> -->
                         </b-tab>
                         <b-tab>
                             <template #title>
@@ -124,11 +124,11 @@
                             </template>
                             <BaseFormGroupInputTokenAmount
                                 symbol="20USDC-80THX-gauge"
-                                :usd="veStore.pricing['20USDC-80THX']"
+                                :usd="liquidityStore.pricing['20USDC-80THX']"
                                 :balance="Math.floor(walletStore.balances[bptGaugeAddress])"
                                 :value="amountDeposit"
                                 @update="amountDeposit = $event"
-                                :min="minBPTGValue / veStore.pricing['20USDC-80THX']"
+                                :min="minBPTGValue / liquidityStore.pricing['20USDC-80THX']"
                                 :max="Math.floor(walletStore.balances[bptGaugeAddress])"
                                 class="mb-4"
                             >
@@ -250,6 +250,7 @@ import { defineComponent } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
+import { useLiquidityStore } from '../../stores/Liquidity';
 import { getChainId, useVeStore } from '../../stores/VE';
 import { format, differenceInDays } from 'date-fns';
 import { contractNetworks } from '../../config/constants';
@@ -306,7 +307,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore, useWalletStore, useVeStore),
+        ...mapStores(useAccountStore, useWalletStore, useVeStore, useLiquidityStore),
         suggestedDates() {
             if (!this.allowedDates.length) return [];
             return [
@@ -334,7 +335,7 @@ export default defineComponent({
             return Number(now) < Number(end);
         },
         isDisabledDeposit() {
-            return this.amountDeposit * this.veStore.pricing['20USDC-80THX'] < this.minBPTGValue;
+            return this.amountDeposit * this.liquidityStore.pricing['20USDC-80THX'] < this.minBPTGValue;
         },
         allowedDates() {
             return getThursdaysUntilTimestamp(Date.now() + NinetyDaysInMs);
@@ -358,7 +359,7 @@ export default defineComponent({
                     this.minDate = new Date(this.veStore.lock.end);
                 }
             });
-            this.veStore.getSpotPrice();
+            this.liquidityStore.getSpotPrice();
         },
     },
     methods: {

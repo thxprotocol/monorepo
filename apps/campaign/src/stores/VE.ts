@@ -12,7 +12,6 @@ export function getChainId() {
 export const useVeStore = defineStore('ve', {
     state: (): TVeState => ({
         lock: null,
-        pricing: { 'THX': 0, 'USDC': 0, '20USDC-80THX': 0 },
     }),
     actions: {
         async getLocks() {
@@ -39,11 +38,6 @@ export const useVeStore = defineStore('ve', {
                 },
             });
             await useWalletStore().confirmTransactions(txs);
-        },
-        async getSpotPrice() {
-            const { api } = useAccountStore();
-            const pricing = await api.request.get('/v1/ve/price');
-            this.pricing = pricing;
         },
         waitForLock(amountInWei: number, lockEndTimestamp: number) {
             const getLatestLockAmount = () => (this.lock ? this.lock.amount : 0);

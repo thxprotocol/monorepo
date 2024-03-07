@@ -126,11 +126,10 @@ type TVeLock = {
 
 type TVeState = {
     lock: TVeLock | null;
-    pricing: { [key: string]: number };
 };
 
 type TLiquidityState = {
-    //
+    pricing: { [key: string]: number };
 };
 
 type TRequestBodyDeposit = {
