@@ -1,5 +1,12 @@
 <template>
-    <b-modal v-model="isShown" @hidden="$emit('hidden')" @show="onShow" centered hide-footer title="Lock 20USDC-80THX">
+    <b-modal
+        v-model="isShown"
+        @hidden="$emit('hidden')"
+        @show="onShow"
+        centered
+        hide-footer
+        title="Stake 20USDC-80THX @ Balancer"
+    >
         <b-alert v-model="isAlertInfoShown" variant="info" class="py-2 px-3">
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
@@ -16,9 +23,9 @@
             </b-tab>
             <b-tab title="2. Deposit">
                 <b-form-group>
-                    <b-form-input type="number" v-model="amountDeposit" />
+                    <b-form-input type="number" v-model="amountStake" />
                 </b-form-group>
-                <b-button variant="primary" @click="onClickDeposit" class="w-100" :disabled="isPolling">
+                <b-button variant="primary" @click="onClickStake" class="w-100" :disabled="isPolling">
                     <b-spinner v-if="isPolling" small />
                     <template v-else>Deposit</template>
                 </b-button>
@@ -35,43 +42,42 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { getChainId, useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
+import { useLiquidityStore } from '../../stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
 import poll from 'promise-poller';
 import { toWei } from 'web3-utils';
 
-const { BPTGauge: BPTG_ADDRESS, VotingEscrow: VE_ADDRESS } = contractNetworks[getChainId()];
+const { BPT: BPT_ADDRESS, BPTGauge: BPTG_ADDRESS } = contractNetworks[getChainId()];
 
 export default defineComponent({
-    name: 'BaseModalDeposit',
+    name: 'BaseModalStake',
     data() {
         return {
             isShown: false,
             error: '',
             isPolling: false,
             tabIndex: 0,
-            isModalDepositShown: false,
+            isModalStakeShown: false,
             amountApproval: 0,
-            amountDeposit: 0,
+            amountStake: 0,
         };
     },
     props: {
         show: Boolean,
         amount: { type: Number, required: true },
-        lockEnd: { type: Date, required: true },
     },
     computed: {
-        ...mapStores(useWalletStore),
-        ...mapStores(useVeStore),
+        ...mapStores(useWalletStore, useVeStore, useLiquidityStore),
         allowance() {
-            if (!this.walletStore.allowances[BPTG_ADDRESS]) return 0;
-            if (!this.walletStore.allowances[BPTG_ADDRESS][VE_ADDRESS]) return 0;
-            return this.walletStore.allowances[BPTG_ADDRESS][VE_ADDRESS];
+            if (!this.walletStore.allowances[BPT_ADDRESS]) return 0;
+            if (!this.walletStore.allowances[BPT_ADDRESS][BPTG_ADDRESS]) return 0;
+            return this.walletStore.allowances[BPT_ADDRESS][BPTG_ADDRESS];
         },
         isAlertInfoShown() {
             return !!this.error;
         },
         isSufficientAllowance() {
-            if (this.allowance >= this.amountDeposit) return true;
+            if (this.allowance >= this.amountStake) return true;
             return false;
         },
     },
@@ -86,7 +92,7 @@ export default defineComponent({
     methods: {
         async onShow() {
             this.amountApproval = this.amount;
-            this.amountDeposit = this.amount;
+            this.amountStake = this.amount;
             await this.getApproval();
             if (this.isSufficientAllowance) {
                 this.tabIndex = 1;
@@ -94,9 +100,9 @@ export default defineComponent({
         },
         getApproval() {
             return this.walletStore.getApproval({
-                tokenAddress: BPTG_ADDRESS,
-                spender: VE_ADDRESS,
-                amountInWei: toWei(String(this.amountDeposit)),
+                tokenAddress: BPT_ADDRESS,
+                spender: BPTG_ADDRESS,
+                amountInWei: toWei(String(this.amountApproval)),
             });
         },
         waitForApproval() {
@@ -110,9 +116,9 @@ export default defineComponent({
             this.isPolling = true;
             try {
                 await this.walletStore.approve({
-                    tokenAddress: BPTG_ADDRESS,
-                    spender: VE_ADDRESS,
-                    amountInWei: toWei(String(this.amountDeposit)),
+                    tokenAddress: BPT_ADDRESS,
+                    spender: BPTG_ADDRESS,
+                    amountInWei: toWei(String(this.amountApproval)),
                 });
 
                 // poll for allowance to increase
@@ -126,30 +132,19 @@ export default defineComponent({
                 this.isPolling = false;
             }
         },
-        async onClickDeposit() {
+        async onClickStake() {
             this.isPolling = true;
             try {
                 // Values to send
-                const amountInWei = toWei(String(this.amountDeposit));
-                const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
-
-                // Values to check
-                const lock = this.veStore.lock;
-                const totalAmount = lock ? lock.amount + this.amountDeposit : this.amountDeposit;
-                const latestLockEndTimestamp = lock
-                    ? lock.end < lockEndTimestamp
-                        ? lockEndTimestamp
-                        : lock.end
-                    : lockEndTimestamp;
-
-                // Stake the BPT
+                const amountInWei = toWei(String(this.amountStake));
 
                 // Make deposit
-                await this.veStore.deposit({ amountInWei, lockEndTimestamp });
+                await this.liquidityStore.stake({ amountInWei });
 
-                // Wait for amount and/or endDate to be updated if it changed
-                await this.veStore.waitForLock(totalAmount, latestLockEndTimestamp);
+                // Wait for BPTGauge balance to increase
+                // await this.liquidityStore.waitForStake(totalAmount);
 
+                this.walletStore.getBalance(BPT_ADDRESS);
                 this.walletStore.getBalance(BPTG_ADDRESS);
 
                 // Hide modal (or cast "success" and switch parent tab to withdrawal/rewards)

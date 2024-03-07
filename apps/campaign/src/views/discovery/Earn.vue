@@ -20,17 +20,17 @@
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
                 <b-card class="border-0 gradient-shadow-xl" style="min-height: 415px">
                     <b-tabs pills justified content-class="mt-3" nav-wrapper-class="text-white">
-                        <b-tab title="Invest">
+                        <b-tab active>
                             <template #title>
-                                <i class="fas fa-dollar-sign me-1"></i>
+                                <i class="fas fa-balance-scale me-1"></i>
                                 Liquidity
                             </template>
 
                             <BaseFormGroupInputTokenAmount
-                                @update="amountBPT = $event"
-                                :usd="veStore.pricing['THX']"
+                                @update="amountStake = $event"
+                                :usd="veStore.pricing['20USDC-80THX']"
                                 :balance="Math.floor(walletStore.balances[bptAddress])"
-                                :value="amountBPT"
+                                :value="amountStake"
                                 :min="0"
                                 :max="Math.floor(walletStore.balances[bptAddress])"
                                 class="mb-4"
@@ -57,14 +57,18 @@
                                 </template>
                             </BaseFormGroupInputTokenAmount>
                             <b-button
-                                :disabled="!amountBPT"
+                                :disabled="!amountStake"
                                 class="w-100 mt-3"
-                                @click="onClickStakeLiquidity"
-                                :variant="!amountBPT ? 'primary' : 'success'"
+                                @click="isModalStakeShown = true"
+                                :variant="!amountStake ? 'primary' : 'success'"
                             >
                                 Stake Liquidity
                             </b-button>
-
+                            <BaseModalStake
+                                :show="isModalStakeShown"
+                                :amount="amountStake"
+                                @hidden="isModalStakeShown = false"
+                            />
                             <hr />
 
                             <BaseFormGroupInputTokenAmount
@@ -111,23 +115,21 @@
                                     </div>
                                 </template>
                             </BaseFormGroupInputTokenAmount>
-                            <b-button disabled class="w-100 mt-3" @click="onClickAddLiquidity" variant="primary">
-                                Create Liquidity
-                            </b-button>
+                            <b-button disabled class="w-100 mt-3" variant="primary"> Create Liquidity </b-button>
                         </b-tab>
-                        <b-tab active>
+                        <b-tab>
                             <template #title>
                                 <i class="fas fa-lock me-1"></i>
                                 Lock
                             </template>
                             <BaseFormGroupInputTokenAmount
-                                symbol="20USDC-80THX"
+                                symbol="20USDC-80THX-gauge"
                                 :usd="veStore.pricing['20USDC-80THX']"
-                                :balance="Math.floor(walletStore.balances[bptAddress])"
+                                :balance="Math.floor(walletStore.balances[bptGaugeAddress])"
                                 :value="amountDeposit"
                                 @update="amountDeposit = $event"
-                                :min="minBPTValue / veStore.pricing['20USDC-80THX']"
-                                :max="Math.floor(walletStore.balances[bptAddress])"
+                                :min="minBPTGValue / veStore.pricing['20USDC-80THX']"
+                                :max="Math.floor(walletStore.balances[bptGaugeAddress])"
                                 class="mb-4"
                             >
                                 <template #label>
@@ -248,11 +250,11 @@ import { defineComponent } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
-import { useVeStore } from '../../stores/VE';
-import { BPT_ADDRESS } from '../../config/secrets';
-import { THX_POLYGON_ADDRESS, USDC_POLYGON_ADDRESS } from '../../config/constants';
+import { getChainId, useVeStore } from '../../stores/VE';
 import { format, differenceInDays } from 'date-fns';
+import { contractNetworks } from '../../config/constants';
 
+const { USDC, THX, BPT, BPTGauge } = contractNetworks[getChainId()];
 const OneDayInMs = 60 * 60 * 24 * 1000;
 const NinetyDaysInMs = OneDayInMs * 90;
 const MaxDuration = Date.now() + NinetyDaysInMs;
@@ -282,22 +284,24 @@ export default defineComponent({
         return {
             format,
             differenceInDays,
-            usdcAddress: USDC_POLYGON_ADDRESS,
-            thxAddress: THX_POLYGON_ADDRESS,
-            bptAddress: BPT_ADDRESS,
+            usdcAddress: USDC,
+            thxAddress: THX,
+            bptAddress: BPT,
+            bptGaugeAddress: BPTGauge,
             publicUrl: 'https://thx.network',
+            isModalStakeShown: false,
             isModalDepositShown: false,
             isAlertDepositShown: true,
             isModalWithdrawShown: false,
             maxDuration: MaxDuration,
             maxDate: new Date(MaxDuration),
             lockEnd: new Date(),
-            minBPTValue: 3,
+            minBPTGValue: 3,
             balPrice: 0,
+            amountStake: 0,
             amountDeposit: 0,
             amountUSDC: 0,
             amountTHX: 0,
-            amountBPT: 0,
             isEarlyAttempt: false,
         };
     },
@@ -330,7 +334,7 @@ export default defineComponent({
             return Number(now) < Number(end);
         },
         isDisabledDeposit() {
-            return this.amountDeposit * this.veStore.pricing['20USDC-80THX'] < this.minBPTValue;
+            return this.amountDeposit * this.veStore.pricing['20USDC-80THX'] < this.minBPTGValue;
         },
         allowedDates() {
             return getThursdaysUntilTimestamp(Date.now() + NinetyDaysInMs);
@@ -342,8 +346,11 @@ export default defineComponent({
     },
     watch: {
         'accountStore.isAuthenticated'() {
-            this.walletStore.getBalance(BPT_ADDRESS).then(() => {
-                this.amountDeposit = this.walletStore.balances[this.bptAddress];
+            this.walletStore.getBalance(this.bptAddress).then(() => {
+                this.amountStake = this.walletStore.balances[this.bptAddress];
+            });
+            this.walletStore.getBalance(this.bptGaugeAddress).then(() => {
+                this.amountDeposit = this.walletStore.balances[this.bptGaugeAddress];
             });
             this.veStore.getLocks().then(() => {
                 // Update minDate if there is a lock already
@@ -356,8 +363,6 @@ export default defineComponent({
     },
     methods: {
         onClickStart() {},
-        onClickAddLiquidity() {},
-        onClickStakeLiquidity() {},
     },
 });
 </script>

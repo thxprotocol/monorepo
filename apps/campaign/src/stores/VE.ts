@@ -1,7 +1,13 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
+import { ChainId } from '@thxnetwork/sdk';
+import { MODE } from '../config/secrets';
 import poll from 'promise-poller';
+
+export function getChainId() {
+    return MODE !== 'production' ? ChainId.Hardhat : ChainId.Polygon;
+}
 
 export const useVeStore = defineStore('ve', {
     state: (): TVeState => ({

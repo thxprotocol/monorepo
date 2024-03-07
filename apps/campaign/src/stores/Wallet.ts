@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/mixpanel';
-import { BPT_ADDRESS, HARDHAT_RPC, POLYGON_RPC } from '../config/secrets';
+import { HARDHAT_RPC, POLYGON_RPC } from '../config/secrets';
 import { useAuthStore } from './Auth';
 import { EthersAdapter, SafeConfig } from '@safe-global/protocol-kit';
 import { ethers } from 'ethers';
@@ -16,6 +16,7 @@ import { watchAccount, signMessage, switchChain } from '@wagmi/core';
 import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
 import { RewardVariant } from '../types/enums/rewards';
+import { formatUnits } from 'ethers/lib/utils';
 
 type TRequestParamsAllowance = {
     tokenAddress: string;
@@ -242,7 +243,7 @@ export const useWalletStore = defineStore('wallet', {
             const { balanceInWei } = await api.request.get('/v1/erc20/balance', {
                 params: { tokenAddress },
             });
-            this.balances[tokenAddress] = Number(balanceInWei);
+            this.balances[tokenAddress] = Number(formatUnits(balanceInWei, 'ether'));
         },
         async getApproval(params: TRequestParamsAllowance) {
             const { api } = useAccountStore();

@@ -126,7 +126,11 @@ type TVeLock = {
 
 type TVeState = {
     lock: TVeLock | null;
-    pricing: { '20USDC-80THX': number; 'THX': number; 'USDC': number };
+    pricing: { [key: string]: number };
+};
+
+type TLiquidityState = {
+    //
 };
 
 type TRequestBodyDeposit = {

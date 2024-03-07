@@ -69,6 +69,7 @@ declare module 'vue' {
     BaseModalLogin: typeof import('./src/components/modal/BaseModalLogin.vue')['default']
     BaseModalQuestEntry: typeof import('./src/components/modal/BaseModalQuestEntry.vue')['default']
     BaseModalRewardPayment: typeof import('./src/components/modal/BaseModalRewardPayment.vue')['default']
+    BaseModalStake: typeof import('./src/components/modal/BaseModalStake.vue')['default']
     BaseModalWallet: typeof import('./src/components/modal/BaseModalWallet.vue')['default']
     BaseModalWalletCreate: typeof import('./src/components/modal/BaseModalWalletCreate.vue')['default']
     BaseModalWalletRecovery: typeof import('./src/components/modal/BaseModalWalletRecovery.vue')['default']
