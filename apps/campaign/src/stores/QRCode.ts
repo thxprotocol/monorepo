@@ -24,7 +24,7 @@ export const useQRCodeStore = defineStore('qrcode', {
         },
         async collect(uuid: string, wallet: TWallet) {
             const { api, account, poolId, config } = useAccountStore();
-            await api.request.patch(`/v1/qr-codes/${uuid}/entries`, { params: { walletId: wallet._id } });
+            await api.request.patch(`/v1/qr-codes/${uuid}`, { params: { walletId: wallet._id } });
             sessionStorage.removeItem('thxClaimUuid');
 
             track('UserCreates', [account?.sub, 'claim URL claim', { poolId, origin: config.origin }]);
