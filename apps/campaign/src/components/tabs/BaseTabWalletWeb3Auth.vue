@@ -1,5 +1,9 @@
 <template>
-    <b-alert variant="warning" show class="p-2 px-3">
+    <b-alert variant="primary" show class="p-2 px-3" v-model="isAlertDangerShown">
+        <i class="fas fa-exclamation-circle me-2" /> {{ error }}
+    </b-alert>
+
+    <b-alert variant="warning" show class="p-2 px-3" v-model="isAlertWarningShown">
         <i class="fas fa-exclamation-circle me-2" />
         <span>Store your secret answer safely!</span>
     </b-alert>
@@ -61,7 +65,6 @@ export default defineComponent({
             question: '',
             password: '',
             passwordCheck: '',
-            isCreateFailed: false,
             isUsernameInvalid: false,
             error: '',
             show: false,
@@ -72,6 +75,12 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useWalletStore),
+        isAlertWarningShown() {
+            return true;
+        },
+        isAlertDangerShown() {
+            return !!this.error;
+        },
         isPasswordLengthValid() {
             if (this.password.length >= 10) return true;
             if (this.password.length && this.password.length < 10) return false;
@@ -122,7 +131,7 @@ export default defineComponent({
 
                 this.$emit('close');
             } catch (error) {
-                this.isCreateFailed = true;
+                this.$emit('error', String(error));
                 console.error(error);
             } finally {
                 this.isLoading = false;
