@@ -1,6 +1,9 @@
+import poll from 'promise-poller';
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
+import { contractNetworks } from '../config/constants';
+import { fromWei } from 'web3-utils';
 
 export const useLiquidityStore = defineStore('liquidity', {
     state: (): TLiquidityState => ({
@@ -19,7 +22,23 @@ export const useLiquidityStore = defineStore('liquidity', {
         async getSpotPrice() {
             const { api } = useAccountStore();
             const pricing = await api.request.get('/v1/liquidity/price');
+
             this.pricing = pricing;
+        },
+        async waitForStake(amountInWei: string) {
+            const { wallet, balances, getBalance } = useWalletStore();
+            if (!wallet) return;
+
+            const bptGaugeAddress = contractNetworks[wallet.chainId].BPTGauge;
+            const oldBalance = balances[bptGaugeAddress];
+            const taskFn = async () => {
+                await getBalance(bptGaugeAddress);
+                return useWalletStore().balances[bptGaugeAddress] === Number(fromWei(amountInWei)) + Number(oldBalance)
+                    ? Promise.resolve()
+                    : Promise.reject('Stake');
+            };
+
+            return poll({ taskFn, interval: 3000, retries: 20 });
         },
     },
 });

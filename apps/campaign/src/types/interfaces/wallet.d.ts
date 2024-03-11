@@ -34,7 +34,7 @@ type TWalletState = {
     erc721: any[];
     erc1155: any[];
     allowances: { [tokenAddress: string]: { [spender: string]: number } };
-    balances: { [tokenAddress: string]: BigNumber };
+    balances: { [tokenAddress: string]: number };
     couponCodes: any[];
     discordRoles: any[];
     pendingPoints: number;

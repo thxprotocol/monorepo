@@ -206,7 +206,6 @@ export const useWalletStore = defineStore('wallet', {
             }
         },
         async confirmTransaction(safeTxHash: string) {
-            console.log(this.wallet, safeTxHash);
             if (!this.wallet || this.wallet.variant !== WalletVariant.Safe) return;
 
             const { api } = useAccountStore();

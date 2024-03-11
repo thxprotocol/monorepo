@@ -175,10 +175,14 @@ export const useAuthStore = defineStore('auth', {
             await this.requestOAuthShareRefresh();
         },
         async getPrivateKey() {
-            // Always refresh as tokens can be max 1 min old
+            // Always refresh as tokens can only be max 1 min old
             await this.requestOAuthShareRefresh();
+
+            // Get the oauth share (1/3)
             await this.triggerLogin();
+            // Get the device share (2/3)
             await this.getDeviceShare();
+            // Get the user controlled share (3/3)
             await this.getSecurityQuestion();
 
             // If no device share is available but there is a security question

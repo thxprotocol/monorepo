@@ -149,10 +149,7 @@ export default defineComponent({
                 await this.liquidityStore.stake({ amountInWei });
 
                 // Wait for BPTGauge balance to increase
-                // await this.liquidityStore.waitForStake(totalAmount);
-
-                this.walletStore.getBalance(this.bptAddress);
-                this.walletStore.getBalance(this.bptGaugeAddress);
+                await this.liquidityStore.waitForStake(amountInWei);
 
                 // Hide modal (or cast "success" and switch parent tab to withdrawal/rewards)
                 this.$emit('hidden');

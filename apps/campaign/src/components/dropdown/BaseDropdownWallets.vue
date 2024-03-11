@@ -4,7 +4,7 @@
         menu-class="w-100"
         toggle-class="rounded d-flex align-items-center justify-content-between"
         v-model="isOpen"
-        variant="primary"
+        variant="link-white"
         no-caret
     >
         <template #button-content>
