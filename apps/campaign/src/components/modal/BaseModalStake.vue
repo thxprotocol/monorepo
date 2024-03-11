@@ -40,14 +40,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { getChainId, useVeStore } from '../../stores/VE';
+import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
-import poll from 'promise-poller';
 import { fromWei, toWei } from 'web3-utils';
-
-const { BPT: BPT_ADDRESS, BPTGauge: BPTG_ADDRESS } = contractNetworks[getChainId()];
+import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseModalStake',
@@ -70,9 +68,9 @@ export default defineComponent({
     computed: {
         ...mapStores(useWalletStore, useVeStore, useLiquidityStore),
         allowance() {
-            if (!this.walletStore.allowances[BPT_ADDRESS]) return 0;
-            if (!this.walletStore.allowances[BPT_ADDRESS][BPTG_ADDRESS]) return 0;
-            return this.walletStore.allowances[BPT_ADDRESS][BPTG_ADDRESS];
+            if (!this.walletStore.allowances[this.bptAddress]) return 0;
+            if (!this.walletStore.allowances[this.bptAddress][this.bptGaugeAddress]) return 0;
+            return this.walletStore.allowances[this.bptAddress][this.bptGaugeAddress];
         },
         isAlertInfoShown() {
             return !!this.error;
@@ -80,6 +78,14 @@ export default defineComponent({
         isSufficientAllowance() {
             if (this.allowance >= this.amountStake) return true;
             return false;
+        },
+        bptAddress() {
+            if (!this.walletStore.wallet) return;
+            return contractNetworks[this.walletStore.wallet.chainId].BPT;
+        },
+        bptGaugeAddress() {
+            if (!this.walletStore.wallet) return;
+            return contractNetworks[this.walletStore.wallet.chainId].BPTGauge;
         },
     },
     watch: {
@@ -101,8 +107,8 @@ export default defineComponent({
         },
         getApproval() {
             return this.walletStore.getApproval({
-                tokenAddress: BPT_ADDRESS,
-                spender: BPTG_ADDRESS,
+                tokenAddress: this.bptAddress,
+                spender: this.bptGaugeAddress,
                 amountInWei: toWei(String(this.amountApproval)),
             });
         },
@@ -117,8 +123,8 @@ export default defineComponent({
             this.isPolling = true;
             try {
                 await this.walletStore.approve({
-                    tokenAddress: BPT_ADDRESS,
-                    spender: BPTG_ADDRESS,
+                    tokenAddress: this.bptAddress,
+                    spender: this.bptGaugeAddress,
                     amountInWei: toWei(String(this.amountApproval)),
                 });
 
@@ -145,8 +151,8 @@ export default defineComponent({
                 // Wait for BPTGauge balance to increase
                 // await this.liquidityStore.waitForStake(totalAmount);
 
-                this.walletStore.getBalance(BPT_ADDRESS);
-                this.walletStore.getBalance(BPTG_ADDRESS);
+                this.walletStore.getBalance(this.bptAddress);
+                this.walletStore.getBalance(this.bptGaugeAddress);
 
                 // Hide modal (or cast "success" and switch parent tab to withdrawal/rewards)
                 this.$emit('hidden');

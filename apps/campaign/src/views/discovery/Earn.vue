@@ -123,10 +123,14 @@
                                 <i class="fas fa-lock me-1"></i>
                                 Lock
                             </template>
-                            <b-alert variant="primary" v-model="isModalWarningShown" class="p-2">
+                            <b-alert variant="primary" v-model="isModalUnstakedLiquidityShown" class="p-2">
                                 <i class="fas fa-exclamation-circle me-1" />
                                 You have unstaked liquidity!
                                 <b-link @click="tabIndex = 0">Stake my liquidity</b-link>
+                            </b-alert>
+                            <b-alert variant="primary" v-model="isInsufficientAmount" class="p-2">
+                                <i class="fas fa-exclamation-circle me-1" />
+                                We require a minimal amount worth $3.00 USDC to be locked.
                             </b-alert>
                             <BaseFormGroupInputTokenAmount
                                 symbol="20USDC-80THX-gauge"
@@ -187,7 +191,7 @@
                             </BaseFormGroupInputDate>
 
                             <b-button
-                                :disabled="isDisabledDeposit"
+                                :disabled="isInsufficientAmount"
                                 @click="isModalDepositShown = true"
                                 class="w-100 mt-3"
                                 :variant="!amountDeposit ? 'primary' : 'success'"
@@ -381,10 +385,10 @@ export default defineComponent({
             const { now, end } = this.veStore.lock;
             return Number(now) < Number(end);
         },
-        isModalWarningShown() {
+        isModalUnstakedLiquidityShown() {
             return this.walletStore.balances[this.bptAddress] > 0;
         },
-        isDisabledDeposit() {
+        isInsufficientAmount() {
             return this.amountDeposit * this.liquidityStore.pricing['20USDC-80THX'] < this.minBPTGValue;
         },
         allowedDates() {

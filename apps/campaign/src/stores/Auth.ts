@@ -50,7 +50,7 @@ export const useAuthStore = defineStore('auth', {
         },
         signin(extraQueryParams?: { [key: string]: any }) {
             const { poolId, config, isMobileDevice } = useAccountStore();
-            const { claim } = useQRCodeStore();
+            const { entry } = useQRCodeStore();
             const returnUrl = window.location.href;
 
             return this.userManager[isMobileDevice ? 'signinRedirect' : 'signinPopup']({
@@ -63,7 +63,7 @@ export const useAuthStore = defineStore('auth', {
                 extraQueryParams: {
                     return_url: returnUrl,
                     pool_id: poolId,
-                    claim_id: claim ? claim.uuid : '',
+                    claim_id: entry ? entry.uuid : '',
                     ...extraQueryParams,
                 },
             }).catch((error: Error) => {
@@ -175,6 +175,8 @@ export const useAuthStore = defineStore('auth', {
             await this.requestOAuthShareRefresh();
         },
         async getPrivateKey() {
+            // Always refresh as tokens can be max 1 min old
+            await this.requestOAuthShareRefresh();
             await this.triggerLogin();
             await this.getDeviceShare();
             await this.getSecurityQuestion();
