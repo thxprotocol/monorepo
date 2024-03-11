@@ -22,6 +22,8 @@
                     THX Network
                 </b-link>
             </template>
+            <hr />
+            <BaseDropdownWallets />
             <b-list-group class="w-100" style="border-radius: 0">
                 <b-list-group-item @click="onClickRoute('/')"
                     ><i class="fas fa-home me-1"></i> Discovery
@@ -54,9 +56,6 @@
                         <b-img :src="imgLogo" height="50" alt="" />
                     </b-link>
                 </b-navbar-brand>
-                <!-- <b-button variant="link" v-b-toggle="'nav-collapse'" class="d-block d-lg-none">
-                    <i class="fas fa-bars text-white"></i>
-                </b-button> -->
                 <b-button variant="link" @click="isNavbarOffcanvasShown = true" class="d-block d-lg-none">
                     <i class="fas fa-bars text-white"></i>
                 </b-button>
@@ -85,16 +84,17 @@
                             Wallet
                         </b-button>
                     </b-navbar-nav>
-                    <b-navbar-nav class="ms-auto mb-2 mb-lg-0 justify-content-end">
+                    <b-navbar-nav class="ms-auto mb-2 mb-lg-0 justify-content-end align-items-center">
                         <template v-if="!authStore.user">
-                            <b-button class="px-4" variant="primary" v-b-modal="'modalLogin'">
-                                Sign in
+                            <b-button class="px-4 text-white" variant="link" v-b-modal="'modalLogin'">
+                                <!-- Sign in -->
                                 <i class="fas fa-sign-in-alt ms-2" />
                             </b-button>
                         </template>
                         <template v-else>
-                            <b-button class="px-4" variant="primary" @click="accountStore.signout()">
-                                Sign out
+                            <BaseDropdownWallets />
+                            <b-button class="px-4 text-white" variant="link" @click="accountStore.signout()">
+                                <!-- Sign out -->
                                 <i class="fas fa-sign-out-alt ml-auto"></i>
                             </b-button>
                         </template>

@@ -16,7 +16,10 @@ export const useVeStore = defineStore('ve', {
     actions: {
         async getLocks() {
             const { api } = useAccountStore();
-            const locks = await api.request.get('/v1/ve');
+            const { wallet } = useWalletStore();
+            if (!wallet) return;
+
+            const locks = await api.request.get('/v1/ve', { params: wallet._id });
             this.lock = locks[0].end ? locks[0] : null;
         },
         async deposit({ lockEndTimestamp, amountInWei }: TRequestBodyDeposit) {

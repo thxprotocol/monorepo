@@ -34,7 +34,7 @@ type TWalletState = {
     erc721: any[];
     erc1155: any[];
     allowances: { [tokenAddress: string]: { [spender: string]: number } };
-    balances: { [tokenAddress: string]: number };
+    balances: { [tokenAddress: string]: BigNumber };
     couponCodes: any[];
     discordRoles: any[];
     pendingPoints: number;
@@ -118,7 +118,8 @@ type TNFTTransferConfig = {
 };
 
 type TVeLock = {
-    amount: number;
+    balance: BigNumber;
+    amount: BigNumber;
     end: number;
     now: number;
     rewards: [];

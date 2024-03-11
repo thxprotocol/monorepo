@@ -13,7 +13,7 @@
         </b-alert>
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab title="1. Approve">
-                <b-form-group label="Amount" :description="`Current allowance: ${allowance}`">
+                <b-form-group label="Amount" :description="`Current allowance: ${fromWei(allowance.toString())}`">
                     <b-form-input type="number" v-model="amountApproval" />
                 </b-form-group>
                 <b-button variant="primary" @click="onClickApprove" class="w-100" :disabled="isPolling">
@@ -45,7 +45,7 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
 import poll from 'promise-poller';
-import { toWei } from 'web3-utils';
+import { fromWei, toWei } from 'web3-utils';
 
 const { BPT: BPT_ADDRESS, BPTGauge: BPTG_ADDRESS } = contractNetworks[getChainId()];
 
@@ -53,6 +53,7 @@ export default defineComponent({
     name: 'BaseModalStake',
     data() {
         return {
+            fromWei,
             isShown: false,
             error: '',
             isPolling: false,

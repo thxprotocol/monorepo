@@ -206,6 +206,7 @@ export const useWalletStore = defineStore('wallet', {
             }
         },
         async confirmTransaction(safeTxHash: string) {
+            console.log(this.wallet, safeTxHash);
             if (!this.wallet || this.wallet.variant !== WalletVariant.Safe) return;
 
             const { api } = useAccountStore();
@@ -260,11 +261,11 @@ export const useWalletStore = defineStore('wallet', {
             if (!this.wallet) return;
 
             const { api } = useAccountStore();
-            const [tx] = await api.request.post('/v1/ve/approve', {
+            const txs = await api.request.post('/v1/ve/approve', {
                 data,
                 params: { walletId: this.wallet?._id },
             });
-            await useWalletStore().confirmTransaction(tx.safeTxHash);
+            await useWalletStore().confirmTransactions(txs);
         },
     },
 });

@@ -2,7 +2,7 @@ export const BALANCER_POOL_ID = '0xb204bf10bc3a5435017d3db247f56da601dfe08a00020
 export const MAX_LOCK_TIME = 7776000;
 export const BREAKPOINT_LG = 992;
 
-export const contractNetworks = {
+export const contractNetworks: any = {
     '31337': {
         // Tokens
         BPT: '0xc368fA6A4057BcFD9E49221d8354d5fA6B88945a',

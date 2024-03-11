@@ -19,57 +19,12 @@
             </b-col>
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
                 <b-card class="border-0 gradient-shadow-xl" style="min-height: 415px">
-                    <b-tabs pills justified content-class="mt-3" nav-wrapper-class="text-white">
-                        <b-tab active>
+                    <b-tabs pills justified content-class="mt-3" nav-wrapper-class="text-white" v-model="tabIndex">
+                        <b-tab>
                             <template #title>
                                 <i class="fas fa-balance-scale me-1"></i>
                                 Liquidity
                             </template>
-
-                            <BaseFormGroupInputTokenAmount
-                                @update="amountStake = $event"
-                                :usd="liquidityStore.pricing['20USDC-80THX']"
-                                :balance="Math.floor(walletStore.balances[bptAddress])"
-                                :value="amountStake"
-                                :min="0"
-                                :max="Math.floor(walletStore.balances[bptAddress])"
-                                class="mb-4"
-                            >
-                                <template #label>
-                                    <div class="d-flex align-items-center">
-                                        <b-img
-                                            src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
-                                            alt="USDC icon"
-                                            width="20"
-                                            height="20"
-                                            class="me-2"
-                                        />
-                                        USDC <span class="text-opaque ms-1">20%</span>
-                                        <b-img
-                                            src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
-                                            alt="THX icon"
-                                            width="20"
-                                            height="20"
-                                            class="mx-2"
-                                        />
-                                        THX <span class="text-opaque ms-1">80%</span>
-                                    </div>
-                                </template>
-                            </BaseFormGroupInputTokenAmount>
-                            <b-button
-                                :disabled="!amountStake"
-                                class="w-100 mt-3"
-                                @click="isModalStakeShown = true"
-                                :variant="!amountStake ? 'primary' : 'success'"
-                            >
-                                Stake Liquidity
-                            </b-button>
-                            <BaseModalStake
-                                :show="isModalStakeShown"
-                                :amount="amountStake"
-                                @hidden="isModalStakeShown = false"
-                            />
-                            <!-- <hr />
 
                             <BaseFormGroupInputTokenAmount
                                 @update="amountUSDC = $event"
@@ -115,21 +70,72 @@
                                     </div>
                                 </template>
                             </BaseFormGroupInputTokenAmount>
-                            <b-button disabled class="w-100 mt-3" variant="primary"> Create Liquidity </b-button> -->
+                            <b-button disabled class="w-100" variant="primary"> Create Liquidity </b-button>
+
+                            <hr />
+
+                            <BaseFormGroupInputTokenAmount
+                                @update="amountStake = $event"
+                                :usd="liquidityStore.pricing['20USDC-80THX']"
+                                :balance="walletStore.balances[bptAddress]"
+                                :value="amountStake"
+                                :min="0"
+                                :max="walletStore.balances[bptAddress]"
+                                class="mb-4"
+                            >
+                                <template #label>
+                                    <div class="d-flex align-items-center">
+                                        <b-img
+                                            src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+                                            alt="USDC icon"
+                                            width="20"
+                                            height="20"
+                                            class="me-2"
+                                        />
+                                        USDC <span class="text-opaque ms-1">20%</span>
+                                        <b-img
+                                            src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
+                                            alt="THX icon"
+                                            width="20"
+                                            height="20"
+                                            class="mx-2"
+                                        />
+                                        THX <span class="text-opaque ms-1">80%</span>
+                                    </div>
+                                </template>
+                            </BaseFormGroupInputTokenAmount>
+                            <b-button
+                                :disabled="!amountStake"
+                                class="w-100"
+                                @click="isModalStakeShown = true"
+                                :variant="!amountStake ? 'primary' : 'success'"
+                            >
+                                Stake Liquidity
+                            </b-button>
+                            <BaseModalStake
+                                :show="isModalStakeShown"
+                                :amount="amountStake"
+                                @hidden="isModalStakeShown = false"
+                            />
                         </b-tab>
-                        <b-tab>
+                        <b-tab active>
                             <template #title>
                                 <i class="fas fa-lock me-1"></i>
                                 Lock
                             </template>
+                            <b-alert variant="primary" v-model="isModalWarningShown" class="p-2">
+                                <i class="fas fa-exclamation-circle me-1" />
+                                You have unstaked liquidity!
+                                <b-link @click="tabIndex = 0">Stake my liquidity</b-link>
+                            </b-alert>
                             <BaseFormGroupInputTokenAmount
                                 symbol="20USDC-80THX-gauge"
                                 :usd="liquidityStore.pricing['20USDC-80THX']"
-                                :balance="Math.floor(walletStore.balances[bptGaugeAddress])"
+                                :balance="walletStore.balances[bptGaugeAddress]"
                                 :value="amountDeposit"
                                 @update="amountDeposit = $event"
                                 :min="minBPTGValue / liquidityStore.pricing['20USDC-80THX']"
-                                :max="Math.floor(walletStore.balances[bptGaugeAddress])"
+                                :max="walletStore.balances[bptGaugeAddress]"
                                 class="mb-4"
                             >
                                 <template #label>
@@ -195,48 +201,80 @@
                                 @hidden="isModalDepositShown = false"
                             />
                         </b-tab>
-                        <b-tab v-if="veStore.lock">
+                        <b-tab>
                             <template #title>
                                 <i class="fas fa-unlock me-1"></i>
                                 Withdraw
                             </template>
-                            <b-alert v-model="isEarly" class="py-2 px-3" variant="danger">
-                                <i class="fas fa-info-circle me-1"></i>
-                                A penalty will be applied on early withdrawals!
-                            </b-alert>
-                            <!-- 
-                            {{ new Date(veStore.lock.now) }}
-                            <pre>
-                                {{ veStore.lock }}
-                            </pre> -->
+                            <div class="d-flex justify-content-center py-5" v-if="!veStore.lock">
+                                <div class="flex-column text-center">
+                                    <i class="fas fa-gift h1 text-accent"></i><br />
+                                    <p>
+                                        <span class="text-opaque">Lock staked liquidity and earn </span><br />
+                                        <strong class="text-white">up to 120% APR</strong>
+                                    </p>
+                                    <b-button variant="primary" class="w-100" @click="tabIndex = 1">
+                                        Lock &amp; Earn
+                                    </b-button>
+                                </div>
+                            </div>
+                            <template v-else>
+                                <b-alert v-model="isEarly" class="p-2" variant="primary">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    A penalty will be applied on early withdrawals!
+                                </b-alert>
+                                <BaseFormGroupInputTokenAmount
+                                    symbol="veTHX"
+                                    :usd="liquidityStore.pricing['20USDC-80THX']"
+                                    :value="fromWei(veStore.lock.balance)"
+                                    :disabled="true"
+                                    class="mb-4"
+                                >
+                                    <template #label>
+                                        <div class="d-flex align-items-center">
+                                            <b-img
+                                                src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
+                                                alt="THX icon"
+                                                width="20"
+                                                height="20"
+                                                class="mx-2"
+                                            />
+                                            veTHX
+                                        </div>
+                                    </template>
+                                </BaseFormGroupInputTokenAmount>
 
-                            <b-row>
-                                <b-col>
-                                    <b-form-group label="Amount">
-                                        <strong class="h3">{{ amount }}</strong>
-                                    </b-form-group>
-                                </b-col>
-                                <b-col>
-                                    <b-form-group label="Lock End">
-                                        <strong class="h3">
-                                            {{ differenceInDays(veStore.lock.end, veStore.lock.now) }} days
-                                        </strong>
-                                        <i
-                                            v-b-tooltip
-                                            :title="`${format(new Date(veStore.lock.end), 'MMMM do yyyy hh:mm:ss')}`"
-                                            class="fas fa-info-circle me-1 cursor-pointer text-opaque"
-                                        />
-                                    </b-form-group>
-                                </b-col>
-                            </b-row>
-                            <b-button class="w-100 mt-3" @click="isModalWithdrawShown = true" variant="primary">
-                                Withdraw
-                            </b-button>
-                            <BaseModalWithdraw
-                                :show="isModalWithdrawShown"
-                                :is-early="isEarly"
-                                @hidden="isModalWithdrawShown = false"
-                            />
+                                <b-row>
+                                    <b-col>
+                                        <b-form-group label="Amount">
+                                            <strong>{{ amount }}</strong>
+                                        </b-form-group>
+                                    </b-col>
+                                    <b-col>
+                                        <b-form-group label="Lock End">
+                                            <strong>
+                                                {{ differenceInDays(veStore.lock.end, veStore.lock.now) }} days
+                                            </strong>
+                                            <i
+                                                v-b-tooltip
+                                                :title="`${format(
+                                                    new Date(veStore.lock.end),
+                                                    'MMMM do yyyy hh:mm:ss',
+                                                )}`"
+                                                class="fas fa-info-circle me-1 cursor-pointer text-opaque"
+                                            />
+                                        </b-form-group>
+                                    </b-col>
+                                </b-row>
+                                <b-button class="w-100 mt-3" @click="isModalWithdrawShown = true" variant="primary">
+                                    Withdraw
+                                </b-button>
+                                <BaseModalWithdraw
+                                    :show="isModalWithdrawShown"
+                                    :is-early="isEarly"
+                                    @hidden="isModalWithdrawShown = false"
+                                />
+                            </template>
                         </b-tab>
                     </b-tabs>
                 </b-card>
@@ -251,12 +289,11 @@ import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
-import { getChainId, useVeStore } from '../../stores/VE';
+import { useVeStore } from '../../stores/VE';
 import { format, differenceInDays } from 'date-fns';
 import { contractNetworks } from '../../config/constants';
 import { fromWei } from 'web3-utils';
 
-const { USDC, THX, BPT, BPTGauge } = contractNetworks[getChainId()];
 const OneDayInMs = 60 * 60 * 24 * 1000;
 const NinetyDaysInMs = OneDayInMs * 90;
 const MaxDuration = Date.now() + NinetyDaysInMs;
@@ -280,16 +317,25 @@ function getThursdaysUntilTimestamp(futureTimestamp: number) {
     return thursdays;
 }
 
+function roundDownWei(value: number) {
+    if (!value || value <= 0) return 0;
+    return Math.floor(value);
+}
+
 export default defineComponent({
     name: 'Earn',
     data() {
         return {
+            roundDownWei,
+            fromWei,
             format,
             differenceInDays,
-            usdcAddress: USDC,
-            thxAddress: THX,
-            bptAddress: BPT,
-            bptGaugeAddress: BPTGauge,
+            tabIndex: 1,
+            usdcAddress: '',
+            thxAddress: '',
+            bptAddress: '',
+            veAddress: '',
+            bptGaugeAddress: '',
             publicUrl: 'https://thx.network',
             isModalStakeShown: false,
             isModalDepositShown: false,
@@ -335,6 +381,9 @@ export default defineComponent({
             const { now, end } = this.veStore.lock;
             return Number(now) < Number(end);
         },
+        isModalWarningShown() {
+            return this.walletStore.balances[this.bptAddress] > 0;
+        },
         isDisabledDeposit() {
             return this.amountDeposit * this.liquidityStore.pricing['20USDC-80THX'] < this.minBPTGValue;
         },
@@ -353,6 +402,14 @@ export default defineComponent({
     watch: {
         'walletStore.wallet'(wallet) {
             if (!wallet) return;
+
+            const { USDC, THX, BPT, BPTGauge, VotingEscrow } = contractNetworks[wallet.chainId];
+
+            this.usdcAddress = USDC;
+            this.thxAddress = THX;
+            this.bptAddress = BPT;
+            this.veAddress = VotingEscrow;
+            this.bptGaugeAddress = BPTGauge;
 
             this.walletStore.getBalance(this.bptAddress).then(() => {
                 this.amountStake = this.walletStore.balances[this.bptAddress];

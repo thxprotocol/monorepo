@@ -50,6 +50,7 @@ declare module 'vue' {
     BaseCardWallet: typeof import('./src/components/card/BaseCardWallet.vue')['default']
     BaseCardWallets: typeof import('./src/components/card/BaseCardWallets.vue')['default']
     BaseDropdownUserMenu: typeof import('./src/components/dropdown/BaseDropdownUserMenu.vue')['default']
+    BaseDropdownWallets: typeof import('./src/components/dropdown/BaseDropdownWallets.vue')['default']
     BaseFooter: typeof import('./src/components/BaseFooter.vue')['default']
     BaseFormGroupAccountVariant: typeof import('./src/components/formgroup/BaseFormGroupAccountVariant.vue')['default']
     BaseFormGroupAvatar: typeof import('./src/components/formgroup/BaseFormGroupAvatar.vue')['default']
