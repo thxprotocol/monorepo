@@ -7,9 +7,6 @@ import { EthersAdapter, SafeConfig } from '@safe-global/protocol-kit';
 import { ethers } from 'ethers';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import { WalletVariant } from '../types/enums/accountVariant';
-import Safe from '@safe-global/protocol-kit';
-import imgSafeLogo from '../assets/safe-logo.jpg';
-import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
 import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 import { watchAccount, signMessage, switchChain } from '@wagmi/core';
@@ -17,6 +14,11 @@ import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
 import { RewardVariant } from '../types/enums/rewards';
 import { formatUnits } from 'ethers/lib/utils';
+import { sendTransaction } from '@wagmi/core';
+import { encodeFunctionData } from 'viem';
+import Safe from '@safe-global/protocol-kit';
+import imgSafeLogo from '../assets/safe-logo.jpg';
+import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
 
 type TRequestParamsAllowance = {
     tokenAddress: string;
@@ -100,6 +102,20 @@ export const useWalletStore = defineStore('wallet', {
         signMessage(message: string) {
             return signMessage(wagmiConfig, { message });
         },
+        async sendTransaction(from: string, to: `0x${string}`, data: `0x${string}`) {
+            this.createWeb3Modal();
+
+            if (!this.account || this.account.address !== from) {
+                this.modal.open();
+                throw new Error('Connect your wallet first!');
+            }
+
+            if (this.chainId && this.chainId !== this.chainId) {
+                await this.switchChain(this.chainId);
+            }
+
+            return sendTransaction(wagmiConfig, { to, data });
+        },
         async create(data: { variant: WalletVariant; message?: string; signature?: string }) {
             const { api } = useAccountStore();
             await api.request.post('/v1/account/wallets', { data });
@@ -108,7 +124,20 @@ export const useWalletStore = defineStore('wallet', {
         async setWallet(wallet: TWallet | null) {
             this.wallet = wallet;
 
+            if (wallet && wallet.variant === WalletVariant.WalletConnect) {
+                // Open connect modal if no account is available or
+                // the address is not the same
+                if (!this.account || this.account.address !== wallet.address) {
+                    await this.modal.open();
+                }
+
+                if (wallet.chainId !== this.chainId) {
+                    await this.switchChain(this.chainId);
+                }
+            }
+
             // Check if there are pending transactions and confirm them
+            // This will always be a Safe wallet
             if (this.wallet && this.wallet.pendingTransactions.length) {
                 await this.confirmTransactions(this.wallet.pendingTransactions);
             }
@@ -137,6 +166,7 @@ export const useWalletStore = defineStore('wallet', {
                 api.request.get('/v1/rewards/payments'),
             ]);
 
+            // TODO Refactor to using a component map with r.variant as key
             this.erc20 = erc20.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' }));
             this.erc721 = erc721.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
             this.erc1155 = erc1155.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
@@ -256,15 +286,50 @@ export const useWalletStore = defineStore('wallet', {
             if (!this.allowances[params.tokenAddress]) this.allowances[params.tokenAddress] = {};
             this.allowances[params.tokenAddress][params.spender] = Number(allowanceInWei);
         },
+        // TODO Make this a WC method
         async approve(data: TRequestBodyApproval) {
             if (!this.wallet) return;
 
+            const map: { [variant: string]: (wallet: TWallet, data: TRequestBodyApproval) => Promise<void> } = {
+                [WalletVariant.Safe]: this.approveSafe.bind(this),
+                [WalletVariant.WalletConnect]: this.approveWalletConnect.bind(this),
+            };
+
+            return await map[this.wallet.variant](this.wallet, data);
+        },
+        async approveSafe(wallet: TWallet, data: TRequestBodyApproval) {
             const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/approve', {
+            const txs = await api.request.post('/v1/erc20/allowance', {
                 data,
-                params: { walletId: this.wallet?._id },
+                params: { walletId: wallet._id },
             });
-            await useWalletStore().confirmTransactions(txs);
+
+            await this.confirmTransactions(txs);
+        },
+        async approveWalletConnect(wallet: TWallet, data: TRequestBodyApproval) {
+            // Prepare the contract call data
+            const abi = [
+                {
+                    inputs: [
+                        { name: 'spender', type: 'address' },
+                        { name: 'amount', type: 'uint256' },
+                    ],
+                    name: 'approve',
+                    outputs: [{ name: '', type: 'bool' }],
+                    stateMutability: 'public',
+                    type: 'function',
+                },
+            ];
+            const call = this.encodeContractCall(data.tokenAddress, abi, 'approve', [data.spender, data.amountInWei]);
+
+            // Sign and execute the transaction data
+            await this.sendTransaction(wallet.address, call.to, call.data);
+        },
+        encodeContractCall(contractAddress: string, abi: any[], functionName: string, args: any[]) {
+            return {
+                to: contractAddress as `0x${string}`,
+                data: encodeFunctionData({ abi, functionName, args }),
+            };
         },
     },
 });

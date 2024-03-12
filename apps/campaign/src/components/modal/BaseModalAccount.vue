@@ -93,7 +93,7 @@ export default defineComponent({
     },
     methods: {
         onShow() {
-            this.accountStore.getAccount();
+            // this.accountStore.getAccount();
         },
         onClickSignout() {
             this.accountStore.signout();

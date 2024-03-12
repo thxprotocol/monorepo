@@ -21,13 +21,13 @@
                     <template v-else>Approve</template>
                 </b-button>
             </b-tab>
-            <b-tab title="2. Deposit">
+            <b-tab title="2. Stake">
                 <b-form-group>
                     <b-form-input type="number" v-model="amountStake" />
                 </b-form-group>
                 <b-button variant="primary" @click="onClickStake" class="w-100" :disabled="isPolling">
                     <b-spinner v-if="isPolling" small />
-                    <template v-else>Deposit</template>
+                    <template v-else>Stake</template>
                 </b-button>
             </b-tab>
         </b-tabs>
@@ -160,7 +160,7 @@ export default defineComponent({
             }
         },
         onError(response: any) {
-            this.error = response && response.error ? response.error.message : 'Something went wrong...';
+            this.error = response && response.error ? response.error.message : response.message;
         },
     },
 });

@@ -4,6 +4,7 @@ import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
 import { contractNetworks } from '../config/constants';
 import { fromWei } from 'web3-utils';
+import { WalletVariant } from '../types/enums/accountVariant';
 
 export const useLiquidityStore = defineStore('liquidity', {
     state: (): TLiquidityState => ({
@@ -11,13 +12,44 @@ export const useLiquidityStore = defineStore('liquidity', {
     }),
     actions: {
         async stake(data: { amountInWei: string }) {
-            const { api } = useAccountStore();
-            const { wallet, confirmTransactions } = useWalletStore();
+            const { wallet } = useWalletStore();
             if (!wallet) return;
 
-            const txs = await api.request.post('/v1/liquidity/stake', { data, params: { walletId: wallet._id } });
+            const map: { [variant: string]: (wallet: TWallet, data: { amountInWei: string }) => Promise<void> } = {
+                [WalletVariant.Safe]: this.stakeSafe.bind(this),
+                [WalletVariant.WalletConnect]: this.stakeWalletConnect.bind(this),
+            };
 
+            return await map[wallet.variant](wallet, data);
+        },
+        async stakeSafe(wallet: TWallet, data: { amountInWei: string }) {
+            const { api } = useAccountStore();
+            const { confirmTransactions } = useWalletStore();
+            const txs = await api.request.post('/v1/liquidity/stake', { data, params: { walletId: wallet._id } });
             await confirmTransactions(txs);
+        },
+        async stakeWalletConnect(wallet: TWallet, data: { amountInWei: string }) {
+            const { sendTransaction, encodeContractCall } = useWalletStore();
+            const abi = [
+                {
+                    stateMutability: 'nonpayable',
+                    type: 'function',
+                    name: 'deposit',
+                    inputs: [
+                        {
+                            name: '_value',
+                            type: 'uint256',
+                        },
+                    ],
+                    outputs: [],
+                },
+            ];
+            const call = encodeContractCall(contractNetworks[wallet.chainId].BPTGauge, abi, 'deposit', [
+                data.amountInWei,
+            ]);
+
+            // Sign and execute the transaction data
+            await sendTransaction(wallet.address, call.to, call.data);
         },
         async getSpotPrice() {
             const { api } = useAccountStore();

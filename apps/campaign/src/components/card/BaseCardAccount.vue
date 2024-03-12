@@ -2,13 +2,14 @@
     <b-card class="bg-splash" style="border-radius: 0">
         <div
             @click="accountStore.isModalAccountShown = true"
-            class="d-flex justify-content-center align-items-center p-3 cursor-pointer"
+            class="d-flex justify-content-start align-items-start p-3 cursor-pointer"
             style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.35); width: 100%; height: 90px"
         >
             <template v-if="accountStore.account">
                 <b-avatar size="50" :src="accountStore.account.profileImg" class="gradient-border-xl" />
                 <div class="px-3" style="min-width: 200px">
                     <h3 class="text-white mb-0">{{ accountStore.account.username }}</h3>
+                    <span class="text-opaque">Earned:</span> <span class="text-accent">$2819,00 </span>
                 </div>
             </template>
             <b-spinner v-else small class="text-opaque" />

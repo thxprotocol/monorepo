@@ -19,7 +19,12 @@
                 {{ walletStore.wallet.short }}
             </div>
             <div v-else>Select your wallet</div>
-            <i class="fas fa-caret-down ms-auto"></i>
+            <i
+                v-if="isWalletConnect"
+                class="fas fa-check-circle text-opaque me-auto"
+                :class="{ 'text-success': isConnected, 'text-danger': !isConnected }"
+            ></i>
+            <i class="fas fa-caret-down ms-3"></i>
         </template>
         <b-dropdown-item
             v-for="wallet of walletStore.wallets"
@@ -71,6 +76,18 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useWalletStore, useAccountStore),
+        isWalletConnect() {
+            return this.walletStore.wallet?.variant === WalletVariant.WalletConnect;
+        },
+        isConnected() {
+            const { chainId, account, wallet } = this.walletStore;
+            if (!account) return false;
+
+            const isAddressCorrect = account.address === wallet.address;
+            const isChainCorrect = chainId === wallet.chainId;
+
+            return isAddressCorrect && isChainCorrect;
+        },
     },
     watch: {
         'accountStore.account': {

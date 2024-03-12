@@ -107,6 +107,9 @@ export default defineComponent({
         async onClickCreate() {
             this.isLoading = true;
             try {
+                // Get recent access token
+                await this.authStore.requestOAuthShareRefresh();
+
                 // Create OAuthshare
                 await this.authStore.triggerLogin();
                 if (!this.authStore.oAuthShare) throw new Error('Could not create the OAuthshare.');
@@ -132,6 +135,7 @@ export default defineComponent({
                 this.$emit('close');
             } catch (error) {
                 this.$emit('error', String(error));
+                this.error = error;
                 console.error(error);
             } finally {
                 this.isLoading = false;
