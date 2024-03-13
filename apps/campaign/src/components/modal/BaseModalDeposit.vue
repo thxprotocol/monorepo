@@ -117,7 +117,7 @@ export default defineComponent({
                 await this.walletStore.approve({
                     tokenAddress: this.address.BPTGauge,
                     spender: this.address.VotingEscrow,
-                    amountInWei: toWei(String(this.amountDeposit)),
+                    amountInWei: toWei(String(this.amountApproval)),
                 });
 
                 // poll for allowance to increase
@@ -125,6 +125,7 @@ export default defineComponent({
 
                 // then change tab index to 1
                 this.tabIndex = 1;
+                this.amountDeposit = this.amount;
             } catch (response) {
                 this.onError(response);
             } finally {
