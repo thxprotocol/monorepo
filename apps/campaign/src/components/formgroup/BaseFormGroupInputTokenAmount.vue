@@ -45,17 +45,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-
-function toFiatPrice(number: number) {
-    // Replace 'en-US' with the appropriate locale for your application
-    const formatter = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD', // Change this to the desired currency code
-        minimumFractionDigits: 2,
-    });
-
-    return formatter.format(number);
-}
+import { toFiatPrice } from '../../utils/price';
 
 export default defineComponent({
     name: 'BaseFormGroupInputTokenAmount',

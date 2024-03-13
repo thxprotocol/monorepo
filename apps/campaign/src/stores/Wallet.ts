@@ -16,6 +16,7 @@ import { RewardVariant } from '../types/enums/rewards';
 import { formatUnits } from 'ethers/lib/utils';
 import { sendTransaction } from '@wagmi/core';
 import { encodeFunctionData } from 'viem';
+import { contractNetworks } from '../config/constants';
 import Safe from '@safe-global/protocol-kit';
 import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
@@ -37,14 +38,10 @@ export const walletLogoMap: { [variant: string]: string } = {
     [WalletVariant.Safe]: imgSafeLogo,
 };
 
-// Safe Contracts
-const GnosisSafeProxyFactoryAddress = '0x1122fD9eBB2a8E7c181Cc77705d2B4cA5D72988A';
-const CompatibilityFallbackHandlerAddress = '0x5D3D550Da6678C0444F5D77Ca086678D9CdeEecA';
-const CreateCallAddress = '0x40Efd8a16485213445E6d8b9a4266Fd2dFf7C69a';
-const MultiSendAddress = '0x7E4728eFfC9376CC7C0EfBCc779cC9833D83a984';
-const MultiSendCallOnlyAddress = '0x75Cbb6C4Db4Bb4f6F8D5F56072A6cF4Bf4C5413C';
-const SignMessageLibAddress = '0x658FAD2acB6d1E615f295E566ee9a6d32Cc97b10';
-const GnosisSafeL2Address = '0xC44951780f195Ed71145e3d0d2F25726A097C348';
+const rpcMap: { [chainId: number]: string } = {
+    [ChainId.Hardhat]: HARDHAT_RPC,
+    [ChainId.Polygon]: POLYGON_RPC,
+};
 
 const wagmiConfig = defaultWagmiConfig({
     chains: [mainnet, ...Object.values(chainList).map((item) => item.chain)],
@@ -74,6 +71,7 @@ export const useWalletStore = defineStore('wallet', {
         wallet: null,
         isLoading: true,
         isModalWalletCreateShown: false,
+        isModalChainSwitchShown: false,
     }),
     actions: {
         createWeb3Modal() {
@@ -81,7 +79,6 @@ export const useWalletStore = defineStore('wallet', {
 
             watchAccount(wagmiConfig, {
                 onChange: (account) => {
-                    console.log(account);
                     this.account = account;
                 },
             });
@@ -94,6 +91,10 @@ export const useWalletStore = defineStore('wallet', {
 
             this.modal.subscribeState((state: { open: boolean; selectedNetworkId: ChainId }) => {
                 this.chainId = state.selectedNetworkId;
+                this.isModalChainSwitchShown =
+                    this.wallet && this.wallet.variant === WalletVariant.WalletConnect
+                        ? this.wallet.chainId !== this.chainId
+                        : false;
             });
         },
         switchChain(chainId: ChainId) {
@@ -129,10 +130,6 @@ export const useWalletStore = defineStore('wallet', {
                 // the address is not the same
                 if (!this.account || this.account.address !== wallet.address) {
                     await this.modal.open();
-                }
-
-                if (wallet.chainId !== this.chainId) {
-                    await this.switchChain(this.chainId);
                 }
             }
 
@@ -212,29 +209,7 @@ export const useWalletStore = defineStore('wallet', {
 
             await this.confirmTransaction(response.safeTxHash);
         },
-        getRPC(chainId: ChainId) {
-            switch (chainId) {
-                default:
-                case ChainId.Hardhat:
-                    return {
-                        url: HARDHAT_RPC,
-                        contractNetworks: {
-                            '31337': {
-                                safeMasterCopyAddress: GnosisSafeL2Address,
-                                safeProxyFactoryAddress: GnosisSafeProxyFactoryAddress,
-                                multiSendAddress: MultiSendAddress,
-                                multiSendCallOnlyAddress: MultiSendCallOnlyAddress,
-                                fallbackHandlerAddress: CompatibilityFallbackHandlerAddress,
-                                signMessageLibAddress: SignMessageLibAddress,
-                                createCallAddress: CreateCallAddress,
-                                simulateTxAccessorAddress: '0x',
-                            },
-                        },
-                    };
-                case ChainId.Polygon:
-                    return { url: POLYGON_RPC };
-            }
-        },
+
         async confirmTransaction(safeTxHash: string) {
             if (!this.wallet || this.wallet.variant !== WalletVariant.Safe) return;
 
@@ -245,14 +220,14 @@ export const useWalletStore = defineStore('wallet', {
                 await authStore.getPrivateKey();
             }
 
-            const rpc = this.getRPC(this.wallet.chainId);
-            const provider = new ethers.providers.JsonRpcProvider(rpc.url);
+            const rpc = rpcMap[this.wallet.chainId];
+            const provider = new ethers.providers.JsonRpcProvider(rpc);
             const signer = new ethers.Wallet(authStore.privateKey, provider);
             const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer }) as any;
             const config: SafeConfig = {
                 ethAdapter,
                 safeAddress: this.wallet.address,
-                contractNetworks: rpc.contractNetworks,
+                contractNetworks,
             };
             const safe = await Safe.create(config);
             const signature = await safe.signTransactionHash(safeTxHash);

@@ -2,8 +2,17 @@ export const BALANCER_POOL_ID = '0xb204bf10bc3a5435017d3db247f56da601dfe08a00020
 export const MAX_LOCK_TIME = 7776000;
 export const BREAKPOINT_LG = 992;
 
+// Safe Contracts
 export const contractNetworks: any = {
     '31337': {
+        safeMasterCopyAddress: '0xC44951780f195Ed71145e3d0d2F25726A097C348',
+        safeProxyFactoryAddress: '0x1122fD9eBB2a8E7c181Cc77705d2B4cA5D72988A',
+        multiSendAddress: '0x7E4728eFfC9376CC7C0EfBCc779cC9833D83a984',
+        multiSendCallOnlyAddress: '0x75Cbb6C4Db4Bb4f6F8D5F56072A6cF4Bf4C5413C',
+        fallbackHandlerAddress: '0x5D3D550Da6678C0444F5D77Ca086678D9CdeEecA',
+        signMessageLibAddress: '0x658FAD2acB6d1E615f295E566ee9a6d32Cc97b10',
+        createCallAddress: '0x40Efd8a16485213445E6d8b9a4266Fd2dFf7C69a',
+        simulateTxAccessorAddress: '0x',
         // Tokens
         BPT: '0xc368fA6A4057BcFD9E49221d8354d5fA6B88945a',
         BPTGauge: '0x439F0128d07f005e0703602f366599ACaaBfEA18',

@@ -29,10 +29,10 @@
                             <BaseFormGroupInputTokenAmount
                                 @update="amountUSDC = $event"
                                 :usd="liquidityStore.pricing['USDC']"
-                                :balance="Math.floor(walletStore.balances[usdcAddress])"
+                                :balance="walletStore.balances[usdcAddress]"
                                 :value="amountUSDC"
                                 :min="0"
-                                :max="Math.floor(walletStore.balances[usdcAddress])"
+                                :max="walletStore.balances[usdcAddress]"
                                 class="mb-4"
                             >
                                 <template #label>
@@ -51,10 +51,10 @@
                             <BaseFormGroupInputTokenAmount
                                 @update="amountTHX = $event"
                                 :usd="liquidityStore.pricing['THX']"
-                                :balance="Math.floor(walletStore.balances[thxAddress])"
+                                :balance="walletStore.balances[thxAddress]"
                                 :value="amountTHX"
                                 :min="0"
-                                :max="Math.floor(walletStore.balances[thxAddress])"
+                                :max="walletStore.balances[thxAddress]"
                                 class="mb-4"
                             >
                                 <template #label>

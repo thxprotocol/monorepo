@@ -9,7 +9,8 @@
                 <b-avatar size="50" :src="accountStore.account.profileImg" class="gradient-border-xl" />
                 <div class="px-3" style="min-width: 200px">
                     <h3 class="text-white mb-0">{{ accountStore.account.username }}</h3>
-                    <span class="text-opaque">Earned:</span> <span class="text-accent">$2819,00 </span>
+                    <span class="text-opaque">Earned: </span>
+                    <span class="text-accent">{{ toFiatPrice(rewardsInUSD) }} </span>
                 </div>
             </template>
             <b-spinner v-else small class="text-opaque" />
@@ -21,14 +22,28 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
+import { useVeStore } from '../../stores/VE';
+import { useLiquidityStore } from '../../stores/Liquidity';
+import { fromWei } from 'web3-utils';
+import { toFiatPrice } from '../../utils/price';
 
 export default defineComponent({
     name: 'BaseCardAccount',
     data() {
-        return {};
+        return { toFiatPrice };
     },
     computed: {
-        ...mapStores(useAccountStore),
+        ...mapStores(useAccountStore, useVeStore, useLiquidityStore),
+        rewardsInUSD() {
+            if (!this.veStore.lock) return 0;
+
+            const balRewards = Number(fromWei(this.veStore.lock.rewards[0].amount));
+            const bptRewards = Number(fromWei(this.veStore.lock.rewards[1].amount));
+            const balPrice = this.liquidityStore.pricing['BAL'];
+            const bptPrice = this.liquidityStore.pricing['20USDC-80THX'];
+
+            return balRewards * balPrice + bptRewards * bptPrice;
+        },
     },
 });
 </script>

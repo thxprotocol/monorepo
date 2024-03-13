@@ -10,6 +10,7 @@
             <BaseSidebar />
         </div>
         <BaseModalLogin />
+        <BaseModalChainSwitch />
         <BaseModalAccount size="lg" />
         <BaseModalWalletCreate size="lg" />
         <BaseModalWalletRecovery size="lg" />

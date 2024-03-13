@@ -8,7 +8,7 @@ import { WalletVariant } from '../types/enums/accountVariant';
 
 export const useLiquidityStore = defineStore('liquidity', {
     state: (): TLiquidityState => ({
-        pricing: { 'THX': 0, 'USDC': 0, '20USDC-80THX': 0 },
+        pricing: { 'THX': 0, 'USDC': 0, 'BAL': 0, '20USDC-80THX': 0 },
     }),
     actions: {
         async stake(data: { amountInWei: string }) {
@@ -26,6 +26,7 @@ export const useLiquidityStore = defineStore('liquidity', {
             const { api } = useAccountStore();
             const { confirmTransactions } = useWalletStore();
             const txs = await api.request.post('/v1/liquidity/stake', { data, params: { walletId: wallet._id } });
+
             await confirmTransactions(txs);
         },
         async stakeWalletConnect(wallet: TWallet, data: { amountInWei: string }) {

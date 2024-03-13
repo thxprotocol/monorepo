@@ -6,7 +6,7 @@
         </b-alert>
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab title="1. Approve">
-                <b-form-group label="Amount" :description="`Current allowance: ${allowance}`">
+                <b-form-group label="Amount" :description="`Current allowance: ${fromWei(allowance.toString())}`">
                     <b-form-input type="number" v-model="amountApproval" />
                 </b-form-group>
                 <b-button variant="primary" @click="onClickApprove" class="w-100" :disabled="isPolling">
@@ -33,18 +33,17 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { getChainId, useVeStore } from '../../stores/VE';
+import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { contractNetworks } from '../../config/constants';
+import { toWei, fromWei } from 'web3-utils';
 import poll from 'promise-poller';
-import { toWei } from 'web3-utils';
-
-const { BPTGauge: BPTG_ADDRESS, VotingEscrow: VE_ADDRESS } = contractNetworks[getChainId()];
 
 export default defineComponent({
     name: 'BaseModalDeposit',
     data() {
         return {
+            fromWei,
             isShown: false,
             error: '',
             isPolling: false,
@@ -62,10 +61,18 @@ export default defineComponent({
     computed: {
         ...mapStores(useWalletStore),
         ...mapStores(useVeStore),
+        veAddress() {
+            if (!this.walletStore.wallet) return;
+            return contractNetworks[this.walletStore.wallet.chainId].VotingEscrow;
+        },
+        bptGaugeAddress() {
+            if (!this.walletStore.wallet) return;
+            return contractNetworks[this.walletStore.wallet.chainId].BPTGauge;
+        },
         allowance() {
-            if (!this.walletStore.allowances[BPTG_ADDRESS]) return 0;
-            if (!this.walletStore.allowances[BPTG_ADDRESS][VE_ADDRESS]) return 0;
-            return this.walletStore.allowances[BPTG_ADDRESS][VE_ADDRESS];
+            if (!this.walletStore.allowances[this.bptGaugeAddress]) return 0;
+            if (!this.walletStore.allowances[this.bptGaugeAddress][this.veAddress]) return 0;
+            return this.walletStore.allowances[this.bptGaugeAddress][this.veAddress];
         },
         isAlertInfoShown() {
             return !!this.error;
@@ -94,8 +101,8 @@ export default defineComponent({
         },
         getApproval() {
             return this.walletStore.getApproval({
-                tokenAddress: BPTG_ADDRESS,
-                spender: VE_ADDRESS,
+                tokenAddress: this.bptGaugeAddress,
+                spender: this.veAddress,
                 amountInWei: toWei(String(this.amountDeposit)),
             });
         },
@@ -110,8 +117,8 @@ export default defineComponent({
             this.isPolling = true;
             try {
                 await this.walletStore.approve({
-                    tokenAddress: BPTG_ADDRESS,
-                    spender: VE_ADDRESS,
+                    tokenAddress: this.bptGaugeAddress,
+                    spender: this.veAddress,
                     amountInWei: toWei(String(this.amountDeposit)),
                 });
 
@@ -142,15 +149,13 @@ export default defineComponent({
                         : lock.end
                     : lockEndTimestamp;
 
-                // Stake the BPT
-
                 // Make deposit
                 await this.veStore.deposit({ amountInWei, lockEndTimestamp });
 
                 // Wait for amount and/or endDate to be updated if it changed
                 await this.veStore.waitForLock(totalAmount, latestLockEndTimestamp);
 
-                this.walletStore.getBalance(BPTG_ADDRESS);
+                this.walletStore.getBalance(this.bptGaugeAddress);
 
                 // Hide modal (or cast "success" and switch parent tab to withdrawal/rewards)
                 this.$emit('hidden');
@@ -161,7 +166,7 @@ export default defineComponent({
             }
         },
         onError(response: any) {
-            this.error = response && response.error ? response.error.message : 'Something went wrong...';
+            this.error = response && response.error ? response.error.message : response.message;
         },
     },
 });

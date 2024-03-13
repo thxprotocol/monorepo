@@ -40,6 +40,7 @@ type TWalletState = {
     pendingPoints: number;
     isLoading: boolean;
     isModalWalletCreateShown: boolean;
+    isModalChainSwitchShown: boolean;
 };
 
 type TERC20 = {
