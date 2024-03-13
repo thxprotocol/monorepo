@@ -14,7 +14,9 @@ export function getChainId() {
 
 export const useVeStore = defineStore('ve', {
     state: (): TVeState => ({
-        lock: null,
+        lock: { end: 0, amount: 0, now: 0 },
+        balance: 0,
+        rewards: [],
     }),
     actions: {
         async getLocks() {
@@ -28,7 +30,10 @@ export const useVeStore = defineStore('ve', {
             }
 
             const locks = await api.request.get('/v1/ve', { params: { walletId: wallet._id } });
-            this.lock = locks[0];
+            const { amount, end, now, balance, rewards } = locks[0];
+            this.lock = { amount, end, now };
+            this.rewards = rewards;
+            this.balance = balance;
         },
         async deposit({ lockEndTimestamp, amountInWei }: TRequestBodyDeposit) {
             const { wallet } = useWalletStore();

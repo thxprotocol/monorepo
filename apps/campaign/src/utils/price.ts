@@ -12,3 +12,24 @@ export function toFiatPrice(number: number) {
 
     return formatter.format(number);
 }
+
+export function calculatePenalty(
+    lockAmount: number,
+    penaltyCoefficient = 1,
+    leftTimeToUnlock: number,
+    maxLockTime: number,
+) {
+    if (penaltyCoefficient < 0 || penaltyCoefficient > 5) {
+        throw new Error('penaltyCoefficient must be between 0 and 5');
+    }
+    if (leftTimeToUnlock < 0 || maxLockTime <= 0) {
+        throw new Error(
+            'Invalid time values. leftTimeToUnlock should be non-negative, and maxLockTime should be positive',
+        );
+    }
+
+    // Ensure leftTimeToUnlock does not exceed maxLockTime
+    leftTimeToUnlock = Math.min(leftTimeToUnlock, maxLockTime);
+
+    return lockAmount * penaltyCoefficient * (leftTimeToUnlock / maxLockTime);
+}

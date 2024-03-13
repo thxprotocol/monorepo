@@ -1,7 +1,7 @@
 import { BootstrapVueNext, vBTooltip } from 'bootstrap-vue-next';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import { Sentry } from '@thxnetwork/common';
+import { Sentry } from '@thxnetwork/common/lib/sentry';
 import { MODE, API_URL, MIXPANEL_TOKEN, AUTH_URL, WIDGET_URL } from './config/secrets';
 import App from './App.vue';
 import VueClipboard from 'vue3-clipboard';

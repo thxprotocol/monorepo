@@ -1,6 +1,7 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
+        "composite": true,
         "rootDir": ".",
         "sourceMap": true,
         "declaration": true,
@@ -17,8 +18,8 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@thxnetwork/campaign": ["apps/campaign/src*"],
-            "@thxnetwork/common": ["libs/common/src/index.ts"],
+            "@thxnetwork/campaign*": ["apps/campaign/src*"],
+            "@thxnetwork/common*": ["libs/common/src*"],
             "@thxnetwork/mixpanel": ["libs/common/src/lib/mixpanel.ts"]
         }
     },

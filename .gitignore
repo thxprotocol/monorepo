@@ -42,3 +42,5 @@ Thumbs.db
 !.env.ci
 !.env.example
 certs/*
+
+.nx/cache

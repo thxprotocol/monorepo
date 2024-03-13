@@ -119,15 +119,15 @@ type TNFTTransferConfig = {
 };
 
 type TVeLock = {
-    balance: BigNumber;
     amount: BigNumber;
     end: number;
     now: number;
-    rewards: [];
 };
 
 type TVeState = {
     lock: TVeLock | null;
+    balance: BigNumber;
+    rewards: { tokenAddress: string; amount: string }[];
 };
 
 type TLiquidityState = {

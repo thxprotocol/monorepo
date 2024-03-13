@@ -38,6 +38,7 @@ import { useWalletStore } from '../../stores/Wallet';
 import { contractNetworks } from '../../config/constants';
 import { toWei, fromWei } from 'web3-utils';
 import poll from 'promise-poller';
+import { ChainId } from '@thxnetwork/sdk';
 
 export default defineComponent({
     name: 'BaseModalDeposit',
@@ -61,18 +62,15 @@ export default defineComponent({
     computed: {
         ...mapStores(useWalletStore),
         ...mapStores(useVeStore),
-        veAddress() {
-            if (!this.walletStore.wallet) return;
-            return contractNetworks[this.walletStore.wallet.chainId].VotingEscrow;
-        },
-        bptGaugeAddress() {
-            if (!this.walletStore.wallet) return;
-            return contractNetworks[this.walletStore.wallet.chainId].BPTGauge;
+        address() {
+            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
+            return contractNetworks[this.walletStore.wallet.chainId];
         },
         allowance() {
-            if (!this.walletStore.allowances[this.bptGaugeAddress]) return 0;
-            if (!this.walletStore.allowances[this.bptGaugeAddress][this.veAddress]) return 0;
-            return this.walletStore.allowances[this.bptGaugeAddress][this.veAddress];
+            if (!this.walletStore.allowances[this.address.BPTGauge]) return 0;
+            if (!this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow]) return 0;
+
+            return this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow];
         },
         isAlertInfoShown() {
             return !!this.error;
@@ -101,8 +99,8 @@ export default defineComponent({
         },
         getApproval() {
             return this.walletStore.getApproval({
-                tokenAddress: this.bptGaugeAddress,
-                spender: this.veAddress,
+                tokenAddress: this.address.BPTGauge,
+                spender: this.address.VotingEscrow,
                 amountInWei: toWei(String(this.amountDeposit)),
             });
         },
@@ -117,8 +115,8 @@ export default defineComponent({
             this.isPolling = true;
             try {
                 await this.walletStore.approve({
-                    tokenAddress: this.bptGaugeAddress,
-                    spender: this.veAddress,
+                    tokenAddress: this.address.BPTGauge,
+                    spender: this.address.VotingEscrow,
                     amountInWei: toWei(String(this.amountDeposit)),
                 });
 
@@ -155,9 +153,9 @@ export default defineComponent({
                 // Wait for amount and/or endDate to be updated if it changed
                 await this.veStore.waitForLock(totalAmount, latestLockEndTimestamp);
 
-                this.walletStore.getBalance(this.bptGaugeAddress);
+                this.walletStore.getBalance(this.address.BPTGauge);
+                this.walletStore.getBalance(this.address.VotingEscrow);
 
-                // Hide modal (or cast "success" and switch parent tab to withdrawal/rewards)
                 this.$emit('hidden');
             } catch (response) {
                 this.onError(response);

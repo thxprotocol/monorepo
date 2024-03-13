@@ -175,8 +175,11 @@ export const useAuthStore = defineStore('auth', {
             await this.requestOAuthShareRefresh();
         },
         async getPrivateKey() {
-            // Always refresh as tokens can only be max 1 min old
-            await this.requestOAuthShareRefresh();
+            // If the token is more than 60s old, we need to refresh
+            // as web3auth will not accept it for deriving key shares
+            if (60 * 60 * 24 - this.user.expires_in > 60) {
+                await this.requestOAuthShareRefresh();
+            }
 
             // Get the oauth share (1/3)
             await this.triggerLogin();

@@ -1,23 +1,7 @@
 {
     "extends": "../../tsconfig.base.json",
-    "compilerOptions": {
-        "module": "ESNext",
-        "lib": ["ESNext", "DOM"],
-        "moduleResolution": "Node",
-        "target": "ESNext",
-        "useDefineForClassFields": true,
-        "strict": true,
-        "sourceMap": true,
-        "resolveJsonModule": true,
-        "esModuleInterop": true,
-        "noEmit": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "noImplicitReturns": true,
-        "types": ["node"]
-    },
     "files": [],
-    "include": ["components.d.ts", "node_modules/**/*.d.ts"],
+    "include": ["components.d.ts", "./types/**/*.d.ts", "node_modules/**/*.d.ts"],
     "references": [
         {
             "path": "./tsconfig.app.json"

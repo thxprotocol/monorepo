@@ -16,6 +16,7 @@
         <BaseModalWalletRecovery size="lg" />
     </div>
 </template>
+
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { GTM, MAINTENANCE } from './config/secrets';
@@ -64,6 +65,7 @@ export default defineComponent({
     },
 });
 </script>
+
 <style lang="scss">
 .router-view-app {
     flex-grow: 1;

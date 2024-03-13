@@ -4,15 +4,9 @@
     "overrides": [
         {
             "files": ["*.ts", "*.js", "*.tsx", "*.jsx"],
-            "rules": {}
-        },
-        {
-            "files": ["*.ts", "*.js", "*.tsx", "*.jsx"],
-            "rules": {}
-        },
-        {
-            "files": ["*.ts", "*.js", "*.tsx", "*.jsx"],
-            "rules": {}
+            "rules": {
+                "@typescript-eslint/no-explicit-any": "off"
+            }
         }
     ]
 }

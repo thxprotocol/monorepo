@@ -10,12 +10,15 @@
                 <div class="px-3" style="min-width: 200px">
                     <h3 class="text-white mb-0">{{ accountStore.account.username }}</h3>
                     <span class="text-opaque">Earned: </span>
-                    <span class="text-accent">{{ toFiatPrice(rewardsInUSD) }} </span>
+                    <b-link @click.stop="onClickRewards" class="text-accent text-hover-underline">
+                        {{ toFiatPrice(rewardsInUSD) }}
+                    </b-link>
                 </div>
             </template>
             <b-spinner v-else small class="text-opaque" />
         </div>
     </b-card>
+    <BaseModalClaimTokens :show="isModalClaimTokensShown" @hidden="isModalClaimTokensShown = false" />
 </template>
 
 <script lang="ts">
@@ -30,20 +33,30 @@ import { toFiatPrice } from '../../utils/price';
 export default defineComponent({
     name: 'BaseCardAccount',
     data() {
-        return { toFiatPrice };
+        return { toFiatPrice, isModalClaimTokensShown: false };
     },
     computed: {
         ...mapStores(useAccountStore, useVeStore, useLiquidityStore),
         rewardsInUSD() {
-            if (!this.veStore.lock) return 0;
+            if (!this.veStore.rewards.length) return 0;
 
-            const balRewards = Number(fromWei(this.veStore.lock.rewards[0].amount));
-            const bptRewards = Number(fromWei(this.veStore.lock.rewards[1].amount));
+            const balRewards = Number(fromWei(this.veStore.rewards[0].amount));
+            const bptRewards = Number(fromWei(this.veStore.rewards[1].amount));
             const balPrice = this.liquidityStore.pricing['BAL'];
             const bptPrice = this.liquidityStore.pricing['20USDC-80THX'];
 
             return balRewards * balPrice + bptRewards * bptPrice;
         },
     },
+    methods: {
+        onClickRewards() {
+            this.isModalClaimTokensShown = true;
+        },
+    },
 });
 </script>
+<style>
+.text-hover-underline:hover {
+    text-decoration: underline;
+}
+</style>
