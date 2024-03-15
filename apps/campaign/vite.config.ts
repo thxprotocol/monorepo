@@ -1,10 +1,10 @@
 import { UserConfigExport, defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import { BootstrapVueNextResolver } from 'unplugin-vue-components/resolvers';
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import mkcert from 'vite-plugin-mkcert';
 import Components from 'unplugin-vue-components/vite';
-import { BootstrapVueNextResolver } from 'unplugin-vue-components/resolvers';
-import { sentryVitePlugin } from '@sentry/vite-plugin';
 
 const SENTRY_AUTH_TOKEN = process.env.SENTRY_AUTH_TOKEN || '';
 const config: UserConfigExport = {
@@ -17,7 +17,10 @@ const config: UserConfigExport = {
         }),
     ],
     server: {
-        https: true,
+        https: {
+            key: './certs/localhost.key',
+            cert: './certs/localhost.crt',
+        },
         // host: '192.168.178.12',
         host: 'localhost',
         port: 8080,

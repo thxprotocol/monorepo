@@ -4,24 +4,6 @@
     "plugins": ["@nx"],
     "overrides": [
         {
-            "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-            "rules": {
-                "@nx/enforce-module-boundaries": [
-                    "error",
-                    {
-                        "enforceBuildableLibDependency": true,
-                        "allow": [],
-                        "depConstraints": [
-                            {
-                                "sourceTag": "*",
-                                "onlyDependOnLibsWithTags": ["*"]
-                            }
-                        ]
-                    }
-                ]
-            }
-        },
-        {
             "files": ["*.ts", "*.tsx"],
             "extends": ["plugin:@nx/typescript"],
             "rules": {}
@@ -30,6 +12,13 @@
             "files": ["*.js", "*.jsx"],
             "extends": ["plugin:@nx/javascript"],
             "rules": {}
+        },
+        {
+            "files": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.vue"],
+            "rules": {
+                "@typescript-eslint/no-explicit-any": ["off"],
+                "@nx/enforce-module-boundaries": "off"
+            }
         }
     ]
 }
