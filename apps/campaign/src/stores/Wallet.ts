@@ -168,13 +168,13 @@ export const useWalletStore = defineStore('wallet', {
             this.erc721 = erc721.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
             this.erc1155 = erc1155.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
             this.couponCodes = payments
-                .filter((p) => p.rewardVariant === RewardVariant.Coupon)
+                .filter((p: { rewardVariant: RewardVariant }) => p.rewardVariant === RewardVariant.Coupon)
                 .map((t: TRewardCouponPayment[]) => ({
                     ...t,
                     component: 'BaseCardCouponCode',
                 }));
             this.discordRoles = payments
-                .filter((p) => p.rewardVariant === RewardVariant.DiscordRole)
+                .filter((p: { rewardVariant: RewardVariant }) => p.rewardVariant === RewardVariant.DiscordRole)
                 .map((t: TRewardDiscordRolePayment[]) => ({
                     ...t,
                     component: 'BaseCardDiscordRole',

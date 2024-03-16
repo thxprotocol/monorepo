@@ -68,6 +68,7 @@ export default defineComponent({
         ...mapStores(useAuthStore, useAccountStore, useWalletStore),
         list() {
             return [
+                ...this.walletStore.discordRoles,
                 ...this.walletStore.couponCodes,
                 ...this.walletStore.erc20,
                 ...this.walletStore.erc721,
@@ -78,6 +79,7 @@ export default defineComponent({
         },
         isEmpty() {
             return ![
+                ...this.walletStore.discordRoles,
                 ...this.walletStore.couponCodes,
                 ...this.walletStore.erc20,
                 ...this.walletStore.erc721,
