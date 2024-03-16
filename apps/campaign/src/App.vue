@@ -27,6 +27,11 @@ import { useAccountStore } from './stores/Account';
 import { useWalletStore } from './stores/Wallet';
 
 export default defineComponent({
+    data() {
+        return {
+            test: false,
+        };
+    },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useWalletStore),
         isOffline() {

@@ -17,6 +17,8 @@
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
+        "isolatedModules": true,
+        "strict": true,
         "paths": {
             "@thxnetwork/campaign*": ["apps/campaign/src*"],
             "@thxnetwork/common*": ["libs/common/src*"],

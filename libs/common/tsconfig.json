@@ -1,20 +1,18 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "CommonJS",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "noImplicitOverride": true,
         "noPropertyAccessFromIndexSignature": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
-        "types": ["node"]
+        "types": ["node"],
+        "outDir": "../../dist/out-tsc",
+        "declaration": true
     },
     "files": [],
-    "include": ["node_modules/**/*.d.ts"],
-    "references": [
-        {
-            "path": "./tsconfig.lib.json"
-        }
-    ]
+    "include": ["node_modules/**/*.d.ts", "types/**/*.d.ts", "src/**/*.ts"],
+    "exclude": []
 }

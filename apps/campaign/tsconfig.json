@@ -1,10 +1,12 @@
 {
     "extends": "../../tsconfig.base.json",
-    "files": [],
-    "include": ["components.d.ts", "src/types/**/*.d.ts", "node_modules/**/*.d.ts"],
-    "references": [
-        {
-            "path": "./tsconfig.app.json"
-        }
-    ]
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.vue",
+        "components.d.ts",
+        "src/types/**/*.d.ts",
+        "node_modules/**/*.d.ts",
+        "../../libs/common/**/*"
+    ],
+    "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }
