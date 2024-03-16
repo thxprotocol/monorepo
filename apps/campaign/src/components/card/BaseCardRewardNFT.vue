@@ -2,7 +2,7 @@
     <BaseCardReward :reward="reward" :image="imgUrl">
         <template #title>
             <div class="flex-grow-1">{{ reward.title }}</div>
-            <div class="text-success fw-bold" v-if="reward.erc1155Amount">{{ reward.erc1155Amount }}x</div>
+            <div v-if="reward.erc1155Amount" class="text-success fw-bold">{{ reward.erc1155Amount }}x</div>
         </template>
     </BaseCardReward>
 </template>

@@ -2,10 +2,10 @@
     <b-modal
         :id="id"
         v-model="isModalShown"
-        @hidden="isModalShown = false"
         :title="reward.title"
         centered
         content-class="gradient-shadow-xl"
+        @hidden="isModalShown = false"
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-gift me-2"></i> {{ reward.title }}</h5>
@@ -25,13 +25,13 @@
             <BaseFormGroupWalletSelect
                 v-if="reward.chainId"
                 :chain-id="reward.chainId"
-                @update="wallet = $event"
                 class="mb-0"
+                @update="wallet = $event"
             />
         </template>
         <template #footer>
             <b-button variant="success" class="w-100 rounded-pill" :disabled="isDisabled" @click="onSubmit">
-                <b-spinner small variant="primary" v-if="isSubmitting" />
+                <b-spinner v-if="isSubmitting" small variant="primary" />
                 <template v-else-if="reward.isLocked"> <i class="fas fa-lock"></i></template>
                 <template v-else>
                     Pay {{ reward.pointPrice }} {{ reward.pointPrice === 1 ? 'point' : 'points' }}</template
@@ -50,14 +50,6 @@ import { useWalletStore } from '../../stores/Wallet';
 
 export default defineComponent({
     name: 'BaseModalRewardPayment',
-    data() {
-        return {
-            error: '',
-            wallet: null,
-            isModalShown: false,
-            isSubmitting: false,
-        };
-    },
     props: {
         id: {
             type: String,
@@ -70,10 +62,13 @@ export default defineComponent({
         show: Boolean,
         isLoading: Boolean,
     },
-    watch: {
-        show(value) {
-            this.isModalShown = value;
-        },
+    data() {
+        return {
+            error: '',
+            wallet: null,
+            isModalShown: false,
+            isSubmitting: false,
+        };
     },
     computed: {
         ...mapStores(useAccountStore, useRewardStore),
@@ -92,6 +87,11 @@ export default defineComponent({
         },
         isAlertDangerShown() {
             return !!this.error;
+        },
+    },
+    watch: {
+        show(value) {
+            this.isModalShown = value;
         },
     },
     methods: {

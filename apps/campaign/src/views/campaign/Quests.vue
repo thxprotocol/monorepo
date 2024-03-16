@@ -15,22 +15,22 @@
                                 </b-badge>
                             </sup>
                         </template>
-                        <div :class="{ 'd-none': !quest.isAvailable }" :key="key" v-for="(quest, key) of quests">
+                        <div v-for="(quest, key) of quests" :key="key" :class="{ 'd-none': !quest.isAvailable }">
                             <component
-                                v-if="quest"
                                 :is="questComponentMap[quest.variant]"
+                                v-if="quest"
                                 :quest="quest"
                                 class="mb-2 mx-lg-0 my-lg-3"
                             />
                         </div>
-                        <div class="text-center mt-5" v-if="!availableQuestCount">
+                        <div v-if="!availableQuestCount" class="text-center mt-5">
                             <i class="h1 fas fa-trophy text-accent" />
                             <p class="lead text-accent">Well done!</p>
                             <p class="text-opaque">You have completed all available quests</p>
                         </div>
                     </b-tab>
                     <b-tab title="Completed">
-                        <div :class="{ 'd-none': quest.isAvailable }" :key="key" v-for="(quest, key) of quests">
+                        <div v-for="(quest, key) of quests" :key="key" :class="{ 'd-none': quest.isAvailable }">
                             <component
                                 :is="questComponentMap[quest.variant]"
                                 :quest="quest"
@@ -98,7 +98,8 @@ export default defineComponent({
             return this.questStore.quests.filter((q: TBaseQuest) => q.isAvailable).length;
         },
         quests() {
-            return this.questStore.quests.sort(sortMap[this.selectedSort.key]);
+            const { quests } = this.questStore;
+            return quests.sort(sortMap[this.selectedSort.key]);
         },
     },
     watch: {

@@ -1,6 +1,6 @@
 <template>
     <b-container>
-        <b-alert v-if="isAlertShown" variant="primary" v-model="isAlertShown" class="py-2 mt-3">
+        <b-alert v-if="isAlertShown" v-model="isAlertShown" variant="primary" class="py-2 mt-3">
             <i class="fas fa-gift me-2" />
             Sign in to see your rewards!
         </b-alert>

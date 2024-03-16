@@ -5,8 +5,8 @@
         </div>
         <b-link
             v-if="accountStore.isAuthenticated && (questStore.quests.length || rewardStore.rewards.length)"
-            @click="onClickRefresh"
             class="pl-3 py-2 p-lg-0 m-lg-0 text-center text-decoration-none d-block d-lg-none"
+            @click="onClickRefresh"
         >
             <div class="text-accent h1 m-0 d-flex align-items-center">
                 <strong>{{ participant ? participant.balance : 0 }}</strong>
@@ -20,9 +20,9 @@
         <div v-else class="pl-3 py-2 text-center text-decoration-none d-lg-none">
             <b-img
                 v-if="accountStore.config.config"
+                v-b-tooltip.hover.bottom="{ title: decodeHTML(accountStore.config.title) }"
                 :src="accountStore.config.config.logoUrl"
                 class="navbar-logo"
-                v-b-tooltip.hover.bottom="{ title: decodeHTML(accountStore.config.title) }"
             />
         </div>
         <div style="width: 120px; text-align: right">

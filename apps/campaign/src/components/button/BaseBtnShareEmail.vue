@@ -1,6 +1,6 @@
 <template>
     <b-button size="sm" class="btn-share" @click="openShareWindow">
-        <i class="fas fa-envelope"></i>
+        <i class="fas fa-envelope" />
     </b-button>
 </template>
 

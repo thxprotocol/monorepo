@@ -2,14 +2,14 @@
     <b-modal
         :id="id"
         v-model="walletStore.isModalChainSwitchShown"
-        @hidden="walletStore.isModalChainSwitchShown = false"
         centered
         hide-footer
+        @hidden="walletStore.isModalChainSwitchShown = false"
     >
         <template #header>
-            <h5 class="modal-title"><i class="fas fa-wifi me-2"></i> Change your connected network</h5>
+            <h5 class="modal-title"><i class="fas fa-wifi me-2" /> Change your connected network</h5>
             <b-link class="btn-close" @click="walletStore.isModalChainSwitchShown = false">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" />
             </b-link>
         </template>
         <b-form>

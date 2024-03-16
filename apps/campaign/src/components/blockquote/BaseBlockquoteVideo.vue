@@ -1,8 +1,8 @@
 <template>
     <blockquote>
         <iframe
-            width="100%"
             :id="id"
+            width="100%"
             :height="height"
             :src="`https://www.youtube.com/embed/${quest.content}?controls=0&modestbranding=1`"
         >

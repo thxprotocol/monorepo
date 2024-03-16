@@ -1,5 +1,5 @@
 <template>
-    <b-modal :id="id" v-model="isShown" @show="onShow" @hidden="isShown = false" centered hide-footer body-class="px-0">
+    <b-modal :id="id" v-model="isShown" centered hide-footer body-class="px-0" @show="onShow" @hidden="isShown = false">
         <template #header>
             <h5 class="modal-title"><i class="fas fa-wallet me-2"></i> Wallet ({{ wallet.variant }})</h5>
             <b-link class="btn-close" @click="isShown = false">
@@ -36,10 +36,10 @@
                                     <i v-else class="fas fa-eye-slash px-2"></i>
                                 </b-button>
                                 <b-button
-                                    size="sm"
-                                    variant="primary"
                                     v-clipboard:copy="authStore.privateKey"
                                     v-clipboard:success="onCopySuccess"
+                                    size="sm"
+                                    variant="primary"
                                 >
                                     <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
                                     <i v-else class="fas fa-clipboard px-2"></i>
@@ -68,8 +68,8 @@
                         </b-form-group>
                         <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
                             <b-form-input
-                                :state="isPasswordValid"
                                 v-model="password"
+                                :state="isPasswordValid"
                                 type="password"
                                 placeholder="Answer"
                                 autocomplete="off"
@@ -77,8 +77,8 @@
                         </b-form-group>
                         <b-form-group :state="isPasswordValid" :invalid-feedback="'Use 10 or more characters'">
                             <b-form-input
-                                :state="isPasswordValid"
                                 v-model="passwordCheck"
+                                :state="isPasswordValid"
                                 type="password"
                                 placeholder="Answer again"
                                 autocomplete="off"
@@ -90,7 +90,7 @@
                             variant="primary"
                             @click="onSubmitDeviceSharePasswordUpdate"
                         >
-                            <b-spinner small variant="light" v-if="isLoadingPasswordChange" />
+                            <b-spinner v-if="isLoadingPasswordChange" small variant="light" />
                             <template v-else> Change Security Question </template>
                         </b-button>
                     </template>
@@ -112,6 +112,10 @@ import { chainList } from '../../utils/chains';
 
 export default defineComponent({
     name: 'BaseModalWallet',
+    props: {
+        id: String,
+        wallet: { type: Object, required: true },
+    },
     data() {
         return {
             isShown: false,
@@ -128,27 +132,6 @@ export default defineComponent({
             isLoadingReset: false,
             isLoadingPasswordChange: false,
         };
-    },
-    props: {
-        id: String,
-        wallet: { type: Object, required: true },
-    },
-    watch: {
-        show(show: boolean) {
-            this.isShown = show;
-        },
-        async tabIndex(index: number) {
-            if (index !== 1) return;
-
-            this.password = '';
-            this.passwordCheck = '';
-
-            if (!this.authStore.privateKey) {
-                await this.authStore.getPrivateKey();
-            }
-
-            this.question = this.authStore.securityQuestion;
-        },
     },
     computed: {
         ...mapStores(useAccountStore),
@@ -175,6 +158,23 @@ export default defineComponent({
             if (this.password.length >= 10 && this.password === this.passwordCheck) return true;
             if (this.password.length && this.password.length < 10) return false;
             return undefined;
+        },
+    },
+    watch: {
+        show(show: boolean) {
+            this.isShown = show;
+        },
+        async tabIndex(index: number) {
+            if (index !== 1) return;
+
+            this.password = '';
+            this.passwordCheck = '';
+
+            if (!this.authStore.privateKey) {
+                await this.authStore.getPrivateKey();
+            }
+
+            this.question = this.authStore.securityQuestion;
         },
     },
     methods: {

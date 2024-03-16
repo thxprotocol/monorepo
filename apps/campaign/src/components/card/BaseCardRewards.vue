@@ -1,37 +1,37 @@
 <template>
-    <b-tabs class="tabs-rewards" v-if="!isEmpty" nav-class="px-3" content-class="p-2">
+    <b-tabs v-if="!isEmpty" class="tabs-rewards" nav-class="px-3" content-class="p-2">
         <template #tabs-end>
             <b-button
-                class="text-primary ms-auto"
                 v-if="accountStore.isAuthenticated"
+                class="text-primary ms-auto"
                 size="sm"
                 variant="link"
                 @click="onClickRefresh"
             >
                 <b-spinner v-if="walletStore.isLoading" small />
-                <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem"></i>
+                <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem" />
             </b-button>
         </template>
         <b-tab title="Coins">
-            <div :key="key" v-for="(token, key) of walletStore.erc20" class="mb-1">
+            <div v-for="(token, key) of walletStore.erc20" :key="key" class="mb-1">
                 <component :is="token.component" :token="token" />
             </div>
         </b-tab>
-        <b-tab title="NFT" v-if="walletStore.erc721.length || walletStore.erc1155.length">
-            <div :key="key" v-for="(token, key) of walletStore.erc1155" class="mb-1">
+        <b-tab v-if="walletStore.erc721.length || walletStore.erc1155.length" title="NFT">
+            <div v-for="(token, key) of walletStore.erc1155" :key="key" class="mb-1">
                 <component :is="token.component" :token="token" />
             </div>
-            <div :key="key" v-for="(token, key) of walletStore.erc721" class="mb-1">
-                <component :is="token.component" :token="token" />
-            </div>
-        </b-tab>
-        <b-tab title="Secrets" v-if="walletStore.couponCodes.length">
-            <div :key="key" v-for="(token, key) of walletStore.couponCodes" class="mb-1">
+            <div v-for="(token, key) of walletStore.erc721" :key="key" class="mb-1">
                 <component :is="token.component" :token="token" />
             </div>
         </b-tab>
-        <b-tab title="Discord" v-if="walletStore.discordRoles.length">
-            <div :key="key" v-for="(token, key) of walletStore.discordRoles" class="mb-1">
+        <b-tab v-if="walletStore.couponCodes.length" title="Secrets">
+            <div v-for="(token, key) of walletStore.couponCodes" :key="key" class="mb-1">
+                <component :is="token.component" :token="token" />
+            </div>
+        </b-tab>
+        <b-tab v-if="walletStore.discordRoles.length" title="Discord">
+            <div v-for="(token, key) of walletStore.discordRoles" :key="key" class="mb-1">
                 <component :is="token.component" :token="token" />
             </div>
         </b-tab>

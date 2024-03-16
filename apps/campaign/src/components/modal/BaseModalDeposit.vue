@@ -1,5 +1,5 @@
 <template>
-    <b-modal v-model="isShown" @hidden="$emit('hidden')" @show="onShow" centered hide-footer title="Lock 20USDC-80THX">
+    <b-modal v-model="isShown" centered hide-footer title="Lock 20USDC-80THX" @hidden="$emit('hidden')" @show="onShow">
         <b-alert v-model="isAlertInfoShown" variant="info" class="py-2 px-3">
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
@@ -7,18 +7,18 @@
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab title="1. Approve">
                 <b-form-group label="Amount" :description="`Current allowance: ${fromWei(allowance.toString())}`">
-                    <b-form-input type="number" v-model="amountApproval" />
+                    <b-form-input v-model="amountApproval" type="number" />
                 </b-form-group>
-                <b-button variant="primary" @click="onClickApprove" class="w-100" :disabled="isPolling">
+                <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickApprove">
                     <b-spinner v-if="isPolling" small />
                     <template v-else>Approve</template>
                 </b-button>
             </b-tab>
             <b-tab title="2. Deposit">
                 <b-form-group>
-                    <b-form-input type="number" v-model="amountDeposit" />
+                    <b-form-input v-model="amountDeposit" type="number" />
                 </b-form-group>
-                <b-button variant="primary" @click="onClickDeposit" class="w-100" :disabled="isPolling">
+                <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickDeposit">
                     <b-spinner v-if="isPolling" small />
                     <template v-else>Deposit</template>
                 </b-button>
@@ -42,6 +42,11 @@ import { ChainId } from '@thxnetwork/sdk';
 
 export default defineComponent({
     name: 'BaseModalDeposit',
+    props: {
+        show: Boolean,
+        amount: { type: Number, required: true },
+        lockEnd: { type: Date, required: true },
+    },
     data() {
         return {
             fromWei,
@@ -53,11 +58,6 @@ export default defineComponent({
             amountApproval: 0,
             amountDeposit: 0,
         };
-    },
-    props: {
-        show: Boolean,
-        amount: { type: Number, required: true },
-        lockEnd: { type: Date, required: true },
     },
     computed: {
         ...mapStores(useWalletStore),

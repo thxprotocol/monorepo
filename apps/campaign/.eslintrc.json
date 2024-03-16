@@ -1,11 +1,27 @@
 {
-    "extends": ["../../.eslintrc.json"],
+    "extends": [
+        "../../.eslintrc.json",
+        "plugin:vue/essential",
+        "plugin:vue/vue3-recommended",
+        "@vue/eslint-config-prettier",
+        "@vue/eslint-config-typescript"
+    ],
     "ignorePatterns": ["!**/*"],
     "overrides": [
         {
-            "files": ["*.ts", "*.js", "*.tsx", "*.jsx"],
+            "files": ["*.ts", "*.vue"],
             "rules": {
-                "@typescript-eslint/no-explicit-any": "off"
+                // no-undef is not working with TS projects, ref: https://typescript-eslint.io/troubleshooting/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
+                "no-undef": "off",
+                "no-debugger": "off",
+                "@typescript-eslint/no-explicit-any": "off",
+                "@nx/enforce-module-boundaries": "off",
+                "vue/require-explicit-emits": "off",
+                "vue/require-default-prop": "off",
+                "vue/require-v-for-key": "off",
+                "vue/valid-v-for": "off",
+                "vue/no-multiple-template-root": "off",
+                "vue/return-in-computed-property": "off"
             }
         }
     ]

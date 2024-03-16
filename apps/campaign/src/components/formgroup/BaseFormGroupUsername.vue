@@ -3,10 +3,10 @@
         <b-input-group>
             <b-form-input
                 v-model="value"
-                @input="onInput"
-                @change="onChange"
                 :state="isValidUsername"
                 placeholder="JohnDoe123"
+                @input="onInput"
+                @change="onChange"
             />
             <b-input-group-append v-if="isLoading">
                 <b-button size="sm" variant="primary" class="px-3" :disabled="true">
@@ -24,6 +24,9 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'BaseFormGroupUsername',
+    props: {
+        username: String,
+    },
     data() {
         return {
             value: '',
@@ -41,9 +44,6 @@ export default defineComponent({
             if (this.isInvalidInput || this.error.length) return false;
             return;
         },
-    },
-    props: {
-        username: String,
     },
     mounted() {
         if (!this.accountStore.account) return;

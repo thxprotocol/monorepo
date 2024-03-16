@@ -18,12 +18,12 @@
             Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
         </b-button>
 
-        <BaseButtonQuestLocked v-else-if="quest.isLocked" :locks="quest.locks" :id="quest._id" />
+        <BaseButtonQuestLocked v-else-if="quest.isLocked" :id="quest._id" :locks="quest.locks" />
 
         <b-input-group v-else>
             <b-form-input :model-value="inviteUrl" />
             <b-input-group-append>
-                <b-button size="sm" variant="primary" v-clipboard:copy="inviteUrl" v-clipboard:success="onCopySuccess">
+                <b-button v-clipboard:copy="inviteUrl" v-clipboard:success="onCopySuccess" size="sm" variant="primary">
                     <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
                     <i v-else class="fas fa-clipboard px-2"></i>
                 </b-button>

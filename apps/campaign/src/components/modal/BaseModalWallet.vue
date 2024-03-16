@@ -1,5 +1,5 @@
 <template>
-    <b-modal :id="id" v-model="isShown" @show="onShow" @hidden="isShown = false" centered hide-footer>
+    <b-modal :id="id" v-model="isShown" centered hide-footer @show="onShow" @hidden="isShown = false">
         <template #header>
             <h5 class="modal-title"><i class="fas fa-wallet me-2"></i> Wallet</h5>
             <b-link class="btn-close" @click="isShown = false">
@@ -22,23 +22,23 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'BaseModalWallet',
+    props: {
+        id: String,
+        wallet: { type: Object, required: true },
+    },
     data() {
         return {
             isShown: false,
             error: '',
         };
     },
-    props: {
-        id: String,
-        wallet: { type: Object, required: true },
+    computed: {
+        ...mapStores(useAccountStore, useWalletStore),
     },
     watch: {
         show(show: boolean) {
             this.isShown = show;
         },
-    },
-    computed: {
-        ...mapStores(useAccountStore, useWalletStore),
     },
     methods: {
         async onShow() {

@@ -2,7 +2,7 @@
     <b-form-group :description="description">
         <template #label>
             {{ label }}
-            <b-link class="text-opaque text-white" v-b-tooltip :title="tooltip">
+            <b-link v-b-tooltip class="text-opaque text-white" :title="tooltip">
                 <i class="fas fa-question-circle" />
             </b-link>
         </template>
@@ -13,10 +13,10 @@
             :max-date="maxDate"
             :start-date="date"
             :allowed-dates="(allowedDates as unknown as string[])"
-            @date-update="$emit('update', $event)"
             :placeholder="placeholder"
             auto-apply
             input-class-name="form-control"
+            @date-update="$emit('update', $event)"
         />
         <template #description>
             <slot name="description"></slot>
@@ -34,11 +34,6 @@ export default defineComponent({
     components: {
         VueDatePicker,
     },
-    data() {
-        return {
-            date: new Date(),
-        };
-    },
     props: {
         label: String,
         description: String,
@@ -50,6 +45,11 @@ export default defineComponent({
         allowedDates: Array as () => number[],
         enableTimePicke: Boolean,
         value: { type: Date, required: true },
+    },
+    data() {
+        return {
+            date: new Date(),
+        };
     },
     watch: {
         startDate: {

@@ -18,7 +18,9 @@
                     >
                         <b-avatar size="80" :src="accountStore.account?.profileImg" class="gradient-border-xl" />
                         <div class="px-3" style="min-width: 200px">
-                            <h3 class="text-white mb-0">{{ accountStore.account?.username }}</h3>
+                            <h3 class="text-white mb-0">
+                                {{ accountStore.account?.username }}
+                            </h3>
                             <div class="text-white text-opaque mb-1">Rank: #{{ participant.rank }}</div>
                             <b-progress style="height: 13px" :max="balance + Number(questStore.availablePoints)">
                                 <b-progress-bar
@@ -43,6 +45,9 @@ import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
 
 export default defineComponent({
+    props: {
+        height: Number,
+    },
     data() {
         return {
             decodeHTML,
@@ -53,9 +58,6 @@ export default defineComponent({
             error: '',
             screenWidth: window.innerWidth,
         };
-    },
-    props: {
-        height: Number,
     },
     computed: {
         ...mapStores(useAccountStore, useQuestStore),

@@ -8,7 +8,7 @@
                         Earn additional BPT next to your native $BAL rewards! You will also receive VeTHX allowing you
                         to partake in protocol governance.
                     </p>
-                    <b-button @click="tabIndex = 1" variant="primary" class="me-3 px-5">
+                    <b-button variant="primary" class="me-3 px-5" @click="tabIndex = 1">
                         Claim
                         <i class="fas fa-chevron-right ms-2" />
                     </b-button>
@@ -19,17 +19,17 @@
             </b-col>
             <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
                 <b-card class="border-0 gradient-shadow-xl" style="min-height: 415px">
-                    <b-tabs pills justified content-class="mt-3" nav-wrapper-class="text-white" v-model="tabIndex">
+                    <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
                         <b-tab>
                             <template #title>
-                                <i class="fas fa-balance-scale me-1"></i>
+                                <i class="fas fa-balance-scale me-1" />
                                 Liquidity
                             </template>
                             <BaseTabLiquidity @change-tab="tabIndex = $event" />
                         </b-tab>
                         <b-tab>
                             <template #title>
-                                <i class="fas fa-id-card me-1"></i>
+                                <i class="fas fa-id-card me-1" />
                                 Membership
                             </template>
                             <BaseTabDeposit
@@ -54,7 +54,7 @@ import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
-import { format, differenceInDays } from 'date-fns';
+import { format } from 'date-fns';
 import { fromWei } from 'web3-utils';
 import { contractNetworks } from '@thxnetwork/campaign/config/constants';
 
@@ -82,9 +82,6 @@ export default defineComponent({
                 this.amountDeposit = this.walletStore.balances[bptGaugeAddress];
             });
         },
-    },
-    methods: {
-        onClickStart() {},
     },
 });
 </script>

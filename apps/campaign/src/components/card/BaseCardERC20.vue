@@ -1,6 +1,6 @@
 <template>
     <b-card body-class="d-flex align-items-center" class="mb-1">
-        <div class="pe-3" v-if="token.erc20">
+        <div v-if="token.erc20" class="pe-3">
             <img height="20" :src="token.erc20.logoImgUrl" />
         </div>
         <div class="flex-grow-1">
@@ -59,7 +59,6 @@ export default defineComponent({
             return this.token.migrationBalance ? Number(fromWei(this.token.migrationBalance)) > 0 : false;
         },
     },
-    mounted() {},
     methods: {
         onToastClose() {
             this.walletStore.list();

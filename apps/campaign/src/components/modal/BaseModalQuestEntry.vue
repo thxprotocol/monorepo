@@ -1,13 +1,13 @@
 <template>
     <b-modal
-        v-model="isShown"
         :id="`quest_complete_${id}`"
-        @show="onShow"
-        @hidden="$emit('hidden')"
+        v-model="isShown"
         centered
         no-close-on-backdrop
         no-close-on-esc
         content-class="gradient-shadow-xl"
+        @show="onShow"
+        @hidden="$emit('hidden')"
     >
         <template #header>
             <h5 class="modal-title">
@@ -39,16 +39,16 @@
                         <b-form-input v-model="email" type="email" :state="isEmailValid" placeholder="E-mail" />
                     </b-form-group>
                 </div>
-                <p class="mb-0" v-else>Continue collecting points or redeem your points for rewards.</p>
+                <p v-else class="mb-0">Continue collecting points or redeem your points for rewards.</p>
             </template>
         </template>
 
         <template #footer>
             <b-button
                 v-if="participant && !participant.isSubscribed"
-                @click="onClickSubscribe"
                 variant="primary"
                 class="w-100 rounded-pill"
+                @click="onClickSubscribe"
             >
                 Subscribe
             </b-button>
@@ -71,15 +71,6 @@ import { useQuestStore } from '../../stores/Quest';
 
 export default defineComponent({
     name: 'BaseModalQuestEntry',
-    data() {
-        return {
-            isShown: false,
-            isSubmitting: false,
-            isLoadingContinue: false,
-            email: '',
-            subscribeError: '',
-        };
-    },
     props: {
         id: String,
         amount: Number,
@@ -91,14 +82,17 @@ export default defineComponent({
             required: true,
         },
     },
-    watch: {
-        show(value) {
-            this.isShown = value;
-        },
+    data() {
+        return {
+            isShown: false,
+            isSubmitting: false,
+            isLoadingContinue: false,
+            email: '',
+            subscribeError: '',
+        };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useQuestStore),
+        ...mapStores(useAccountStore, useQuestStore),
         isAlertErrorShown() {
             return !!this.error || !!this.subscribeError;
         },
@@ -112,6 +106,11 @@ export default defineComponent({
         participant() {
             const { participants, poolId } = useAccountStore();
             return participants.find((p) => p.poolId === poolId);
+        },
+    },
+    watch: {
+        show(value) {
+            this.isShown = value;
         },
     },
     methods: {

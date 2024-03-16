@@ -1,12 +1,12 @@
 <template>
     <b-modal
         v-model="authStore.isModalWalletRecoveryShown"
-        @show="onShow"
-        @hidden="authStore.isModalWalletRecoveryShown = false"
         no-close-on-backdrop
         centered
         hide-footer
         no-close-on-esc
+        @show="onShow"
+        @hidden="authStore.isModalWalletRecoveryShown = false"
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-key me-2"></i> Wallet Recovery</h5>
@@ -26,10 +26,10 @@
             <b-button
                 class="w-100"
                 variant="primary"
-                @click="onSubmitDeviceShareRecovery"
                 :disabled="!!authStore.isDeviceShareAvailable || !passwordRecovery.length"
+                @click="onSubmitDeviceShareRecovery"
             >
-                <b-spinner small variant="light" v-if="isLoadingPasswordRecovery" />
+                <b-spinner v-if="isLoadingPasswordRecovery" small variant="light" />
                 <template v-else> Recover Key </template>
             </b-button>
             <b-button variant="link" class="text-danger w-100 mt-2" @click="onClickReset">
@@ -43,7 +43,7 @@
                 <b-link class="w-100" target="_blank" href="">Contact Support</b-link>
             </b-alert>
             <b-form-group label="Confirm Reset" description="Type 'reset' to create a new wallet for this account.">
-                <b-form-input placeholder="reset" v-model="inputConfirm" />
+                <b-form-input v-model="inputConfirm" placeholder="reset" />
             </b-form-group>
             <b-button variant="danger" class="w-100" :disabled="inputConfirm !== 'reset'" @click="onClickResetContinue">
                 Reset (2/2)

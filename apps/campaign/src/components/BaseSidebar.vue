@@ -1,5 +1,5 @@
 <template>
-    <aside class="sidebar" v-if="isShown">
+    <aside v-if="isShown" class="sidebar">
         <div class="sidebar-panel h-100">
             <BaseCardAccount />
             <!-- <BaseCardWallets /> -->

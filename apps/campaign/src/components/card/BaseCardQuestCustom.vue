@@ -1,12 +1,12 @@
 <template>
     <BaseCardQuest
-        @modal-close="isModalQuestEntryShown = false"
-        :quest="quest"
         :id="quest._id"
+        :quest="quest"
         :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
         :error="error"
+        @modal-close="isModalQuestEntryShown = false"
     >
         <b-progress v-if="accountStore.isAuthenticated && quest.limit > 0" class="mb-3" :max="quest.limit" show-value>
             <b-progress-bar variant="primary" :value="quest.entries.length" :label="`${quest.events.length}`" />
@@ -14,7 +14,7 @@
         </b-progress>
 
         <template #button>
-            <b-button variant="primary" block class="w-100" @click="onClickClaim" :disabled="isSubmitting">
+            <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
                 <template v-if="isSubmitting">
                     <b-spinner small></b-spinner>
                     Adding points...

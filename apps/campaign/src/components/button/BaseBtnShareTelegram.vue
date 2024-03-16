@@ -1,6 +1,6 @@
 <template>
     <b-button size="sm" class="btn-share" @click="openShareWindow">
-        <i class="fab fa-telegram"></i>
+        <i class="fab fa-telegram" />
     </b-button>
 </template>
 

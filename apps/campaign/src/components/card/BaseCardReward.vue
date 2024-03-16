@@ -13,7 +13,7 @@
                     expiryDate
                 }}</span>
             </b-badge>
-            <b-img class="card-img-logo" v-if="!image" :src="accountStore.config.logoUrl" widht="auto" height="100" />
+            <b-img v-if="!image" class="card-img-logo" :src="accountStore.config.logoUrl" widht="auto" height="100" />
         </header>
         <b-card-body>
             <b-card-title class="d-flex">
@@ -30,7 +30,7 @@
                         </span>
                     </b-badge>
                 </div>
-                <div class="d-flex align-items-center ms-auto" v-if="reward.progress && reward.progress.limit">
+                <div v-if="reward.progress && reward.progress.limit" class="d-flex align-items-center ms-auto">
                     <span class="card-text me-1"> Supply: </span>
                     <b-badge variant="primary" class="ms-1 p-1 px-2 bg-primary">
                         <span
@@ -49,16 +49,16 @@
             <span id="disabled-wrapper" class="d-block" tabindex="0">
                 <BaseButtonQuestLocked
                     v-if="reward.isLocked"
-                    :locks="reward.locks"
                     :id="`modalQuestLock${reward._id}`"
+                    :locks="reward.locks"
                 />
                 <b-button
+                    v-else
+                    v-b-modal="`modalRewardPayment${reward._id}`"
                     variant="primary"
                     block
                     class="w-100"
                     :disabled="!reward.isStocked || reward.isExpired || reward.isLocked || reward.isDisabled"
-                    v-b-modal="`modalRewardPayment${reward._id}`"
-                    v-else
                 >
                     <template v-if="!reward.isStocked">Sold out</template>
                     <template v-else-if="reward.isExpired">Expired</template>

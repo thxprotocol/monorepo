@@ -1,18 +1,18 @@
 <template>
     <BaseCardQuest
-        @modal-close="isModalQuestEntryShown = false"
-        :quest="quest"
         :id="quest._id"
+        :quest="quest"
         :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
         :error="error"
+        @modal-close="isModalQuestEntryShown = false"
     >
         <component :is="interactionComponentMap[quest.interaction]" :quest="quest" />
 
         <template #button>
-            <BButtonGroup block class="w-100" v-if="!isConnected">
-                <b-button variant="primary" @click="onClickConnect" :disabled="isSubmitting">
+            <BButtonGroup v-if="!isConnected" block class="w-100">
+                <b-button variant="primary" :disabled="isSubmitting" @click="onClickConnect">
                     <template v-if="isSubmitting">
                         <b-spinner small class="me-1" />
                         Connecting platform...
@@ -21,17 +21,17 @@
                         Connect <strong>{{ kinds[quest.kind] }}</strong>
                     </template>
                 </b-button>
-                <BButton v-if="isSubmitting" @click="onClickCancel" variant="primary" style="max-width: 40px">
+                <BButton v-if="isSubmitting" variant="primary" style="max-width: 40px" @click="onClickCancel">
                     <i class="fas fa-times text-opaque" />
                 </BButton>
             </BButtonGroup>
             <b-button
                 v-else-if="contentURL && !isViewed"
-                @click="onClickView"
                 variant="primary"
                 block
                 class="w-100"
                 :disabled="isLoadingView"
+                @click="onClickView"
             >
                 <b-spinner v-if="isLoadingView" small></b-spinner>
                 <template v-else>
@@ -39,7 +39,7 @@
                     <i class="fas fa-external-link-alt ms-1"></i>
                 </template>
             </b-button>
-            <b-button v-else variant="primary" block class="w-100" @click="onClickComplete" :disabled="isSubmitting">
+            <b-button v-else variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickComplete">
                 <template v-if="isSubmitting">
                     <b-spinner small></b-spinner>
                     Adding points...

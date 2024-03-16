@@ -3,12 +3,12 @@
         <div class="card-text ps-2 position-relative">
             <div class="d-flex pb-1">
                 <b-link
-                    class="position-absolute"
-                    style="right: 0.5rem"
                     v-b-tooltip
-                    :title="'Do not change this text in your post! Complete the quest not faster than 10s after posting.'"
                     v-clipboard:copy="quest.content"
                     v-clipboard:success="onCopySuccess"
+                    class="position-absolute"
+                    style="right: 0.5rem"
+                    :title="'Do not change this text in your post! Complete the quest not faster than 10s after posting.'"
                 >
                     {{ copyLabel }}
                 </b-link>

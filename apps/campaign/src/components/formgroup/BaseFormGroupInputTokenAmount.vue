@@ -6,7 +6,7 @@
                 variant="primary"
                 style="font-size: 1rem; font-weight: normal"
             >
-                <slot name="label"></slot>
+                <slot name="label" />
             </b-badge>
             <b-form-input
                 :disabled="disabled"
@@ -14,17 +14,17 @@
                 :min="min"
                 :max="max"
                 :value="value"
-                @input="$emit('update', Number($event))"
                 type="number"
                 style="text-align: right"
+                @input="$emit('update', Number($event))"
             />
         </div>
-        <template #description v-if="balance">
+        <template v-if="balance" #description>
             <div class="d-flex mb-1 justify-content-between mt-1 text-muted">
                 <div>
                     Balance: {{ balance }}
                     <span v-if="value >= balance" class="text-muted"> (Maxed) </span>
-                    <b-badge v-else @click="$emit('update', balance)" class="cursor-pointer ms-1" variant="primary">
+                    <b-badge v-else class="cursor-pointer ms-1" variant="primary" @click="$emit('update', balance)">
                         Max
                     </b-badge>
                 </div>

@@ -1,5 +1,12 @@
 <template>
-    <b-modal v-model="show" @hidden="$emit('hidden')" @show="onShow" centered hide-footer title="Unlock 20USDC-80THX">
+    <b-modal
+        v-model="isShown"
+        centered
+        hide-footer
+        title="Unlock 20USDC-80THX"
+        @hidden="$emit('hidden')"
+        @show="onShow"
+    >
         <b-alert v-model="isAlertInfoShown" variant="info" class="py-2 px-3">
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
@@ -16,9 +23,9 @@
         <p v-else>You are ready to unlock (or relock!)</p>
         <b-button
             variant="primary"
-            @click="onClickWithdraw"
             class="w-100"
             :disabled="isPolling || (isEarly && !isEarlyAttempt)"
+            @click="onClickWithdraw"
         >
             <b-spinner v-if="isPolling" small />
             <template v-else>Withdraw</template>
@@ -38,17 +45,18 @@ import { calculatePenalty, toFiatPrice } from '@thxnetwork/campaign/utils/price'
 
 export default defineComponent({
     name: 'BaseModalWithdraw',
+    props: {
+        show: Boolean,
+        isEarly: Boolean,
+    },
     data() {
         return {
+            isShown: false,
             error: '',
             isPolling: false,
             isEarlyAttempt: false,
             toFiatPrice,
         };
-    },
-    props: {
-        show: Boolean,
-        isEarly: Boolean,
     },
     computed: {
         ...mapStores(useWalletStore, useVeStore, useLiquidityStore),
@@ -74,6 +82,11 @@ export default defineComponent({
             const lock = this.veStore.lock;
             if (!lock) return 0;
             return Number(lock.amount) - this.penalty;
+        },
+    },
+    watch: {
+        show(value) {
+            this.isShown = value;
         },
     },
     methods: {

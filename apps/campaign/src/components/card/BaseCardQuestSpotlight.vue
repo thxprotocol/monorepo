@@ -26,18 +26,18 @@
             <strong class="text-success">{{ quest.title }} </strong>
             <div class="flex-shrink-0">
                 <b-badge
+                    v-b-tooltip
                     variant="primary"
                     class="p-2"
-                    v-b-tooltip
                     :title="`Created: ${quest.createdAt && format(new Date(quest.createdAt), 'dd-MM-yyyy HH:mm')}`"
                 >
                     <i class="fas fa-clock text-opaque me-0" />
                 </b-badge>
-                <b-badge variant="primary" class="p-2 ms-1" v-b-tooltip title="Twitter Quest">
+                <b-badge v-b-tooltip variant="primary" class="p-2 ms-1" title="Twitter Quest">
                     <i class="fab fa-twitter text-opaque me-0" />
                 </b-badge>
-                <b-badge variant="primary" class="p-2 ms-1" v-b-tooltip :title="`Visit ${quest.domain}`">
-                    <b-link @click.stop="isModalCampaignDomainShown = true" class="text-white">
+                <b-badge v-b-tooltip variant="primary" class="p-2 ms-1" :title="`Visit ${quest.domain}`">
+                    <b-link class="text-white" @click.stop="isModalCampaignDomainShown = true">
                         <i class="fas fa-external-link-alt text-opaque me-0" />
                     </b-link>
                 </b-badge>

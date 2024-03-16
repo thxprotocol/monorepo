@@ -3,18 +3,18 @@
         <template #label>
             E-mail
             <b-spinner v-if="isLoadingResend" class="ms-auto" small variant="primary" />
-            <b-link v-else @click="onClickResend" class="ms-auto text-primary">Re-send e-mail</b-link>
+            <b-link v-else class="ms-auto text-primary" @click="onClickResend">Re-send e-mail</b-link>
         </template>
-        <template #description v-if="!isEmailVerified">
+        <template v-if="!isEmailVerified" #description>
             <span class="text-danger"> E-mail is not verified</span>
         </template>
         <b-input-group>
             <b-form-input
                 v-model="value"
-                @input="onInput"
-                @change="onChange"
                 :state="isEmailValid"
                 placeholder="john@example.io"
+                @input="onInput"
+                @change="onChange"
             />
             <b-input-group-append v-if="isLoading">
                 <b-button size="sm" variant="primary" class="px-3" :disabled="true">

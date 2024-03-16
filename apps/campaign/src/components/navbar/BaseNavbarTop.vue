@@ -8,14 +8,14 @@
             <i class="fas fa-caret-left me-1" />
             Back
         </b-link>
-        <b-link @click="isModalExternalURLShown = true" class="text-white text-opaque text-decoration-none">
+        <b-link class="text-white text-opaque text-decoration-none" @click="isModalExternalURLShown = true">
             {{ domain }}
             <i v-if="!accountStore.config.active" class="fas fa-check-circle text-success" />
         </b-link>
         <BaseModalExternalURL
             :show="isModalExternalURLShown"
-            @hidden="isModalExternalURLShown = false"
             :url="accountStore.config.domain"
+            @hidden="isModalExternalURLShown = false"
         />
     </div>
 </template>

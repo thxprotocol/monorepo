@@ -4,12 +4,17 @@ import { BootstrapVueNextResolver } from 'unplugin-vue-components/resolvers';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import mkcert from 'vite-plugin-mkcert';
+import eslintPlugin from 'vite-plugin-eslint';
 import Components from 'unplugin-vue-components/vite';
 
 const SENTRY_AUTH_TOKEN = process.env.SENTRY_AUTH_TOKEN || '';
 const config: UserConfigExport = {
     plugins: [
         mkcert(),
+        eslintPlugin({
+            fix: true,
+            extensions: ['.ts', '.vue'],
+        }),
         vue(),
         nodePolyfills({ protocolImports: true }),
         Components({

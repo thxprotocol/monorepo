@@ -1,7 +1,7 @@
 {
     "extends": "../../tsconfig.base.json",
     "files": [],
-    "include": ["components.d.ts", "./types/**/*.d.ts", "node_modules/**/*.d.ts"],
+    "include": ["components.d.ts", "src/types/**/*.d.ts", "node_modules/**/*.d.ts"],
     "references": [
         {
             "path": "./tsconfig.app.json"

@@ -6,25 +6,25 @@
             class="pl-3 py-2 text-decoration-none d-none d-lg-block me-auto"
         >
             <b-img
+                v-b-tooltip.hover.bottom="{ title: decodeHTML(accountStore.config.title) }"
                 :src="accountStore.config.logoUrl"
                 class="navbar-logo"
-                v-b-tooltip.hover.bottom="{ title: decodeHTML(accountStore.config.title) }"
             />
         </div>
         <router-link :to="`/c/${accountStore.config.slug}/quests`">
-            <i class="fas fa-tasks me-lg-3"></i>
+            <i class="fas fa-tasks me-lg-3" />
             <div>Quests</div>
         </router-link>
         <router-link :to="`/c/${accountStore.config.slug}/rewards`">
-            <i class="fas fa-gift me-lg-3"></i>
+            <i class="fas fa-gift me-lg-3" />
             <div>Rewards</div>
         </router-link>
         <router-link :to="`/c/${accountStore.config.slug}/ranking`">
-            <i class="fas fa-trophy mr-lg-3"></i>
+            <i class="fas fa-trophy mr-lg-3" />
             <div>Rank</div>
         </router-link>
         <router-link v-if="accountStore.isMobile" :to="`/c/${accountStore.config.slug}/wallets`">
-            <i class="fas fa-wallet mr-lg-3"></i>
+            <i class="fas fa-wallet mr-lg-3" />
             <div>Wallet</div>
         </router-link>
         <BaseNavbarSecondary v-if="!accountStore.isMobile" class="ms-auto" />

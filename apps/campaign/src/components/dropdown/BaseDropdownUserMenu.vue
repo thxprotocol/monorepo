@@ -1,11 +1,11 @@
 <template>
-    <b-button v-if="!accountStore.isAuthenticated" variant="link" v-b-modal="'modalLogin'">
+    <b-button v-if="!accountStore.isAuthenticated" v-b-modal="'modalLogin'" variant="link">
         <b-spinner v-if="accountStore.isAuthenticated === false" small />
-        <template v-else>Sign in</template>
+        <template v-else> Sign in </template>
     </b-button>
     <b-dropdown v-else variant="link" no-caret end>
         <template #button-content>
-            <i class="fas fa-ellipsis-v"></i>
+            <i class="fas fa-ellipsis-v" />
         </template>
         <b-dropdown-item @click="accountStore.isModalAccountShown = true"> Account </b-dropdown-item>
         <b-dropdown-item
@@ -21,11 +21,11 @@
         <b-dropdown-divider />
         <b-dropdown-item
             size="sm"
-            @click="onClickSignout"
             link-class="d-flex align-items-center justify-content-between"
+            @click="onClickSignout"
         >
             Sign out
-            <i class="fas fa-sign-out-alt ml-auto"></i>
+            <i class="fas fa-sign-out-alt ml-auto" />
         </b-dropdown-item>
     </b-dropdown>
 </template>

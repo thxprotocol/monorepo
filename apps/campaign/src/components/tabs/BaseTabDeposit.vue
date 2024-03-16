@@ -1,10 +1,10 @@
 <template>
-    <b-alert variant="primary" v-model="isModalUnstakedLiquidityShown" class="p-2">
+    <b-alert v-model="isModalUnstakedLiquidityShown" variant="primary" class="p-2">
         <i class="fas fa-exclamation-circle me-1" />
         You have unstaked liquidity!
-        <b-link @click="$emit('change-tab', 0)">Stake my liquidity</b-link>
+        <b-link @click="$emit('change-tab', 0)"> Stake my liquidity </b-link>
     </b-alert>
-    <b-alert variant="primary" v-model="isModalInsufficientAmountShown" class="p-2">
+    <b-alert v-model="isModalInsufficientAmountShown" variant="primary" class="p-2">
         <i class="fas fa-exclamation-circle me-1" />
         We require a minimal amount worth $3.00 USDC to be locked.
     </b-alert>
@@ -12,10 +12,10 @@
         :usd="liquidityStore.pricing['20USDC-80THX']"
         :balance="walletStore.balances[address.BPTGauge]"
         :value="amount"
-        @update="$emit('update-amount', $event)"
         :min="minBPTGValue / liquidityStore.pricing['20USDC-80THX']"
         :max="walletStore.balances[address.BPTGauge]"
         class="mb-4"
+        @update="$emit('update-amount', $event)"
     >
         <template #label>
             <div class="d-flex align-items-center">
@@ -53,11 +53,11 @@
             <div class="d-flex justify-content-start">
                 <b-button
                     v-for="{ timestamp, label } of suggestedDates"
-                    @click="lockEnd = new Date(timestamp)"
                     size="sm"
                     variant="primary"
                     class="rounded-pill me-2 mt-2 mb-0"
                     :disabled="lockEnd.getTime() === timestamp"
+                    @click="lockEnd = new Date(timestamp)"
                 >
                     {{ label }}
                 </b-button>
@@ -67,9 +67,9 @@
 
     <b-button
         :disabled="isInsufficientAmount"
-        @click="isModalDepositShown = true"
         class="w-100 mt-3"
         :variant="!amount ? 'primary' : 'success'"
+        @click="isModalDepositShown = true"
     >
         Deposit
     </b-button>
@@ -94,6 +94,9 @@ import { ChainId } from '@thxnetwork/sdk';
 
 export default defineComponent({
     name: 'BaseTabDeposit',
+    props: {
+        amount: { type: Number, required: true },
+    },
     data() {
         return {
             isModalDepositShown: false,
@@ -104,9 +107,6 @@ export default defineComponent({
             lockEnd: new Date(),
             minBPTGValue: 3,
         };
-    },
-    props: {
-        amount: { type: Number, required: true },
     },
     computed: {
         ...mapStores(useAccountStore, useWalletStore, useVeStore, useLiquidityStore),

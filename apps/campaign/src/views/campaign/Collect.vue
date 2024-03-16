@@ -21,9 +21,9 @@
                             v-if="isLoadingCollectComplete"
                             class="position-fixed"
                             style="pointer-events: none"
-                            :stageHeight="400"
-                            :stageWidth="500"
-                            :particleCount="200"
+                            :stage-height="400"
+                            :stage-width="500"
+                            :particle-count="200"
                             :duration="3500"
                             :colors="['#98D80D', '#972d15', '#fcec53']"
                             :force="0.5"
@@ -79,24 +79,24 @@
 
                     <BaseFormGroupWalletSelect
                         v-if="accountStore.isAuthenticated"
-                        @update="wallet = $event"
                         :chain-id="qrcodeStore.erc721.chainId"
+                        @update="wallet = $event"
                     />
 
                     <b-button
                         v-if="isLoadingCollectComplete && accountStore.isMobile"
                         variant="primary"
-                        @click="onClickGoToWallet"
                         class="w-100"
+                        @click="onClickGoToWallet"
                     >
                         Continue
                     </b-button>
                     <b-button
                         v-else-if="accountStore.isAuthenticated && !isLoadingCollectComplete"
-                        @click="onClickCollect"
                         variant="success"
                         class="w-100"
                         :disabled="!!error || isLoadingCollect || !wallet"
+                        @click="onClickCollect"
                     >
                         <b-spinner v-if="isLoadingCollect" small variant="dark" />
                         <template v-else>Collect</template>
@@ -122,15 +122,6 @@ import ConfettiExplosion from 'vue-confetti-explosion';
 export default defineComponent({
     name: 'Home',
     components: { ConfettiExplosion },
-    computed: {
-        ...mapStores(useAccountStore, useAuthStore, useQRCodeStore, useWalletStore),
-        isAlertInfoShown() {
-            return !this.accountStore.isAuthenticated;
-        },
-        isAlertErrorShown() {
-            return !!this.error;
-        },
-    },
     data() {
         return {
             uuid: '',
@@ -140,6 +131,15 @@ export default defineComponent({
             isLoadingCollect: false,
             isLoadingCollectComplete: false,
         };
+    },
+    computed: {
+        ...mapStores(useAccountStore, useAuthStore, useQRCodeStore, useWalletStore),
+        isAlertInfoShown() {
+            return !this.accountStore.isAuthenticated;
+        },
+        isAlertErrorShown() {
+            return !!this.error;
+        },
     },
     watch: {
         'accountStore.account': {

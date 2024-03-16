@@ -1,6 +1,6 @@
 <template>
     <b-card body-class="d-flex align-items-center py-2">
-        <div class="pe-3" v-b-tooltip :title="token.guild.name" v-if="token.guild">
+        <div v-if="token.guild" v-b-tooltip class="pe-3" :title="token.guild.name">
             <b-img v-if="token.guild.icon" :src="token.guild.icon" height="30" class="rounded" />
             <i v-else class="fab fa-discord text-primary"></i>
         </div>
@@ -18,8 +18,8 @@
             <b-badge v-else variant="dark" class="p-2">
                 Role not found
                 <i
-                    class="fas fa-info-circle"
                     v-b-tooltip
+                    class="fas fa-info-circle"
                     title="THX Bot is no longerin this server or the role has been removed."
                 />
             </b-badge>
@@ -45,13 +45,9 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useWalletStore } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
-import BaseModalExternalURL from '../../components/modal/BaseModalExternalURL.vue';
 
 export default defineComponent({
     name: 'BaseCardCouponCode',
-    components: {
-        BaseModalExternalURL,
-    },
     props: {
         token: {
             type: Object as PropType<TRewardDiscordRolePayment>,

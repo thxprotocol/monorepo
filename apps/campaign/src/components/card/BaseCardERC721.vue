@@ -7,18 +7,18 @@
     >
         <template #header>
             <b-card-title
-                @click.stop="isVisible = !isVisible"
                 class="d-flex p-3 m-0 align-items-center"
                 style="cursor: pointer"
+                @click.stop="isVisible = !isVisible"
             >
-                <div class="pe-3" v-if="token.nft">
+                <div v-if="token.nft" class="pe-3">
                     <img height="25" :src="token.nft.logoImgUrl" />
                 </div>
                 <div class="flex-grow-1">
                     <strong>{{ token.metadata.name }}</strong>
                 </div>
 
-                <b-spinner small variant="primary" v-if="!token.tokenId" />
+                <b-spinner v-if="!token.tokenId" small variant="primary" />
                 <div v-else-if="token.nft.variant === NFTVariant.ERC721" class="text-accent fw-bold">
                     #{{ token.tokenId }}
                 </div>
@@ -98,11 +98,11 @@
                         <span>Token Standard</span>
                         <strong class="ms-auto">{{ token.nft.variant.toUpperCase() }}</strong>
                     </p>
-                    <p class="d-flex align-items-center" v-if="token.nft.variant === NFTVariant.ERC1155">
+                    <p v-if="token.nft.variant === NFTVariant.ERC1155" class="d-flex align-items-center">
                         <span>Balance</span>
                         <strong class="ms-auto">{{ balance }}</strong>
                     </p>
-                    <p class="d-flex align-items-center" v-if="token.nft && token.nft.symbol">
+                    <p v-if="token.nft && token.nft.symbol" class="d-flex align-items-center">
                         <span>Symbol</span>
                         <strong class="ms-auto">{{ token.nft.symbol }}</strong>
                     </p>

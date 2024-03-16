@@ -17,16 +17,16 @@
             </div>
         </template>
         <b-input-group>
-            <b-form-input disabled v-model="wallet.address" />
+            <b-form-input v-model="address" disabled />
             <b-input-group-append>
                 <b-button
-                    size="sm"
-                    variant="primary"
                     v-clipboard:copy="wallet.address"
                     v-clipboard:success="onCopySuccess"
+                    size="sm"
+                    variant="primary"
                 >
-                    <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
-                    <i v-else class="fas fa-clipboard px-2"></i>
+                    <i v-if="isCopied" class="fas fa-clipboard-check px-2" />
+                    <i v-else class="fas fa-clipboard px-2" />
                 </b-button>
             </b-input-group-append>
         </b-input-group>
@@ -42,18 +42,21 @@ import { chainList } from '../../utils/chains';
 
 export default defineComponent({
     name: 'BaseFormGroupUsername',
+    props: {
+        wallet: Object,
+        description: String,
+    },
     data() {
-        return { chainList, walletLogoMap, isCopied: false };
+        return { address: '', chainList, walletLogoMap, isCopied: false };
     },
     computed: {
         ...mapStores(useAccountStore),
     },
-    props: {
-        wallet: {
-            type: Object,
-            required: true,
+    watch: {
+        wallet(wallet) {
+            if (!wallet) return;
+            this.address = wallet.address;
         },
-        description: String,
     },
     methods: {
         onCopySuccess() {

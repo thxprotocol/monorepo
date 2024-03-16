@@ -40,11 +40,11 @@
                 </b-list-group-item>
             </b-list-group>
             <hr />
-            <b-button variant="primary" v-if="!accountStore.isAuthenticated" v-b-modal="'modalLogin'">
+            <b-button v-if="!accountStore.isAuthenticated" v-b-modal="'modalLogin'" variant="primary">
                 Sign in
                 <i class="fas fa-sign-in-alt ml-auto"></i>
             </b-button>
-            <b-button variant="primary" @click="accountStore.signout()" v-else>
+            <b-button v-else variant="primary" @click="accountStore.signout()">
                 Sign out
                 <i class="fas fa-sign-out-alt ml-auto"></i>
             </b-button>
@@ -56,7 +56,7 @@
                         <b-img :src="imgLogo" height="50" alt="" />
                     </b-link>
                 </b-navbar-brand>
-                <b-button variant="link" @click="isNavbarOffcanvasShown = true" class="d-block d-lg-none">
+                <b-button variant="link" class="d-block d-lg-none" @click="isNavbarOffcanvasShown = true">
                     <i class="fas fa-bars text-white"></i>
                 </b-button>
                 <b-collapse id="nav-collapse" is-nav class="pt-3">
@@ -86,7 +86,7 @@
                     </b-navbar-nav>
                     <b-navbar-nav class="ms-auto mb-2 mb-lg-0 justify-content-end align-items-center">
                         <template v-if="!authStore.user">
-                            <b-button class="px-4 text-white" variant="link" v-b-modal="'modalLogin'">
+                            <b-button v-b-modal="'modalLogin'" class="px-4 text-white" variant="link">
                                 <!-- Sign in -->
                                 <i class="fas fa-sign-in-alt ms-2" />
                             </b-button>
@@ -118,9 +118,6 @@ import { useWalletStore } from '../stores/Wallet';
 
 export default defineComponent({
     name: 'ViewDiscovery',
-    computed: {
-        ...mapStores(useAccountStore, useAuthStore, useWalletStore),
-    },
     data() {
         return {
             isNavbarOffcanvasShown: false,
@@ -129,6 +126,9 @@ export default defineComponent({
             imgLogo,
             imgBgOverlay,
         };
+    },
+    computed: {
+        ...mapStores(useAccountStore, useAuthStore, useWalletStore),
     },
     methods: {
         onClickRoute(path: string) {

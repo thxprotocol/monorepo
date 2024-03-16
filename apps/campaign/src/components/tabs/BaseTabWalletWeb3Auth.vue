@@ -1,9 +1,9 @@
 <template>
-    <b-alert variant="primary" show class="p-2 px-3" v-model="isAlertDangerShown">
+    <b-alert v-model="isAlertDangerShown" variant="primary" show class="p-2 px-3">
         <i class="fas fa-exclamation-circle me-2" /> {{ error }}
     </b-alert>
 
-    <b-alert variant="warning" show class="p-2 px-3" v-model="isAlertWarningShown">
+    <b-alert v-model="isAlertWarningShown" variant="warning" show class="p-2 px-3">
         <i class="fas fa-exclamation-circle me-2" />
         <span>Store your secret answer safely!</span>
     </b-alert>
@@ -14,8 +14,8 @@
 
     <b-form-group>
         <b-form-input
-            :state="isPasswordLengthValid"
             v-model="password"
+            :state="isPasswordLengthValid"
             type="password"
             placeholder="Answer"
             autocomplete="off"
@@ -27,8 +27,8 @@
 
     <b-form-group>
         <b-form-input
-            :state="isPasswordCheckLengthValid && isPasswordCheckEqualValid"
             v-model="passwordCheck"
+            :state="isPasswordCheckLengthValid && isPasswordCheckEqualValid"
             type="password"
             placeholder="Answer again"
             autocomplete="off"
@@ -42,7 +42,7 @@
     </b-form-group>
 
     <b-button :disabled="isDisabled" class="w-100 mt-3" variant="primary" @click="onClickCreate">
-        <b-spinner small variant="light" v-if="isLoading" />
+        <b-spinner v-if="isLoading" small variant="light" />
         <template v-else> Create Wallet </template>
     </b-button>
 </template>

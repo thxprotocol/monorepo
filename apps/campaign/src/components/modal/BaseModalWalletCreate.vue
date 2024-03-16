@@ -1,10 +1,10 @@
 <template>
     <b-modal
         v-model="walletStore.isModalWalletCreateShown"
-        @show="onShow"
-        @hidden="walletStore.isModalWalletCreateShown = false"
         centered
         hide-footer
+        @show="onShow"
+        @hidden="walletStore.isModalWalletCreateShown = false"
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-wallet me-2"></i> Add a new wallet</h5>

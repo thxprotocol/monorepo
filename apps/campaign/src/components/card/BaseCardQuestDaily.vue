@@ -1,20 +1,20 @@
 <template>
     <BaseCardQuest
-        @modal-close="isModalQuestEntryShown = false"
-        :quest="quest"
         :id="quest._id"
+        :quest="quest"
         :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
         :error="error"
+        @modal-close="isModalQuestEntryShown = false"
     >
         <div class="d-flex flex-wrap pb-3 justify-content-between">
             <b-badge
+                v-for="(amount, key) of quest.amounts"
                 style="width: 40px; height: 40px"
                 class="m-1 d-flex flex-column align-items-center justify-content-center"
                 :variant="key < quest.entries.length ? 'success' : 'primary'"
                 :class="key < quest.entries.length ? 'bg-success text-white' : 'bg-primary text-white'"
-                v-for="(amount, key) of quest.amounts"
             >
                 <small>Day {{ key + 1 }}</small>
                 <strong class="h5 mb-0">{{ amount }}</strong>
@@ -26,8 +26,8 @@
                 class="w-100"
                 block
                 variant="primary"
-                @click="onClickClaim"
                 :disabled="isSubmitting || !quest.isAvailable"
+                @click="onClickClaim"
             >
                 <template v-if="!quest.isAvailable && waitDuration">
                     Wait for {{ waitDuration.hours }}: {{ waitDuration.minutes }}:{{ waitDuration.seconds }}

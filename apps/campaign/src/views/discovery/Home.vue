@@ -8,7 +8,7 @@
                         Discovery
                     </h1>
                     <p class="lead mb-4">A single spot to discover all Quest &amp; Reward campaigns for you to join.</p>
-                    <b-button @click="onClickStart" variant="primary" class="me-3 px-5">
+                    <b-button variant="primary" class="me-3 px-5" @click="onClickStart">
                         Start Campaign
                         <i class="fas fa-chevron-right ms-2" />
                     </b-button>
@@ -23,12 +23,12 @@
                     Quest Spotlight
                 </div>
                 <b-card style="min-height: 305px" body-class="p-0" class="border-0 gradient-shadow-xl">
-                    <b-carousel fade indicators :interval="1000" ref="carouselQuests">
+                    <b-carousel ref="carouselQuests" fade indicators :interval="1000">
                         <b-carousel-slide
+                            v-for="quest of questLists"
                             background="transparent"
                             img-blank
                             img-blank-color="primary"
-                            v-for="quest of questLists"
                         >
                             <BaseCardQuestSpotlight :quest="quest" />
                         </b-carousel-slide>
@@ -44,11 +44,11 @@
                 <b-input-group class="mb-3 mb-md-0">
                     <template #prepend>
                         <b-input-group-text class="bg-primary">
-                            <b-spinner small variant="white" v-if="isLoadingSearch" />
+                            <b-spinner v-if="isLoadingSearch" small variant="white" />
                             <i v-else class="fas fa-search"></i>
                         </b-input-group-text>
                     </template>
-                    <b-form-input placeholder="Search..." v-model="search" @input="onInputSearch" />
+                    <b-form-input v-model="search" placeholder="Search..." @input="onInputSearch" />
                 </b-input-group>
             </b-col>
             <b-col xs="12" md="6" offset-md="2" class="d-flex align-items-center justify-content-end">
@@ -69,7 +69,7 @@
                 <p v-if="!isLoading && !campaigns.results.length" class="text-opaque">
                     Could not find a campaign with that name...
                 </p>
-                <b-table responsive="lg" id="table-campaigns" hover :items="campaignData" @row-clicked="onRowClicked">
+                <b-table id="table-campaigns" responsive="lg" hover :items="campaignData" @row-clicked="onRowClicked">
                     <template #head(rank)>#</template>
                     <template #head(logo)></template>
                     <template #head(name)></template>
@@ -193,11 +193,6 @@ export default defineComponent({
                 .sort((a: any, b: any) => a.rank - b.rank);
         },
     },
-    async mounted() {
-        await this.getCampaigns();
-        await this.getQuests();
-        this.isLoading = false;
-    },
     watch: {
         async page(page) {
             this.page = page;
@@ -205,6 +200,11 @@ export default defineComponent({
             await this.getCampaigns();
             this.isLoadingPage = false;
         },
+    },
+    async mounted() {
+        await this.getCampaigns();
+        await this.getQuests();
+        this.isLoading = false;
     },
     methods: {
         onClickStart() {

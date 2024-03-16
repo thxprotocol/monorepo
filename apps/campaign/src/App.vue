@@ -1,5 +1,5 @@
 <template>
-    <b-alert v-if="isOffline" class="m-3" variant="primary" v-model="isOffline">
+    <b-alert v-if="isOffline" v-model="isOffline" class="m-3" variant="primary">
         <i class="fas fa-tools me-2" />
         We are running some maintenance and will be back shortly. See you soon! ❤️
     </b-alert>
@@ -25,8 +25,6 @@ import { mapStores } from 'pinia';
 import { useAuthStore } from './stores/Auth';
 import { useAccountStore } from './stores/Account';
 import { useWalletStore } from './stores/Wallet';
-
-import './scss/main.scss';
 
 export default defineComponent({
     computed: {

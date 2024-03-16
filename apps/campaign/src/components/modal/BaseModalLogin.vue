@@ -1,5 +1,5 @@
 <template>
-    <b-modal id="modalLogin" centered v-model="authStore.isModalLoginShown" hide-footer>
+    <b-modal id="modalLogin" v-model="authStore.isModalLoginShown" centered hide-footer>
         <template #header>
             <h5 class="modal-title">
                 <i class="fas fa-id-badge me-2" />
@@ -9,13 +9,13 @@
         </template>
         <b-alert v-model="isAlertErrorShown" class="p-2" variant="primary">{{ error }}</b-alert>
         <b-form-group>
-            <b-form-input :state="isEmailValid" v-model="email" placeholder="E-mail" />
+            <b-form-input v-model="email" :state="isEmailValid" placeholder="E-mail" />
         </b-form-group>
         <b-button
-            @click="onClickSignin(AccountVariant.EmailPassword)"
             variant="primary"
             :disabled="!isEmailValid"
             class="w-100"
+            @click="onClickSignin(AccountVariant.EmailPassword)"
         >
             Send one-time password
             <i class="fas fa-chevron-right ms-2"></i>
@@ -36,19 +36,19 @@
         </b-form-group>
         <hr class="or-separator" />
         <b-form-group label="Use a trusted provider" label-class="text-opaque">
-            <b-button @click="onClickSignin(AccountVariant.SSOGoogle)" variant="primary" class="rounded me-2 px-3">
+            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSignin(AccountVariant.SSOGoogle)">
                 <i class="fab fa-google"></i>
             </b-button>
-            <b-button @click="onClickSignin(AccountVariant.SSODiscord)" variant="primary" class="rounded me-2 px-3">
+            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSignin(AccountVariant.SSODiscord)">
                 <i class="fab fa-discord"></i>
             </b-button>
-            <b-button @click="onClickSignin(AccountVariant.SSOTwitter)" variant="primary" class="rounded me-2 px-3">
+            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSignin(AccountVariant.SSOTwitter)">
                 <i class="fab fa-twitter"></i>
             </b-button>
-            <b-button @click="onClickSignin(AccountVariant.SSOTwitch)" variant="primary" class="rounded me-2 px-3">
+            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSignin(AccountVariant.SSOTwitch)">
                 <i class="fab fa-twitch"></i>
             </b-button>
-            <b-button @click="onClickSignin(AccountVariant.SSOGithub)" variant="primary" class="rounded me-2 px-3">
+            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSignin(AccountVariant.SSOGithub)">
                 <i class="fab fa-github"></i>
             </b-button>
         </b-form-group>

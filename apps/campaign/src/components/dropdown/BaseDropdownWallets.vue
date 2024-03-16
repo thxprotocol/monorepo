@@ -1,14 +1,14 @@
 <template>
     <b-dropdown
+        v-model="isOpen"
         class="w-100"
         menu-class="w-100"
         toggle-class="rounded d-flex align-items-center justify-content-between"
-        v-model="isOpen"
         variant="link-white"
         no-caret
     >
         <template #button-content>
-            <div class="d-flex align-items-center me-2" v-if="walletStore.wallet">
+            <div v-if="walletStore.wallet" class="d-flex align-items-center me-2">
                 <b-img
                     :src="walletLogoMap[walletStore.wallet.variant]"
                     width="15"
@@ -47,7 +47,7 @@
             <component :is="getComponentName(wallet)" :id="`modalWallet${wallet._id}`" :wallet="wallet" size="lg" />
         </b-dropdown-item>
         <b-dropdown-divider />
-        <b-dropdown-item @click="walletStore.isModalWalletCreateShown = true" link-class="d-flex align-items-center">
+        <b-dropdown-item link-class="d-flex align-items-center" @click="walletStore.isModalWalletCreateShown = true">
             New Wallet
         </b-dropdown-item>
     </b-dropdown>
@@ -59,15 +59,9 @@ import { mapStores } from 'pinia';
 import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { WalletVariant } from '../../types/enums/accountVariant';
-import BaseModalWallet from '../modal/BaseModalWallet.vue';
-import BaseModalWalletSafe from '../modal/BaseModalWalletSafe.vue';
 
 export default defineComponent({
     name: 'BaseDropdownWallets',
-    components: {
-        BaseModalWallet,
-        BaseModalWalletSafe,
-    },
     data() {
         return {
             walletLogoMap,

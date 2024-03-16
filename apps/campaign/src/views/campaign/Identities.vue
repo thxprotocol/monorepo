@@ -17,15 +17,15 @@
                         label="Identity code"
                         description="Identity codes are used for connecting account in other apps."
                     >
-                        <b-form-input :state="isValidUUID" v-model="uuid" placeholder="Code" />
+                        <b-form-input v-model="uuid" :state="isValidUUID" placeholder="Code" />
                     </b-form-group>
 
                     <b-button
                         v-if="accountStore.isAuthenticated"
-                        @click="onClickCollect"
                         variant="success"
                         class="w-100"
                         :disabled="!!error || isWaitingForWalletAddress || isLoading || !isValidUUID"
+                        @click="onClickCollect"
                     >
                         <b-spinner v-if="isLoading" small variant="dark" />
                         Connect Identity

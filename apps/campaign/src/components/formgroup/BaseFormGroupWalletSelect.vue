@@ -4,11 +4,11 @@
             This reward requires a crypto wallet for your account.
             <b-link class="text-primary" @click="onClickAdd">Add a new wallet</b-link>
         </template>
-        <b-form-select v-model="wallet" @change="$emit('update', $event)" placeholder="Choose a wallet">
+        <b-form-select v-model="wallet" placeholder="Choose a wallet" @change="$emit('update', $event)">
             <b-form-select-option :value="null" disabled>Choose a wallet...</b-form-select-option>
-            <b-form-select-option v-for="wallet in wallets" :value="wallet" :disabled="chainId !== wallet.chainId">
-                {{ wallet.short }}
-                ({{ wallet.variant }})
+            <b-form-select-option v-for="w in wallets" :value="wallet" :disabled="chainId !== wallet.chainId">
+                {{ w.short }}
+                ({{ w.variant }})
             </b-form-select-option>
         </b-form-select>
     </b-form-group>
@@ -23,6 +23,12 @@ import { useWalletStore } from '../../stores/Wallet';
 
 export default defineComponent({
     name: 'BaseFormGroupUsername',
+    props: {
+        chainId: {
+            type: Number,
+            required: true,
+        },
+    },
     data() {
         return { chainList, selectedWallet: null };
     },
@@ -44,12 +50,6 @@ export default defineComponent({
                 this.$emit('update', wallet);
             },
             immediate: true,
-        },
-    },
-    props: {
-        chainId: {
-            type: Number,
-            required: true,
         },
     },
     methods: {

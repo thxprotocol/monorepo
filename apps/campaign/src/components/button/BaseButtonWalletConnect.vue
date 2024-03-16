@@ -1,10 +1,10 @@
 <template>
     <b-button-group class="w-100">
         <b-button
-            @click="onClick"
             class="d-flex align-items-center justify-content-center"
             variant="primary"
             :disabled="isConnecting"
+            @click="onClick"
         >
             <template v-if="!isConnected">
                 <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" />
@@ -15,16 +15,16 @@
                 Switch to {{ chainList[chainId].name }}
             </template>
             <template v-else>
-                <b-spinner small v-if="isConnecting" />
+                <b-spinner v-if="isConnecting" small />
                 <slot v-else />
             </template>
         </b-button>
         <b-button
             v-if="isConnected"
             class="flex-grow-0"
-            @click="onClickDisconnect"
             variant="primary"
             style="width: 50px"
+            @click="onClickDisconnect"
         >
             <i class="fas fa-times" />
         </b-button>
@@ -42,6 +42,13 @@ import imgWalletConnect from '../../assets/walletconnect-logo.png';
 
 export default defineComponent({
     name: 'BaseButtonWalletConnect',
+    props: {
+        chainId: Number,
+        message: {
+            type: String,
+            default: 'This signature will be used to proof ownership of a web3 account.',
+        },
+    },
     data() {
         return {
             signature: '',
@@ -51,6 +58,7 @@ export default defineComponent({
             interval: null as any,
         };
     },
+
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useWalletStore),
         isConnecting() {
@@ -58,13 +66,6 @@ export default defineComponent({
         },
         isConnected() {
             return this.walletStore.account && this.walletStore.account.isConnected;
-        },
-    },
-    props: {
-        chainId: Number,
-        message: {
-            type: String,
-            default: 'This signature will be used to proof ownership of a web3 account.',
         },
     },
     mounted() {

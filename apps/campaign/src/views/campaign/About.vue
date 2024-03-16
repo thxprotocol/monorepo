@@ -6,7 +6,7 @@
                     <template #header>
                         <strong>{{ decodeHTML(accountStore.config.title) }}</strong>
                     </template>
-                    <p style="white-space: pre-line" v-html="decodeHTML(accountStore.config.description)"></p>
+                    <p style="white-space: pre-line" v-html="decodeHTML(accountStore.config.description)" />
                     <b-button
                         v-if="!isQuestCampaign && accountStore.isAuthenticated"
                         :to="`/c/${accountStore.config.slug}/wallets`"

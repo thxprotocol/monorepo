@@ -4,7 +4,7 @@
     "plugins": ["@nx"],
     "overrides": [
         {
-            "files": ["*.ts", "*.tsx"],
+            "files": ["*.ts", "*.tsx", "*.vue"],
             "extends": ["plugin:@nx/typescript"],
             "rules": {}
         },
@@ -15,10 +15,7 @@
         },
         {
             "files": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.vue"],
-            "rules": {
-                "@typescript-eslint/no-explicit-any": ["off"],
-                "@nx/enforce-module-boundaries": "off"
-            }
+            "rules": {}
         }
     ]
 }

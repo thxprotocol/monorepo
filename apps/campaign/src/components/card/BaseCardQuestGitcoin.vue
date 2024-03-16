@@ -1,12 +1,12 @@
 <template>
     <BaseCardQuest
-        @modal-close="isModalQuestEntryShown = false"
-        :quest="quest"
         :id="quest._id"
+        :quest="quest"
         :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
         :error="error"
+        @modal-close="isModalQuestEntryShown = false"
     >
         <blockquote>
             <div class="d-flex align-items-center">
@@ -31,9 +31,9 @@
 
         <template #button>
             <BaseButtonWalletConnect
+                message="This signed message will be used to proof ownership of your web3 account and verify the quest requirements."
                 @signed="onSigned"
                 @error="error = $event"
-                message="This signed message will be used to proof ownership of your web3 account and verify the quest requirements."
             >
                 Claim <strong>{{ quest.amount }}</strong> points
             </BaseButtonWalletConnect>

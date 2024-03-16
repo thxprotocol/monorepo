@@ -10,16 +10,16 @@
                 <b-spinner v-if="provider.isSubmitting" small />
                 <template v-else>
                     <b-button
+                        v-if="provider.isConnected"
                         :disabled="provider.isDisabled"
-                        @click="onClickDisconnect(provider.kind)"
                         variant="link"
                         class="text-decoration-none text-primary"
                         size="sm"
-                        v-if="provider.isConnected"
+                        @click="onClickDisconnect(provider.kind)"
                     >
                         Disconnect
                     </b-button>
-                    <b-button @click="onClickConnect(provider)" variant="primary" size="sm" v-else> Connect </b-button>
+                    <b-button v-else variant="primary" size="sm" @click="onClickConnect(provider)"> Connect </b-button>
                 </template>
             </div>
             <hr class="my-1" />
@@ -36,6 +36,9 @@ import { AccessTokenKind } from '../../types/enums/accessTokenKind';
 
 export default defineComponent({
     name: 'BaseFormGroupUsername',
+    props: {
+        username: String,
+    },
     data() {
         return {
             error: '',
@@ -79,9 +82,6 @@ export default defineComponent({
         isErrorShown() {
             return !!this.error.length;
         },
-    },
-    props: {
-        username: String,
     },
     mounted() {
         this.updateConnectionStatus();

@@ -1,7 +1,7 @@
 <template>
-    <div class="d-flex justify-content-center py-5" v-if="veStore.lock && !veStore.lock.end">
+    <div v-if="veStore.lock && !veStore.lock.end" class="d-flex justify-content-center py-5">
         <div class="flex-column text-center">
-            <i class="fas fa-gift h1 text-accent"></i><br />
+            <i class="fas fa-gift h1 text-accent" /><br />
             <p>
                 <span class="text-opaque">Lock staked liquidity and earn </span><br />
                 <strong class="text-white">up to 120% APR</strong>
@@ -37,20 +37,22 @@
                             class="position-relative bg-dark rounded-circle d-flex align-items-center justify-content-center"
                             style="z-index: 1; width: 65px; height: 65px"
                         >
-                            <i class="fas fa-id-card" style="font-size: 1.5rem"></i>
+                            <i class="fas fa-id-card" style="font-size: 1.5rem" />
                         </div>
                     </div>
-                    <b-badge class="mt-2 p-2" variant="primary"> {{ membership }} </b-badge>
+                    <b-badge class="mt-2 p-2" variant="primary">
+                        {{ membership }}
+                    </b-badge>
                 </div>
             </b-col>
         </b-row>
 
         <hr />
         <b-alert v-model="isEarly" class="p-2" variant="primary">
-            <i class="fas fa-info-circle me-1"></i>
+            <i class="fas fa-info-circle me-1" />
             A penalty will be applied on early withdrawals!
         </b-alert>
-        <b-button class="w-100" @click="isModalWithdrawShown = true" variant="primary"> Withdraw </b-button>
+        <b-button class="w-100" variant="primary" @click="isModalWithdrawShown = true"> Withdraw </b-button>
         <BaseModalWithdraw :show="isModalWithdrawShown" :is-early="isEarly" @hidden="isModalWithdrawShown = false" />
     </template>
 </template>

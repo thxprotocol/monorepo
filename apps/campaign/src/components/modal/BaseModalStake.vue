@@ -1,11 +1,11 @@
 <template>
     <b-modal
         v-model="isShown"
-        @hidden="$emit('hidden')"
-        @show="onShow"
         centered
         hide-footer
         title="Stake 20USDC-80THX @ Balancer"
+        @hidden="$emit('hidden')"
+        @show="onShow"
     >
         <b-alert v-model="isAlertInfoShown" variant="info" class="py-2 px-3">
             <i class="fas fa-exclamation-circle me-1"></i>
@@ -14,18 +14,18 @@
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab title="1. Approve">
                 <b-form-group label="Amount" :description="`Current allowance: ${fromWei(allowance.toString())}`">
-                    <b-form-input type="number" v-model="amountApproval" />
+                    <b-form-input v-model="amountApproval" type="number" />
                 </b-form-group>
-                <b-button variant="primary" @click="onClickApprove" class="w-100" :disabled="isPolling">
+                <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickApprove">
                     <b-spinner v-if="isPolling" small />
                     <template v-else>Approve</template>
                 </b-button>
             </b-tab>
             <b-tab title="2. Stake">
                 <b-form-group>
-                    <b-form-input type="number" v-model="amountStake" />
+                    <b-form-input v-model="amountStake" type="number" />
                 </b-form-group>
-                <b-button variant="primary" @click="onClickStake" class="w-100" :disabled="isPolling">
+                <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickStake">
                     <b-spinner v-if="isPolling" small />
                     <template v-else>Stake</template>
                 </b-button>
@@ -49,6 +49,10 @@ import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseModalStake',
+    props: {
+        show: Boolean,
+        amount: { type: Number, required: true },
+    },
     data() {
         return {
             fromWei,
@@ -60,10 +64,6 @@ export default defineComponent({
             amountApproval: 0,
             amountStake: 0,
         };
-    },
-    props: {
-        show: Boolean,
-        amount: { type: Number, required: true },
     },
     computed: {
         ...mapStores(useWalletStore, useVeStore, useLiquidityStore),

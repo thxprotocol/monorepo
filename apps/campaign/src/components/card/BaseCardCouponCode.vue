@@ -6,10 +6,10 @@
         <div class="flex-grow-1">
             <b-link
                 v-if="isURL"
-                @click="isModalURLShown = true"
                 size="sm"
                 style="text-align: left"
                 class="d-flex align-items-center text-accent text-decoration-underline"
+                @click="isModalURLShown = true"
             >
                 <div class="truncate-text-ellipsis">{{ token.code }}</div>
                 <i class="fas fa-external-link-alt ms-3" />
@@ -36,7 +36,7 @@
             </b-dropdown-item>
         </b-dropdown>
     </b-card>
-    <BaseModalExternalURL :show="isModalURLShown" @hidden="isModalURLShown = false" :url="token.code" />
+    <BaseModalExternalURL :show="isModalURLShown" :url="token.code" @hidden="isModalURLShown = false" />
 </template>
 
 <script lang="ts">

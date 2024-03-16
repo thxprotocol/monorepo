@@ -7,9 +7,9 @@
     >
         <template #header>
             <b-card-title
-                @click.stop="isVisible = !isVisible"
                 class="d-flex p-3 m-0 align-items-center"
                 style="cursor: pointer"
+                @click.stop="isVisible = !isVisible"
             >
                 <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                     <i class="me-2 text-primary" :class="iconMap[quest.variant]"></i>
@@ -17,7 +17,7 @@
                 <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
                 <div class="text-accent fw-bold">{{ quest.amount }}</div>
                 <div>
-                    <b-link v-b-tooltip :title="`Ends in ${expiryDate}`" size="sm" class="ms-2" v-if="expiryDate">
+                    <b-link v-if="expiryDate" v-b-tooltip :title="`Ends in ${expiryDate}`" size="sm" class="ms-2">
                         <i class="fas fa-clock text-primary" />
                     </b-link>
                     <b-dropdown v-if="quest.infoLinks.length" variant="link" size="sm" no-caret toggle-class="py-0" end>
@@ -25,10 +25,10 @@
                             <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
                         </template>
                         <b-dropdown-item
-                            @click="onClickLink(link.url)"
-                            :key="key"
                             v-for="(link, key) of quest.infoLinks"
+                            :key="key"
                             link-class="d-flex align-items-center justify-content-between"
+                            @click="onClickLink(link.url)"
                         >
                             <div>
                                 {{ link.label }}
@@ -65,20 +65,20 @@
                     Quest Completed
                 </b-button>
 
-                <BaseButtonQuestLocked v-else-if="quest.isLocked" :locks="quest.locks" :id="quest._id" />
+                <BaseButtonQuestLocked v-else-if="quest.isLocked" :id="quest._id" :locks="quest.locks" />
 
                 <slot v-else name="button"></slot>
             </div>
         </b-collapse>
     </b-card>
     <BaseModalQuestEntry
-        @hidden="$emit('modal-close')"
-        :quest="quest"
         :id="id"
+        :quest="quest"
         :loading="loading"
         :show="completing"
         :amount="quest.amount"
         :error="error"
+        @hidden="$emit('modal-close')"
     />
 </template>
 
@@ -125,13 +125,13 @@ export default defineComponent({
             return !!this.error;
         },
     },
-    mounted() {
-        this.isVisible = window.innerWidth > 768 || this.visible;
-    },
     watch: {
         visible(value: boolean) {
             this.isVisible = window.innerWidth > 768 || value;
         },
+    },
+    mounted() {
+        this.isVisible = window.innerWidth > 768 || this.visible;
     },
     methods: {
         onClickLink(url: string) {

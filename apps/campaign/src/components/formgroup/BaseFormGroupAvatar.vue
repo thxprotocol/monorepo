@@ -1,14 +1,14 @@
 <template>
     <b-form-group class="text-center">
-        <b-form-file v-model="profileImgFile" @input="onChangeProfileImg" accept="image/*" size="sm" class="d-none">
+        <b-form-file v-model="profileImgFile" accept="image/*" size="sm" class="d-none" @input="onChangeProfileImg">
             <template #label>
                 <b-avatar size="100" class="cursor-pointer gradient-border-xl" :src="profileImg" variant="primary" />
                 <br />
-                <div class="mt-2 cursor-pointer text-primary" v-if="!isRemoveable">Upload</div>
+                <div v-if="!isRemoveable" class="mt-2 cursor-pointer text-primary">Upload</div>
             </template>
         </b-form-file>
         <br />
-        <b-link v-if="isRemoveable" @click="onClickRemovePicture" class="text-danger small"> Remove </b-link>
+        <b-link v-if="isRemoveable" class="text-danger small" @click="onClickRemovePicture"> Remove </b-link>
     </b-form-group>
 </template>
 

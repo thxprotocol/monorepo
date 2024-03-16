@@ -3,16 +3,16 @@
         <div class="w-100 m-2 align-items-center d-flex">
             <i class="fas fa-filter text-primary me-2"></i>
             <b-dropdown size="sm" variant="primary" class="w-100" no-caret>
-                <template #button-content v-if="!filter.length"> No filter </template>
-                <template #button-content v-else>
-                    <i :class="f.icon" class="me-2" :key="key" v-for="(f, key) of filter"></i>
+                <template v-if="!filter.length" #button-content> No filter </template>
+                <template v-else #button-content>
+                    <i v-for="(f, key) of filter" :key="key" :class="f.icon" class="me-2"></i>
                 </template>
-                <b-dropdown-item-button class="dropdown-item-filter" :key="key" v-for="(f, key) of filters">
+                <b-dropdown-item-button v-for="(f, key) of filters" :key="key" class="dropdown-item-filter">
                     <b-form-checkbox
                         v-model="activeFilters"
-                        @change="$emit('change-filter', activeFilters)"
                         :value="f"
                         class="d-block"
+                        @change="$emit('change-filter', activeFilters)"
                     >
                         <div class="d-inline-flex justify-content-center align-items-center" style="width: 20px">
                             <i :class="f.icon" class="text-opaque me-1" />
@@ -25,7 +25,7 @@
                 <i class="fas fa-sort text-primary me-2"></i>
                 <b-dropdown size="sm" variant="primary" class="w-100" no-caret>
                     <template #button-content> {{ sort.label }} </template>
-                    <b-dropdown-item-button @click="$emit('change-sort', s)" :key="key" v-for="(s, key) of sorts">
+                    <b-dropdown-item-button v-for="(s, key) of sorts" :key="key" @click="$emit('change-sort', s)">
                         {{ s.label }}
                     </b-dropdown-item-button>
                 </b-dropdown>
@@ -42,6 +42,16 @@ import { RewardSortVariant, QuestVariant } from '../types/enums/rewards';
 
 export default defineComponent({
     name: 'Home',
+    props: {
+        filter: {
+            type: Array,
+            required: true,
+        },
+        sort: {
+            type: String,
+            required: true,
+        },
+    },
     data(): any {
         return {
             activeFilters: [],
@@ -59,16 +69,6 @@ export default defineComponent({
                 { label: 'Web3', key: QuestVariant.Web3, icon: 'fab fa-ethereum' },
             ],
         };
-    },
-    props: {
-        filter: {
-            type: Array,
-            required: true,
-        },
-        sort: {
-            type: String,
-            required: true,
-        },
     },
     computed: {
         ...mapStores(useAccountStore),

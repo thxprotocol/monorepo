@@ -1,12 +1,12 @@
 <template>
     <BaseCardQuest
-        @modal-close="isModalQuestEntryShown = false"
-        :quest="quest"
         :id="quest._id"
+        :quest="quest"
         :visible="!!accountStore.isAuthenticated && quest.isAvailable"
         :loading="isSubmitting"
         :completing="isModalQuestEntryShown"
         :error="error"
+        @modal-close="isModalQuestEntryShown = false"
     >
         <blockquote>
             <b-form-group label="Available On">
@@ -42,7 +42,7 @@
             <b-button-group class="w-100" block>
                 <BaseButtonWalletConnect
                     :message="message"
-                    :chainId="chainId"
+                    :chain-id="chainId"
                     @signed="onSigned"
                     @chain-change="chainId = $event"
                     @error="error = $event"
@@ -55,7 +55,7 @@
                     <template #button-content>
                         <i class="fas fa-caret-down"></i>
                     </template>
-                    <BDropdownItem @click="chainId = contract.chainId" v-for="contract of quest.contracts">
+                    <BDropdownItem v-for="contract of quest.contracts" @click="chainId = contract.chainId">
                         <b-img
                             :src="chainList[contract.chainId].logo"
                             width="12"

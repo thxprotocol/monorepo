@@ -26,7 +26,7 @@
             <p class="small text-start text-opaque mb-0">Connect one of your existing wallets using WalletConnect.</p>
         </b-button>
     </b-form-group>
-    <b-button @click="$emit('next')" :disabled="isDisabled" variant="primary" class="w-100">Continue</b-button>
+    <b-button :disabled="isDisabled" variant="primary" class="w-100" @click="$emit('next')"> Continue </b-button>
 </template>
 
 <script lang="ts">
@@ -39,6 +39,9 @@ import { WalletVariant } from '../../types/enums/accountVariant';
 
 export default defineComponent({
     name: 'BaseTabWalletVariant',
+    props: {
+        variant: { type: String, required: false },
+    },
     data() {
         return {
             walletLogoMap,
@@ -53,9 +56,6 @@ export default defineComponent({
         isDisabledSafeCreate() {
             return !!this.walletStore.wallets.find((wallet) => wallet.variant === WalletVariant.Safe);
         },
-    },
-    props: {
-        variant: { type: String, required: false },
     },
 });
 </script>

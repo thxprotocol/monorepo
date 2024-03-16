@@ -1,6 +1,6 @@
 <template>
     <blockquote>
-        <b-alert variant="warning" show v-model="isAlertDiscordShown" class="p-2 px-3">
+        <b-alert v-model="isAlertDiscordShown" variant="warning" show class="p-2 px-3">
             <i class="fas fa-exclamation-circle me-1" />
             Connect a Discord account for this quest
         </b-alert>
@@ -40,12 +40,12 @@
                 (Day)
             </b-col>
         </p>
-        <b-button @click="visible = !visible" variant="link" class="text-white text-opaque w-100 text-center">
+        <b-button variant="link" class="text-white text-opaque w-100 text-center" @click="visible = !visible">
             {{ visible ? 'Hide' : 'View' }} Discord activity
             <i class="fas ms-2" :class="{ 'fa-caret-down': !visible, 'fa-caret-up': visible }" />
         </b-button>
         <b-collapse v-model="visible" class="mt-2">
-            <BarChart :height="120" :chartData="chartData" :options="options" />
+            <BarChart :height="120" :chart-data="chartData" :options="options" />
         </b-collapse>
     </blockquote>
 </template>

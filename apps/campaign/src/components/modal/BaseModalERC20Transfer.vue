@@ -1,5 +1,5 @@
 <template>
-    <b-modal :id="id" v-model="isShown" @hidden="$emit('hidden')" no-close-on-backdrop centered no-close-on-esc>
+    <b-modal :id="id" v-model="isShown" no-close-on-backdrop centered no-close-on-esc @hidden="$emit('hidden')">
         <template #header>
             <h5 class="modal-title"><i class="fas fa-exchange-alt me-2"></i> Transfer {{ token.erc20.symbol }}</h5>
             <b-link class="btn-close" @click="isShown = false"> <i class="fas fa-times"></i> </b-link>
@@ -24,8 +24,8 @@
                     <b-input-group-append>
                         <b-button
                             style="border-radius: 0px 5px 5px 0px"
-                            @click="amount = token.walletBalance"
                             variant="primary"
+                            @click="amount = token.walletBalance"
                         >
                             Max
                         </b-button>
@@ -54,6 +54,19 @@ import { WalletVariant } from '../../types/enums/accountVariant';
 
 export default defineComponent({
     name: 'BaseModalERC20Transfer',
+    props: {
+        id: {
+            type: String,
+            required: true,
+        },
+        token: {
+            type: Object as PropType<TERC20Token>,
+            required: true,
+        },
+        error: String,
+        show: Boolean,
+        isLoading: Boolean,
+    },
     data() {
         return { isShown: false, amount: 0, receiver: '' };
     },
@@ -77,19 +90,6 @@ export default defineComponent({
             if (!this.walletStore.wallet) return true;
             return this.walletStore.wallet.variant !== WalletVariant.Safe;
         },
-    },
-    props: {
-        id: {
-            type: String,
-            required: true,
-        },
-        token: {
-            type: Object as PropType<TERC20Token>,
-            required: true,
-        },
-        error: String,
-        show: Boolean,
-        isLoading: Boolean,
     },
     watch: {
         show(value) {

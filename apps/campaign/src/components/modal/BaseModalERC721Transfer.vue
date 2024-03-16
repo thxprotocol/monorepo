@@ -1,5 +1,5 @@
 <template>
-    <b-modal :id="id" v-model="isShown" @hidden="$emit('hidden')" no-close-on-backdrop centered no-close-on-esc>
+    <b-modal :id="id" v-model="isShown" no-close-on-backdrop centered no-close-on-esc @hidden="$emit('hidden')">
         <template #header>
             <h5 class="modal-title"><i class="fas fa-exchange-alt me-2"></i> Transfer {{ token.nft.symbol }}</h5>
             <b-link class="btn-close" @click="isShown = false"> <i class="fas fa-times"></i> </b-link>
@@ -44,6 +44,13 @@ import { WalletVariant } from '../../types/enums/accountVariant';
 
 export default defineComponent({
     name: 'BaseModalERC721Transfer',
+    props: {
+        id: String,
+        token: Object as PropType<TERC721Token>,
+        error: String,
+        show: Boolean,
+        isLoading: Boolean,
+    },
     data() {
         return { NFTVariant, isShown: false, amount: 0, erc1155Amount: 0, receiver: '' };
     },
@@ -62,19 +69,6 @@ export default defineComponent({
             if (!this.walletStore.wallet) return true;
             return this.walletStore.wallet.variant !== WalletVariant.Safe;
         },
-    },
-    props: {
-        id: {
-            type: String,
-            required: true,
-        },
-        token: {
-            type: Object as PropType<TERC721Token>,
-            required: true,
-        },
-        error: String,
-        show: Boolean,
-        isLoading: Boolean,
     },
     watch: {
         show(value) {
