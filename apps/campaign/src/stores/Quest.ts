@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
-import { track } from '@thxnetwork/mixpanel';
+import { track } from '@thxnetwork/common/lib/mixpanel';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import poll from 'promise-poller';
 

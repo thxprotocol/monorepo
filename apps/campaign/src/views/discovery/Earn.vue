@@ -49,14 +49,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
+import { format } from 'date-fns';
+import { fromWei } from 'web3-utils';
+import { useAccountStore } from '../../stores/Account';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
-import { format } from 'date-fns';
-import { fromWei } from 'web3-utils';
-import { contractNetworks } from '@thxnetwork/campaign/config/constants';
+import { contractNetworks } from '../../config/constants';
 
 export default defineComponent({
     name: 'Earn',

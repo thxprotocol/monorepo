@@ -5,42 +5,19 @@
     "projectType": "application",
     "targets": {
         "build": {
-            "executor": "@nxext/vite:build",
-            "outputs": ["{options.outputPath}"],
-            "defaultConfiguration": "production",
+            "executor": "@nx/vite:build",
             "options": {
-                "outputPath": "dist/apps/campaign",
-                "baseHref": "/",
-                "configFile": "apps/campaign/vite.config.ts"
-            },
-            "configurations": {
-                "production": {
-                    "fileReplacements": [
-                        {
-                            "replace": "apps/campaign/src/environments/environment.ts",
-                            "with": "apps/campaign/src/environments/environment.prod.ts"
-                        }
-                    ]
-                }
+                "outputPath": "dist/apps/campaign"
             }
         },
         "serve": {
-            "executor": "@nxext/vite:dev",
+            "executor": "@nx/vite:dev-server",
+            "defaultConfiguration": "development",
             "options": {
-                "outputPath": "dist/apps/campaign",
-                "baseHref": "/",
-                "configFile": "apps/campaign/vite.config.ts"
+                "buildTarget": "campaign:build",
+                "port": 8080
             },
-            "configurations": {
-                "production": {
-                    "fileReplacements": [
-                        {
-                            "replace": "apps/campaign/src/environments/environment.ts",
-                            "with": "apps/campaign/src/environments/environment.prod.ts"
-                        }
-                    ]
-                }
-            }
+            "configurations": {}
         },
         "notify": {
             "dependsOn": ["^build"],

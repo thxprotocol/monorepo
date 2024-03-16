@@ -29,6 +29,14 @@
         "@nx/eslint:lint": {
             "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
             "cache": true
+        },
+        "@nx/vite:test": {
+            "cache": true,
+            "inputs": ["default", "^production"]
+        },
+        "e2e": {
+            "cache": true,
+            "inputs": ["default", "^production"]
         }
     },
     "namedInputs": {
@@ -44,15 +52,25 @@
         ],
         "sharedGlobals": []
     },
-    "generators": {
-        "@nxext/vite": {
-            "application": {
-                "linter": "eslint"
-            },
-            "library": {
-                "linter": "eslint"
+    "plugins": [
+        {
+            "plugin": "@nx/vite/plugin",
+            "options": {
+                "buildTargetName": "build",
+                "previewTargetName": "preview",
+                "testTargetName": "test",
+                "serveTargetName": "serve",
+                "serveStaticTargetName": "serve-static"
             }
         }
-    },
-    "defaultProject": "campaign"
+    ],
+    "defaultProject": "campaign",
+    "generators": {
+        "@nx/web:application": {
+            "style": "scss",
+            "linter": "eslint",
+            "unitTestRunner": "vitest",
+            "e2eTestRunner": "playwright"
+        }
+    }
 }

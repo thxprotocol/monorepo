@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
+import { track } from '@thxnetwork/common/lib/mixpanel';
 import { toNumber } from '../utils/quests';
 import { useAccountStore } from './Account';
-import { track } from '@thxnetwork/mixpanel';
 import { RewardVariant } from '../types/enums/rewards';
 
 export const useRewardStore = defineStore('reward', {

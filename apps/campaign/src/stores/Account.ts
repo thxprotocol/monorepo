@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { track } from '@thxnetwork/mixpanel';
+import { track } from '@thxnetwork/common/lib/mixpanel';
 import { THXBrowserClient } from '@thxnetwork/sdk';
 import { API_URL, AUTH_URL, CLIENT_ID, WIDGET_URL } from '../config/secrets';
 import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';

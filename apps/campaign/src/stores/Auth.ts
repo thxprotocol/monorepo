@@ -5,7 +5,7 @@ import { tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
 import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { Wallet } from '@ethersproject/wallet';
-import { track } from '@thxnetwork/mixpanel';
+import { track } from '@thxnetwork/common/lib/mixpanel';
 import poll from 'promise-poller';
 
 const userManager = new UserManager({

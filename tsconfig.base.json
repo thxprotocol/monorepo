@@ -21,8 +21,7 @@
         "strict": true,
         "paths": {
             "@thxnetwork/campaign*": ["apps/campaign/src*"],
-            "@thxnetwork/common*": ["libs/common/src*"],
-            "@thxnetwork/mixpanel": ["libs/common/src/lib/mixpanel.ts"]
+            "@thxnetwork/common*": ["libs/common/src*"]
         }
     },
     "exclude": ["node_modules", "tmp"]

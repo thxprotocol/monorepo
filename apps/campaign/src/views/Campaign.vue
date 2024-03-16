@@ -17,7 +17,7 @@
 </template>
 <script lang="ts">
 import { mapStores } from 'pinia';
-import { track } from '@thxnetwork/mixpanel';
+import { track } from '@thxnetwork/common/lib/mixpanel';
 import { defineComponent } from 'vue';
 import { GTM } from '../config/secrets';
 import { useAuthStore } from '../stores/Auth';
