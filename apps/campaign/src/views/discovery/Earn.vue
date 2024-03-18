@@ -1,5 +1,5 @@
 <template>
-    <b-container>
+    <b-container class="py-md-5">
         <b-row class="py-md-5">
             <b-col lg="4" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex order-1 order-md-0">
                 <div>
@@ -33,9 +33,9 @@
                                 Membership
                             </template>
                             <BaseTabDeposit
-                                v-if="!veStore.lock.amount"
-                                :amount="amountDeposit"
-                                @update-amount="amountDeposit = $event"
+                                v-if="veStore.lock && !Number(veStore.lock.amount)"
+                                :amount="amountDepositInWei"
+                                @update-amount="amountDepositInWei = $event"
                                 @change-tab="tabIndex = $event"
                             />
                             <BaseTabWithdraw v-else @change-tab="tabIndex = $event" />
@@ -66,7 +66,7 @@ export default defineComponent({
             format,
             tabIndex: 1,
             publicUrl: 'https://thx.network',
-            amountDeposit: 0,
+            amountDepositInWei: '0',
         };
     },
     computed: {
@@ -79,7 +79,7 @@ export default defineComponent({
             this.veStore.getLocks();
             this.liquidityStore.getSpotPrice();
             this.walletStore.getBalance(bptGaugeAddress).then(() => {
-                this.amountDeposit = this.walletStore.balances[bptGaugeAddress];
+                this.amountDepositInWei = this.walletStore.balances[bptGaugeAddress];
             });
         },
     },

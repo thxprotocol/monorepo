@@ -14,7 +14,8 @@ export function getChainId() {
 
 export const useVeStore = defineStore('ve', {
     state: (): TVeState => ({
-        lock: { end: 0, amount: 0, now: 0 },
+        lock: { end: 0, amount: '0' },
+        now: 0,
         balance: 0,
         rewards: [],
     }),
@@ -22,16 +23,13 @@ export const useVeStore = defineStore('ve', {
         async getLocks() {
             const { api } = useAccountStore();
             const { wallet } = useWalletStore();
-
             // Remove lock info if selected wallet is null
-            if (!wallet) {
-                this.lock = null;
-                return;
-            }
+            if (!wallet) return;
 
             const locks = await api.request.get('/v1/ve', { params: { walletId: wallet._id } });
             const { amount, end, now, balance, rewards } = locks[0];
-            this.lock = { amount, end, now };
+            this.lock = { amount, end };
+            this.now = now;
             this.rewards = rewards;
             this.balance = balance;
         },
@@ -151,6 +149,62 @@ export const useVeStore = defineStore('ve', {
             );
             await sendTransaction(wallet.address, call.to, call.data);
         },
+        async claimTokens() {
+            const { wallet } = useWalletStore();
+            if (!wallet) return;
+
+            const map: { [variant: string]: (wallet: TWallet) => Promise<void> } = {
+                [WalletVariant.Safe]: this.claimTokenSafe.bind(this),
+                [WalletVariant.WalletConnect]: this.claimTokenWalletConnect.bind(this),
+            };
+
+            return await map[wallet.variant](wallet);
+        },
+        async claimTokenSafe(wallet: TWallet) {
+            const { confirmTransactions } = useWalletStore();
+            const { api } = useAccountStore();
+            const txs = await api.request.post('/v1/ve/claim', {
+                params: { walletId: wallet._id },
+            });
+
+            await confirmTransactions(txs);
+        },
+        async claimTokenWalletConnect(wallet: TWallet) {
+            const { sendTransaction } = useWalletStore();
+            const abi = [
+                {
+                    inputs: [
+                        {
+                            internalType: 'address',
+                            name: 'user',
+                            type: 'address',
+                        },
+                        {
+                            internalType: 'contract IERC20',
+                            name: 'tokens',
+                            type: 'address',
+                        },
+                    ],
+                    name: 'claimToken',
+                    outputs: [
+                        {
+                            internalType: 'uint256',
+                            name: '',
+                            type: 'uint256',
+                        },
+                    ],
+                    stateMutability: 'nonpayable',
+                    type: 'function',
+                },
+            ];
+            const call = useWalletStore().encodeContractCall(
+                contractNetworks[wallet.chainId].RewardDistributor,
+                abi,
+                'claimToken',
+                [wallet.address, contractNetworks[wallet.chainId].BPT],
+            );
+            await sendTransaction(wallet.address, call.to, call.data);
+        },
         async withdraw(isEarlyAttempt: boolean) {
             const { wallet } = useWalletStore();
             if (!wallet) return;
@@ -192,12 +246,10 @@ export const useVeStore = defineStore('ve', {
             );
             await sendTransaction(wallet.address, call.to, call.data);
         },
-        waitForLock(amountInWei: number, lockEndTimestamp: number) {
-            const getLatestLockAmount = () => (this.lock ? this.lock.amount : 0);
-            const getLatestLockEnd = () => (this.lock ? this.lock.end : 0);
+        waitForLock(amountInWei: BigNumber, lockEndTimestamp: number) {
             const taskFn = async () => {
                 await this.getLocks();
-                return getLatestLockAmount() === amountInWei && getLatestLockEnd() === lockEndTimestamp
+                return this.lock && this.lock.amount === amountInWei.toString() && this.lock.end === lockEndTimestamp
                     ? Promise.resolve()
                     : Promise.reject('Amount');
             };

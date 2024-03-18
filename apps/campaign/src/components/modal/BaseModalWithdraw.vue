@@ -1,12 +1,11 @@
 <template>
-    <b-modal
-        v-model="isShown"
-        centered
-        hide-footer
-        title="Unlock 20USDC-80THX"
-        @hidden="$emit('hidden')"
-        @show="onShow"
-    >
+    <b-modal v-model="isShown" centered hide-footer @hidden="$emit('hidden')" @show="onShow">
+        <template #header>
+            <strong class="text-accent">Unlock 20USDC-80THX</strong>
+            <b-link class="btn-close" @click="$emit('hidden')">
+                <i class="fas fa-times"></i>
+            </b-link>
+        </template>
         <b-alert v-model="isAlertInfoShown" variant="info" class="py-2 px-3">
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
@@ -38,10 +37,12 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
-import { MAX_LOCK_TIME } from '../../config/constants';
-import { fromWei } from 'web3-utils';
+import { MAX_LOCK_TIME, contractNetworks } from '../../config/constants';
 import { useLiquidityStore } from '@thxnetwork/campaign/stores/Liquidity';
 import { calculatePenalty, toFiatPrice } from '@thxnetwork/campaign/utils/price';
+import { formatUnits } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers/lib/ethers';
+import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseModalWithdraw',
@@ -64,24 +65,18 @@ export default defineComponent({
             return !!this.error;
         },
         penaltyInWei() {
-            const lock = this.veStore.lock;
-            if (!lock) return 0;
-
-            const end = Math.floor(lock.end / 1000);
-            const now = Math.floor(lock.now / 1000);
-
-            return calculatePenalty(Number(lock.amount), 1, end - now, MAX_LOCK_TIME);
+            const end = Math.floor(this.veStore.lock.end / 1000);
+            const now = Math.floor(this.veStore.now / 1000);
+            return calculatePenalty(this.veStore.lock.amount, 1, end - now, MAX_LOCK_TIME);
         },
         penalty() {
-            const price = this.liquidityStore.pricing['20USDC-80THX'];
-            const penaltyInBPT = fromWei(this.penaltyInWei.toString());
-
-            return Number(penaltyInBPT) * price;
+            const penaltyInUSDC = this.penaltyInWei * this.liquidityStore.pricing['20USDC-80THX'];
+            return Number(formatUnits(String(penaltyInUSDC), 18));
         },
         withdrawAmount() {
             const lock = this.veStore.lock;
             if (!lock) return 0;
-            return Number(lock.amount) - this.penalty;
+            return Number(lock.amount) - Number(this.penalty);
         },
     },
     watch: {
@@ -94,7 +89,11 @@ export default defineComponent({
             //
         },
         async waitForWithdrawal() {
-            //
+            const taskFn = async () => {
+                await this.veStore.getLocks();
+                return BigNumber.from(this.veStore.lock.amount).eq(0) ? Promise.resolve() : Promise.reject('x');
+            };
+            return poll({ taskFn, interval: 3000, retries: 20 });
         },
         async onClickWithdraw() {
             this.isPolling = true;
@@ -102,6 +101,9 @@ export default defineComponent({
             try {
                 await this.veStore.withdraw(this.isEarlyAttempt);
                 await this.waitForWithdrawal();
+
+                const { wallet } = this.walletStore;
+                if (wallet) this.walletStore.getBalance(contractNetworks[wallet.chainId].BPTGauge);
 
                 this.$emit('hidden');
             } catch (response) {

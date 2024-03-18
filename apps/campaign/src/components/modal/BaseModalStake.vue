@@ -1,19 +1,18 @@
 <template>
-    <b-modal
-        v-model="isShown"
-        centered
-        hide-footer
-        title="Stake 20USDC-80THX @ Balancer"
-        @hidden="$emit('hidden')"
-        @show="onShow"
-    >
+    <b-modal v-model="isShown" centered hide-footer @hidden="$emit('hidden')" @show="onShow">
+        <template #header>
+            <strong class="text-accent">Stake 20USDC-80THX @ Balancer</strong>
+            <b-link class="btn-close" @click="$emit('hidden')">
+                <i class="fas fa-times"></i>
+            </b-link>
+        </template>
         <b-alert v-model="isAlertInfoShown" variant="info" class="py-2 px-3">
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
         </b-alert>
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab title="1. Approve">
-                <b-form-group label="Amount" :description="`Current allowance: ${fromWei(allowance.toString())}`">
+                <b-form-group label="Amount" :description="`Current allowance: ${currentAllowance}`">
                     <b-form-input v-model="amountApproval" type="number" />
                 </b-form-group>
                 <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickApprove">
@@ -44,7 +43,8 @@ import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
-import { fromWei, toWei } from 'web3-utils';
+import { BigNumber } from 'ethers';
+import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import poll from 'promise-poller';
 
 export default defineComponent({
@@ -55,7 +55,6 @@ export default defineComponent({
     },
     data() {
         return {
-            fromWei,
             isShown: false,
             error: '',
             isPolling: false,
@@ -67,25 +66,28 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useWalletStore, useVeStore, useLiquidityStore),
+        address() {
+            if (!this.walletStore.wallet) return;
+            return contractNetworks[this.walletStore.wallet.chainId];
+        },
         allowance() {
-            if (!this.walletStore.allowances[this.bptAddress]) return 0;
-            if (!this.walletStore.allowances[this.bptAddress][this.bptGaugeAddress]) return 0;
-            return this.walletStore.allowances[this.bptAddress][this.bptGaugeAddress];
+            if (!this.address) return 0;
+            if (!this.walletStore.allowances[this.address.BPT]) return 0;
+            if (!this.walletStore.allowances[this.address.BPT][this.address.BPTGauge]) return 0;
+            return this.walletStore.allowances[this.address.BPT][this.address.BPTGauge];
+        },
+        currentAllowance() {
+            const allowance = BigNumber.from(this.allowance);
+            return formatUnits(allowance, 'ether');
         },
         isAlertInfoShown() {
             return !!this.error;
         },
         isSufficientAllowance() {
-            if (this.allowance >= this.amountStake) return true;
+            const allowanceInWei = BigNumber.from(this.allowance);
+            const amountInWei = parseUnits(this.amountStake.toString(), 18);
+            if (allowanceInWei.gte(amountInWei)) return true;
             return false;
-        },
-        bptAddress() {
-            if (!this.walletStore.wallet) return;
-            return contractNetworks[this.walletStore.wallet.chainId].BPT;
-        },
-        bptGaugeAddress() {
-            if (!this.walletStore.wallet) return;
-            return contractNetworks[this.walletStore.wallet.chainId].BPTGauge;
         },
     },
     watch: {
@@ -100,16 +102,17 @@ export default defineComponent({
         async onShow() {
             this.amountApproval = this.amount;
             this.amountStake = this.amount;
+
             await this.getApproval();
+
             if (this.isSufficientAllowance) {
                 this.tabIndex = 1;
             }
         },
         getApproval() {
             return this.walletStore.getApproval({
-                tokenAddress: this.bptAddress,
-                spender: this.bptGaugeAddress,
-                amountInWei: toWei(String(this.amountApproval)),
+                tokenAddress: this.address.BPT,
+                spender: this.address.BPTGauge,
             });
         },
         waitForApproval() {
@@ -122,10 +125,13 @@ export default defineComponent({
         async onClickApprove() {
             this.isPolling = true;
             try {
+                // Value to approve
+                const amountInWei = parseUnits(this.amountStake.toString(), 18);
+
                 await this.walletStore.approve({
-                    tokenAddress: this.bptAddress,
-                    spender: this.bptGaugeAddress,
-                    amountInWei: toWei(String(this.amountApproval)),
+                    tokenAddress: this.address.BPT,
+                    spender: this.address.BPTGauge,
+                    amountInWei: amountInWei.toString(),
                 });
 
                 // poll for allowance to increase
@@ -143,16 +149,16 @@ export default defineComponent({
             this.isPolling = true;
             try {
                 // Values to send
-                const amountInWei = toWei(String(this.amountStake));
+                const amountInWei = parseUnits(this.amountStake.toString(), 18);
 
                 // Make deposit
-                await this.liquidityStore.stake({ amountInWei });
+                await this.liquidityStore.stake({ amountInWei: amountInWei.toString() });
 
                 // Wait for BPTGauge balance to increase
                 await this.liquidityStore.waitForStake(amountInWei);
 
                 // Hide modal (or cast "success" and switch parent tab to withdrawal/rewards)
-                this.$emit('hidden');
+                this.$emit('staked');
             } catch (response) {
                 this.onError(response);
             } finally {

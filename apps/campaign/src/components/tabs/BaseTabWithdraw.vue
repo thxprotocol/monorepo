@@ -1,60 +1,47 @@
 <template>
-    <div v-if="veStore.lock && !veStore.lock.end" class="d-flex justify-content-center py-5">
-        <div class="flex-column text-center">
-            <i class="fas fa-gift h1 text-accent" /><br />
-            <p>
-                <span class="text-opaque">Lock staked liquidity and earn </span><br />
-                <strong class="text-white">up to 120% APR</strong>
-            </p>
-            <b-button variant="primary" class="w-100" @click="$emit('change-tab', 1)"> Lock &amp; Earn </b-button>
-        </div>
-    </div>
-    <template v-else-if="veStore.lock">
-        <b-row>
-            <b-col>
-                <b-form-group label="Voting power" label-class="text-opaque">
-                    {{ fromWei(String(veStore.balance)) }}
-                </b-form-group>
-                <b-form-group label="Locked amount" label-class="text-opaque">
-                    {{ amount }}
-                </b-form-group>
-                <b-form-group label="Locked ends" label-class="text-opaque">
-                    {{ differenceInDays(veStore.lock.end, veStore.lock.now) }} days
-                    <i
-                        v-b-tooltip
-                        :title="`${format(new Date(veStore.lock.end), 'MMMM do yyyy hh:mm:ss')}`"
-                        class="fas fa-info-circle me-1 cursor-pointer text-opaque"
-                    />
-                </b-form-group>
-            </b-col>
-            <b-col class="d-flex align-items-center justify-content-center flex-column">
-                <div class="text-center">
+    <b-row>
+        <b-col>
+            <b-form-group label="Voting power" label-class="text-opaque">
+                {{ fromWei(String(veStore.balance)) }}
+            </b-form-group>
+            <b-form-group label="Locked amount" label-class="text-opaque">
+                {{ amount }}
+            </b-form-group>
+            <b-form-group label="Locked ends" label-class="text-opaque">
+                {{ differenceInDays(veStore.lock.end, veStore.now) }} days
+                <i
+                    v-b-tooltip
+                    :title="`${format(new Date(veStore.lock.end), 'MMMM do yyyy hh:mm:ss')}`"
+                    class="fas fa-info-circle me-1 cursor-pointer text-opaque"
+                />
+            </b-form-group>
+        </b-col>
+        <b-col class="d-flex align-items-center justify-content-center flex-column">
+            <div class="text-center">
+                <div
+                    class="position-relative rounded-circle m-auto gradient-border-xl"
+                    style="width: 75px; height: 75px"
+                >
                     <div
-                        class="position-relative rounded-circle m-auto gradient-border-xl"
-                        style="width: 75px; height: 75px"
+                        class="position-relative bg-dark rounded-circle d-flex align-items-center justify-content-center"
+                        style="z-index: 1; width: 65px; height: 65px"
                     >
-                        <div
-                            class="position-relative bg-dark rounded-circle d-flex align-items-center justify-content-center"
-                            style="z-index: 1; width: 65px; height: 65px"
-                        >
-                            <i class="fas fa-id-card" style="font-size: 1.5rem" />
-                        </div>
+                        <i class="fas fa-id-card" style="font-size: 1.5rem" />
                     </div>
-                    <b-badge class="mt-2 p-2" variant="primary">
-                        {{ membership }}
-                    </b-badge>
                 </div>
-            </b-col>
-        </b-row>
-
-        <hr />
-        <b-alert v-model="isEarly" class="p-2" variant="primary">
-            <i class="fas fa-info-circle me-1" />
-            A penalty will be applied on early withdrawals!
-        </b-alert>
-        <b-button class="w-100" variant="primary" @click="isModalWithdrawShown = true"> Withdraw </b-button>
-        <BaseModalWithdraw :show="isModalWithdrawShown" :is-early="isEarly" @hidden="isModalWithdrawShown = false" />
-    </template>
+                <b-badge class="mt-2 p-2" variant="primary">
+                    {{ membership }}
+                </b-badge>
+            </div>
+        </b-col>
+    </b-row>
+    <hr />
+    <b-alert v-model="isEarly" class="p-2" variant="primary">
+        <i class="fas fa-info-circle me-1" />
+        A penalty will be applied on early withdrawals!
+    </b-alert>
+    <b-button class="w-100" variant="primary" @click="isModalWithdrawShown = true"> Withdraw </b-button>
+    <BaseModalWithdraw :show="isModalWithdrawShown" :is-early="isEarly" @hidden="isModalWithdrawShown = false" />
 </template>
 
 <script lang="ts">
@@ -91,8 +78,7 @@ export default defineComponent({
         },
         isEarly() {
             if (!this.veStore.lock) return;
-            const { now, end } = this.veStore.lock;
-            return Number(now) < Number(end);
+            return Number(this.veStore.now) < Number(this.veStore.lock.end);
         },
         amount() {
             if (!this.veStore.lock) return;

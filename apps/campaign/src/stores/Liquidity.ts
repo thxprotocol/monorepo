@@ -3,8 +3,8 @@ import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
 import { contractNetworks } from '../config/constants';
-import { fromWei } from 'web3-utils';
 import { WalletVariant } from '../types/enums/accountVariant';
+import { BigNumber } from 'ethers';
 
 export const useLiquidityStore = defineStore('liquidity', {
     state: (): TLiquidityState => ({
@@ -58,17 +58,19 @@ export const useLiquidityStore = defineStore('liquidity', {
 
             this.pricing = pricing;
         },
-        async waitForStake(amountInWei: string) {
+        async waitForStake(amountInWei: BigNumber) {
             const { wallet, balances, getBalance } = useWalletStore();
             if (!wallet) return;
 
             const bptGaugeAddress = contractNetworks[wallet.chainId].BPTGauge;
-            const oldBalance = balances[bptGaugeAddress];
+            const oldBalanceInWei = BigNumber.from(balances[bptGaugeAddress]);
             const taskFn = async () => {
                 await getBalance(bptGaugeAddress);
-                return useWalletStore().balances[bptGaugeAddress] === Number(fromWei(amountInWei)) + Number(oldBalance)
-                    ? Promise.resolve()
-                    : Promise.reject('Stake');
+
+                const bptGaugeBalance = useWalletStore().balances[bptGaugeAddress];
+                const bptGaugeBalanceExpected = amountInWei.add(oldBalanceInWei);
+
+                return bptGaugeBalanceExpected.eq(bptGaugeBalance) ? Promise.resolve() : Promise.reject('Stake');
             };
 
             return poll({ taskFn, interval: 3000, retries: 20 });

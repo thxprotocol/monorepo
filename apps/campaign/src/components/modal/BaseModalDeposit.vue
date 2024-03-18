@@ -1,13 +1,19 @@
 <template>
-    <b-modal v-model="isShown" centered hide-footer title="Lock 20USDC-80THX" @hidden="$emit('hidden')" @show="onShow">
+    <b-modal v-model="isShown" centered hide-footer @hidden="$emit('hidden')" @show="onShow">
+        <template #header>
+            <strong class="modal-title">Lock 20USDC-80THX</strong>
+            <b-link class="btn-close" @click="$emit('hidden')">
+                <i class="fas fa-times"></i>
+            </b-link>
+        </template>
         <b-alert v-model="isAlertInfoShown" variant="info" class="py-2 px-3">
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
         </b-alert>
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab title="1. Approve">
-                <b-form-group label="Amount" :description="`Current allowance: ${fromWei(allowance.toString())}`">
-                    <b-form-input v-model="amountApproval" type="number" />
+                <b-form-group label="Amount" :description="`Current allowance: ${currentAllowance}`">
+                    <b-form-input v-model="amountApproval" type="number" :step="1 / 10 ** precision" />
                 </b-form-group>
                 <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickApprove">
                     <b-spinner v-if="isPolling" small />
@@ -16,7 +22,7 @@
             </b-tab>
             <b-tab title="2. Deposit">
                 <b-form-group>
-                    <b-form-input v-model="amountDeposit" type="number" />
+                    <b-form-input v-model="amountDeposit" type="number" :step="1 / 10 ** precision" />
                 </b-form-group>
                 <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickDeposit">
                     <b-spinner v-if="isPolling" small />
@@ -36,9 +42,11 @@ import { mapStores } from 'pinia';
 import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { contractNetworks } from '../../config/constants';
-import { toWei, fromWei } from 'web3-utils';
-import poll from 'promise-poller';
 import { ChainId } from '@thxnetwork/sdk';
+import { BigNumber } from 'ethers/lib/ethers';
+import { formatUnits, parseUnits } from 'ethers/lib/utils';
+import poll from 'promise-poller';
+import { roundDownFixed } from '@thxnetwork/campaign/utils/price';
 
 export default defineComponent({
     name: 'BaseModalDeposit',
@@ -49,19 +57,18 @@ export default defineComponent({
     },
     data() {
         return {
-            fromWei,
             isShown: false,
             error: '',
             isPolling: false,
             tabIndex: 0,
             isModalDepositShown: false,
-            amountApproval: 0,
-            amountDeposit: 0,
+            precision: 6,
+            amountApproval: '0',
+            amountDeposit: '0',
         };
     },
     computed: {
-        ...mapStores(useWalletStore),
-        ...mapStores(useVeStore),
+        ...mapStores(useWalletStore, useVeStore),
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
@@ -69,14 +76,18 @@ export default defineComponent({
         allowance() {
             if (!this.walletStore.allowances[this.address.BPTGauge]) return 0;
             if (!this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow]) return 0;
-
             return this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow];
+        },
+        currentAllowance() {
+            return Number(formatUnits(this.allowance, 'ether'));
         },
         isAlertInfoShown() {
             return !!this.error;
         },
         isSufficientAllowance() {
-            if (this.allowance >= this.amountDeposit) return true;
+            const allowanceInWei = BigNumber.from(this.allowance);
+            const amountInWei = parseUnits(this.amountDeposit.toString(), 18);
+            if (allowanceInWei.gte(amountInWei)) return true;
             return false;
         },
     },
@@ -90,8 +101,8 @@ export default defineComponent({
     },
     methods: {
         async onShow() {
-            this.amountApproval = this.amount;
-            this.amountDeposit = this.amount;
+            this.amountApproval = roundDownFixed(this.amount, this.precision);
+            this.amountDeposit = roundDownFixed(this.amount, this.precision);
             await this.getApproval();
             if (this.isSufficientAllowance) {
                 this.tabIndex = 1;
@@ -101,7 +112,6 @@ export default defineComponent({
             return this.walletStore.getApproval({
                 tokenAddress: this.address.BPTGauge,
                 spender: this.address.VotingEscrow,
-                amountInWei: toWei(String(this.amountDeposit)),
             });
         },
         waitForApproval() {
@@ -114,10 +124,12 @@ export default defineComponent({
         async onClickApprove() {
             this.isPolling = true;
             try {
+                const amountInWei = parseUnits(this.amountApproval.toString(), 18);
+
                 await this.walletStore.approve({
                     tokenAddress: this.address.BPTGauge,
                     spender: this.address.VotingEscrow,
-                    amountInWei: toWei(String(this.amountApproval)),
+                    amountInWei: amountInWei.toString(),
                 });
 
                 // poll for allowance to increase
@@ -125,7 +137,7 @@ export default defineComponent({
 
                 // then change tab index to 1
                 this.tabIndex = 1;
-                this.amountDeposit = this.amount;
+                this.amountDeposit = this.currentAllowance;
             } catch (response) {
                 this.onError(response);
             } finally {
@@ -136,23 +148,14 @@ export default defineComponent({
             this.isPolling = true;
             try {
                 // Values to send
-                const amountInWei = toWei(String(this.amountDeposit));
+                const amountInWei = parseUnits(this.amountDeposit.toString(), 18);
                 const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
 
-                // Values to check
-                const lock = this.veStore.lock;
-                const totalAmount = lock ? lock.amount + this.amountDeposit : this.amountDeposit;
-                const latestLockEndTimestamp = lock
-                    ? lock.end < lockEndTimestamp
-                        ? lockEndTimestamp
-                        : lock.end
-                    : lockEndTimestamp;
-
                 // Make deposit
-                await this.veStore.deposit({ amountInWei, lockEndTimestamp });
+                await this.veStore.deposit({ amountInWei: amountInWei.toString(), lockEndTimestamp });
 
                 // Wait for amount and/or endDate to be updated if it changed
-                await this.veStore.waitForLock(totalAmount, latestLockEndTimestamp);
+                await this.veStore.waitForLock(amountInWei, lockEndTimestamp);
 
                 this.walletStore.getBalance(this.address.BPTGauge);
                 this.walletStore.getBalance(this.address.VotingEscrow);

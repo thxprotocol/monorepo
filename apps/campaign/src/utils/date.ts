@@ -1,13 +1,12 @@
 const OneDayInMs = 60 * 60 * 24 * 1000;
 
 export const NinetyDaysInMs = OneDayInMs * 90;
-export const MaxDuration = Date.now() + NinetyDaysInMs;
 
-export function getThursdaysUntilTimestamp(futureTimestamp: number) {
+export function getThursdaysUntilTimestamp(now: number, futureTimestamp: number) {
     const thursdays = [];
 
     // Get the current timestamp
-    const timestampTomorrow = Date.now() + OneDayInMs;
+    const timestampTomorrow = now + OneDayInMs;
 
     // Start from the current date and iterate until the future timestamp
     for (let timestamp = timestampTomorrow; timestamp <= futureTimestamp; timestamp += OneDayInMs) {

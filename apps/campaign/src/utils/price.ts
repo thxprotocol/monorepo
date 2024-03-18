@@ -1,3 +1,8 @@
+export function roundDownFixed(amount: number, precision: number) {
+    const factor = 10 ** precision;
+    return (Math.floor(amount * factor) / factor).toFixed(precision);
+}
+
 export function parseUnitAmount(price: number) {
     return Number(price / 100).toFixed(2);
 }
@@ -14,7 +19,7 @@ export function toFiatPrice(number: number) {
 }
 
 export function calculatePenalty(
-    lockAmount: number,
+    lockAmount: string,
     penaltyCoefficient = 1,
     leftTimeToUnlock: number,
     maxLockTime: number,
@@ -31,5 +36,5 @@ export function calculatePenalty(
     // Ensure leftTimeToUnlock does not exceed maxLockTime
     leftTimeToUnlock = Math.min(leftTimeToUnlock, maxLockTime);
 
-    return lockAmount * penaltyCoefficient * (leftTimeToUnlock / maxLockTime);
+    return Number(lockAmount) * penaltyCoefficient * (leftTimeToUnlock / maxLockTime);
 }

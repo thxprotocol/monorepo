@@ -25,7 +25,7 @@ type TTransaction = {
 };
 
 type TWalletState = {
-    modal: any | null;
+    modal: Web3Modal | null;
     account: any | null;
     chainId: ChainId;
     wallets: TWallet[];
@@ -33,8 +33,8 @@ type TWalletState = {
     erc20: any[];
     erc721: any[];
     erc1155: any[];
-    allowances: { [tokenAddress: string]: { [spender: string]: number } };
-    balances: { [tokenAddress: string]: number };
+    allowances: { [tokenAddress: string]: { [spender: string]: string } };
+    balances: { [tokenAddress: string]: string };
     couponCodes: any[];
     discordRoles: any[];
     pendingPoints: number;
@@ -119,15 +119,15 @@ type TNFTTransferConfig = {
 };
 
 type TVeLock = {
-    amount: BigNumber;
+    amount: string;
     end: number;
-    now: number;
 };
 
 type TVeState = {
-    lock: TVeLock | null;
+    lock: TVeLock;
+    now: number;
     balance: BigNumber;
-    rewards: { tokenAddress: string; amount: string }[];
+    rewards: { tokenAddress: string; amount: string; symbol: string }[];
 };
 
 type TLiquidityState = {

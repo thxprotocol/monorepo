@@ -11,9 +11,9 @@
                     <h3 class="text-white mb-0">
                         {{ accountStore.account.username }}
                     </h3>
-                    <span class="text-opaque">Earned: </span>
-                    <b-link class="text-accent text-hover-underline" @click.stop="onClickRewards">
-                        {{ toFiatPrice(rewardsInUSD) }}
+                    <b-link class="text-decoration-none" @click.stop="onClickRewards">
+                        <span class="text-accent text-hover-underline">{{ toFiatPrice(rewardsInUSD) }}</span>
+                        <i class="fas fa-download small ms-1 text-white text-opaque"></i>
                     </b-link>
                 </div>
             </template>
@@ -29,8 +29,8 @@ import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
 import { useVeStore } from '../../stores/VE';
 import { useLiquidityStore } from '../../stores/Liquidity';
-import { fromWei } from 'web3-utils';
 import { toFiatPrice } from '../../utils/price';
+import { formatUnits } from 'ethers/lib/utils';
 
 export default defineComponent({
     name: 'BaseCardAccount',
@@ -42,8 +42,8 @@ export default defineComponent({
         rewardsInUSD() {
             if (!this.veStore.rewards.length) return 0;
 
-            const balRewards = Number(fromWei(this.veStore.rewards[0].amount));
-            const bptRewards = Number(fromWei(this.veStore.rewards[1].amount));
+            const balRewards = Number(formatUnits(this.veStore.rewards[0].amount, 'ether'));
+            const bptRewards = Number(formatUnits(this.veStore.rewards[1].amount, 'ether'));
             const balPrice = this.liquidityStore.pricing['BAL'];
             const bptPrice = this.liquidityStore.pricing['20USDC-80THX'];
 

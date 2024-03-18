@@ -1,10 +1,10 @@
 <template>
     <BaseFormGroupInputTokenAmount
         :usd="liquidityStore.pricing['USDC']"
-        :balance="walletStore.balances[address.USDC]"
+        :balance="balanceUSDC"
         :value="amountUSDC"
         :min="0"
-        :max="walletStore.balances[address.USDC]"
+        :max="balanceUSDC"
         class="mb-4"
         @update="amountUSDC = $event"
     >
@@ -23,10 +23,10 @@
     </BaseFormGroupInputTokenAmount>
     <BaseFormGroupInputTokenAmount
         :usd="liquidityStore.pricing['THX']"
-        :balance="walletStore.balances[address.THX]"
+        :balance="balanceTHX"
         :value="amountTHX"
         :min="0"
-        :max="walletStore.balances[address.THX]"
+        :max="balanceTHX"
         class="mb-4"
         @update="amountTHX = $event"
     >
@@ -49,10 +49,10 @@
 
     <BaseFormGroupInputTokenAmount
         :usd="liquidityStore.pricing['20USDC-80THX']"
-        :balance="walletStore.balances[address.BPT]"
+        :balance="balanceBPT"
         :value="amountStake"
         :min="0"
-        :max="walletStore.balances[address.BPT]"
+        :max="balanceBPT"
         class="mb-4"
         @update="amountStake = $event"
     >
@@ -85,7 +85,12 @@
     >
         Stake Liquidity
     </b-button>
-    <BaseModalStake :show="isModalStakeShown" :amount="amountStake" @hidden="isModalStakeShown = false" />
+    <BaseModalStake
+        :show="isModalStakeShown"
+        :amount="amountStake"
+        @staked="onStaked"
+        @hidden="isModalStakeShown = false"
+    />
 </template>
 
 <script lang="ts">
@@ -97,14 +102,14 @@ import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
 import { format } from 'date-fns';
 import { contractNetworks } from '../../config/constants';
-import { fromWei } from 'web3-utils';
 import { ChainId } from '@thxnetwork/sdk';
+import { formatUnits } from 'ethers/lib/utils';
 
 export default defineComponent({
     name: 'BaseTabLiquidity',
     data() {
         return {
-            fromWei,
+            formatUnits,
             format,
             isModalStakeShown: false,
             amountStake: 0,
@@ -118,14 +123,36 @@ export default defineComponent({
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
         },
+        balanceUSDC() {
+            if (!this.walletStore.balances[this.address.USDC]) return 0;
+            return Number(formatUnits(this.walletStore.balances[this.address.USDC], 'ether'));
+        },
+        balanceTHX() {
+            if (!this.walletStore.balances[this.address.THX]) return 0;
+            return Number(formatUnits(this.walletStore.balances[this.address.THX], 'ether'));
+        },
+        balanceBPT() {
+            if (!this.walletStore.balances[this.address.BPT]) return 0;
+            return Number(formatUnits(this.walletStore.balances[this.address.BPT], 'ether'));
+        },
     },
     watch: {
         'walletStore.wallet'(wallet) {
             if (!wallet) return;
 
+            this.updateAmountStake();
+        },
+    },
+    methods: {
+        updateAmountStake() {
             this.walletStore.getBalance(this.address.BPT).then(() => {
-                this.amountStake = this.walletStore.balances[this.address.BPT];
+                this.amountStake = Number(formatUnits(this.walletStore.balances[this.address.BPT], 'ether'));
             });
+        },
+        onStaked() {
+            this.isModalStakeShown = false;
+            this.updateAmountStake();
+            this.$emit('change-tab', 1);
         },
     },
 });

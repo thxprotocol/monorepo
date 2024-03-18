@@ -9,22 +9,29 @@
                 <slot name="label" />
             </b-badge>
             <b-form-input
+                v-model="valueFormatted"
                 :disabled="disabled"
                 class="ms-3"
                 :min="min"
                 :max="max"
-                :value="value"
+                :step="1 / 10 ** precision"
                 type="number"
                 style="text-align: right"
-                @input="$emit('update', Number($event))"
             />
         </div>
         <template v-if="balance" #description>
             <div class="d-flex mb-1 justify-content-between mt-1 text-muted">
                 <div>
-                    Balance: {{ balance }}
-                    <span v-if="value >= balance" class="text-muted"> (Maxed) </span>
-                    <b-badge v-else class="cursor-pointer ms-1" variant="primary" @click="$emit('update', balance)">
+                    Balance: {{ roundDownFixed(balance, precision) }}
+                    <span v-if="valueFormatted >= roundDownFixed(balance, precision)" class="text-muted">
+                        (Maxed)
+                    </span>
+                    <b-badge
+                        v-else
+                        class="cursor-pointer ms-1"
+                        variant="primary"
+                        @click="$emit('update', roundDownFixed(balance, precision))"
+                    >
                         Max
                     </b-badge>
                 </div>
@@ -45,7 +52,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { toFiatPrice } from '../../utils/price';
+import { roundDownFixed, toFiatPrice } from '../../utils/price';
 
 export default defineComponent({
     name: 'BaseFormGroupInputTokenAmount',
@@ -55,11 +62,22 @@ export default defineComponent({
         max: Number,
         disabled: Boolean,
         usd: { type: Number, required: true },
-        value: { type: Number, required: true },
+        value: { type: Number, required: true, default: 0 },
         balance: { type: Number },
+        precision: { type: Number, default: 6 },
     },
     data() {
-        return { toFiatPrice };
+        return { toFiatPrice, roundDownFixed };
+    },
+    computed: {
+        valueFormatted: {
+            get() {
+                return roundDownFixed(this.value, this.precision);
+            },
+            set(value: number) {
+                this.$emit('update', roundDownFixed(value, this.precision));
+            },
+        },
     },
 });
 </script>

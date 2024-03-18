@@ -9,23 +9,16 @@ import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
-import { watchAccount, signMessage, switchChain } from '@wagmi/core';
+import { sendTransaction, disconnect, watchAccount, signMessage, switchChain } from '@wagmi/core';
 import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
 import { RewardVariant } from '../types/enums/rewards';
 import { formatUnits } from 'ethers/lib/utils';
-import { sendTransaction } from '@wagmi/core';
 import { encodeFunctionData } from 'viem';
 import { contractNetworks } from '../config/constants';
 import Safe from '@safe-global/protocol-kit';
 import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
-
-type TRequestParamsAllowance = {
-    tokenAddress: string;
-    spender: string;
-    amountInWei: string;
-};
 
 type TRequestBodyApproval = {
     tokenAddress: string;
@@ -91,8 +84,10 @@ export const useWalletStore = defineStore('wallet', {
 
             this.modal.subscribeState((state: { open: boolean; selectedNetworkId: ChainId }) => {
                 this.chainId = state.selectedNetworkId;
+
+                // Show chain modal if an account is connected but the desired chain is not the current chain
                 this.isModalChainSwitchShown =
-                    this.wallet && this.wallet.variant === WalletVariant.WalletConnect
+                    this.account && this.wallet && this.wallet.variant === WalletVariant.WalletConnect
                         ? this.wallet.chainId !== this.chainId
                         : false;
             });
@@ -103,12 +98,24 @@ export const useWalletStore = defineStore('wallet', {
         signMessage(message: string) {
             return signMessage(wagmiConfig, { message });
         },
+        async connect() {
+            this.createWeb3Modal();
+            this.modal.open();
+            await this.waitForAccount();
+        },
+        async disconnect() {
+            this.account = null;
+            await disconnect(wagmiConfig);
+            this.modal.resetAccount();
+            this.modal.resetNetwork();
+            this.modal.close();
+            this.modal = null;
+        },
         async sendTransaction(from: string, to: `0x${string}`, data: `0x${string}`) {
             this.createWeb3Modal();
 
             if (!this.account || this.account.address !== from) {
-                this.modal.open();
-                throw new Error('Connect your wallet first!');
+                await this.connect();
             }
 
             if (this.chainId && this.chainId !== this.chainId) {
@@ -117,6 +124,21 @@ export const useWalletStore = defineStore('wallet', {
 
             return sendTransaction(wagmiConfig, { to, data });
         },
+        waitForAccount() {
+            return new Promise((resolve: any) => {
+                const interval = setInterval(() => {
+                    if (
+                        this.account &&
+                        this.account.isConnected &&
+                        this.wallet &&
+                        this.account.address === this.wallet.address
+                    ) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 300);
+            });
+        },
         async create(data: { variant: WalletVariant; message?: string; signature?: string }) {
             const { api } = useAccountStore();
             await api.request.post('/v1/account/wallets', { data });
@@ -124,14 +146,6 @@ export const useWalletStore = defineStore('wallet', {
         },
         async setWallet(wallet: TWallet | null) {
             this.wallet = wallet;
-
-            if (wallet && wallet.variant === WalletVariant.WalletConnect) {
-                // Open connect modal if no account is available or
-                // the address is not the same
-                if (!this.account || this.account.address !== wallet.address) {
-                    await this.modal.open();
-                }
-            }
 
             // Check if there are pending transactions and confirm them
             // This will always be a Safe wallet
@@ -249,9 +263,9 @@ export const useWalletStore = defineStore('wallet', {
             const { balanceInWei } = await api.request.get('/v1/erc20/balance', {
                 params: { tokenAddress, walletId: this.wallet._id },
             });
-            this.balances[tokenAddress] = Number(formatUnits(balanceInWei, 'ether'));
+            this.balances[tokenAddress] = balanceInWei;
         },
-        async getApproval(params: TRequestParamsAllowance) {
+        async getApproval(params: { tokenAddress: string; spender: string }) {
             if (!this.wallet) return;
 
             const { api } = useAccountStore();
@@ -259,9 +273,8 @@ export const useWalletStore = defineStore('wallet', {
                 params: { ...params, walletId: this.wallet._id },
             });
             if (!this.allowances[params.tokenAddress]) this.allowances[params.tokenAddress] = {};
-            this.allowances[params.tokenAddress][params.spender] = Number(allowanceInWei);
+            this.allowances[params.tokenAddress][params.spender] = allowanceInWei;
         },
-        // TODO Make this a WC method
         async approve(data: TRequestBodyApproval) {
             if (!this.wallet) return;
 

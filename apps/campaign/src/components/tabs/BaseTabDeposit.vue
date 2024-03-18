@@ -10,12 +10,12 @@
     </b-alert>
     <BaseFormGroupInputTokenAmount
         :usd="liquidityStore.pricing['20USDC-80THX']"
-        :balance="walletStore.balances[address.BPTGauge]"
-        :value="amount"
-        :min="minBPTGValue / liquidityStore.pricing['20USDC-80THX']"
-        :max="walletStore.balances[address.BPTGauge]"
+        :balance="balanceBPTGauge"
+        :value="value"
+        :min="minAmount"
+        :max="balanceBPTGauge"
         class="mb-4"
-        @update="$emit('update-amount', $event)"
+        @update="$emit('update-amount', parseUnits(String($event), 18))"
     >
         <template #label>
             <div class="d-flex align-items-center">
@@ -38,6 +38,7 @@
             </div>
         </template>
     </BaseFormGroupInputTokenAmount>
+    <small class="text-opaque">{{ new Date(veStore.now) }}</small>
     <BaseFormGroupInputDate
         label="Lock duration"
         tooltip="The longer you lock, the more rewards you get. You will be able to withdraw early, but a penalty will be applied."
@@ -64,17 +65,16 @@
             </div>
         </template>
     </BaseFormGroupInputDate>
-
     <b-button
         :disabled="isInsufficientAmount"
         class="w-100 mt-3"
-        :variant="!amount ? 'primary' : 'success'"
+        :variant="!Number(amount) ? 'primary' : 'success'"
         @click="isModalDepositShown = true"
     >
         Deposit
     </b-button>
     <BaseModalDeposit
-        :amount="amount"
+        :amount="value"
         :lock-end="lockEnd"
         :show="isModalDepositShown"
         @hidden="isModalDepositShown = false"
@@ -89,23 +89,24 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
 import { contractNetworks } from '../../config/constants';
-import { MaxDuration, NinetyDaysInMs, getThursdaysUntilTimestamp } from '../../utils/date';
+import { NinetyDaysInMs, getThursdaysUntilTimestamp } from '../../utils/date';
 import { ChainId } from '@thxnetwork/sdk';
+import { BigNumber } from 'ethers';
+import { formatUnits, parseUnits } from 'ethers/lib/utils';
 
 export default defineComponent({
     name: 'BaseTabDeposit',
     props: {
-        amount: { type: Number, required: true },
+        amount: { type: String, required: true },
     },
     data() {
         return {
+            parseUnits,
             isModalDepositShown: false,
             isAlertDepositShown: true,
             isModalWithdrawShown: false,
-            maxDuration: MaxDuration,
-            maxDate: new Date(MaxDuration),
             lockEnd: new Date(),
-            minBPTGValue: 3,
+            minBPTGValue: parseUnits('3', 'ether'),
         };
     },
     computed: {
@@ -113,6 +114,19 @@ export default defineComponent({
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
+        },
+        balanceBPTGauge() {
+            if (!this.walletStore.balances[this.address.BPTGauge]) return 0;
+            return Number(formatUnits(this.walletStore.balances[this.address.BPTGauge], 'ether'));
+        },
+        value() {
+            if (!this.amount) return 0;
+            return Number(formatUnits(this.amount, 'ether'));
+        },
+        minAmount() {
+            if (!this.liquidityStore.pricing['20USDC-80THX']) return 0;
+            const bptPriceInWei = parseUnits(String(this.liquidityStore.pricing['20USDC-80THX']), 18);
+            return Number(formatUnits(this.minBPTGValue.div(bptPriceInWei), 18));
         },
         suggestedDates() {
             if (!this.allowedDates.length) return [];
@@ -136,23 +150,34 @@ export default defineComponent({
             ];
         },
         isModalUnstakedLiquidityShown() {
-            return this.walletStore.balances[this.bptAddress] > 0;
+            if (!this.walletStore.balances[this.address.BPT]) return false;
+            return BigNumber.from(this.walletStore.balances[this.address.BPT]).gt(0);
         },
         isModalInsufficientAmountShown() {
-            return (
-                this.amountDeposit * this.liquidityStore.pricing['20USDC-80THX'] < this.minBPTGValue &&
-                this.amountDeposit * this.liquidityStore.pricing['20USDC-80THX'] > 0
-            );
+            const bptPriceInWei = parseUnits(String(this.liquidityStore.pricing['20USDC-80THX']), 18);
+            const bptValue = BigNumber.from(this.amount).mul(bptPriceInWei);
+            return bptValue.lt(this.minBPTGValue) && bptValue.gt(0);
         },
         isInsufficientAmount() {
-            return this.amountDeposit * this.liquidityStore.pricing['20USDC-80THX'] < this.minBPTGValue;
+            const bptPriceInWei = parseUnits(String(this.liquidityStore.pricing['20USDC-80THX']), 18);
+            const bptValue = BigNumber.from(this.amount).mul(bptPriceInWei);
+            return bptValue.lt(this.minBPTGValue);
         },
         allowedDates() {
-            return getThursdaysUntilTimestamp(Date.now() + NinetyDaysInMs);
+            return getThursdaysUntilTimestamp(this.veStore.now, this.veStore.now + NinetyDaysInMs);
         },
         minDate() {
             if (!this.allowedDates.length) return new Date();
             return new Date(this.allowedDates[0]);
+        },
+        maxDate() {
+            return new Date(this.veStore.now + NinetyDaysInMs);
+        },
+    },
+    watch: {
+        'veStore.now'(now) {
+            const [firstDate] = getThursdaysUntilTimestamp(now, now + NinetyDaysInMs);
+            this.lockEnd = new Date(firstDate);
         },
     },
 });
