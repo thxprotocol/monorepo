@@ -117,6 +117,7 @@ declare module 'vue' {
     BLink: typeof import('bootstrap-vue-next')['BLink']
     BListGroup: typeof import('bootstrap-vue-next')['BListGroup']
     BListGroupItem: typeof import('bootstrap-vue-next')['BListGroupItem']
+    BLnk: typeof import('bootstrap-vue-next')['BLnk']
     BModal: typeof import('bootstrap-vue-next')['BModal']
     BNav: typeof import('bootstrap-vue-next')['BNav']
     BNavbar: typeof import('bootstrap-vue-next')['BNavbar']

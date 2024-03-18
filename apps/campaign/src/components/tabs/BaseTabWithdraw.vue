@@ -6,6 +6,7 @@
             </b-form-group>
             <b-form-group label="Locked amount" label-class="text-opaque">
                 {{ amount }}
+                <b-link size="sm" class="text-accent text-decoration-underline ms-2">Increase</b-link>
             </b-form-group>
             <b-form-group label="Locked ends" label-class="text-opaque">
                 {{ differenceInDays(veStore.lock.end, veStore.now) }} days
@@ -14,6 +15,7 @@
                     :title="`${format(new Date(veStore.lock.end), 'MMMM do yyyy hh:mm:ss')}`"
                     class="fas fa-info-circle me-1 cursor-pointer text-opaque"
                 />
+                <b-link size="sm" class="text-accent text-decoration-underline ms-2">Increase</b-link>
             </b-form-group>
         </b-col>
         <b-col class="d-flex align-items-center justify-content-center flex-column">
