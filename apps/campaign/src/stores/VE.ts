@@ -165,29 +165,29 @@ export const useVeStore = defineStore('ve', {
                             type: 'address',
                         },
                         {
-                            internalType: 'contract IERC20',
+                            internalType: 'contract IERC20[]',
                             name: 'tokens',
-                            type: 'address',
+                            type: 'address[]',
                         },
                     ],
-                    name: 'claimToken',
+                    name: 'claimTokens',
                     outputs: [
                         {
-                            internalType: 'uint256',
+                            internalType: 'uint256[]',
                             name: '',
-                            type: 'uint256',
+                            type: 'uint256[]',
                         },
                     ],
                     stateMutability: 'nonpayable',
                     type: 'function',
                 },
             ];
-            const call = useWalletStore().encodeContractCall(
-                contractNetworks[wallet.chainId].RewardDistributor,
-                abi,
-                'claimToken',
-                [wallet.address, contractNetworks[wallet.chainId].BPT],
-            );
+
+            const { RewardDistributor, BAL, BPT } = contractNetworks[wallet.chainId];
+            const call = useWalletStore().encodeContractCall(RewardDistributor, abi, 'claimTokens', [
+                wallet.address,
+                [BAL, BPT],
+            ]);
             await sendTransaction(wallet.address, call.to, call.data);
         },
         async withdraw(isEarlyAttempt: boolean) {

@@ -23,7 +23,6 @@
                 </b-link>
             </template>
             <hr />
-            <BaseDropdownWallets />
             <b-list-group class="w-100" style="border-radius: 0">
                 <b-list-group-item @click="onClickRoute('/')"
                     ><i class="fas fa-home me-1"></i> Discovery
@@ -56,6 +55,7 @@
                         <b-img :src="imgLogo" height="50" alt="" />
                     </b-link>
                 </b-navbar-brand>
+                <BaseDropdownWallets class="d-block d-lg-none ms-auto" />
                 <b-button variant="link" class="d-block d-lg-none" @click="isNavbarOffcanvasShown = true">
                     <i class="fas fa-bars text-white"></i>
                 </b-button>

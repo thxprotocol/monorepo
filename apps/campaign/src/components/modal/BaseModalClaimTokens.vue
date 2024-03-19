@@ -18,23 +18,23 @@
                 <span class="text-opaque">
                     {{ rewardToken.symbol }}
                 </span>
-                <span class="text-opaque ms-auto me-3">
+                <b-link
+                    v-if="walletStore.wallet"
+                    :href="`${chainList[walletStore.wallet.chainId].blockExplorer}/token/${
+                        rewardToken.tokenAddress
+                    }?a=${walletStore.wallet.address}`"
+                    target="_blank"
+                >
+                    <i class="fas fa-external-link-alt text-white text-opaque ms-1 small" />
+                </b-link>
+                <span class="ms-auto">
                     {{ rewardToken.value }}
-                    <b-link
-                        v-if="walletStore.wallet"
-                        :href="`${chainList[walletStore.wallet.chainId].blockExplorer}/token/${
-                            rewardToken.tokenAddress
-                        }?a=${walletStore.wallet.address}`"
-                        target="_blank"
-                    >
-                        <i class="fas fa-external-link-alt text-white text-opaque ms-1 small" />
-                    </b-link>
                 </span>
-                <b-button size="sm" variant="success" :disabled="isLoading" @click="onClickClaimRewards()">
-                    Claim
-                </b-button>
             </b-list-group-item>
         </b-list-group>
+        <b-button class="w-100" variant="primary" :disabled="isLoading" @click="onClickClaimRewards()">
+            Claim Rewards
+        </b-button>
         <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
             ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
         </p>
