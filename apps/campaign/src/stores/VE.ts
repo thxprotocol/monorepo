@@ -84,10 +84,8 @@ export const useVeStore = defineStore('ve', {
             await sendTransaction(wallet.address, call.to, call.data);
         },
         async increaseAmount(data: { amountInWei: string }) {
-            const { wallet } = useWalletStore();
+            const { wallet, sendTransaction } = useWalletStore();
             if (!wallet) return;
-
-            const { sendTransaction } = useWalletStore();
             const abi = [
                 {
                     stateMutability: 'nonpayable',
@@ -113,7 +111,6 @@ export const useVeStore = defineStore('ve', {
         async increasUnlockTime(data: { lockEndTimestamp: number }) {
             const { wallet, sendTransaction } = useWalletStore();
             if (!wallet) return;
-
             const abi = [
                 {
                     stateMutability: 'nonpayable',

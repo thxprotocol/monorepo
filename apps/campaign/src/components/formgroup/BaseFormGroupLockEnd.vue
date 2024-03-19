@@ -32,6 +32,7 @@ import { defineComponent } from 'vue';
 import { NinetyDaysInMs, getThursdaysUntilTimestamp } from '@thxnetwork/campaign/utils/date';
 import { mapStores } from 'pinia';
 import { useVeStore } from '@thxnetwork/campaign/stores/VE';
+import { BigNumber } from 'ethers';
 
 export default defineComponent({
     name: 'BaseFormGroupLockEnd',
@@ -40,8 +41,15 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useVeStore),
+        startDate() {
+            // If there is a lock the start date should be lock end instead of now
+            if (!BigNumber.from(this.veStore.lock.amount).eq(0)) {
+                return new Date(this.veStore.lock.end).getTime();
+            }
+            return this.veStore.now;
+        },
         allowedDates() {
-            return getThursdaysUntilTimestamp(this.veStore.now, this.veStore.now + NinetyDaysInMs);
+            return getThursdaysUntilTimestamp(this.startDate, this.startDate + NinetyDaysInMs);
         },
         suggestedDates() {
             if (!this.allowedDates.length) return [];
@@ -65,6 +73,12 @@ export default defineComponent({
             ];
         },
         minDate() {
+            // If there is a lock the min date should be the current lock end date
+            if (!BigNumber.from(this.veStore.lock.amount).eq(0)) {
+                return new Date(this.veStore.lock.end);
+            }
+
+            // If not we pick the first suggested allowed date
             if (!this.allowedDates.length) return new Date();
             return new Date(this.allowedDates[0]);
         },

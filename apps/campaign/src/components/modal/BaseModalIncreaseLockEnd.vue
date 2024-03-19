@@ -13,8 +13,11 @@
         <BaseFormGroupLockEnd :value="lockEnd" @update="lockEnd = $event" />
         <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickIncreaseLockEnd">
             <b-spinner v-if="isPolling" small />
-            <template v-else>Increase Amount</template>
+            <template v-else>Increase End Date</template>
         </b-button>
+        <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
+            ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
+        </p>
     </b-modal>
 </template>
 
@@ -24,7 +27,7 @@ import { mapStores } from 'pinia';
 import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '@thxnetwork/campaign/stores/Liquidity';
-import { BigNumber } from 'ethers/lib/ethers';
+import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
 import poll from 'promise-poller';
 
 export default defineComponent({
@@ -35,6 +38,7 @@ export default defineComponent({
     },
     data() {
         return {
+            WalletVariant,
             isShown: false,
             error: '',
             isPolling: false,
@@ -56,10 +60,10 @@ export default defineComponent({
         async onShow() {
             //
         },
-        async waitForIncrease() {
+        async waitForIncrease(timestamp: number) {
             const taskFn = async () => {
                 await this.veStore.getLocks();
-                return BigNumber.from(this.veStore.lock.amount).eq(0) ? Promise.resolve() : Promise.reject('x');
+                return this.veStore.lock.end === timestamp * 1000 ? Promise.resolve() : Promise.reject('x');
             };
             return poll({ taskFn, interval: 3000, retries: 20 });
         },
@@ -67,8 +71,10 @@ export default defineComponent({
             this.isPolling = true;
 
             try {
-                await this.veStore.increasUnlockTime({ lockEndTimestamp: this.lockEnd });
-                await this.waitForIncrease();
+                const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
+
+                await this.veStore.increasUnlockTime({ lockEndTimestamp });
+                await this.waitForIncrease(lockEndTimestamp);
 
                 this.$emit('hidden');
             } catch (response) {

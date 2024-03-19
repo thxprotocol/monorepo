@@ -12,13 +12,14 @@
         </b-alert>
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab title="1. Approve">
-                <b-form-group label="Amount" :description="`Current allowance: ${currentAllowance}`">
-                    <b-form-input v-model="amountApproval" type="number" :step="1 / 10 ** precision" />
-                </b-form-group>
-                <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickApprove">
-                    <b-spinner v-if="isPolling" small />
-                    <template v-else>Approve</template>
-                </b-button>
+                <BaseTabApprove
+                    :amount="amountApproval"
+                    :token-address="address.BPTGauge"
+                    :spender="address.VotingEscrow"
+                    @update="amountApproval = $event"
+                    @approve="onApprove"
+                    @ok="tabIndex = 1"
+                />
             </b-tab>
             <b-tab title="2. Deposit">
                 <b-form-group>
@@ -30,7 +31,7 @@
                 </b-button>
             </b-tab>
         </b-tabs>
-        <p class="text-muted text-center mt-3 mb-0">
+        <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
             ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
         </p>
     </b-modal>
@@ -43,10 +44,9 @@ import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { contractNetworks } from '../../config/constants';
 import { ChainId } from '@thxnetwork/sdk';
-import { BigNumber } from 'ethers/lib/ethers';
-import { formatUnits, parseUnits } from 'ethers/lib/utils';
-import poll from 'promise-poller';
+import { parseUnits } from 'ethers/lib/utils';
 import { roundDownFixed } from '@thxnetwork/campaign/utils/price';
+import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
 
 export default defineComponent({
     name: 'BaseModalDeposit',
@@ -57,6 +57,7 @@ export default defineComponent({
     },
     data() {
         return {
+            WalletVariant,
             isShown: false,
             error: '',
             isPolling: false,
@@ -73,22 +74,8 @@ export default defineComponent({
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
         },
-        allowance() {
-            if (!this.walletStore.allowances[this.address.BPTGauge]) return 0;
-            if (!this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow]) return 0;
-            return this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow];
-        },
-        currentAllowance() {
-            return Number(formatUnits(this.allowance, 'ether'));
-        },
         isAlertInfoShown() {
             return !!this.error;
-        },
-        isSufficientAllowance() {
-            const allowanceInWei = BigNumber.from(this.allowance);
-            const amountInWei = parseUnits(this.amountDeposit.toString(), 18);
-            if (allowanceInWei.gte(amountInWei)) return true;
-            return false;
         },
     },
     watch: {
@@ -103,46 +90,10 @@ export default defineComponent({
         async onShow() {
             this.amountApproval = roundDownFixed(this.amount, this.precision);
             this.amountDeposit = roundDownFixed(this.amount, this.precision);
-            await this.getApproval();
-            if (this.isSufficientAllowance) {
-                this.tabIndex = 1;
-            }
         },
-        getApproval() {
-            return this.walletStore.getApproval({
-                tokenAddress: this.address.BPTGauge,
-                spender: this.address.VotingEscrow,
-            });
-        },
-        waitForApproval() {
-            const taskFn = async () => {
-                await this.getApproval();
-                return this.isSufficientAllowance ? Promise.resolve() : Promise.reject('x');
-            };
-            return poll({ taskFn, interval: 3000, retries: 20 });
-        },
-        async onClickApprove() {
-            this.isPolling = true;
-            try {
-                const amountInWei = parseUnits(this.amountApproval.toString(), 18);
-
-                await this.walletStore.approve({
-                    tokenAddress: this.address.BPTGauge,
-                    spender: this.address.VotingEscrow,
-                    amountInWei: amountInWei.toString(),
-                });
-
-                // poll for allowance to increase
-                await this.waitForApproval();
-
-                // then change tab index to 1
-                this.tabIndex = 1;
-                this.amountDeposit = this.currentAllowance;
-            } catch (response) {
-                this.onError(response);
-            } finally {
-                this.isPolling = false;
-            }
+        onApprove() {
+            this.amountDeposit = this.amountApproval;
+            this.tabIndex = 1;
         },
         async onClickDeposit() {
             this.isPolling = true;

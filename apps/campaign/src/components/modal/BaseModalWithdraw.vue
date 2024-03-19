@@ -29,6 +29,9 @@
             <b-spinner v-if="isPolling" small />
             <template v-else>Withdraw</template>
         </b-button>
+        <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
+            ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
+        </p>
     </b-modal>
 </template>
 
@@ -42,6 +45,7 @@ import { useLiquidityStore } from '@thxnetwork/campaign/stores/Liquidity';
 import { calculatePenalty, toFiatPrice } from '@thxnetwork/campaign/utils/price';
 import { formatUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers/lib/ethers';
+import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
 import poll from 'promise-poller';
 
 export default defineComponent({
@@ -52,6 +56,7 @@ export default defineComponent({
     },
     data() {
         return {
+            WalletVariant,
             isShown: false,
             error: '',
             isPolling: false,

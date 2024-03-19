@@ -35,6 +35,9 @@
                 </b-button>
             </b-list-group-item>
         </b-list-group>
+        <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
+            ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
+        </p>
     </b-modal>
 </template>
 
@@ -48,6 +51,7 @@ import { roundDownFixed, toFiatPrice } from '@thxnetwork/campaign/utils/price';
 import { ChainId } from '@thxnetwork/sdk';
 import { chainList } from '@thxnetwork/campaign/utils/chains';
 import { useLiquidityStore } from '@thxnetwork/campaign/stores/Liquidity';
+import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
 
 export default defineComponent({
     name: 'BaseModalClaimTokens',
@@ -55,7 +59,15 @@ export default defineComponent({
         show: Boolean,
     },
     data() {
-        return { chainList, ChainId, isAlertInfoShown: false, isLoading: false, isShown: false, error: '' };
+        return {
+            WalletVariant,
+            chainList,
+            ChainId,
+            isAlertInfoShown: false,
+            isLoading: false,
+            isShown: false,
+            error: '',
+        };
     },
     computed: {
         ...mapStores(useVeStore, useWalletStore, useLiquidityStore),

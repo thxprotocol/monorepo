@@ -12,13 +12,14 @@
         </b-alert>
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab title="1. Approve">
-                <b-form-group label="Amount" :description="`Current allowance: ${currentAllowance}`">
-                    <b-form-input v-model="amountApproval" type="number" />
-                </b-form-group>
-                <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickApprove">
-                    <b-spinner v-if="isPolling" small />
-                    <template v-else>Approve</template>
-                </b-button>
+                <BaseTabApprove
+                    :amount="amountApproval"
+                    :token-address="address.BPT"
+                    :spender="address.BPTGauge"
+                    @update="amountApproval = $event"
+                    @approve="onApprove"
+                    @ok="tabIndex = 1"
+                />
             </b-tab>
             <b-tab title="2. Stake">
                 <b-form-group>
@@ -30,7 +31,7 @@
                 </b-button>
             </b-tab>
         </b-tabs>
-        <p class="text-muted text-center mt-3 mb-0">
+        <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
             ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
         </p>
     </b-modal>
@@ -43,51 +44,36 @@ import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
-import { BigNumber } from 'ethers';
-import { formatUnits, parseUnits } from 'ethers/lib/utils';
-import poll from 'promise-poller';
+import { parseUnits } from 'ethers/lib/utils';
+import { ChainId } from '@thxnetwork/sdk';
+import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
 
 export default defineComponent({
     name: 'BaseModalStake',
     props: {
         show: Boolean,
-        amount: { type: Number, required: true },
+        amount: { type: String, required: true },
     },
     data() {
         return {
+            WalletVariant,
             isShown: false,
             error: '',
             isPolling: false,
             tabIndex: 0,
             isModalStakeShown: false,
-            amountApproval: 0,
-            amountStake: 0,
+            amountStake: '0',
+            amountApproval: '0',
         };
     },
     computed: {
         ...mapStores(useWalletStore, useVeStore, useLiquidityStore),
         address() {
-            if (!this.walletStore.wallet) return;
+            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
-        },
-        allowance() {
-            if (!this.address) return 0;
-            if (!this.walletStore.allowances[this.address.BPT]) return 0;
-            if (!this.walletStore.allowances[this.address.BPT][this.address.BPTGauge]) return 0;
-            return this.walletStore.allowances[this.address.BPT][this.address.BPTGauge];
-        },
-        currentAllowance() {
-            const allowance = BigNumber.from(this.allowance);
-            return formatUnits(allowance, 'ether');
         },
         isAlertInfoShown() {
             return !!this.error;
-        },
-        isSufficientAllowance() {
-            const allowanceInWei = BigNumber.from(this.allowance);
-            const amountInWei = parseUnits(this.amountStake.toString(), 18);
-            if (allowanceInWei.gte(amountInWei)) return true;
-            return false;
         },
     },
     watch: {
@@ -102,48 +88,10 @@ export default defineComponent({
         async onShow() {
             this.amountApproval = this.amount;
             this.amountStake = this.amount;
-
-            await this.getApproval();
-
-            if (this.isSufficientAllowance) {
-                this.tabIndex = 1;
-            }
         },
-        getApproval() {
-            return this.walletStore.getApproval({
-                tokenAddress: this.address.BPT,
-                spender: this.address.BPTGauge,
-            });
-        },
-        waitForApproval() {
-            const taskFn = async () => {
-                await this.getApproval();
-                return this.isSufficientAllowance ? Promise.resolve() : Promise.reject('x');
-            };
-            return poll({ taskFn, interval: 3000, retries: 20 });
-        },
-        async onClickApprove() {
-            this.isPolling = true;
-            try {
-                // Value to approve
-                const amountInWei = parseUnits(this.amountStake.toString(), 18);
-
-                await this.walletStore.approve({
-                    tokenAddress: this.address.BPT,
-                    spender: this.address.BPTGauge,
-                    amountInWei: amountInWei.toString(),
-                });
-
-                // poll for allowance to increase
-                await this.waitForApproval();
-
-                // then change tab index to 1
-                this.tabIndex = 1;
-            } catch (response) {
-                this.onError(response);
-            } finally {
-                this.isPolling = false;
-            }
+        onApprove() {
+            this.amountStake = this.amountApproval;
+            this.tabIndex = 1;
         },
         async onClickStake() {
             this.isPolling = true;

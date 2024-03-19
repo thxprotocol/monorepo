@@ -83,6 +83,7 @@ declare module 'vue' {
     BaseQuestFilters: typeof import('./src/components/BaseQuestFilters.vue')['default']
     BaseQuestLeaderboard: typeof import('./src/components/BaseQuestLeaderboard.vue')['default']
     BaseSidebar: typeof import('./src/components/BaseSidebar.vue')['default']
+    BaseTabApprove: typeof import('./src/components/tabs/BaseTabApprove.vue')['default']
     BaseTabDeposit: typeof import('./src/components/tabs/BaseTabDeposit.vue')['default']
     BaseTabLiquidity: typeof import('./src/components/tabs/BaseTabLiquidity.vue')['default']
     BaseTabWalletVariant: typeof import('./src/components/tabs/BaseTabWalletVariant.vue')['default']

@@ -6,6 +6,7 @@
         :min="0"
         :max="balanceUSDC"
         class="mb-4"
+        disabled
         @update="amountUSDC = $event"
     >
         <template #label>
@@ -28,6 +29,7 @@
         :min="0"
         :max="balanceTHX"
         class="mb-4"
+        disabled
         @update="amountTHX = $event"
     >
         <template #label>
@@ -50,7 +52,7 @@
     <BaseFormGroupInputTokenAmount
         :usd="liquidityStore.pricing['20USDC-80THX']"
         :balance="balanceBPT"
-        :value="amountStake"
+        :value="Number(amountStake)"
         :min="0"
         :max="balanceBPT"
         class="mb-4"
@@ -100,7 +102,6 @@ import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
-import { format } from 'date-fns';
 import { contractNetworks } from '../../config/constants';
 import { ChainId } from '@thxnetwork/sdk';
 import { formatUnits } from 'ethers/lib/utils';
@@ -110,11 +111,10 @@ export default defineComponent({
     data() {
         return {
             formatUnits,
-            format,
-            isModalStakeShown: false,
-            amountStake: 0,
             amountUSDC: 0,
             amountTHX: 0,
+            isModalStakeShown: false,
+            amountStake: '0',
         };
     },
     computed: {
@@ -146,7 +146,7 @@ export default defineComponent({
     methods: {
         updateAmountStake() {
             this.walletStore.getBalance(this.address.BPT).then(() => {
-                this.amountStake = Number(formatUnits(this.walletStore.balances[this.address.BPT], 'ether'));
+                this.amountStake = formatUnits(this.walletStore.balances[this.address.BPT], 'ether');
             });
         },
         onStaked() {

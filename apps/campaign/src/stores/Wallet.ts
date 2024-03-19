@@ -13,7 +13,6 @@ import { sendTransaction, disconnect, watchAccount, signMessage, switchChain } f
 import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
 import { RewardVariant } from '../types/enums/rewards';
-import { formatUnits } from 'ethers/lib/utils';
 import { encodeFunctionData } from 'viem';
 import { contractNetworks } from '../config/constants';
 import Safe from '@safe-global/protocol-kit';
