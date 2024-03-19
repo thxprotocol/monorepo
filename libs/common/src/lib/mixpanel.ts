@@ -56,7 +56,6 @@ export const init = (mixpanelToken: string, proxyBaseUrl: string) => {
 
 export const client = () => mixpanel;
 export const track = (event: string, params: any[]) => {
-    if (process.env['NODE_ENV'] === 'development') return;
     try {
         trackers[event](...params);
     } catch (error) {
