@@ -73,14 +73,17 @@ export default defineComponent({
         ...mapStores(useAccountStore, useWalletStore, useVeStore, useLiquidityStore),
     },
     watch: {
-        'walletStore.wallet'(wallet) {
-            if (!wallet) return;
-            const bptGaugeAddress = contractNetworks[wallet.chainId].BPTGauge;
-            this.veStore.getLocks();
-            this.liquidityStore.getSpotPrice();
-            this.walletStore.getBalance(bptGaugeAddress).then(() => {
-                this.amountDepositInWei = this.walletStore.balances[bptGaugeAddress];
-            });
+        'walletStore.wallet': {
+            handler(wallet) {
+                if (!wallet) return;
+                const bptGaugeAddress = contractNetworks[wallet.chainId].BPTGauge;
+                this.veStore.getLocks();
+                this.liquidityStore.getSpotPrice();
+                this.walletStore.getBalance(bptGaugeAddress).then(() => {
+                    this.amountDepositInWei = this.walletStore.balances[bptGaugeAddress];
+                });
+            },
+            immediate: true,
         },
     },
 });
