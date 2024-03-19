@@ -90,6 +90,7 @@ export default defineComponent({
         async onShow() {
             this.amountApproval = roundDownFixed(this.amount, this.precision);
             this.amountDeposit = roundDownFixed(this.amount, this.precision);
+            this.walletStore.getApproval({ tokenAddress: this.address.BPTGauge, spender: this.address.VotingEscrow });
         },
         onApprove() {
             this.amountDeposit = this.amountApproval;

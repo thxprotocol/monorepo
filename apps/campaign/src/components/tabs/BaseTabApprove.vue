@@ -59,16 +59,7 @@ export default defineComponent({
             return false;
         },
     },
-    mounted() {
-        this.getApproval();
-    },
     methods: {
-        getApproval() {
-            return this.walletStore.getApproval({
-                tokenAddress: this.tokenAddress,
-                spender: this.spender,
-            });
-        },
         waitForApproval() {
             const taskFn = async () => {
                 await this.walletStore.getApproval({

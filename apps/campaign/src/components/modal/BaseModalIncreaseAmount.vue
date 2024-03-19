@@ -89,6 +89,7 @@ export default defineComponent({
     methods: {
         onShow() {
             this.amountApproval = roundDownFixed(this.balanceBPTGauge, this.precision);
+            this.walletStore.getApproval({ tokenAddress: this.address.BPTGauge, spender: this.address.VotingEscrow });
         },
         onApprove() {
             this.lockAmount = this.amountApproval;

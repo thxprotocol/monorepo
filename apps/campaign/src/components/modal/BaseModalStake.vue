@@ -88,6 +88,7 @@ export default defineComponent({
         async onShow() {
             this.amountApproval = this.amount;
             this.amountStake = this.amount;
+            this.walletStore.getApproval({ tokenAddress: this.address.BPT, spender: this.address.BPTGauge });
         },
         onApprove() {
             this.amountStake = this.amountApproval;
