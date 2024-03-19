@@ -4,9 +4,9 @@
             <img height="20" :src="token.erc20.logoImgUrl" />
         </div>
         <div class="flex-grow-1">
-            <strong>{{ token.erc20.symbol }}</strong>
+            {{ token.erc20.symbol }}
         </div>
-        <div class="text-success fw-bold">{{ token.walletBalance }}</div>
+        <div class="text-success">{{ token.walletBalance }}</div>
         <div>
             <b-dropdown variant="link" size="sm" no-caret end toggle-class="py-0">
                 <template #button-content>

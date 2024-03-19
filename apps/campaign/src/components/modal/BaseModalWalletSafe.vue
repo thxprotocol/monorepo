@@ -1,15 +1,14 @@
 <template>
-    <b-modal :id="id" v-model="isShown" centered hide-footer @hidden="isShown = false">
+    <b-modal :id="id" v-model="isShown" centered hide-footer @hidden="isShown = false" @show="onShow">
         <template #header>
             <h5 class="modal-title"><i class="fas fa-wallet me-2"></i> Safe Multisig</h5>
             <b-link class="btn-close" @click="isShown = false">
                 <i class="fas fa-times"></i>
             </b-link>
         </template>
+        <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
 
         <b-form>
-            <b-alert v-if="error" show variant="danger" class="p-2">{{ error }}</b-alert>
-
             <div v-if="!privateKey" class="d-flex w-100 justify-content-center py-5">
                 <b-spinner small />
             </div>
@@ -108,7 +107,6 @@ export default defineComponent({
             chainList,
             WalletVariant,
             error: '',
-            tabIndex: 0,
             isCopied: false,
             isPrivateKeyHidden: true,
             question: '',
@@ -146,9 +144,9 @@ export default defineComponent({
         show(show: boolean) {
             this.isShown = show;
         },
-        async tabIndex(index: number) {
-            if (index !== 1) return;
-
+    },
+    methods: {
+        async onShow() {
             this.password = '';
             this.passwordCheck = '';
 
@@ -158,8 +156,6 @@ export default defineComponent({
 
             this.question = this.authStore.securityQuestion;
         },
-    },
-    methods: {
         onCopySuccess() {
             this.isCopied = true;
         },

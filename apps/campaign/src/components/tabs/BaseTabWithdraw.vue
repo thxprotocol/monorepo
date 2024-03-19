@@ -6,7 +6,17 @@
             </b-form-group>
             <b-form-group label="Locked amount" label-class="text-opaque">
                 {{ amount }}
-                <b-link size="sm" class="text-accent text-decoration-underline ms-2">Increase</b-link>
+                <b-link
+                    size="sm"
+                    class="text-accent text-decoration-underline ms-2"
+                    @click="isModalIncreaseAmountShown = true"
+                >
+                    Increase
+                </b-link>
+                <BaseModalIncreaseAmount
+                    :show="isModalIncreaseAmountShown"
+                    @hidden="isModalIncreaseAmountShown = false"
+                />
             </b-form-group>
             <b-form-group label="Locked ends" label-class="text-opaque">
                 {{ differenceInDays(veStore.lock.end, veStore.now) }} days
@@ -15,7 +25,17 @@
                     :title="`${format(new Date(veStore.lock.end), 'MMMM do yyyy hh:mm:ss')}`"
                     class="fas fa-info-circle me-1 cursor-pointer text-opaque"
                 />
-                <b-link size="sm" class="text-accent text-decoration-underline ms-2">Increase</b-link>
+                <b-link
+                    size="sm"
+                    class="text-accent text-decoration-underline ms-2"
+                    @click="isModalIncreaseLockEndShown = true"
+                >
+                    Increase
+                </b-link>
+                <BaseModalIncreaseLockEnd
+                    :show="isModalIncreaseLockEndShown"
+                    @hidden="isModalIncreaseLockEndShown = false"
+                />
             </b-form-group>
         </b-col>
         <b-col class="d-flex align-items-center justify-content-center flex-column">
@@ -65,11 +85,13 @@ export default defineComponent({
             fromWei,
             format,
             differenceInDays,
-            isModalStakeShown: false,
+            isModalIncreaseAmountShown: false,
+            isModalIncreaseLockEndShown: false,
             isModalWithdrawShown: false,
-            amountStake: 0,
-            amountUSDC: 0,
-            amountTHX: 0,
+            isLoadingAmount: false,
+            isLoadingLockEnd: false,
+            lockAmount: '0',
+            lockEnd: Date.now(),
         };
     },
     computed: {
@@ -95,6 +117,13 @@ export default defineComponent({
             if (amount > 1750 && amount < 17500) return 'Elite';
             if (amount > 17500 && amount < 175000) return 'Master';
             if (amount > 175000 && amount < 1750000) return 'Legend';
+        },
+    },
+    methods: {
+        async onClickIncreaseLockEnd() {
+            this.isLoadingLockEnd = true;
+            await this.veStore.increasUnlockTime({ lockEndTimestamp: this.lockEnd });
+            this.isLoadingLockEnd = false;
         },
     },
 });

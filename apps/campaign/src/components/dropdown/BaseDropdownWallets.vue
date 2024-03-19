@@ -20,9 +20,9 @@
             <div>{{ walletStore.wallet ? walletStore.wallet.short : 'No Wallet' }}</div>
         </template>
         <b-dropdown-text v-if="walletStore.wallet" text-class="bg-dark">
-            <b-form-group label-class="d-flex align-items-center mb-1 text-opaquey">
+            <b-form-group label-class="d-flex align-items-center mb-1 ">
                 <template #label>
-                    Account
+                    <span class="text-opaque">Account</span>
                     <template v-if="isWalletConnect">
                         <b-button
                             v-if="isConnected"
@@ -104,7 +104,7 @@
                     </div>
                 </div>
             </b-form-group>
-            <b-form-group label="Network">
+            <b-form-group label="Network" label-class="text-opaque">
                 <i
                     v-if="isWalletConnect"
                     class="fas fa-circle me-2"

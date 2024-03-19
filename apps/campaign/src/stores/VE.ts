@@ -55,24 +55,6 @@ export const useVeStore = defineStore('ve', {
             await confirmTransactions(txs);
         },
         async depositWalletConnect(wallet: TWallet, data: TRequestBodyDeposit) {
-            const isLocked = this.lock ? BigNumber.from(String(this.lock.amount)).gt(0) : false;
-
-            // If there is a lock and amount is > 0
-            if (isLocked && BigNumber.from(data.amountInWei).gt(0)) {
-                await this.increaseAmount(wallet, data);
-            }
-
-            // If there a lock and endTimestamp is > lock.end
-            if (isLocked && this.lock && data.lockEndTimestamp > Number(this.lock.end)) {
-                await this.increasUnlockTime(wallet, data);
-            }
-
-            // If there is no lock create the lock
-            if (!isLocked) {
-                await this.createLock(wallet, data);
-            }
-        },
-        async createLock(wallet: TWallet, data: TRequestBodyDeposit) {
             const { sendTransaction } = useWalletStore();
             const abi = [
                 {
@@ -101,7 +83,10 @@ export const useVeStore = defineStore('ve', {
 
             await sendTransaction(wallet.address, call.to, call.data);
         },
-        async increaseAmount(wallet: TWallet, data: TRequestBodyDeposit) {
+        async increaseAmount(data: { amountInWei: string }) {
+            const { wallet } = useWalletStore();
+            if (!wallet) return;
+
             const { sendTransaction } = useWalletStore();
             const abi = [
                 {
@@ -125,8 +110,10 @@ export const useVeStore = defineStore('ve', {
             );
             await sendTransaction(wallet.address, call.to, call.data);
         },
-        async increasUnlockTime(wallet: TWallet, data: TRequestBodyDeposit) {
-            const { sendTransaction } = useWalletStore();
+        async increasUnlockTime(data: { lockEndTimestamp: number }) {
+            const { wallet, sendTransaction } = useWalletStore();
+            if (!wallet) return;
+
             const abi = [
                 {
                     stateMutability: 'nonpayable',
@@ -147,6 +134,7 @@ export const useVeStore = defineStore('ve', {
                 'increase_unlock_time',
                 [data.lockEndTimestamp],
             );
+
             await sendTransaction(wallet.address, call.to, call.data);
         },
         async claimTokens() {

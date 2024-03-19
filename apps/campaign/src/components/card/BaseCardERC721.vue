@@ -15,7 +15,7 @@
                     <img height="25" :src="token.nft.logoImgUrl" />
                 </div>
                 <div class="flex-grow-1">
-                    <strong>{{ token.metadata.name }}</strong>
+                    {{ token.metadata.name }}
                 </div>
 
                 <b-spinner v-if="!token.tokenId" small variant="primary" />
