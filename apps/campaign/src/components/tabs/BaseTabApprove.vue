@@ -52,7 +52,7 @@ export default defineComponent({
         isSufficientAllowance() {
             const allowanceInWei = BigNumber.from(this.allowance);
             const amountInWei = parseUnits(this.amount.toString(), 18);
-            if (allowanceInWei.gte(amountInWei)) return true;
+            if (amountInWei.gt(0) && allowanceInWei.gte(amountInWei)) return true;
             return false;
         },
     },
