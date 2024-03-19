@@ -2,7 +2,10 @@
     <b-form-group label="Amount" :description="`Current allowance: ${currentAllowance}`">
         <b-form-input :value="amount" type="number" :step="1 / 10 ** precision" @input="$emit('update', $event)" />
     </b-form-group>
-    <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickApprove">
+    <b-button v-if="isSufficientAllowance" variant="primary" class="w-100" :disabled="isPolling" @click="$emit('ok')">
+        Continue
+    </b-button>
+    <b-button v-else variant="primary" class="w-100" :disabled="isPolling" @click="onClickApprove">
         <b-spinner v-if="isPolling" small />
         <template v-else>Approve</template>
     </b-button>
@@ -63,9 +66,6 @@ export default defineComponent({
     },
     async mounted() {
         await this.getApproval();
-        if (this.isSufficientAllowance) {
-            this.$emit('ok');
-        }
     },
     methods: {
         getApproval() {

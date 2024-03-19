@@ -84,8 +84,28 @@ export const useVeStore = defineStore('ve', {
             await sendTransaction(wallet.address, call.to, call.data);
         },
         async increaseAmount(data: { amountInWei: string }) {
-            const { wallet, sendTransaction } = useWalletStore();
+            const { wallet } = useWalletStore();
             if (!wallet) return;
+
+            const map: { [variant: string]: (wallet: TWallet, data: { amountInWei: string }) => Promise<void> } = {
+                [WalletVariant.Safe]: this.increaseAmountSafe.bind(this),
+                [WalletVariant.WalletConnect]: this.increaseAmountWalletConnect.bind(this),
+            };
+
+            return await map[wallet.variant](wallet, data);
+        },
+        async increaseAmountSafe(wallet: TWallet, data: { amountInWei: string }) {
+            const { confirmTransactions } = useWalletStore();
+            const { api } = useAccountStore();
+            const txs = await api.request.post('/v1/ve/increase', {
+                data,
+                params: { walletId: wallet._id },
+            });
+
+            await confirmTransactions(txs);
+        },
+        async increaseAmountWalletConnect(wallet: TWallet, data: { amountInWei: string }) {
+            const { sendTransaction } = useWalletStore();
             const abi = [
                 {
                     stateMutability: 'nonpayable',
