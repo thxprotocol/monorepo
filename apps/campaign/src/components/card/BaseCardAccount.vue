@@ -2,19 +2,26 @@
     <b-card class="bg-splash" style="border-radius: 0">
         <div
             class="d-flex justify-content-start align-items-start p-3 cursor-pointer"
-            style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.35); width: 100%; height: 90px"
-            @click="accountStore.isModalAccountShown = true"
+            style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.35); width: 100%; height: 100px"
         >
             <template v-if="accountStore.account">
-                <b-avatar size="50" :src="accountStore.account.profileImg" class="gradient-border-xl" />
-                <div class="px-3" style="min-width: 200px">
+                <b-avatar
+                    size="50"
+                    :src="accountStore.account.profileImg"
+                    class="gradient-border-xl mt-2"
+                    @click="accountStore.isModalAccountShown = true"
+                />
+                <div class="ps-3 flex-grow-1" style="min-width: 200px">
                     <h3 class="text-white mb-0">
                         {{ accountStore.account.username }}
                     </h3>
-                    <b-link class="text-decoration-none" @click.stop="onClickRewards">
-                        <span class="text-accent text-hover-underline">{{ toFiatPrice(rewardsInUSD) }}</span>
-                        <i class="fas fa-download small ms-1 text-white text-opaque"></i>
-                    </b-link>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <b-link class="text-decoration-none" @click.stop="onClickRewards">
+                            <span class="text-accent text-hover-underline">{{ toFiatPrice(rewardsInUSD) }}</span>
+                            <i class="fas fa-download small ms-1 text-white text-opaque"></i>
+                        </b-link>
+                        <BaseDropdownWallets class="ms-auto" />
+                    </div>
                 </div>
             </template>
             <b-spinner v-else small class="text-opaque" />

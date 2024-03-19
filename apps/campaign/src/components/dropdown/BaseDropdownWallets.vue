@@ -4,7 +4,7 @@
             v-model="isOpenWallet"
             variant="link"
             class="w-100"
-            toggle-class="d-flex align-items-center justify-content-between text-white text-decoration-none pe-0"
+            :toggle-class="`d-flex align-items-center justify-content-end text-white text-decoration-none pe-0 ${toggleClass}`"
             auto-close="outside"
             menu-class="bg-body"
             no-caret
@@ -157,6 +157,9 @@ import { chainList } from '@thxnetwork/campaign/utils/chains';
 
 export default defineComponent({
     name: 'BaseDropdownWallets',
+    props: {
+        toggleClass: String,
+    },
     data() {
         return {
             walletLogoMap,

@@ -92,7 +92,6 @@
                             </b-button>
                         </template>
                         <template v-else>
-                            <BaseDropdownWallets />
                             <b-button class="px-4 text-white" variant="link" @click="accountStore.signout()">
                                 <!-- Sign out -->
                                 <i class="fas fa-sign-out-alt ml-auto"></i>
