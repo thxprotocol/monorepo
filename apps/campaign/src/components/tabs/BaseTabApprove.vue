@@ -59,13 +59,8 @@ export default defineComponent({
             return false;
         },
     },
-    watch: {
-        async amount(amount: number) {
-            if (!Number(amount)) return;
-        },
-    },
-    async mounted() {
-        await this.getApproval();
+    mounted() {
+        this.getApproval();
     },
     methods: {
         getApproval() {

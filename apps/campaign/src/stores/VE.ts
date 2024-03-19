@@ -129,8 +129,28 @@ export const useVeStore = defineStore('ve', {
             await sendTransaction(wallet.address, call.to, call.data);
         },
         async increasUnlockTime(data: { lockEndTimestamp: number }) {
-            const { wallet, sendTransaction } = useWalletStore();
+            const { wallet } = useWalletStore();
             if (!wallet) return;
+
+            const map: { [variant: string]: (wallet: TWallet, data: { lockEndTimestamp: number }) => Promise<void> } = {
+                [WalletVariant.Safe]: this.increaseUnlockTimeSafe.bind(this),
+                [WalletVariant.WalletConnect]: this.increaseUnlockTimeWalletConnect.bind(this),
+            };
+
+            return await map[wallet.variant](wallet, data);
+        },
+        async increaseUnlockTimeSafe(wallet: TWallet, data: { lockEndTimestamp: number }) {
+            const { confirmTransactions } = useWalletStore();
+            const { api } = useAccountStore();
+            const txs = await api.request.post('/v1/ve/increase', {
+                data,
+                params: { walletId: wallet._id },
+            });
+
+            await confirmTransactions(txs);
+        },
+        async increaseUnlockTimeWalletConnect(wallet: TWallet, data: { lockEndTimestamp: number }) {
+            const { sendTransaction } = useWalletStore();
             const abi = [
                 {
                     stateMutability: 'nonpayable',
