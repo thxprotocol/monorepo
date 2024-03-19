@@ -90,7 +90,7 @@ type TQuestDaily = TBaseQuest & {
 type TQuestWeb3 = TBaseQuest & {
     contracts: { chainId: ChainId; address: string }[];
     methodName: string;
-    threshold: number;
+    threshold: string;
 };
 
 type TQuestGitcoin = TBaseQuest & {
