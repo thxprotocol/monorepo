@@ -1,10 +1,10 @@
 <template>
-    <div class="d-flex">
+    <div class="d-flex" style="height: 30px">
         <b-dropdown
             v-model="isOpenWallet"
             variant="link"
             class="w-100"
-            :toggle-class="`d-flex align-items-center justify-content-end text-white text-decoration-none pe-0 ${toggleClass}`"
+            toggle-class="d-flex align-items-center justify-content-end text-white text-decoration-none pe-0"
             auto-close="outside"
             menu-class="bg-body"
             no-caret
@@ -116,7 +116,7 @@
                 </b-form-group>
             </b-dropdown-text>
         </b-dropdown>
-        <b-dropdown v-model="isOpen" variant="link" menu-class="w-100" no-caret end>
+        <b-dropdown v-model="isOpen" variant="link" menu-class="w-100" no-caret end toggle-class="py-0">
             <template #button-content>
                 <i class="fas fa-caret-down text-white" />
             </template>

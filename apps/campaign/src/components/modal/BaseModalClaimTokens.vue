@@ -10,34 +10,58 @@
             <i class="fas fa-exclamation-circle me-1" />
             {{ error }}
         </b-alert>
-        <b-list-group class="mb-3">
-            <b-list-group-item v-for="rewardToken of rewards" class="d-flex align-items-center justify-content-between">
-                <span class="text-accent me-1">
-                    {{ rewardToken.amount }}
-                </span>
-                <span class="text-opaque">
-                    {{ rewardToken.symbol }}
-                </span>
-                <b-link
-                    v-if="walletStore.wallet"
-                    :href="`${chainList[walletStore.wallet.chainId].blockExplorer}/token/${
-                        rewardToken.tokenAddress
-                    }?a=${walletStore.wallet.address}`"
-                    target="_blank"
+
+        <template v-if="isAvailable">
+            <b-list-group class="mb-3">
+                <b-list-group-item
+                    v-for="rewardToken of rewards"
+                    class="d-flex align-items-center justify-content-between"
                 >
-                    <i class="fas fa-external-link-alt text-white text-opaque ms-1 small" />
-                </b-link>
-                <span class="ms-auto">
-                    {{ rewardToken.value }}
-                </span>
-            </b-list-group-item>
-        </b-list-group>
-        <b-button class="w-100" variant="primary" :disabled="isLoading" @click="onClickClaimRewards()">
-            Claim Rewards
-        </b-button>
-        <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
-            ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
-        </p>
+                    <span class="text-accent me-1">
+                        {{ rewardToken.amount }}
+                    </span>
+                    <span class="text-opaque">
+                        {{ rewardToken.symbol }}
+                    </span>
+                    <b-link
+                        v-if="walletStore.wallet"
+                        :href="`${chainList[walletStore.wallet.chainId].blockExplorer}/token/${
+                            rewardToken.tokenAddress
+                        }?a=${walletStore.wallet.address}`"
+                        target="_blank"
+                    >
+                        <i class="fas fa-external-link-alt text-white text-opaque ms-1 small" />
+                    </b-link>
+                    <span class="ms-auto">
+                        {{ toFiatPrice(rewardToken.value) }}
+                    </span>
+                </b-list-group-item>
+            </b-list-group>
+            <b-button class="w-100" variant="primary" :disabled="isLoading" @click="onClickClaimRewards()">
+                Claim Rewards
+            </b-button>
+            <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
+                ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
+            </p>
+        </template>
+
+        <div v-else class="text-center py-5">
+            <i class="fas fa-gift text-accent h1" /><br />
+            <strong>You have earned no rewards yet...</strong>
+            <p class="text-opaque">
+                Lock liquidity to earn BAL and<br />
+                20USDC-80THX rewards!
+            </p>
+            <b-button
+                class="rounded-pill px-3"
+                variant="primary"
+                target="_blank"
+                href="https://medium.com/thxprotocol/revolutionizing-gaming-with-thx-networks-new-vote-escrowed-tokenomics-18ef24239e46"
+            >
+                Learn more
+                <i class="fas fa-chevron-right ms-1" />
+            </b-button>
+        </div>
     </b-modal>
 </template>
 
@@ -60,6 +84,7 @@ export default defineComponent({
     },
     data() {
         return {
+            toFiatPrice,
             WalletVariant,
             chainList,
             ChainId,
@@ -79,6 +104,13 @@ export default defineComponent({
                 value: this.getValue(reward.symbol, reward.amount),
             }));
         },
+        isAvailable() {
+            const result = this.veStore.rewards
+                .map(({ amount, symbol }) => this.getValue(symbol, amount))
+                .reduce((a, b) => a + b, 0);
+            console.log(result);
+            return !!result;
+        },
     },
     watch: {
         show(value) {
@@ -91,7 +123,7 @@ export default defineComponent({
         },
         getValue(symbol: string, amount: string) {
             const value = this.liquidityStore.pricing[symbol] * Number(formatUnits(amount, 'ether'));
-            return toFiatPrice(Number(value));
+            return Number(value);
         },
         async onClickClaimRewards() {
             this.isLoading = true;

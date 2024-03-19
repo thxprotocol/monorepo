@@ -1,14 +1,14 @@
 <template>
     <b-card class="bg-splash" style="border-radius: 0">
         <div
-            class="d-flex justify-content-start align-items-start p-3 cursor-pointer"
-            style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.35); width: 100%; height: 100px"
+            class="d-flex justify-content-start align-items-center p-3 cursor-pointer"
+            style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.35); width: 100%"
         >
             <template v-if="accountStore.account">
                 <b-avatar
                     size="50"
                     :src="accountStore.account.profileImg"
-                    class="gradient-border-xl mt-2"
+                    class="gradient-border-xl"
                     @click="accountStore.isModalAccountShown = true"
                 />
                 <div class="ps-3 flex-grow-1" style="min-width: 200px">
