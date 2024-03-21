@@ -6,7 +6,11 @@
         </template>
         <b-form-select v-model="wallet" placeholder="Choose a wallet" @change="$emit('update', $event)">
             <b-form-select-option :value="null" disabled>Choose a wallet...</b-form-select-option>
-            <b-form-select-option v-for="w in wallets" :value="wallet" :disabled="chainId !== wallet.chainId">
+            <b-form-select-option
+                v-for="w in wallets"
+                :value="wallet"
+                :disabled="chainId ? chainId !== wallet.chainId : null"
+            >
                 {{ w.short }}
                 ({{ w.variant }})
             </b-form-select-option>

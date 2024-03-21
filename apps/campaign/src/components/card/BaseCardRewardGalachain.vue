@@ -10,7 +10,7 @@
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
-    name: 'BaseCardGalachainRole',
+    name: 'BaseCardRewardGalachain',
     props: {
         reward: {
             type: Object as PropType<TRewardGalachain>,

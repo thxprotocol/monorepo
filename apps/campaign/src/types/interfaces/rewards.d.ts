@@ -19,6 +19,7 @@ type TReward = {
     isPromoted: boolean;
     isDisabled: boolean;
     erc1155Amount: number;
+    variant: RewardVariant;
     locks: { questId: string; variant: QuestVariant }[];
     progress: {
         limit: number;

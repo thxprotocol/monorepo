@@ -35,6 +35,11 @@
                 <component :is="token.component" :token="token" />
             </div>
         </b-tab>
+        <b-tab v-if="walletStore.galachain.length" title="Galachain">
+            <div v-for="(token, key) of walletStore.galachain" :key="key" class="mb-1">
+                <component :is="token.component" :token="token" />
+            </div>
+        </b-tab>
     </b-tabs>
 </template>
 
