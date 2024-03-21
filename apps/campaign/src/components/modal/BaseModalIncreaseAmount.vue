@@ -103,7 +103,7 @@ export default defineComponent({
                     ? Promise.resolve()
                     : Promise.reject('Increase amount');
             };
-            return poll({ taskFn, interval: 3000, retries: 20 });
+            return await poll({ taskFn, interval: 3000, retries: 20 });
         },
         async onClickIncreaseAmount() {
             this.isPolling = true;

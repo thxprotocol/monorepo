@@ -63,9 +63,11 @@ export default defineComponent({
         async waitForIncrease(timestamp: number) {
             const taskFn = async () => {
                 await this.veStore.getLocks();
-                return this.veStore.lock.end === timestamp * 1000 ? Promise.resolve() : Promise.reject('x');
+                return this.veStore.lock.end === timestamp * 1000
+                    ? Promise.resolve()
+                    : Promise.reject('Increase lock end');
             };
-            return poll({ taskFn, interval: 3000, retries: 20 });
+            return await poll({ taskFn, interval: 3000, retries: 20 });
         },
         async onClickIncreaseLockEnd() {
             this.isPolling = true;
