@@ -29,6 +29,7 @@ declare module 'vue' {
     BaseCardDiscordRole: typeof import('./src/components/card/BaseCardDiscordRole.vue')['default']
     BaseCardERC20: typeof import('./src/components/card/BaseCardERC20.vue')['default']
     BaseCardERC721: typeof import('./src/components/card/BaseCardERC721.vue')['default']
+    BaseCardGalachain: typeof import('./src/components/card/BaseCardGalachain.vue')['default']
     BaseCardQuest: typeof import('./src/components/card/BaseCardQuest.vue')['default']
     BaseCardQuestCustom: typeof import('./src/components/card/BaseCardQuestCustom.vue')['default']
     BaseCardQuestDaily: typeof import('./src/components/card/BaseCardQuestDaily.vue')['default']

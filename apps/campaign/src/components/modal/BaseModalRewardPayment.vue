@@ -92,9 +92,12 @@ export default defineComponent({
     },
     methods: {
         async onSubmit() {
+            if (!this.wallet) return;
             this.isSubmitting = true;
+
             try {
                 const walletStore = useWalletStore();
+
                 await this.rewardStore.createPayment(this.reward.variant, this.reward._id, this.wallet);
                 await this.accountStore.getParticipants();
 

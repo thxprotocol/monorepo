@@ -6,11 +6,7 @@
         </template>
         <b-form-select v-model="wallet" placeholder="Choose a wallet" @change="$emit('update', $event)">
             <b-form-select-option :value="null" disabled>Choose a wallet...</b-form-select-option>
-            <b-form-select-option
-                v-for="w in wallets"
-                :value="wallet"
-                :disabled="chainId ? chainId !== wallet.chainId : null"
-            >
+            <b-form-select-option v-for="w in wallets" :value="w" :disabled="chainId ? chainId !== w.chainId : false">
                 {{ w.short }}
                 ({{ w.variant }})
             </b-form-select-option>
@@ -46,14 +42,6 @@ export default defineComponent({
         wallet() {
             if (this.selectedWallet) return this.selectedWallet;
             return this.wallets.length ? this.wallets[0] : null;
-        },
-    },
-    watch: {
-        wallet: {
-            handler(wallet: TWallet) {
-                this.$emit('update', wallet);
-            },
-            immediate: true,
         },
     },
     methods: {
