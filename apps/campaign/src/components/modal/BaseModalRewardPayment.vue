@@ -23,7 +23,7 @@
                 Do you want to use {{ reward.pointPrice }} points for <strong>{{ reward.title }} </strong>?
             </p>
             <BaseFormGroupWalletSelect
-                v-if="reward.chainId"
+                v-if="[RewardVariant.Coin, RewardVariant.NFT, RewardVariant.Galachain].includes(reward.variant)"
                 :chain-id="reward.chainId"
                 class="mb-0"
                 @update="wallet = $event"
@@ -34,8 +34,8 @@
                 <b-spinner v-if="isSubmitting" small variant="primary" />
                 <template v-else-if="reward.isLocked"> <i class="fas fa-lock"></i></template>
                 <template v-else>
-                    Pay {{ reward.pointPrice }} {{ reward.pointPrice === 1 ? 'point' : 'points' }}</template
-                >
+                    Pay {{ reward.pointPrice }} {{ reward.pointPrice === 1 ? 'point' : 'points' }}
+                </template>
             </b-button>
         </template>
     </b-modal>
@@ -47,6 +47,7 @@ import { mapStores } from 'pinia';
 import { useRewardStore } from '../../stores/Reward';
 import { useAccountStore } from '../../stores/Account';
 import { useWalletStore } from '../../stores/Wallet';
+import { RewardVariant } from '@thxnetwork/campaign/types/enums/rewards';
 
 export default defineComponent({
     name: 'BaseModalRewardPayment',
@@ -63,12 +64,7 @@ export default defineComponent({
         isLoading: Boolean,
     },
     data() {
-        return {
-            error: '',
-            wallet: null,
-            isModalShown: false,
-            isSubmitting: false,
-        };
+        return { RewardVariant, error: '', wallet: null, isModalShown: false, isSubmitting: false };
     },
     computed: {
         ...mapStores(useAccountStore, useRewardStore),
@@ -96,9 +92,12 @@ export default defineComponent({
     },
     methods: {
         async onSubmit() {
+            if (!this.wallet) return;
             this.isSubmitting = true;
+
             try {
                 const walletStore = useWalletStore();
+
                 await this.rewardStore.createPayment(this.reward.variant, this.reward._id, this.wallet);
                 await this.accountStore.getParticipants();
 

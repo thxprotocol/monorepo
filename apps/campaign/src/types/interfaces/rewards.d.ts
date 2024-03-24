@@ -19,6 +19,7 @@ type TReward = {
     isPromoted: boolean;
     isDisabled: boolean;
     erc1155Amount: number;
+    variant: RewardVariant;
     locks: { questId: string; variant: QuestVariant }[];
     progress: {
         limit: number;
@@ -39,6 +40,22 @@ type TBaseRewardPayment = {
     amount: number;
     sub: string;
     createdAt: Date;
+};
+
+type TRewardGalachain = TReward & {
+    contractChannelName: string;
+    contractChaincodeName: string;
+    contractContractName: string;
+    tokenCollection: string;
+    tokenCategory: string;
+    tokenType: string;
+    tokenAdditionalKey: string;
+    amount: string;
+    privateKey: string;
+};
+
+type TRewardGalachainPayment = TBaseRewardPayment & {
+    amount: string;
 };
 
 type TRewardCoinPayment = TBaseRewardPayment & {

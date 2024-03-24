@@ -35,6 +35,11 @@
                 <component :is="token.component" :token="token" />
             </div>
         </b-tab>
+        <b-tab v-if="walletStore.galachain.length" title="Galachain">
+            <div v-for="(token, key) of walletStore.galachain" :key="key" class="mb-1">
+                <component :is="token.component" :token="token" />
+            </div>
+        </b-tab>
     </b-tabs>
 </template>
 
@@ -48,6 +53,7 @@ import BaseCardERC20 from '../../components/card/BaseCardERC20.vue';
 import BaseCardERC721 from '../../components/card/BaseCardERC721.vue';
 import BaseCardCouponCode from '../../components/card/BaseCardCouponCode.vue';
 import BaseCardDiscordRole from '../../components/card/BaseCardDiscordRole.vue';
+import BaseCardGalachain from '../../components/card/BaseCardGalachain.vue';
 
 export default defineComponent({
     name: 'BaseViewWallet',
@@ -56,6 +62,7 @@ export default defineComponent({
         BaseCardERC721,
         BaseCardCouponCode,
         BaseCardDiscordRole,
+        BaseCardGalachain,
     },
     data() {
         return {

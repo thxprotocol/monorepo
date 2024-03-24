@@ -58,6 +58,7 @@ export const useWalletStore = defineStore('wallet', {
         erc1155: [],
         couponCodes: [],
         discordRoles: [],
+        galachain: [],
         pendingPoints: 0,
         wallets: [],
         wallet: null,
@@ -191,6 +192,12 @@ export const useWalletStore = defineStore('wallet', {
                 .map((t: TRewardDiscordRolePayment[]) => ({
                     ...t,
                     component: 'BaseCardDiscordRole',
+                }));
+            this.galachain = payments
+                .filter((p: { rewardVariant: RewardVariant }) => p.rewardVariant === RewardVariant.Galachain)
+                .map((t: TRewardGalachainPayment[]) => ({
+                    ...t,
+                    component: 'BaseCardGalachain',
                 }));
 
             this.isLoading = false;

@@ -100,6 +100,7 @@ export default defineComponent({
                 [RewardVariant.Coupon]: 'fas fa-tags',
                 [RewardVariant.Custom]: 'fas fa-gift',
                 [RewardVariant.DiscordRole]: 'fab fa-discord',
+                [RewardVariant.Galachain]: 'fas fa-box',
             } as { [variant: string]: string },
         };
     },
