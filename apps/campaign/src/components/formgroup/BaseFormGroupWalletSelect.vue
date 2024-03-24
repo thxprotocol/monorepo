@@ -24,10 +24,7 @@ import { useWalletStore } from '../../stores/Wallet';
 export default defineComponent({
     name: 'BaseFormGroupUsername',
     props: {
-        chainId: {
-            type: Number,
-            required: true,
-        },
+        chainId: Number,
     },
     data() {
         return { chainList, selectedWallet: null };
