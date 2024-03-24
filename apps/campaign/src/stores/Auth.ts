@@ -177,7 +177,7 @@ export const useAuthStore = defineStore('auth', {
         async getPrivateKey() {
             // If the token is more than 60s old, we need to refresh
             // as web3auth will not accept it for deriving key shares
-            if (60 * 60 * 24 - this.user.expires_in > 60) {
+            if (this.user && 60 * 60 * 24 - this.user.expires_in > 60) {
                 await this.requestOAuthShareRefresh();
             }
 
