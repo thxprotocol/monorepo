@@ -3,7 +3,8 @@ import ImgLogoArbitrum from '../assets/thx_logo_arbitrum.svg';
 import ImgLogoBinanceSmartChain from '../assets/thx_logo_bsc.svg';
 import ImgLogoPolygon from '../assets/thx_logo_polygon.svg';
 import ImgLogoHardhat from '../assets/thx_logo_hardhat.svg';
-import { arbitrum, mainnet, bsc, polygon, hardhat, polygonZkEvm } from '@wagmi/core/chains';
+import ImgLogoLinea from '../assets/thx_logo_linea.svg';
+import { arbitrum, mainnet, bsc, polygon, hardhat, polygonZkEvm, linea } from '@wagmi/core/chains';
 import { ChainId } from '@thxnetwork/sdk';
 
 const chainList: { [chainId: number]: ChainInfo } = {
@@ -41,6 +42,13 @@ const chainList: { [chainId: number]: ChainInfo } = {
         logo: ImgLogoPolygon,
         blockExplorer: 'https://zkevm.polygonscan.com',
         chain: polygonZkEvm,
+    },
+    [ChainId.Linea]: {
+        chainId: ChainId.Linea,
+        name: 'Linea',
+        logo: ImgLogoLinea,
+        blockExplorer: 'https://zkevm.polygonscan.com',
+        chain: linea,
     },
 };
 

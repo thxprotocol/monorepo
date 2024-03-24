@@ -4014,10 +4014,10 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@thxnetwork/sdk@1.3.3":
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.3.3.tgz#fd46f4e2307f2f3d15369cde4082b90d1f7f009b"
-  integrity sha512-xDG3dBCqdIQnZRZM/gUzbuRE+inLRXLiLulJjk5jvTfYs9VXx/z1AK3dIBOHvI0ps8POhFQh8aCsvq5v096FYA==
+"@thxnetwork/sdk@1.3.4":
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.3.4.tgz#c5d57d8a2eef6792458f3e378f9c5b550775faa7"
+  integrity sha512-hndjWnSzUCOPIj8q7KEi4ozUrS8Ppk6Rz5hthR6/NP4l0hl67hxHGgHFDxmnr1xQpe6WOwb4kXYlkXqDXk21ng==
 
 "@tkey/common-types@^10.1.0":
   version "10.1.0"
