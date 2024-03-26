@@ -108,7 +108,6 @@ export default defineComponent({
             const result = this.veStore.rewards
                 .map(({ amount, symbol }) => this.getValue(symbol, amount))
                 .reduce((a, b) => a + b, 0);
-            console.log(result);
             return !!result;
         },
     },

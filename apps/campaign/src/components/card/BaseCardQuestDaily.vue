@@ -112,8 +112,8 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
+                await this.questStore.completeQuest(this.quest);
                 this.isModalQuestEntryShown = true;
-                await this.questStore.completeDailyQuest(this.quest);
             } catch (error) {
                 this.error = String(error);
             } finally {

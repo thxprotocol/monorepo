@@ -155,8 +155,8 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
+                await this.questStore.completeQuest(this.quest);
                 this.isModalQuestEntryShown = true;
-                await this.questStore.completeSocialQuest(this.quest);
             } catch (error) {
                 const err = error as Error;
                 this.error = err.message ? err.message : 'Could not claim points.';

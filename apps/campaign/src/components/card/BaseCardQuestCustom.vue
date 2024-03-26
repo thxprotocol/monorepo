@@ -68,8 +68,8 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
+                await this.questStore.completeQuest(this.quest);
                 this.isModalQuestEntryShown = true;
-                await this.questStore.completeCustomQuest(this.quest);
             } catch (error) {
                 this.error = error as string;
             } finally {

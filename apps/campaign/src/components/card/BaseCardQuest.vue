@@ -14,7 +14,7 @@
                 <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                     <i class="me-2 text-primary" :class="iconMap[quest.variant]"></i>
                 </div>
-                <div class="flex-grow-1 pe-2">{{ quest.title }}</div>
+                <div class="flex-grow-1 pe-2">{{ decodeHTML(quest.title) }}</div>
                 <div class="text-accent fw-bold">{{ quest.amount }}</div>
                 <div>
                     <b-link v-if="expiryDate" v-b-tooltip :title="`Ends in ${expiryDate}`" size="sm" class="ms-2">
@@ -47,8 +47,11 @@
                     <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
                 </b-alert>
 
-                <b-card-text v-if="quest.description" style="white-space: pre-line" v-html="quest.description" />
-
+                <b-card-text
+                    v-if="quest.description"
+                    style="white-space: pre-line"
+                    v-html="decodeHTML(quest.description)"
+                />
                 <slot></slot>
 
                 <b-button
@@ -66,7 +69,6 @@
                 </b-button>
 
                 <BaseButtonQuestLocked v-else-if="quest.isLocked" :id="quest._id" :locks="quest.locks" />
-
                 <slot v-else name="button"></slot>
             </div>
         </b-collapse>
@@ -88,6 +90,8 @@ import { formatDistance } from 'date-fns';
 import { QuestVariant } from '@thxnetwork/sdk';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
+import { useQuestStore } from '../../stores/Quest';
+import { decodeHTML } from '@thxnetwork/campaign/utils/decode-html';
 
 export default defineComponent({
     name: 'BaseCardCollapse',
@@ -101,6 +105,7 @@ export default defineComponent({
     },
     data() {
         return {
+            decodeHTML,
             isVisible: false,
             iconMap: {
                 [QuestVariant.Daily]: 'fas fa-calendar',
@@ -114,7 +119,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
+        ...mapStores(useAccountStore, useQuestStore),
         expiryDate() {
             if (!this.quest.expiryDate) return '';
             return formatDistance(new Date(this.quest.expiryDate), new Date(), {

@@ -15,3 +15,4 @@ export const POLYGON_RPC = import.meta.env.VITE_POLYGON_RPC || '';
 export const WALLET_CONNECT_PROJECT_ID = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || '';
 export const SENTRY_AUTH_TOKEN = import.meta.env.VITE_SENTRY_AUTH_TOKEN || '';
 export const MAINTENANCE = import.meta.env.VITE_MAINTENANCE || '';
+export const GCLOUD_RECAPTCHA_SITE_KEY = import.meta.env.VITE_GCLOUD_RECAPTCHA_SITE_KEY || '';

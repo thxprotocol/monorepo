@@ -26,7 +26,7 @@ export const useRewardStore = defineStore('reward', {
             };
             track('UserCreates', [account?.sub, eventMap[variant], { poolId }]);
         },
-        async createPayment(variant: RewardVariant, id: string, wallet?: TWallet) {
+        async createPayment(variant: RewardVariant, id: string, wallet: TWallet | null) {
             await useAccountStore().api.request.post(`/v1/rewards/${variant}/${id}/payments`, {
                 data: { walletId: wallet?._id },
             });

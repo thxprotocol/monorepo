@@ -112,12 +112,11 @@ export default defineComponent({
             this.error = '';
             this.isSubmitting = true;
             try {
-                await this.questStore.completeWeb3Quest(this.quest, {
+                await this.questStore.completeQuest(this.quest, {
                     signature,
                     message,
                     chainId: this.chainId,
                 });
-
                 this.isModalQuestEntryShown = true;
             } catch (error) {
                 this.error = (error as Error).message;

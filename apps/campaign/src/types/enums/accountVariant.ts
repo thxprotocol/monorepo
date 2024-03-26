@@ -13,3 +13,11 @@ export enum WalletVariant {
     Safe = 'safe',
     WalletConnect = 'walletconnect',
 }
+
+export enum ReCaptchaAction {
+    QuestDailyEntryCreate = 'QUEST_DAILY_ENTRY_CREATE',
+    QuestSocialEntryCreate = 'QUEST_SOCIAL_ENTRY_CREATE',
+    QuestCustomEntryCreate = 'QUEST_CUSTOM_ENTRY_CREATE',
+    QuestWeb3EntryCreate = 'QUEST_WEB3_ENTRY_CREATE',
+    QuestGitcoinEntryCreate = 'QUEST_GITCOIN_ENTRY_CREATE',
+}

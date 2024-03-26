@@ -84,7 +84,7 @@ export default defineComponent({
             this.error = '';
             this.isSubmitting = true;
             try {
-                await this.questStore.completeGitcoinQuest(this.quest, {
+                await this.questStore.completeQuest(this.quest, {
                     signature,
                     message,
                     chainId: ChainId.Polygon,

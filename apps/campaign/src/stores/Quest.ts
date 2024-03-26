@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/common/lib/mixpanel';
-import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
+import { QuestVariant } from '@thxnetwork/sdk';
+import { GCLOUD_RECAPTCHA_SITE_KEY } from '../config/secrets';
 import poll from 'promise-poller';
 
 export const useQuestStore = defineStore('quest', {
@@ -21,92 +22,73 @@ export const useQuestStore = defineStore('quest', {
         },
     },
     actions: {
-        async completeGitcoinQuest(
-            quest: TQuestGitcoin,
-            payload: { signature: string; message: string; chainId: ChainId },
-        ) {
-            const { api, account, poolId, config } = useAccountStore();
-            const { error, jobId } = await api.quests.gitcoin.entry.create(quest._id, payload);
-            if (error) throw new Error(error);
-
-            track('UserCreates', [account?.sub, 'gitcoin quest entry', { poolId, origin: config.origin }]);
-            await this.waitForQuestEntryJob(jobId);
-
-            const index = this.quests.findIndex((r) => r._id === quest._id);
-            this.quests[index].isAvailable = false;
-        },
-        async completeWeb3Quest(quest: TQuestWeb3, payload: { signature: string; message: string; chainId: ChainId }) {
-            const { api, account, poolId, config } = useAccountStore();
-            const { error, jobId } = await api.quests.web3.entry.create(quest._id, payload);
-            if (error) throw new Error(error);
-
-            track('UserCreates', [account?.sub, 'web3 quest entry', { poolId, origin: config.origin }]);
-            await this.waitForQuestEntryJob(jobId);
-
-            const index = this.quests.findIndex((r) => r._id === quest._id);
-            this.quests[index].isAvailable = false;
-        },
-        async completeSocialQuest(quest: TQuestSocial) {
-            const { api, account, poolId, config } = useAccountStore();
-            const { error, jobId } = await api.quests.social.entry.create(quest._id);
-            if (error) throw new Error(error);
-
-            track('UserCreates', [account?.sub, 'conditional reward claim', { poolId, origin: config.origin }]);
-            await this.waitForQuestEntryJob(jobId);
-
-            // TODO Fetch daily quest again here
-            const index = this.quests.findIndex((r) => r._id === quest._id);
-            this.quests[index].isAvailable = false;
-        },
-        async completeCustomQuest(quest: TQuestCustom) {
-            const { api, account, poolId, config } = useAccountStore();
-            if (!account) return;
-
-            const { error, jobId } = await api.quests.custom.entry.create(quest._id);
-            if (error) throw new Error(error);
-
-            track('UserCreates', [account.sub, 'milestone reward claim', { poolId, origin: config.origin }]);
-            await this.waitForQuestEntryJob(jobId);
-
-            // TODO Fetch custom quest again here
-            const index = this.quests.findIndex((r) => r._id === quest._id);
-            (this.quests[index] as TQuestCustom).entries.push({
-                questId: quest._id,
-                uuid: '',
-                sub: account.sub,
-                isClaimed: true,
-                amount: quest.amount,
+        async getReCAPTCHAToken(action: string) {
+            const { grecaptcha } = window as unknown as { grecaptcha: any };
+            return new Promise((resolve) => {
+                grecaptcha.enterprise.ready(async () => {
+                    const token = await grecaptcha.enterprise.execute(GCLOUD_RECAPTCHA_SITE_KEY, {
+                        action,
+                    });
+                    resolve(token);
+                });
             });
         },
-        async completeInviteQuest(quest: TQuestInvite) {
-            const { account, config, setConfig, poolId, api } = useAccountStore();
-            if (!config.ref) return;
+        async completeQuest(quest: TAnyQuest, payload = {}) {
+            const { api, account, poolId } = useAccountStore();
+            if (!account) return;
 
-            const { sub } = JSON.parse(window.atob(config.ref));
-            const { error, jobId } = await api.quests.invite.entry.create(quest.uuid, { sub });
+            /// Non generic data for quest types. Should be refactored.
+            const callback = () => {
+                const index = this.quests.findIndex((r) => r._id === quest._id);
+                this.quests[index].isAvailable = false;
+            };
+            const questEntrySocialDetails = { eventKey: 'conditional reward claim', callback };
+            const questEntryDetailsMap: any = {
+                [QuestVariant.Daily]: { eventKey: 'daily reward claim', callback },
+                [QuestVariant.Twitter]: questEntrySocialDetails,
+                [QuestVariant.YouTube]: questEntrySocialDetails,
+                [QuestVariant.Discord]: questEntrySocialDetails,
+                [QuestVariant.Web3]: { eventKey: 'web3 quest entry', callback },
+                [QuestVariant.Custom]: {
+                    eventKey: 'milestone reward claim',
+                    callback: () => {
+                        const index = this.quests.findIndex((r) => r._id === quest._id);
+                        (this.quests[index] as TQuestCustom).entries.push({
+                            questId: quest._id,
+                            uuid: '',
+                            sub: account.sub,
+                            isClaimed: true,
+                            amount: quest.amount,
+                        });
+                    },
+                },
+                [QuestVariant.Gitcoin]: { eventKey: 'gitcoin quest entry', callback },
+            };
+
+            // Create entry variant key based on enum key
+            const key = QuestVariant[quest.variant].toLowerCase();
+
+            // Create ReCaptcha Token
+            const recaptcha = await this.getReCAPTCHAToken(`QUEST_${key.toUpperCase()}_ENTRY_CREATE`);
+            if (!recaptcha) throw new Error('Was not able to create recaptcha token.');
+            console.log({ recaptcha });
+
+            // Create quest entry using SDK
+            const { eventKey } = questEntryDetailsMap[quest.variant];
+            const { error, jobId } = await api.request.post(`/v1/quests/${key}/${quest._id}/entries`, {
+                data: { ...payload, recaptcha },
+            });
             if (error) throw new Error(error);
 
-            setConfig(poolId, { ref: '' } as TWidgetConfig);
-            track('UserCreates', [account?.sub, 'referral reward claim', { poolId, origin: config.origin }]);
-
+            // Wait for the quest entry job to complete
             await this.waitForQuestEntryJob(jobId);
 
-            const index = this.quests.findIndex((r) => r._id === quest._id);
-            this.quests[index].isAvailable = false;
+            // Track event in mixpanel
+            track('UserCreates', [account?.sub, eventKey, { poolId }]);
+
+            // Execute callback to update state
+            questEntryDetailsMap[quest.variant].callback();
         },
-        async completeDailyQuest(quest: TQuestDaily) {
-            const { api, account, poolId, config } = useAccountStore();
-            const { error, jobId } = await api.quests.daily.entry.create(quest._id);
-            if (error) throw new Error(error);
-
-            track('UserCreates', [account?.sub, 'daily reward claim', { poolId, origin: config.origin }]);
-            await this.waitForQuestEntryJob(jobId);
-
-            // TODO Fetch daily quest again here
-            const index = this.quests.findIndex((r) => r._id === quest._id);
-            this.quests[index].isAvailable = false;
-        },
-
         async list() {
             const { api } = useAccountStore();
             this.isLoading = true;
