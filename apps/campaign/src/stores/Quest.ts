@@ -42,14 +42,15 @@ export const useQuestStore = defineStore('quest', {
                 const index = this.quests.findIndex((r) => r._id === quest._id);
                 this.quests[index].isAvailable = false;
             };
-            const questEntrySocialDetails = { eventKey: 'conditional reward claim', callback };
+            const questEntrySocialDetails = { apiKey: 'social', eventKey: 'conditional reward claim', callback };
             const questEntryDetailsMap: any = {
-                [QuestVariant.Daily]: { eventKey: 'daily reward claim', callback },
+                [QuestVariant.Daily]: { apiKey: 'daily', eventKey: 'daily reward claim', callback },
                 [QuestVariant.Twitter]: questEntrySocialDetails,
                 [QuestVariant.YouTube]: questEntrySocialDetails,
                 [QuestVariant.Discord]: questEntrySocialDetails,
-                [QuestVariant.Web3]: { eventKey: 'web3 quest entry', callback },
+                [QuestVariant.Web3]: { apiKey: 'web3', eventKey: 'web3 quest entry', callback },
                 [QuestVariant.Custom]: {
+                    apiKey: 'custom',
                     eventKey: 'milestone reward claim',
                     callback: () => {
                         const index = this.quests.findIndex((r) => r._id === quest._id);
@@ -62,7 +63,7 @@ export const useQuestStore = defineStore('quest', {
                         });
                     },
                 },
-                [QuestVariant.Gitcoin]: { eventKey: 'gitcoin quest entry', callback },
+                [QuestVariant.Gitcoin]: { apiKey: 'gitcoin', eventKey: 'gitcoin quest entry', callback },
             };
 
             // Create entry variant key based on enum key
@@ -73,8 +74,8 @@ export const useQuestStore = defineStore('quest', {
             if (!recaptcha) throw new Error('Was not able to create recaptcha token.');
 
             // Create quest entry using SDK
-            const { eventKey } = questEntryDetailsMap[quest.variant];
-            const { error, jobId } = await api.request.post(`/v1/quests/${key}/${quest._id}/entries`, {
+            const { eventKey, apiKey } = questEntryDetailsMap[quest.variant];
+            const { error, jobId } = await api.request.post(`/v1/quests/${apiKey}/${quest._id}/entries`, {
                 data: { ...payload, recaptcha },
             });
             if (error) throw new Error(error);
