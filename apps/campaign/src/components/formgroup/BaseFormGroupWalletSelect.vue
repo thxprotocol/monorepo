@@ -27,7 +27,7 @@ export default defineComponent({
         chainId: Number,
     },
     data() {
-        return { chainList, selectedWallet: null };
+        return { chainList, wallet: null };
     },
     computed: {
         ...mapStores(useWalletStore),
@@ -35,10 +35,6 @@ export default defineComponent({
             return this.walletStore.wallets.filter((wallet: TWallet) =>
                 [WalletVariant.Safe, WalletVariant.WalletConnect].includes(wallet.variant),
             );
-        },
-        wallet() {
-            if (this.selectedWallet) return this.selectedWallet;
-            return this.wallets.length ? this.wallets[0] : null;
         },
     },
     methods: {

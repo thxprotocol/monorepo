@@ -1,5 +1,5 @@
 <template>
-    <b-card body-class="d-flex align-items-center py-2">
+    <b-card v-if="token.reward" body-class="d-flex align-items-center py-2">
         <b-img v-if="token.reward.image" :src="token.reward.image" height="30" class="rounded" />
         <div class="flex-grow-1">
             {{ token.reward.title }}

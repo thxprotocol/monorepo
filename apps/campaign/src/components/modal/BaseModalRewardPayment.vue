@@ -19,6 +19,10 @@
                 <i class="fas fa-exclamation-circle me-2"></i>
                 {{ error }}
             </b-alert>
+            <b-alert v-model="isInsufficientPoints" show variant="danger" class="p-2">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                You don't have enough points to purchase this reward.
+            </b-alert>
             <p :class="!reward.chainId && 'mb-0'">
                 Do you want to use {{ reward.pointPrice }} points for <strong>{{ reward.title }} </strong>?
             </p>
@@ -73,12 +77,15 @@ export default defineComponent({
             if (!participant) return 0;
             return participant.balance;
         },
+        isInsufficientPoints() {
+            return this.participantBalance < this.reward.pointPrice;
+        },
         isDisabled() {
             return (
                 this.isLoading ||
                 this.isSubmitting ||
-                (this.reward.chainId && !this.wallet) ||
-                this.participantBalance < this.reward.pointPrice
+                this.isInsufficientPoints ||
+                (this.reward.chainId && !this.wallet)
             );
         },
         isAlertDangerShown() {
@@ -92,7 +99,6 @@ export default defineComponent({
     },
     methods: {
         async onSubmit() {
-            if (!this.wallet) return;
             this.isSubmitting = true;
 
             try {
