@@ -71,7 +71,6 @@ export const useQuestStore = defineStore('quest', {
             // Create ReCaptcha Token
             const recaptcha = await this.getReCAPTCHAToken(`QUEST_${key.toUpperCase()}_ENTRY_CREATE`);
             if (!recaptcha) throw new Error('Was not able to create recaptcha token.');
-            console.log({ recaptcha });
 
             // Create quest entry using SDK
             const { eventKey } = questEntryDetailsMap[quest.variant];
