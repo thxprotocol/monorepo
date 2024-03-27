@@ -55,7 +55,7 @@
                         <b-img :src="imgLogo" height="50" alt="" />
                     </b-link>
                 </b-navbar-brand>
-                <BaseDropdownWallets class="d-block d-lg-none ms-auto" />
+                <BaseDropdownWallets v-if="accountStore.isAuthenticated" class="d-block d-lg-none ms-auto" />
                 <b-button variant="link" class="d-block d-lg-none" @click="isNavbarOffcanvasShown = true">
                     <i class="fas fa-bars text-white"></i>
                 </b-button>
