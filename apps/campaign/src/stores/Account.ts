@@ -91,7 +91,8 @@ export const useAccountStore = defineStore('account', {
             this.setConfig(config.poolId, { ...config, origin });
             this.setTheme(config);
 
-            track('UserVisits', [this.account?.sub, slug, { poolId: this.poolId }]);
+            // Disabled to save credits on high volume campaigns
+            // track('UserVisits', [this.account?.sub, slug, { poolId: this.poolId }]);
         },
         onLoad() {
             // debugger;
