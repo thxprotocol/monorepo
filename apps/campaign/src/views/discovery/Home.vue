@@ -156,7 +156,7 @@ export default defineComponent({
             imgLogo,
             isLoading: true,
             page: 1,
-            limit: 10,
+            limit: 15,
             search: '',
             debouncedSearch: null,
             screenWidth: window.innerWidth,
