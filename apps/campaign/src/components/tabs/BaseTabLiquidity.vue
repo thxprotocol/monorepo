@@ -47,52 +47,53 @@
     </BaseFormGroupInputTokenAmount>
     <b-button disabled class="w-100" variant="primary"> Create Liquidity </b-button>
 
-    <hr />
-
-    <BaseFormGroupInputTokenAmount
-        :usd="liquidityStore.pricing['20USDC-80THX']"
-        :balance="balanceBPT"
-        :value="Number(amountStake)"
-        :min="0"
-        :max="balanceBPT"
-        class="mb-4"
-        @update="amountStake = $event"
-    >
-        <template #label>
-            <div class="d-flex align-items-center">
-                <b-img
-                    src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
-                    alt="USDC icon"
-                    width="20"
-                    height="20"
-                    class="me-2"
-                />
-                USDC <span class="text-opaque ms-1">20%</span>
-                <b-img
-                    src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
-                    alt="THX icon"
-                    width="20"
-                    height="20"
-                    class="mx-2"
-                />
-                THX <span class="text-opaque ms-1">80%</span>
-            </div>
-        </template>
-    </BaseFormGroupInputTokenAmount>
-    <b-button
-        :disabled="!amountStake"
-        class="w-100"
-        :variant="!amountStake ? 'primary' : 'success'"
-        @click="isModalStakeShown = true"
-    >
-        Stake Liquidity
-    </b-button>
-    <BaseModalStake
-        :show="isModalStakeShown"
-        :amount="amountStake"
-        @staked="onStaked"
-        @hidden="isModalStakeShown = false"
-    />
+    <template v-if="balanceBPT">
+        <hr />
+        <BaseFormGroupInputTokenAmount
+            :usd="liquidityStore.pricing['20USDC-80THX']"
+            :balance="balanceBPT"
+            :value="Number(amountStake)"
+            :min="0"
+            :max="balanceBPT"
+            class="mb-4"
+            @update="amountStake = $event"
+        >
+            <template #label>
+                <div class="d-flex align-items-center">
+                    <b-img
+                        src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+                        alt="USDC icon"
+                        width="20"
+                        height="20"
+                        class="me-2"
+                    />
+                    USDC <span class="text-opaque ms-1">20%</span>
+                    <b-img
+                        src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
+                        alt="THX icon"
+                        width="20"
+                        height="20"
+                        class="mx-2"
+                    />
+                    THX <span class="text-opaque ms-1">80%</span>
+                </div>
+            </template>
+        </BaseFormGroupInputTokenAmount>
+        <b-button
+            :disabled="!amountStake"
+            class="w-100"
+            :variant="!amountStake ? 'primary' : 'success'"
+            @click="isModalStakeShown = true"
+        >
+            Stake Liquidity
+        </b-button>
+        <BaseModalStake
+            :show="isModalStakeShown"
+            :amount="amountStake"
+            @staked="onStaked"
+            @hidden="isModalStakeShown = false"
+        />
+    </template>
 </template>
 
 <script lang="ts">
@@ -139,7 +140,6 @@ export default defineComponent({
     watch: {
         'walletStore.wallet'(wallet) {
             if (!wallet) return;
-
             this.updateAmountStake();
         },
     },

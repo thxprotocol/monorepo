@@ -1,5 +1,5 @@
 <template>
-    <b-card header-class="p-0" body-class="justify-content-start" class="w-100">
+    <b-card v-if="quest" header-class="p-0" body-class="justify-content-start" class="w-100">
         <template #header>
             <div
                 class="d-flex bg-dark rounded"
@@ -74,10 +74,13 @@ export default defineComponent({
     },
     computed: {
         backgroundImage() {
-            return this.quest.image || (this.quest.brand && this.quest.brand.backgroundImgUrl);
+            return (
+                (this.quest && this.quest.image) ||
+                (this.quest && this.quest.brand && this.quest.brand.backgroundImgUrl)
+            );
         },
         logoImage() {
-            return this.quest.brand && this.quest.brand.logoImgUrl;
+            return this.quest && this.quest.brand && this.quest.brand.logoImgUrl;
         },
     },
 });

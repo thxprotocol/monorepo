@@ -3,7 +3,7 @@
         <div class="pe-3">
             <i class="fas fa-tags text-primary"></i>
         </div>
-        <div class="flex-grow-1">
+        <div class="flex-grow-1 d-flex align-items-center justify-content-between">
             <b-link
                 v-if="isURL"
                 size="sm"
@@ -14,13 +14,13 @@
                 <div class="truncate-text-ellipsis">{{ token.code }}</div>
                 <i class="fas fa-external-link-alt ms-3" />
             </b-link>
-            <blockquote v-else-if="code" class="mb-0 d-flex align-items-center w-100 text-accent">
+            <div v-else-if="code" class="mb-0 d-flex align-items-center w-100 text-accent">
                 <strong class="truncate-text" style="letter-spacing: 0.25rem">{{ code }}</strong>
-                <b-button variant="primary" size="sm" class="ms-auto" @click="isVisible = !isVisible">
+                <b-button variant="link" size="sm" class="ms-auto" @click="isVisible = !isVisible">
                     <i class="fas fa-eye" />
                 </b-button>
-            </blockquote>
-            <blockquote v-else class="mb-0 d-flex align-items-center w-100">Code not found.</blockquote>
+            </div>
+            <span v-else>Code not found.</span>
         </div>
         <b-dropdown v-if="token.webshopURL" variant="link" size="sm" no-caret end>
             <template #button-content>
