@@ -86,15 +86,15 @@
                     </b-navbar-nav>
                     <b-navbar-nav class="ms-auto mb-2 mb-lg-0 justify-content-end align-items-center">
                         <template v-if="!authStore.user">
-                            <b-button v-b-modal="'modalLogin'" class="px-4 text-white" variant="link">
-                                <!-- Sign in -->
+                            <b-button v-b-modal="'modalLogin'" class="px-4 text-white" variant="primary">
+                                Sign in
                                 <i class="fas fa-sign-in-alt ms-2" />
                             </b-button>
                         </template>
                         <template v-else>
-                            <b-button class="px-4 text-white" variant="link" @click="accountStore.signout()">
-                                <!-- Sign out -->
-                                <i class="fas fa-sign-out-alt ml-auto"></i>
+                            <b-button class="px-4 text-white" variant="primary" @click="accountStore.signout()">
+                                Sign out
+                                <i class="fas fa-sign-out-alt ms-2"></i>
                             </b-button>
                         </template>
                     </b-navbar-nav>
