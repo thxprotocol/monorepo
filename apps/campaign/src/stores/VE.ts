@@ -5,8 +5,8 @@ import { ChainId } from '@thxnetwork/sdk';
 import { MODE } from '../config/secrets';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { contractNetworks } from '../config/constants';
-import poll from 'promise-poller';
 import { BigNumber } from 'ethers';
+import poll, { CANCEL_TOKEN } from 'promise-poller';
 
 export function getChainId() {
     return MODE !== 'production' ? ChainId.Hardhat : ChainId.Polygon;
@@ -271,14 +271,14 @@ export const useVeStore = defineStore('ve', {
             );
             await sendTransaction(wallet.address, call.to, call.data);
         },
-        waitForLock(amountInWei: BigNumber, lockEndTimestamp: number) {
+        async waitForLock(amountInWei: BigNumber, lockEndTimestamp: number) {
             const taskFn = async () => {
                 await this.getLocks();
                 return this.lock && this.lock.amount === amountInWei.toString() && this.lock.end === lockEndTimestamp
-                    ? Promise.resolve()
+                    ? Promise.reject(CANCEL_TOKEN)
                     : Promise.reject('Amount');
             };
-            return poll({ taskFn, interval: 3000, retries: 20 });
+            return await poll({ taskFn, interval: 3000, retries: 20 });
         },
     },
 });
