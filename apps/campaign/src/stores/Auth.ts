@@ -7,6 +7,8 @@ import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { Wallet } from '@ethersproject/wallet';
 import { track } from '@thxnetwork/common/lib/mixpanel';
 import poll from 'promise-poller';
+import { useVeStore } from './VE';
+import { useWalletStore } from './Wallet';
 
 const userManager = new UserManager({
     authority: AUTH_URL,
@@ -43,6 +45,8 @@ export const useAuthStore = defineStore('auth', {
         onUserUnloadedCallback() {
             this.oAuthShare = '';
             this.user = null;
+            useWalletStore().reset();
+            useVeStore().reset();
         },
         onUserLoadedCallback(user: Partial<User>) {
             this.user = user;

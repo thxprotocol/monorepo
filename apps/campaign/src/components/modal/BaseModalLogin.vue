@@ -29,7 +29,7 @@
             >
                 <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" />
                 <span>
-                    Connect
+                    Continue with
                     <strong>{{ walletStore.account && shortenAddress(walletStore.account.address) }}</strong>
                 </span>
             </BaseButtonWalletConnect>
@@ -89,7 +89,9 @@ export default defineComponent({
         },
         isEmailValid() {
             if (!this.email) return null;
-            return this.email.length && this.email.length > 3 && this.email.includes('@') && this.email.includes('.');
+            const isEmail =
+                this.email.length && this.email.length > 3 && this.email.includes('@') && this.email.includes('.');
+            return !!isEmail;
         },
     },
     methods: {

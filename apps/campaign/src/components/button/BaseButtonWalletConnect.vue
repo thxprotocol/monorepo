@@ -73,6 +73,7 @@ export default defineComponent({
     },
     methods: {
         onClickDisconnect() {
+            this.walletStore.modal.resetAccount();
             window.location.reload();
         },
         onClick() {

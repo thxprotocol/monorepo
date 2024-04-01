@@ -67,6 +67,23 @@ export const useWalletStore = defineStore('wallet', {
         isModalChainSwitchShown: false,
     }),
     actions: {
+        reset() {
+            this.modal = null;
+            this.account = null;
+            this.chainId = null;
+            this.allowances = {};
+            this.balances = {};
+            this.erc20 = [];
+            this.erc721 = [];
+            this.erc1155 = [];
+            this.couponCodes = [];
+            this.discordRoles = [];
+            this.galachain = [];
+            this.pendingPoints = 0;
+            this.wallets = [];
+            this.wallet = null;
+            this.isLoading = true;
+        },
         createWeb3Modal() {
             if (this.modal) return;
 

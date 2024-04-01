@@ -129,6 +129,7 @@ type TVeState = {
     now: number;
     balance: BigNumber;
     rewards: { tokenAddress: string; amount: string; symbol: string }[];
+    isModalClaimTokensShown: boolean;
 };
 
 type TLiquidityState = {

@@ -15,11 +15,18 @@ export function getChainId() {
 export const useVeStore = defineStore('ve', {
     state: (): TVeState => ({
         lock: { end: 0, amount: '0' },
-        now: 0,
+        now: Date.now(),
         balance: 0,
         rewards: [],
+        isModalClaimTokensShown: false,
     }),
     actions: {
+        reset() {
+            this.lock = { end: 0, amount: '0' };
+            this.now = Date.now();
+            this.balance = 0;
+            this.rewards = [];
+        },
         async getLocks() {
             const { api } = useAccountStore();
             const { wallet } = useWalletStore();
@@ -276,7 +283,7 @@ export const useVeStore = defineStore('ve', {
                 await this.getLocks();
                 return this.lock && this.lock.amount === amountInWei.toString() && this.lock.end === lockEndTimestamp
                     ? Promise.reject(CANCEL_TOKEN)
-                    : Promise.reject('Amount');
+                    : Promise.reject('Ve amount');
             };
             return await poll({ taskFn, interval: 3000, retries: 20 });
         },

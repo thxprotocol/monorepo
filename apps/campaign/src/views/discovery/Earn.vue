@@ -8,11 +8,21 @@
                         Earn additional BPT next to your native $BAL rewards! You will also receive VeTHX allowing you
                         to partake in protocol governance.
                     </p>
-                    <b-button variant="primary" class="me-3 px-5" @click="tabIndex = 1">
-                        Claim
+                    <b-button
+                        variant="primary"
+                        class="me-3 px-5"
+                        :disabled="!accountStore.isAuthenticated"
+                        @click="veStore.isModalClaimTokensShown = true"
+                    >
+                        Claim Rewards
                         <i class="fas fa-chevron-right ms-2" />
                     </b-button>
-                    <b-button :href="publicUrl" target="_blank" variant="link" class="text-white">
+                    <b-button
+                        href="https://medium.com/thxprotocol/revolutionizing-gaming-with-thx-networks-new-vote-escrowed-tokenomics-18ef24239e46"
+                        target="_blank"
+                        variant="link"
+                        class="text-white"
+                    >
                         Learn more
                     </b-button>
                 </div>
@@ -67,6 +77,7 @@ export default defineComponent({
             tabIndex: 1,
             publicUrl: 'https://thx.network',
             amountDepositInWei: '0',
+            isAlertSigninShown: true,
         };
     },
     computed: {

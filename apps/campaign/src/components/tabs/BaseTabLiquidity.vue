@@ -45,9 +45,17 @@
             </div>
         </template>
     </BaseFormGroupInputTokenAmount>
-    <b-button disabled class="w-100" variant="primary"> Create Liquidity </b-button>
+    <b-button
+        v-if="!accountStore.isAuthenticated"
+        class="w-100"
+        variant="primary"
+        @click="authStore.isModalLoginShown = true"
+    >
+        Sign in &amp; Create Liquidity
+    </b-button>
+    <b-button v-else disabled class="w-100" variant="primary"> Create Liquidity </b-button>
 
-    <template v-if="balanceBPT">
+    <template v-if="accountStore.isAuthenticated && balanceBPT">
         <hr />
         <BaseFormGroupInputTokenAmount
             :usd="liquidityStore.pricing['20USDC-80THX']"
@@ -106,6 +114,7 @@ import { useVeStore } from '../../stores/VE';
 import { contractNetworks } from '../../config/constants';
 import { ChainId } from '@thxnetwork/sdk';
 import { formatUnits } from 'ethers/lib/utils';
+import { useAuthStore } from '@thxnetwork/campaign/stores/Auth';
 
 export default defineComponent({
     name: 'BaseTabLiquidity',
@@ -119,7 +128,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore, useWalletStore, useVeStore, useLiquidityStore),
+        ...mapStores(useAccountStore, useAuthStore, useWalletStore, useVeStore, useLiquidityStore),
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];

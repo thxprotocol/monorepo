@@ -11,6 +11,15 @@
     <BaseFormGroupLockAmount :value="value" @update="$emit('update-amount', parseUnits(String($event), 18))" />
     <BaseFormGroupLockEnd :value="lockEnd" @update="lockEnd = $event" />
     <b-button
+        v-if="!accountStore.isAuthenticated"
+        class="w-100 mt-3"
+        variant="primary"
+        @click="authStore.isModalLoginShown = true"
+    >
+        Sign in &amp; Deposit
+    </b-button>
+    <b-button
+        v-else
         :disabled="isInsufficientAmount"
         class="w-100 mt-3"
         :variant="!Number(amount) ? 'primary' : 'success'"
@@ -38,6 +47,7 @@ import { NinetyDaysInMs, getThursdaysUntilTimestamp } from '../../utils/date';
 import { ChainId } from '@thxnetwork/sdk';
 import { BigNumber } from 'ethers';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
+import { useAuthStore } from '@thxnetwork/campaign/stores/Auth';
 
 export default defineComponent({
     name: 'BaseTabDeposit',
@@ -55,7 +65,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore, useWalletStore, useVeStore, useLiquidityStore),
+        ...mapStores(useAccountStore, useWalletStore, useAuthStore, useVeStore, useLiquidityStore),
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];

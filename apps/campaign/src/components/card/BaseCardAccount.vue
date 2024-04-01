@@ -5,18 +5,15 @@
             style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.35); width: 100%"
         >
             <template v-if="accountStore.account">
-                <b-avatar
-                    size="50"
-                    :src="accountStore.account.profileImg"
-                    class="gradient-border-xl"
-                    @click="accountStore.isModalAccountShown = true"
-                />
+                <b-link @click="accountStore.isModalAccountShown = true">
+                    <b-avatar size="50" :src="accountStore.account.profileImg" class="gradient-border-xl" />
+                </b-link>
                 <div class="ps-3 flex-grow-1" style="min-width: 200px">
                     <h3 class="text-white mb-0">
                         {{ accountStore.account.username }}
                     </h3>
                     <div class="d-flex align-items-center justify-content-between">
-                        <b-link class="text-decoration-none" @click.stop="onClickRewards">
+                        <b-link class="text-decoration-none" @click="onClickRewards">
                             <span class="text-accent text-hover-underline">{{ toFiatPrice(rewardsInUSD) }}</span>
                             <i class="fas fa-download small ms-1 text-white text-opaque"></i>
                         </b-link>
@@ -27,7 +24,7 @@
             <b-spinner v-else small class="text-opaque" />
         </div>
     </b-card>
-    <BaseModalClaimTokens :show="isModalClaimTokensShown" @hidden="isModalClaimTokensShown = false" />
+    <BaseModalClaimTokens :show="veStore.isModalClaimTokensShown" @hidden="veStore.isModalClaimTokensShown = false" />
 </template>
 
 <script lang="ts">
@@ -42,7 +39,7 @@ import { formatUnits } from 'ethers/lib/utils';
 export default defineComponent({
     name: 'BaseCardAccount',
     data() {
-        return { toFiatPrice, isModalClaimTokensShown: false };
+        return { toFiatPrice };
     },
     computed: {
         ...mapStores(useAccountStore, useVeStore, useLiquidityStore),
@@ -59,7 +56,7 @@ export default defineComponent({
     },
     methods: {
         onClickRewards() {
-            this.isModalClaimTokensShown = true;
+            this.veStore.isModalClaimTokensShown = true;
         },
     },
 });
