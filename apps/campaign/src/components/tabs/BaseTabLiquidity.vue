@@ -67,7 +67,13 @@
         >
             Sign in &amp; Add Liquidity
         </b-button>
-        <b-button v-else class="w-100" variant="primary" @click="isModalCreateLiquidityShown = true">
+        <b-button
+            v-else
+            :disabled="isButtonAddLiquidityDisabled"
+            class="w-100"
+            variant="primary"
+            @click="isModalCreateLiquidityShown = true"
+        >
             Add Liquidity
         </b-button>
     </b-collapse>
@@ -192,6 +198,9 @@ export default defineComponent({
         balanceBPT() {
             if (!this.walletStore.balances[this.address.BPT]) return 0;
             return Number(formatUnits(this.walletStore.balances[this.address.BPT], 'ether'));
+        },
+        isButtonAddLiquidityDisabled() {
+            return !Number(this.amountUSDC) && !Number(this.amountTHX);
         },
     },
     watch: {

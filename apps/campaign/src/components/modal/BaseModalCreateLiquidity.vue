@@ -10,8 +10,9 @@
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
         </b-alert>
+        {{ tabTitles }}
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
-            <b-tab title="1. Approve USDC">
+            <b-tab v-if="Number(amounts[0])" :title="tabTitles.approveUSDC">
                 <BaseTabApprove
                     :amount="amountApprovalUSDC"
                     :token-address="address.USDC"
@@ -21,7 +22,7 @@
                     @ok="tabIndex = 1"
                 />
             </b-tab>
-            <b-tab title="2. Approve THX">
+            <b-tab v-if="Number(amounts[1])" :title="tabTitles.approveTHX">
                 <BaseTabApprove
                     :amount="amountApprovalTHX"
                     :token-address="address.THX"
@@ -31,7 +32,7 @@
                     @ok="tabIndex = 2"
                 />
             </b-tab>
-            <b-tab title="3. Create Liquidity">
+            <b-tab :title="tabTitles.addLiquidity">
                 <b-form-group>
                     <div class="w-100 d-flex align-items-center justify-content-between">
                         <b-badge
@@ -118,6 +119,17 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useWalletStore, useVeStore, useLiquidityStore),
+        tabTitles() {
+            const titles: { [key: string]: string } = {};
+            if (Number(this.amountUSDC) > 0) {
+                titles['approveUSDC'] = `${Object.values(titles).length + 1}. Approve USDC`;
+            }
+            if (Number(this.amountTHX) > 0) {
+                titles['approveTHX'] = `${Object.values(titles).length + 1}. Approve THX`;
+            }
+            titles['addLiquidity'] = `${Object.values(titles).length + 1}. Create Liquidity`;
+            return titles;
+        },
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
