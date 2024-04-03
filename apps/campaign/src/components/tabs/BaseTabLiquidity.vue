@@ -1,78 +1,31 @@
 <template>
-    <BaseFormGroupInputTokenAmount
-        :usd="liquidityStore.pricing['USDC']"
-        :balance="balanceUSDC"
-        :value="Number(amountUSDC)"
-        :min="0"
-        :max="balanceUSDC"
-        class="mb-4"
-        @update="amountUSDC = $event"
-    >
-        <template #label>
-            <div class="d-flex align-items-center" style="width: 65px">
-                <b-img
-                    src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
-                    alt="USDC icon"
-                    width="20"
-                    height="20"
-                    class="me-2"
-                />
-                USDC
-            </div>
-        </template>
-    </BaseFormGroupInputTokenAmount>
-    <BaseFormGroupInputTokenAmount
-        :usd="liquidityStore.pricing['THX']"
-        :balance="balanceTHX"
-        :value="Number(amountTHX)"
-        :min="0"
-        :max="balanceTHX"
-        class="mb-4"
-        @update="amountTHX = $event"
-    >
-        <template #label>
-            <div class="d-flex align-items-center" style="width: 65px">
-                <b-img
-                    src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
-                    alt="THX icon"
-                    width="20"
-                    height="20"
-                    class="me-2"
-                />
-                THX
-            </div>
-        </template>
-    </BaseFormGroupInputTokenAmount>
     <b-button
-        v-if="!accountStore.isAuthenticated"
-        class="w-100"
+        v-if="balanceBPT"
+        class="rounded w-100 d-flex align-items-center justify-content-between"
         variant="primary"
-        @click="authStore.isModalLoginShown = true"
+        @click="onClickCollapse"
     >
-        Sign in &amp; Create Liquidity
+        1. Add Liquidity
+        <i
+            class="fas ms-auto"
+            :class="{
+                'fa-chevron-down': isCollapseCreateLiquidityOpen,
+                'fa-chevron-up': !isCollapseCreateLiquidityOpen,
+            }"
+        />
     </b-button>
-    <b-button v-else class="w-100" variant="primary" @click="isModalCreateLiquidityShown = true">
-        Create Liquidity
-    </b-button>
-    <BaseModalCreateLiquidity
-        :show="isModalCreateLiquidityShown"
-        :amounts="[amountUSDC, amountTHX]"
-        @submit="onSubmitCreateLiquidity"
-        @hidden="isModalCreateLiquidityShown = false"
-    />
-    <template v-if="accountStore.isAuthenticated && balanceBPT">
-        <hr />
+    <b-collapse v-model="isCollapseCreateLiquidityOpen" class="pt-3">
         <BaseFormGroupInputTokenAmount
-            :usd="liquidityStore.pricing['20USDC-80THX']"
-            :balance="balanceBPT"
-            :value="Number(amountStake)"
+            :usd="liquidityStore.pricing['USDC']"
+            :balance="balanceUSDC"
+            :value="Number(amountUSDC)"
             :min="0"
-            :max="balanceBPT"
+            :max="balanceUSDC"
             class="mb-4"
-            @update="amountStake = $event"
+            @update="amountUSDC = $event"
         >
             <template #label>
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center" style="width: 70px">
                     <b-img
                         src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
                         alt="USDC icon"
@@ -80,32 +33,119 @@
                         height="20"
                         class="me-2"
                     />
-                    USDC <span class="text-opaque ms-1">20%</span>
+                    USDC
+                </div>
+            </template>
+        </BaseFormGroupInputTokenAmount>
+        <BaseFormGroupInputTokenAmount
+            :usd="liquidityStore.pricing['THX']"
+            :balance="balanceTHX"
+            :value="Number(amountTHX)"
+            :min="0"
+            :max="balanceTHX"
+            class="mb-4"
+            @update="amountTHX = $event"
+        >
+            <template #label>
+                <div class="d-flex align-items-center" style="width: 70px">
                     <b-img
                         src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
                         alt="THX icon"
                         width="20"
                         height="20"
-                        class="mx-2"
+                        class="me-2"
                     />
-                    THX <span class="text-opaque ms-1">80%</span>
+                    THX
                 </div>
             </template>
         </BaseFormGroupInputTokenAmount>
         <b-button
-            :disabled="!amountStake"
+            v-if="!accountStore.isAuthenticated"
             class="w-100"
-            :variant="!amountStake ? 'primary' : 'success'"
-            @click="isModalStakeShown = true"
+            variant="primary"
+            @click="authStore.isModalLoginShown = true"
         >
-            Stake Liquidity
+            Sign in &amp; Add Liquidity
         </b-button>
-        <BaseModalStake
-            :show="isModalStakeShown"
-            :amount="amountStake"
-            @staked="onStaked"
-            @hidden="isModalStakeShown = false"
-        />
+        <b-button v-else class="w-100" variant="primary" @click="isModalCreateLiquidityShown = true">
+            Add Liquidity
+        </b-button>
+    </b-collapse>
+    <BaseModalCreateLiquidity
+        :show="isModalCreateLiquidityShown"
+        :amounts="[amountUSDC, amountTHX]"
+        @submit="onSubmitCreateLiquidity"
+        @hidden="isModalCreateLiquidityShown = false"
+    />
+    <template v-if="balanceBPT">
+        <hr />
+        <b-button
+            class="rounded w-100 d-flex align-items-center justify-content-between"
+            variant="primary"
+            @click="onClickCollapse"
+        >
+            <span>
+                2. Stake Liquidity
+                <i
+                    v-b-tooltip
+                    class="fas fa-info-circle ms-1"
+                    title="You have unstaked liquidity! You can only lock and obtain veTHX after staking the provided liquidity."
+                />
+            </span>
+            <i
+                class="fas ms-auto"
+                :class="{
+                    'fa-chevron-down': isCollapseStakeLiquidityOpen,
+                    'fa-chevron-up': !isCollapseStakeLiquidityOpen,
+                }"
+            />
+        </b-button>
+        <b-collapse v-model="isCollapseStakeLiquidityOpen" class="pt-3">
+            <BaseFormGroupInputTokenAmount
+                :usd="liquidityStore.pricing['20USDC-80THX']"
+                :balance="balanceBPT"
+                :value="Number(amountStake)"
+                :min="0"
+                :max="balanceBPT"
+                class="mb-4"
+                @update="amountStake = $event"
+            >
+                <template #label>
+                    <div class="d-flex align-items-center">
+                        <b-img
+                            src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+                            alt="USDC icon"
+                            width="20"
+                            height="20"
+                            class="me-2"
+                        />
+                        USDC <span class="text-opaque ms-1">20%</span>
+                        <b-img
+                            src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
+                            alt="THX icon"
+                            width="20"
+                            height="20"
+                            class="mx-2"
+                        />
+                        THX <span class="text-opaque ms-1">80%</span>
+                    </div>
+                </template>
+            </BaseFormGroupInputTokenAmount>
+            <b-button
+                :disabled="!amountStake"
+                class="w-100"
+                :variant="!amountStake ? 'primary' : 'success'"
+                @click="isModalStakeShown = true"
+            >
+                Stake Liquidity
+            </b-button>
+            <BaseModalStake
+                :show="isModalStakeShown"
+                :amount="amountStake"
+                @staked="onStaked"
+                @hidden="isModalStakeShown = false"
+            />
+        </b-collapse>
     </template>
 </template>
 
@@ -126,6 +166,8 @@ export default defineComponent({
     data() {
         return {
             formatUnits,
+            isCollapseCreateLiquidityOpen: true,
+            isCollapseStakeLiquidityOpen: false,
             isModalCreateLiquidityShown: false,
             isModalStakeShown: false,
             amountUSDC: '0',
@@ -159,6 +201,10 @@ export default defineComponent({
         },
     },
     methods: {
+        onClickCollapse() {
+            this.isCollapseStakeLiquidityOpen = !this.isCollapseStakeLiquidityOpen;
+            this.isCollapseCreateLiquidityOpen = !this.isCollapseCreateLiquidityOpen;
+        },
         updateBalances() {
             this.walletStore.getBalance(this.address.USDC).then(() => {
                 this.amountUSDC = formatUnits(this.walletStore.balances[this.address.USDC], 'ether');
@@ -171,11 +217,18 @@ export default defineComponent({
             });
         },
         onSubmitCreateLiquidity() {
+            this.isCollapseCreateLiquidityOpen = false;
+            this.isCollapseStakeLiquidityOpen = true;
             this.isModalCreateLiquidityShown = false;
+            this.amountUSDC = '0';
+            this.amountTHX = '0';
             this.updateBalances();
         },
         onStaked() {
+            this.isCollapseCreateLiquidityOpen = true;
+            this.isCollapseStakeLiquidityOpen = false;
             this.isModalStakeShown = false;
+            this.amountStake = '0';
             this.updateBalances();
             this.$emit('change-tab', 1);
         },

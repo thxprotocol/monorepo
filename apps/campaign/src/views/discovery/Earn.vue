@@ -35,6 +35,7 @@
                                 <i class="fas fa-balance-scale me-1" />
                                 Liquidity
                             </template>
+                            <hr />
                             <BaseTabLiquidity @change-tab="tabIndex = $event" />
                         </b-tab>
                         <b-tab>
@@ -42,6 +43,7 @@
                                 <i class="fas fa-id-card me-1" />
                                 Membership
                             </template>
+                            <hr />
                             <BaseTabDeposit
                                 v-if="veStore.lock && !Number(veStore.lock.amount)"
                                 :amount="amountDepositInWei"

@@ -33,10 +33,46 @@
             </b-tab>
             <b-tab title="3. Create Liquidity">
                 <b-form-group>
-                    <b-form-input v-model="amountUSDC" type="number" />
+                    <div class="w-100 d-flex align-items-center justify-content-between">
+                        <b-badge
+                            class="p-2 d-flex align-items-center"
+                            variant="primary"
+                            style="font-size: 1rem; font-weight: normal"
+                        >
+                            <div class="d-flex align-items-center" style="width: 70px">
+                                <b-img
+                                    src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+                                    alt="USDC icon"
+                                    width="20"
+                                    height="20"
+                                    class="me-2"
+                                />
+                                USDC
+                            </div>
+                        </b-badge>
+                        <b-form-input v-model="amountUSDC" disabled class="ms-3" type="number" />
+                    </div>
                 </b-form-group>
                 <b-form-group>
-                    <b-form-input v-model="amountTHX" type="number" />
+                    <div class="w-100 d-flex align-items-center justify-content-between">
+                        <b-badge
+                            class="p-2 d-flex align-items-center"
+                            variant="primary"
+                            style="font-size: 1rem; font-weight: normal"
+                        >
+                            <div class="d-flex align-items-center" style="width: 70px">
+                                <b-img
+                                    src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
+                                    alt="THX icon"
+                                    width="20"
+                                    height="20"
+                                    class="me-2"
+                                />
+                                THX
+                            </div>
+                        </b-badge>
+                        <b-form-input v-model="amountTHX" disabled class="ms-3" type="number" />
+                    </div>
                 </b-form-group>
                 <b-button variant="success" class="w-100" :disabled="isPolling" @click="onClickCreateLiquidity">
                     <b-spinner v-if="isPolling" small />
