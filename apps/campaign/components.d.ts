@@ -64,6 +64,7 @@ declare module 'vue' {
     BaseModalAccount: typeof import('./src/components/modal/BaseModalAccount.vue')['default']
     BaseModalChainSwitch: typeof import('./src/components/modal/BaseModalChainSwitch.vue')['default']
     BaseModalClaimTokens: typeof import('./src/components/modal/BaseModalClaimTokens.vue')['default']
+    BaseModalCreateLiquidity: typeof import('./src/components/modal/BaseModalCreateLiquidity.vue')['default']
     BaseModalDeposit: typeof import('./src/components/modal/BaseModalDeposit.vue')['default']
     BaseModalERC20Transfer: typeof import('./src/components/modal/BaseModalERC20Transfer.vue')['default']
     BaseModalERC721Transfer: typeof import('./src/components/modal/BaseModalERC721Transfer.vue')['default']

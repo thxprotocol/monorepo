@@ -2,11 +2,10 @@
     <BaseFormGroupInputTokenAmount
         :usd="liquidityStore.pricing['USDC']"
         :balance="balanceUSDC"
-        :value="amountUSDC"
+        :value="Number(amountUSDC)"
         :min="0"
         :max="balanceUSDC"
         class="mb-4"
-        disabled
         @update="amountUSDC = $event"
     >
         <template #label>
@@ -25,11 +24,10 @@
     <BaseFormGroupInputTokenAmount
         :usd="liquidityStore.pricing['THX']"
         :balance="balanceTHX"
-        :value="amountTHX"
+        :value="Number(amountTHX)"
         :min="0"
         :max="balanceTHX"
         class="mb-4"
-        disabled
         @update="amountTHX = $event"
     >
         <template #label>
@@ -53,8 +51,15 @@
     >
         Sign in &amp; Create Liquidity
     </b-button>
-    <b-button v-else disabled class="w-100" variant="primary"> Create Liquidity </b-button>
-
+    <b-button v-else class="w-100" variant="primary" @click="isModalCreateLiquidityShown = true">
+        Create Liquidity
+    </b-button>
+    <BaseModalCreateLiquidity
+        :show="isModalCreateLiquidityShown"
+        :amounts="[amountUSDC, amountTHX]"
+        @submit="onSubmitCreateLiquidity"
+        @hidden="isModalCreateLiquidityShown = false"
+    />
     <template v-if="accountStore.isAuthenticated && balanceBPT">
         <hr />
         <BaseFormGroupInputTokenAmount
@@ -121,9 +126,10 @@ export default defineComponent({
     data() {
         return {
             formatUnits,
-            amountUSDC: 0,
-            amountTHX: 0,
+            isModalCreateLiquidityShown: false,
             isModalStakeShown: false,
+            amountUSDC: '0',
+            amountTHX: '0',
             amountStake: '0',
         };
     },
@@ -149,18 +155,28 @@ export default defineComponent({
     watch: {
         'walletStore.wallet'(wallet) {
             if (!wallet) return;
-            this.updateAmountStake();
+            this.updateBalances();
         },
     },
     methods: {
-        updateAmountStake() {
+        updateBalances() {
+            this.walletStore.getBalance(this.address.USDC).then(() => {
+                this.amountUSDC = formatUnits(this.walletStore.balances[this.address.USDC], 'ether');
+            });
+            this.walletStore.getBalance(this.address.THX).then(() => {
+                this.amountTHX = formatUnits(this.walletStore.balances[this.address.THX], 'ether');
+            });
             this.walletStore.getBalance(this.address.BPT).then(() => {
                 this.amountStake = formatUnits(this.walletStore.balances[this.address.BPT], 'ether');
             });
         },
+        onSubmitCreateLiquidity() {
+            this.isModalCreateLiquidityShown = false;
+            this.updateBalances();
+        },
         onStaked() {
             this.isModalStakeShown = false;
-            this.updateAmountStake();
+            this.updateBalances();
             this.$emit('change-tab', 1);
         },
     },
