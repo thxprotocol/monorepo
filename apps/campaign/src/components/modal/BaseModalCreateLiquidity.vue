@@ -10,7 +10,6 @@
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
         </b-alert>
-        {{ tabTitles }}
         <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
             <b-tab v-if="Number(amounts[0])" :title="tabTitles.approveUSDC">
                 <BaseTabApprove
@@ -75,7 +74,33 @@
                         <b-form-input v-model="amountTHX" disabled class="ms-3" type="number" />
                     </div>
                 </b-form-group>
-                <b-button variant="success" class="w-100" :disabled="isPolling" @click="onClickCreateLiquidity">
+                <b-form-group>
+                    <template #label>
+                        <span class="text-opaque me-1">Slippage</span>
+                        <i v-b-tooltip class="fas fa-question-circle" title="Percentage" />
+                    </template>
+                    <div class="d-flex justify-content-between">
+                        <b-button
+                            v-for="{ label, value } of slippageOptions"
+                            size="sm"
+                            variant="primary"
+                            class="me-2 rounded"
+                            style="width: 100px"
+                            @click="slippage = value"
+                        >
+                            {{ label }}
+                        </b-button>
+                        <b-input-group size="sm" class="flex-grow-0" style="width: 100px">
+                            <template #append>
+                                <div class="d-flex align-items-center justify-content-between px-2">
+                                    <strong>%</strong>
+                                </div>
+                            </template>
+                            <b-form-input v-model="slippage" size="sm" />
+                        </b-input-group>
+                    </div>
+                </b-form-group>
+                <b-button variant="success" class="w-100 mt-3" :disabled="isPolling" @click="onClickCreateLiquidity">
                     <b-spinner v-if="isPolling" small />
                     <template v-else>Create Liquidity</template>
                 </b-button>
@@ -115,6 +140,12 @@ export default defineComponent({
             amountTHX: '0',
             amountApprovalUSDC: '0',
             amountApprovalTHX: '0',
+            slippage: 0.5,
+            slippageOptions: [
+                { label: '0.5%', value: 0.5 },
+                { label: '1.0%', value: 1 },
+                { label: '2.0%', value: 2 },
+            ],
         };
     },
     computed: {
@@ -179,7 +210,7 @@ export default defineComponent({
                 const data = {
                     usdcAmountInWei: usdcAmountInWei.toString(),
                     thxAmountInWei: thxAmountInWei.toString(),
-                    slippage: '50',
+                    slippage: String(Number(this.slippage.toFixed(2)) * 100),
                 };
                 await this.liquidityStore.createLiquidity(this.walletStore.wallet, data);
 
