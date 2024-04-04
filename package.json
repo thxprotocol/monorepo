@@ -11,6 +11,7 @@
     "private": true,
     "dependencies": {
         "@balancer-labs/sdk": "^1.1.5",
+        "@balancer/sdk": "^0.14.0",
         "@ethersproject/wallet": "^5.7.0",
         "@popperjs/core": "^2.11.6",
         "@safe-global/api-kit": "^1.1.0",

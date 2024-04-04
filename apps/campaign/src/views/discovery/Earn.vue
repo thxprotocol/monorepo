@@ -5,8 +5,43 @@
                 <div>
                     <h1>Lock & Earn</h1>
                     <p class="lead mb-4">
-                        Earn additional BPT next to your native $BAL rewards! You will also receive VeTHX allowing you
-                        to partake in protocol governance.
+                        Earn additional
+                        <b-link
+                            class="fw-bold text-white text-decoration-none"
+                            target="_blank"
+                            href="https://www.coingecko.com/en/coins/thx-network"
+                        >
+                            $THX
+                        </b-link>
+                        <sup class="text-success ms-1">
+                            {{ toFiatPrice(Number(roundUpFixed(liquidityStore.pricing['THX'], 2))) }}
+                        </sup>
+                        and
+                        <b-link
+                            class="fw-bold text-white text-decoration-none"
+                            target="_blank"
+                            href="https://www.coingecko.com/en/coins/usdc"
+                        >
+                            $USDC
+                        </b-link>
+                        <sup class="text-success ms-1">
+                            {{ toFiatPrice(Number(roundUpFixed(liquidityStore.pricing['USDC'], 2))) }}
+                        </sup>
+                        next to your native
+                        <b-link
+                            class="fw-bold text-white text-decoration-none"
+                            target="_blank"
+                            href="https://www.coingecko.com/en/coins/balancer"
+                        >
+                            $BAL
+                        </b-link>
+                        <sup class="text-success ms-1">
+                            {{ toFiatPrice(Number(roundUpFixed(liquidityStore.pricing['BAL'], 2))) }}
+                        </sup>
+                        rewards for providing liquidity!
+                    </p>
+                    <p class="lead mb-4">
+                        You will also receive <strong>$veTHX</strong> allowing you to partake in protocol governance 🚀
                     </p>
                     <b-button
                         variant="primary"
@@ -62,20 +97,19 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { format } from 'date-fns';
-import { fromWei } from 'web3-utils';
 import { useAccountStore } from '../../stores/Account';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
 import { contractNetworks } from '../../config/constants';
+import { roundUpFixed, toFiatPrice } from '@thxnetwork/campaign/utils/price';
 
 export default defineComponent({
     name: 'Earn',
     data() {
         return {
-            fromWei,
-            format,
+            toFiatPrice,
+            roundUpFixed,
             tabIndex: 1,
             publicUrl: 'https://thx.network',
             amountDepositInWei: '0',

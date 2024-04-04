@@ -14,7 +14,7 @@
             <b-tab title="1. Approve">
                 <BaseTabApprove
                     :amount="amountApproval"
-                    :token-address="address.BPTGauge"
+                    :token="{ address: address.BPTGauge, decimals: 18 }"
                     :spender="address.VotingEscrow"
                     @update="amountApproval = $event"
                     @approve="onApprove"

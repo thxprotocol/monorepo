@@ -189,15 +189,15 @@ export default defineComponent({
         },
         balanceUSDC() {
             if (!this.walletStore.balances[this.address.USDC]) return 0;
-            return Number(formatUnits(this.walletStore.balances[this.address.USDC], 'ether'));
+            return Number(formatUnits(this.walletStore.balances[this.address.USDC], 'mwei')); // USDC.e has 6 decimals
         },
         balanceTHX() {
             if (!this.walletStore.balances[this.address.THX]) return 0;
-            return Number(formatUnits(this.walletStore.balances[this.address.THX], 'ether'));
+            return Number(formatUnits(this.walletStore.balances[this.address.THX], 'ether')); // THX has 18 decimals
         },
         balanceBPT() {
             if (!this.walletStore.balances[this.address.BPT]) return 0;
-            return Number(formatUnits(this.walletStore.balances[this.address.BPT], 'ether'));
+            return Number(formatUnits(this.walletStore.balances[this.address.BPT], 'ether')); // BPT has 18 decimals
         },
         isButtonAddLiquidityDisabled() {
             return !Number(this.amountUSDC) && !Number(this.amountTHX);

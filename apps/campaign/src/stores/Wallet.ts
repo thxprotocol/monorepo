@@ -128,7 +128,7 @@ export const useWalletStore = defineStore('wallet', {
             this.modal.close();
             this.modal = null;
         },
-        async sendTransaction(from: string, to: `0x${string}`, data: `0x${string}`) {
+        async sendTransaction(from: string, to: `0x${string}`, data: `0x${string}`, gas?: any) {
             this.createWeb3Modal();
 
             if (!this.account || this.account.address !== from) {
@@ -139,7 +139,7 @@ export const useWalletStore = defineStore('wallet', {
                 await this.switchChain(this.chainId);
             }
 
-            return sendTransaction(wagmiConfig, { to, data });
+            return sendTransaction(wagmiConfig, { to, data, gas });
         },
         waitForAccount() {
             return new Promise((resolve: any) => {

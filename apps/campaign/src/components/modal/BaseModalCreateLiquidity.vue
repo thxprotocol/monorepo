@@ -14,7 +14,7 @@
             <b-tab v-if="Number(amounts[0])" :title="tabTitles.approveUSDC">
                 <BaseTabApprove
                     :amount="amountApprovalUSDC"
-                    :token-address="address.USDC"
+                    :token="{ address: address.USDC, decimals: 6 }"
                     :spender="address.BalancerVault"
                     @update="amountApprovalUSDC = $event"
                     @approve="onApproveUSDC"
@@ -24,7 +24,7 @@
             <b-tab v-if="Number(amounts[1])" :title="tabTitles.approveTHX">
                 <BaseTabApprove
                     :amount="amountApprovalTHX"
-                    :token-address="address.THX"
+                    :token="{ address: address.THX, decimals: 18 }"
                     :spender="address.BalancerVault"
                     @update="amountApprovalTHX = $event"
                     @approve="onApproveTHX"
@@ -77,7 +77,11 @@
                 <b-form-group>
                     <template #label>
                         <span class="text-opaque me-1">Slippage</span>
-                        <i v-b-tooltip class="fas fa-question-circle" title="Percentage" />
+                        <i
+                            v-b-tooltip
+                            class="fas fa-question-circle"
+                            title="Market conditions can shift between when you place an order and when it's executed. Slippage tolerance sets the maximum price change you'll accept, guarding against front-running bots and miner extractable value (MEV)."
+                        />
                     </template>
                     <div class="d-flex justify-content-between">
                         <b-button
@@ -86,6 +90,7 @@
                             variant="primary"
                             class="me-2 rounded"
                             style="width: 100px"
+                            :disabled="slippage === value"
                             @click="slippage = value"
                         >
                             {{ label }}
@@ -185,8 +190,8 @@ export default defineComponent({
             this.amountUSDC = this.amounts[0];
             this.amountTHX = this.amounts[1];
 
-            this.walletStore.getApproval({ tokenAddress: this.address.USDC, spender: this.address.BPT });
-            this.walletStore.getApproval({ tokenAddress: this.address.THX, spender: this.address.BPT });
+            this.walletStore.getApproval({ tokenAddress: this.address.USDC, spender: this.address.BalancerVault });
+            this.walletStore.getApproval({ tokenAddress: this.address.THX, spender: this.address.BalancerVault });
         },
         onApproveUSDC() {
             this.amountUSDC = this.amountApprovalUSDC;
@@ -203,7 +208,7 @@ export default defineComponent({
                 this.isPolling = true;
 
                 // Values to send
-                const usdcAmountInWei = parseUnits(this.amountUSDC.toString(), 18);
+                const usdcAmountInWei = parseUnits(this.amountUSDC.toString(), 6);
                 const thxAmountInWei = parseUnits(this.amountTHX.toString(), 18);
 
                 // Create liquidity

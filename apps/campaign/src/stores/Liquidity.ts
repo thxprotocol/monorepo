@@ -5,6 +5,8 @@ import { useWalletStore } from './Wallet';
 import { BALANCER_POOL_ID, contractNetworks } from '../config/constants';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { BigNumber } from 'ethers';
+import { BalancerSDK, Network } from '@balancer-labs/sdk';
+import { POLYGON_RPC } from '../config/secrets';
 
 type TCreateLiquidityOptions = { thxAmountInWei: string; usdcAmountInWei: string; slippage: string };
 
@@ -29,73 +31,26 @@ export const useLiquidityStore = defineStore('liquidity', {
             await confirmTransactions(txs);
         },
         async createLiquidityWalletConnect(wallet: TWallet, data: TCreateLiquidityOptions) {
-            const { sendTransaction, encodeContractCall } = useWalletStore();
-            const abi = [
-                {
-                    inputs: [
-                        {
-                            internalType: 'bytes32',
-                            name: 'poolId',
-                            type: 'bytes32',
-                        },
-                        {
-                            internalType: 'address',
-                            name: 'sender',
-                            type: 'address',
-                        },
-                        {
-                            internalType: 'address',
-                            name: 'recipient',
-                            type: 'address',
-                        },
-                        {
-                            components: [
-                                {
-                                    internalType: 'address[]',
-                                    name: 'assets',
-                                    type: 'address[]',
-                                },
-                                {
-                                    internalType: 'uint256[]',
-                                    name: 'maxAmountsIn',
-                                    type: 'uint256[]',
-                                },
-                                {
-                                    internalType: 'bytes',
-                                    name: 'userData',
-                                    type: 'bytes',
-                                },
-                                {
-                                    internalType: 'bool',
-                                    name: 'fromInternalBalance',
-                                    type: 'bool',
-                                },
-                            ],
-                            internalType: 'struct BalancerVault.JoinPoolRequest',
-                            name: 'request',
-                            type: 'tuple',
-                        },
-                    ],
-                    name: 'joinPool',
-                    outputs: [],
-                    stateMutability: 'nonpayable',
-                    type: 'function',
-                },
-            ];
-            const call = encodeContractCall(contractNetworks[wallet.chainId].BalancerVault, abi, 'joinPool', [
-                BALANCER_POOL_ID,
-                wallet.address,
-                wallet.address,
-                {
-                    assets: [contractNetworks[wallet.chainId].USDC, contractNetworks[wallet.chainId].THX],
-                    maxAmountsIn: [data.usdcAmountInWei, data.thxAmountInWei],
-                    userData: '0x',
-                    fromInternalBalance: false,
-                },
-            ]);
+            const { sendTransaction } = useWalletStore();
+            const balancer = new BalancerSDK({
+                network: Network.POLYGON,
+                rpcUrl: POLYGON_RPC,
+            });
+            const pool = await balancer.pools.find(BALANCER_POOL_ID);
+            if (!pool) throw new Error('Liquidity pool not found');
 
-            // Sign and execute the transaction data
-            await sendTransaction(wallet.address, call.to, call.data);
+            const [usdc, thx] = pool.tokens as unknown as {
+                address: string;
+            }[];
+
+            const call = pool.buildJoin(
+                wallet.address,
+                [usdc.address, thx.address],
+                [data.usdcAmountInWei, data.thxAmountInWei],
+                data.slippage,
+            ) as { to: `0x${string}`; data: `0x${string}` };
+
+            await sendTransaction(wallet.address, call.to, call.data, '500000');
         },
         waitForLiquidity(wallet: TWallet, data: TCreateLiquidityOptions) {
             const { balances, getBalance } = useWalletStore();
@@ -112,7 +67,6 @@ export const useLiquidityStore = defineStore('liquidity', {
                 const usdcBalance = useWalletStore().balances[USDC];
                 const thxBalance = useWalletStore().balances[THX];
 
-                // @dev Not yet taking slippage into account here
                 return usdcBalanceExpected.eq(usdcBalance) && thxBalanceExpected.eq(thxBalance)
                     ? Promise.resolve()
                     : Promise.reject('Liquidity');

@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
@@ -28,7 +28,7 @@ export default defineComponent({
     name: 'BaseTabApprove',
     props: {
         amount: { type: String, required: true },
-        tokenAddress: { type: String, required: true },
+        token: { type: Object as PropType<{ address: string; decimals: number }>, required: true },
         spender: { type: String, required: true },
     },
     data() {
@@ -45,16 +45,16 @@ export default defineComponent({
             return contractNetworks[this.walletStore.wallet.chainId];
         },
         allowance() {
-            if (!this.walletStore.allowances[this.tokenAddress]) return 0;
-            if (!this.walletStore.allowances[this.tokenAddress][this.spender]) return 0;
-            return this.walletStore.allowances[this.tokenAddress][this.spender];
+            if (!this.walletStore.allowances[this.token.address]) return 0;
+            if (!this.walletStore.allowances[this.token.address][this.spender]) return 0;
+            return this.walletStore.allowances[this.token.address][this.spender];
         },
         currentAllowance() {
-            return Number(formatUnits(this.allowance, 'ether'));
+            return Number(formatUnits(this.allowance, this.token.decimals));
         },
         isSufficientAllowance() {
             const allowanceInWei = BigNumber.from(this.allowance);
-            const amountInWei = parseUnits(this.amount.toString(), 18);
+            const amountInWei = parseUnits(this.amount.toString(), this.token.decimals);
             if (amountInWei.gt(0) && allowanceInWei.gte(amountInWei)) return true;
             return false;
         },
@@ -63,7 +63,7 @@ export default defineComponent({
         waitForApproval() {
             const taskFn = async () => {
                 await this.walletStore.getApproval({
-                    tokenAddress: this.tokenAddress,
+                    tokenAddress: this.token.address,
                     spender: this.spender,
                 });
                 return this.isSufficientAllowance ? Promise.resolve() : Promise.reject('x');
@@ -73,10 +73,10 @@ export default defineComponent({
         async onClickApprove() {
             this.isPolling = true;
             try {
-                const amountInWei = parseUnits(this.amount.toString(), 18);
+                const amountInWei = parseUnits(this.amount.toString(), this.token.decimals);
 
                 await this.walletStore.approve({
-                    tokenAddress: this.tokenAddress,
+                    tokenAddress: this.token.address,
                     spender: this.spender,
                     amountInWei: amountInWei.toString(),
                 });
