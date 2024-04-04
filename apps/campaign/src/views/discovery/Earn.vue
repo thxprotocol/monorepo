@@ -125,13 +125,15 @@ export default defineComponent({
                 if (!wallet) return;
                 const bptGaugeAddress = contractNetworks[wallet.chainId].BPTGauge;
                 this.veStore.getLocks();
-                this.liquidityStore.getSpotPrice();
                 this.walletStore.getBalance(bptGaugeAddress).then(() => {
                     this.amountDepositInWei = this.walletStore.balances[bptGaugeAddress];
                 });
             },
             immediate: true,
         },
+    },
+    mounted() {
+        this.liquidityStore.getSpotPrice();
     },
 });
 </script>

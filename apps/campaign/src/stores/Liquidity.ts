@@ -117,8 +117,7 @@ export const useLiquidityStore = defineStore('liquidity', {
         },
         async getSpotPrice() {
             const { api } = useAccountStore();
-            const pricing = await api.request.get('/v1/liquidity/price');
-
+            const pricing = await api.request.get('/v1/prices');
             this.pricing = pricing;
         },
         async waitForStake(amountInWei: BigNumber) {
