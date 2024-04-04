@@ -1,6 +1,6 @@
 <template>
     <b-form-group label="Amount" :description="`Current allowance: ${currentAllowance}`">
-        <b-form-input :value="amount" type="number" :step="1 / 10 ** precision" @input="$emit('update', $event)" />
+        <b-form-input :value="amount" type="number" :step="0.1 ** precision" @input="$emit('update', $event)" />
     </b-form-group>
     <b-button v-if="isSufficientAllowance" variant="primary" class="w-100" :disabled="isPolling" @click="$emit('ok')">
         Continue

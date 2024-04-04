@@ -30,11 +30,13 @@ export const contractNetworks: any = {
     },
     '137': {
         // Tokens
+        THX: '0x2934b36ca9a4b31e633c5be670c8c8b28b6aa015',
+        USDC: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
+        BAL: '0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3',
         BPT: '0xb204bf10bc3a5435017d3db247f56da601dfe08a',
         BPTGauge: '0xf16BECC1Bcaf0fF0b865024a644a4da1A2f8585c',
-        BAL: '0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3',
-        USDC: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
-        THX: '0x2934b36ca9a4b31e633c5be670c8c8b28b6aa015',
+        BalancerVault: '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
+
         // veTHX
         VotingEscrow: '0xE3B8E734e7BCcB64B63e032795896CC57012A51D',
         RewardDistributor: '0xCc62c812EfF9cA4c35623103B2Bb63E22f465E09',
