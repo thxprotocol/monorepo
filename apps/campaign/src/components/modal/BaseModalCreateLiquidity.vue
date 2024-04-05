@@ -123,10 +123,12 @@ import { mapStores } from 'pinia';
 import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
-import { contractNetworks } from '../../config/constants';
+import { BALANCER_POOL_ID, contractNetworks } from '../../config/constants';
 import { parseUnits } from 'ethers/lib/utils';
 import { ChainId } from '@thxnetwork/sdk';
 import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
+import { BalancerSDK, Network } from '@balancer-labs/sdk';
+import { POLYGON_RPC } from '@thxnetwork/campaign/config/secrets';
 
 export default defineComponent({
     name: 'BaseModalCreateLiquidity',
@@ -211,13 +213,22 @@ export default defineComponent({
                 const usdcAmountInWei = parseUnits(this.amountUSDC.toString(), 6);
                 const thxAmountInWei = parseUnits(this.amountTHX.toString(), 18);
 
+                // Create Balancer SDK here in favor of code splitting on /earn
+                const balancer = new BalancerSDK({
+                    network: Network.POLYGON,
+                    rpcUrl: POLYGON_RPC,
+                });
+                const pool = await balancer.pools.find(BALANCER_POOL_ID);
+                if (!pool) throw new Error('Liquidity pool not found');
+
                 // Create liquidity
                 const data = {
                     usdcAmountInWei: usdcAmountInWei.toString(),
                     thxAmountInWei: thxAmountInWei.toString(),
                     slippage: String(Number(this.slippage.toFixed(2)) * 100),
+                    pool,
                 };
-                await this.liquidityStore.createLiquidity(this.walletStore.wallet, data);
+                await this.liquidityStore.createLiquidity(this.walletStore.wallet, pool, data);
 
                 // Wait for BPTGauge balance to increase
                 await this.liquidityStore.waitForLiquidity(this.walletStore.wallet, data);

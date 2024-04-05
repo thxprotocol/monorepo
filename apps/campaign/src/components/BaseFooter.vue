@@ -1,9 +1,6 @@
 <template>
-    <b-container class="py-3">
+    <b-container class="py-5 mt-5">
         <b-row>
-            <b-col cols="12">
-                <hr />
-            </b-col>
             <b-col cols="6">
                 <b-nav>
                     <b-nav-item href="https://thx.network" target="_blank" link-class="text-white text-opaque ps-lg-0">

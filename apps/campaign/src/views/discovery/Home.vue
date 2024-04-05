@@ -1,7 +1,14 @@
 <template>
-    <b-container>
-        <b-row class="py-md-5">
-            <b-col lg="4" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex">
+    <b-container class="pt-4 pt-lg-5">
+        <b-row
+            class="py-md-5"
+            :style="{
+                backgroundSize: 'cover',
+                backgroundImage: `url(${imgBgOverlay})`,
+                borderRadius: '15px',
+            }"
+        >
+            <b-col lg="4" offset-lg="1" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex">
                 <div>
                     <h1>
                         Campaign<br />
@@ -17,26 +24,12 @@
                     </b-button>
                 </div>
             </b-col>
-            <b-col lg="5" class="py-4 py-lg-0 offset-lg-3 text-right">
-                <div class="py-2 text-opaque">
-                    <i class="fas fa-trophy me-1" />
-                    Quest Spotlight
+            <b-col lg="4" offset-lg="2" class="py-4 py-lg-0 text-right">
+                <div class="gradient-shadow-xl position-relative">
+                    <b-img :src="imgJumbotron" class="mb-4" fluid />
                 </div>
-                <b-card style="min-height: 305px" body-class="p-0" class="border-0 gradient-shadow-xl">
-                    <b-carousel ref="carouselQuests" fade indicators :interval="1000">
-                        <b-carousel-slide
-                            v-for="quest of questLists"
-                            background="transparent"
-                            img-blank
-                            img-blank-color="primary"
-                        >
-                            <BaseCardQuestSpotlight :quest="quest" />
-                        </b-carousel-slide>
-                    </b-carousel>
-                </b-card>
             </b-col>
         </b-row>
-        <hr class="my-5" />
     </b-container>
     <b-container class="flex-grow-1">
         <b-row class="mt-5 mb-3">
@@ -128,6 +121,14 @@
                 </b-table>
             </b-col>
         </b-row>
+        <hr class="my-5" />
+        <b-row>
+            <b-col v-for="quest of questLists" lg="3" :quest="quest">
+                <b-card style="min-height: 305px" body-class="p-0" class="border-0">
+                    <BaseCardQuestSpotlight :quest="quest" />
+                </b-card>
+            </b-col>
+        </b-row>
     </b-container>
 </template>
 
@@ -138,17 +139,19 @@ import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { mapStores } from 'pinia';
 import { format } from 'date-fns';
-import imgJumbotron from '../../assets/thx_token_governance.webp';
+import imgJumbotron from '../../assets/thx_token_governance.png';
 import imgLogo from '../../assets/logo.png';
 import { decodeHTML } from '../../utils/decode-html';
+import imgBgOverlay from '../../assets/bg-overlay.png';
 
 export default defineComponent({
     name: 'Home',
     data(): any {
         return {
             decodeHTML,
+            imgBgOverlay,
             publicUrl: 'https://www.thx.network',
-            questLists: { daily: [], invite: [], social: [], custom: [], web3: [] },
+            questLists: { daily: [], invite: [], social: [], custom: [], web3: [], gitcoin: [] },
             isLoadingSearch: false,
             isLoadingPage: false,
             isAlertShown: true,

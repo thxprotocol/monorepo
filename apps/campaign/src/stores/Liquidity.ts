@@ -2,13 +2,17 @@ import poll from 'promise-poller';
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
-import { BALANCER_POOL_ID, contractNetworks } from '../config/constants';
+import { contractNetworks } from '../config/constants';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { BigNumber } from 'ethers';
-import { BalancerSDK, Network } from '@balancer-labs/sdk';
-import { POLYGON_RPC } from '../config/secrets';
+import { PoolWithMethods } from '@balancer-labs/sdk';
 
-type TCreateLiquidityOptions = { thxAmountInWei: string; usdcAmountInWei: string; slippage: string };
+type TCreateLiquidityOptions = {
+    thxAmountInWei: string;
+    usdcAmountInWei: string;
+    slippage: string;
+    pool: PoolWithMethods;
+};
 
 export const useLiquidityStore = defineStore('liquidity', {
     state: (): TLiquidityState => ({
@@ -32,18 +36,12 @@ export const useLiquidityStore = defineStore('liquidity', {
         },
         async createLiquidityWalletConnect(wallet: TWallet, data: TCreateLiquidityOptions) {
             const { sendTransaction } = useWalletStore();
-            const balancer = new BalancerSDK({
-                network: Network.POLYGON,
-                rpcUrl: POLYGON_RPC,
-            });
-            const pool = await balancer.pools.find(BALANCER_POOL_ID);
-            if (!pool) throw new Error('Liquidity pool not found');
 
-            const [usdc, thx] = pool.tokens as unknown as {
+            const [usdc, thx] = data.pool.tokens as unknown as {
                 address: string;
             }[];
 
-            const call = pool.buildJoin(
+            const call = data.pool.buildJoin(
                 wallet.address,
                 [usdc.address, thx.address],
                 [data.usdcAmountInWei, data.thxAmountInWei],

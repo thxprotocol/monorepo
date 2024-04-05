@@ -1,12 +1,5 @@
 <template>
-    <div
-        :style="{
-            minHeight: '100%',
-            backgroundSize: 'cover',
-            backgroundImage: `url(${imgBgOverlay})`,
-        }"
-        class="pt-3"
-    >
+    <div :style="{ minHeight: '100%' }" class="pt-3">
         <b-offcanvas
             v-model="isNavbarOffcanvasShown"
             :no-header-close="true"
@@ -102,14 +95,15 @@
             </b-navbar>
         </b-container>
         <router-view />
-        <BaseFooter />
+        <div class="bg-dark">
+            <BaseFooter />
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import imgLogo from '../assets/logo.png';
-import imgBgOverlay from '../assets/bg-overlay.png';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../stores/Account';
 import { useAuthStore } from '../stores/Auth';
@@ -123,7 +117,6 @@ export default defineComponent({
             isModalConnectSettingsShown: false,
             isModalAccountShown: false,
             imgLogo,
-            imgBgOverlay,
         };
     },
     computed: {
