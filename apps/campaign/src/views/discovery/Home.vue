@@ -124,7 +124,7 @@
         <hr class="my-5" />
         <b-row>
             <b-col v-for="quest of questLists" lg="3" :quest="quest">
-                <b-card style="min-height: 305px" body-class="p-0" class="border-0">
+                <b-card style="min-height: 305px" body-class="p-0 h-100" class="border-0 h-100">
                     <BaseCardQuestSpotlight :quest="quest" />
                 </b-card>
             </b-col>
