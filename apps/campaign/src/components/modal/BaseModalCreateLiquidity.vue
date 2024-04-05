@@ -228,7 +228,7 @@ export default defineComponent({
                     slippage: String(Number(this.slippage.toFixed(2)) * 100),
                     pool,
                 };
-                await this.liquidityStore.createLiquidity(this.walletStore.wallet, pool, data);
+                await this.liquidityStore.createLiquidity(this.walletStore.wallet, data);
 
                 // Wait for BPTGauge balance to increase
                 await this.liquidityStore.waitForLiquidity(this.walletStore.wallet, data);
