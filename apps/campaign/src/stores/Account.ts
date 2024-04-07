@@ -284,5 +284,17 @@ export const useAccountStore = defineStore('account', {
             const leaderboard = await this.api.request.get(`/v1/leaderboards/${this.poolId}`);
             this.leaderboard = leaderboard;
         },
+        async waitForJob(jobId: string) {
+            const taskFn = async () => {
+                const job = await this.api.request.get(`/v1/jobs/${jobId}`);
+                return job && !!job.lastRunAt ? Promise.resolve() : Promise.reject('Job not finished');
+            };
+
+            // Poll for job to finish
+            await poll({ taskFn, interval: 1000 });
+
+            // Updates point balance
+            await this.getParticipants();
+        },
     },
 });

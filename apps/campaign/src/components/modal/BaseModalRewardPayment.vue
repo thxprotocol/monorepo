@@ -105,7 +105,6 @@ export default defineComponent({
                 const walletStore = useWalletStore();
 
                 await this.rewardStore.createPayment(this.reward.variant, this.reward._id, this.wallet);
-                await this.accountStore.getParticipants();
 
                 walletStore.list();
 

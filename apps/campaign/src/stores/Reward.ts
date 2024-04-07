@@ -27,9 +27,15 @@ export const useRewardStore = defineStore('reward', {
             track('UserCreates', [account?.sub, eventMap[variant], { poolId }]);
         },
         async createPayment(variant: RewardVariant, id: string, wallet: TWallet | null) {
-            await useAccountStore().api.request.post(`/v1/rewards/${variant}/${id}/payments`, {
+            const { api, waitForJob } = useAccountStore();
+            const { jobId } = await api.request.post(`/v1/rewards/${variant}/${id}/payments`, {
                 data: { walletId: wallet?._id },
             });
+
+            // Wait for the quest entry job to complete
+            await waitForJob(jobId);
+
+            // Update local state
             this.updateSupply(id);
             this.trackEvent(variant);
         },

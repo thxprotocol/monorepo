@@ -35,7 +35,7 @@ export const useQuestStore = defineStore('quest', {
             });
         },
         async completeQuest(quest: TAnyQuest, payload = {}) {
-            const { api, account, poolId } = useAccountStore();
+            const { api, account, poolId, waitForJob } = useAccountStore();
             if (!account) return;
 
             /// Non generic data for quest types. Should be refactored.
@@ -82,7 +82,7 @@ export const useQuestStore = defineStore('quest', {
             if (error) throw new Error(error);
 
             // Wait for the quest entry job to complete
-            await this.waitForQuestEntryJob(jobId);
+            await waitForJob(jobId);
 
             // Track event in mixpanel
             track('UserCreates', [account?.sub, eventKey, { poolId }]);
@@ -99,18 +99,6 @@ export const useQuestStore = defineStore('quest', {
 
             this.quests = [...gitcoin, ...invite, ...socialQuestList, ...custom, ...daily, ...web3];
             this.isLoading = false;
-        },
-
-        async waitForQuestEntryJob(jobId: string) {
-            const { api } = useAccountStore();
-            const taskFn = async () => {
-                const job = await api.request.get(`/v1/jobs/${jobId}`);
-                return job && !!job.lastRunAt ? Promise.resolve() : Promise.reject('Job not finished');
-            };
-
-            // Poll for job to finish
-            await poll({ taskFn, interval: 1000, retries: 5 });
-            await useAccountStore().getParticipants();
         },
     },
 });
