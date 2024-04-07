@@ -118,7 +118,8 @@ export default defineComponent({
     },
     methods: {
         onShow() {
-            //
+            this.veStore.getLocks();
+            this.liquidityStore.getSpotPrice();
         },
         getValue(symbol: string, amount: string) {
             const value = this.liquidityStore.pricing[symbol] * Number(formatUnits(amount, 'ether'));
