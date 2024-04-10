@@ -1,5 +1,5 @@
 <template>
-    <b-container class="py-5 mt-5">
+    <b-container class="py-5">
         <b-row>
             <b-col cols="6">
                 <b-nav>

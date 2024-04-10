@@ -1,39 +1,12 @@
 <template>
-    <b-container class="pt-4 pt-lg-5">
-        <b-row
-            class="py-md-5"
-            :style="{
-                backgroundSize: 'cover',
-                backgroundImage: `url(${imgBgOverlay})`,
-                borderRadius: '15px',
-            }"
-        >
-            <b-col lg="4" offset-lg="1" class="pb-0 pt-4 pt-lg-0 text-white brand-intro align-items-center d-flex">
-                <div>
-                    <h1>
-                        Campaign<br />
-                        Discovery
-                    </h1>
-                    <p class="lead mb-4">A single spot to discover all Quest &amp; Reward campaigns for you to join.</p>
-                    <b-button variant="primary" class="me-3 px-5" @click="onClickStart">
-                        Start Campaign
-                        <i class="fas fa-chevron-right ms-2" />
-                    </b-button>
-                    <b-button href="https://docs.thx.network" target="_blank" variant="link" class="text-white">
-                        Learn more
-                    </b-button>
-                </div>
-            </b-col>
-            <b-col lg="4" offset-lg="2" class="py-4 py-lg-0 text-right">
-                <div class="gradient-shadow-xl position-relative">
-                    <b-img :src="imgJumbotron" class="mb-4" fluid />
-                </div>
-            </b-col>
-        </b-row>
-    </b-container>
+    <BaseCardHeaderHome />
+
     <b-container class="flex-grow-1">
         <b-row class="mt-5 mb-3">
-            <b-col xs="12" md="4">
+            <b-col xs="12" md="6">
+                <h2>Explore campaigns</h2>
+            </b-col>
+            <b-col xs="12" md="4" offset-md="2" class="d-flex align-items-center justify-content-end">
                 <b-input-group class="mb-3 mb-md-0">
                     <template #prepend>
                         <b-input-group-text class="bg-primary">
@@ -43,15 +16,6 @@
                     </template>
                     <b-form-input v-model="search" placeholder="Search..." @input="onInputSearch" />
                 </b-input-group>
-            </b-col>
-            <b-col xs="12" md="6" offset-md="2" class="d-flex align-items-center justify-content-end">
-                <b-pagination
-                    v-model="page"
-                    :per-page="limit"
-                    :total-rows="campaigns.total"
-                    align="center"
-                    class="mb-0"
-                ></b-pagination>
             </b-col>
         </b-row>
         <b-row :style="{ opacity: isLoadingSearch || isLoadingPage ? 0.5 : 1 }">
@@ -121,7 +85,20 @@
                 </b-table>
             </b-col>
         </b-row>
-        <hr class="my-5" />
+        <b-pagination
+            v-model="page"
+            :per-page="limit"
+            :total-rows="campaigns.total"
+            align="center"
+            class="mb-0"
+        ></b-pagination>
+    </b-container>
+    <b-container>
+        <b-row class="mt-5 mb-3">
+            <b-col xs="12" md="6">
+                <h2>Quest Spotlight</h2>
+            </b-col>
+        </b-row>
         <b-row>
             <b-col v-for="quest of questLists" lg="3" :quest="quest">
                 <b-card style="min-height: 305px" body-class="p-0 h-100" class="border-0 h-100">
@@ -130,27 +107,55 @@
             </b-col>
         </b-row>
     </b-container>
+    <BaseCardHeader row-class="py-md-0 mt-5" class="my-5">
+        <template #primary>
+            <b-img :src="imgHeader" fluid />
+        </template>
+        <template #secondary>
+            <div class="py-lg-5 pe-lg-5">
+                <h1 class="mt-lg-3">
+                    Quest<br />
+                    Campaigns
+                </h1>
+                <p class="lead mb-4">
+                    Give back to your community while increasing engagement with effective Quest Campaigns.
+                </p>
+                <b-button :href="`${publicURL}/pricing`" variant="primary" class="me-3 px-5" target="_blank">
+                    Campaign Pricing
+                </b-button>
+                <b-button
+                    href="https://discord.com/invite/TzbbSmkE7Y"
+                    target="_blank"
+                    variant="link"
+                    class="text-white"
+                >
+                    Reach out! (We don't bite)
+                </b-button>
+            </div>
+        </template>
+    </BaseCardHeader>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { API_URL } from '../../config/secrets';
+import { API_URL, DASHBOARD_URL, PUBLIC_URL } from '../../config/secrets';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { mapStores } from 'pinia';
 import { format } from 'date-fns';
+import { decodeHTML } from '../../utils/decode-html';
 import imgJumbotron from '../../assets/thx_token_governance.png';
 import imgLogo from '../../assets/logo.png';
-import { decodeHTML } from '../../utils/decode-html';
-import imgBgOverlay from '../../assets/bg-overlay.png';
+import imgHeader from '../../assets/thx_token_governance.png';
 
 export default defineComponent({
     name: 'Home',
     data(): any {
         return {
+            imgHeader,
             decodeHTML,
-            imgBgOverlay,
-            publicUrl: 'https://www.thx.network',
+            publicURL: PUBLIC_URL,
+            dashboardURL: DASHBOARD_URL,
             questLists: { daily: [], invite: [], social: [], custom: [], web3: [], gitcoin: [] },
             isLoadingSearch: false,
             isLoadingPage: false,
@@ -161,21 +166,20 @@ export default defineComponent({
             page: 1,
             limit: 15,
             search: '',
-            debouncedSearch: null,
+            debouncedSearch: null as any,
             screenWidth: window.innerWidth,
             campaigns: { results: [], total: 0 },
             isModalCampaignDomainShown: false,
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useAuthStore),
-        campaignData() {
+        ...mapStores(useAccountStore, useAuthStore),
+        campaignData(): any[] {
             if (!this.campaigns.results) return [];
             return this.campaigns.results
                 .map((c: any) => ({
                     rank: c.rank,
-                    logo: c.logoImgUrl,
+                    logo: c.logoImgUrl as string,
                     name: {
                         title: c.title,
                         active: c.active,
@@ -219,8 +223,8 @@ export default defineComponent({
         async getCampaigns() {
             const url = new URL(API_URL);
             url.pathname = '/v1/leaderboards';
-            url.searchParams.append('page', this.page);
-            url.searchParams.append('limit', this.limit);
+            url.searchParams.append('page', this.page.toString());
+            url.searchParams.append('limit', this.limit.toString());
             if (this.search) {
                 url.searchParams.append('search', this.search);
             }

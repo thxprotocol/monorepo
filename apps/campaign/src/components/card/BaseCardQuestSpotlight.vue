@@ -43,7 +43,9 @@
                 </b-badge>
             </div>
         </div>
-        <p class="mb-0">{{ quest.description }}</p>
+        <p class="pt-2 mb-0 d-block" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+            {{ quest.description }}
+        </p>
         <template #footer>
             <b-button class="w-100" :to="`/c/${quest.poolId}`" variant="primary">
                 Earn <strong>{{ quest.amount }}</strong> points!

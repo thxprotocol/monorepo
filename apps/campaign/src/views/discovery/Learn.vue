@@ -1,10 +1,14 @@
 <template>
-    <b-container>
-        <b-alert v-model="isAlertShown" variant="primary" class="mt-3 p-2">
-            <i class="fas fa-exclamation-circle me-1" />
-            Complete quests to learn about our new Campaign Discovery platform!
-        </b-alert>
-    </b-container>
+    <BaseCardHeader>
+        <template #primary>
+            <h1>
+                Onboarding <br />
+                Quest &amp; Rewards
+            </h1>
+            <p class="lead">Complete quests and earn rewards while you learn about THX Network!</p>
+            <b-button variant="primary" class="px-5" disabled>Coming Soon!</b-button>
+        </template>
+    </BaseCardHeader>
 </template>
 
 <script lang="ts">
