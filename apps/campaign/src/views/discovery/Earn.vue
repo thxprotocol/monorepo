@@ -90,6 +90,24 @@
             </b-card>
         </template>
     </BaseCardHeader>
+    <b-container class="my-5">
+        <b-row>
+            <b-col><h2>Reward Distribution (May 2024)</h2></b-col>
+            <b-col></b-col>
+        </b-row>
+        <b-row>
+            <b-col>
+                <p class="lead">
+                    A whopping <strong>70% of the campaign payments</strong> will be distributed among
+                    <b-link target="_blank" href="https://docs.thx.network/faq/memberships" class="text-white fw-bold">
+                        members
+                    </b-link>
+                    as staked liquidity ready to be claimed.
+                </p>
+                <p class="lead">Become member today and share in the success of THX Network! ✨</p>
+            </b-col>
+        </b-row>
+    </b-container>
 </template>
 
 <script lang="ts">
