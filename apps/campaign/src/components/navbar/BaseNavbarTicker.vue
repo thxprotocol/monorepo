@@ -19,6 +19,7 @@
 <style lang="scss">
 .ticker {
     text-align: center;
+    min-height: 40px;
 }
 
 @media (max-width: 992px) {

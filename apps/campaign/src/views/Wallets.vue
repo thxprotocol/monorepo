@@ -1,12 +1,11 @@
 <template>
-    <b-container>
+    <b-container class="mt-5">
         <b-alert v-if="isAlertShown" v-model="isAlertShown" variant="primary" class="py-2 mt-3">
             <i class="fas fa-gift me-2" />
             Sign in to see your rewards!
         </b-alert>
         <b-row v-else>
             <b-col lg="6" offset-lg="3" class="px-0">
-                <BaseCardWallets />
                 <BaseCardRewards />
             </b-col>
         </b-row>

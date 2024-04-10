@@ -93,23 +93,38 @@
                 THX Network
             </b-link>
         </template>
-        <hr />
-        <b-list-group class="w-100" style="border-radius: 0">
-            <b-list-group-item @click="onClickRoute('/')"
-                ><i class="fas fa-home me-1"></i> Discovery
+        <BaseCardAccount v-if="accountStore.isAuthenticated" />
+        <b-list-group class="w-100 mb-4" style="border-radius: 0">
+            <b-list-group-item class="d-flex" @click="onClickRoute('/')">
+                <div style="width: 30px"><i class="fas fa-home me-1 text-opaque"></i></div>
+                Explore
             </b-list-group-item>
-            <b-list-group-item @click="onClickRoute('/learn')">
-                <i class="fas fa-graduation-cap me-1"></i> Learn
+            <b-list-group-item class="d-flex" @click="onClickRoute('/learn')">
+                <div style="width: 30px"><i class="fas fa-graduation-cap me-1 text-opaque"></i></div>
+                Learn
             </b-list-group-item>
-            <b-list-group-item @click="onClickRoute('/earn')">
-                <i class="fas fa-rocket me-1"></i> Earn
+            <b-list-group-item class="d-flex" @click="onClickRoute('/earn')">
+                <div style="width: 30px"><i class="fas fa-rocket me-1 text-opaque"></i></div>
+                Earn
             </b-list-group-item>
-            <b-list-group-item @click="onClickRoute('/wallets')">
-                <i class="fas fa-wallet me-1"></i>
-                Wallet
+            <b-list-group-item class="d-flex" disabled @click="onClickRoute('/community')">
+                <div style="width: 30px"><i class="fas fa-users me-1 text-opaque"></i></div>
+                Community
+            </b-list-group-item>
+            <b-list-group-item class="d-flex" disabled @click="onClickRoute('/members')">
+                <div style="width: 30px"><i class="fas fa-id-card me-1 text-opaque"></i></div>
+                Members
+                <sup><i class="fas fa-circle text-danger" /></sup>
+            </b-list-group-item>
+            <b-list-group-item
+                class="d-flex"
+                :disabled="!accountStore.isAuthenticated"
+                @click="onClickRoute('/wallets')"
+            >
+                <div style="width: 30px"><i class="fas fa-wallet me-1 text-opaque"></i></div>
+                My Rewards
             </b-list-group-item>
         </b-list-group>
-        <hr />
         <b-button v-if="!accountStore.isAuthenticated" v-b-modal="'modalLogin'" variant="primary">
             Sign in
             <i class="fas fa-sign-in-alt ml-auto"></i>

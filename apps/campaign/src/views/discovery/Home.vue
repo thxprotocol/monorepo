@@ -1,7 +1,7 @@
 <template>
     <BaseCardHeaderHome />
 
-    <b-container class="flex-grow-1">
+    <b-container>
         <b-row class="mt-5 mb-3">
             <b-col xs="12" md="6">
                 <h2>Explore campaigns</h2>
@@ -93,7 +93,7 @@
             class="mb-0"
         ></b-pagination>
     </b-container>
-    <b-container>
+    <b-container class="mb-5">
         <b-row class="mt-5 mb-3">
             <b-col xs="12" md="6">
                 <h2>Quest Spotlight</h2>
@@ -107,7 +107,7 @@
             </b-col>
         </b-row>
     </b-container>
-    <BaseCardHeader row-class="py-md-0 mt-5" class="my-5">
+    <BaseCardHeader row-class="py-md-0" class="my-5">
         <template #primary>
             <b-img :src="imgHeader" fluid />
         </template>
@@ -129,7 +129,7 @@
                     variant="link"
                     class="text-white"
                 >
-                    Reach out! (We don't bite)
+                    Reach out! We don't bite😉
                 </b-button>
             </div>
         </template>
