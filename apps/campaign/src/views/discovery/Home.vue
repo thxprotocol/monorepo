@@ -4,7 +4,7 @@
     <b-container>
         <b-row class="mt-5 mb-3">
             <b-col xs="12" md="6">
-                <h2>Explore campaigns</h2>
+                <h2>Explore Campaigns</h2>
             </b-col>
             <b-col xs="12" md="4" offset-md="2" class="d-flex align-items-center justify-content-end">
                 <b-input-group class="mb-3 mb-md-0">
@@ -101,9 +101,7 @@
         </b-row>
         <b-row>
             <b-col v-for="quest of questLists" lg="3" :quest="quest">
-                <b-card style="min-height: 305px" body-class="p-0 h-100" class="border-0 h-100">
-                    <BaseCardQuestSpotlight :quest="quest" />
-                </b-card>
+                <BaseCardQuestSpotlight :quest="quest" class="mb-2" />
             </b-col>
         </b-row>
     </b-container>
