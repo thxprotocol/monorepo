@@ -1,9 +1,19 @@
 <template>
     <b-alert v-model="isModalUnstakedLiquidityShown" variant="primary" class="p-2">
         <i class="fas fa-exclamation-circle me-1" />
-        You have unstaked liquidity!
-        <b-link @click="$emit('change-tab', 0)"> Stake my liquidity </b-link>
+        You hold unstaked liquidity!
+        <b-link @click="isModalStakeShown = true"> Stake your liquidity first</b-link>
+        <i
+            v-b-tooltip
+            class="fas fa-info-circle ms-1 text-opaque"
+            title="You can only lock and obtain veTHX after staking your provided liquidity."
+        />
     </b-alert>
+    <BaseModalStake
+        :show="isModalStakeShown"
+        :amount="formatUnits(balanceBPT.toString(), 18)"
+        @hidden="isModalStakeShown = false"
+    />
     <b-alert v-model="isModalInsufficientAmountShown" variant="primary" class="p-2">
         <i class="fas fa-exclamation-circle me-1" />
         We require a minimal amount worth $3.00 USDC to be locked.
@@ -57,6 +67,8 @@ export default defineComponent({
     data() {
         return {
             parseUnits,
+            formatUnits,
+            isModalStakeShown: false,
             isModalDepositShown: false,
             isAlertDepositShown: true,
             isModalWithdrawShown: false,
@@ -66,6 +78,13 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useWalletStore, useAuthStore, useVeStore, useLiquidityStore),
+        amountStake() {
+            return this.balanceBPT;
+        },
+        balanceBPT() {
+            if (!this.walletStore.balances[this.address.BPT]) return BigNumber.from(0);
+            return BigNumber.from(this.walletStore.balances[this.address.BPT]);
+        },
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
@@ -75,8 +94,7 @@ export default defineComponent({
             return Number(formatUnits(this.amount, 'ether'));
         },
         isModalUnstakedLiquidityShown() {
-            if (!this.walletStore.balances[this.address.BPT]) return false;
-            return BigNumber.from(this.walletStore.balances[this.address.BPT]).gt(0);
+            return this.balanceBPT.gt(0);
         },
         isModalInsufficientAmountShown() {
             const bptPriceInWei = parseUnits(String(this.liquidityStore.pricing['20USDC-80THX']), 18);

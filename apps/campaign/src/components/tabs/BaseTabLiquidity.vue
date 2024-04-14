@@ -189,15 +189,15 @@ export default defineComponent({
         },
         balanceUSDC() {
             if (!this.walletStore.balances[this.address.USDC]) return 0;
-            return Number(formatUnits(this.walletStore.balances[this.address.USDC], 'mwei')); // USDC.e has 6 decimals
+            return Number(formatUnits(this.walletStore.balances[this.address.USDC], 6)); // USDC.e has 6 decimals
         },
         balanceTHX() {
             if (!this.walletStore.balances[this.address.THX]) return 0;
-            return Number(formatUnits(this.walletStore.balances[this.address.THX], 'ether')); // THX has 18 decimals
+            return Number(formatUnits(this.walletStore.balances[this.address.THX], 18)); // THX has 18 decimals
         },
         balanceBPT() {
             if (!this.walletStore.balances[this.address.BPT]) return 0;
-            return Number(formatUnits(this.walletStore.balances[this.address.BPT], 'ether')); // BPT has 18 decimals
+            return Number(formatUnits(this.walletStore.balances[this.address.BPT], 18)); // BPT has 18 decimals
         },
         isButtonAddLiquidityDisabled() {
             return !Number(this.amountUSDC) && !Number(this.amountTHX);
@@ -216,13 +216,13 @@ export default defineComponent({
         },
         updateBalances() {
             this.walletStore.getBalance(this.address.USDC).then(() => {
-                this.amountUSDC = formatUnits(this.walletStore.balances[this.address.USDC], 'ether');
+                this.amountUSDC = formatUnits(this.walletStore.balances[this.address.USDC], 6);
             });
             this.walletStore.getBalance(this.address.THX).then(() => {
-                this.amountTHX = formatUnits(this.walletStore.balances[this.address.THX], 'ether');
+                this.amountTHX = formatUnits(this.walletStore.balances[this.address.THX], 18);
             });
             this.walletStore.getBalance(this.address.BPT).then(() => {
-                this.amountStake = formatUnits(this.walletStore.balances[this.address.BPT], 'ether');
+                this.amountStake = formatUnits(this.walletStore.balances[this.address.BPT], 18);
             });
         },
         onSubmitCreateLiquidity() {

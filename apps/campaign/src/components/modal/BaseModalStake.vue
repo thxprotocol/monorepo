@@ -44,7 +44,7 @@ import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
-import { parseUnits } from 'ethers/lib/utils';
+import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { ChainId } from '@thxnetwork/sdk';
 import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
 
@@ -89,6 +89,12 @@ export default defineComponent({
             this.amountApproval = this.amount;
             this.amountStake = this.amount;
             this.walletStore.getApproval({ tokenAddress: this.address.BPT, spender: this.address.BPTGauge });
+            this.getBalances();
+        },
+        getBalances() {
+            this.walletStore.getBalance(this.address.BPT).then(() => {
+                this.amountStake = formatUnits(this.walletStore.balances[this.address.BPT], 18);
+            });
         },
         onApprove() {
             this.amountStake = this.amountApproval;

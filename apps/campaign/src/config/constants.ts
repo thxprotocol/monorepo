@@ -22,11 +22,16 @@ export const contractNetworks: any = {
         BalancerVault: '0xb3B2b0fc5ce12aE58EEb13E19547Eb2Dd61A79D5',
 
         // veTHX
-        VotingEscrow: '0xe3C1Fda814032919F7CE63D9c3cd5C0F9a579d1A',
-        RewardDistributor: '0xf0Ac139fD5362E2823667c7F9dD7238b020D44EC',
-        RewardFaucet: '0x879E73B20973d78c55b5B07566A3355327Db47bd',
-        SmartWalletWhitelist: '0xD4702511e43E2b778b34185A59728B57bE61aEd1',
-        LensReward: '0x36260689483bc55753E3258725f31E8aee31A7B0',
+        VotingEscrow: '0xFB1aEd47351005cE1BF85a339C019bea96BC9a21',
+        RewardDistributor: '0x1BBfB8A870823D52Ed42F4Ad0706f37F32C229a7',
+        RewardFaucet: '0xF880B1920Eb6c1A45162900059150D22faFc2070',
+        SmartWalletWhitelist: '0x36260689483bc55753E3258725f31E8aee31A7B0',
+        LensReward: '0x8c4Ca9343734227366653495cC068aB03B4f5bee',
+
+        // Company
+        THXRegistry: '0x726C9c8278eC209CfBE6BBb1d02e65dF6FcB7cdA',
+        THXPaymentSplitter: '0x50861908E2Bb609524D63F5b4E57d3CACaDf09C2',
+        CompanyMultiSig: '0xaf9d56684466fcFcEA0a2B7fC137AB864d642946',
     },
     '137': {
         // Tokens

@@ -36,10 +36,10 @@ export const useLiquidityStore = defineStore('liquidity', {
         },
         async createLiquidityWalletConnect(wallet: TWallet, data: TCreateLiquidityOptions) {
             const { sendTransaction } = useWalletStore();
-
             const [usdc, thx] = data.pool.tokens as unknown as {
                 address: string;
             }[];
+            debugger;
 
             const call = data.pool.buildJoin(
                 wallet.address,
@@ -47,8 +47,8 @@ export const useLiquidityStore = defineStore('liquidity', {
                 [data.usdcAmountInWei, data.thxAmountInWei],
                 data.slippage,
             ) as { to: `0x${string}`; data: `0x${string}` };
-
-            await sendTransaction(wallet.address, call.to, call.data, '500000');
+            // Not using call.to as it would not be able to use the loacl BalancerVault contract
+            await sendTransaction(wallet.address, contractNetworks[wallet.chainId].BalancerVault, call.data, '1000000'); // TODO Using a fixed gas limit for now
         },
         waitForLiquidity(wallet: TWallet, data: TCreateLiquidityOptions) {
             const { balances, getBalance } = useWalletStore();
