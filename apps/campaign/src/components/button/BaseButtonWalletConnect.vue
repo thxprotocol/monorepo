@@ -2,7 +2,7 @@
     <b-button-group class="w-100">
         <b-button
             class="d-flex align-items-center justify-content-center"
-            variant="primary"
+            :variant="isConnected ? 'success' : 'primary'"
             :disabled="isConnecting"
             @click="onClick"
         >
@@ -22,7 +22,7 @@
         <b-button
             v-if="isConnected"
             class="flex-grow-0"
-            variant="primary"
+            variant="success"
             style="width: 50px"
             @click="onClickDisconnect"
         >
