@@ -19,6 +19,10 @@ export const useLiquidityStore = defineStore('liquidity', {
         pricing: { 'THX': 0, 'USDC': 0, 'BAL': 0, '20USDC-80THX': 0 },
     }),
     actions: {
+        getAPR() {
+            const { api } = useAccountStore();
+            return api.request.get('/v1/liquidity/apr');
+        },
         async createLiquidity(wallet: TWallet, data: TCreateLiquidityOptions) {
             const map: { [variant: string]: (wallet: TWallet, data: TCreateLiquidityOptions) => Promise<void> } = {
                 [WalletVariant.Safe]: this.createLiquiditySafe.bind(this),
@@ -39,15 +43,14 @@ export const useLiquidityStore = defineStore('liquidity', {
             const [usdc, thx] = data.pool.tokens as unknown as {
                 address: string;
             }[];
-            debugger;
-
             const call = data.pool.buildJoin(
                 wallet.address,
                 [usdc.address, thx.address],
                 [data.usdcAmountInWei, data.thxAmountInWei],
                 data.slippage,
             ) as { to: `0x${string}`; data: `0x${string}` };
-            // Not using call.to as it would not be able to use the loacl BalancerVault contract
+
+            // Not using call.to as it would not be able to use the local BalancerVault contract
             await sendTransaction(wallet.address, contractNetworks[wallet.chainId].BalancerVault, call.data, '1000000'); // TODO Using a fixed gas limit for now
         },
         waitForLiquidity(wallet: TWallet, data: TCreateLiquidityOptions) {

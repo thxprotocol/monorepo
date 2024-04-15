@@ -25,7 +25,7 @@
             @update="amountUSDC = $event"
         >
             <template #label>
-                <div class="d-flex align-items-center" style="width: 70px">
+                <div class="d-flex align-items-center" style="width: 105px">
                     <b-img
                         src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
                         alt="USDC icon"
@@ -33,7 +33,14 @@
                         height="20"
                         class="me-2"
                     />
-                    USDC
+                    USDC.e
+                    <b-link
+                        :href="`${chainInfo.blockExplorer}/token/${address.USDC}`"
+                        target="_blank"
+                        class="text-white text-opaque small ms-2"
+                    >
+                        <i class="fas fa-external-link-alt" />
+                    </b-link>
                 </div>
             </template>
         </BaseFormGroupInputTokenAmount>
@@ -47,7 +54,7 @@
             @update="amountTHX = $event"
         >
             <template #label>
-                <div class="d-flex align-items-center" style="width: 70px">
+                <div class="d-flex align-items-center" style="width: 80px">
                     <b-img
                         src="https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png"
                         alt="THX icon"
@@ -56,6 +63,13 @@
                         class="me-2"
                     />
                     THX
+                    <b-link
+                        :href="`${chainInfo.blockExplorer}/token/${address.THX}`"
+                        target="_blank"
+                        class="text-white text-opaque small ms-2"
+                    >
+                        <i class="fas fa-external-link-alt" />
+                    </b-link>
                 </div>
             </template>
         </BaseFormGroupInputTokenAmount>
@@ -166,6 +180,7 @@ import { contractNetworks } from '../../config/constants';
 import { ChainId } from '@thxnetwork/sdk';
 import { formatUnits } from 'ethers/lib/utils';
 import { useAuthStore } from '@thxnetwork/campaign/stores/Auth';
+import { chainList } from '@thxnetwork/campaign/utils/chains';
 
 export default defineComponent({
     name: 'BaseTabLiquidity',
@@ -183,6 +198,10 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useWalletStore, useVeStore, useLiquidityStore),
+        chainInfo() {
+            if (!this.walletStore.wallet) return chainList[ChainId.Polygon];
+            return chainList[this.walletStore.wallet.chainId];
+        },
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
