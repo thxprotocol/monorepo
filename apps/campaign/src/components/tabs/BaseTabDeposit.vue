@@ -1,4 +1,5 @@
 <template>
+    <BaseAlertErrorList :errors="errors" @close="errors.splice($event, 1)" />
     <BaseFormGroupLockAmount :value="Number(amount)" @update="amount = $event" />
     <BaseFormGroupLockEnd :value="lockEnd" class="mb-4" @update="lockEnd = $event" />
     <b-button
@@ -6,6 +7,7 @@
         class="w-100"
         variant="primary"
         @click="authStore.isModalLoginShown = true"
+        @error="onError"
     >
         Sign in &amp; Lock Liquidity
     </b-button>
@@ -15,6 +17,7 @@
         :token="{ address: address.BPTGauge, decimals: 18 }"
         :spender="address.VotingEscrow"
         @success="onLiquidityLock"
+        @error="onError"
     >
         Approve 20USDC-80THX
     </BaseButtonApprove>
@@ -23,6 +26,7 @@
         :amount="parseUnits(amount, 18).toString()"
         :lock-end="lockEnd"
         @success="onLiquidityLock"
+        @error="onError"
     >
         Lock Liquidity
     </BaseButtonLiquidityLock>
@@ -41,6 +45,7 @@ import { ChainId } from '@thxnetwork/sdk';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { useAuthStore } from '@thxnetwork/campaign/stores/Auth';
 import { BigNumber } from 'ethers/lib/ethers';
+import { parseError } from '@thxnetwork/campaign/utils/toast';
 
 export default defineComponent({
     name: 'BaseTabDeposit',
@@ -49,6 +54,7 @@ export default defineComponent({
             parseUnits,
             formatUnits,
             amount: '0',
+            errors: [] as string[],
             isAlertDepositShown: true,
             lockEnd: new Date(),
         };
@@ -85,6 +91,9 @@ export default defineComponent({
             this.walletStore.getBalance(this.address.BPTGauge).then(() => {
                 this.amount = formatUnits(this.walletStore.balances[this.address.BPTGauge], 18);
             });
+        },
+        onError(error: Error) {
+            this.errors.push(parseError(error));
         },
     },
 });

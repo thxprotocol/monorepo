@@ -1,4 +1,5 @@
 <template>
+    <BaseAlertErrorList :errors="errors" @close="errors.splice($event, 1)" />
     <b-button
         v-if="balanceBPT"
         class="rounded w-100 d-flex align-items-center justify-content-between"
@@ -109,6 +110,7 @@
             :token="{ address: address.USDC, decimals: 6 }"
             :spender="address.BalancerVault"
             :amount="amountUSDC"
+            @error="onError"
         >
             Approve USDC
         </BaseButtonApprove>
@@ -117,6 +119,7 @@
             :token="{ address: address.THX, decimals: 18 }"
             :spender="address.BalancerVault"
             :amount="amountTHX"
+            @error="onError"
         >
             Approve THX
         </BaseButtonApprove>
@@ -126,6 +129,7 @@
             :tokens="[address.USDC, address.THX]"
             :slippage="slippage"
             @success="onLiquidityCreate"
+            @error="onError"
         >
             Add Liquidity
         </BaseButtonLiquidityCreate>
@@ -189,6 +193,7 @@
                 :token="{ address: address.BPT, decimals: 18 }"
                 :spender="address.BPTGauge"
                 :amount="amountStake"
+                @error="onError"
             >
                 Approve 20USDC-80THX
             </BaseButtonApprove>
@@ -196,6 +201,7 @@
                 v-else
                 :amount="parseUnits(amountStake, 18).toString()"
                 @success="onLiquidityStake"
+                @error="onError"
             >
                 Stake Liquidity
             </BaseButtonLiquidityStake>
@@ -216,6 +222,7 @@ import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { useAuthStore } from '@thxnetwork/campaign/stores/Auth';
 import { chainList } from '@thxnetwork/campaign/utils/chains';
 import { BigNumber } from 'ethers/lib/ethers';
+import { parseError } from '@thxnetwork/campaign/utils/toast';
 
 export default defineComponent({
     name: 'BaseTabLiquidity',
@@ -228,6 +235,7 @@ export default defineComponent({
             amountUSDC: '0',
             amountTHX: '0',
             amountStake: '0',
+            errors: [] as string[],
             slippage: 0.5,
             slippageOptions: [
                 { label: '0.5%', value: 0.5 },
@@ -320,6 +328,9 @@ export default defineComponent({
             this.walletStore.getBalance(this.address.BPT);
             this.walletStore.getBalance(this.address.BPTGauge);
             this.$emit('change-tab', 1);
+        },
+        onError(error: Error) {
+            this.errors.push(parseError(error));
         },
     },
 });

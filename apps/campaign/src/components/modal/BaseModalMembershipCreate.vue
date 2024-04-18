@@ -7,6 +7,7 @@
             </h5>
             <b-link class="btn-close" @click="$emit('hidden')"><i class="fas fa-times"></i></b-link>
         </template>
+        <BaseAlertErrorList :errors="errors" @close="errors.splice($event, 1)" />
         <b-row class="mb-3">
             <b-col>
                 <div class="text-opaque">Liquidity estimate</div>
@@ -31,6 +32,7 @@
                 :amount="amount.toString()"
                 :token="{ address: address.USDC, decimals: 6 }"
                 :spender="address.BalancerVault"
+                @error="onError"
             >
                 Approve <strong>{{ toFiatPrice(amount) }}</strong>
             </BaseButtonApprove>
@@ -41,6 +43,7 @@
                 :tokens="[address.USDC, address.THX]"
                 :slippage="0.5"
                 @success="onLiquidityCreate"
+                @error="onError"
             >
                 Add <strong>{{ toFiatPrice(amount) }}</strong>
             </BaseButtonLiquidityCreate>
@@ -58,13 +61,20 @@
                 :amount="formatUnits(amountBPTInWei, 18).toString()"
                 :token="{ address: address.BPT, decimals: 18 }"
                 :spender="address.BPTGauge"
+                @error="onError"
             >
                 Approve
                 <strong>
                     {{ toFiatPrice(amount) }}
                 </strong>
             </BaseButtonApprove>
-            <BaseButtonLiquidityStake v-else size="sm" :amount="amountBPTInWei.toString()" @success="onLiquidityStake">
+            <BaseButtonLiquidityStake
+                v-else
+                size="sm"
+                :amount="amountBPTInWei.toString()"
+                @success="onLiquidityStake"
+                @error="onError"
+            >
                 Stake
                 <strong>
                     {{ toFiatPrice(amount) }}
@@ -82,6 +92,7 @@
                 :amount="formatUnits(amountBPTInWei, 18).toString()"
                 :token="{ address: address.BPTGauge, decimals: 18 }"
                 :spender="address.VotingEscrow"
+                @error="onError"
             >
                 Approve
                 <strong>
@@ -94,6 +105,7 @@
                 :amount="amountBPTInWei.toString()"
                 :lock-end="lockEnd"
                 @success="onLiquidityLock"
+                @error="onError"
             >
                 Lock
                 <strong>
@@ -120,6 +132,7 @@ import { chainList } from '@thxnetwork/campaign/utils/chains';
 import { BigNumber } from 'ethers/lib/ethers';
 import { format } from 'date-fns';
 import { roundDownFixed, toFiatPrice } from '@thxnetwork/campaign/utils/price';
+import { parseError } from '@thxnetwork/campaign/utils/toast';
 
 export default defineComponent({
     name: 'BaseModalDeposit',
@@ -140,10 +153,14 @@ export default defineComponent({
             isPolling: false,
             isShown: false,
             amountLiquidity: 0,
+            errors: [] as string[],
         };
     },
     computed: {
         ...mapStores(useVeStore, useWalletStore, useLiquidityStore),
+        isAlertErrorShown() {
+            return !!this.errors.length;
+        },
         chainInfo() {
             if (!this.walletStore.wallet) return chainList[ChainId.Polygon];
             return chainList[this.walletStore.wallet.chainId];
@@ -278,6 +295,9 @@ export default defineComponent({
             const wallet = this.walletStore.wallet;
             if (!wallet) return;
             await Promise.all([this.walletStore.getBalance(this.address.BPTGauge), this.veStore.getLocks(wallet)]);
+        },
+        onError(error: Error) {
+            this.errors.push(parseError(error));
         },
     },
 });

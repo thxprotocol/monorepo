@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BAlert: typeof import('bootstrap-vue-next')['BAlert']
+    BaseAlertErrorList: typeof import('./src/components/alert/BaseAlertErrorList.vue')['default']
     BaseBlockquoteDiscordInviteUsed: typeof import('./src/components/blockquote/BaseBlockquoteDiscordInviteUsed.vue')['default']
     BaseBlockquoteDiscordMessage: typeof import('./src/components/blockquote/BaseBlockquoteDiscordMessage.vue')['default']
     BaseBlockquoteDiscordServerJoin: typeof import('./src/components/blockquote/BaseBlockquoteDiscordServerJoin.vue')['default']
@@ -25,7 +26,6 @@ declare module 'vue' {
     BaseButtonLiquidityCreate: typeof import('./src/components/button/BaseButtonLiquidityCreate.vue')['default']
     BaseButtonLiquidityLock: typeof import('./src/components/button/BaseButtonLiquidityLock.vue')['default']
     BaseButtonLiquidityStake: typeof import('./src/components/button/BaseButtonLiquidityStake.vue')['default']
-    BaseButtonLock: typeof import('./src/components/button/BaseButtonLock.vue')['default']
     BaseButtonQuestLocked: typeof import('./src/components/button/BaseButtonQuestLocked.vue')['default']
     BaseButtonWalletConnect: typeof import('./src/components/button/BaseButtonWalletConnect.vue')['default']
     BaseCardAccount: typeof import('./src/components/card/BaseCardAccount.vue')['default']

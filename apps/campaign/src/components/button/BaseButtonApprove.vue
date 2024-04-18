@@ -77,7 +77,7 @@ export default defineComponent({
 
                 this.$emit('success');
             } catch (error) {
-                console.error(error);
+                this.$emit('error', error);
             } finally {
                 this.isPolling = false;
             }
