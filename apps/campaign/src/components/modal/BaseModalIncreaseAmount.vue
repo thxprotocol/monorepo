@@ -10,25 +10,20 @@
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
         </b-alert>
-        <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
-            <b-tab title="1. Approve">
-                <BaseTabApprove
-                    :amount="amountApproval"
-                    :token="{ address: address.BPTGauge, decimals: 18 }"
-                    :spender="address.VotingEscrow"
-                    @update="amountApproval = $event"
-                    @approve="onApprove"
-                    @ok="tabIndex = 1"
-                />
-            </b-tab>
-            <b-tab title="2. Increase">
-                <BaseFormGroupLockAmount :value="Number(lockAmount)" @update="lockAmount = $event" />
-                <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickIncreaseAmount">
-                    <b-spinner v-if="isPolling" small />
-                    <template v-else>Increase Amount</template>
-                </b-button>
-            </b-tab>
-        </b-tabs>
+        <BaseFormGroupLockAmount :value="Number(lockAmount)" @update="lockAmount = $event" />
+        <BaseButtonApprove
+            v-if="!isAllowanceSufficient"
+            :amount="lockAmount"
+            :token="{ address: address.BPTGauge, decimals: 18 }"
+            :spender="address.VotingEscrow"
+            @success="onClickIncreaseAmount"
+        >
+            Approve Transfer
+        </BaseButtonApprove>
+        <b-button v-else variant="success" class="w-100" :disabled="isPolling" @click="onClickIncreaseAmount">
+            <b-spinner v-if="isPolling" small />
+            <template v-else>Increase Amount</template>
+        </b-button>
         <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
             ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
         </p>
@@ -44,8 +39,8 @@ import { useLiquidityStore } from '@thxnetwork/campaign/stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { ChainId } from '@thxnetwork/sdk';
-import { roundDownFixed } from '@thxnetwork/campaign/utils/price';
 import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
+import { BigNumber } from 'ethers/lib/ethers';
 
 export default defineComponent({
     name: 'BaseModalIncreaseAmount',
@@ -74,6 +69,16 @@ export default defineComponent({
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
         },
+        amountInWei() {
+            return parseUnits(this.lockAmount, 18);
+        },
+        isAllowanceSufficient() {
+            if (!this.walletStore.allowances[this.address.BPTGauge]) return false;
+            if (!this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow]) return false;
+            const allowanceInWei = this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow];
+            console.log(allowanceInWei.toString(), this.amountInWei.toString());
+            return BigNumber.from(allowanceInWei).gte(this.amountInWei);
+        },
         balanceBPTGauge() {
             if (!this.walletStore.balances[this.address.BPTGauge]) return 0;
             return Number(formatUnits(this.walletStore.balances[this.address.BPTGauge], 'ether'));
@@ -86,12 +91,7 @@ export default defineComponent({
     },
     methods: {
         onShow() {
-            this.amountApproval = roundDownFixed(this.balanceBPTGauge, this.precision);
             this.walletStore.getApproval({ tokenAddress: this.address.BPTGauge, spender: this.address.VotingEscrow });
-        },
-        onApprove() {
-            this.lockAmount = this.amountApproval;
-            this.tabIndex = 1;
         },
         async onClickIncreaseAmount() {
             this.isPolling = true;

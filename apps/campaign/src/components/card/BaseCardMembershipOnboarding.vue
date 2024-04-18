@@ -65,14 +65,12 @@ import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
-import { BALANCER_POOL_ID, contractNetworks } from '@thxnetwork/campaign/config/constants';
+import { contractNetworks } from '@thxnetwork/campaign/config/constants';
 import { chainList } from '@thxnetwork/campaign/utils/chains';
 import { ChainId } from '@thxnetwork/sdk';
-import { formatUnits, parseUnits } from 'ethers/lib/utils';
+import { formatUnits } from 'ethers/lib/utils';
 import { useAuthStore } from '@thxnetwork/campaign/stores/Auth';
 import { useAccountStore } from '../../stores/Account';
-import { BalancerSDK, Network } from '@balancer-labs/sdk';
-import { POLYGON_RPC } from '@thxnetwork/campaign/config/secrets';
 
 export default defineComponent({
     name: 'BaseCardMembershipOnboarding',
@@ -110,7 +108,6 @@ export default defineComponent({
                 this.walletStore.getBalance(this.address.USDC).then(() => {
                     this.amountUSDC = formatUnits(this.walletStore.balances[this.address.USDC], 6);
                 });
-                // this.isModalMembershipCreateShown = true;
             },
             immediate: true,
         },
@@ -118,44 +115,6 @@ export default defineComponent({
     methods: {
         async onClickTokenSelect() {
             //
-        },
-        async onClickMembershipCreate() {
-            this.isPolling = true;
-            try {
-                if (!this.walletStore.wallet) throw new Error('Wallet not connected');
-
-                const amountInWei = parseUnits(this.amountUSDC, 6);
-                const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
-                const data = {
-                    usdcAmountInWei: amountInWei.toString(),
-                    thxAmountInWei: '0',
-                    slippage: '50',
-                    pool: await this.getPool(),
-                };
-                await this.liquidityStore.createLiquidity(this.walletStore.wallet, data);
-                await this.liquidityStore.waitForLiquidity(this.walletStore.wallet, data);
-                await this.liquidityStore.stake({ amountInWei: amountInWei.toString() });
-                await this.liquidityStore.waitForStake(amountInWei);
-                await this.veStore.deposit({ amountInWei: amountInWei.toString(), lockEndTimestamp });
-                await this.veStore.waitForLock(amountInWei, lockEndTimestamp);
-            } catch (response) {
-                this.onError(response);
-            } finally {
-                this.isPolling = false;
-            }
-        },
-        async getPool() {
-            // Create Balancer SDK here in favor of code splitting on /earn
-            const balancer = new BalancerSDK({
-                network: Network.POLYGON,
-                rpcUrl: POLYGON_RPC,
-            });
-            const pool = await balancer.pools.find(BALANCER_POOL_ID);
-            if (!pool) throw new Error('Liquidity pool not found');
-            return pool;
-        },
-        onError(response: any) {
-            this.error = response && response.error ? response.error.message : response.message;
         },
     },
 });

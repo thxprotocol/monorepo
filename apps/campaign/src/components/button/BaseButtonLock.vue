@@ -1,7 +1,7 @@
 <template>
     <b-button :disabled="isDisabled" variant="success" size="sm" class="w-100" @click="onClick">
         <b-spinner v-if="isPolling" small />
-        <template v-else> Lock Liquidity </template>
+        <template v-else> <slot /> </template>
     </b-button>
 </template>
 
@@ -35,18 +35,14 @@ export default defineComponent({
     methods: {
         async onClick() {
             try {
-                if (!this.walletStore.wallet) throw new Error('Pleas connect a wallet!');
+                const wallet = this.walletStore.wallet;
+                if (!wallet) throw new Error('Please connect a wallet!');
 
                 this.isPolling = true;
 
-                // Values to send
                 const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
-
-                // Make deposit
-                await this.veStore.deposit({ amountInWei: this.amountInWei.toString(), lockEndTimestamp });
-
-                // Wait for amount and/or endDate to be updated if it changed
-                await this.veStore.waitForLock(this.amountInWei, lockEndTimestamp);
+                await this.veStore.deposit(wallet, { amountInWei: this.amountInWei.toString(), lockEndTimestamp });
+                await this.veStore.waitForLock(wallet, this.amountInWei, lockEndTimestamp);
 
                 this.$emit('success');
             } catch (error) {

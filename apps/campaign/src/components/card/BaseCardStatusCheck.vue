@@ -12,7 +12,7 @@
                         <div class="small text-opaque">{{ description }}</div>
                     </div>
                 </b-col>
-                <b-col v-if="!status" lg="3" class="d-flex justify-content-end">
+                <b-col v-if="!status" lg="4" class="d-flex justify-content-end">
                     <slot />
                 </b-col>
             </b-row>

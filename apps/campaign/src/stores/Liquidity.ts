@@ -145,10 +145,7 @@ export const useLiquidityStore = defineStore('liquidity', {
 
             return poll({ taskFn, interval: 3000, retries: 20 });
         },
-        async stake(data: { amountInWei: string }) {
-            const { wallet } = useWalletStore();
-            if (!wallet) return;
-
+        async stake(wallet: TWallet, data: { amountInWei: string }) {
             const map: { [variant: string]: (wallet: TWallet, data: { amountInWei: string }) => Promise<void> } = {
                 [WalletVariant.Safe]: this.stakeSafe.bind(this),
                 [WalletVariant.WalletConnect]: this.stakeWalletConnect.bind(this),
@@ -197,10 +194,8 @@ export const useLiquidityStore = defineStore('liquidity', {
             const pricing = await api.request.get('/v1/prices');
             this.pricing = pricing;
         },
-        async waitForStake(amountInWei: BigNumber) {
-            const { wallet, balances, getBalance } = useWalletStore();
-            if (!wallet) return;
-
+        async waitForStake(wallet: TWallet, amountInWei: BigNumber) {
+            const { balances, getBalance } = useWalletStore();
             const bptGaugeAddress = contractNetworks[wallet.chainId].BPTGauge;
             const oldBalanceInWei = BigNumber.from(balances[bptGaugeAddress]);
             const taskFn = async () => {

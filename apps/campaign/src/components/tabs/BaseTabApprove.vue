@@ -1,6 +1,7 @@
 <template>
-    <b-form-group label="Amount" :description="`Current allowance: ${currentAllowance}`">
+    <b-form-group label="Amount">
         <b-form-input :value="amount" type="number" :step="0.1 ** precision" @input="$emit('update', $event)" />
+        <template #description> Current allowance: {{ currentAllowance }} ({{ toFiatPrice(0) }}) </template>
     </b-form-group>
     <b-button v-if="isSufficientAllowance" variant="primary" class="w-100" :disabled="isPolling" @click="$emit('ok')">
         Continue
@@ -23,17 +24,20 @@ import { ChainId } from '@thxnetwork/sdk';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers/lib/ethers';
 import poll from 'promise-poller';
+import { toFiatPrice } from '@thxnetwork/campaign/utils/price';
 
 export default defineComponent({
     name: 'BaseTabApprove',
     props: {
         amount: { type: String, required: true },
+        price: { type: Number, required: true },
         token: { type: Object as PropType<{ address: string; decimals: number }>, required: true },
         spender: { type: String, required: true },
     },
     data() {
         return {
             error: '',
+            toFiatPrice,
             isPolling: false,
             precision: 6,
         };

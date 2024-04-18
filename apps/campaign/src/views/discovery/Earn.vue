@@ -140,7 +140,7 @@ export default defineComponent({
             handler(wallet) {
                 if (!wallet) return;
                 const bptGaugeAddress = contractNetworks[wallet.chainId].BPTGauge;
-                this.veStore.getLocks();
+                this.veStore.getLocks(wallet);
                 this.walletStore.getBalance(bptGaugeAddress).then(() => {
                     this.amountDepositInWei = this.walletStore.balances[bptGaugeAddress];
                 });

@@ -1,6 +1,6 @@
-export function roundDownFixed(amount: number, precision: number) {
+export function roundDownFixed(amount: number | string, precision: number) {
     const factor = 10 ** precision;
-    return (Math.floor(amount * factor) / factor).toFixed(precision);
+    return (Math.floor(Number(amount) * factor) / factor).toFixed(precision);
 }
 
 export function roundUpFixed(amount: number, precision: number) {
@@ -12,15 +12,14 @@ export function parseUnitAmount(price: number) {
     return Number(price / 100).toFixed(2);
 }
 
-export function toFiatPrice(number: number) {
+export function toFiatPrice(number: number | string) {
     // Replace 'en-US' with the appropriate locale for your application
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD', // Change this to the desired currency code
         minimumFractionDigits: 2,
     });
-
-    return formatter.format(number);
+    return formatter.format(Number(number));
 }
 
 export function calculatePenalty(

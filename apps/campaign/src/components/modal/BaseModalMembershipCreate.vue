@@ -3,14 +3,15 @@
         <template #header>
             <h5 class="modal-title">
                 <i class="fas fa-user-plus me-2" />
-                Become a member today
+                Become a member today!
             </h5>
             <b-link class="btn-close" @click="$emit('hidden')"><i class="fas fa-times"></i></b-link>
         </template>
         <b-row class="mb-3">
             <b-col>
-                <div class="text-opaque">Amount</div>
-                <strong>{{ toFiatPrice(Number(amount)) }}</strong>
+                <div class="text-opaque">Liquidity estimate</div>
+                {{ Number(amountBPT).toFixed(6) }}
+                <strong>({{ toFiatPrice(Number(amount)) }})</strong>
             </b-col>
             <b-col>
                 <div class="text-opaque">Lock end date</div>
@@ -18,55 +19,87 @@
             </b-col>
         </b-row>
         <BaseCardStatusCheck
-            label="Provided liquidity"
-            :description="`${formatUnits(balances.BPT, 18)} 20USDC-80THX`"
+            label="Added liquidity"
+            :description="`Balance: ${Number(formatUnits(balances.BPT, 18)).toFixed(6)} 20USDC-80THX (${toFiatPrice(
+                balanceBPTInUSD.toString(),
+            )})`"
             :status="isLiquidityProvided"
         >
             <BaseButtonApprove
                 v-if="!isAllowanceUSDCSufficient"
+                size="sm"
                 :amount="amount.toString()"
                 :token="{ address: address.USDC, decimals: 6 }"
                 :spender="address.BalancerVault"
                 @success="onApproveLiquidityCreate"
-            />
+            >
+                Approve <strong>{{ toFiatPrice(amount) }}</strong>
+            </BaseButtonApprove>
             <BaseButtonLiquidityCreate
                 v-else
                 :amounts="[parseUnits(amount, 6).toString(), '0']"
                 :tokens="[address.USDC, address.THX]"
                 :slippage="0.5"
                 @success="onLiquidityCreate"
-            />
+            >
+                Add <strong>{{ toFiatPrice(amount) }}</strong>
+            </BaseButtonLiquidityCreate>
         </BaseCardStatusCheck>
         <BaseCardStatusCheck
             label="Staked liquidity"
-            :description="`${formatUnits(balances.BPTGauge, 18)} 20USDC-80THX`"
+            :description="`Balance: ${Number(formatUnits(balances.BPTGauge, 18)).toFixed(
+                6,
+            )} 20USDC-80THX (${toFiatPrice(balanceBPTGaugeInUSD)})`"
             :status="isLiquidityStaked"
         >
             <BaseButtonApprove
                 v-if="!isAllowanceBPTSufficient"
-                :amount="formatUnits(amountBPT, 18).toString()"
+                size="sm"
+                :amount="formatUnits(amountBPTInWei, 18).toString()"
                 :token="{ address: address.BPT, decimals: 18 }"
                 :spender="address.BPTGauge"
                 @success="onApproveLiquidityStake"
-            />
-            <BaseButtonLiquidityStake v-else :amount="amountBPT.toString()" @success="onLiquidityStake" />
+            >
+                Approve
+                <strong>
+                    {{ toFiatPrice(amount) }}
+                </strong>
+            </BaseButtonApprove>
+            <BaseButtonLiquidityStake v-else :amount="amountBPTInWei.toString()" @success="onLiquidityStake">
+                Stake
+                <strong>
+                    {{ toFiatPrice(amount) }}
+                </strong>
+            </BaseButtonLiquidityStake>
         </BaseCardStatusCheck>
         <BaseCardStatusCheck
-            v-if="!Number(balances.VeTHX)"
-            label="locked liquidity"
-            :description="`${balances.VeTHX} veTHX`"
+            label="Locked liquidity"
+            :description="`Balance: ${balances.VeTHX} veTHX`"
             :status="isLiquidityLocked"
         >
             <BaseButtonApprove
                 v-if="!isAllowanceBPTGaugeSufficient"
-                :amount="formatUnits(amountBPTGauge, 18).toString()"
+                size="sm"
+                :amount="formatUnits(amountBPTInWei, 18).toString()"
                 :token="{ address: address.BPTGauge, decimals: 18 }"
                 :spender="address.VotingEscrow"
                 @success="onApproveLiquidityLock"
-            />
-            <BaseButtonLock v-else :amount="amountBPTGauge.toString()" :lock-end="lockEnd" @success="onLiquidityLock" />
+            >
+                Approve
+                <strong>
+                    {{ toFiatPrice(amount) }}
+                </strong>
+            </BaseButtonApprove>
+            <BaseButtonLock v-else :amount="amountBPTInWei.toString()" :lock-end="lockEnd" @success="onLiquidityLock">
+                Lock
+                <strong>
+                    {{ toFiatPrice(amount) }}
+                </strong>
+            </BaseButtonLock>
         </BaseCardStatusCheck>
-        <b-button v-if="Number(balances.VeTHX)" to="/earn" variant="success" class="w-100"> Your Membership </b-button>
+        <b-button v-if="Number(balances.VeTHX)" to="/earn" variant="success" class="w-100">
+            Update Membership
+        </b-button>
     </b-modal>
 </template>
 
@@ -82,12 +115,7 @@ import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { chainList } from '@thxnetwork/campaign/utils/chains';
 import { BigNumber } from 'ethers/lib/ethers';
 import { format } from 'date-fns';
-import { toFiatPrice } from '@thxnetwork/campaign/utils/price';
-
-enum CollapseStep {
-    Liquidity = 'liquidity',
-    Lock = 'lock',
-}
+import { roundDownFixed, toFiatPrice } from '@thxnetwork/campaign/utils/price';
 
 export default defineComponent({
     name: 'BaseModalDeposit',
@@ -100,7 +128,6 @@ export default defineComponent({
         return {
             format,
             BigNumber,
-            CollapseStep,
             toFiatPrice,
             parseUnits,
             formatUnits,
@@ -121,6 +148,34 @@ export default defineComponent({
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
         },
+        usdcPerBPT() {
+            if (!this.liquidityStore.pricing['20USDC-80THX']) return 0;
+            return this.liquidityStore.pricing['20USDC-80THX'];
+        },
+        usdcPerBPTInWei() {
+            if (!this.liquidityStore.pricing['20USDC-80THX']) return BigNumber.from(0);
+            return parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
+        },
+        bptPerUSD() {
+            if (!this.liquidityStore.pricing['20USDC-80THX']) return 0;
+            return Number(roundDownFixed(1 / this.liquidityStore.pricing['20USDC-80THX'], 0));
+        },
+        bptPerUSDCInWei() {
+            return parseUnits(this.bptPerUSD.toString(), 18);
+        },
+        amountUSDCInWei() {
+            return parseUnits(this.amount, 6);
+        },
+        amountBPTInWei() {
+            const amount = formatUnits(this.amountUSDCInWei.mul(this.bptPerUSD), 6);
+            return parseUnits(amount, 18);
+        },
+        amountBPT() {
+            return formatUnits(this.amountBPTInWei, 18);
+        },
+        allowances() {
+            return this.walletStore.allowances;
+        },
         balances() {
             return {
                 USDC: this.walletStore.balances[this.address.USDC] || '0',
@@ -129,59 +184,44 @@ export default defineComponent({
                 VeTHX: this.veStore.lock ? this.veStore.balance.toString() : '0',
             };
         },
-        amountBPT() {
-            if (!this.balances.BPT) return BigNumber.from(0);
+        balanceBPTInWei() {
             return BigNumber.from(this.balances.BPT);
         },
-        amountBPTGauge() {
-            if (!this.balances.BPTGauge) return BigNumber.from(0);
+        balanceBPTInUSD() {
+            const valueInUSDInWei = BigNumber.from(this.balances.BPT).mul(this.usdcPerBPTInWei);
+            return formatUnits(valueInUSDInWei, 18 * 2); // Decimals * 2 because of both the balance and price conversion to wei
+        },
+        balanceBPTGaugeInWei() {
             return BigNumber.from(this.balances.BPTGauge);
         },
-        allowances() {
-            return this.walletStore.allowances;
-        },
-        amountInWei() {
-            return parseUnits(this.amount, 6);
-        },
-        isBalanceUSDCSufficient() {
-            if (!this.balances.USDC) return;
-            return BigNumber.from(this.balances.USDC).gte(this.amountInWei);
+        balanceBPTGaugeInUSD() {
+            const valueInUSDInWei = BigNumber.from(this.balances.BPTGauge).mul(this.usdcPerBPTInWei);
+            return formatUnits(valueInUSDInWei, 18 * 2); // Decimals * 2 because of both the balance and price conversion to wei
         },
         isAllowanceUSDCSufficient() {
             if (!this.allowances[this.address.USDC]) return false;
             if (!this.allowances[this.address.USDC][this.address.BalancerVault]) return false;
-            return BigNumber.from(this.allowances[this.address.USDC][this.address.BalancerVault]).gte(this.amountInWei);
-        },
-        isBalanceBPTSufficient() {
-            if (!this.balances.BPT) return false;
-            if (!this.liquidityStore.pricing['20USDC-80THX']) return false;
-            // Checks if BPT gauge balance has a value greater than 3 USD
-            // Dollar price for bpt and bpt-gauge is equal
-            const bptUSDPriceInWei = parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
-            return BigNumber.from(this.balances.BPT).gte(bptUSDPriceInWei.mul(3));
+            const allowanceInWei = this.allowances[this.address.USDC][this.address.BalancerVault];
+            return BigNumber.from(allowanceInWei).gte(this.amountUSDCInWei);
         },
         isAllowanceBPTSufficient() {
             if (!this.balances.BPT || BigNumber.from(this.balances.BPT).eq(0)) return false;
             if (!this.allowances[this.address.BPT]) return false;
             if (!this.allowances[this.address.BPT][this.address.BPTGauge]) return false;
             const allowanceInWei = this.allowances[this.address.BPT][this.address.BPTGauge];
-            return BigNumber.from(allowanceInWei).gte(this.balances.BPT);
-        },
-        isBalanceBPTGaugeSufficient() {
-            if (!this.balances.BPTGauge) return false;
-            if (!this.liquidityStore.pricing['20USDC-80THX']) return false;
-            // Checks if BPT gauge balance has a value greater than 3 USD
-            // Dollar price for bpt and bpt-gauge is equal
-            const bptUSDPriceInWei = parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
-            console.log(this.balances.BPTGauge, bptUSDPriceInWei.mul(3).toString());
-            return BigNumber.from(this.balances.BPTGauge).gte(bptUSDPriceInWei.mul(3));
+            return BigNumber.from(allowanceInWei).gte(this.amountBPTInWei);
         },
         isAllowanceBPTGaugeSufficient() {
             if (!this.allowances[this.address.BPTGauge]) return false;
             if (!this.allowances[this.address.BPTGauge][this.address.VotingEscrow]) return false;
-            return BigNumber.from(this.allowances[this.address.BPTGauge][this.address.VotingEscrow]).gte(
-                this.balances.BPTGauge,
-            );
+            const allowanceInWei = this.allowances[this.address.BPTGauge][this.address.VotingEscrow];
+            return BigNumber.from(allowanceInWei).gte(this.amountBPTInWei);
+        },
+        isBalanceBPTSufficient() {
+            return this.balanceBPTInWei.gte(this.amountBPTInWei);
+        },
+        isBalanceBPTGaugeSufficient() {
+            return this.balanceBPTGaugeInWei.gte(this.amountBPTInWei);
         },
         isLiquidityProvided() {
             return this.isBalanceBPTSufficient;

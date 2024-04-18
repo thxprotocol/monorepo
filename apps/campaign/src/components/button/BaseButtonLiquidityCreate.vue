@@ -1,7 +1,7 @@
 <template>
     <b-button :disabled="isDisabled" variant="success" size="sm" class="w-100" @click="onClick">
         <b-spinner v-if="isPolling" small />
-        <template v-else> Add Liquidity </template>
+        <template v-else> <slot /> </template>
     </b-button>
 </template>
 

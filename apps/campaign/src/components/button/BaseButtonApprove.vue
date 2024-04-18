@@ -1,7 +1,7 @@
 <template>
-    <b-button :disabled="isDisabled" variant="primary" size="sm" class="w-100" @click="onClickApprove">
+    <b-button :disabled="isDisabled" variant="primary" :size="size" class="w-100" @click="onClickApprove">
         <b-spinner v-if="isPolling" small />
-        <template v-else> Approve </template>
+        <template v-else> <slot /> </template>
     </b-button>
 </template>
 
@@ -18,6 +18,7 @@ import poll from 'promise-poller';
 export default defineComponent({
     name: 'BaseButtonApprove',
     props: {
+        size: { type: String as PropType<'sm'> | null, default: null },
         amount: { type: String, required: true },
         token: { type: Object as PropType<{ address: string; decimals: number }>, required: true },
         spender: { type: String, required: true },
@@ -36,21 +37,19 @@ export default defineComponent({
         amountInWei() {
             return parseUnits(this.amount, this.token.decimals);
         },
-        allowance() {
-            if (!this.walletStore.allowances[this.token.address]) return 0;
-            if (!this.walletStore.allowances[this.token.address][this.spender]) return 0;
+        allowanceInWei() {
+            if (!this.walletStore.allowances[this.token.address]) return '0';
+            if (!this.walletStore.allowances[this.token.address][this.spender]) return '0';
             return this.walletStore.allowances[this.token.address][this.spender];
         },
         currentAllowance() {
-            return Number(formatUnits(this.allowance, this.token.decimals));
+            return Number(formatUnits(this.allowanceInWei, this.token.decimals));
         },
         isSufficientAllowance() {
-            const allowanceInWei = BigNumber.from(this.allowance);
-            if (this.amountInWei.gt(0) && allowanceInWei.gte(this.amountInWei)) return true;
-            return false;
+            return BigNumber.from(this.allowanceInWei).gte(this.amountInWei);
         },
         isDisabled() {
-            return this.isSufficientAllowance || this.isPolling;
+            return !this.amountInWei.gt(0) || this.isPolling;
         },
     },
     methods: {
@@ -60,7 +59,7 @@ export default defineComponent({
                     tokenAddress: this.token.address,
                     spender: this.spender,
                 });
-                return this.isSufficientAllowance ? Promise.resolve() : Promise.reject('x');
+                return this.isSufficientAllowance ? Promise.resolve() : Promise.reject('Approve');
             };
             return poll({ taskFn, interval: 3000, retries: 20 });
         },

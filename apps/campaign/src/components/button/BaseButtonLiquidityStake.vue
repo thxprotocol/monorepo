@@ -1,7 +1,7 @@
 <template>
     <b-button :disabled="isDisabled" variant="success" size="sm" class="w-100" @click="onClick">
         <b-spinner v-if="isPolling" small />
-        <template v-else> Stake Liquidity </template>
+        <template v-else> <slot /> </template>
     </b-button>
 </template>
 
@@ -37,21 +37,19 @@ export default defineComponent({
             return BigNumber.from(this.walletStore.balances[this.address.USDC]);
         },
         isDisabled() {
-            return this.isPolling;
+            return this.balanceBPT.lt(this.amountInWei) || this.isPolling;
         },
     },
     methods: {
         async onClick() {
             try {
-                if (!this.walletStore.wallet) throw new Error('Pleas connect a wallet!');
+                const wallet = this.walletStore.wallet;
+                if (!wallet) throw new Error('Pleas connect a wallet!');
 
                 this.isPolling = true;
 
-                // Make deposit
-                await this.liquidityStore.stake({ amountInWei: this.amountInWei.toString() });
-
-                // Wait for BPTGauge balance to increase
-                await this.liquidityStore.waitForStake(this.amountInWei);
+                await this.liquidityStore.stake(wallet, { amountInWei: this.amountInWei.toString() });
+                await this.liquidityStore.waitForStake(wallet, this.amountInWei);
 
                 this.$emit('success');
             } catch (error) {

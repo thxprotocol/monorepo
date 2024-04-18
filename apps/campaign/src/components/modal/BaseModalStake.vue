@@ -103,14 +103,13 @@ export default defineComponent({
         async onClickStake() {
             this.isPolling = true;
             try {
-                // Values to send
+                const wallet = this.walletStore.wallet;
+                if (!wallet) throw new Error('Please connect a wallet!');
+
                 const amountInWei = parseUnits(this.amountStake.toString(), 18);
 
-                // Make deposit
-                await this.liquidityStore.stake({ amountInWei: amountInWei.toString() });
-
-                // Wait for BPTGauge balance to increase
-                await this.liquidityStore.waitForStake(amountInWei);
+                await this.liquidityStore.stake(wallet, { amountInWei: amountInWei.toString() });
+                await this.liquidityStore.waitForStake(wallet, amountInWei);
 
                 // Hide modal (or cast "success" and switch parent tab to withdrawal/rewards)
                 this.$emit('staked');
