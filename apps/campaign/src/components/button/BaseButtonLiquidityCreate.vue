@@ -1,5 +1,5 @@
 <template>
-    <b-button :disabled="isDisabled" variant="success" size="sm" class="w-100" @click="onClick">
+    <b-button :disabled="isDisabled" variant="success" :size="size" class="w-100" @click="onClick">
         <b-spinner v-if="isPolling" small />
         <template v-else> <slot /> </template>
     </b-button>
@@ -19,6 +19,7 @@ import { useLiquidityStore } from '@thxnetwork/campaign/stores/Liquidity';
 export default defineComponent({
     name: 'BaseButtonLiquidityCreate',
     props: {
+        size: { type: String as PropType<'sm'> | null, default: null },
         amounts: { type: Array as PropType<string[]>, required: true },
         tokens: { type: Object as PropType<string[]>, required: true },
         slippage: { type: Number, required: true },
@@ -47,7 +48,8 @@ export default defineComponent({
     methods: {
         async onClick() {
             try {
-                if (!this.walletStore.wallet) throw new Error('Pleas connect a wallet!');
+                const wallet = this.walletStore.wallet;
+                if (!wallet) throw new Error('Pleas connect a wallet!');
 
                 this.isPolling = true;
 
@@ -66,10 +68,8 @@ export default defineComponent({
 
                 // Create liquidity
                 const data = { usdcAmountInWei, thxAmountInWei, slippage, pool };
-                await this.liquidityStore.createLiquidity(this.walletStore.wallet, data);
-
-                // Wait for BPTGauge balance to increase
-                await this.liquidityStore.waitForLiquidity(this.walletStore.wallet, data);
+                await this.liquidityStore.createLiquidity(wallet, data);
+                await this.liquidityStore.waitForLiquidity(wallet, data);
 
                 this.$emit('success');
             } catch (error) {

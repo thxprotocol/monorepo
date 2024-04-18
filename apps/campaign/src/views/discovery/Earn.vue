@@ -2,7 +2,7 @@
     <BaseCardHeader>
         <template #primary>
             <div>
-                <h1>Lock & Earn</h1>
+                <h1 class="text-opaque">Lock & Earn</h1>
                 <p class="lead mb-4">
                     Earn additional
                     <b-link
@@ -80,8 +80,6 @@
                         <hr />
                         <BaseTabDeposit
                             v-if="veStore.lock && !Number(veStore.lock.amount)"
-                            :amount="amountDepositInWei"
-                            @update-amount="amountDepositInWei = $event"
                             @change-tab="tabIndex = $event"
                         />
                         <BaseTabWithdraw v-else @change-tab="tabIndex = $event" />
@@ -117,7 +115,6 @@ import { useAccountStore } from '../../stores/Account';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
-import { contractNetworks } from '../../config/constants';
 import { roundUpFixed, toFiatPrice } from '@thxnetwork/campaign/utils/price';
 
 export default defineComponent({
@@ -128,7 +125,6 @@ export default defineComponent({
             roundUpFixed,
             tabIndex: 1,
             publicUrl: 'https://thx.network',
-            amountDepositInWei: '0',
             isAlertSigninShown: true,
         };
     },
@@ -139,11 +135,7 @@ export default defineComponent({
         'walletStore.wallet': {
             handler(wallet) {
                 if (!wallet) return;
-                const bptGaugeAddress = contractNetworks[wallet.chainId].BPTGauge;
                 this.veStore.getLocks(wallet);
-                this.walletStore.getBalance(bptGaugeAddress).then(() => {
-                    this.amountDepositInWei = this.walletStore.balances[bptGaugeAddress];
-                });
             },
             immediate: true,
         },

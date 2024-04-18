@@ -76,7 +76,6 @@ export default defineComponent({
             if (!this.walletStore.allowances[this.address.BPTGauge]) return false;
             if (!this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow]) return false;
             const allowanceInWei = this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow];
-            console.log(allowanceInWei.toString(), this.amountInWei.toString());
             return BigNumber.from(allowanceInWei).gte(this.amountInWei);
         },
         balanceBPTGauge() {

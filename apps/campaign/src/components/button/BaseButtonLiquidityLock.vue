@@ -1,20 +1,21 @@
 <template>
-    <b-button :disabled="isDisabled" variant="success" size="sm" class="w-100" @click="onClick">
+    <b-button :disabled="isDisabled" variant="success" :size="size" class="w-100" @click="onClick">
         <b-spinner v-if="isPolling" small />
         <template v-else> <slot /> </template>
     </b-button>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { BigNumber } from 'ethers/lib/ethers';
 import { useWalletStore } from '@thxnetwork/campaign/stores/Wallet';
 import { mapStores } from 'pinia';
 import { useVeStore } from '@thxnetwork/campaign/stores/VE';
 
 export default defineComponent({
-    name: 'BaseButtonLock',
+    name: 'BaseButtonLiquidityLock',
     props: {
+        size: { type: String as PropType<'sm'> | null, default: null },
         amount: { type: String, required: true },
         lockEnd: { type: Date, required: true },
     },

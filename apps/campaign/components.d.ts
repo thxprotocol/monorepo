@@ -23,6 +23,7 @@ declare module 'vue' {
     BaseBtnShareWhatsapp: typeof import('./src/components/button/BaseBtnShareWhatsapp.vue')['default']
     BaseButtonApprove: typeof import('./src/components/button/BaseButtonApprove.vue')['default']
     BaseButtonLiquidityCreate: typeof import('./src/components/button/BaseButtonLiquidityCreate.vue')['default']
+    BaseButtonLiquidityLock: typeof import('./src/components/button/BaseButtonLiquidityLock.vue')['default']
     BaseButtonLiquidityStake: typeof import('./src/components/button/BaseButtonLiquidityStake.vue')['default']
     BaseButtonLock: typeof import('./src/components/button/BaseButtonLock.vue')['default']
     BaseButtonQuestLocked: typeof import('./src/components/button/BaseButtonQuestLocked.vue')['default']

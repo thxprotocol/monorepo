@@ -73,6 +73,29 @@
                 </div>
             </template>
         </BaseFormGroupInputTokenAmount>
+        <b-form-group label="Slippage" class="my-4">
+            <div class="d-flex justify-content-between">
+                <b-button
+                    v-for="{ label, value } of slippageOptions"
+                    size="sm"
+                    variant="primary"
+                    class="me-2 rounded"
+                    style="width: 100px"
+                    :disabled="slippage === value"
+                    @click="slippage = value"
+                >
+                    {{ label }}
+                </b-button>
+                <b-input-group size="sm" class="flex-grow-0" style="width: 100px">
+                    <template #append>
+                        <div class="d-flex align-items-center justify-content-between px-2">
+                            <strong>%</strong>
+                        </div>
+                    </template>
+                    <b-form-input v-model="slippage" size="sm" />
+                </b-input-group>
+            </div>
+        </b-form-group>
         <b-button
             v-if="!accountStore.isAuthenticated"
             class="w-100"
@@ -81,22 +104,32 @@
         >
             Sign in &amp; Add Liquidity
         </b-button>
-        <b-button
+        <BaseButtonApprove
+            v-else-if="!isSufficientUSDCAllowance"
+            :token="{ address: address.USDC, decimals: 6 }"
+            :spender="address.BalancerVault"
+            :amount="amountUSDC"
+        >
+            Approve USDC
+        </BaseButtonApprove>
+        <BaseButtonApprove
+            v-else-if="!isSufficientTHXAllowance"
+            :token="{ address: address.THX, decimals: 18 }"
+            :spender="address.BalancerVault"
+            :amount="amountTHX"
+        >
+            Approve THX
+        </BaseButtonApprove>
+        <BaseButtonLiquidityCreate
             v-else
-            :disabled="isButtonAddLiquidityDisabled"
-            class="w-100"
-            variant="primary"
-            @click="isModalCreateLiquidityShown = true"
+            :amounts="[parseUnits(amountUSDC, 6).toString(), parseUnits(amountTHX, 18).toString()]"
+            :tokens="[address.USDC, address.THX]"
+            :slippage="slippage"
+            @success="onLiquidityCreate"
         >
             Add Liquidity
-        </b-button>
+        </BaseButtonLiquidityCreate>
     </b-collapse>
-    <BaseModalCreateLiquidity
-        :show="isModalCreateLiquidityShown"
-        :amounts="[amountUSDC, amountTHX]"
-        @submit="onSubmitCreateLiquidity"
-        @hidden="isModalCreateLiquidityShown = false"
-    />
     <template v-if="balanceBPT">
         <hr />
         <b-button
@@ -151,20 +184,21 @@
                     </div>
                 </template>
             </BaseFormGroupInputTokenAmount>
-            <b-button
-                :disabled="!amountStake"
-                class="w-100"
-                :variant="!amountStake ? 'primary' : 'success'"
-                @click="isModalStakeShown = true"
+            <BaseButtonApprove
+                v-if="!isSufficientBPTAllowance"
+                :token="{ address: address.BPT, decimals: 18 }"
+                :spender="address.BPTGauge"
+                :amount="amountStake"
+            >
+                Approve 20USDC-80THX
+            </BaseButtonApprove>
+            <BaseButtonLiquidityStake
+                v-else
+                :amount="parseUnits(amountStake, 18).toString()"
+                @success="onLiquidityStake"
             >
                 Stake Liquidity
-            </b-button>
-            <BaseModalStake
-                :show="isModalStakeShown"
-                :amount="amountStake"
-                @staked="onStaked"
-                @hidden="isModalStakeShown = false"
-            />
+            </BaseButtonLiquidityStake>
         </b-collapse>
     </template>
 </template>
@@ -178,22 +212,28 @@ import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
 import { contractNetworks } from '../../config/constants';
 import { ChainId } from '@thxnetwork/sdk';
-import { formatUnits } from 'ethers/lib/utils';
+import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { useAuthStore } from '@thxnetwork/campaign/stores/Auth';
 import { chainList } from '@thxnetwork/campaign/utils/chains';
+import { BigNumber } from 'ethers/lib/ethers';
 
 export default defineComponent({
     name: 'BaseTabLiquidity',
     data() {
         return {
             formatUnits,
+            parseUnits,
             isCollapseCreateLiquidityOpen: true,
             isCollapseStakeLiquidityOpen: false,
-            isModalCreateLiquidityShown: false,
-            isModalStakeShown: false,
             amountUSDC: '0',
             amountTHX: '0',
             amountStake: '0',
+            slippage: 0.5,
+            slippageOptions: [
+                { label: '0.5%', value: 0.5 },
+                { label: '1.0%', value: 1 },
+                { label: '2.0%', value: 2 },
+            ],
         };
     },
     computed: {
@@ -205,6 +245,27 @@ export default defineComponent({
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
+        },
+        isSufficientUSDCAllowance() {
+            if (!this.walletStore.allowances[this.address.USDC]) return false;
+            if (!this.walletStore.allowances[this.address.USDC][this.address.BalancerVault]) return false;
+            const allowanceInWei = this.walletStore.allowances[this.address.USDC][this.address.BalancerVault];
+            const amountInWei = parseUnits(this.amountUSDC, 6);
+            return BigNumber.from(allowanceInWei).gte(amountInWei);
+        },
+        isSufficientTHXAllowance() {
+            if (!this.walletStore.allowances[this.address.THX]) return false;
+            if (!this.walletStore.allowances[this.address.THX][this.address.BalancerVault]) return false;
+            const allowanceInWei = this.walletStore.allowances[this.address.THX][this.address.BalancerVault];
+            const amountInWei = parseUnits(this.amountTHX, 18);
+            return BigNumber.from(allowanceInWei).gte(amountInWei);
+        },
+        isSufficientBPTAllowance() {
+            if (!this.walletStore.allowances[this.address.BPT]) return false;
+            if (!this.walletStore.allowances[this.address.BPT][this.address.BPTGauge]) return false;
+            const allowanceInWei = this.walletStore.allowances[this.address.BPT][this.address.BPTGauge];
+            const amountInWei = parseUnits(this.amountStake, 18);
+            return BigNumber.from(allowanceInWei).gte(amountInWei);
         },
         balanceUSDC() {
             if (!this.walletStore.balances[this.address.USDC]) return 0;
@@ -218,22 +279,10 @@ export default defineComponent({
             if (!this.walletStore.balances[this.address.BPT]) return 0;
             return Number(formatUnits(this.walletStore.balances[this.address.BPT], 18)); // BPT has 18 decimals
         },
-        isButtonAddLiquidityDisabled() {
-            return !Number(this.amountUSDC) && !Number(this.amountTHX);
-        },
     },
     watch: {
         'walletStore.wallet'(wallet) {
             if (!wallet) return;
-            this.updateBalances();
-        },
-    },
-    methods: {
-        onClickCollapse() {
-            this.isCollapseStakeLiquidityOpen = !this.isCollapseStakeLiquidityOpen;
-            this.isCollapseCreateLiquidityOpen = !this.isCollapseCreateLiquidityOpen;
-        },
-        updateBalances() {
             this.walletStore.getBalance(this.address.USDC).then(() => {
                 this.amountUSDC = formatUnits(this.walletStore.balances[this.address.USDC], 6);
             });
@@ -243,21 +292,33 @@ export default defineComponent({
             this.walletStore.getBalance(this.address.BPT).then(() => {
                 this.amountStake = formatUnits(this.walletStore.balances[this.address.BPT], 18);
             });
+            this.walletStore.getApproval({ tokenAddress: this.address.USDC, spender: this.address.BalancerVault });
+            this.walletStore.getApproval({ tokenAddress: this.address.THX, spender: this.address.BalancerVault });
+            this.walletStore.getApproval({ tokenAddress: this.address.BPT, spender: this.address.BPTGauge });
         },
-        onSubmitCreateLiquidity() {
-            this.isCollapseCreateLiquidityOpen = false;
-            this.isCollapseStakeLiquidityOpen = true;
-            this.isModalCreateLiquidityShown = false;
+    },
+    methods: {
+        onClickCollapse() {
+            this.isCollapseStakeLiquidityOpen = !this.isCollapseStakeLiquidityOpen;
+            this.isCollapseCreateLiquidityOpen = !this.isCollapseCreateLiquidityOpen;
+        },
+        onLiquidityCreate() {
             this.amountUSDC = '0';
             this.amountTHX = '0';
-            this.updateBalances();
+            this.isCollapseCreateLiquidityOpen = false;
+            this.isCollapseStakeLiquidityOpen = true;
+            this.walletStore.getBalance(this.address.USDC);
+            this.walletStore.getBalance(this.address.THX);
+            this.walletStore.getBalance(this.address.BPT).then(() => {
+                this.amountStake = formatUnits(this.walletStore.balances[this.address.BPT], 18);
+            });
         },
-        onStaked() {
+        onLiquidityStake() {
+            this.amountStake = '0';
             this.isCollapseCreateLiquidityOpen = true;
             this.isCollapseStakeLiquidityOpen = false;
-            this.isModalStakeShown = false;
-            this.amountStake = '0';
-            this.updateBalances();
+            this.walletStore.getBalance(this.address.BPT);
+            this.walletStore.getBalance(this.address.BPTGauge);
             this.$emit('change-tab', 1);
         },
     },

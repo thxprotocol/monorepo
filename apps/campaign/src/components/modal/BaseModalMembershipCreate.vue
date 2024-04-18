@@ -31,12 +31,12 @@
                 :amount="amount.toString()"
                 :token="{ address: address.USDC, decimals: 6 }"
                 :spender="address.BalancerVault"
-                @success="onApproveLiquidityCreate"
             >
                 Approve <strong>{{ toFiatPrice(amount) }}</strong>
             </BaseButtonApprove>
             <BaseButtonLiquidityCreate
                 v-else
+                size="sm"
                 :amounts="[parseUnits(amount, 6).toString(), '0']"
                 :tokens="[address.USDC, address.THX]"
                 :slippage="0.5"
@@ -58,14 +58,13 @@
                 :amount="formatUnits(amountBPTInWei, 18).toString()"
                 :token="{ address: address.BPT, decimals: 18 }"
                 :spender="address.BPTGauge"
-                @success="onApproveLiquidityStake"
             >
                 Approve
                 <strong>
                     {{ toFiatPrice(amount) }}
                 </strong>
             </BaseButtonApprove>
-            <BaseButtonLiquidityStake v-else :amount="amountBPTInWei.toString()" @success="onLiquidityStake">
+            <BaseButtonLiquidityStake v-else size="sm" :amount="amountBPTInWei.toString()" @success="onLiquidityStake">
                 Stake
                 <strong>
                     {{ toFiatPrice(amount) }}
@@ -83,19 +82,24 @@
                 :amount="formatUnits(amountBPTInWei, 18).toString()"
                 :token="{ address: address.BPTGauge, decimals: 18 }"
                 :spender="address.VotingEscrow"
-                @success="onApproveLiquidityLock"
             >
                 Approve
                 <strong>
                     {{ toFiatPrice(amount) }}
                 </strong>
             </BaseButtonApprove>
-            <BaseButtonLock v-else :amount="amountBPTInWei.toString()" :lock-end="lockEnd" @success="onLiquidityLock">
+            <BaseButtonLiquidityLock
+                v-else
+                size="sm"
+                :amount="amountBPTInWei.toString()"
+                :lock-end="lockEnd"
+                @success="onLiquidityLock"
+            >
                 Lock
                 <strong>
                     {{ toFiatPrice(amount) }}
                 </strong>
-            </BaseButtonLock>
+            </BaseButtonLiquidityLock>
         </BaseCardStatusCheck>
         <b-button v-if="Number(balances.VeTHX)" to="/earn" variant="success" class="w-100">
             Update Membership
@@ -258,32 +262,22 @@ export default defineComponent({
                 this.veStore.getLocks(wallet),
             ]);
         },
-        onApproveLiquidityCreate() {
-            this.walletStore.getApproval({ tokenAddress: this.address.USDC, spender: this.address.BalancerVault });
+        async onLiquidityCreate() {
+            await Promise.all([
+                this.walletStore.getBalance(this.address.USDC),
+                this.walletStore.getBalance(this.address.BPT),
+            ]);
         },
-        onLiquidityCreate() {
-            this.walletStore.getBalance(this.address.USDC);
-            this.walletStore.getBalance(this.address.BPT);
+        async onLiquidityStake() {
+            await Promise.all([
+                this.walletStore.getBalance(this.address.BPT),
+                this.walletStore.getBalance(this.address.BPTGauge),
+            ]);
         },
-        onApproveLiquidityStake() {
-            this.walletStore.getApproval({ tokenAddress: this.address.BPT, spender: this.address.BPTGauge });
-        },
-        onLiquidityStake() {
-            this.walletStore.getBalance(this.address.BPT);
-            this.walletStore.getBalance(this.address.BPTGauge);
-        },
-        onApproveLiquidityLock() {
-            this.walletStore.getApproval({
-                tokenAddress: this.address.BPTGauge,
-                spender: this.address.VotingEscrow,
-            });
-        },
-        onLiquidityLock() {
+        async onLiquidityLock() {
             const wallet = this.walletStore.wallet;
             if (!wallet) return;
-
-            this.walletStore.getBalance(this.address.BPTGauge);
-            this.veStore.getLocks(wallet);
+            await Promise.all([this.walletStore.getBalance(this.address.BPTGauge), this.veStore.getLocks(wallet)]);
         },
     },
 });
