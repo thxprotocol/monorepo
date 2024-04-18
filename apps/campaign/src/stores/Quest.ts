@@ -3,7 +3,6 @@ import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/common/lib/mixpanel';
 import { QuestVariant } from '@thxnetwork/sdk';
 import { GCLOUD_RECAPTCHA_SITE_KEY } from '../config/secrets';
-import poll from 'promise-poller';
 
 export const useQuestStore = defineStore('quest', {
     state: (): TQuestState => ({

@@ -10,7 +10,6 @@
             <i class="fas fa-exclamation-circle me-1" />
             {{ error }}
         </b-alert>
-
         <template v-if="isAvailable">
             <b-list-group class="mb-3">
                 <b-list-group-item
@@ -88,7 +87,6 @@ export default defineComponent({
             WalletVariant,
             chainList,
             ChainId,
-            isAlertInfoShown: false,
             isLoading: false,
             isShown: false,
             error: '',
@@ -110,6 +108,9 @@ export default defineComponent({
                 .reduce((a, b) => a + b, 0);
             return !!result;
         },
+        isAlertInfoShown() {
+            return !!this.error;
+        },
     },
     watch: {
         show(value) {
@@ -118,7 +119,10 @@ export default defineComponent({
     },
     methods: {
         onShow() {
-            this.veStore.getLocks();
+            const wallet = this.walletStore.wallet;
+            if (wallet) {
+                this.veStore.getLocks(wallet);
+            }
             this.liquidityStore.getSpotPrice();
         },
         getValue(symbol: string, amount: string) {
@@ -127,8 +131,16 @@ export default defineComponent({
         },
         async onClickClaimRewards() {
             this.isLoading = true;
-            await this.veStore.claimTokens();
-            this.isLoading = false;
+            try {
+                const wallet = this.walletStore.wallet;
+                if (!wallet) throw new Error('Please connect a wallet first');
+
+                await this.veStore.claimTokens(wallet);
+            } catch (error) {
+                this.error = (error as any).toString();
+            } finally {
+                this.isLoading = false;
+            }
         },
     },
 });

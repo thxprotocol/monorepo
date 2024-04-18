@@ -84,6 +84,7 @@ export default defineComponent({
         return {
             fromWei,
             format,
+            error: '',
             differenceInDays,
             isModalIncreaseAmountShown: false,
             isModalIncreaseLockEndShown: false,
@@ -122,8 +123,15 @@ export default defineComponent({
     methods: {
         async onClickIncreaseLockEnd() {
             this.isLoadingLockEnd = true;
-            await this.veStore.increasUnlockTime({ lockEndTimestamp: this.lockEnd });
-            this.isLoadingLockEnd = false;
+            try {
+                const wallet = this.walletStore.wallet;
+                if (!wallet) throw new Error('Please connect a wallet ');
+                await this.veStore.increasUnlockTime(wallet, { lockEndTimestamp: this.lockEnd });
+            } catch (error) {
+                this.error = (error as any).toSTring();
+            } finally {
+                this.isLoadingLockEnd = false;
+            }
         },
     },
 });

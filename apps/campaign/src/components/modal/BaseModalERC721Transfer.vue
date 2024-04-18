@@ -46,7 +46,7 @@ export default defineComponent({
     name: 'BaseModalERC721Transfer',
     props: {
         id: String,
-        token: Object as PropType<TERC721Token>,
+        token: { type: Object as PropType<TERC721Token>, required: true },
         error: String,
         show: Boolean,
         isLoading: Boolean,

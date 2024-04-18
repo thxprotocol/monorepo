@@ -44,9 +44,7 @@ import { MAX_LOCK_TIME, contractNetworks } from '../../config/constants';
 import { useLiquidityStore } from '@thxnetwork/campaign/stores/Liquidity';
 import { calculatePenalty, toFiatPrice } from '@thxnetwork/campaign/utils/price';
 import { formatUnits } from 'ethers/lib/utils';
-import { BigNumber } from 'ethers/lib/ethers';
 import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
-import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseModalWithdraw',
@@ -93,22 +91,17 @@ export default defineComponent({
         async onShow() {
             //
         },
-        async waitForWithdrawal() {
-            const taskFn = async () => {
-                await this.veStore.getLocks();
-                return BigNumber.from(this.veStore.lock.amount).eq(0) ? Promise.resolve() : Promise.reject('x');
-            };
-            return poll({ taskFn, interval: 3000, retries: 20 });
-        },
         async onClickWithdraw() {
             this.isPolling = true;
 
             try {
-                await this.veStore.withdraw(this.isEarlyAttempt);
-                await this.waitForWithdrawal();
+                const wallet = this.walletStore.wallet;
+                if (!wallet) throw new Error('Please connect a wallet');
 
-                const { wallet } = this.walletStore;
-                if (wallet) this.walletStore.getBalance(contractNetworks[wallet.chainId].BPTGauge);
+                await this.veStore.withdraw(wallet, this.isEarlyAttempt);
+                await this.veStore.waitForWithdrawal(wallet);
+
+                this.walletStore.getBalance(contractNetworks[wallet.chainId].BPTGauge);
 
                 this.$emit('hidden');
             } catch (response) {

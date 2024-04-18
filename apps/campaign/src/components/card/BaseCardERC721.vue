@@ -167,23 +167,24 @@ export default defineComponent({
     },
     methods: {
         getToken() {
-            const getTokenMap: { [variant: string]: () => void } = {
+            const getTokenMap: { [variant: string]: (wallet: TWallet) => void } = {
                 [NFTVariant.ERC721]: this.getERC721Token.bind(this),
                 [NFTVariant.ERC1155]: this.getERC1155Token.bind(this),
             };
-            getTokenMap[this.token.nft.variant]();
+            const wallet = this.walletStore.wallet;
+            if (!wallet) return;
+
+            getTokenMap[this.token.nft.variant](wallet);
         },
-        async getERC721Token() {
-            if (!this.walletStore.wallet) return;
+        async getERC721Token(wallet: TWallet) {
             const token = await this.accountStore.api.request.get(`/v1/erc721/token/${this.token._id}`, {
-                params: { walletId: this.walletStore.wallet._id },
+                params: { walletId: wallet._id },
             });
             this.owner = token.owner;
         },
-        async getERC1155Token() {
-            if (!this.walletStore.wallet) return;
+        async getERC1155Token(wallet: TWallet) {
             const token = await this.accountStore.api.request.get(`/v1/erc1155/token/${this.token._id}`, {
-                params: { walletId: this.walletStore.wallet._id },
+                params: { walletId: wallet._id },
             });
             this.balance = token.balance;
         },

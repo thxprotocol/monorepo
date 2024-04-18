@@ -35,6 +35,9 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'BaseModalChainSwitch',
+    props: {
+        id: String,
+    },
     data() {
         return {
             chainList,

@@ -173,6 +173,7 @@ export default defineComponent({
             // Checks if BPT gauge balance has a value greater than 3 USD
             // Dollar price for bpt and bpt-gauge is equal
             const bptUSDPriceInWei = parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
+            console.log(this.balances.BPTGauge, bptUSDPriceInWei.mul(3).toString());
             return BigNumber.from(this.balances.BPTGauge).gte(bptUSDPriceInWei.mul(3));
         },
         isAllowanceBPTGaugeSufficient() {
@@ -200,6 +201,9 @@ export default defineComponent({
     },
     methods: {
         async onShow() {
+            const wallet = this.walletStore.wallet;
+            if (!wallet) return;
+
             await Promise.all([
                 this.walletStore.getBalance(this.address.USDC),
                 this.walletStore.getBalance(this.address.THX),
@@ -211,7 +215,7 @@ export default defineComponent({
                     tokenAddress: this.address.BPTGauge,
                     spender: this.address.VotingEscrow,
                 }),
-                this.veStore.getLocks(),
+                this.veStore.getLocks(wallet),
             ]);
         },
         onApproveLiquidityCreate() {
@@ -235,8 +239,11 @@ export default defineComponent({
             });
         },
         onLiquidityLock() {
+            const wallet = this.walletStore.wallet;
+            if (!wallet) return;
+
             this.walletStore.getBalance(this.address.BPTGauge);
-            this.veStore.getLocks();
+            this.veStore.getLocks(wallet);
         },
     },
 });

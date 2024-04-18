@@ -146,15 +146,17 @@ export default defineComponent({
         async onClickDeposit() {
             this.isPolling = true;
             try {
+                const wallet = this.walletStore.wallet;
+                if (!wallet) throw new Error('Please connect a wallet');
+
                 // Values to send
                 const amountInWei = parseUnits(this.amountDeposit.toString(), 18);
                 const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
-
                 // Make deposit
-                await this.veStore.deposit({ amountInWei: amountInWei.toString(), lockEndTimestamp });
+                await this.veStore.deposit(wallet, { amountInWei: amountInWei.toString(), lockEndTimestamp });
 
                 // Wait for amount and/or endDate to be updated if it changed
-                await this.veStore.waitForLock(amountInWei, lockEndTimestamp);
+                await this.veStore.waitForLock(wallet, amountInWei, lockEndTimestamp);
 
                 this.walletStore.getBalance(this.address.BPTGauge);
                 this.walletStore.getBalance(this.address.VotingEscrow);

@@ -27,12 +27,8 @@ export const useVeStore = defineStore('ve', {
             this.balance = 0;
             this.rewards = [];
         },
-        async getLocks() {
+        async getLocks(wallet: TWallet) {
             const { api } = useAccountStore();
-            const { wallet } = useWalletStore();
-            // Remove lock info if selected wallet is null
-            if (!wallet) return;
-
             const locks = await api.request.get('/v1/ve', { params: { walletId: wallet._id } });
             const { amount, end, now, balance, rewards } = locks[0];
             this.lock = { amount, end };
@@ -40,10 +36,7 @@ export const useVeStore = defineStore('ve', {
             this.rewards = rewards;
             this.balance = balance;
         },
-        async deposit({ lockEndTimestamp, amountInWei }: TRequestBodyDeposit) {
-            const { wallet } = useWalletStore();
-            if (!wallet) return;
-
+        async deposit(wallet: TWallet, { lockEndTimestamp, amountInWei }: TRequestBodyDeposit) {
             const map: { [variant: string]: (wallet: TWallet, data: TRequestBodyDeposit) => Promise<void> } = {
                 [WalletVariant.Safe]: this.depositSafe.bind(this),
                 [WalletVariant.WalletConnect]: this.depositWalletConnect.bind(this),
@@ -90,15 +83,11 @@ export const useVeStore = defineStore('ve', {
 
             await sendTransaction(wallet.address, call.to, call.data);
         },
-        async increaseAmount(data: { amountInWei: string }) {
-            const { wallet } = useWalletStore();
-            if (!wallet) return;
-
+        async increaseAmount(wallet: TWallet, data: { amountInWei: string }) {
             const map: { [variant: string]: (wallet: TWallet, data: { amountInWei: string }) => Promise<void> } = {
                 [WalletVariant.Safe]: this.increaseAmountSafe.bind(this),
                 [WalletVariant.WalletConnect]: this.increaseAmountWalletConnect.bind(this),
             };
-
             return await map[wallet.variant](wallet, data);
         },
         async increaseAmountSafe(wallet: TWallet, data: { amountInWei: string }) {
@@ -135,10 +124,17 @@ export const useVeStore = defineStore('ve', {
             );
             await sendTransaction(wallet.address, call.to, call.data);
         },
-        async increasUnlockTime(data: { lockEndTimestamp: number }) {
-            const { wallet } = useWalletStore();
-            if (!wallet) return;
-
+        async waitForIncreaseAmount(wallet: TWallet, amountInWei: BigNumber) {
+            const expectedAmount = BigNumber.from(this.lock.amount).add(amountInWei);
+            const taskFn = async () => {
+                await this.getLocks(wallet);
+                return BigNumber.from(this.lock.amount).eq(expectedAmount)
+                    ? Promise.resolve()
+                    : Promise.reject('Increase amount');
+            };
+            return await poll({ taskFn, interval: 3000, retries: 20 });
+        },
+        async increasUnlockTime(wallet: TWallet, data: { lockEndTimestamp: number }) {
             const map: { [variant: string]: (wallet: TWallet, data: { lockEndTimestamp: number }) => Promise<void> } = {
                 [WalletVariant.Safe]: this.increaseUnlockTimeSafe.bind(this),
                 [WalletVariant.WalletConnect]: this.increaseUnlockTimeWalletConnect.bind(this),
@@ -181,10 +177,14 @@ export const useVeStore = defineStore('ve', {
 
             await sendTransaction(wallet.address, call.to, call.data);
         },
-        async claimTokens() {
-            const { wallet } = useWalletStore();
-            if (!wallet) return;
-
+        async waitForIncreaseUnlockTime(wallet: TWallet, timestamp: number) {
+            const taskFn = async () => {
+                await this.getLocks(wallet);
+                return this.lock.end === timestamp * 1000 ? Promise.resolve() : Promise.reject('Increase lock end');
+            };
+            return await poll({ taskFn, interval: 3000, retries: 20 });
+        },
+        async claimTokens(wallet: TWallet) {
             const map: { [variant: string]: (wallet: TWallet) => Promise<void> } = {
                 [WalletVariant.Safe]: this.claimTokenSafe.bind(this),
                 [WalletVariant.WalletConnect]: this.claimTokenWalletConnect.bind(this),
@@ -237,10 +237,7 @@ export const useVeStore = defineStore('ve', {
             ]);
             await sendTransaction(wallet.address, call.to, call.data);
         },
-        async withdraw(isEarlyAttempt: boolean) {
-            const { wallet } = useWalletStore();
-            if (!wallet) return;
-
+        async withdraw(wallet: TWallet, isEarlyAttempt: boolean) {
             const map: { [variant: string]: (wallet: TWallet, isEarlyAttempt: boolean) => Promise<void> } = {
                 [WalletVariant.Safe]: this.withdrawSafe.bind(this),
                 [WalletVariant.WalletConnect]: this.withdrawWalletConnect.bind(this),
@@ -278,9 +275,16 @@ export const useVeStore = defineStore('ve', {
             );
             await sendTransaction(wallet.address, call.to, call.data);
         },
-        async waitForLock(amountInWei: BigNumber, lockEndTimestamp: number) {
+        async waitForWithdrawal(wallet: TWallet) {
             const taskFn = async () => {
-                await this.getLocks();
+                await this.getLocks(wallet);
+                return BigNumber.from(this.lock.amount).eq(0) ? Promise.resolve() : Promise.reject('Withdraw');
+            };
+            return poll({ taskFn, interval: 3000, retries: 20 });
+        },
+        async waitForLock(wallet: TWallet, amountInWei: BigNumber, lockEndTimestamp: number) {
+            const taskFn = async () => {
+                await this.getLocks(wallet);
                 return this.lock && this.lock.amount === amountInWei.toString() && this.lock.end === lockEndTimestamp
                     ? Promise.reject(CANCEL_TOKEN)
                     : Promise.reject('Ve amount');

@@ -28,7 +28,6 @@ import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '@thxnetwork/campaign/stores/Liquidity';
 import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
-import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseModalIncreaseLockEnd',
@@ -60,23 +59,18 @@ export default defineComponent({
         async onShow() {
             //
         },
-        async waitForIncrease(timestamp: number) {
-            const taskFn = async () => {
-                await this.veStore.getLocks();
-                return this.veStore.lock.end === timestamp * 1000
-                    ? Promise.resolve()
-                    : Promise.reject('Increase lock end');
-            };
-            return await poll({ taskFn, interval: 3000, retries: 20 });
-        },
+
         async onClickIncreaseLockEnd() {
             this.isPolling = true;
 
             try {
+                const wallet = this.walletStore.wallet;
+                if (!wallet) throw new Error('Please connect a wallet first');
+
                 const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
 
-                await this.veStore.increasUnlockTime({ lockEndTimestamp });
-                await this.waitForIncrease(lockEndTimestamp);
+                await this.veStore.increasUnlockTime(wallet, { lockEndTimestamp });
+                await this.veStore.waitForIncreaseUnlockTime(wallet, lockEndTimestamp);
 
                 this.$emit('hidden');
             } catch (response) {

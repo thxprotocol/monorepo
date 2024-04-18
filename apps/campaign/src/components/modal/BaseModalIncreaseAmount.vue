@@ -41,13 +41,11 @@ import { mapStores } from 'pinia';
 import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '@thxnetwork/campaign/stores/Liquidity';
-import { BigNumber } from 'ethers/lib/ethers';
 import { contractNetworks } from '../../config/constants';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { ChainId } from '@thxnetwork/sdk';
 import { roundDownFixed } from '@thxnetwork/campaign/utils/price';
 import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
-import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseModalIncreaseAmount',
@@ -95,24 +93,17 @@ export default defineComponent({
             this.lockAmount = this.amountApproval;
             this.tabIndex = 1;
         },
-        async waitForIncrease() {
-            const expectedAmount = BigNumber.from(this.veStore.lock.amount).add(parseUnits(this.lockAmount, 18));
-            const taskFn = async () => {
-                await this.veStore.getLocks();
-                return BigNumber.from(this.veStore.lock.amount).eq(expectedAmount)
-                    ? Promise.resolve()
-                    : Promise.reject('Increase amount');
-            };
-            return await poll({ taskFn, interval: 3000, retries: 20 });
-        },
         async onClickIncreaseAmount() {
             this.isPolling = true;
 
             try {
+                const wallet = this.walletStore.wallet;
+                if (!wallet) throw new Error('Please connect a wallet');
+
                 const amountInWei = parseUnits(String(this.lockAmount), 18);
 
-                await this.veStore.increaseAmount({ amountInWei: amountInWei.toString() });
-                await this.waitForIncrease();
+                await this.veStore.increaseAmount(wallet, { amountInWei: amountInWei.toString() });
+                await this.veStore.waitForIncreaseAmount(wallet, amountInWei);
 
                 this.$emit('hidden');
             } catch (response) {

@@ -135,7 +135,7 @@ export default defineComponent({
                 this.$emit('close');
             } catch (error) {
                 this.$emit('error', String(error));
-                this.error = error;
+                this.error = (error as Error).toString();
                 console.error(error);
             } finally {
                 this.isLoading = false;
