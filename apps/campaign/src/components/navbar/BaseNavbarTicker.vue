@@ -20,9 +20,11 @@
 .ticker {
     text-align: center;
     min-height: 40px;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1200px) {
     .ticker {
         text-align: left;
         overflow: hidden;
