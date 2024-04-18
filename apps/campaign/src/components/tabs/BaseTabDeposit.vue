@@ -97,7 +97,8 @@ export default defineComponent({
             return this.balanceBPT.gt(0);
         },
         isModalInsufficientAmountShown() {
-            const bptPriceInWei = parseUnits(String(this.liquidityStore.pricing['20USDC-80THX']), 18);
+            if (!this.liquidityStore.pricing['20USDC-80THX']) return false;
+            const bptPriceInWei = parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
             const bptValue = BigNumber.from(this.amount).mul(bptPriceInWei);
             return bptValue.lt(this.minBPTGValue) && bptValue.gt(0);
         },

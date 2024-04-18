@@ -2,10 +2,11 @@ import poll from 'promise-poller';
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
-import { contractNetworks } from '../config/constants';
+import { BALANCER_POOL_ID, contractNetworks } from '../config/constants';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { BigNumber } from 'ethers';
 import { PoolWithMethods } from '@balancer-labs/sdk';
+import { ChainId } from '@thxnetwork/sdk';
 
 type TCreateLiquidityOptions = {
     thxAmountInWei: string;
@@ -17,12 +18,13 @@ type TCreateLiquidityOptions = {
 export const useLiquidityStore = defineStore('liquidity', {
     state: (): TLiquidityState => ({
         pricing: { 'THX': 0, 'USDC': 0, 'BAL': 0, '20USDC-80THX': 0 },
+        apr: {
+            balancer: { min: 0, max: 0 },
+            thx: { min: 0, max: 0 },
+        },
+        tvl: 0,
     }),
     actions: {
-        getAPR() {
-            const { api } = useAccountStore();
-            return api.request.get('/v1/liquidity/apr');
-        },
         async createLiquidity(wallet: TWallet, data: TCreateLiquidityOptions) {
             const map: { [variant: string]: (wallet: TWallet, data: TCreateLiquidityOptions) => Promise<void> } = {
                 [WalletVariant.Safe]: this.createLiquiditySafe.bind(this),
@@ -38,20 +40,88 @@ export const useLiquidityStore = defineStore('liquidity', {
 
             await confirmTransactions(txs);
         },
+        buildJoin(wallet: TWallet, data: TCreateLiquidityOptions) {
+            if (wallet.chainId === ChainId.Hardhat) {
+                const { encodeContractCall } = useWalletStore();
+                const abi = [
+                    {
+                        inputs: [
+                            {
+                                internalType: 'bytes32',
+                                name: 'poolId',
+                                type: 'bytes32',
+                            },
+                            {
+                                internalType: 'address',
+                                name: 'sender',
+                                type: 'address',
+                            },
+                            {
+                                internalType: 'address',
+                                name: 'recipient',
+                                type: 'address',
+                            },
+                            {
+                                components: [
+                                    {
+                                        internalType: 'address[]',
+                                        name: 'assets',
+                                        type: 'address[]',
+                                    },
+                                    {
+                                        internalType: 'uint256[]',
+                                        name: 'maxAmountsIn',
+                                        type: 'uint256[]',
+                                    },
+                                    {
+                                        internalType: 'bytes',
+                                        name: 'userData',
+                                        type: 'bytes',
+                                    },
+                                    {
+                                        internalType: 'bool',
+                                        name: 'fromInternalBalance',
+                                        type: 'bool',
+                                    },
+                                ],
+                                internalType: 'struct BalancerVault.JoinPoolRequest',
+                                name: 'request',
+                                type: 'tuple',
+                            },
+                        ],
+                        name: 'joinPool',
+                        outputs: [],
+                        stateMutability: 'nonpayable',
+                        type: 'function',
+                    },
+                ];
+                return encodeContractCall(contractNetworks[wallet.chainId].BalancerVault, abi, 'joinPool', [
+                    BALANCER_POOL_ID,
+                    wallet.address,
+                    wallet.address,
+                    {
+                        assets: [data.pool.tokens[0].address, data.pool.tokens[1].address],
+                        maxAmountsIn: [data.usdcAmountInWei, data.thxAmountInWei],
+                        userData: '0x',
+                        fromInternalBalance: false,
+                    },
+                ]);
+            } else {
+                const [usdc, thx] = data.pool.tokens as unknown as {
+                    address: string;
+                }[];
+                return data.pool.buildJoin(
+                    wallet.address,
+                    [usdc.address, thx.address],
+                    [data.usdcAmountInWei, data.thxAmountInWei],
+                    data.slippage,
+                ) as { to: `0x${string}`; data: `0x${string}` };
+            }
+        },
         async createLiquidityWalletConnect(wallet: TWallet, data: TCreateLiquidityOptions) {
             const { sendTransaction } = useWalletStore();
-            const [usdc, thx] = data.pool.tokens as unknown as {
-                address: string;
-            }[];
-            const call = data.pool.buildJoin(
-                wallet.address,
-                [usdc.address, thx.address],
-                [data.usdcAmountInWei, data.thxAmountInWei],
-                data.slippage,
-            ) as { to: `0x${string}`; data: `0x${string}` };
-
-            // Not using call.to as it would not be able to use the local BalancerVault contract
-            await sendTransaction(wallet.address, contractNetworks[wallet.chainId].BalancerVault, call.data, '1000000'); // TODO Using a fixed gas limit for now
+            const call = this.buildJoin(wallet, data);
+            await sendTransaction(wallet.address, call.to, call.data, '1000000'); // TODO Using a fixed gas limit for now
         },
         waitForLiquidity(wallet: TWallet, data: TCreateLiquidityOptions) {
             const { balances, getBalance } = useWalletStore();
@@ -118,6 +188,12 @@ export const useLiquidityStore = defineStore('liquidity', {
         },
         async getSpotPrice() {
             const { api } = useAccountStore();
+
+            api.request.get('/v1/prices/apr').then((data: { apr: TAPR; tvl: number }) => {
+                this.apr = data.apr;
+                this.tvl = data.tvl;
+            });
+
             const pricing = await api.request.get('/v1/prices');
             this.pricing = pricing;
         },

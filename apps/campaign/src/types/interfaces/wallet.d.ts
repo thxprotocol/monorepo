@@ -132,8 +132,15 @@ type TVeState = {
     isModalClaimTokensShown: boolean;
 };
 
+type TAPR = {
+    balancer: { min: number; max: number };
+    thx: { min: number; max: number };
+};
+
 type TLiquidityState = {
     pricing: { [key: string]: number };
+    apr: TAPR;
+    tvl: number;
 };
 
 type TRequestBodyDeposit = {

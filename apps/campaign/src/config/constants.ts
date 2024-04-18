@@ -13,6 +13,7 @@ export const contractNetworks: any = {
         signMessageLibAddress: '0x658FAD2acB6d1E615f295E566ee9a6d32Cc97b10',
         createCallAddress: '0x40Efd8a16485213445E6d8b9a4266Fd2dFf7C69a',
         simulateTxAccessorAddress: '0xFF1eE64b8806C0891e8F73b37f8403F441b552E1',
+
         // Tokens
         THX: '0xc368fA6A4057BcFD9E49221d8354d5fA6B88945a',
         USDC: '0x439F0128d07f005e0703602f366599ACaaBfEA18',

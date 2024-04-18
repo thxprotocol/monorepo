@@ -1,6 +1,5 @@
 <template>
     <BaseCardHeaderHome />
-
     <b-container>
         <b-row class="mt-5 mb-3">
             <b-col xs="12" md="6">
