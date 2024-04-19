@@ -20,7 +20,7 @@
             </b-col>
         </b-row>
         <BaseCardStatusCheck
-            label="Added liquidity"
+            label="1. Add liquidity"
             :description="`Balance: ${Number(formatUnits(balances.BPT, 18)).toFixed(6)} 20USDC-80THX (${toFiatPrice(
                 balanceBPTInUSD.toString(),
             )})`"
@@ -49,7 +49,7 @@
             </BaseButtonLiquidityCreate>
         </BaseCardStatusCheck>
         <BaseCardStatusCheck
-            label="Staked liquidity"
+            label="2. Stake liquidity"
             :description="`Balance: ${Number(formatUnits(balances.BPTGauge, 18)).toFixed(
                 6,
             )} 20USDC-80THX (${toFiatPrice(balanceBPTGaugeInUSD)})`"
@@ -82,7 +82,7 @@
             </BaseButtonLiquidityStake>
         </BaseCardStatusCheck>
         <BaseCardStatusCheck
-            label="Locked liquidity"
+            label="3. Lock liquidity"
             :description="`Balance: ${balances.VeTHX} veTHX`"
             :status="isLiquidityLocked"
         >
