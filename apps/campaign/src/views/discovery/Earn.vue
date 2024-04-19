@@ -4,7 +4,7 @@
             <div>
                 <h1 class="text-opaque">Lock & Earn</h1>
                 <p class="lead mb-4">
-                    Earn additional
+                    Members earn additional
                     <b-link
                         class="fw-bold text-white text-decoration-none"
                         target="_blank"
@@ -39,26 +39,36 @@
                     </sup>
                     rewards for providing liquidity!
                 </p>
-                <p class="lead mb-4">
-                    You will also receive <strong>$veTHX</strong> allowing you to partake in protocol governance 🚀
-                </p>
-                <b-button
-                    variant="primary"
-                    class="me-3 px-5"
-                    :disabled="!accountStore.isAuthenticated"
-                    @click="veStore.isModalClaimTokensShown = true"
-                >
-                    Claim Rewards
-                    <i class="fas fa-chevron-right ms-2" />
-                </b-button>
-                <b-button
-                    href="https://medium.com/thxprotocol/revolutionizing-gaming-with-thx-networks-new-vote-escrowed-tokenomics-18ef24239e46"
-                    target="_blank"
-                    variant="link"
-                    class="text-white"
-                >
-                    Learn more
-                </b-button>
+                <div class="d-flex">
+                    <div class="d-block-inline rounded fw-normal text-start me-5" variant="primary">
+                        <div class="small text-opaque">
+                            APR
+                            <i class="fas fa-question-circle" />
+                        </div>
+                        <div class="lead fw-bold">
+                            <span>{{ aprLabel }}</span>
+                        </div>
+                    </div>
+                    <div class="d-block-inline rounded fw-normal text-start me-5" variant="primary">
+                        <div class="small text-opaque">
+                            TVL
+                            <i class="fas fa-question-circle" />
+                        </div>
+                        <div class="lead fw-bold">
+                            <span>{{ tvlLabel }}</span>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="d-block-inline rounded fw-normal text-start" variant="primary">
+                    <div class="small text-opaque">
+                        Rewards
+                        <i class="fas fa-question-circle" />
+                    </div>
+                    <div class="lead fw-bold">
+                        <span>$0.00</span>
+                    </div>
+                </div>
             </div>
         </template>
         <template #secondary>
@@ -88,21 +98,14 @@
             </b-card>
         </template>
     </BaseCardHeader>
-    <b-container class="my-5">
+    <b-container>
+        <h2 class="mt-5">Reward Distribution</h2>
         <b-row>
-            <b-col><h2>Reward Distribution (May 2024)</h2></b-col>
-            <b-col></b-col>
-        </b-row>
-        <b-row>
-            <b-col>
-                <p class="lead">
-                    A whopping <strong>70% of the campaign payments</strong> will be distributed among
-                    <b-link target="_blank" href="https://docs.thx.network/faq/memberships" class="text-white fw-bold">
-                        members
-                    </b-link>
-                    as staked liquidity ready to be claimed.
-                </p>
-                <p class="lead">Become member today and share in the success of THX Network! ✨</p>
+            <b-col v-for="{ week, total } of schedule" lg="3">
+                <div class="bg-primary p-4 rounded">
+                    <span class="text-opaque">Week {{ week }}</span>
+                    <div class="h3 mb-0">{{ toFiatPrice(total) }}</div>
+                </div>
             </b-col>
         </b-row>
     </b-container>
@@ -116,6 +119,9 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
 import { roundUpFixed, toFiatPrice } from '@thxnetwork/campaign/utils/price';
+import { formatUnits, parseUnits } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
+import { startOfWeek, addWeeks, format, eachWeekOfInterval } from 'date-fns';
 
 export default defineComponent({
     name: 'Earn',
@@ -123,6 +129,7 @@ export default defineComponent({
         return {
             toFiatPrice,
             roundUpFixed,
+            formatUnits,
             tabIndex: 1,
             publicUrl: 'https://thx.network',
             isAlertSigninShown: true,
@@ -130,18 +137,70 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useWalletStore, useVeStore, useLiquidityStore),
+        aprLabel() {
+            const { balancer } = this.liquidityStore.apr;
+            return balancer.min.toFixed(2) + '% - ' + balancer.max.toFixed(2) + '%';
+        },
+        tvlLabel() {
+            const tvlInWei = formatUnits(this.liquidityStore.tvl, 18).toString();
+            const bptPrice = this.liquidityStore.pricing['20USDC-80THX'];
+            return toFiatPrice(Number(tvlInWei) * bptPrice);
+        },
+        rewards() {
+            const balPriceInWei = parseUnits(this.liquidityStore.pricing['BAL'].toString(), 18);
+            const bptPriceInWei = parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
+
+            const valueBALInWei = BigNumber.from(this.liquidityStore.rewards.bal).mul(balPriceInWei);
+            const valueBPTInWei = BigNumber.from(this.liquidityStore.rewards.bpt).mul(bptPriceInWei);
+
+            return {
+                bal: '',
+                bpt: '',
+                total: valueBALInWei.add(valueBPTInWei),
+            };
+        },
+        schedule() {
+            const { bal, bpt } = this.liquidityStore.schedule;
+            const balPriceInWei = parseUnits(this.liquidityStore.pricing['BAL'].toString(), 18);
+            const bptPriceInWei = parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
+
+            // Usage
+            const weekNumbers = this.getWeekNumbers();
+            return weekNumbers.map((week, index) => {
+                const valueBAL = BigNumber.from(bal[index]).mul(balPriceInWei);
+                const valueBPT = BigNumber.from(bpt[index]).mul(bptPriceInWei);
+                const total = valueBAL.add(valueBPT);
+
+                return {
+                    week,
+                    bal: formatUnits(valueBAL, 18),
+                    bpt: formatUnits(valueBPT, 18),
+                    total: formatUnits(total, 18 * 2), // 18 * 2 as we need to format both price and amount in wei
+                };
+            });
+        },
     },
     watch: {
         'walletStore.wallet': {
             handler(wallet) {
                 if (!wallet) return;
                 this.veStore.getLocks(wallet);
+                this.liquidityStore.listMetrics(wallet);
             },
             immediate: true,
         },
     },
-    mounted() {
-        this.liquidityStore.getSpotPrice();
+    methods: {
+        getWeekNumbers() {
+            const today = new Date();
+            const currentWeek = format(startOfWeek(today, { weekStartsOn: 3 }), 'w'); // Setting Thursday as the start of the week
+            const nextFourWeeks = eachWeekOfInterval({
+                start: addWeeks(today, 1),
+                end: addWeeks(today, 3),
+            });
+            const weekNumbers = [currentWeek, ...nextFourWeeks.map((date) => format(date, 'w'))];
+            return weekNumbers;
+        },
     },
 });
 </script>

@@ -141,6 +141,8 @@ type TLiquidityState = {
     pricing: { [key: string]: number };
     apr: TAPR;
     tvl: number;
+    rewards: { bal: string; bpt: string };
+    schedule: { bal: string[]; bpt: string[] };
 };
 
 type TRequestBodyDeposit = {

@@ -23,6 +23,8 @@ export const useLiquidityStore = defineStore('liquidity', {
             thx: { min: 0, max: 0 },
         },
         tvl: 0,
+        rewards: { bal: '0', bpt: '0' },
+        schedule: { bal: ['0', '0', '0', '0'], bpt: ['0', '0', '0', '0'] },
     }),
     actions: {
         async createLiquidity(wallet: TWallet, data: TCreateLiquidityOptions) {
@@ -183,16 +185,20 @@ export const useLiquidityStore = defineStore('liquidity', {
             // Sign and execute the transaction data
             await sendTransaction(wallet.address, call.to, call.data);
         },
-        async getSpotPrice() {
+        async listPrices() {
             const { api } = useAccountStore();
-
-            api.request.get('/v1/prices/apr').then((data: { apr: TAPR; tvl: number }) => {
-                this.apr = data.apr;
-                this.tvl = data.tvl;
-            });
-
-            const pricing = await api.request.get('/v1/prices');
+            const pricing = await api.request.get('/v1/earn/prices');
             this.pricing = pricing;
+        },
+        async listMetrics(wallet: TWallet) {
+            const { api } = useAccountStore();
+            const { apr, tvl, rewards, schedule } = await api.request.get('/v1/earn/metrics', {
+                params: { walletId: wallet._id },
+            });
+            this.apr = apr;
+            this.tvl = tvl;
+            this.rewards = rewards;
+            this.schedule = schedule;
         },
         async waitForStake(wallet: TWallet, amountInWei: BigNumber) {
             const { balances, getBalance } = useWalletStore();

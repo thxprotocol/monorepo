@@ -51,7 +51,7 @@ export default defineComponent({
         },
     },
     mounted() {
-        this.liquidityStore.getSpotPrice();
+        this.liquidityStore.listPrices();
     },
 });
 </script>

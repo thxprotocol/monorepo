@@ -123,7 +123,6 @@ export default defineComponent({
             if (wallet) {
                 this.veStore.getLocks(wallet);
             }
-            this.liquidityStore.getSpotPrice();
         },
         getValue(symbol: string, amount: string) {
             const value = this.liquidityStore.pricing[symbol] * Number(formatUnits(amount, 'ether'));
