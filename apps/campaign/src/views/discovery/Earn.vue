@@ -40,35 +40,34 @@
                     rewards for providing liquidity!
                 </p>
                 <div class="d-flex">
-                    <div class="d-block-inline rounded fw-normal text-start me-5" variant="primary">
-                        <div class="small text-opaque">
-                            APR
-                            <i class="fas fa-question-circle" />
-                        </div>
-                        <div class="lead fw-bold">
-                            <span>{{ aprLabel }}</span>
-                        </div>
-                    </div>
-                    <div class="d-block-inline rounded fw-normal text-start me-5" variant="primary">
-                        <div class="small text-opaque">
-                            TVL
-                            <i class="fas fa-question-circle" />
-                        </div>
-                        <div class="lead fw-bold">
-                            <span>{{ tvlLabel }}</span>
-                        </div>
-                    </div>
+                    <BaseDropdownMetric label="APR" :value="aprMetric" :metrics="[]" class="me-4" />
+                    <BaseDropdownMetric label="TVL" :value="toFiatPrice(tvlMetric)" :metrics="[]" />
                 </div>
                 <hr />
-                <div class="d-block-inline rounded fw-normal text-start" variant="primary">
-                    <div class="small text-opaque">
-                        Rewards
-                        <i class="fas fa-question-circle" />
-                    </div>
-                    <div class="lead fw-bold">
-                        <span>$0.00</span>
-                    </div>
-                </div>
+                <BaseDropdownMetric
+                    label="Rewards"
+                    :value="toFiatPrice(rewardsMetric.totalInUSD)"
+                    :metrics="[
+                        {
+                            label: '$BAL',
+                            url: chainInfo.blockExplorer + '/token/' + address.BAL,
+                            badge: toFiatPrice(liquidityStore.pricing['BAL']),
+                            data: [
+                                { label: 'Amount', value: rewardsMetric.bal },
+                                { label: 'Value', value: toFiatPrice(rewardsMetric.balInUSD) },
+                            ],
+                        },
+                        {
+                            label: '$20USDC-80THX',
+                            url: 'https://app.balancer.fi/#/polygon/pool/0xb204bf10bc3a5435017d3db247f56da601dfe08a0002000000000000000000fe',
+                            badge: toFiatPrice(liquidityStore.pricing['20USDC-80THX']),
+                            data: [
+                                { label: 'Amount', value: rewardsMetric.bpt },
+                                { label: 'Value', value: toFiatPrice(rewardsMetric.bptInUSD) },
+                            ],
+                        },
+                    ]"
+                />
             </div>
         </template>
         <template #secondary>
@@ -122,6 +121,9 @@ import { roundUpFixed, toFiatPrice } from '@thxnetwork/campaign/utils/price';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import { startOfWeek, addWeeks, format, eachWeekOfInterval } from 'date-fns';
+import { BALANCER_POOL_ID, contractNetworks } from '@thxnetwork/campaign/config/constants';
+import { ChainId } from '@thxnetwork/sdk';
+import { chainList } from '@thxnetwork/campaign/utils/chains';
 
 export default defineComponent({
     name: 'Earn',
@@ -131,20 +133,47 @@ export default defineComponent({
             roundUpFixed,
             formatUnits,
             tabIndex: 1,
-            publicUrl: 'https://thx.network',
+            balancerPoolId: BALANCER_POOL_ID,
             isAlertSigninShown: true,
         };
     },
     computed: {
         ...mapStores(useAccountStore, useWalletStore, useVeStore, useLiquidityStore),
-        aprLabel() {
+        chainInfo() {
+            if (!this.walletStore.wallet) return chainList[ChainId.Polygon];
+            return chainList[this.walletStore.wallet.chainId];
+        },
+        address() {
+            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
+            return contractNetworks[this.walletStore.wallet.chainId];
+        },
+        aprMetric() {
             const { balancer } = this.liquidityStore.apr;
             return balancer.min.toFixed(2) + '% - ' + balancer.max.toFixed(2) + '%';
         },
-        tvlLabel() {
+        tvlMetric() {
             const tvlInWei = formatUnits(this.liquidityStore.tvl, 18).toString();
             const bptPrice = this.liquidityStore.pricing['20USDC-80THX'];
-            return toFiatPrice(Number(tvlInWei) * bptPrice);
+            return {
+                tvlInWei: tvlInWei,
+                totalInUSD: Number(tvlInWei) * bptPrice,
+            };
+        },
+        rewardsMetric() {
+            const { bal, bpt } = this.liquidityStore.rewards;
+            const balPriceInWei = parseUnits(this.liquidityStore.pricing['BAL'].toString(), 18);
+            const bptPriceInWei = parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
+            const valueBAL = BigNumber.from(bal).mul(balPriceInWei);
+            const valueBPT = BigNumber.from(bpt).mul(bptPriceInWei);
+            const totalInWei = valueBAL.add(valueBPT);
+
+            return {
+                bal: Number(formatUnits(bal, 18)).toFixed(6),
+                bpt: Number(formatUnits(bpt, 18)).toFixed(6),
+                balInUSD: formatUnits(valueBAL, 18 * 2),
+                bptInUSD: formatUnits(valueBPT, 18 * 2),
+                totalInUSD: formatUnits(totalInWei, 18 * 2),
+            };
         },
         rewards() {
             const balPriceInWei = parseUnits(this.liquidityStore.pricing['BAL'].toString(), 18);
@@ -173,8 +202,10 @@ export default defineComponent({
 
                 return {
                     week,
-                    bal: formatUnits(valueBAL, 18),
-                    bpt: formatUnits(valueBPT, 18),
+                    balInWei: bal[index],
+                    bptInWei: bpt[index],
+                    balInUSD: formatUnits(valueBAL, 18),
+                    bptInUSD: formatUnits(valueBPT, 18),
                     total: formatUnits(total, 18 * 2), // 18 * 2 as we need to format both price and amount in wei
                 };
             });
