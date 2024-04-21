@@ -8,7 +8,7 @@
                     <sup class="text-success ms-1">
                         {{ toFiatPrice(Number(roundUpFixed(liquidityStore.pricing['20USDC-80THX'], 2))) }}
                     </sup>
-                    and next to your native <strong>BAL</strong>
+                    next to the native <strong>BAL</strong>
                     <sup class="text-success ms-1">
                         {{ toFiatPrice(Number(roundUpFixed(liquidityStore.pricing['BAL'], 2))) }}
                     </sup>
