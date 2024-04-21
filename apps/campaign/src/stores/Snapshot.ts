@@ -55,7 +55,7 @@ export const useSnapshotStore = defineStore('snapshot', {
                 query: `
                     messages (
                     first: 20
-                    where: { space: "ens.eth" }
+                    where: { space: "thxprotocol.eth" }
                     orderBy: "mci"
                     orderDirection: desc
                     ) {
