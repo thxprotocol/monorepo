@@ -17,7 +17,6 @@ export const useSnapshotStore = defineStore('snapshot', {
                                 skip: 0,
                                 where: {
                                     space_in: ["thxprotocol.eth"],
-                                    state: "closed"
                                 },
                                 orderBy: "created",
                                 orderDirection: desc
@@ -31,9 +30,7 @@ export const useSnapshotStore = defineStore('snapshot', {
                                 snapshot
                                 state
                                 scores
-                                scores_by_strategy
                                 scores_total
-                                scores_updated
                                 author
                                 space {
                                     id

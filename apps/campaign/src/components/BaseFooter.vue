@@ -1,9 +1,86 @@
 <template>
-    <b-container class="py-5">
+    <b-container class="pt-5 pb-3">
         <b-row>
-            <b-col cols="6">
+            <b-col md="3">
+                <div class="text-opaque my-3">THX Network</div>
                 <b-nav>
-                    <b-nav-item href="https://thx.network" target="_blank" link-class="text-white text-opaque ps-lg-0">
+                    <b-nav-item href="https://thx.network" target="_blank" link-class="px-0" class="w-100">
+                        Company
+                    </b-nav-item>
+                    <b-nav-item href="https://app.thx.network" target="_blank" link-class="px-0" class="w-100">
+                        App
+                    </b-nav-item>
+                    <b-nav-item href="https://dashboard.thx.network" target="_blank" link-class="px-0" class="w-100">
+                        Dashboard
+                    </b-nav-item>
+                </b-nav>
+            </b-col>
+            <b-col md="3">
+                <div class="text-opaque my-3">Campaign Managers</div>
+                <b-nav>
+                    <b-nav-item href="https://docs.thx.network" target="_blank" link-class="px-0" class="w-100">
+                        Documentation
+                    </b-nav-item>
+                    <b-nav-item
+                        href="https://www.youtube.com/watch?v=sy5YpR_Yx-E&list=PL48K1wk1bVouB8nTEBz9F_d5D6LXvaH_y"
+                        target="_blank"
+                        link-class="px-0"
+                        class="w-100"
+                    >
+                        Tutorials
+                    </b-nav-item>
+                    <b-nav-item
+                        href="https://docs.thx.network/developers/js-sdk"
+                        target="_blank"
+                        link-class="px-0"
+                        class="w-100"
+                    >
+                        JavaScript SDK
+                    </b-nav-item>
+                </b-nav>
+            </b-col>
+            <b-col md="3">
+                <div class="text-opaque my-3">Campaign Participants</div>
+                <b-nav>
+                    <b-nav-item to="/" link-class="px-0" class="w-100"> Explore Campaigns </b-nav-item>
+                    <b-nav-item to="/earn" link-class="px-0" class="w-100"> Quest & Earn </b-nav-item>
+                    <b-nav-item
+                        href="https://discord.com/invite/TzbbSmkE7Y"
+                        target="_blank"
+                        link-class="px-0"
+                        class="w-100"
+                    >
+                        Support
+                    </b-nav-item>
+                </b-nav>
+            </b-col>
+            <b-col md="3">
+                <div class="text-opaque my-3">Community</div>
+                <b-nav>
+                    <b-nav-item
+                        href="https://discord.com/invite/TzbbSmkE7Y"
+                        target="_blank"
+                        link-class="px-0"
+                        class="w-100"
+                    >
+                        Discord <i class="fas fa-external-link-alt ms-1 small" />
+                    </b-nav-item>
+                    <b-nav-item href="https://twitter.com/thxprotocol" target="_blank" link-class="px-0" class="w-100">
+                        Twitter <i class="fas fa-external-link-alt ms-1 small" />
+                    </b-nav-item>
+                    <b-nav-item
+                        href="https://www.youtube.com/@thxnetwork9284"
+                        target="_blank"
+                        link-class="px-0"
+                        class="w-100"
+                    >
+                        YouTube <i class="fas fa-external-link-alt ms-1 small" />
+                    </b-nav-item>
+                </b-nav>
+            </b-col>
+            <b-col md="12">
+                <b-nav class="my-3">
+                    <b-nav-item href="https://thx.network" target="_blank" link-class="text-white text-opaque px-0">
                         &copy; 2024 THX Network
                     </b-nav-item>
                     <b-nav-item
@@ -19,19 +96,6 @@
                         link-class="text-white text-opaque"
                     >
                         Terms of use
-                    </b-nav-item>
-                </b-nav>
-            </b-col>
-            <b-col cols="6">
-                <b-nav class="justify-content-end text-opaque">
-                    <b-nav-item href="https://discord.com/invite/TzbbSmkE7Y" target="_blank">
-                        <i class="fab fa-discord" style="color: #7289da" />
-                    </b-nav-item>
-                    <b-nav-item href="https://twitter.com/thxprotocol" target="_blank">
-                        <i class="fab fa-twitter" style="color: #1da1f2" />
-                    </b-nav-item>
-                    <b-nav-item href="https://www.youtube.com/@thxnetwork9284" target="_blank">
-                        <i class="fab fa-youtube" style="color: #ff0000" />
                     </b-nav-item>
                 </b-nav>
             </b-col>

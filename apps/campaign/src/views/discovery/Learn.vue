@@ -7,6 +7,9 @@
             </h1>
             <p class="lead">Complete quests and earn rewards while you learn about THX Network!</p>
             <b-button variant="primary" class="px-5" disabled>Coming Soon!</b-button>
+            <b-button href="https://docs.thx.network" target="_blank" variant="link" class="px-5 text-white">
+                Documentation
+            </b-button>
         </template>
     </BaseCardHeader>
 </template>

@@ -53,7 +53,7 @@
         <h2 class="mt-5">Reward Distribution</h2>
         <b-row>
             <b-col v-for="{ week, total } of schedule" lg="3">
-                <div class="bg-primary p-4 rounded">
+                <div class="bg-primary p-4 rounded my-2">
                     <span class="text-opaque">Week {{ week }}</span>
                     <div class="h3 mb-0">{{ toFiatPrice(total) }}</div>
                 </div>

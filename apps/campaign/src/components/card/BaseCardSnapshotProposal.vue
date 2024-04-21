@@ -11,7 +11,11 @@
                         >
                             {{ proposal.state }}
                         </b-badge>
-                        <b-link class="text-white text-decoration-none" @click="isModalProposalShown = true">
+                        <b-link
+                            :href="'https://snapshot.org/#/thxprotocol.eth/proposal/' + proposal.id"
+                            target="_blank"
+                            class="text-white text-decoration-none"
+                        >
                             {{ proposal.title }}
                         </b-link>
                         <b-link
@@ -31,7 +35,7 @@
         </template>
         <b-container class="p-0">
             <b-row>
-                <b-col lg="12" class="d-flex align-items-center">
+                <b-col lg="9" class="d-flex align-items-center">
                     <b-progress :max="proposal.scores_total" class="flex-grow-1">
                         <b-progress-bar variant="success" :value="proposal.scores[0]">
                             <small>{{ proposal.scores[0].toFixed(6) }} veTHX</small>
@@ -41,7 +45,7 @@
                         </b-progress-bar>
                     </b-progress>
                 </b-col>
-                <!-- <b-col lg="4">
+                <b-col lg="3">
                     <b-button-group size="sm" class="w-100 mt-3 mt-lg-0">
                         <b-button class="text-success" variant="primary" disabled>
                             <i class="fas me-2 fa-check-circle" />For
@@ -50,7 +54,7 @@
                             <i class="fas me-2 fa-times-circle" />Against
                         </b-button>
                     </b-button-group>
-                </b-col> -->
+                </b-col>
             </b-row>
         </b-container>
     </b-card>
