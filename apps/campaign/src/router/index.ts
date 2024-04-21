@@ -30,10 +30,16 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'learn',
                 component: () => import(/* webpackChunkName: "learn" */ '../views/discovery/Learn.vue'),
             },
+
             {
                 path: '/earn',
                 name: 'earn',
                 component: () => import(/* webpackChunkName: "earn" */ '../views/discovery/Earn.vue'),
+            },
+            {
+                path: '/community',
+                name: 'community',
+                component: () => import(/* webpackChunkName: "earn" */ '../views/discovery/Community.vue'),
             },
             {
                 path: '/wallets',

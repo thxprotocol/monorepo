@@ -33,7 +33,6 @@
                 Earn
             </b-button>
             <b-button
-                disabled
                 class="me-lg-3 mb-3 mb-lg-0 py-2 px-4 rounded text-decoration-none text-white"
                 variant="link"
                 to="/community"
@@ -107,7 +106,7 @@
                 <div style="width: 30px"><i class="fas fa-rocket me-1 text-opaque"></i></div>
                 Earn
             </b-list-group-item>
-            <b-list-group-item class="d-flex" disabled @click="onClickRoute('/community')">
+            <b-list-group-item class="d-flex" @click="onClickRoute('/community')">
                 <div style="width: 30px"><i class="fas fa-users me-1 text-opaque"></i></div>
                 Community
             </b-list-group-item>
