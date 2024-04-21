@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 export const useSnapshotStore = defineStore('snapshot', {
     state: (): TSnapshotState => ({
         proposals: [],
+        messages: {},
     }),
     actions: {
         async listProposals() {
@@ -43,35 +44,33 @@ export const useSnapshotStore = defineStore('snapshot', {
                     `,
                 });
                 this.proposals = data.data.proposals;
-                console.log(this.proposals);
             } catch (error) {
                 console.error('Error fetching data:', (error as any).toString());
             }
         },
-    },
-    async listMessages() {
-        try {
-            const { data } = await axios.post('https://hub.snapshot.org/graphql', {
-                query: `
-                    messages (
-                    first: 20
-                    where: { space: "thxprotocol.eth" }
-                    orderBy: "mci"
-                    orderDirection: desc
-                    ) {
-                        id
-                        address
-                        ipfs
-                        receipt
-                        type
-                        mci
-                    }
-                `,
-            });
-            console.log(data);
-            // this.messages[0] = response.data.data.messages;
-        } catch (error) {
-            console.error(error);
-        }
+        async listMessages(id: string) {
+            try {
+                const { data } = await axios.post('https://hub.snapshot.org/graphql', {
+                    query: `
+                        messages (
+                        first: 20
+                        where: { space: "thxprotocol.eth", id: ${id} }
+                        orderBy: "mci"
+                        orderDirection: desc
+                        ) {
+                            id
+                            address
+                            ipfs
+                            receipt
+                            type
+                            mci
+                        }
+                    `,
+                });
+                this.messages[id] = data.data.messages;
+            } catch (error) {
+                console.error(error);
+            }
+        },
     },
 });
