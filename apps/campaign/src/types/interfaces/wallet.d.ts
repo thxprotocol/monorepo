@@ -133,14 +133,14 @@ type TVeState = {
 };
 
 type TAPR = {
-    balancer: { min: number; max: number };
-    thx: { min: number; max: number };
+    balancer: { min: number; max: number; swapFees: number };
+    thx: number;
 };
 
 type TLiquidityState = {
     pricing: { [key: string]: number };
     apr: TAPR;
-    tvl: number;
+    tvl: { liquidity: '0'; staked: '0'; tvl: '0' };
     rewards: { bal: string; bpt: string };
     schedule: { bal: string[]; bpt: string[] };
 };

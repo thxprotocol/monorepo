@@ -19,10 +19,10 @@ export const useLiquidityStore = defineStore('liquidity', {
     state: (): TLiquidityState => ({
         pricing: { 'THX': 0, 'USDC': 0, 'BAL': 0, '20USDC-80THX': 0 },
         apr: {
-            balancer: { min: 0, max: 0 },
-            thx: { min: 0, max: 0 },
+            balancer: { min: 0, max: 0, swapFees: 0 },
+            thx: 0,
         },
-        tvl: 0,
+        tvl: { liquidity: '0', staked: '0', tvl: '0' },
         rewards: { bal: '0', bpt: '0' },
         schedule: { bal: ['0', '0', '0', '0'], bpt: ['0', '0', '0', '0'] },
     }),
@@ -190,10 +190,10 @@ export const useLiquidityStore = defineStore('liquidity', {
             const pricing = await api.request.get('/v1/earn/prices');
             this.pricing = pricing;
         },
-        async listMetrics(wallet: TWallet) {
+        async listMetrics(wallet?: TWallet) {
             const { api } = useAccountStore();
             const { apr, tvl, rewards, schedule } = await api.request.get('/v1/earn/metrics', {
-                params: { walletId: wallet._id },
+                params: { walletId: wallet?._id },
             });
             this.apr = apr;
             this.tvl = tvl;

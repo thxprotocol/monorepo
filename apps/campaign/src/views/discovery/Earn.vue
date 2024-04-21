@@ -4,70 +4,22 @@
             <div>
                 <h1 class="text-opaque">Lock & Earn</h1>
                 <p class="lead mb-4">
-                    Members earn additional
-                    <b-link
-                        class="fw-bold text-white text-decoration-none"
-                        target="_blank"
-                        href="https://www.coingecko.com/en/coins/thx-network"
-                    >
-                        $THX
-                    </b-link>
+                    Members earn additional <strong>20USDC-80THX</strong>
                     <sup class="text-success ms-1">
-                        {{ toFiatPrice(Number(roundUpFixed(liquidityStore.pricing['THX'], 2))) }}
+                        {{ toFiatPrice(Number(roundUpFixed(liquidityStore.pricing['20USDC-80THX'], 2))) }}
                     </sup>
-                    and
-                    <b-link
-                        class="fw-bold text-white text-decoration-none"
-                        target="_blank"
-                        href="https://www.coingecko.com/en/coins/usdc"
-                    >
-                        $USDC
-                    </b-link>
-                    <sup class="text-success ms-1">
-                        {{ toFiatPrice(Number(roundUpFixed(liquidityStore.pricing['USDC'], 2))) }}
-                    </sup>
-                    next to your native
-                    <b-link
-                        class="fw-bold text-white text-decoration-none"
-                        target="_blank"
-                        href="https://www.coingecko.com/en/coins/balancer"
-                    >
-                        $BAL
-                    </b-link>
+                    and next to your native <strong>BAL</strong>
                     <sup class="text-success ms-1">
                         {{ toFiatPrice(Number(roundUpFixed(liquidityStore.pricing['BAL'], 2))) }}
                     </sup>
-                    rewards for providing liquidity!
+                    for providing liquidity!
                 </p>
                 <div class="d-flex">
-                    <BaseDropdownMetric label="APR" :value="aprMetric" :metrics="[]" class="me-4" />
-                    <BaseDropdownMetric label="TVL" :value="toFiatPrice(tvlMetric)" :metrics="[]" />
+                    <BaseDropdownMetricAPR />
+                    <BaseDropdownMetricTVL />
                 </div>
                 <hr />
-                <BaseDropdownMetric
-                    label="Rewards"
-                    :value="toFiatPrice(rewardsMetric.totalInUSD)"
-                    :metrics="[
-                        {
-                            label: '$BAL',
-                            url: chainInfo.blockExplorer + '/token/' + address.BAL,
-                            badge: toFiatPrice(liquidityStore.pricing['BAL']),
-                            data: [
-                                { label: 'Amount', value: rewardsMetric.bal },
-                                { label: 'Value', value: toFiatPrice(rewardsMetric.balInUSD) },
-                            ],
-                        },
-                        {
-                            label: '$20USDC-80THX',
-                            url: 'https://app.balancer.fi/#/polygon/pool/0xb204bf10bc3a5435017d3db247f56da601dfe08a0002000000000000000000fe',
-                            badge: toFiatPrice(liquidityStore.pricing['20USDC-80THX']),
-                            data: [
-                                { label: 'Amount', value: rewardsMetric.bpt },
-                                { label: 'Value', value: toFiatPrice(rewardsMetric.bptInUSD) },
-                            ],
-                        },
-                    ]"
-                />
+                <BaseDropdownMetricRewards />
             </div>
         </template>
         <template #secondary>
@@ -121,9 +73,6 @@ import { roundUpFixed, toFiatPrice } from '@thxnetwork/campaign/utils/price';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import { startOfWeek, addWeeks, format, eachWeekOfInterval } from 'date-fns';
-import { BALANCER_POOL_ID, contractNetworks } from '@thxnetwork/campaign/config/constants';
-import { ChainId } from '@thxnetwork/sdk';
-import { chainList } from '@thxnetwork/campaign/utils/chains';
 
 export default defineComponent({
     name: 'Earn',
@@ -133,61 +82,10 @@ export default defineComponent({
             roundUpFixed,
             formatUnits,
             tabIndex: 1,
-            balancerPoolId: BALANCER_POOL_ID,
-            isAlertSigninShown: true,
         };
     },
     computed: {
         ...mapStores(useAccountStore, useWalletStore, useVeStore, useLiquidityStore),
-        chainInfo() {
-            if (!this.walletStore.wallet) return chainList[ChainId.Polygon];
-            return chainList[this.walletStore.wallet.chainId];
-        },
-        address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
-        },
-        aprMetric() {
-            const { balancer } = this.liquidityStore.apr;
-            return balancer.min.toFixed(2) + '% - ' + balancer.max.toFixed(2) + '%';
-        },
-        tvlMetric() {
-            const tvlInWei = formatUnits(this.liquidityStore.tvl, 18).toString();
-            const bptPrice = this.liquidityStore.pricing['20USDC-80THX'];
-            return {
-                tvlInWei: tvlInWei,
-                totalInUSD: Number(tvlInWei) * bptPrice,
-            };
-        },
-        rewardsMetric() {
-            const { bal, bpt } = this.liquidityStore.rewards;
-            const balPriceInWei = parseUnits(this.liquidityStore.pricing['BAL'].toString(), 18);
-            const bptPriceInWei = parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
-            const valueBAL = BigNumber.from(bal).mul(balPriceInWei);
-            const valueBPT = BigNumber.from(bpt).mul(bptPriceInWei);
-            const totalInWei = valueBAL.add(valueBPT);
-
-            return {
-                bal: Number(formatUnits(bal, 18)).toFixed(6),
-                bpt: Number(formatUnits(bpt, 18)).toFixed(6),
-                balInUSD: formatUnits(valueBAL, 18 * 2),
-                bptInUSD: formatUnits(valueBPT, 18 * 2),
-                totalInUSD: formatUnits(totalInWei, 18 * 2),
-            };
-        },
-        rewards() {
-            const balPriceInWei = parseUnits(this.liquidityStore.pricing['BAL'].toString(), 18);
-            const bptPriceInWei = parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
-
-            const valueBALInWei = BigNumber.from(this.liquidityStore.rewards.bal).mul(balPriceInWei);
-            const valueBPTInWei = BigNumber.from(this.liquidityStore.rewards.bpt).mul(bptPriceInWei);
-
-            return {
-                bal: '',
-                bpt: '',
-                total: valueBALInWei.add(valueBPTInWei),
-            };
-        },
         schedule() {
             const { bal, bpt } = this.liquidityStore.schedule;
             const balPriceInWei = parseUnits(this.liquidityStore.pricing['BAL'].toString(), 18);
@@ -209,16 +107,6 @@ export default defineComponent({
                     total: formatUnits(total, 18 * 2), // 18 * 2 as we need to format both price and amount in wei
                 };
             });
-        },
-    },
-    watch: {
-        'walletStore.wallet': {
-            handler(wallet) {
-                if (!wallet) return;
-                this.veStore.getLocks(wallet);
-                this.liquidityStore.listMetrics(wallet);
-            },
-            immediate: true,
         },
     },
     methods: {
