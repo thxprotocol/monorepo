@@ -1,5 +1,5 @@
 <template>
-    <b-card no-body class="cursor-pointer" @click="goTo(`/c/${campaign.slug}`)">
+    <b-card no-body class="cursor-pointer gradient-shadow card-campaign" @click="goTo(`/c/${campaign.slug}`)">
         <b-row>
             <b-col md="2">
                 <div
@@ -146,3 +146,15 @@ export default defineComponent({
     },
 });
 </script>
+
+<style lang="scss">
+.card-campaign {
+    &:before {
+        transition: opacity 0.2s;
+        opacity: 0;
+    }
+    &:hover:before {
+        opacity: 0.5;
+    }
+}
+</style>
