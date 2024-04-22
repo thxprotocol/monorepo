@@ -58,7 +58,6 @@ export default defineComponent({
             interval: null as any,
         };
     },
-
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useWalletStore),
         isConnecting() {
@@ -68,19 +67,16 @@ export default defineComponent({
             return this.walletStore.account && this.walletStore.account.isConnected;
         },
     },
-    mounted() {
-        this.walletStore.createWeb3Modal();
-    },
     methods: {
-        onClickDisconnect() {
-            this.walletStore.modal.resetAccount();
+        async onClickDisconnect() {
+            await this.walletStore.disconnect();
             window.location.reload();
         },
-        onClick() {
+        async onClick() {
             if (!this.walletStore.account) {
-                this.walletStore.modal.open();
+                await this.walletStore.connect();
             } else if (this.chainId && this.walletStore.chainId !== this.chainId) {
-                this.walletStore.switchChain(this.chainId);
+                await this.walletStore.switchChain(this.chainId);
             } else {
                 this.sign();
             }

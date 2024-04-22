@@ -12,8 +12,8 @@
             <BaseSidebar />
         </div>
         <BaseModalLogin />
-        <BaseModalChainSwitch />
         <BaseModalAccount size="lg" />
+        <BaseModalWalletConnect />
         <BaseModalWalletCreate size="lg" />
         <BaseModalWalletRecovery size="lg" />
     </div>

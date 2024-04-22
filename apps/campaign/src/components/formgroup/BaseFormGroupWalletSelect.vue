@@ -1,16 +1,23 @@
 <template>
-    <b-form-group>
-        <template #description>
-            This reward requires a crypto wallet for your account.
-            <b-link class="text-primary" @click="onClickAdd">Add a new wallet</b-link>
-        </template>
-        <b-form-select v-model="wallet" placeholder="Choose a wallet" @change="$emit('update', $event)">
-            <b-form-select-option :value="null" disabled>Choose a wallet...</b-form-select-option>
-            <b-form-select-option v-for="w in wallets" :value="w" :disabled="chainId ? chainId !== w.chainId : false">
-                {{ w.short }}
-                ({{ w.variant }})
-            </b-form-select-option>
-        </b-form-select>
+    <b-form-group :description="description">
+        <b-input-group>
+            <b-form-select v-model="wallet" placeholder="Choose a wallet" @change="$emit('update', $event)">
+                <b-form-select-option :value="null" disabled>Choose a wallet...</b-form-select-option>
+                <b-form-select-option
+                    v-for="w in wallets"
+                    :value="w"
+                    :disabled="chainId ? chainId !== w.chainId : false"
+                >
+                    {{ w.short }}
+                    ({{ w.variant }})
+                </b-form-select-option>
+            </b-form-select>
+            <template #append>
+                <b-button variant="primary" class="rounded" @click="onClickAdd">
+                    <i class="fas fa-plus"></i>
+                </b-button>
+            </template>
+        </b-input-group>
     </b-form-group>
 </template>
 
@@ -25,6 +32,11 @@ export default defineComponent({
     name: 'BaseFormGroupUsername',
     props: {
         chainId: Number,
+        description: String,
+        variants: {
+            type: Array,
+            default: () => [WalletVariant.Safe, WalletVariant.WalletConnect],
+        },
     },
     data() {
         return { chainList, wallet: null };
@@ -32,9 +44,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useWalletStore),
         wallets() {
-            return this.walletStore.wallets.filter((wallet: TWallet) =>
-                [WalletVariant.Safe, WalletVariant.WalletConnect].includes(wallet.variant),
-            );
+            return this.walletStore.wallets.filter((wallet: TWallet) => this.variants.includes(wallet.variant));
         },
     },
     methods: {

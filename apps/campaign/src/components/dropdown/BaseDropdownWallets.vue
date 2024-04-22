@@ -210,7 +210,6 @@ export default defineComponent({
                 if (!this.walletStore.wallet) {
                     this.setDefaultWallet();
                 }
-
                 this.listRewards();
             },
             immediate: true,

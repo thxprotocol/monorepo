@@ -1,20 +1,20 @@
 <template>
     <b-alert v-model="isAlertShown" variant="primary" class="p-2">{{ error }}</b-alert>
-    <b-form-group>
-        <strong>Proof ownership</strong>
+    <b-form-group label="Proof ownership">
         <p class="text-opaque">Sign this message using your wallet to confirm it's address.</p>
-        <blockquote v-if="!address" class="mb-0">
+        <blockquote class="mb-0">
             <code>
                 <em>{{ message }}</em>
             </code>
         </blockquote>
-        <b-form-group v-else label="Address">
-            <span class="text-opaque">{{ address }}</span>
-        </b-form-group>
     </b-form-group>
-    <BaseButtonWalletConnect :message="message" @signed="onSigned" @error="error = $event">
-        Create Wallet
-    </BaseButtonWalletConnect>
+    <b-form-group v-if="address" label="Address">
+        <span class="text-opaque">{{ address }}</span>
+    </b-form-group>
+    <b-button v-if="!address" variant="primary" class="w-100" @click="onClickConnect"> Connect Wallet </b-button>
+    <b-button v-else variant="success" class="w-100" @click="onClickAdd">
+        Add <strong>{{ shortenAddress(walletStore.account.address) }}</strong>
+    </b-button>
 </template>
 
 <script lang="ts">
@@ -24,6 +24,8 @@ import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { WalletVariant } from '../../types/enums/accountVariant';
+import { shortenAddress } from '@thxnetwork/campaign/utils/address';
+import poll from 'promise-poller';
 
 export default defineComponent({
     name: 'BaseTabWalletWalletConnect',
@@ -37,6 +39,7 @@ export default defineComponent({
             message: 'This signature will be used to proof ownership of a web3 account.',
             signature: '',
             isLoading: false,
+            shortenAddress,
         };
     },
     computed: {
@@ -45,18 +48,39 @@ export default defineComponent({
             return !!this.error;
         },
     },
+    mounted() {
+        this.walletStore.setWallet(null, true);
+    },
     methods: {
-        async onSigned({ address, signature }: { signature: string; address: string; message: string }) {
-            this.address = address;
-            this.signature = signature;
-
+        async getAddress() {
+            const taskFn = async () => {
+                return this.walletStore.account.address ? Promise.resolve() : Promise.reject('Account address');
+            };
+            await poll({ taskFn, interval: 1000, retries: 10 });
+            return this.walletStore.account.address;
+        },
+        async onClickConnect() {
             try {
+                await this.walletStore.disconnect();
+                await this.walletStore.connect();
+
+                this.address = await this.getAddress();
+            } catch (error) {
+                this.error = error as string;
+            }
+        },
+        async onClickAdd() {
+            try {
+                const signature = await this.walletStore.signMessage(this.message);
                 await this.walletStore.create({
                     variant: this.variant,
                     message: this.message,
-                    signature: this.signature,
+                    signature,
                 });
+                const wallet = this.walletStore.wallets.find((wallet: TWallet) => wallet.address === this.address);
+                if (!wallet) throw new Error('New wallet not found');
 
+                this.walletStore.setWallet(wallet);
                 this.$emit('close');
             } catch (error) {
                 this.error = error as string;

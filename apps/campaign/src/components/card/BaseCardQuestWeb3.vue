@@ -38,35 +38,21 @@
             </b-row>
         </blockquote>
 
+        <BaseFormGroupWalletSelect
+            description="Add or connect the wallet you will use for this quest."
+            :variants="[WalletVariant.WalletConnect]"
+            @update="onUpdate"
+        />
+
         <template #button>
-            <b-button-group class="w-100" block>
-                <BaseButtonWalletConnect
-                    :message="message"
-                    :chain-id="chainId"
-                    @signed="onSigned"
-                    @chain-change="chainId = $event"
-                    @error="error = $event"
-                >
-                    <span>
-                        Claim <strong>{{ quest.amount }}</strong> points on {{ chainList[chainId].name }}
-                    </span>
-                </BaseButtonWalletConnect>
-                <b-dropdown end variant="primary" no-caret toggle-class="pe-3">
-                    <template #button-content>
-                        <i class="fas fa-caret-down"></i>
-                    </template>
-                    <BDropdownItem v-for="contract of quest.contracts" @click="chainId = contract.chainId">
-                        <b-img
-                            :src="chainList[contract.chainId].logo"
-                            width="12"
-                            height="12"
-                            :alt="chainList[contract.chainId].name"
-                            class="me-2"
-                        />
-                        {{ chainList[contract.chainId].name }}
-                    </BDropdownItem>
-                </b-dropdown>
-            </b-button-group>
+            <b-button variant="primary" class="w-100" :disabled="isSubmitting" @click="onClickSign">
+                <b-spinner v-if="isSubmitting" small />
+                <template v-else>
+                    Claim
+                    <strong>{{ quest.amount }}</strong>
+                    points
+                </template>
+            </b-button>
         </template>
     </BaseCardQuest>
 </template>
@@ -79,9 +65,11 @@ import { useAuthStore } from '../../stores/Auth';
 import { useQuestStore } from '../../stores/Quest';
 import { chainList, getAddressURL } from '../../utils/chains';
 import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
+import { useWalletStore } from '@thxnetwork/campaign/stores/Wallet';
+import { WalletVariant } from '@thxnetwork/campaign/types/enums/accountVariant';
 
 export default defineComponent({
-    name: 'BaseCardQuestSocial',
+    name: 'BaseCardQuestWeb3',
     props: {
         quest: {
             type: Object as PropType<TQuestWeb3>,
@@ -90,6 +78,7 @@ export default defineComponent({
     },
     data() {
         return {
+            WalletVariant,
             error: '',
             message: '',
             isSubmitting: false,
@@ -100,7 +89,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore, useAuthStore, useQuestStore),
+        ...mapStores(useAccountStore, useAuthStore, useQuestStore, useWalletStore),
     },
     mounted() {
         if (!this.quest.isAvailable) return;
@@ -108,13 +97,17 @@ export default defineComponent({
         this.message = `This signature will be used to validate if the result of calling ${this.quest.methodName} on chain ${this.chainId} with the address used to sign this message is above the threshold of ${this.quest.threshold}.`;
     },
     methods: {
-        async onSigned({ signature, message }: { signature: string; message: string }) {
+        onUpdate(wallet: TWallet) {
+            this.walletStore.setWallet(wallet, true);
+        },
+        async onClickSign() {
             this.error = '';
             this.isSubmitting = true;
             try {
+                const signature = await this.walletStore.signMessage(this.message);
                 await this.questStore.completeQuest(this.quest, {
                     signature,
-                    message,
+                    message: this.message,
                     chainId: this.chainId,
                 });
                 this.isModalQuestEntryShown = true;

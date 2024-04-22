@@ -63,11 +63,8 @@ import { useQuestStore } from '../../stores/Quest';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { AccountVariant } from '../../types/enums/accountVariant';
+import { shortenAddress } from '../../utils/address';
 import imgWalletConnect from '../../assets/walletconnect-logo.png';
-
-function shortenAddress(address: string) {
-    return `${address.substring(0, 5)}...${address.substring(address.length - 5, address.length)}`;
-}
 
 export default defineComponent({
     name: 'BaseModalAccount',

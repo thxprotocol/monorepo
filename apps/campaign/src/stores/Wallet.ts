@@ -9,7 +9,19 @@ import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
-import { sendTransaction, disconnect, watchAccount, signMessage, switchChain } from '@wagmi/core';
+import {
+    sendTransaction,
+    disconnect,
+    watchAccount,
+    signMessage,
+    switchChain,
+    watchChainId,
+    GetAccountReturnType,
+    reconnect,
+    getAccount,
+    getChainId,
+    watchConnections,
+} from '@wagmi/core';
 import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
 import { RewardVariant } from '../types/enums/rewards';
@@ -84,12 +96,22 @@ export const useWalletStore = defineStore('wallet', {
             this.wallet = null;
             this.isLoading = true;
         },
-        createWeb3Modal() {
+        async createWeb3Modal() {
             if (this.modal) return;
 
+            await reconnect(wagmiConfig);
+
             watchAccount(wagmiConfig, {
-                onChange: (account) => {
-                    this.account = account;
+                onChange: (account) => this.onChange({ account, ignoreChainId: false }),
+            });
+
+            watchChainId(wagmiConfig, {
+                onChange: (chainId) => this.onChange({ chainId, ignoreChainId: false }),
+            });
+
+            watchConnections(wagmiConfig, {
+                onChange(data) {
+                    console.log('Connections changed!', data);
                 },
             });
 
@@ -98,16 +120,32 @@ export const useWalletStore = defineStore('wallet', {
                 projectId: WALLET_CONNECT_PROJECT_ID,
                 themeMode: 'dark',
             });
+        },
+        onChange({
+            account,
+            chainId,
+            ignoreChainId,
+        }: {
+            account?: GetAccountReturnType;
+            chainId?: ChainId;
+            ignoreChainId: boolean;
+        }) {
+            if (account) this.account = account;
+            if (chainId) this.chainId = chainId;
 
-            this.modal.subscribeState((state: { open: boolean; selectedNetworkId: ChainId }) => {
-                this.chainId = state.selectedNetworkId;
+            // Return early if no wallet is selected
+            if (!this.wallet) return;
 
-                // Show chain modal if an account is connected but the desired chain is not the current chain
-                this.isModalChainSwitchShown =
-                    this.account && this.wallet && this.wallet.variant === WalletVariant.WalletConnect
-                        ? this.wallet.chainId !== this.chainId
-                        : false;
-            });
+            // Return early if not a walletconnect wallet
+            const isWalletConnect = this.wallet.variant === WalletVariant.WalletConnect;
+            if (!isWalletConnect) return;
+
+            // Show chain modal if an account is connected but the desired chain is not the current chain
+            // or if the desired address is not the current address
+            const isWalletAddressCorrect = this.account ? this.wallet.address === this.account.address : false;
+            const isWalletChainCorrect = ignoreChainId ? true : this.wallet.chainId === this.chainId;
+
+            this.isModalChainSwitchShown = !isWalletAddressCorrect || !isWalletChainCorrect;
         },
         switchChain(chainId: ChainId) {
             return switchChain(wagmiConfig, { chainId });
@@ -116,20 +154,23 @@ export const useWalletStore = defineStore('wallet', {
             return signMessage(wagmiConfig, { message });
         },
         async connect() {
-            this.createWeb3Modal();
+            await this.createWeb3Modal();
             this.modal.open();
-            await this.waitForAccount();
         },
         async disconnect() {
-            this.account = null;
-            await disconnect(wagmiConfig);
-            this.modal.resetAccount();
-            this.modal.resetNetwork();
-            this.modal.close();
-            this.modal = null;
+            if (this.account) {
+                await disconnect(wagmiConfig);
+                this.account = null;
+            }
+            if (this.modal) {
+                this.modal.resetAccount();
+                this.modal.resetNetwork();
+                this.modal.close();
+                this.modal = null;
+            }
         },
         async sendTransaction(from: string, to: `0x${string}`, data: `0x${string}`, gas?: any) {
-            this.createWeb3Modal();
+            await this.createWeb3Modal();
 
             if (!this.account || this.account.address !== from) {
                 await this.connect();
@@ -141,27 +182,12 @@ export const useWalletStore = defineStore('wallet', {
 
             return sendTransaction(wagmiConfig, { to, data, gas });
         },
-        waitForAccount() {
-            return new Promise((resolve: any) => {
-                const interval = setInterval(() => {
-                    if (
-                        this.account &&
-                        this.account.isConnected &&
-                        this.wallet &&
-                        this.account.address === this.wallet.address
-                    ) {
-                        clearInterval(interval);
-                        resolve();
-                    }
-                }, 300);
-            });
-        },
         async create(data: { variant: WalletVariant; message?: string; signature?: string }) {
             const { api } = useAccountStore();
             await api.request.post('/v1/account/wallets', { data });
             await this.listWallets();
         },
-        async setWallet(wallet: TWallet | null) {
+        async setWallet(wallet: TWallet | null, ignoreChainId = false) {
             this.wallet = wallet;
 
             // Check if there are pending transactions and confirm them
@@ -169,6 +195,10 @@ export const useWalletStore = defineStore('wallet', {
             if (this.wallet && this.wallet.pendingTransactions.length) {
                 await this.confirmTransactions(this.wallet.pendingTransactions);
             }
+
+            const account = getAccount(wagmiConfig);
+            const chainId = getChainId(wagmiConfig);
+            this.onChange({ account, chainId, ignoreChainId });
         },
         async listWallets() {
             const { api, account } = useAccountStore();

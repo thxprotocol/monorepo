@@ -10,6 +10,7 @@ import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { User } from 'oidc-client-ts';
 import { decodeHTML } from '../utils/decode-html';
 import poll from 'promise-poller';
+import { useWalletStore } from './Wallet';
 
 // Feature only available on mobile devices
 const isMobileDevice = !!window.matchMedia('(pointer:coarse)').matches;
@@ -219,9 +220,11 @@ export const useAccountStore = defineStore('account', {
             });
         },
         async signout() {
+            const walletStore = useWalletStore();
             const { signout } = useAuthStore();
+            walletStore.wallet = null;
+            await walletStore.disconnect();
             await signout();
-
             this.setStatus(null);
             this.account = null;
         },
