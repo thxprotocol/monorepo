@@ -1,5 +1,10 @@
 <template>
-    <b-dropdown no-caret variant="link" toggle-class="text-white text-decoration-none p-0" menu-class="p-0 rounded">
+    <b-dropdown
+        no-caret
+        variant="link"
+        toggle-class="text-white text-decoration-none p-0"
+        menu-class="p-0 rounded border-0 gradient-shadow"
+    >
         <template #button-content>
             <div class="d-block-inline rounded fw-normal text-start" variant="primary">
                 <div class="small text-opaque">
@@ -11,7 +16,7 @@
                 </div>
             </div>
         </template>
-        <div style="width: 240px" class="small">
+        <div style="width: 240px; overflow: hidden" class="small rounded">
             <b-card v-for="metric of metrics" class="rounded-0" body-class="p-2" header-class="d-flex p-2">
                 <template #header>
                     {{ metric.label }}
@@ -51,3 +56,4 @@ export default defineComponent({
     },
 });
 </script>
+<style lang="scss"></style>

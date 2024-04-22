@@ -52,10 +52,9 @@
     <b-container>
         <h2 class="mt-5">Reward Distribution</h2>
         <b-row>
-            <b-col v-for="{ week, total } of schedule" lg="3">
+            <b-col v-for="reward of schedule" lg="3">
                 <div class="bg-primary p-4 rounded my-2">
-                    <span class="text-opaque">Week {{ week }}</span>
-                    <div class="h3 mb-0">{{ toFiatPrice(total) }}</div>
+                    <BaseDropdownMetricReward :reward="reward" />
                 </div>
             </b-col>
         </b-row>
@@ -102,8 +101,8 @@ export default defineComponent({
                     week,
                     balInWei: bal[index],
                     bptInWei: bpt[index],
-                    balInUSD: formatUnits(valueBAL, 18),
-                    bptInUSD: formatUnits(valueBPT, 18),
+                    balInUSD: formatUnits(valueBAL, 18 * 2),
+                    bptInUSD: formatUnits(valueBPT, 18 * 2),
                     total: formatUnits(total, 18 * 2), // 18 * 2 as we need to format both price and amount in wei
                 };
             });
@@ -117,8 +116,7 @@ export default defineComponent({
                 start: addWeeks(today, 1),
                 end: addWeeks(today, 3),
             });
-            const weekNumbers = [currentWeek, ...nextFourWeeks.map((date) => format(date, 'w'))];
-            return weekNumbers;
+            return [currentWeek, ...nextFourWeeks.map((date) => format(date, 'w'))];
         },
     },
 });
