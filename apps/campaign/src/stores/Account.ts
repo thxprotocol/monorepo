@@ -135,6 +135,9 @@ export const useAccountStore = defineStore('account', {
         onUserUnloaded() {
             return useAuthStore().onUserUnloadedCallback();
         },
+        isSubscribed(id: string) {
+            return this.participants.find((p) => p.poolId === id)?.isSubscribed;
+        },
         async getAccount() {
             this.account = await this.api.request.get('/v1/account');
         },

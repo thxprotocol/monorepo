@@ -25,63 +25,7 @@
                 <p v-if="!isLoading && !campaigns.results.length" class="text-opaque">
                     Could not find a campaign with that name...
                 </p>
-                <b-table id="table-campaigns" responsive="lg" hover :items="campaignData" @row-clicked="onRowClicked">
-                    <template #head(rank)>#</template>
-                    <template #head(logo)></template>
-                    <template #head(name)></template>
-                    <template #head(isSubscribed)></template>
-
-                    <template #cell(rank)="{ item }">
-                        <span class="text-opaque">{{ item.rank }}</span>
-                    </template>
-
-                    <template #cell(logo)="{ item }">
-                        <BImg
-                            lazy
-                            style="max-width: 100px; max-height: 40px; width: auto; height: auto"
-                            :src="item.logo"
-                        />
-                    </template>
-
-                    <template #cell(name)="{ item }">
-                        <div>
-                            <span> {{ decodeHTML(item.name.title) }}</span>
-                            <i v-if="item.name.active" class="fas fa-check-circle text-success ms-1" />
-                        </div>
-                    </template>
-
-                    <template #cell(duration)="{ item }">
-                        <span class="text-opaque">
-                            {{ item.duration.expiryDate ? `End: ${item.duration.expiryDate}` : 'Unlimited' }}
-                        </span>
-                        <b-progress v-if="item.duration.expiryDate" class="bg-primary" style="height: 6px">
-                            <b-progress-bar :value="item.duration.progress" :max="100" variant="success" />
-                        </b-progress>
-                    </template>
-
-                    <template #cell(participants)="{ item }">
-                        <i class="fas text-opaque fa-users me-1"></i> {{ item.participants }}
-                    </template>
-
-                    <template #cell(domain)="{ item }">
-                        <b-button
-                            v-b-modal="`modal-campaign-domain-${item.domain.campaign._id}`"
-                            class="rounded-pill d-flex align-items-center p-0 text-white text-opaque"
-                            variant="link"
-                        >
-                            {{ item.domain.host }}
-                            <i class="fas fa-external-link-alt ms-1" />
-                        </b-button>
-                        <BaseModalExternalURL :campaign="item.domain.campaign" />
-                    </template>
-
-                    <template #cell(isSubscribed)="{ item }">
-                        <i
-                            class="text-opaque fas"
-                            :class="{ 'fa-bell-slash': item.isSubscribed, 'fa-bell': !item.isSubscribed }"
-                        />
-                    </template>
-                </b-table>
+                <BaseCardCampaign v-for="campaign of campaigns.results" class="mt-3" :campaign="campaign" />
             </b-col>
         </b-row>
         <b-pagination
@@ -89,7 +33,7 @@
             :per-page="limit"
             :total-rows="campaigns.total"
             align="center"
-            class="mb-0"
+            class="mt-3 mb-0"
         ></b-pagination>
     </b-container>
     <b-container class="mb-5">
@@ -139,7 +83,6 @@ import { API_URL, DASHBOARD_URL, PUBLIC_URL } from '../../config/secrets';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { mapStores } from 'pinia';
-import { format } from 'date-fns';
 import { decodeHTML } from '../../utils/decode-html';
 import imgJumbotron from '../../assets/thx_token_governance.png';
 import imgLogo from '../../assets/logo.png';
@@ -171,31 +114,6 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore),
-        campaignData(): any[] {
-            if (!this.campaigns.results) return [];
-            return this.campaigns.results
-                .map((c: any) => ({
-                    rank: c.rank,
-                    logo: c.logoImgUrl as string,
-                    name: {
-                        title: c.title,
-                        active: c.active,
-                        description: c.description,
-                        slug: c.slug,
-                    },
-                    participants: c.participants,
-                    duration: {
-                        progress: c.progress,
-                        expiryDate: c.expiryDate && format(new Date(c.expiryDate), 'dd-MM-yyyy HH:mm'),
-                    },
-                    domain: {
-                        host: new URL(c.domain).host,
-                        campaign: c,
-                    },
-                    isSubscribed: c.subscribed || false,
-                }))
-                .sort((a: any, b: any) => a.rank - b.rank);
-        },
     },
     watch: {
         async page(page) {
@@ -209,14 +127,9 @@ export default defineComponent({
         await this.getCampaigns();
         await this.getQuests();
         this.isLoading = false;
+        this.accountStore.getParticipants();
     },
     methods: {
-        onClickStart() {
-            window.open('https://dashboard.thx.network', '_blank');
-        },
-        onRowClicked(row: any) {
-            this.$router.push({ path: `/c/${row.name.slug}` });
-        },
         async getCampaigns() {
             const url = new URL(API_URL);
             url.pathname = '/v1/leaderboards';
