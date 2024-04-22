@@ -1,5 +1,13 @@
 <template>
-    <b-modal v-model="isShown" size="lg" centered hide-footer @hidden="$emit('hidden')" @show="onShow">
+    <b-modal
+        v-model="isShown"
+        size="lg"
+        centered
+        hide-footer
+        content-class="gradient-shadow-xl"
+        @hidden="$emit('hidden')"
+        @show="onShow"
+    >
         <template #header>
             <h5 class="modal-title">
                 <i class="fas fa-user-plus me-2" />

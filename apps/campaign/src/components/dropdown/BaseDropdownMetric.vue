@@ -2,7 +2,7 @@
     <b-dropdown
         no-caret
         variant="link"
-        toggle-class="text-white text-decoration-none p-0"
+        toggle-class="text-white text-decoration-none p-0 border-0"
         menu-class="p-0 rounded border-0 gradient-shadow"
     >
         <template #button-content>
