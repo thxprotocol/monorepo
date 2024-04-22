@@ -13,7 +13,7 @@
     </b-form-group>
     <b-button v-if="!address" variant="primary" class="w-100" @click="onClickConnect"> Connect Wallet </b-button>
     <b-button v-else variant="success" class="w-100" @click="onClickAdd">
-        Add <strong>{{ shortenAddress(walletStore.account.address) }}</strong>
+        Add <strong>{{ walletStore.account.address && shortenAddress(walletStore.account.address) }}</strong>
     </b-button>
 </template>
 

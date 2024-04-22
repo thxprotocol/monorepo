@@ -39,6 +39,7 @@
         </blockquote>
 
         <BaseFormGroupWalletSelect
+            v-if="accountStore.isAuthenticated"
             description="Add or connect the wallet you will use for this quest."
             :variants="[WalletVariant.WalletConnect]"
             @update="onUpdate"
