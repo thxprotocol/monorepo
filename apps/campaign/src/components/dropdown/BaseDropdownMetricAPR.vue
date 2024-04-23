@@ -35,7 +35,6 @@ export default defineComponent({
         ...mapStores(useLiquidityStore),
         aprMetric() {
             const { balancer, thx } = this.liquidityStore.apr;
-            console.log(balancer, thx);
             return {
                 balancerMin: balancer.min.toFixed(2),
                 balancerMax: balancer.max.toFixed(2),

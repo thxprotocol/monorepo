@@ -33,7 +33,7 @@
                 balanceBPTInUSD.toString(),
             )})`"
             :status="isLiquidityProvided"
-            >{{ amounts }}
+        >
             <BaseButtonApprove
                 v-if="!isAllowanceSufficient"
                 size="sm"
@@ -300,6 +300,7 @@ export default defineComponent({
         async onLiquidityCreate() {
             await Promise.all([
                 this.walletStore.getBalance(this.address.USDC),
+                this.walletStore.getBalance(this.address.THX),
                 this.walletStore.getBalance(this.address.BPT),
             ]);
         },
