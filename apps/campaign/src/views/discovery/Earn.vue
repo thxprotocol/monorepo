@@ -49,7 +49,7 @@
             </b-card>
         </template>
     </BaseCardHeader>
-    <b-container>
+    <b-container class="mb-5">
         <h2 class="mt-5">Reward Distribution</h2>
         <b-row>
             <b-col v-for="reward of schedule" lg="3">

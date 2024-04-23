@@ -19,15 +19,15 @@
     </BaseCardHeader>
     <b-container class="mt-5">
         <b-row>
-            <b-col>
-                <b-card class="gradient-bg" body-class="text-center py-4">
+            <b-col lg="3">
+                <b-card class="gradient-bg mb-3" body-class="text-center py-4">
                     <i class="fas fa-trophy h2 text-opaque" />
                     <div>Discord Role</div>
                     <p class="mb-1 text-opaque">Members can a claim their free THX Network Discord Role</p>
                 </b-card>
             </b-col>
-            <b-col>
-                <b-card class="gradient-bg" body-class="text-center py-4">
+            <b-col lg="3">
+                <b-card class="gradient-bg mb-3" body-class="text-center py-4">
                     <i class="fas fa-balance-scale h2 text-opaque" />
                     <div>Balancer APR</div>
                     <p class="mb-1 text-opaque">
@@ -35,15 +35,15 @@
                     </p>
                 </b-card>
             </b-col>
-            <b-col>
-                <b-card class="gradient-bg" body-class="text-center py-4">
+            <b-col lg="3">
+                <b-card class="gradient-bg mb-3" body-class="text-center py-4">
                     <i class="fas fa-coins h2 text-opaque" />
                     <div>Protocol Revenue Share</div>
                     <p class="mb-1 text-opaque">Members share in 70% of the protocol revenue</p>
                 </b-card>
             </b-col>
-            <b-col>
-                <b-card class="gradient-bg" body-class="text-center py-4">
+            <b-col lg="3">
+                <b-card class="gradient-bg mb-3" body-class="text-center py-4">
                     <i class="fas fa-gift h2 text-opaque" />
                     <div>Exclusive Rewards</div>
                     <p class="mb-1 text-opaque">Members can buy discounted rewards from partners</p>
@@ -57,7 +57,7 @@
             <p class="lead">Members can use their points to buy rewards from partners at a discount!</p>
         </div>
         <b-row>
-            <b-col v-for="reward of rewards" md="4">
+            <b-col v-for="reward of rewards" lg="4">
                 <BaseCardReward :reward="reward" :image="reward.image">
                     <template #title>
                         <div class="flex-grow-1">{{ reward.title }}</div>
