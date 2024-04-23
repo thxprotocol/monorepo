@@ -56,7 +56,7 @@ export default defineComponent({
             const taskFn = async () => {
                 return this.walletStore.account.address ? Promise.resolve() : Promise.reject('Account address');
             };
-            await poll({ taskFn, interval: 1000, retries: 10 });
+            await poll({ taskFn, interval: 1000, retries: 60 });
             return this.walletStore.account.address;
         },
         async onClickConnect() {
