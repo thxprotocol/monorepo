@@ -94,11 +94,17 @@ export default defineComponent({
             ].length;
         },
     },
+    mounted() {
+        this.listRewards();
+    },
     methods: {
         onClickSignin() {
             this.accountStore.signin();
         },
-        async onClickRefresh() {
+        onClickRefresh() {
+            this.listRewards();
+        },
+        async listRewards() {
             this.isRefreshing = true;
             await this.walletStore.list();
             this.isRefreshing = false;
