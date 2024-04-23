@@ -73,7 +73,15 @@ export default defineComponent({
             error: '',
             amount: '0',
             formatUnits,
-            token: null as TToken | null,
+            token: {
+                symbol: 'THX',
+                logoImgURL: 'https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png',
+                decimals: 18,
+                address: contractNetworks[ChainId.Polygon].THX,
+                balance: '0',
+                value: 0,
+                price: 0,
+            },
             lockEnd: new Date(),
             isPolling: false,
             isModalTokenSelectShown: false,
@@ -97,12 +105,11 @@ export default defineComponent({
                     logoImgURL: 'https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png',
                     decimals: 18,
                     address: this.address.THX,
-                    balance: this.walletStore.wallet ? this.walletStore.balances[this.address.THX] : '0',
-                    value:
-                        this.walletStore.wallet && this.walletStore.balances[this.address.THX]
-                            ? Number(formatUnits(this.walletStore.balances[this.address.THX], 18)) *
-                              this.liquidityStore.pricing['THX']
-                            : 0,
+                    balance: this.walletStore.balances[this.address.THX] || '0',
+                    value: this.walletStore.balances[this.address.THX]
+                        ? Number(formatUnits(this.walletStore.balances[this.address.THX], 18)) *
+                          this.liquidityStore.pricing['THX']
+                        : 0,
                     price: this.liquidityStore.pricing['THX'],
                 },
                 {
@@ -110,12 +117,11 @@ export default defineComponent({
                     logoImgURL: 'https://assets.coingecko.com/coins/images/6319/standard/usdc.png',
                     decimals: 6,
                     address: this.address.USDC,
-                    balance: this.walletStore.wallet ? this.walletStore.balances[this.address.USDC] : '0',
-                    value:
-                        this.walletStore.wallet && this.walletStore.balances[this.address.USDC]
-                            ? Number(formatUnits(this.walletStore.balances[this.address.USDC], 6)) *
-                              this.liquidityStore.pricing['USDC']
-                            : 0,
+                    balance: this.walletStore.balances[this.address.USDC] || '0',
+                    value: this.walletStore.balances[this.address.USDC]
+                        ? Number(formatUnits(this.walletStore.balances[this.address.USDC], 6)) *
+                          this.liquidityStore.pricing['USDC']
+                        : 0,
                     price: this.liquidityStore.pricing['USDC'],
                 },
             ];
@@ -127,7 +133,6 @@ export default defineComponent({
     watch: {
         'walletStore.wallet': {
             handler(wallet) {
-                this.token = this.tokens[0];
                 if (!wallet) return;
                 this.walletStore.getBalance(this.address.THX).then(() => {
                     this.amount = formatUnits(this.walletStore.balances[this.address.THX], 18);

@@ -23,7 +23,7 @@
                             <i class="fas fa-external-link-alt text-white text-opaque small" />
                         </b-link>
                     </div>
-                    <div v-if="t.balance" class="text-opaque small">
+                    <div class="text-opaque small">
                         Balance: {{ Number(formatUnits(t.balance, t.decimals)).toFixed(6) }}
                     </div>
                 </div>

@@ -210,7 +210,7 @@ export default defineComponent({
                 if (!this.walletStore.wallet) {
                     this.setDefaultWallet();
                 }
-                this.listRewards();
+                this.walletStore.list();
             },
             immediate: true,
         },
@@ -236,13 +236,10 @@ export default defineComponent({
                 ) || null;
             this.walletStore.setWallet(wallet);
         },
-        listRewards() {
-            this.walletStore.list();
-        },
         async onClickWallet(wallet: TWallet) {
             this.walletStore.setWallet(wallet);
             this.accountStore.setGlobals({ activeWalletId: wallet._id });
-            this.listRewards();
+            this.walletStore.list();
         },
     },
 });
