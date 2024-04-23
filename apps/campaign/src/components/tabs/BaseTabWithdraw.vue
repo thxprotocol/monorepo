@@ -111,13 +111,16 @@ export default defineComponent({
         },
         membership() {
             if (!this.veStore.lock) return;
+            const price = this.liquidityStore.pricing['20USDC-80THX'];
             const amount = Number(fromWei(String(this.veStore.lock.amount)));
+            const amountInUSD = amount * price;
 
-            if (amount < 175) return 'No Rank';
-            if (amount > 175 && amount < 1750) return 'Rookie';
-            if (amount > 1750 && amount < 17500) return 'Elite';
-            if (amount > 17500 && amount < 175000) return 'Master';
-            if (amount > 175000 && amount < 1750000) return 'Legend';
+            if (amountInUSD < 4) return 'No Rank';
+            if (amountInUSD > 4 && amount < 40) return 'Rookie';
+            if (amountInUSD > 40 && amount < 400) return 'Pro';
+            if (amountInUSD > 400 && amount < 4000) return 'Elite';
+            if (amountInUSD > 4000 && amount < 40000) return 'Master';
+            if (amountInUSD > 40000 && amount < 400000) return 'Legend';
         },
     },
     methods: {
