@@ -19,8 +19,8 @@
         <b-row class="mb-3">
             <b-col>
                 <div class="text-opaque">Liquidity estimate</div>
-                {{ Number(amountBPT).toFixed(6) }}
-                <strong>({{ toFiatPrice(Number(amount)) }})</strong>
+                {{ Number(amountInBPT).toFixed(6) }}
+                <strong>({{ toFiatPrice(amountInUSD) }})</strong>
             </b-col>
             <b-col>
                 <div class="text-opaque">Lock end date</div>
@@ -33,27 +33,27 @@
                 balanceBPTInUSD.toString(),
             )})`"
             :status="isLiquidityProvided"
-        >
+            >{{ amounts }}
             <BaseButtonApprove
-                v-if="!isAllowanceUSDCSufficient"
+                v-if="!isAllowanceSufficient"
                 size="sm"
                 :amount="amount.toString()"
-                :token="{ address: address.USDC, decimals: 6 }"
+                :token="token"
                 :spender="address.BalancerVault"
                 @error="onError"
             >
-                Approve <strong>{{ toFiatPrice(amount) }}</strong>
+                Approve <strong>{{ toFiatPrice(amountInUSD) }}</strong>
             </BaseButtonApprove>
             <BaseButtonLiquidityCreate
                 v-else
                 size="sm"
-                :amounts="[parseUnits(amount, 6).toString(), '0']"
+                :amounts="amounts"
                 :tokens="[address.USDC, address.THX]"
                 :slippage="0.5"
                 @success="onLiquidityCreate"
                 @error="onError"
             >
-                Add <strong>{{ toFiatPrice(amount) }}</strong>
+                Add <strong>{{ toFiatPrice(amountInUSD) }}</strong>
             </BaseButtonLiquidityCreate>
         </BaseCardStatusCheck>
         <BaseCardStatusCheck
@@ -66,26 +66,26 @@
             <BaseButtonApprove
                 v-if="!isAllowanceBPTSufficient"
                 size="sm"
-                :amount="formatUnits(amountBPTInWei, 18).toString()"
+                :amount="formatUnits(amountInBPTInWei, 18).toString()"
                 :token="{ address: address.BPT, decimals: 18 }"
                 :spender="address.BPTGauge"
                 @error="onError"
             >
                 Approve
                 <strong>
-                    {{ toFiatPrice(amount) }}
+                    {{ toFiatPrice(amountInUSD) }}
                 </strong>
             </BaseButtonApprove>
             <BaseButtonLiquidityStake
                 v-else
                 size="sm"
-                :amount="amountBPTInWei.toString()"
+                :amount="amountInBPTInWei.toString()"
                 @success="onLiquidityStake"
                 @error="onError"
             >
                 Stake
                 <strong>
-                    {{ toFiatPrice(amount) }}
+                    {{ toFiatPrice(amountInUSD) }}
                 </strong>
             </BaseButtonLiquidityStake>
         </BaseCardStatusCheck>
@@ -97,27 +97,28 @@
             <BaseButtonApprove
                 v-if="!isAllowanceBPTGaugeSufficient"
                 size="sm"
-                :amount="formatUnits(amountBPTInWei, 18).toString()"
+                :amount="formatUnits(amountInBPTInWei, 18).toString()"
                 :token="{ address: address.BPTGauge, decimals: 18 }"
                 :spender="address.VotingEscrow"
                 @error="onError"
             >
                 Approve
                 <strong>
-                    {{ toFiatPrice(amount) }}
+                    {{ toFiatPrice(amountInUSD) }}
                 </strong>
             </BaseButtonApprove>
+
             <BaseButtonLiquidityLock
                 v-else
                 size="sm"
-                :amount="amountBPTInWei.toString()"
+                :amount="amountInBPTInWei.toString()"
                 :lock-end="lockEnd"
                 @success="onLiquidityLock"
                 @error="onError"
             >
                 Lock
                 <strong>
-                    {{ toFiatPrice(amount) }}
+                    {{ toFiatPrice(amountInUSD) }}
                 </strong>
             </BaseButtonLiquidityLock>
         </BaseCardStatusCheck>
@@ -128,7 +129,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { mapStores } from 'pinia';
 import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
@@ -146,6 +147,7 @@ export default defineComponent({
     name: 'BaseModalDeposit',
     props: {
         show: Boolean,
+        token: { type: Object as PropType<TToken>, required: true },
         amount: { type: String, required: true, default: '0' },
         lockEnd: { type: Date, required: true },
     },
@@ -177,13 +179,17 @@ export default defineComponent({
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
         },
-        usdcPerBPT() {
-            if (!this.liquidityStore.pricing['20USDC-80THX']) return 0;
-            return this.liquidityStore.pricing['20USDC-80THX'];
+        amounts() {
+            const amountUSDCInWei = this.token.address === this.address.USDC ? this.amountInWei : BigNumber.from(0);
+            const amountTHXInWei = this.token.address === this.address.THX ? this.amountInWei : BigNumber.from(0);
+            return [amountUSDCInWei.toString(), amountTHXInWei.toString()];
         },
-        usdcPerBPTInWei() {
+        usdPerBPTInWei() {
             if (!this.liquidityStore.pricing['20USDC-80THX']) return BigNumber.from(0);
             return parseUnits(this.liquidityStore.pricing['20USDC-80THX'].toString(), 18);
+        },
+        usdPerTokenInWei() {
+            return parseUnits(this.token.price.toString(), 18);
         },
         bptPerUSD() {
             if (!this.liquidityStore.pricing['20USDC-80THX']) return 0;
@@ -192,15 +198,19 @@ export default defineComponent({
         bptPerUSDCInWei() {
             return parseUnits(this.bptPerUSD.toString(), 18);
         },
-        amountUSDCInWei() {
-            return parseUnits(this.amount, 6);
+        amountInUSD() {
+            return formatUnits(this.amountInWei.mul(this.usdPerTokenInWei), 18 + this.token.decimals);
         },
-        amountBPTInWei() {
-            const amount = formatUnits(this.amountUSDCInWei.mul(this.bptPerUSD), 6);
+        amountInWei() {
+            return parseUnits(this.amount, this.token.decimals);
+        },
+        amountInBPTInWei() {
+            const amountInUSD = this.amountInWei.mul(this.usdPerTokenInWei);
+            const amount = formatUnits(amountInUSD.mul(this.bptPerUSD), 18 + this.token.decimals);
             return parseUnits(amount, 18);
         },
-        amountBPT() {
-            return formatUnits(this.amountBPTInWei, 18);
+        amountInBPT() {
+            return formatUnits(this.amountInBPTInWei, 18);
         },
         allowances() {
             return this.walletStore.allowances;
@@ -217,40 +227,40 @@ export default defineComponent({
             return BigNumber.from(this.balances.BPT);
         },
         balanceBPTInUSD() {
-            const valueInUSDInWei = BigNumber.from(this.balances.BPT).mul(this.usdcPerBPTInWei);
+            const valueInUSDInWei = BigNumber.from(this.balances.BPT).mul(this.usdPerBPTInWei);
             return formatUnits(valueInUSDInWei, 18 * 2); // Decimals * 2 because of both the balance and price conversion to wei
         },
         balanceBPTGaugeInWei() {
             return BigNumber.from(this.balances.BPTGauge);
         },
         balanceBPTGaugeInUSD() {
-            const valueInUSDInWei = BigNumber.from(this.balances.BPTGauge).mul(this.usdcPerBPTInWei);
+            const valueInUSDInWei = BigNumber.from(this.balances.BPTGauge).mul(this.usdPerBPTInWei);
             return formatUnits(valueInUSDInWei, 18 * 2); // Decimals * 2 because of both the balance and price conversion to wei
         },
-        isAllowanceUSDCSufficient() {
-            if (!this.allowances[this.address.USDC]) return false;
-            if (!this.allowances[this.address.USDC][this.address.BalancerVault]) return false;
-            const allowanceInWei = this.allowances[this.address.USDC][this.address.BalancerVault];
-            return BigNumber.from(allowanceInWei).gte(this.amountUSDCInWei);
+        isAllowanceSufficient() {
+            if (!this.allowances[this.token.address]) return false;
+            if (!this.allowances[this.token.address][this.address.BalancerVault]) return false;
+            const allowanceInWei = this.allowances[this.token.address][this.address.BalancerVault];
+            return BigNumber.from(allowanceInWei).gte(this.amountInWei);
         },
         isAllowanceBPTSufficient() {
             if (!this.balances.BPT || BigNumber.from(this.balances.BPT).eq(0)) return false;
             if (!this.allowances[this.address.BPT]) return false;
             if (!this.allowances[this.address.BPT][this.address.BPTGauge]) return false;
             const allowanceInWei = this.allowances[this.address.BPT][this.address.BPTGauge];
-            return BigNumber.from(allowanceInWei).gte(this.amountBPTInWei);
+            return BigNumber.from(allowanceInWei).gte(this.amountInBPTInWei);
         },
         isAllowanceBPTGaugeSufficient() {
             if (!this.allowances[this.address.BPTGauge]) return false;
             if (!this.allowances[this.address.BPTGauge][this.address.VotingEscrow]) return false;
             const allowanceInWei = this.allowances[this.address.BPTGauge][this.address.VotingEscrow];
-            return BigNumber.from(allowanceInWei).gte(this.amountBPTInWei);
+            return BigNumber.from(allowanceInWei).gte(this.amountInBPTInWei);
         },
         isBalanceBPTSufficient() {
-            return this.balanceBPTInWei.gte(this.amountBPTInWei);
+            return this.balanceBPTInWei.gte(this.amountInBPTInWei);
         },
         isBalanceBPTGaugeSufficient() {
-            return this.balanceBPTGaugeInWei.gte(this.amountBPTInWei);
+            return this.balanceBPTGaugeInWei.gte(this.amountInBPTInWei);
         },
         isLiquidityProvided() {
             return this.isBalanceBPTSufficient;

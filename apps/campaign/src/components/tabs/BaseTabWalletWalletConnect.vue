@@ -63,10 +63,10 @@ export default defineComponent({
             try {
                 await this.walletStore.disconnect();
                 await this.walletStore.connect();
-
                 this.address = await this.getAddress();
             } catch (error) {
-                this.error = error as string;
+                console.error(error);
+                this.error = 'An issue occured while connecting your wallet. Please try again.';
             }
         },
         async onClickAdd() {
@@ -83,7 +83,8 @@ export default defineComponent({
                 this.walletStore.setWallet(wallet);
                 this.$emit('close');
             } catch (error) {
-                this.error = error as string;
+                console.error(error);
+                this.error = 'An issue occured while creating your wallet. Please try again.';
             } finally {
                 this.isLoading = false;
             }

@@ -23,7 +23,7 @@
             <div class="d-flex mb-1 justify-content-between mt-1 text-muted">
                 <div>
                     Balance: {{ roundDownFixed(balance, precision) }}
-                    <span v-if="balance > 0 && valueFormatted >= roundDownFixed(balance, precision)" class="text-muted">
+                    <span v-if="balance > 0 && valueFormatted == roundDownFixed(balance, precision)" class="text-muted">
                         (Maxed)
                     </span>
                     <b-badge

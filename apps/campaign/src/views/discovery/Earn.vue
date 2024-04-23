@@ -53,7 +53,7 @@
         <h2 class="mt-5">Reward Distribution</h2>
         <b-row>
             <b-col v-for="reward of schedule" lg="3">
-                <div class="bg-primary p-4 rounded my-2">
+                <div class="bg-primary p-4 rounded my-2 gradient-bg">
                     <BaseDropdownMetricReward :reward="reward" />
                 </div>
             </b-col>

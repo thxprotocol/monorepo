@@ -1,37 +1,29 @@
 <template>
     <b-card class="border-0 gradient-shadow-xl">
         <BaseFormGroupInputTokenAmount
-            :usd="liquidityStore.pricing['USDC']"
-            :balance="balanceUSDC"
-            :value="Number(amountUSDC)"
+            :usd="token ? token.price : 0"
+            :balance="token ? Number(formatUnits(token.balance, token.decimals)) : 0"
+            :value="Number(amount)"
             :min="0"
-            :max="balanceUSDC"
+            :max="token ? Number(formatUnits(token.balance, token.decimals)) : 0"
             class="mb-4"
-            @update="amountUSDC = $event"
+            @update="amount = $event"
         >
-            <template #label>
-                <b-img
-                    src="https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
-                    alt="USDC icon"
-                    width="20"
-                    height="20"
-                    class="me-2"
-                />
-                <span style="font-size: 1rem">USDC.e</span>
-                <!-- <b-button variant="primary" size="sm" class="ms-2" disabled @click="onClickTokenSelect">
+            <template v-if="token" #label>
+                <b-img :src="token?.logoImgURL" :alt="`${token.symbol} icon`" width="20" height="20" class="me-2" />
+                <span style="font-size: 1rem">{{ token.symbol }}</span>
+                <b-button variant="primary" size="sm" class="ms-2" @click="isModalTokenSelectShown = true">
                     <i class="fas fa-chevron-down text-opaque" />
-                </b-button> -->
-                <b-button
-                    variant="primary"
-                    size="sm"
-                    class="ms-2"
-                    :href="`${chainInfo.blockExplorer}/token/${address.USDC}`"
-                    target="_blank"
-                >
-                    <i class="fas fa-external-link-alt text-opaque" />
                 </b-button>
             </template>
         </BaseFormGroupInputTokenAmount>
+        <BaseModalTokenSelect
+            :show="isModalTokenSelectShown"
+            :token="address.THX"
+            :tokens="tokens"
+            @change="onChangeToken"
+            @hidden="isModalTokenSelectShown = false"
+        />
         <BaseFormGroupLockEnd :value="lockEnd" @update="lockEnd = $event" />
         <b-button
             v-if="!accountStore.isAuthenticated"
@@ -51,8 +43,10 @@
             Create Membership
         </b-button>
         <BaseModalMembershipCreate
+            v-if="token"
             :show="isModalMembershipCreateShown"
-            :amount="amountUSDC"
+            :amount="amount"
+            :token="token"
             :lock-end="lockEnd"
             @hidden="isModalMembershipCreateShown = false"
         />
@@ -77,9 +71,12 @@ export default defineComponent({
     data() {
         return {
             error: '',
-            amountUSDC: '0',
+            amount: '0',
+            formatUnits,
+            token: null as TToken | null,
             lockEnd: new Date(),
             isPolling: false,
+            isModalTokenSelectShown: false,
             isModalMembershipCreateShown: false,
         };
     },
@@ -93,28 +90,55 @@ export default defineComponent({
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
         },
-        balanceUSDC() {
-            if (!this.walletStore.balances[this.address.USDC]) return 0;
-            return Number(formatUnits(this.walletStore.balances[this.address.USDC], 6)); // USDC.e has 6 decimals
+        tokens() {
+            return [
+                {
+                    symbol: 'THX',
+                    logoImgURL: 'https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png',
+                    decimals: 18,
+                    address: this.address.THX,
+                    balance: this.walletStore.balances[this.address.THX],
+                    value: this.walletStore.balances[this.address.THX]
+                        ? Number(formatUnits(this.walletStore.balances[this.address.THX], 18)) *
+                          this.liquidityStore.pricing['THX']
+                        : 0,
+                    price: this.liquidityStore.pricing['THX'],
+                },
+                {
+                    symbol: 'USDC.e',
+                    logoImgURL: 'https://assets.coingecko.com/coins/images/6319/standard/usdc.png',
+                    decimals: 6,
+                    address: this.address.USDC,
+                    balance: this.walletStore.balances[this.address.USDC],
+                    value: this.walletStore.balances[this.address.USDC]
+                        ? Number(formatUnits(this.walletStore.balances[this.address.USDC], 6)) *
+                          this.liquidityStore.pricing['USDC']
+                        : 0,
+                    price: this.liquidityStore.pricing['USDC'],
+                },
+            ];
         },
         isButtonMemberschipCreateDisabled() {
-            return !Number(this.amountUSDC);
+            return !Number(this.amount);
         },
     },
     watch: {
         'walletStore.wallet': {
             handler(wallet) {
                 if (!wallet) return;
-                this.walletStore.getBalance(this.address.USDC).then(() => {
-                    this.amountUSDC = formatUnits(this.walletStore.balances[this.address.USDC], 6);
+                this.walletStore.getBalance(this.address.THX).then(() => {
+                    this.amount = formatUnits(this.walletStore.balances[this.address.THX], 18);
+                    this.token = this.tokens[0];
                 });
+                this.walletStore.getBalance(this.address.USDC);
             },
             immediate: true,
         },
     },
     methods: {
-        async onClickTokenSelect() {
-            //
+        async onChangeToken(token: TToken) {
+            this.token = token;
+            this.isModalTokenSelectShown = false;
         },
     },
 });

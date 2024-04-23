@@ -17,7 +17,7 @@
                 label: 'THX Network APR',
                 url: 'https://docs.thx.network',
                 badge: '',
-                data: [{ label: 'VeTHX APR', value: `${aprMetric.thx.toString()}%` }],
+                data: [{ label: 'VeTHX APR', value: `${aprMetric.thx}%` }],
             },
         ]"
         class="me-4"
@@ -35,6 +35,7 @@ export default defineComponent({
         ...mapStores(useLiquidityStore),
         aprMetric() {
             const { balancer, thx } = this.liquidityStore.apr;
+            console.log(balancer, thx);
             return {
                 balancerMin: balancer.min.toFixed(2),
                 balancerMax: balancer.max.toFixed(2),

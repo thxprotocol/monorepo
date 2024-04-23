@@ -13,6 +13,16 @@ type TWallet = {
     short: string;
 };
 
+type TToken = {
+    symbol: string;
+    logoImgURL: string;
+    decimals: number;
+    address: string;
+    balance: string;
+    value: number;
+    price: number;
+};
+
 type TTransaction = {
     from: string;
     to: string;
