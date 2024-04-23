@@ -42,6 +42,11 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import(/* webpackChunkName: "earn" */ '../views/discovery/Community.vue'),
             },
             {
+                path: '/members',
+                name: 'members',
+                component: () => import(/* webpackChunkName: "earn" */ '../views/discovery/Members.vue'),
+            },
+            {
                 path: '/wallets',
                 name: 'wallets',
                 beforeEnter,

@@ -38,6 +38,7 @@ declare module 'vue' {
     BaseCardGalachain: typeof import('./src/components/card/BaseCardGalachain.vue')['default']
     BaseCardHeader: typeof import('./src/components/card/BaseCardHeader.vue')['default']
     BaseCardHeaderHome: typeof import('./src/components/card/BaseCardHeaderHome.vue')['default']
+    BaseCardMembership: typeof import('./src/components/card/BaseCardMembership.vue')['default']
     BaseCardMembershipOnboarding: typeof import('./src/components/card/BaseCardMembershipOnboarding.vue')['default']
     BaseCardPrices: typeof import('./src/components/card/BaseCardPrices.vue')['default']
     BaseCardQuest: typeof import('./src/components/card/BaseCardQuest.vue')['default']

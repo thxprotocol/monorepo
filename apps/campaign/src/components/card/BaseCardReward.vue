@@ -87,7 +87,7 @@ export default defineComponent({
     props: {
         image: String,
         reward: {
-            type: Object as PropType<TReward>,
+            type: Object as PropType<TReward & { isExpired: boolean; isStocked: boolean }>,
             required: true,
         },
     },

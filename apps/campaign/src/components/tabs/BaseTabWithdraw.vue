@@ -39,22 +39,7 @@
             </b-form-group>
         </b-col>
         <b-col class="d-flex align-items-center justify-content-center flex-column">
-            <div class="text-center">
-                <div
-                    class="position-relative rounded-circle m-auto gradient-border-xl"
-                    style="width: 75px; height: 75px"
-                >
-                    <div
-                        class="position-relative bg-dark rounded-circle d-flex align-items-center justify-content-center"
-                        style="z-index: 1; width: 65px; height: 65px"
-                    >
-                        <i class="fas fa-id-card" style="font-size: 1.5rem" />
-                    </div>
-                </div>
-                <b-badge class="mt-2 p-2" variant="primary">
-                    {{ membership }}
-                </b-badge>
-            </div>
+            <BaseCardMembership />
         </b-col>
     </b-row>
     <hr />
@@ -108,19 +93,6 @@ export default defineComponent({
         amount() {
             if (!this.veStore.lock) return;
             return fromWei(String(this.veStore.lock.amount));
-        },
-        membership() {
-            if (!this.veStore.lock) return;
-            const price = this.liquidityStore.pricing['20USDC-80THX'];
-            const amount = Number(fromWei(String(this.veStore.lock.amount)));
-            const amountInUSD = amount * price;
-
-            if (amountInUSD < 4) return 'No Rank';
-            if (amountInUSD > 4 && amount < 40) return 'Rookie';
-            if (amountInUSD > 40 && amount < 400) return 'Pro';
-            if (amountInUSD > 400 && amount < 4000) return 'Elite';
-            if (amountInUSD > 4000 && amount < 40000) return 'Master';
-            if (amountInUSD > 40000 && amount < 400000) return 'Legend';
         },
     },
     methods: {

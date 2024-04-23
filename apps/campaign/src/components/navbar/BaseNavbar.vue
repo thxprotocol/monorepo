@@ -43,7 +43,6 @@
                 class="me-lg-3 mb-3 mb-lg-0 py-2 px-4 rounded text-decoration-none text-white"
                 variant="link"
                 to="/members"
-                disabled
             >
                 Members
                 <sup><i class="fas fa-circle text-danger" /></sup>
@@ -76,7 +75,6 @@
             </b-navbar-nav>
         </b-collapse>
     </b-navbar>
-
     <b-offcanvas
         v-model="isNavbarOffcanvasShown"
         :no-header-close="true"
@@ -110,7 +108,7 @@
                 <div style="width: 30px"><i class="fas fa-users me-1 text-opaque"></i></div>
                 Community
             </b-list-group-item>
-            <b-list-group-item class="d-flex" disabled @click="onClickRoute('/members')">
+            <b-list-group-item class="d-flex" @click="onClickRoute('/members')">
                 <div style="width: 30px"><i class="fas fa-id-card me-1 text-opaque"></i></div>
                 Members
                 <sup><i class="fas fa-circle text-danger" /></sup>
