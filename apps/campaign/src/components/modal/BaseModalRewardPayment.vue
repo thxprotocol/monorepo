@@ -11,7 +11,11 @@
             <h5 class="modal-title"><i class="fas fa-gift me-2"></i> {{ reward.title }}</h5>
             <b-link class="btn-close" @click="isModalShown = false"><i class="fas fa-times"></i></b-link>
         </template>
-        <div v-if="isLoading" class="text-center">
+        <b-alert v-if="isAlertSuccessShown" v-model="isAlertSuccessShown" show variant="success" class="p-2 mb-0">
+            <i class="fas fa-gift me-2"></i>
+            Your reward has been successfully redeemed.
+        </b-alert>
+        <div v-else-if="isLoading" class="text-center">
             <b-spinner show small variant="primary" />
         </div>
         <template v-else>
@@ -34,13 +38,20 @@
             />
         </template>
         <template #footer>
-            <b-button variant="success" class="w-100 rounded-pill" :disabled="isDisabled" @click="onSubmit">
+            <b-button
+                v-if="!isAlertSuccessShown"
+                variant="success"
+                class="w-100 rounded-pill"
+                :disabled="isDisabled"
+                @click="onSubmit"
+            >
                 <b-spinner v-if="isSubmitting" small variant="primary" />
                 <template v-else-if="reward.isLocked"> <i class="fas fa-lock"></i></template>
                 <template v-else>
                     Pay {{ reward.pointPrice }} {{ reward.pointPrice === 1 ? 'point' : 'points' }}
                 </template>
             </b-button>
+            <b-button v-else class="w-100" variant="primary" @click="onClickContinue">Continue</b-button>
         </template>
     </b-modal>
 </template>
@@ -68,7 +79,14 @@ export default defineComponent({
         isLoading: Boolean,
     },
     data() {
-        return { RewardVariant, error: '', wallet: null, isModalShown: false, isSubmitting: false };
+        return {
+            RewardVariant,
+            isAlertSuccessShown: false,
+            error: '',
+            wallet: null,
+            isModalShown: false,
+            isSubmitting: false,
+        };
     },
     computed: {
         ...mapStores(useAccountStore, useRewardStore),
@@ -95,6 +113,7 @@ export default defineComponent({
     watch: {
         show(value) {
             this.isModalShown = value;
+            this.isAlertSuccessShown = false;
         },
     },
     methods: {
@@ -107,13 +126,17 @@ export default defineComponent({
                 await this.rewardStore.createPayment(this.reward.variant, this.reward._id, this.wallet);
 
                 walletStore.list();
-
-                this.isModalShown = false;
+                this.isAlertSuccessShown = true;
             } catch (res) {
                 this.error = (res as { error: { message: string } }).error.message;
             } finally {
                 this.isSubmitting = false;
             }
+        },
+        async onClickContinue() {
+            this.isModalShown = false;
+            // Updates point balance
+            await this.accountStore.getParticipants();
         },
     },
 });

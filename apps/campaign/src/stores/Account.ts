@@ -298,9 +298,6 @@ export const useAccountStore = defineStore('account', {
 
             // Poll for job to finish
             await poll({ taskFn, interval: 1000 });
-
-            // Updates point balance
-            await this.getParticipants();
         },
     },
 });

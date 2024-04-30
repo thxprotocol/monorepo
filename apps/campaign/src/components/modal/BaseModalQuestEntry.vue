@@ -55,7 +55,7 @@
             <b-button
                 :variant="participant && participant.isSubscribed ? 'primary' : 'link'"
                 class="w-100 rounded-pill"
-                @click="$emit('hidden')"
+                @click="onClickContinue"
             >
                 Continue
             </b-button>
@@ -129,6 +129,10 @@ export default defineComponent({
                 const { error } = response as any;
                 this.subscribeError = error.message;
             }
+        },
+        async onClickContinue() {
+            await this.accountStore.getParticipants();
+            this.$emit('hidden');
         },
     },
 });
