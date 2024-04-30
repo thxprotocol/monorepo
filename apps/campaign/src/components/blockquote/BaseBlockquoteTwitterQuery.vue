@@ -46,8 +46,10 @@
     </blockquote>
     <blockquote v-if="quest.contentMetadata.operators.media !== 'ignore'">
         <div class="card-text ps-2 position-relative">
-            <div class="d-flex text-opaque pb-1">Your post contains:</div>
-            <em>{{ quest.contentMetadata.operators.media }}</em>
+            <div class="d-flex text-opaque pb-1">Required media:</div>
+            <em v-if="quest.contentMetadata.operators.media === 'has:media'">A video and/or image</em>
+            <em v-if="quest.contentMetadata.operators.media === 'has:image'">An image</em>
+            <em v-if="quest.contentMetadata.operators.media === 'has:video'">A video</em>
         </div>
     </blockquote>
 </template>
