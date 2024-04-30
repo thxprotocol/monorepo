@@ -9,7 +9,7 @@
             <b-card-title
                 class="d-flex p-3 m-0 align-items-center"
                 style="cursor: pointer"
-                @click.stop="isVisible = !isVisible"
+                @click="isVisible = !isVisible"
             >
                 <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                     <i class="me-2 text-primary" :class="iconMap[quest.variant]"></i>
