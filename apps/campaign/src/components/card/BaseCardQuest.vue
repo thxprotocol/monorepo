@@ -38,7 +38,7 @@
                 <div class="d-flex align-items-start justify-content-between">
                     <b-card-text
                         v-if="quest.description"
-                        class="flex-grow-1"
+                        class="flex-grow-1 mb-3"
                         style="white-space: pre-line"
                         v-html="decodeHTML(quest.description)"
                     />
