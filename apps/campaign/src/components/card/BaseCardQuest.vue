@@ -88,8 +88,10 @@
 
                 <div class="d-flex align-items-center justify-content-between mt-2 pb-2" style="opacity: 0.5">
                     <div class="d-flex align-items-center text-opaque small">
-                        <span class="text-white me-1">{{ quest.author.username }}</span>
-                        <span>&CenterDot; {{ format(new Date(quest.createdAt), 'MMMM do') }} </span>
+                        <span v-if="quest.author" class="text-white me-1">
+                            {{ quest.author.username }} &CenterDot;
+                        </span>
+                        <span>{{ format(new Date(quest.createdAt), 'MMMM do') }} </span>
                     </div>
                     <div class="d-flex align-items-center text-opaque small">
                         <i class="fas fa-users me-1" />
