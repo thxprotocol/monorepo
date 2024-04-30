@@ -16,13 +16,28 @@
                 </div>
                 <div class="flex-grow-1 pe-2">{{ decodeHTML(quest.title) }}</div>
                 <div class="text-accent fw-bold">{{ quest.amount }}</div>
-                <div>
-                    <b-link v-if="expiryDate" v-b-tooltip :title="`Ends in ${expiryDate}`" size="sm" class="ms-2">
-                        <i class="fas fa-clock text-primary" />
-                    </b-link>
-                    <b-dropdown v-if="quest.infoLinks.length" variant="link" size="sm" no-caret toggle-class="py-0" end>
+            </b-card-title>
+        </template>
+
+        <b-collapse v-model="isVisible">
+            <img v-if="quest.image" class="img-fluid" :src="quest.image" alt="header image" />
+
+            <div class="px-3 mt-3">
+                <div class="d-flex align-items-center justify-content-end">
+                    <b-badge v-if="expiryDate" variant="primary" class="text-opaque">
+                        <i class="fas fa-clock me-1" />
+                        Ends in {{ expiryDate }}
+                    </b-badge>
+                    <b-dropdown
+                        v-if="quest.infoLinks.length"
+                        variant="link"
+                        size="sm"
+                        no-caret
+                        toggle-class="py-0 ms-2"
+                        end
+                    >
                         <template #button-content>
-                            <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
+                            <i class="fas fa-ellipsis-v ml-0 text-muted"></i>
                         </template>
                         <b-dropdown-item
                             v-for="(link, key) of quest.infoLinks"
@@ -37,12 +52,7 @@
                         </b-dropdown-item>
                     </b-dropdown>
                 </div>
-            </b-card-title>
-        </template>
 
-        <b-collapse v-model="isVisible">
-            <img v-if="quest.image" class="img-fluid" :src="quest.image" alt="header image" />
-            <div class="px-3 my-3">
                 <b-alert v-model="isAlertDangerShown" variant="primary" class="p-2">
                     <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
                 </b-alert>
@@ -70,6 +80,16 @@
 
                 <BaseButtonQuestLocked v-else-if="quest.isLocked" :id="quest._id" :locks="quest.locks" />
                 <slot v-else name="button"></slot>
+                <div class="d-flex justify-content-between small text-opaque mt-2 pb-2" style="opacity: 0.3 !important">
+                    <div>
+                        <i class="fas fa-clock me-1" />
+                        {{ format(new Date(quest.createdAt), 'MMMM do yyyy') }}
+                    </div>
+                    <div>
+                        <i class="fas fa-users me-1" />
+                        {{ quest.entryCount }}
+                    </div>
+                </div>
             </div>
         </b-collapse>
     </b-card>
@@ -86,7 +106,7 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
-import { formatDistance } from 'date-fns';
+import { format, formatDistance } from 'date-fns';
 import { QuestVariant } from '@thxnetwork/sdk';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
@@ -105,6 +125,7 @@ export default defineComponent({
     },
     data() {
         return {
+            format,
             decodeHTML,
             isVisible: false,
             iconMap: {

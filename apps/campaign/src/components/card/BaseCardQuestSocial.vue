@@ -10,6 +10,11 @@
     >
         <component :is="interactionComponentMap[quest.interaction]" :quest="quest" />
 
+        <b-alert v-model="isAlertMinFollowersShown" variant="primary" class="p-2">
+            <i class="fas fa-exclamation-circle me-2" />
+            A minimum of {{ quest.contentMetadata.minFollowersCount }} followers is required.
+        </b-alert>
+
         <template #button>
             <BButtonGroup v-if="!isConnected" block class="w-100">
                 <b-button variant="primary" :disabled="isSubmitting" @click="onClickConnect">
@@ -116,6 +121,9 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         ...mapStores(useQuestStore),
+        isAlertMinFollowersShown() {
+            return this.quest.contentMetadata && !!this.quest.contentMetadata.minFollowersCount;
+        },
         isConnected() {
             const { account } = useAccountStore();
             if (!account) return;
