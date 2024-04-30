@@ -21,7 +21,7 @@ const interactionLabelMap: { [i: number]: string } = {
     [QuestSocialRequirement.TwitterLike]: 'Like on 𝕏',
     [QuestSocialRequirement.TwitterRetweet]: 'Repost on 𝕏',
     [QuestSocialRequirement.TwitterLikeRetweet]: 'Repost & Like on 𝕏',
-    [QuestSocialRequirement.TwitterMessage]: 'Post on 𝕏',
+    [QuestSocialRequirement.TwitterQuery]: 'Post on 𝕏',
     [QuestSocialRequirement.YouTubeLike]: 'Watch & Like on YouTube',
     [QuestSocialRequirement.YouTubeSubscribe]: 'Subscribe on YouTube',
     [QuestSocialRequirement.DiscordGuildJoined]: 'Join Discord',
@@ -49,7 +49,7 @@ const interactionComponentMap: { [req: number]: string } = {
     [QuestSocialRequirement.TwitterRetweet]: 'BaseBlockquoteTwitterTweet',
     [QuestSocialRequirement.TwitterLikeRetweet]: 'BaseBlockquoteTwitterTweet',
     [QuestSocialRequirement.TwitterFollow]: 'BaseBlockquoteTwitterUser',
-    [QuestSocialRequirement.TwitterMessage]: 'BaseBlockquoteTwitterMessage',
+    [QuestSocialRequirement.TwitterQuery]: 'BaseBlockquoteTwitterQuery',
     [QuestSocialRequirement.DiscordGuildJoined]: 'BaseBlockquoteDiscordServerJoin',
     [QuestSocialRequirement.DiscordMessage]: 'BaseBlockquoteDiscordMessage',
 };
@@ -129,7 +129,7 @@ const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; sco
         kind: AccessTokenKind.Twitter,
         scopes: OAuthRequiredScopes.TwitterValidateFollow,
     },
-    [QuestSocialRequirement.TwitterMessage]: { kind: AccessTokenKind.Twitter, scopes: OAuthRequiredScopes.TwitterAuth },
+    [QuestSocialRequirement.TwitterQuery]: { kind: AccessTokenKind.Twitter, scopes: OAuthRequiredScopes.TwitterAuth },
     [QuestSocialRequirement.TwitterLikeRetweet]: {
         kind: AccessTokenKind.Twitter,
         scopes: OAuthRequiredScopes.TwitterValidateLike,

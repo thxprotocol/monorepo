@@ -67,7 +67,7 @@ import {
     AccessTokenKind,
 } from '../../utils/social';
 import BaseBlockquoteTwitterTweet from '../blockquote/BaseBlockquoteTwitterTweet.vue';
-import BaseBlockquoteTwitterMessage from '../blockquote/BaseBlockquoteTwitterMessage.vue';
+import BaseBlockquoteTwitterQuery from '../blockquote/BaseBlockquoteTwitterQuery.vue';
 import BaseBlockquoteTwitterUser from '../blockquote/BaseBlockquoteTwitterUser.vue';
 import BaseBlockquoteYoutubeChannelSubscription from '../../components/blockquote/BaseBlockquoteYoutubeChannelSubscription.vue';
 import BaseBlockquoteVideo from '../../components/blockquote/BaseBlockquoteVideo.vue';
@@ -82,7 +82,7 @@ export default defineComponent({
         BaseBlockquoteYoutubeChannelSubscription,
         BaseBlockquoteVideo,
         BaseBlockquoteTwitterTweet,
-        BaseBlockquoteTwitterMessage,
+        BaseBlockquoteTwitterQuery,
         BaseBlockquoteTwitterUser,
         BaseBlockquoteDiscordServerJoin,
         BaseBlockquoteDiscordInviteUsed,
@@ -128,7 +128,7 @@ export default defineComponent({
                 [QuestSocialRequirement.TwitterLikeRetweet]: this.quest.contentMetadata.url,
                 [QuestSocialRequirement.TwitterLike]: this.quest.contentMetadata.url,
                 [QuestSocialRequirement.TwitterRetweet]: this.quest.contentMetadata.url,
-                [QuestSocialRequirement.TwitterMessage]: 'https://www.x.com',
+                [QuestSocialRequirement.TwitterQuery]: this.queryToURL(this.quest),
                 [QuestSocialRequirement.YouTubeLike]: `https://www.youtube.com/watch?v=${this.quest.content}`,
                 [QuestSocialRequirement.YouTubeSubscribe]: `https://www.youtube.com/channel/${this.quest.content}`,
                 [QuestSocialRequirement.DiscordGuildJoined]: this.quest.contentMetadata.inviteURL,
@@ -138,6 +138,15 @@ export default defineComponent({
         },
     },
     methods: {
+        queryToURL(quest: TQuestSocial) {
+            if (!quest.contentMetadata || !quest.contentMetadata.operators) return 'https://x.com';
+            const { text, hashtags, url } = quest.contentMetadata.operators;
+            const intentURL = new URL('https://x.com/intent/tweet');
+            intentURL.searchParams.append('text', text);
+            intentURL.searchParams.append('hashtags', hashtags.join(','));
+            intentURL.searchParams.append('url', url[0]);
+            return intentURL.toString();
+        },
         onClickCancel() {
             this.isSubmitting = false;
         },
