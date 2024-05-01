@@ -89,11 +89,11 @@ export const useQuestStore = defineStore('quest', {
             // Execute callback to update state
             questEntryDetailsMap[quest.variant].callback();
         },
-        async list() {
+        async list(poolId?: string) {
             const { api } = useAccountStore();
             this.isLoading = true;
 
-            const { gitcoin, invite, twitter, discord, youtube, custom, daily, web3 } = await api.quests.list();
+            const { gitcoin, invite, twitter, discord, youtube, custom, daily, web3 } = await api.quests.list(poolId);
             const socialQuestList = [...twitter, ...discord, ...youtube];
 
             this.quests = [...gitcoin, ...invite, ...socialQuestList, ...custom, ...daily, ...web3];

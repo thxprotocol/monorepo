@@ -1,6 +1,6 @@
 <template>
     <b-card
-        class="mb-1"
+        class="mb-1 w-100"
         header-class="p-0"
         body-class="d-flex flex-column p-0"
         :class="{ 'card-collapsed': isVisible, 'card-promoted': quest.isPromoted }"
@@ -31,6 +31,7 @@
                     <i class="fab fa-twitter me-1" />
                     A minimum of <strong>{{ quest.contentMetadata.minFollowersCount }} followers</strong> is required.
                 </b-alert>
+
                 <b-alert v-model="isAlertDangerShown" variant="primary" class="p-2">
                     <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
                 </b-alert>
@@ -122,7 +123,7 @@ import { useQuestStore } from '../../stores/Quest';
 import { decodeHTML } from '@thxnetwork/campaign/utils/decode-html';
 
 export default defineComponent({
-    name: 'BaseCardCollapse',
+    name: 'BaseCardQuest',
     props: {
         id: String,
         visible: Boolean,

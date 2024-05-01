@@ -5,9 +5,9 @@
     </b-alert>
     <div v-else id="main" :class="{ 'overflow-hidden': accountStore.isMobile }">
         <BaseNavbarTop />
-        <div class="d-flex justify-content-end h-vertical">
+        <div class="d-flex h-100">
             <transition name="fade" mode="out-in">
-                <router-view class="router-view-app h-vertical order-lg-0" />
+                <router-view class="router-view-app order-lg-0" />
             </transition>
             <BaseSidebar />
         </div>
@@ -78,14 +78,6 @@ export default defineComponent({
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
-}
-
-.h-vertical {
     height: 100% !important;
-
-    @media (min-width: 991px) {
-        // 100% minus navbar top
-        height: calc(100% - 30px) !important;
-    }
 }
 </style>

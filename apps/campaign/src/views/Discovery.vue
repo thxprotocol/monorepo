@@ -1,5 +1,5 @@
 <template>
-    <div :style="{ minHeight: '100%' }">
+    <div :style="{ minHeight: '100%' }" class="gradient-bg-opacity">
         <BaseNavbarTicker />
         <BaseNavbar />
         <router-view />

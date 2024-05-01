@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex flex-column h-100 p-0">
+    <div class="d-flex flex-column h-100 p-0 h-vertical">
         <BaseNavbarSecondary v-if="accountStore.isMobile" />
         <b-container
             v-if="accountStore.isAuthenticated === false"
@@ -113,11 +113,19 @@ export default defineComponent({
     },
 });
 </script>
-<style>
+<style lang="scss">
 @media (max-width: 992px) {
     .overflow-mobile {
         overflow-x: none;
         overflow-y: auto;
+    }
+}
+
+.h-vertical {
+    height: 100% !important;
+
+    @media (min-width: 991px) {
+        height: calc(100% - 30px) !important;
     }
 }
 </style>

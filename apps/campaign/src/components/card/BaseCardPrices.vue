@@ -1,10 +1,18 @@
 <template>
-    <b-button v-for="item of priceList" class="px-4 rounded py-1 ms-2" variant="dark" target="_blank" :href="item.url">
-        <span style="color: gray !important" class="text-decoration-none">{{ item.ticker }}</span>
-        <sup class="text-success ms-1">
-            {{ item.value }}
-        </sup>
-    </b-button>
+    <div class="card-prices">
+        <b-button
+            v-for="item of priceList"
+            class="px-4 rounded py-1 ms-2"
+            variant="dark"
+            target="_blank"
+            :href="item.url"
+        >
+            <span style="color: gray !important" class="text-decoration-none">{{ item.ticker }}</span>
+            <sup class="text-success ms-1">
+                {{ item.value }}
+            </sup>
+        </b-button>
+    </div>
 </template>
 
 <script lang="ts">

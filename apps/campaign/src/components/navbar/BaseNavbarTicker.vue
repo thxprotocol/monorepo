@@ -12,7 +12,7 @@
                 Early Stakers Get Extra Rewards
             </b-link>
         </div>
-        <BaseCardPrices style="font-size: 0.8rem" />
+        <BaseCardPrices />
     </div>
 </template>
 
@@ -22,27 +22,38 @@
     min-height: 40px;
     overflow: hidden;
     white-space: nowrap;
+
+    .card-prices {
+        display: none;
+        font-size: 0.8rem;
+    }
 }
 
-@media (max-width: 1200px) {
+.ticker-content {
+    display: inline-block;
+    animation: tickerMove 13s linear infinite;
+}
+
+@media (min-width: 1500px) {
     .ticker {
         text-align: left;
-        overflow: hidden;
-        white-space: nowrap;
-    }
 
-    .ticker-content {
-        display: inline-block;
-        animation: tickerMove 15s linear infinite;
-    }
+        .ticker-content {
+            animation: none;
+        }
 
-    @keyframes tickerMove {
-        0% {
-            transform: translateX(100%);
+        .card-prices {
+            display: flex;
         }
-        100% {
-            transform: translateX(-100%);
-        }
+    }
+}
+
+@keyframes tickerMove {
+    0% {
+        transform: translateX(30%);
+    }
+    100% {
+        transform: translateX(-100%);
     }
 }
 </style>
