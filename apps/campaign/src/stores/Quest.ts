@@ -22,7 +22,6 @@ export const useQuestStore = defineStore('quest', {
     },
     actions: {
         async getReCAPTCHAToken(action: string) {
-            console.log(action);
             const { grecaptcha } = window as unknown as { grecaptcha: any };
             return new Promise((resolve) => {
                 grecaptcha.enterprise.ready(async () => {

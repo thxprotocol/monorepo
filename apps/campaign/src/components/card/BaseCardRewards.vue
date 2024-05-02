@@ -1,5 +1,5 @@
 <template>
-    <b-tabs v-if="!isEmpty" class="tabs-rewards" nav-class="px-3" content-class="p-2">
+    <b-tabs class="tabs-rewards" nav-class="px-3" content-class="p-2">
         <template #tabs-end>
             <b-button
                 v-if="accountStore.isAuthenticated"
@@ -8,7 +8,7 @@
                 variant="link"
                 @click="onClickRefresh"
             >
-                <b-spinner v-if="walletStore.isLoading" small />
+                <b-spinner v-if="isRefreshing" small />
                 <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem" />
             </b-button>
         </template>
@@ -84,15 +84,6 @@ export default defineComponent({
                 .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
                 .reverse();
         },
-        isEmpty() {
-            return ![
-                ...this.walletStore.discordRoles,
-                ...this.walletStore.couponCodes,
-                ...this.walletStore.erc20,
-                ...this.walletStore.erc721,
-                ...this.walletStore.erc1155,
-            ].length;
-        },
     },
     mounted() {
         this.listRewards();
@@ -101,8 +92,8 @@ export default defineComponent({
         onClickSignin() {
             this.accountStore.signin();
         },
-        onClickRefresh() {
-            this.listRewards();
+        async onClickRefresh() {
+            await this.listRewards();
         },
         async listRewards() {
             this.isRefreshing = true;

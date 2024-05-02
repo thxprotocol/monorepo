@@ -4,7 +4,7 @@
             v-model="isOpenWallet"
             variant="link"
             class="w-100"
-            toggle-class="d-flex align-items-center justify-content-end text-white text-decoration-none pe-0"
+            toggle-class="d-flex align-items-center justify-content-end text-white text-decoration-none px-0 "
             auto-close="outside"
             menu-class="bg-body"
             no-caret

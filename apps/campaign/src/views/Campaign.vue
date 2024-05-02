@@ -37,7 +37,8 @@ export default defineComponent({
         ...mapStores(useAccountStore, useAuthStore, useQuestStore, useRewardStore),
     },
     watch: {
-        'questStore.isLoading'() {
+        'questStore.isLoading'(isLoading: boolean) {
+            if (isLoading) return;
             this.redirect();
 
             const amount = this.questStore.quests.filter((r) => r.isAvailable).length;
@@ -51,7 +52,6 @@ export default defineComponent({
         this.accountStore.onResize();
         this.accountStore.postMessage({ message: 'thx.widget.ready' });
 
-        // TODO Check user state here and only list quests if there is no token or no expired token
         await this.questStore.list();
     },
     methods: {
@@ -66,6 +66,7 @@ export default defineComponent({
             if (isQuestCampaign || this.$route.name === 'collect') return;
 
             if (this.accountStore.isAuthenticated === null) {
+                debugger;
                 return this.$router.push(`${basePath}/about`);
             }
 

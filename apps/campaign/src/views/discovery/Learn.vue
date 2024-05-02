@@ -14,7 +14,7 @@
                     backgroundSize: 'cover',
                     backgroundPosition: 'center bottom',
                 }"
-                class="d-flex align-items-center justify-content-center h-100 rounded"
+                class="d-flex align-items-center justify-content-center h-100 rounded p-5"
             >
                 <div class="p-5 rounded text-center" :style="{ background: 'rgba(0, 0, 0, 0.75)' }">
                     <strong class="text-success h1">

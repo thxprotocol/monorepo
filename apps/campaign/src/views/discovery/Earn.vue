@@ -20,6 +20,22 @@
                 </div>
                 <hr />
                 <BaseDropdownMetricRewards />
+                <b-button
+                    variant="link"
+                    class="text-white text-decoration-none rounded py-0 ms-5"
+                    @click="onClickRewards"
+                >
+                    <div class="d-block-inline rounded fw-normal text-start" variant="primary">
+                        <div class="small text-opaque">Your Rewards</div>
+                        <div class="lead fw-bold text-accent">
+                            <span>{{ toFiatPrice(rewardsInUSD) }}</span>
+                        </div>
+                    </div>
+                </b-button>
+                <BaseModalClaimTokens
+                    :show="veStore.isModalClaimTokensShown"
+                    @hidden="veStore.isModalClaimTokensShown = false"
+                />
             </div>
         </template>
         <template #secondary>
@@ -107,6 +123,16 @@ export default defineComponent({
                 };
             });
         },
+        rewardsInUSD() {
+            if (!this.veStore.rewards.length) return 0;
+
+            const balRewards = Number(formatUnits(this.veStore.rewards[0].amount, 'ether'));
+            const bptRewards = Number(formatUnits(this.veStore.rewards[1].amount, 'ether'));
+            const balPrice = this.liquidityStore.pricing['BAL'];
+            const bptPrice = this.liquidityStore.pricing['20USDC-80THX'];
+
+            return balRewards * balPrice + bptRewards * bptPrice;
+        },
     },
     methods: {
         getWeekNumbers() {
@@ -117,6 +143,9 @@ export default defineComponent({
                 end: addWeeks(today, 3),
             });
             return [currentWeek, ...nextFourWeeks.map((date) => format(date, 'w'))];
+        },
+        onClickRewards() {
+            this.veStore.isModalClaimTokensShown = true;
         },
     },
 });
