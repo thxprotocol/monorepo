@@ -17,7 +17,7 @@
                 class="d-flex align-items-center justify-content-center h-100 rounded"
             >
                 <div class="p-5 rounded text-center" :style="{ background: 'rgba(0, 0, 0, 0.75)' }">
-                    <strong v-if="participant" class="text-success h1">
+                    <strong class="text-success h1">
                         {{ participant ? participant.balance : 0 }}
                     </strong>
                     <br />
@@ -86,9 +86,9 @@ export default defineComponent({
     watch: {
         'accountStore.isAuthenticated': {
             handler(isAuthenticated: boolean) {
+                this.questStore.list(this.campaignId);
                 if (!isAuthenticated) return;
                 this.accountStore.getParticipants();
-                this.questStore.list(this.campaignId);
             },
             immediate: true,
         },
