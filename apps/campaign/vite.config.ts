@@ -50,6 +50,7 @@ const config: UserConfigExport = {
         outDir: 'build',
         target: ['esnext'],
         sourcemap: true,
+        manifest: true,
         // used for "Graph" is undefined error with Dagre package https://github.com/vitejs/vite/issues/5759
         commonjsOptions: {
             ignoreTryCatch: false,

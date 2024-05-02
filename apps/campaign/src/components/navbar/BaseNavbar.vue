@@ -6,7 +6,7 @@
         toggleable="lg"
         type="dark"
         :container="true"
-        class="px-3 py-1"
+        class="navbar-menu px-3 py-1"
     >
         <b-navbar-brand href="#">
             <b-link to="/">
@@ -173,5 +173,8 @@ export default defineComponent({
         display: flex;
         flex-direction: column;
     }
+}
+.navbar-menu .router-link-active.active {
+    background: rgba(0, 0, 0, 0.4);
 }
 </style>
