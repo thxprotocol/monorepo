@@ -47,7 +47,7 @@
                 </span>
             </div>
         </blockquote>
-        <blockquote v-if="operators.media !== 'ignore'" class="mb-1">
+        <blockquote v-if="operators.media && operators.media !== 'ignore'" class="mb-1">
             <div class="card-text ps-2 position-relative">
                 <div class="d-flex text-opaque pb-1">Required media:</div>
                 <em v-if="operators.media === 'has:media'">A video and/or image</em>
