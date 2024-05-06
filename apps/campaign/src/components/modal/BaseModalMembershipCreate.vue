@@ -207,7 +207,7 @@ export default defineComponent({
         amountInBPTInWei() {
             const amountInUSD = this.amountInWei.mul(this.usdPerTokenInWei);
             const amount = formatUnits(amountInUSD.mul(this.bptPerUSD), 18 + this.token.decimals);
-            return parseUnits(amount, 18);
+            return parseUnits(Number(amount).toFixed(18), 18);
         },
         amountInBPT() {
             return formatUnits(this.amountInBPTInWei, 18);
