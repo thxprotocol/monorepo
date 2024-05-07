@@ -34,7 +34,7 @@ type TBaseQuest = {
     expiryDate: Date;
 };
 
-type TAnyQuest = TQuestSocial | TQuestCustom | TQuestInvite | TQuestDaily | TQuestWeb3 | TQuestGitcoin;
+type TAnyQuest = TQuestSocial | TQuestCustom | TQuestInvite | TQuestDaily | TQuestWeb3 | TQuestGitcoin | TQuestWebhook;
 
 type TJob = {
     name: string;
@@ -91,6 +91,12 @@ type TQuestWeb3 = TBaseQuest & {
     contracts: { chainId: ChainId; address: string }[];
     methodName: string;
     threshold: string;
+};
+
+type TQuestWebhook = TBaseQuest & {
+    amount: number;
+    webhookId: string;
+    identities: { sub: string }[];
 };
 
 type TQuestGitcoin = TBaseQuest & {

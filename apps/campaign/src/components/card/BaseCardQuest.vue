@@ -145,6 +145,7 @@ export default defineComponent({
                 [QuestVariant.Custom]: 'fas fa-flag',
                 [QuestVariant.Web3]: 'fab fa-ethereum',
                 [QuestVariant.Gitcoin]: 'fas fa-fingerprint',
+                [QuestVariant.Webhook]: 'fas fa-globe',
             } as { [variant: string]: string },
         };
     },

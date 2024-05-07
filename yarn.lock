@@ -4023,10 +4023,10 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@thxnetwork/sdk@1.3.4":
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.3.4.tgz#c5d57d8a2eef6792458f3e378f9c5b550775faa7"
-  integrity sha512-hndjWnSzUCOPIj8q7KEi4ozUrS8Ppk6Rz5hthR6/NP4l0hl67hxHGgHFDxmnr1xQpe6WOwb4kXYlkXqDXk21ng==
+"@thxnetwork/sdk@1.3.5":
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/@thxnetwork/sdk/-/sdk-1.3.5.tgz#ef20dc0151b7a7a0bf5a02bee7ca4bc1cbbd5216"
+  integrity sha512-sZFXgOgd5xesygf3iGpZyzhRghrzTwkCwDEfdkqMgNHZCc6dFJAaPxzCxstWUyiilqgkQwMFk1AScBbdXP3eew==
 
 "@tkey/common-types@^10.1.0":
   version "10.1.0"

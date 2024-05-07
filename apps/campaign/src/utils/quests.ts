@@ -20,6 +20,7 @@ export const questComponentMap: any = {
     [QuestVariant.Custom]: 'BaseCardQuestCustom',
     [QuestVariant.Web3]: 'BaseCardQuestWeb3',
     [QuestVariant.Gitcoin]: 'BaseCardQuestGitcoin',
+    [QuestVariant.Webhook]: 'BaseCardQuestWebhook',
 };
 
 export const sortMap: { [k: number]: any } = {
