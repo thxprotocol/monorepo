@@ -63,6 +63,7 @@ export const useQuestStore = defineStore('quest', {
                     },
                 },
                 [QuestVariant.Gitcoin]: { apiKey: 'gitcoin', eventKey: 'gitcoin quest entry', callback },
+                [QuestVariant.Webhook]: { apiKey: 'webhook', eventKey: 'webhook quest entry', callback },
             };
 
             // Create entry variant key based on enum key
@@ -92,10 +93,12 @@ export const useQuestStore = defineStore('quest', {
             const { api } = useAccountStore();
             this.isLoading = true;
 
-            const { gitcoin, invite, twitter, discord, youtube, custom, daily, web3 } = await api.quests.list(poolId);
+            const { gitcoin, invite, twitter, discord, youtube, custom, daily, web3, webhook } = await api.quests.list(
+                poolId,
+            );
             const socialQuestList = [...twitter, ...discord, ...youtube];
 
-            this.quests = [...gitcoin, ...invite, ...socialQuestList, ...custom, ...daily, ...web3];
+            this.quests = [...gitcoin, ...invite, ...socialQuestList, ...custom, ...daily, ...web3, ...webhook];
             this.isLoading = false;
         },
     },

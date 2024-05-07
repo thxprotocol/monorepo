@@ -62,6 +62,7 @@ import BaseCardQuestCustom from '../../components/card/BaseCardQuestCustom.vue';
 import BaseCardQuestDaily from '../../components/card/BaseCardQuestDaily.vue';
 import BaseCardQuestWeb3 from '../../components/card/BaseCardQuestWeb3.vue';
 import BaseCardQuestGitcoin from '../../components/card/BaseCardQuestGitcoin.vue';
+import BaseCardQuestWebhook from '../../components/card/BaseCardQuestWebhook.vue';
 
 export default defineComponent({
     name: 'Quests',
@@ -72,6 +73,7 @@ export default defineComponent({
         BaseCardQuestDaily,
         BaseCardQuestWeb3,
         BaseCardQuestGitcoin,
+        BaseCardQuestWebhook,
     },
     data() {
         return {
