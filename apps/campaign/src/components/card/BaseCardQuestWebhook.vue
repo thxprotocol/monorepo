@@ -13,7 +13,13 @@
             Your don't have an identity connected for this campaign
         </b-alert>
         <template #button>
-            <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
+            <b-button
+                variant="primary"
+                block
+                class="w-100"
+                :disabled="isSubmitting || !quest.identities.length"
+                @click="onClickClaim"
+            >
                 <template v-if="isSubmitting">
                     <b-spinner small></b-spinner>
                     Adding points...
