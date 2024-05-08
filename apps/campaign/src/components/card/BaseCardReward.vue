@@ -63,10 +63,13 @@
                     <template v-if="!reward.isStocked">Sold out</template>
                     <template v-else-if="reward.isExpired">Expired</template>
                     <template v-else-if="reward.isDisabled">Not available</template>
-                    <template v-else>
+                    <template v-else-if="reward.pointPrice">
                         <strong>{{
                             `${reward.pointPrice} point${reward.pointPrice && reward.pointPrice > 1 ? 's' : ''}`
                         }}</strong>
+                    </template>
+                    <template v-else>
+                        <strong>Free!</strong>
                     </template>
                 </b-button>
             </span>
