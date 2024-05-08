@@ -56,6 +56,7 @@ import BaseCardQuestCustom from '../../components/card/BaseCardQuestCustom.vue';
 import BaseCardQuestDaily from '../../components/card/BaseCardQuestDaily.vue';
 import BaseCardQuestWeb3 from '../../components/card/BaseCardQuestWeb3.vue';
 import BaseCardQuestGitcoin from '../../components/card/BaseCardQuestGitcoin.vue';
+import BaseCardQuestWebhook from '../../components/card/BaseCardQuestWebhook.vue';
 import { useAccountStore } from '@thxnetwork/campaign/stores/Account';
 import { useAuthStore } from '@thxnetwork/campaign/stores/Auth';
 
@@ -68,6 +69,7 @@ export default defineComponent({
         BaseCardQuestDaily,
         BaseCardQuestWeb3,
         BaseCardQuestGitcoin,
+        BaseCardQuestWebhook,
     },
     data() {
         return {
