@@ -6,6 +6,7 @@
         centered
         content-class="gradient-shadow-xl"
         @hidden="isModalShown = false"
+        @show="onShow"
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-gift me-2"></i> {{ reward.title }}</h5>
@@ -113,10 +114,14 @@ export default defineComponent({
     watch: {
         show(value) {
             this.isModalShown = value;
-            this.isAlertSuccessShown = false;
         },
     },
     methods: {
+        onShow() {
+            this.isAlertSuccessShown = false;
+            this.isSubmitting = false;
+            this.error = '';
+        },
         async onSubmit() {
             this.isSubmitting = true;
 
