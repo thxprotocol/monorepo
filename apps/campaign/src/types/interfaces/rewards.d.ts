@@ -33,6 +33,14 @@ type TReward = {
     isOwner: boolean;
 };
 
+type TRewardCoin = TReward & {
+    //
+};
+
+type TRewardNFT = TReward & {
+    //
+};
+
 type TBaseRewardPayment = {
     _id: string;
     rewardId: string;
