@@ -22,7 +22,7 @@
             </b-card-title>
             <b-card-text class="card-description" v-html="reward.description" />
             <div class="d-flex pb-3">
-                <div class="d-flex align-items-center">
+                <div v-if="reward.pointPrice" class="d-flex align-items-center">
                     <span class="card-text me-1"> Price: </span>
                     <b-badge variant="primary" class="ms-1 p-1 bg-primary">
                         <span class="text-accent">
