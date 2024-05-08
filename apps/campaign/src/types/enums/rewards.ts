@@ -49,4 +49,5 @@ export enum QuestSocialRequirement {
     TwitterLikeRetweet = 7,
     DiscordMessage = 8,
     DiscordMessageReaction = 9,
+    DiscordGuildRole = 10,
 }

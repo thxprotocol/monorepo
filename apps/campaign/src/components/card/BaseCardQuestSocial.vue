@@ -44,9 +44,10 @@
                     <b-spinner small></b-spinner>
                     Adding points...
                 </template>
-                <template v-else>
+                <template v-else-if="quest.amount">
                     Claim <strong>{{ quest.amount }} points</strong>
                 </template>
+                <template v-else>Complete Quest</template>
             </b-button>
         </template>
     </BaseCardQuest>
@@ -72,6 +73,7 @@ import BaseBlockquoteTwitterUser from '../blockquote/BaseBlockquoteTwitterUser.v
 import BaseBlockquoteYoutubeChannelSubscription from '../../components/blockquote/BaseBlockquoteYoutubeChannelSubscription.vue';
 import BaseBlockquoteVideo from '../../components/blockquote/BaseBlockquoteVideo.vue';
 import BaseBlockquoteDiscordServerJoin from '../../components/blockquote/BaseBlockquoteDiscordServerJoin.vue';
+import BaseBlockquoteDiscordServerRole from '../../components/blockquote/BaseBlockquoteDiscordServerRole.vue';
 import BaseBlockquoteDiscordMessage from '../../components/blockquote/BaseBlockquoteDiscordMessage.vue';
 import BaseBlockquoteDiscordInviteUsed from '../../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
 import { interactionLabelMap } from '../../utils/social';
@@ -85,6 +87,7 @@ export default defineComponent({
         BaseBlockquoteTwitterQuery,
         BaseBlockquoteTwitterUser,
         BaseBlockquoteDiscordServerJoin,
+        BaseBlockquoteDiscordServerRole,
         BaseBlockquoteDiscordInviteUsed,
         BaseBlockquoteDiscordMessage,
     },
@@ -132,6 +135,7 @@ export default defineComponent({
                 [QuestSocialRequirement.YouTubeLike]: `https://www.youtube.com/watch?v=${this.quest.content}`,
                 [QuestSocialRequirement.YouTubeSubscribe]: `https://www.youtube.com/channel/${this.quest.content}`,
                 [QuestSocialRequirement.DiscordGuildJoined]: this.quest.contentMetadata.inviteURL,
+                [QuestSocialRequirement.DiscordGuildRole]: '',
                 [QuestSocialRequirement.DiscordMessage]: '',
             };
             return map[this.quest.interaction];

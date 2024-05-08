@@ -15,7 +15,7 @@
                     <i class="me-2 text-primary" :class="iconMap[quest.variant]"></i>
                 </div>
                 <div class="flex-grow-1 pe-2">{{ decodeHTML(quest.title) }}</div>
-                <div class="text-accent fw-bold">{{ quest.amount }}</div>
+                <div v-if="quest.amount" class="text-accent fw-bold">{{ quest.amount }}</div>
             </b-card-title>
         </template>
 
@@ -77,7 +77,8 @@
                     block
                     class="w-100"
                 >
-                    Sign in &amp; claim <strong>{{ quest.amount }} points</strong>
+                    Sign in &amp;
+                    <span v-html="quest.amount ? `claim <strong>${quest.amount} points</strong>` : 'complete quest'" />
                 </b-button>
 
                 <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>

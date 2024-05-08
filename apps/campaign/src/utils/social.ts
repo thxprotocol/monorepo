@@ -51,6 +51,7 @@ const interactionComponentMap: { [req: number]: string } = {
     [QuestSocialRequirement.TwitterFollow]: 'BaseBlockquoteTwitterUser',
     [QuestSocialRequirement.TwitterQuery]: 'BaseBlockquoteTwitterQuery',
     [QuestSocialRequirement.DiscordGuildJoined]: 'BaseBlockquoteDiscordServerJoin',
+    [QuestSocialRequirement.DiscordGuildRole]: 'BaseBlockquoteDiscordServerRole',
     [QuestSocialRequirement.DiscordMessage]: 'BaseBlockquoteDiscordMessage',
 };
 export enum OAuthGoogleScope {
@@ -137,6 +138,10 @@ const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; sco
     [QuestSocialRequirement.DiscordGuildJoined]: {
         kind: AccessTokenKind.Discord,
         scopes: OAuthRequiredScopes.DiscordValidateGuild,
+    },
+    [QuestSocialRequirement.DiscordGuildRole]: {
+        kind: AccessTokenKind.Discord,
+        scopes: OAuthRequiredScopes.DiscordAuth,
     },
     [QuestSocialRequirement.DiscordMessage]: { kind: AccessTokenKind.Discord, scopes: OAuthRequiredScopes.DiscordAuth },
     [QuestSocialRequirement.DiscordMessageReaction]: {

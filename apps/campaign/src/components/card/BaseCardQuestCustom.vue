@@ -19,13 +19,14 @@
                     <b-spinner small></b-spinner>
                     Adding points...
                 </template>
-                <template v-else>
+                <template v-else-if="quest.amount">
                     Claim
                     <strong>
                         {{ `${pendingCount} x` }}
                         {{ quest.amount }} points
                     </strong>
                 </template>
+                <template v-else>Complete Quest</template>
             </b-button>
         </template>
     </BaseCardQuest>

@@ -8,9 +8,9 @@
             @{{ quest.contentMetadata.username }}
         </b-link>
         -
-        <span v-if="quest.contentMetadata.text"> {{ quest.contentMetadata.text.substring(0, 110) }}</span>
+        <span v-if="quest.contentMetadata.text"> {{ quest.contentMetadata.text.substring(0, 255) }}</span>
         <b-link
-            v-if="quest.contentMetadata.text.length > 110"
+            v-if="quest.contentMetadata.text.length > 255"
             :href="quest.contentMetadata.url"
             target="_blank"
             class="text-accent"

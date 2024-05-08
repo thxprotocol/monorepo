@@ -48,11 +48,12 @@
         <template #button>
             <b-button variant="primary" class="w-100" :disabled="isSubmitting" @click="onClickSign">
                 <b-spinner v-if="isSubmitting" small />
-                <template v-else>
+                <template v-else-if="quest.amount">
                     Claim
                     <strong>{{ quest.amount }}</strong>
                     points
                 </template>
+                <template v-else>Complete Quest</template>
             </b-button>
         </template>
     </BaseCardQuest>

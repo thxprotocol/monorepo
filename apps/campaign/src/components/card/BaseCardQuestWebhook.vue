@@ -24,10 +24,11 @@
                     <b-spinner small></b-spinner>
                     Adding points...
                 </template>
-                <template v-else>
+                <template v-else-if="quest.amount">
                     Claim
                     <strong> {{ quest.amount }} points </strong>
                 </template>
+                <template v-else>Complete Quest</template>
             </b-button>
         </template>
     </BaseCardQuest>
@@ -54,7 +55,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore),
         isAlertShown() {
-            return !this.quest.identities.length;
+            return this.accountStore.isAuthenticated && !this.quest.identities.length;
         },
     },
     methods: {

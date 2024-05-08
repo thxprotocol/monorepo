@@ -34,9 +34,10 @@
                 </template>
                 <template v-else-if="!quest.isAvailable && !waitDuration"> Not available </template>
                 <template v-else-if="isSubmitting"><b-spinner small></b-spinner> Adding points...</template>
-                <template v-else>
+                <template v-else-if="quest.amount">
                     Claim <strong>{{ quest.amount }} points </strong>
                 </template>
+                <template v-else>Complete Quest</template>
             </b-button>
         </template>
     </BaseCardQuest>
