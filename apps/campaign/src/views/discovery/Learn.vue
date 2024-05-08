@@ -26,10 +26,10 @@
             </div>
         </template>
     </BaseCardHeader>
-    <b-container class="mb-3">
+    <b-container>
         <b-row>
             <b-col lg="8" offset-lg="2">
-                <div v-for="(quest, index) of questStore.quests" class="d-flex align-items-start quest-wrapper pt-5">
+                <div v-for="(quest, index) of questStore.quests" class="d-flex align-items-start quest-wrapper py-5">
                     <div
                         style="width: 50px; height: 50px; font-size: 1.5rem"
                         class="rounded-pill bg-primary mx-3 d-flex align-items-center justify-content-center"
