@@ -143,7 +143,7 @@ type TVeState = {
 };
 
 type TAPR = {
-    balancer: { min: number; max: number; swapFees: number };
+    balancer: { apr: number; swapFees: number };
     thx: number;
 };
 

@@ -1,5 +1,6 @@
 <template>
     <BaseDropdownMetric
+        class="me-4"
         label="Rewards"
         :value="toFiatPrice(rewardsMetric.totalInUSD)"
         :metrics="[

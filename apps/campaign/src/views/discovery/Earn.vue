@@ -15,14 +15,14 @@
                     for providing liquidity!
                 </p>
                 <div class="d-flex">
+                    <BaseDropdownMetricRewards />
                     <BaseDropdownMetricAPR />
                     <BaseDropdownMetricTVL />
                 </div>
                 <hr />
-                <BaseDropdownMetricRewards />
                 <b-button
                     variant="link"
-                    class="text-white text-decoration-none rounded py-0 ms-5"
+                    class="text-white text-decoration-none rounded py-0 px-0"
                     @click="onClickRewards"
                 >
                     <div class="d-block-inline rounded fw-normal text-start" variant="primary">

@@ -19,7 +19,7 @@ export const useLiquidityStore = defineStore('liquidity', {
     state: (): TLiquidityState => ({
         pricing: { 'THX': 0, 'USDC': 0, 'BAL': 0, '20USDC-80THX': 0 },
         apr: {
-            balancer: { min: 0, max: 0, swapFees: 0 },
+            balancer: { apr: 0, swapFees: 0 },
             thx: 0,
         },
         tvl: { liquidity: '0', staked: '0', tvl: '0' },
