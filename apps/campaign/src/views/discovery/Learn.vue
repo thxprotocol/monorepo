@@ -90,7 +90,7 @@ export default defineComponent({
             handler(isAuthenticated: boolean) {
                 this.questStore.list(this.campaignId);
                 if (!isAuthenticated) return;
-                this.accountStore.getParticipants();
+                this.accountStore.getParticipants(this.campaignId);
             },
             immediate: true,
         },

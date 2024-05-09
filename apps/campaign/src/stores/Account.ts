@@ -142,8 +142,9 @@ export const useAccountStore = defineStore('account', {
         async getAccount() {
             this.account = await this.api.request.get('/v1/account');
         },
-        async getParticipants() {
+        async getParticipants(poolId?: string) {
             const params: { poolId?: string } = {};
+            if (poolId) params['poolId'] = poolId;
             if (this.poolId) params['poolId'] = this.poolId;
             this.participants = await this.api.request.get('/v1/participants', { params });
         },
