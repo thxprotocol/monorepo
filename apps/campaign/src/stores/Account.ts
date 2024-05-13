@@ -146,6 +146,7 @@ export const useAccountStore = defineStore('account', {
             const params: { poolId?: string } = {};
             if (poolId) params['poolId'] = poolId;
             if (this.poolId) params['poolId'] = this.poolId;
+
             this.participants = await this.api.request.get('/v1/participants', { params });
         },
         async updateParticipant({ email, isSubscribed }: Partial<TParticipant> & { email: string }) {

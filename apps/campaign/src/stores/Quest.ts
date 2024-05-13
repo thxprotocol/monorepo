@@ -21,6 +21,18 @@ export const useQuestStore = defineStore('quest', {
         },
     },
     actions: {
+        // Complete a quest and remove from locks if it locks other quests
+        unlock(quest: TBaseQuest) {
+            for (const questIndex in this.quests) {
+                // If this quest is not found in other quests locks continue
+                const index = this.quests[questIndex].locks.findIndex((l) => l.questId === quest._id);
+                if (index === -1) continue;
+
+                // If there is a hit remove the lock and update flag
+                this.quests[questIndex].locks.splice(index, 1);
+                this.quests[questIndex].isLocked = false;
+            }
+        },
         async getReCAPTCHAToken(action: string) {
             const { grecaptcha } = window as unknown as { grecaptcha: any };
             return new Promise((resolve) => {
@@ -86,8 +98,11 @@ export const useQuestStore = defineStore('quest', {
             // Track event in mixpanel
             track('UserCreates', [account?.sub, eventKey, { poolId }]);
 
-            // Execute callback to update state
+            // Execute callback to update state (TODO Make more generic)
             questEntryDetailsMap[quest.variant].callback();
+
+            // Remove potential lock from other quests
+            this.unlock(quest);
         },
         async list(poolId?: string) {
             const { api } = useAccountStore();

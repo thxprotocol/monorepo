@@ -12,7 +12,7 @@
             </div>
             <b-alert v-else v-model="isAlertShown" show variant="info" class="p-2 px-3">
                 <i class="fas fa-info-circle me-1" />
-                A quest has been removed but still locks this quest...
+                A quest that is no longer available still locks this quest...
             </b-alert>
         </template>
         <template #footer>
