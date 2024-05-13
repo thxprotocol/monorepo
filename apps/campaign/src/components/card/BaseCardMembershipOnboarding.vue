@@ -25,6 +25,28 @@
             @hidden="isModalTokenSelectShown = false"
         />
         <BaseFormGroupLockEnd :value="lockEnd" @update="lockEnd = $event" />
+
+        <b-button
+            class="d-flex text-decoration-none align-items-center text-white"
+            variant="link"
+            @click="isAccepted = !isAccepted"
+        >
+            <i class="fas me-2 mt-1" :class="isAccepted ? 'fa-check-square' : 'fa-square'" />
+            <div>
+                I agree to THX Network
+                <b-link
+                    class="text-accent"
+                    @click.stop="openURL('https://thx.network/general-terms-and-conditions.pdf')"
+                >
+                    Terms
+                </b-link>
+                and
+                <b-link class="text-accent" @click.stop="openURL('https://thx.network/privacy-policy.pdf')">
+                    Privacy Policy
+                </b-link>
+            </div>
+        </b-button>
+
         <b-button
             v-if="!accountStore.isAuthenticated"
             class="w-100"
@@ -36,7 +58,7 @@
         <b-button
             v-else
             :disabled="isButtonMemberschipCreateDisabled"
-            class="w-100 mt-3"
+            class="w-100 mt-2"
             variant="success"
             @click="isModalMembershipCreateShown = true"
         >
@@ -50,6 +72,16 @@
             :lock-end="lockEnd"
             @hidden="isModalMembershipCreateShown = false"
         />
+
+        <b-button
+            variant="link"
+            href="https://docs.thx.network/faq/memberships"
+            target="_blank"
+            class="w-100 text-opaque text-white"
+        >
+            Learn more about memberships
+            <i class="fas fa-external-link-alt ms-1 small" />
+        </b-button>
     </b-card>
 </template>
 
@@ -73,6 +105,7 @@ export default defineComponent({
             error: '',
             amount: '0',
             formatUnits,
+            isAccepted: false,
             token: {
                 symbol: 'THX',
                 logoImgURL: 'https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png',
@@ -127,7 +160,7 @@ export default defineComponent({
             ];
         },
         isButtonMemberschipCreateDisabled() {
-            return !Number(this.amount);
+            return !Number(this.amount) || !this.isAccepted;
         },
     },
     watch: {
@@ -147,6 +180,9 @@ export default defineComponent({
         async onChangeToken(token: TToken) {
             this.token = token;
             this.isModalTokenSelectShown = false;
+        },
+        openURL(url: string) {
+            window.open(url, '_blank');
         },
     },
 });
