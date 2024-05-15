@@ -1,0 +1,18 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "module": "commonjs",
+        "types": ["node"],
+        // Custom
+        "noImplicitAny": false,
+        "strict": false
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/app/contracts/abis/**/*.json",
+        "../../libs/common/src/**/*",
+        "../../libs/sdk/src/**/*"
+    ],
+    "exclude": ["jest.config.ts", "src/**/*.test.ts", "../../libs/common/src/lib/scss/**/*"]
+}

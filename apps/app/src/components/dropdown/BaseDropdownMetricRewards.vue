@@ -35,7 +35,7 @@ import { toFiatPrice } from '@thxnetwork/app/utils/price';
 import { BigNumber } from 'ethers/lib/ethers';
 import { chainList } from '@thxnetwork/app/utils/chains';
 import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import { contractNetworks } from '@thxnetwork/app/config/constants';
 
 export default defineComponent({

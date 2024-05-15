@@ -12,7 +12,7 @@ import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
 import { mapStores } from 'pinia';
 import { contractNetworks } from '@thxnetwork/app/config/constants';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import poll from 'promise-poller';
 
 export default defineComponent({

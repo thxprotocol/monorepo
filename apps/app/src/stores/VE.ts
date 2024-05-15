@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import { MODE } from '../config/secrets';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { contractNetworks } from '../config/constants';

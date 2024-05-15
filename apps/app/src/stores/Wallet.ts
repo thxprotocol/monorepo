@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
-import { track } from '@thxnetwork/common/lib/mixpanel';
+import { track } from '@thxnetwork/common/mixpanel';
 import { HARDHAT_RPC, POLYGON_RPC } from '../config/secrets';
 import { useAuthStore } from './Auth';
 import { EthersAdapter, SafeConfig } from '@safe-global/protocol-kit';
 import { ethers } from 'ethers';
-import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
+import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';

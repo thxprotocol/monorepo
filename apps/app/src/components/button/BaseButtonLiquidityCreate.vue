@@ -11,7 +11,7 @@ import { BigNumber } from 'ethers/lib/ethers';
 import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
 import { mapStores } from 'pinia';
 import { BALANCER_POOL_ID, contractNetworks } from '@thxnetwork/app/config/constants';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import { POLYGON_RPC } from '@thxnetwork/app/config/secrets';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';

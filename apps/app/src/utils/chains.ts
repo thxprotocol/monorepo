@@ -5,7 +5,7 @@ import ImgLogoPolygon from '../assets/thx_logo_polygon.svg';
 import ImgLogoHardhat from '../assets/thx_logo_hardhat.svg';
 import ImgLogoLinea from '../assets/thx_logo_linea.svg';
 import { arbitrum, mainnet, bsc, polygon, hardhat, polygonZkEvm, linea } from '@wagmi/core/chains';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 
 const chainList: { [chainId: number]: ChainInfo } = {
     [ChainId.Ethereum]: {

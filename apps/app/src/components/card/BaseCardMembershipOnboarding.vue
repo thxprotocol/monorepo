@@ -90,7 +90,7 @@ import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
 import { contractNetworks } from '@thxnetwork/app/config/constants';
 import { chainList } from '@thxnetwork/app/utils/chains';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import { formatUnits } from 'ethers/lib/utils';
 import { useAuthStore } from '@thxnetwork/app/stores/Auth';
 import { useAccountStore } from '../../stores/Account';

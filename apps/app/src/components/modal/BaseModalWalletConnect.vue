@@ -47,7 +47,7 @@ import { useWalletStore } from '../../stores/Wallet';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { useAccountStore } from '@thxnetwork/app/stores/Account';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import { shortenAddress } from '@thxnetwork/app/utils/address';
 
 export default defineComponent({

@@ -125,7 +125,7 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { BALANCER_POOL_ID, contractNetworks } from '../../config/constants';
 import { parseUnits } from 'ethers/lib/utils';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
 import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import { POLYGON_RPC } from '@thxnetwork/app/config/secrets';

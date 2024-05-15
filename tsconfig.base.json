@@ -17,11 +17,13 @@
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
-        "isolatedModules": true,
+        "isolatedModules": false,
         "strict": true,
         "paths": {
+            "@thxnetwork/api*": ["apps/api/src/app*"],
             "@thxnetwork/app*": ["apps/app/src*"],
-            "@thxnetwork/common*": ["libs/common/src*"]
+            "@thxnetwork/common*": ["libs/common/src/lib*"],
+            "@thxnetwork/sdk*": ["libs/sdk/src/lib*"]
         }
     },
     "exclude": ["node_modules", "tmp"]

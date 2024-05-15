@@ -43,7 +43,7 @@ import { useWalletStore } from '../../stores/Wallet';
 import { toFiatPrice } from '@thxnetwork/app/utils/price';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { contractNetworks } from '@thxnetwork/app/config/constants';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import { chainList } from '@thxnetwork/app/utils/chains';
 import { formatUnits } from 'ethers/lib/utils';
 

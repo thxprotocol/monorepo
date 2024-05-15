@@ -61,7 +61,7 @@ import { useVeStore } from '../../stores/VE';
 import { format, differenceInDays } from 'date-fns';
 import { contractNetworks } from '../../config/constants';
 import { fromWei } from 'web3-utils';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 
 export default defineComponent({
     name: 'BaseTabWithdraw',

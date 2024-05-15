@@ -57,8 +57,8 @@ import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useQuestStore } from '../../stores/Quest';
 import { useWalletStore } from '../../stores/Wallet';
-import { ChainId } from '@thxnetwork/sdk';
-import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
+import { WalletVariant } from '../../types/enums/accountVariant';
+import { ChainId } from '@thxnetwork/common/enums';
 import imgLogoGitcoin from '../../assets/gitcoin-logo.svg';
 
 export default defineComponent({

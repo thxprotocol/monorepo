@@ -1,13 +1,13 @@
 import { BootstrapVueNext, vBTooltip } from 'bootstrap-vue-next';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import { Sentry } from '@thxnetwork/common/lib/sentry';
+import { Sentry } from '@thxnetwork/common/sentry';
 import { GCLOUD_RECAPTCHA_SITE_KEY, MODE, API_URL, MIXPANEL_TOKEN, AUTH_URL, WIDGET_URL } from './config/secrets';
 import App from './App.vue';
 import VueClipboard from 'vue3-clipboard';
 import Vue3Toastify from 'vue3-toastify';
 import router from './router';
-import Mixpanel from '@thxnetwork/common/lib/mixpanel';
+import Mixpanel from '@thxnetwork/common/mixpanel';
 
 import './scss/main.scss';
 

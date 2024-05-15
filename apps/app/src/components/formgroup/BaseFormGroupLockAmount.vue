@@ -36,7 +36,7 @@ import { contractNetworks } from '@thxnetwork/app/config/constants';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { useVeStore } from '@thxnetwork/app/stores/VE';
 import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';

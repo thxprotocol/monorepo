@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
-import { track } from '@thxnetwork/common/lib/mixpanel';
-import { QuestVariant } from '@thxnetwork/sdk';
+import { track } from '@thxnetwork/common/mixpanel';
+import { QuestVariant } from '@thxnetwork/common/enums';
 import { GCLOUD_RECAPTCHA_SITE_KEY } from '../config/secrets';
 
 export const useQuestStore = defineStore('quest', {

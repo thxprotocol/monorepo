@@ -6,7 +6,7 @@ import { BALANCER_POOL_ID, contractNetworks } from '../config/constants';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { BigNumber } from 'ethers';
 import { PoolWithMethods } from '@balancer-labs/sdk';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 
 type TCreateLiquidityOptions = {
     thxAmountInWei: string;

@@ -6,7 +6,8 @@
         "components.d.ts",
         "src/types/**/*.d.ts",
         "node_modules/**/*.d.ts",
-        "../../libs/common/**/*"
+        "../../libs/common/**/*",
+        "../../libs/sdk/**/*"
     ],
     "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

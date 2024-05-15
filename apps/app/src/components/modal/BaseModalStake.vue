@@ -45,7 +45,7 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
 
 export default defineComponent({

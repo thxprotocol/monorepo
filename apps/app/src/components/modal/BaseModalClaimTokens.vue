@@ -71,7 +71,7 @@ import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { formatUnits } from 'ethers/lib/utils';
 import { roundDownFixed, toFiatPrice } from '@thxnetwork/app/utils/price';
-import { ChainId } from '@thxnetwork/sdk';
+import { ChainId } from '@thxnetwork/common/enums';
 import { chainList } from '@thxnetwork/app/utils/chains';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';

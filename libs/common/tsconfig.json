@@ -6,6 +6,8 @@
         "strict": true,
         "noImplicitOverride": true,
         "noPropertyAccessFromIndexSignature": true,
+        "noImplicitAny": false,
+        "resolveJsonModule": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "types": ["node"],

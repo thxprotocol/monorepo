@@ -66,7 +66,7 @@ import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useQuestStore } from '../../stores/Quest';
 import { chainList, getAddressURL } from '../../utils/chains';
-import { ChainId } from '@thxnetwork/sdk/src/lib/types/enums/ChainId';
+import { ChainId } from '@thxnetwork/common/enums';
 import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
 

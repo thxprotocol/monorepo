@@ -5,7 +5,7 @@ import { tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
 import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { Wallet } from '@ethersproject/wallet';
-import { track } from '@thxnetwork/common/lib/mixpanel';
+import { track } from '@thxnetwork/common/mixpanel';
 import poll from 'promise-poller';
 import { useVeStore } from './VE';
 import { useWalletStore } from './Wallet';
