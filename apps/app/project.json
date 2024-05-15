@@ -1,0 +1,42 @@
+{
+    "name": "app",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/app/src",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "executor": "@nx/vite:build",
+            "options": {
+                "outputPath": "dist/apps/app"
+            }
+        },
+        "serve": {
+            "executor": "@nx/vite:dev-server",
+            "defaultConfiguration": "development",
+            "options": {
+                "buildTarget": "app:build",
+                "port": 8080
+            },
+            "configurations": {}
+        },
+        "notify": {
+            "dependsOn": ["^build"],
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "node notify.js {args.branch} {args.version} {args.webhook}",
+                "cwd": "dist/apps/dashboard"
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+            "executor": "@nxext/vitest:vitest",
+            "options": {
+                "vitestConfig": "apps/app/vitest.config.ts"
+            }
+        }
+    },
+    "tags": []
+}

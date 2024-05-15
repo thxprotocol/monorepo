@@ -6,7 +6,7 @@
         "start": "nx serve",
         "build": "nx build",
         "test": "nx test",
-        "serve:app": "nx serve campaign"
+        "serve:app": "nx serve app"
     },
     "private": true,
     "dependencies": {

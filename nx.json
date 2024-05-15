@@ -64,7 +64,7 @@
             }
         }
     ],
-    "defaultProject": "campaign",
+    "defaultProject": "app",
     "generators": {
         "@nx/web:application": {
             "style": "scss",
