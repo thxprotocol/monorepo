@@ -48,7 +48,7 @@ jobs:
                   key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
 
             - name: Start Hardhat RPC
-              working-directory: ./apps/api/hardhat
+              working-directory: ./apps/api/src/app/hardhat
               run: |
                   npx hardhat node --hostname 0.0.0.0 > /dev/null &
                   npx hardhat run scripts/deploy.ts --network localhost
