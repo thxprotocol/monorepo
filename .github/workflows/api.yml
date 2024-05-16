@@ -9,7 +9,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                node-version: [20.x] # Add other versions if needed
+                node-version: [18.x] # Add other versions if needed
 
         steps:
             - name: Checkout repository
@@ -48,8 +48,10 @@ jobs:
                   key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
 
             - name: Start Hardhat RPC
-              working-directory: ./libs/contracts
-              run: npx hardhat node --hostname 0.0.0.0 > /dev/null &
+              working-directory: ./apps/api/hardhat
+              run: |
+                  npx hardhat node --hostname 0.0.0.0 > /dev/null &
+                  npx hardhat run scripts/deploy.ts --network localhost
 
             - name: Start Safe Transaction Service
               run: |
