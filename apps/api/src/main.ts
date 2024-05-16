@@ -22,9 +22,9 @@ if (LOCAL_CERT && LOCAL_CERT_KEY) {
     };
     server = https.createServer(ssl, app);
     httpProxy
-        .createServer({
+        .createProxyServer({
             target: {
-                host: 'localhost',
+                host: '127.0.0.1',
                 port: 8545,
             },
             ssl,
