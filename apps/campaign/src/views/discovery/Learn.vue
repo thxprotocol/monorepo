@@ -5,7 +5,12 @@
                 Onboarding <br />
                 Quest &amp; Rewards
             </h1>
-            <p class="lead">Complete quests and earn rewards while you learn about THX Network!</p>
+            <p class="lead">
+                Get lottery tickets for NFT's at a discount and claim the Discord Role for your membership rank.
+            </p>
+            <b-button variant="success" href="https://app.thx.network/c/thx-app/rewards" target="_blank">
+                Onboarding Rewards
+            </b-button>
         </template>
         <template #secondary>
             <div
