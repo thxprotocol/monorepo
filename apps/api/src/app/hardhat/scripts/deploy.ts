@@ -2,7 +2,7 @@ import hre from 'hardhat';
 import SafeModule from '../ignition/modules/Safe';
 import BalancerModule from '../ignition/modules/Balancer';
 import { EventLog, Signer, TransactionReceipt, TransactionResponse } from 'ethers';
-import { contractArtifacts } from '../../contracts';
+import { contractArtifacts } from '..';
 
 const deploy = async (contractName: string, args: string[], signer: Signer) => {
     const artifact = contractArtifacts[contractName];

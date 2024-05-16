@@ -5,9 +5,10 @@ import { NODE_ENV } from '@thxnetwork/api/config/secrets';
 import { ChainId } from '@thxnetwork/common/enums';
 import { logger } from '@thxnetwork/api/util/logger';
 import { getProvider } from '@thxnetwork/api/util/network';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { contractArtifacts } from '@thxnetwork/api/services/ContractService';
-import { contractNetworks } from '@thxnetwork/api/contracts';
+import { contractNetworks } from '@thxnetwork/api/hardhat';
+import { BigNumber } from 'alchemy-sdk';
 
 function handleError(error: Error) {
     newrelic.noticeError(error);
@@ -52,8 +53,8 @@ async function getNetworkDetails(chainId: ChainId) {
             registry: registry.address,
             relayer: defaultAccount,
             bptGauge: bptGauge.address,
-            bpt: bpt.address,
-            bal: bal.address,
+            bpt: await bpt.getAddress(),
+            bal: await bal.getAddress(),
             thx: contractNetworks[chainId].THX,
             usdc: contractNetworks[chainId].USDC,
             vault: contractNetworks[chainId].BalancerVault,
@@ -97,8 +98,8 @@ async function getNetworkDetails(chainId: ChainId) {
                 },
             ]),
             rewards: {
-                bpt: await getRewards(bpt.address, String(currentBlock.timestamp)),
-                bal: await getRewards(bal.address, String(currentBlock.timestamp)),
+                bpt: await getRewards(await bpt.getAddress(), String(currentBlock.timestamp)),
+                bal: await getRewards(await bal.getAddress(), String(currentBlock.timestamp)),
             },
         };
         const splitter = new ethers.Contract(
