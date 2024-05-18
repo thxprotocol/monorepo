@@ -44,3 +44,6 @@ Thumbs.db
 certs/*
 
 .nx/cache
+
+# Docker
+docker/data/**/*

@@ -275,6 +275,7 @@ describe('VESytem', () => {
                 .query({ walletId: String(safeWallet._id) })
                 .send({ isEarlyAttempt: false });
             expect(status).toBe(403);
+            console.log(body);
             expect(body.error.message).toBe('Funds are locked');
         });
 

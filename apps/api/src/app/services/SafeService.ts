@@ -8,6 +8,7 @@ import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit';
 import {
     SafeMultisigTransactionResponse,
+    SafeTransactionData,
     SafeTransactionDataPartial,
     SafeVersion,
 } from '@safe-global/safe-core-sdk-types';
@@ -17,7 +18,7 @@ import { Job } from '@hokify/agenda';
 import { convertObjectIdToNumber } from '../util';
 import TransactionService from './TransactionService';
 
-function getSafeSDK(chainId: ChainId) {
+function getSafeApiKit(chainId: ChainId) {
     const { txServiceUrl, ethAdapter } = getProvider(chainId);
     return new SafeApiKit({ txServiceUrl, ethAdapter });
 }
@@ -166,19 +167,18 @@ async function proposeTransaction(wallet: WalletDocument, safeTransactionData: S
 
     // Create hash for this transaction
     const safeTxHash = await safe.getTransactionHash(safeTransaction);
-    const signedTx = await safe.signTransaction(safeTransaction);
-
-    const safeAPIKit = getSafeSDK(wallet.chainId);
+    const signature = await safe.signTransactionHash(safeTxHash);
+    const apiKit = getSafeApiKit(wallet.chainId);
 
     logger.info({ safeTxHash, nonce });
 
     try {
-        await safeAPIKit.proposeTransaction({
+        await apiKit.proposeTransaction({
             safeAddress: wallet.address,
             safeTxHash,
-            safeTransactionData: signedTx.data as any,
+            safeTransactionData: safeTransaction.data as any,
             senderAddress: toChecksumAddress(await signer.getAddress()),
-            senderSignature: signedTx.signatures[0].data,
+            senderSignature: signature.data,
         });
 
         logger.info(`Safe TX Proposed: ${safeTxHash}`);
@@ -195,8 +195,8 @@ async function confirmTransaction(wallet: WalletDocument, safeTxHash: string) {
         safeAddress: wallet.address,
         contractNetworks,
     });
-    const signedTx = await safe.signTransactionHash(safeTxHash);
-    return await confirm(wallet, safeTxHash, signedTx.data);
+    const signature = await safe.signTransactionHash(safeTxHash);
+    return await confirm(wallet, safeTxHash, signature.data);
 }
 
 async function confirm(wallet: WalletDocument, safeTxHash: string, signatureData: string) {
@@ -207,13 +207,13 @@ async function confirm(wallet: WalletDocument, safeTxHash: string, signatureData
 
 async function executeTransaction(wallet: WalletDocument, safeTxHash: string) {
     const { ethAdapter } = getProvider(wallet.chainId);
-    const safeService = getSafeSDK(wallet.chainId);
+    const apiKit = getSafeApiKit(wallet.chainId);
     const safe = await Safe.create({
         ethAdapter,
         safeAddress: wallet.address,
         contractNetworks,
     });
-    const safeTransaction = await safeService.getTransaction(safeTxHash);
+    const safeTransaction = await apiKit.getTransaction(safeTxHash);
     const executeTxResponse = await safe.executeTransaction(safeTransaction as any);
     const receipt = await executeTxResponse.transactionResponse?.wait();
     const tx = await Transaction.findOne({ safeTxHash });
@@ -224,15 +224,15 @@ async function executeTransaction(wallet: WalletDocument, safeTxHash: string) {
 }
 
 async function getLastPendingTransactions(wallet: WalletDocument) {
-    const safeService = getSafeSDK(wallet.chainId);
-    const { results }: any = await safeService.getPendingTransactions(wallet.address);
+    const apiKit = getSafeApiKit(wallet.chainId);
+    const { results }: any = await apiKit.getPendingTransactions(wallet.address);
 
     return results as unknown as SafeMultisigTransactionResponse[];
 }
 
 async function getTransaction(wallet: WalletDocument, safeTxHash: string): Promise<SafeMultisigTransactionResponse> {
-    const safeSDK = getSafeSDK(wallet.chainId);
-    return (await safeSDK.getTransaction(safeTxHash)) as unknown as SafeMultisigTransactionResponse;
+    const apiKit = getSafeApiKit(wallet.chainId);
+    return (await apiKit.getTransaction(safeTxHash)) as unknown as SafeMultisigTransactionResponse;
 }
 
 export default {

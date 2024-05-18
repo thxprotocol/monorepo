@@ -15,7 +15,9 @@ interface ErrorResponse {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const errorOutput = (error: any, req: Request, res: Response, next: NextFunction) => {
     let status = 500;
+    console.log(error);
     const response: ErrorResponse = { error: { message: 'Unable to fulfill request' } };
+    console.log(error instanceof THXHttpError);
     if (error instanceof THXHttpError || error.status) {
         status = error.status;
         response.error.message = error.message;
@@ -24,6 +26,6 @@ export const errorOutput = (error: any, req: Request, res: Response, next: NextF
         response.error.stack = error.stack;
     }
 
-    res.status(status);
-    res.json(response);
+    console.log(status, response);
+    res.status(status).json(response);
 };

@@ -178,6 +178,7 @@ async function proposeSafeAsync(
         data,
         value: '0',
     });
+    if (!safeTxHash) throw new Error("Couldn't propose transaction.");
 
     await SafeService.confirmTransaction(wallet, safeTxHash);
 

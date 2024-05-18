@@ -5,7 +5,12 @@
     "scripts": {
         "start": "nx serve",
         "build": "nx build",
-        "test": "nx test",
+        "build:safe": "docker compose exec txs-web python manage.py insert_safe_master_copy --address \"0xd916a690676e925Ac9Faf2d01869c13Fd9757ef2\"",
+        "ngrok": "~/ngrok http --domain=local.auth.thx.network https://localhost:3030  > /dev/null &",
+        "hardhat": "nx run api:hardhat",
+        "hardhat-deploy": "nx run api:hardhat-deploy",
+        "test": "NODE_OPTIONS='--max-old-space-size=8192' nx test",
+        "serve:docker": "docker-compose --env-file .env.example -f docker-compose.yml -f docker-compose.safe.yml up --build -d",
         "serve:app": "nx serve app",
         "serve:api": "NODE_TLS_REJECT_UNAUTHORIZED='0' nx serve api"
     },

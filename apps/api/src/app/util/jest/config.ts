@@ -24,7 +24,7 @@ export async function beforeAllCallback(options = { skipWalletCreation: false })
 
     const { web3, defaultAccount, ethAdapter } = getProvider(ChainId.Hardhat);
     // Wait for this hardhat log:
-    const lastDeployedContractAddress = '0x726c9c8278ec209cfbe6bbb1d02e65df6fcb7cda';
+    const lastDeployedContractAddress = '0x58C0e64cBB7E5C7D0201A3a5c2D899cC70B0dc4c';
     const fn = () => web3.eth.getCode(lastDeployedContractAddress);
     const fnCondition = (result: string) => result === '0x';
 

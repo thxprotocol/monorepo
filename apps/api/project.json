@@ -57,6 +57,22 @@
                 }
             }
         },
+        "hardhat": {
+            "dependsOn": ["^build"],
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "npx hardhat node --hostname 0.0.0.0",
+                "cwd": "apps/api/src/app/hardhat"
+            }
+        },
+        "hardhat-deploy": {
+            "dependsOn": ["^build"],
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "npx hardhat run scripts/deploy.ts --network localhost",
+                "cwd": "apps/api/src/app/hardhat"
+            }
+        },
         "lint": {
             "executor": "@nx/eslint:lint",
             "outputs": ["{options.outputFile}"],

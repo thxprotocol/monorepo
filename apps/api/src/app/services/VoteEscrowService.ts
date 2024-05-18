@@ -171,8 +171,6 @@ async function claimExternalRewardsJob() {
             );
 
             // Execute directly using the relayer
-            await ve.methods.claimExternalRewards().send();
-
             const receipt = await TransactionService.send(
                 ve.options.address,
                 ve.methods.claimExternalRewards(),

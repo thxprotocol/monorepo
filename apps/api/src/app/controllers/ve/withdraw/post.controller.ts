@@ -24,7 +24,11 @@ const controller = async ({ wallet, body }: Request, res: Response) => {
 
     // Check if client requests early exit and end date has not past
     const isEarlyWithdraw = Number(lock.end) > Number(now);
-    if (!body.isEarlyAttempt && isEarlyWithdraw) throw new ForbiddenError('Funds are locked');
+    console.log(typeof body.isEarlyAttempt, body.isEarlyAttempt, isEarlyWithdraw, Number(lock.end), Number(now));
+    if (!body.isEarlyAttempt && isEarlyWithdraw) {
+        console.log('Funds are locked');
+        throw new ForbiddenError('Funds are locked');
+    }
 
     // Propose the withdraw transaction
     const txs = await VoteEscrowService.withdraw(wallet, isEarlyWithdraw);
