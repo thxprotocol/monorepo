@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import newrelic from 'newrelic';
 import { fromWei } from 'web3-utils';
 import { NODE_ENV } from '@thxnetwork/api/config/secrets';
 import { ChainId } from '@thxnetwork/common/enums';
@@ -10,7 +9,6 @@ import { getArtifact, contractNetworks } from '@thxnetwork/api/hardhat';
 import { BigNumber } from 'alchemy-sdk';
 
 function handleError(error: Error) {
-    newrelic.noticeError(error);
     logger.error(error);
     return { error: 'invalid response' };
 }

@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+import express from 'express';
 import { assertRequestInput } from '@thxnetwork/api/middlewares';
 import { assertWallet } from '@thxnetwork/api/middlewares/assertWallet';
 
