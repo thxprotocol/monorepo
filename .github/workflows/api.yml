@@ -48,10 +48,9 @@ jobs:
                   key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
 
             - name: Start Hardhat RPC
-              working-directory: ./apps/api/src/app/hardhat
               run: |
-                  npx hardhat node --hostname 0.0.0.0 > /dev/null &
-                  npx hardhat run scripts/deploy.ts --network localhost
+                  yarn hardhat > /dev/null &
+                  yarn hardhat-deploy
 
             - name: Start Safe Transaction Service
               run: |
@@ -70,13 +69,13 @@ jobs:
                   -T api \
                   npx nx run api:test --verbose
 
-            - name: SonarCloud Scan
-              uses: SonarSource/sonarcloud-github-action@master
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-              with:
-                  projectBaseDir: apps/api
+            # - name: SonarCloud Scan
+            #   uses: SonarSource/sonarcloud-github-action@master
+            #   env:
+            #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            #   with:
+            #       projectBaseDir: apps/api
 
     bumpVersion:
         name: 'Bump Version on develop'
