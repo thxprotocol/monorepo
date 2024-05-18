@@ -1,11 +1,6 @@
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { TransactionReceipt } from 'web3-core';
 import { ChainId, TransactionState, ERC1155TokenState } from '@thxnetwork/common/enums';
-import {
-    getAbiForContractName,
-    getByteCodeForContractName,
-    getContractFromName,
-} from '@thxnetwork/api/services/ContractService';
 import { getProvider } from '@thxnetwork/api/util/network';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
@@ -26,13 +21,14 @@ import {
     ERC1155TokenDocument,
     ERC1155Token,
 } from '@thxnetwork/api/models';
+import { getArtifact } from '../hardhat';
 
-const contractName = 'THX_ERC1155';
+const contractName = 'THXERC1155';
 
 async function deploy(data: TERC1155, forceSync = true): Promise<ERC1155Document> {
-    const { defaultAccount } = getProvider(data.chainId);
-    const contract = getContractFromName(data.chainId, contractName);
-    const bytecode = getByteCodeForContractName(contractName);
+    const { web3, defaultAccount } = getProvider(data.chainId);
+    const { abi, bytecode } = getArtifact(contractName);
+    const contract = new web3.eth.Contract(abi);
     const erc1155 = await ERC1155.create(data);
     const baseURL = getBaseURL(erc1155);
     const fn = contract.deploy({
@@ -50,8 +46,7 @@ async function deploy(data: TERC1155, forceSync = true): Promise<ERC1155Document
 
 async function deployCallback({ erc1155Id }: TERC1155DeployCallbackArgs, receipt: TransactionReceipt) {
     const erc1155 = await ERC1155.findById(erc1155Id);
-    const contract = getContractFromName(erc1155.chainId, contractName);
-    const events = parseLogs(contract.options.jsonInterface, receipt.logs);
+    const events = parseLogs(erc1155.contract.options.jsonInterface, receipt.logs);
 
     if (!findEvent('OwnershipTransferred', events) && !findEvent('Transfer', events)) {
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
@@ -155,7 +150,7 @@ export async function mint(
 
 export async function mintCallback(args: TERC1155TokenMintCallbackArgs, receipt: TransactionReceipt) {
     const { erc1155tokenId } = args;
-    const abi = getAbiForContractName('THX_ERC1155');
+    const { abi } = getArtifact(contractName);
     const events = parseLogs(abi, receipt.logs);
     const event = assertEvent('TransferSingle', events);
 
@@ -229,7 +224,7 @@ export async function transferFrom(
 
 export async function transferFromCallback(args: TERC1155TransferFromCallbackArgs, receipt: TransactionReceipt) {
     const { erc1155TokenId, walletId } = args;
-    const abi = getAbiForContractName('THX_ERC1155');
+    const { abi } = getArtifact(contractName);
     const events = parseLogs(abi, receipt.logs);
     const event = assertEvent('TransferSingle', events);
     const wallet = await SafeService.findById(walletId);
@@ -314,7 +309,9 @@ export const update = (erc1155: ERC1155Document, updates: Partial<TERC1155>) => 
 };
 
 export const getOnChainERC1155Token = async (chainId: number, address: string) => {
-    const contract = getContractFromName(chainId, contractName, address);
+    const { web3 } = getProvider(chainId);
+    const { abi } = getArtifact(contractName);
+    const contract = new web3.eth.Contract(abi, address);
     const uri = await contract.methods.uri(1).call();
 
     return { uri };

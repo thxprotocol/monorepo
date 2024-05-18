@@ -1,9 +1,8 @@
 import { ethers } from 'ethers';
-import { PRIVATE_KEY } from '@thxnetwork/api/config/secrets';
-import { contractArtifacts, contractNetworks } from '@thxnetwork/api/contracts';
-import { ChainId } from '@thxnetwork/common/enums';
 import { parseUnits } from 'ethers/lib/utils';
-import TransactionService from '@thxnetwork/api/services/TransactionService';
+import { PRIVATE_KEY } from '@thxnetwork/api/config/secrets';
+import { getArtifact, contractNetworks } from '@thxnetwork/api/hardhat';
+import { ChainId } from '@thxnetwork/common/enums';
 
 async function increaseBlockTime(provider, seconds) {
     await provider.send('evm_increaseTime', [seconds]);
@@ -21,10 +20,10 @@ export default async function main() {
     const chainId = ChainId.Hardhat;
     const signer = new ethers.Wallet(PRIVATE_KEY, hardhatProvider) as unknown as ethers.Signer;
 
-    const usdc = new ethers.Contract(contractNetworks[chainId].USDC, contractArtifacts['USDC'].abi, signer);
+    const usdc = new ethers.Contract(contractNetworks[chainId].USDC, getArtifact('USDC').abi, signer);
     await usdc.transfer(TO, AMOUNT_USDC);
 
-    const thx = new ethers.Contract(contractNetworks[chainId].THX, contractArtifacts['THX'].abi, signer);
+    const thx = new ethers.Contract(contractNetworks[chainId].THX, getArtifact('THX').abi, signer);
     await thx.transfer(TO, AMOUNT_THX);
 
     // Increase time till past veTHX reward distribution start time

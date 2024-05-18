@@ -1,7 +1,7 @@
-import { ethers } from 'ethers';
 import { PRIVATE_KEY } from '@thxnetwork/api/config/secrets';
-import { contractArtifacts, contractNetworks } from '@thxnetwork/api/contracts';
+import { contractNetworks, getArtifact } from '@thxnetwork/api/hardhat';
 import { ChainId } from '@thxnetwork/common/enums';
+import { ethers } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
 import { increaseBlockTime } from './time';
 
@@ -10,11 +10,11 @@ export default async function main() {
     const hardhatProvider = new ethers.providers.JsonRpcProvider(HARDHAT_RPC);
     const chainId = ChainId.Hardhat;
     const signer = new ethers.Wallet(PRIVATE_KEY, hardhatProvider) as unknown as ethers.Signer;
-    const bpt = new ethers.Contract(contractNetworks[chainId].BPT, contractArtifacts['BPT'].abi, signer);
-    const bal = new ethers.Contract(contractNetworks[chainId].BAL, contractArtifacts['BAL'].abi, signer);
+    const bpt = new ethers.Contract(contractNetworks[chainId].BPT, getArtifact('BPT').abi, signer);
+    const bal = new ethers.Contract(contractNetworks[chainId].BAL, getArtifact('BAL').abi, signer);
     const rewardFaucet = new ethers.Contract(
         contractNetworks[chainId].RewardFaucet,
-        contractArtifacts['RewardFaucet'].abi,
+        getArtifact('RewardFaucet').abi,
         signer,
     );
     const AMOUNTBAL = parseUnits('100').toString();

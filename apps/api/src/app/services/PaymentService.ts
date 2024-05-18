@@ -1,13 +1,13 @@
-import { contractArtifacts, contractNetworks } from '@thxnetwork/api/contracts';
+import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
 import { Pool, WalletDocument } from '../models';
 import { getProvider } from '../util/network';
-import { BigNumber } from 'ethers';
+import { BigNumber } from 'alchemy-sdk';
 import { differenceInSeconds, isBefore, subWeeks } from 'date-fns';
-import { getContract } from './ContractService';
 import { AccountPlanType, ChainId } from '@thxnetwork/common/enums';
 import { Payment } from '../models/Payment';
 import { planPricingMap } from '@thxnetwork/common/constants';
 import { parseUnits } from 'ethers/lib/utils';
+import ContractService from './ContractService';
 import TransactionService from './TransactionService';
 import SafeService from './SafeService';
 import BalancerService from './BalancerService';
@@ -39,13 +39,13 @@ export default class PaymentService {
             return '0';
         }
 
-        const splitter = getContract('THXPaymentSplitter', wallet.chainId, THXPaymentSplitter);
+        const splitter = ContractService.getContract('THXPaymentSplitter', wallet.chainId, THXPaymentSplitter);
         const balance = await splitter.balanceOf(wallet.address);
         return balance.toString();
     }
 
     static async getRate(wallet: WalletDocument) {
-        const splitter = getContract(
+        const splitter = ContractService.getContract(
             'THXPaymentSplitter',
             wallet.chainId,
             contractNetworks[wallet.chainId].THXPaymentSplitter,
@@ -64,7 +64,7 @@ export default class PaymentService {
         // Convert plan pricing to rate in wei per second
         const pricing = planPricingMap[plan];
         // Using 6 decimals for USDC
-        const costInWeiPerThirtyDays = parseUnits(pricing.costSubscription.toString(), 6);
+        const costInWeiPerThirtyDays = BigNumber.from(parseUnits(pricing.costSubscription.toString(), 6));
         // Plan pricing is determined on a per 4 week basis
         const rateInWeiPerSecond = costInWeiPerThirtyDays.div(4 * 7 * 24 * 60 * 60);
         const fn = contract.methods.setRate(rateInWeiPerSecond);

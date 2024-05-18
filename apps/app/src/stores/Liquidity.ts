@@ -4,7 +4,7 @@ import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
 import { BALANCER_POOL_ID, contractNetworks } from '../config/constants';
 import { WalletVariant } from '../types/enums/accountVariant';
-import { BigNumber } from 'ethers';
+import { BigNumber } from 'alchemy-sdk';
 import { PoolWithMethods } from '@balancer-labs/sdk';
 import { ChainId } from '@thxnetwork/common/enums';
 

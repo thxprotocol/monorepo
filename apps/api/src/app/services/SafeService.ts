@@ -1,8 +1,8 @@
 import { Wallet, WalletDocument, Pool, PoolDocument, Transaction } from '@thxnetwork/api/models';
 import { ChainId, WalletVariant } from '@thxnetwork/common/enums';
 import { getProvider } from '@thxnetwork/api/util/network';
-import { contractNetworks } from '@thxnetwork/api/contracts';
-import { getChainId, safeVersion } from '@thxnetwork/api/services/ContractService';
+import { contractNetworks } from '@thxnetwork/api/hardhat';
+import ContractService, { safeVersion } from '@thxnetwork/api/services/ContractService';
 import { toChecksumAddress } from 'web3-utils';
 import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
@@ -121,7 +121,7 @@ function findOneByAddress(address: string) {
 async function findOneByPool(pool: PoolDocument, chainId?: ChainId) {
     return await Wallet.findOne({
         poolId: pool.id,
-        chainId: chainId || getChainId(),
+        chainId: chainId || ContractService.getChainId(),
         sub: pool.sub,
         safeVersion,
     });
@@ -151,19 +151,23 @@ async function createSwapOwnerTransaction(wallet: WalletDocument, oldOwnerAddres
 
 async function proposeTransaction(wallet: WalletDocument, safeTransactionData: SafeTransactionDataPartial) {
     const { ethAdapter, signer } = getProvider(wallet.chainId);
-    const safeSdk = await Safe.create({
+    const safe = await Safe.create({
         ethAdapter,
         safeAddress: wallet.address,
         contractNetworks,
     });
 
     // Get nonce for this Safes transaction
-    const nonce = await safeSdk.getNonce();
-    const safeTransaction = await safeSdk.createTransaction({ safeTransactionData, options: { nonce: nonce + 1 } });
+    const nonce = await safe.getNonce();
+    const safeTransaction = await safe.createTransaction({
+        safeTransactionData,
+        options: { nonce: nonce + 1 },
+    });
 
     // Create hash for this transaction
-    const safeTxHash = await safeSdk.getTransactionHash(safeTransaction);
-    const senderSignature = await safeSdk.signTransactionHash(safeTxHash);
+    const safeTxHash = await safe.getTransactionHash(safeTransaction);
+    const signedTx = await safe.signTransaction(safeTransaction);
+
     const safeAPIKit = getSafeSDK(wallet.chainId);
 
     logger.info({ safeTxHash, nonce });
@@ -172,9 +176,9 @@ async function proposeTransaction(wallet: WalletDocument, safeTransactionData: S
         await safeAPIKit.proposeTransaction({
             safeAddress: wallet.address,
             safeTxHash,
-            safeTransactionData: safeTransaction.data as any,
+            safeTransactionData: signedTx.data as any,
             senderAddress: toChecksumAddress(await signer.getAddress()),
-            senderSignature: senderSignature.data,
+            senderSignature: signedTx.signatures[0].data,
         });
 
         logger.info(`Safe TX Proposed: ${safeTxHash}`);
@@ -191,25 +195,26 @@ async function confirmTransaction(wallet: WalletDocument, safeTxHash: string) {
         safeAddress: wallet.address,
         contractNetworks,
     });
-    const signature = await safe.signTransactionHash(safeTxHash);
-    return await confirm(wallet, safeTxHash, signature.data);
+    const signedTx = await safe.signTransactionHash(safeTxHash);
+    return await confirm(wallet, safeTxHash, signedTx.data);
 }
 
 async function confirm(wallet: WalletDocument, safeTxHash: string, signatureData: string) {
-    const safeSDK = getSafeSDK(wallet.chainId);
-    return await safeSDK.confirmTransaction(safeTxHash, signatureData);
+    const { txServiceUrl, ethAdapter } = getProvider(wallet.chainId);
+    const apiKit = new SafeApiKit({ ethAdapter, txServiceUrl });
+    return await apiKit.confirmTransaction(safeTxHash, signatureData);
 }
 
 async function executeTransaction(wallet: WalletDocument, safeTxHash: string) {
     const { ethAdapter } = getProvider(wallet.chainId);
     const safeService = getSafeSDK(wallet.chainId);
-    const safeSdk = await Safe.create({
+    const safe = await Safe.create({
         ethAdapter,
         safeAddress: wallet.address,
         contractNetworks,
     });
     const safeTransaction = await safeService.getTransaction(safeTxHash);
-    const executeTxResponse = await safeSdk.executeTransaction(safeTransaction as any);
+    const executeTxResponse = await safe.executeTransaction(safeTransaction as any);
     const receipt = await executeTxResponse.transactionResponse?.wait();
     const tx = await Transaction.findOne({ safeTxHash });
 

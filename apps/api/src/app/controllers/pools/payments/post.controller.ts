@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { InsufficientAllowanceError, InsufficientBalanceError, NotFoundError } from '@thxnetwork/api/util/errors';
 import { body, param } from 'express-validator';
-import { BigNumber } from 'ethers';
-import { contractArtifacts, contractNetworks } from '@thxnetwork/api/contracts';
+import { BigNumber } from 'alchemy-sdk';
+import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
 import { getProvider } from '@thxnetwork/api/util/network';
 import PoolService from '@thxnetwork/api/services/PoolService';
 import SafeService from '@thxnetwork/api/services/SafeService';

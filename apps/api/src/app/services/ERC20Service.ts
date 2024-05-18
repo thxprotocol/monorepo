@@ -1,11 +1,10 @@
 import { toChecksumAddress } from 'web3-utils';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import { ChainId, ERC20Type, TransactionState } from '@thxnetwork/common/enums';
-import { getByteCodeForContractName, getContractFromName } from '@thxnetwork/api/services/ContractService';
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { getProvider } from '@thxnetwork/api/util/network';
 import { TransactionReceipt } from 'web3-core';
-import { contractNetworks, TokenContractName } from '@thxnetwork/api/contracts';
+import { contractNetworks, getArtifact } from '@thxnetwork/api/hardhat';
 import {
     ERC20,
     ERC20Document,
@@ -66,10 +65,9 @@ export const deploy = async (params: Partial<TERC20>, forceSync = true) => {
         sub: params.sub,
         logoImgUrl: params.logoImgUrl,
     });
-
-    const contract = getContractFromName(params.chainId, erc20.contractName as TokenContractName);
-    const bytecode = getByteCodeForContractName(erc20.contractName as TokenContractName);
-
+    const { web3 } = getProvider(erc20.chainId);
+    const { abi, bytecode } = getArtifact(erc20.contractName);
+    const contract = new web3.eth.Contract(abi);
     const fn = contract.deploy({
         data: bytecode,
         arguments: getDeployArgs(erc20, String(params.totalSupply)),
@@ -85,7 +83,10 @@ export const deploy = async (params: Partial<TERC20>, forceSync = true) => {
 
 export async function deployCallback({ erc20Id }: TERC20DeployCallbackArgs, receipt: TransactionReceipt) {
     const erc20 = await ERC20.findById(erc20Id);
-    const contract = getContractFromName(erc20.chainId, erc20.contractName as TokenContractName);
+    const { chainId } = erc20;
+    const { web3 } = getProvider(chainId);
+    const { abi } = getArtifact(erc20.contractName);
+    const contract = new web3.eth.Contract(abi);
     const events = parseLogs(contract.options.jsonInterface, receipt.logs);
 
     // Limited and unlimited tokes emit different events. Check if one of the two is emitted.
@@ -188,7 +189,9 @@ export const addTokenForWallet = async (erc20: ERC20Document, wallet: WalletDocu
 };
 
 export const importToken = async (chainId: number, address: string, sub: string, logoImgUrl: string) => {
-    const contract = getContractFromName(chainId, 'LimitedSupplyToken', address);
+    const { web3 } = getProvider(chainId);
+    const { abi } = getArtifact('THXERC20_LimitedSupply');
+    const contract = new web3.eth.Contract(abi);
     const [name, symbol] = await Promise.all([contract.methods.name().call(), contract.methods.symbol().call()]);
     const erc20 = await ERC20.create({
         name,
@@ -259,11 +262,11 @@ async function isMinter(erc20: ERC20Document, address: string) {
     return await erc20.contract.methods.hasRole(keccak256(toUtf8Bytes('MINTER_ROLE')), address).call();
 }
 
-async function createERC20Token(erc20: ERC20Document, wallet: TWallet) {
+async function createERC20Token(erc20: ERC20Document, wallet: WalletDocument) {
     await ERC20Token.create({
         sub: wallet.sub,
-        walletId: String(wallet._id),
-        erc20Id: String(erc20._id),
+        walletId: wallet.id,
+        erc20Id: erc20.id,
     });
 }
 
@@ -299,7 +302,9 @@ async function findDefaultTokens(wallet: WalletDocument) {
     ];
 
     const promises = defaultContracts.map(async (erc20) => {
-        const contract = getContractFromName(erc20.chainId, 'LimitedSupplyToken', erc20.address);
+        const { web3 } = getProvider(erc20.chainId);
+        const { abi } = getArtifact('THXERC20_LimitedSupply');
+        const contract = new web3.eth.Contract(abi, erc20.address);
         const walletBalanceInWei = await contract.methods.balanceOf(wallet.address).call();
         const walletBalance = Number(fromWei(walletBalanceInWei));
         return {

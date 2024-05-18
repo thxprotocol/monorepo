@@ -1,13 +1,13 @@
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { WEBHOOK_SIGNING_SECRET } from '@thxnetwork/api/config/secrets';
 import { Wallet } from '@thxnetwork/api/models';
-import VoteEscrowService from '@thxnetwork/api/services/VoteEscrowService';
-import crypto from 'crypto';
-import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 import { logger } from '@thxnetwork/api/util/logger';
-import BalancerService from '@thxnetwork/api/services/BalancerService';
 import { formatUnits } from 'ethers/lib/utils';
+import VoteEscrowService from '@thxnetwork/api/services/VoteEscrowService';
+import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
+import BalancerService from '@thxnetwork/api/services/BalancerService';
 
 const validation = [body('payload').isString(), body('signature').isString()];
 

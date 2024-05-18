@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { WalletVariant, AccountVariant } from '@thxnetwork/common/enums';
-import { getChainId } from '@thxnetwork/api/services/ContractService';
 import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 import WalletService from '@thxnetwork/api/services/WalletService';
 import THXService from '@thxnetwork/api/services/THXService';
+import ContractService from '@thxnetwork/api/services/ContractService';
 
 const validation = [];
 
@@ -28,7 +28,7 @@ const controller = async (req: Request, res: Response) => {
             await WalletService.createWalletConnect({
                 sub: req.auth.sub,
                 address: account.address,
-                chainId: getChainId(),
+                chainId: ContractService.getChainId(),
             });
         }
     }

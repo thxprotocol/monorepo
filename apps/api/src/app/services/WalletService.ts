@@ -1,7 +1,7 @@
 import { Wallet } from '@thxnetwork/api/models/Wallet';
 import { TransactionState, WalletVariant } from '@thxnetwork/common/enums';
 import { Transaction } from '@thxnetwork/api/models/Transaction';
-import { getChainId, safeVersion } from './ContractService';
+import ContractService, { safeVersion } from './ContractService';
 import SafeService from './SafeService';
 
 export default class WalletService {
@@ -41,7 +41,7 @@ export default class WalletService {
     }
 
     static create(variant: WalletVariant, data: Partial<TWallet>) {
-        const chainId = getChainId();
+        const chainId = ContractService.getChainId();
         const map = {
             [WalletVariant.Safe]: WalletService.createSafe,
             [WalletVariant.WalletConnect]: WalletService.createWalletConnect,

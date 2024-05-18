@@ -9,15 +9,15 @@ import {
     SAFE_TXS_SERVICE,
 } from '@thxnetwork/api/config/secrets';
 import Web3 from 'web3';
+import { ethers, Signer, Wallet } from 'ethers';
 import { Contract } from 'web3-eth-contract';
-import { arrayify, computeAddress, hashMessage, recoverPublicKey } from 'ethers/lib/utils';
-import { Signer, Wallet, ethers } from 'ethers';
+import { recoverAddress, hashMessage } from 'ethers/lib/utils';
 import { EthersAdapter } from '@safe-global/protocol-kit';
 import { DefenderRelaySigner } from '@openzeppelin/defender-relay-client/lib/ethers';
 import { Relayer } from '@openzeppelin/defender-relay-client';
 import { DefenderRelayProvider } from '@openzeppelin/defender-relay-client/lib/web3';
-import { getChainId } from '@thxnetwork/api/services/ContractService';
 import { ChainId } from '@thxnetwork/common/enums';
+import ContractService from '@thxnetwork/api/services/ContractService';
 
 export const MaxUint256 = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
 
@@ -28,7 +28,6 @@ const networks: {
         txServiceUrl: string;
         signer: Signer;
         ethAdapter: any;
-        readProvider: Web3;
         defaultAccount: string;
         relayer?: Relayer;
     };
@@ -37,8 +36,7 @@ const networks: {
 if (HARDHAT_RPC) {
     networks[ChainId.Hardhat] = (() => {
         const web3 = new Web3(HARDHAT_RPC);
-        const hardhatProvider = new ethers.providers.JsonRpcProvider(HARDHAT_RPC);
-        const signer = new Wallet(PRIVATE_KEY, hardhatProvider) as unknown as Signer;
+        const signer = new Wallet(PRIVATE_KEY, new ethers.providers.JsonRpcProvider(HARDHAT_RPC));
         const methods = [
             { name: 'setAutomine', call: 'evm_setAutomine', params: 1 },
             { name: 'setIntervalMining', call: 'evm_setIntervalMining', params: 1 },
@@ -47,10 +45,9 @@ if (HARDHAT_RPC) {
         return {
             web3,
             txServiceUrl: SAFE_TXS_SERVICE,
-            ethAdapter: new EthersAdapter({ ethers, signerOrProvider: signer }),
+            ethAdapter: new EthersAdapter({ ethers, signerOrProvider: signer as any }),
             signer,
             defaultAccount: web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY).address,
-            readProvider: web3,
         };
     })();
 }
@@ -62,33 +59,34 @@ if (POLYGON_RELAYER) {
             { speed: RELAYER_SPEED },
         );
         const relayer = new Relayer({ apiKey: POLYGON_RELAYER_API_KEY, apiSecret: POLYGON_RELAYER_API_SECRET });
-        const readProvider = new Web3(POLYGON_RPC);
         const signer = new DefenderRelaySigner(
             { apiKey: POLYGON_RELAYER_API_KEY, apiSecret: POLYGON_RELAYER_API_SECRET },
             new ethers.providers.JsonRpcProvider(POLYGON_RPC),
             { speed: RELAYER_SPEED },
-        );
+        ) as unknown as Signer;
 
         return {
             web3: new Web3(provider),
             txServiceUrl: SAFE_TXS_SERVICE,
-            ethAdapter: new EthersAdapter({ ethers, signerOrProvider: signer }),
+            ethAdapter: new EthersAdapter({
+                ethers,
+                signerOrProvider: signer as any,
+            }),
             signer,
             relayer,
             defaultAccount: POLYGON_RELAYER,
-            readProvider,
         };
     })();
 }
 
 export function getProvider(chainId?: ChainId) {
-    if (!chainId) chainId = getChainId();
+    if (!chainId) chainId = ContractService.getChainId();
     if (!networks[chainId]) throw new Error(`Network with chainId ${chainId} is not available`);
     return networks[chainId];
 }
 
 export const recoverSigner = (message: string, sig: string) => {
-    return computeAddress(recoverPublicKey(arrayify(hashMessage(message)), sig));
+    return recoverAddress(hashMessage(message), sig);
 };
 
 export function getSelectors(contract: Contract) {

@@ -6,8 +6,7 @@ import { ChainId } from '@thxnetwork/common/enums';
 import { logger } from '@thxnetwork/api/util/logger';
 import { getProvider } from '@thxnetwork/api/util/network';
 import { ethers } from 'ethers';
-import { contractArtifacts } from '@thxnetwork/api/services/ContractService';
-import { contractNetworks } from '@thxnetwork/api/hardhat';
+import { getArtifact, contractNetworks } from '@thxnetwork/api/hardhat';
 import { BigNumber } from 'alchemy-sdk';
 
 function handleError(error: Error) {
@@ -21,31 +20,27 @@ async function getNetworkDetails(chainId: ChainId) {
         const { defaultAccount, web3, signer } = getProvider(chainId);
         const rfthx = new ethers.Contract(
             contractNetworks[chainId].RewardFaucet,
-            contractArtifacts['RewardFaucet'].abi,
+            getArtifact('RewardFaucet').abi,
             signer,
         );
         const registry = new ethers.Contract(
             contractNetworks[chainId].THXRegistry,
-            contractArtifacts['THXRegistry'].abi,
+            getArtifact('THXRegistry').abi,
             signer,
         );
         const rdthx = new ethers.Contract(
             contractNetworks[chainId].RewardDistributor,
-            contractArtifacts['RewardDistributor'].abi,
+            getArtifact('RewardDistributor').abi,
             signer,
         );
-        const bpt = new ethers.Contract(contractNetworks[chainId].BPT, contractArtifacts['BPT'].abi, signer);
-        const bptGauge = new ethers.Contract(
-            contractNetworks[chainId].BPTGauge,
-            contractArtifacts['BPTGauge'].abi,
-            signer,
-        );
+        const bpt = new ethers.Contract(contractNetworks[chainId].BPT, getArtifact('BPT').abi, signer);
+        const bptGauge = new ethers.Contract(contractNetworks[chainId].BPTGauge, getArtifact('BPTGauge').abi, signer);
         const veTHX = new ethers.Contract(
             contractNetworks[chainId].VotingEscrow,
-            contractArtifacts['VotingEscrow'].abi,
+            getArtifact('VotingEscrow').abi,
             signer,
         );
-        const bal = new ethers.Contract(contractNetworks[chainId].BAL, contractArtifacts['BAL'].abi, signer);
+        const bal = new ethers.Contract(contractNetworks[chainId].BAL, getArtifact('BAL').abi, signer);
         // const thx = new ethers.Contract(contractNetworks[chainId].THX, contractArtifacts['THX'].abi, signer);
         // const usdc = new ethers.Contract(contractNetworks[chainId].USDC, contractArtifacts['USDC'].abi, signer);
 
@@ -104,7 +99,7 @@ async function getNetworkDetails(chainId: ChainId) {
         };
         const splitter = new ethers.Contract(
             contractNetworks[chainId].THXPaymentSplitter,
-            contractArtifacts['THXPaymentSplitter'].abi,
+            getArtifact('THXPaymentSplitter').abi,
             signer,
         );
 

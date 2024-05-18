@@ -33,7 +33,7 @@ import MailService from './MailService';
 import SafeService from './SafeService';
 import ParticipantService from './ParticipantService';
 import DiscordService from './DiscordService';
-import { getContract } from './ContractService';
+import ContractService from './ContractService';
 
 export const ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -121,7 +121,7 @@ function getAll() {
 }
 
 async function balanceOf(safe: WalletDocument) {
-    const contract = getContract('USDC', safe.chainId, safe.address);
+    const contract = ContractService.getContract('USDC', safe.chainId, safe.address);
     return await contract.balanceOf(safe.address);
 }
 

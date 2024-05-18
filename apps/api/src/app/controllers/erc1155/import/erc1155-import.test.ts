@@ -10,8 +10,8 @@ import { deployERC1155, mockGetNftsForOwner } from '@thxnetwork/api/util/jest/er
 import { PoolDocument } from '@thxnetwork/api/models';
 import { Contract } from 'web3-eth-contract';
 import { getProvider } from '@thxnetwork/api/util/network';
-import TransactionService from '@thxnetwork/api/services/TransactionService';
 import { ethers } from 'ethers';
+import TransactionService from '@thxnetwork/api/services/TransactionService';
 
 const user = request.agent(app);
 

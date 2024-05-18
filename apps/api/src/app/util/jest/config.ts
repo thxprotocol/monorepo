@@ -15,7 +15,7 @@ import {
 } from './constants';
 import { Wallet } from '@thxnetwork/api/models';
 import Safe, { SafeFactory } from '@safe-global/protocol-kit';
-import { contractNetworks } from '@thxnetwork/api/contracts';
+import { contractNetworks } from '@thxnetwork/api/hardhat';
 import { poll } from '../polling';
 import { agenda } from '../agenda';
 

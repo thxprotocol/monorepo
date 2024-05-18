@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { getAbiForContractName } from '@thxnetwork/api/services/ContractService';
 import { getProvider } from '@thxnetwork/api/util/network';
+import { getArtifact } from '../hardhat';
 
 export type ERC721Document = mongoose.Document & TERC721;
 
@@ -23,9 +23,9 @@ const schema = new mongoose.Schema(
 
 schema.virtual('contract').get(function () {
     if (!this.address) return;
-    const { readProvider, defaultAccount } = getProvider(this.chainId);
-    const abi = getAbiForContractName('NonFungibleToken');
-    return new readProvider.eth.Contract(abi, this.address, { from: defaultAccount });
+    const { web3, defaultAccount } = getProvider(this.chainId);
+    const { abi } = getArtifact('THXERC721');
+    return new web3.eth.Contract(abi, this.address, { from: defaultAccount });
 });
 
 export const ERC721 = mongoose.model<ERC721Document>('ERC721', schema, 'erc721');

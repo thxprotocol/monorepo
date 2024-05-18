@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { body } from 'express-validator';
-import { getChainId, safeVersion } from '@thxnetwork/api/services/ContractService';
+import ContractService, { safeVersion } from '@thxnetwork/api/services/ContractService';
 import PoolService from '@thxnetwork/api/services/PoolService';
 import SafeService from '@thxnetwork/api/services/SafeService';
 
@@ -12,7 +12,7 @@ const controller = async (req: Request, res: Response) => {
 
     // Deploy a Safe for the campaign
     const poolId = String(pool._id);
-    const chainId = getChainId();
+    const chainId = ContractService.getChainId();
     const safe = await SafeService.create({ chainId, sub: req.auth.sub, safeVersion, poolId });
 
     // Update predicted safe address for pool

@@ -9,7 +9,7 @@ import {
 import { RewardCoinPayment } from '@thxnetwork/api/models';
 import { IRewardService } from './interfaces/IRewardService';
 import { ChainId, ERC20Type, TransactionState } from '@thxnetwork/common/enums';
-import { BigNumber } from 'ethers';
+import { BigNumber } from 'alchemy-sdk';
 import AccountProxy from '../proxies/AccountProxy';
 import ERC20Service from './ERC20Service';
 import MailService from './MailService';

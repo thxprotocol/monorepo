@@ -1,7 +1,8 @@
+import { ethers } from 'ethers';
 import { QuestWeb3Entry, QuestWeb3 } from '@thxnetwork/api/models';
-import { BigNumber, ethers } from 'ethers';
 import { logger } from '@thxnetwork/api/util/logger';
 import { IQuestService } from './interfaces/IQuestService';
+import { BigNumber } from 'alchemy-sdk';
 
 export default class QuestWeb3Service implements IQuestService {
     models = {

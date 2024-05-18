@@ -7,7 +7,7 @@ type TERC20 = {
     transactions: string[];
     chainId?: ChainId;
     contract?: Contract;
-    contractName?: string;
+    contractName?: TContractName;
     sub?: string;
     totalSupply: number;
     decimals?: number;

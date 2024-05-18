@@ -1,6 +1,5 @@
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { TransactionReceipt } from 'web3-core';
-import { getByteCodeForContractName, getContractFromName } from '@thxnetwork/api/services/ContractService';
 import { ERC721, ERC721Document } from '@thxnetwork/api/models/ERC721';
 import { ERC721Metadata, ERC721MetadataDocument } from '@thxnetwork/api/models/ERC721Metadata';
 import { ERC721Token, ERC721TokenDocument } from '@thxnetwork/api/models/ERC721Token';
@@ -11,17 +10,18 @@ import { getProvider } from '@thxnetwork/api/util/network';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { WalletDocument } from '../models/Wallet';
 import { RewardNFT } from '../models/RewardNFT';
+import { getArtifact } from '../hardhat';
 import PoolService from './PoolService';
 import TransactionService from './TransactionService';
 import IPFSService from './IPFSService';
 import WalletService from './WalletService';
 
-const contractName = 'NonFungibleToken';
+const contractName = 'THXERC721';
 
 async function deploy(data: TERC721, forceSync = true): Promise<ERC721Document> {
-    const { defaultAccount } = getProvider(data.chainId);
-    const contract = getContractFromName(data.chainId, contractName);
-    const bytecode = getByteCodeForContractName(contractName);
+    const { web3, defaultAccount } = getProvider(data.chainId);
+    const { abi, bytecode } = getArtifact(contractName);
+    const contract = new web3.eth.Contract(abi);
     const erc721 = await ERC721.create(data);
     const fn = contract.deploy({
         data: bytecode,
@@ -37,8 +37,7 @@ async function deploy(data: TERC721, forceSync = true): Promise<ERC721Document> 
 
 async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: TransactionReceipt) {
     const erc721 = await ERC721.findById(erc721Id);
-    const contract = getContractFromName(erc721.chainId, contractName);
-    const events = parseLogs(contract.options.jsonInterface, receipt.logs);
+    const events = parseLogs(erc721.contract.options.jsonInterface, receipt.logs);
 
     if (!findEvent('OwnershipTransferred', events) && !findEvent('Transfer', events)) {
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
@@ -194,8 +193,9 @@ async function findMetadataByNFT(erc721Id: string, page = 1, limit = 10) {
 }
 
 export const getOnChainERC721Token = async (chainId: number, address: string) => {
-    const contract = getContractFromName(chainId, 'NonFungibleToken', address);
-
+    const { web3 } = getProvider(chainId);
+    const { abi } = getArtifact(contractName);
+    const contract = new web3.eth.Contract(abi, address);
     const [name, symbol, totalSupply] = await Promise.all([
         contract.methods.name().call(),
         contract.methods.symbol().call(),

@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { body, query } from 'express-validator';
 import { ForbiddenError, NotFoundError } from '@thxnetwork/api/util/errors';
 import { getProvider } from '@thxnetwork/api/util/network';
-import { BigNumber } from 'ethers';
-import { getAbiForContractName } from '@thxnetwork/api/services/ContractService';
+import { BigNumber } from 'alchemy-sdk';
+import { getArtifact } from '@thxnetwork/api/hardhat';
 import TransactionService from '@thxnetwork/api/services/TransactionService';
 import WalletService from '@thxnetwork/api/services/WalletService';
 
@@ -21,14 +21,14 @@ const controller = async (req: Request, res: Response) => {
     if (wallet.sub !== req.auth.sub) throw new ForbiddenError('Wallet not owned by sub.');
 
     const { web3 } = getProvider(wallet.chainId);
-
-    const abi = getAbiForContractName('LimitedSupplyToken');
+    const { abi } = getArtifact('THXERC20_LimitedSupply');
     const contract = new web3.eth.Contract(abi, req.body.tokenAddress);
     const amount = await contract.methods.balanceOf(wallet.address).call();
 
     // Check sufficient BPT Balance
-    if (BigNumber.from(amount).lt(BigNumber.from(req.body.amountInWei)))
+    if (BigNumber.from(amount).lt(BigNumber.from(req.body.amountInWei))) {
         throw new ForbiddenError('Insufficient balance');
+    }
 
     const fn = contract.methods.approve(req.body.spender, req.body.amountInWei);
 

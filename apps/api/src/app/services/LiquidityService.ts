@@ -1,6 +1,5 @@
-import { contractNetworks } from '@thxnetwork/api/contracts';
+import { contractNetworks, getArtifact } from '@thxnetwork/api/hardhat';
 import { WalletDocument } from '../models/Wallet';
-import { contractArtifacts } from './ContractService';
 import { getProvider } from '../util/network';
 import TransactionService from './TransactionService';
 import BalancerService from './BalancerService';
@@ -15,10 +14,7 @@ export default class LiquidityService {
         const { web3 } = getProvider(wallet.chainId);
 
         // Deposit the BPT into the gauge
-        const bptGauge = new web3.eth.Contract(
-            contractArtifacts['BPTGauge'].abi,
-            contractNetworks[wallet.chainId].BPTGauge,
-        );
+        const bptGauge = new web3.eth.Contract(getArtifact('BPTGauge').abi, contractNetworks[wallet.chainId].BPTGauge);
         const fn = bptGauge.methods.deposit(amountInWei);
 
         // Propose tx data to relayer and return safeTxHash to client to sign

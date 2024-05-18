@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { body, query } from 'express-validator';
 import { ForbiddenError } from '@thxnetwork/api/util/errors';
-import { BigNumber } from 'ethers';
+import { BigNumber } from 'alchemy-sdk';
 import { getProvider } from '@thxnetwork/api/util/network';
-import { contractNetworks } from '@thxnetwork/api/contracts';
+import { contractNetworks } from '@thxnetwork/api/hardhat';
 import VoteEscrowService from '@thxnetwork/api/services/VoteEscrowService';
 
 const validation = [body('amountInWei').isString(), body('lockEndTimestamp').isInt(), query('walletId').isMongoId()];

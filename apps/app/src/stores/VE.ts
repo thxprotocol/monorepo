@@ -5,7 +5,7 @@ import { ChainId } from '@thxnetwork/common/enums';
 import { MODE } from '../config/secrets';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { contractNetworks } from '../config/constants';
-import { BigNumber } from 'ethers';
+import { BigNumber } from 'alchemy-sdk';
 import poll, { CANCEL_TOKEN } from 'promise-poller';
 
 export function getChainId() {

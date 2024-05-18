@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { PRIVATE_KEY } from '@thxnetwork/api/config/secrets';
-import { contractArtifacts, contractNetworks } from '@thxnetwork/api/contracts';
+import { getArtifact, contractNetworks } from '@thxnetwork/api/hardhat';
 import { ChainId } from '@thxnetwork/common/enums';
 import { parseUnits } from 'ethers/lib/utils';
 
@@ -13,7 +13,7 @@ export default async function main() {
     const AMOUNT = parseUnits('10000').toString();
     const chainId = ChainId.Hardhat;
     const signer = new ethers.Wallet(PRIVATE_KEY, hardhatProvider) as unknown as ethers.Signer;
-    const bpt = new ethers.Contract(contractNetworks[chainId].BPT, contractArtifacts['BPT'].abi, signer);
+    const bpt = new ethers.Contract(contractNetworks[chainId].BPT, getArtifact('BPT').abi, signer);
 
     await bpt.transfer(TO, AMOUNT);
 }

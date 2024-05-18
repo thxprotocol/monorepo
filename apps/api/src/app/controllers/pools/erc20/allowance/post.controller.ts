@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { body, param } from 'express-validator';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { getProvider } from '@thxnetwork/api/util/network';
-import { getAbiForContractName } from '@thxnetwork/api/services/ContractService';
+import { getArtifact } from '@thxnetwork/api/hardhat';
 import TransactionService from '@thxnetwork/api/services/TransactionService';
 import PoolService from '@thxnetwork/api/services/PoolService';
 import SafeService from '@thxnetwork/api/services/SafeService';
@@ -23,8 +23,7 @@ const controller = async (req: Request, res: Response) => {
     if (!safe) throw new NotFoundError('Wallet not found');
 
     const { web3 } = getProvider(safe.chainId);
-
-    const abi = getAbiForContractName('LimitedSupplyToken');
+    const { abi } = getArtifact('THXERC20_LimitedSupply');
     const contract = new web3.eth.Contract(abi, req.body.tokenAddress);
     const fn = contract.methods.approve(req.body.spender, req.body.amountInWei);
 

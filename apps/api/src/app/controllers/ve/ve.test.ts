@@ -4,7 +4,7 @@ import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/c
 import { getProvider } from '@thxnetwork/api/util/network';
 import { BigNumber, Contract, ethers } from 'ethers';
 import { ChainId } from '@thxnetwork/common/enums';
-import { contractArtifacts, contractNetworks } from '@thxnetwork/api/contracts';
+import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
 import { sub, userWalletPrivateKey, widgetAccessToken } from '@thxnetwork/api/util/jest/constants';
 import { WalletDocument } from '@thxnetwork/api/models/Wallet';
 import { signTxHash, timeTravel } from '@thxnetwork/api/util/jest/network';

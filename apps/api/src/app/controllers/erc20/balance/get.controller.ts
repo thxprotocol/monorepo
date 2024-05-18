@@ -11,13 +11,13 @@ const controller = async (req: Request, res: Response) => {
     const wallet = await WalletService.findById(walletId);
     if (!wallet) throw new NotFoundError('Wallet not found');
 
-    const contract = ContractService.getContractFromAbi(
+    const contract = ContractService.getContract(
+        'THXERC20_LimitedSupply',
         wallet.chainId,
-        ContractService.getAbiForContractName('LimitedSupplyToken'),
         req.query.tokenAddress as string,
     );
-    const balanceInWei = await contract.methods.balanceOf(wallet.address).call();
+    const balance = await contract.balanceOf(wallet.address);
 
-    res.json({ balanceInWei });
+    res.json({ balanceInWei: balance.toString() });
 };
 export { controller, validation };

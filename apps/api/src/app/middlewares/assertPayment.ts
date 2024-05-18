@@ -1,5 +1,5 @@
 import { Response, Request, NextFunction } from 'express';
-import { BigNumber } from 'ethers';
+import { BigNumber } from 'alchemy-sdk';
 import { logger } from '../util/logger';
 import SafeService from '../services/SafeService';
 import PoolService from '../services/PoolService';

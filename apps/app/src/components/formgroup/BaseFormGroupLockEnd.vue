@@ -32,7 +32,7 @@ import { defineComponent } from 'vue';
 import { NinetyDaysInMs, getThursdaysUntilTimestamp } from '@thxnetwork/app/utils/date';
 import { mapStores } from 'pinia';
 import { useVeStore } from '@thxnetwork/app/stores/VE';
-import { BigNumber } from 'ethers';
+import { BigNumber } from 'alchemy-sdk';
 
 export default defineComponent({
     name: 'BaseFormGroupLockEnd',

@@ -19,13 +19,13 @@ const controller = async (req: Request, res: Response) => {
     const safe = await SafeService.findOneByPool(pool);
     if (!safe) throw new NotFoundError('Wallet not found');
 
-    const contract = ContractService.getContractFromName(
+    const contract = ContractService.getContract(
+        'THXERC20_LimitedSupply',
         safe.chainId,
-        'LimitedSupplyToken',
         req.query.tokenAddress as string,
     );
-    const allowanceInWei = await contract.methods.allowance(safe.address, req.query.spender).call();
+    const allowance = await contract.allowance(safe.address, req.query.spender);
 
-    res.json({ allowanceInWei: String(allowanceInWei) });
+    res.json({ allowanceInWei: allowance.toString() });
 };
 export { controller, validation };

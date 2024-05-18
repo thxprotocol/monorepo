@@ -1,53 +1,75 @@
-import { AbiItem } from 'web3-utils';
 import { ContractNetworksConfig } from '@safe-global/protocol-kit';
+// Safe
+import DefaultCallbackHandler from './export/DefaultCallbackHandler.json';
+import CreateCall from './export/CreateCall.json';
+import GnosisSafeL2 from './export/GnosisSafeL2.json';
+import GnosisSafeProxyFactory from './export/GnosisSafeProxyFactory.json';
+import MultiSend from './export/MultiSend.json';
+import MultiSendCallOnly from './export/MultiSendCallOnly.json';
+import SignMessageLib from './export/SignMessageLib.json';
+import SimulateTxAccessor from './export/SimulateTxAccessor.json';
+// Balancer
+import USDC from './export/USDC.json';
+import THX from './export/THX.json';
+import BPT from './export/BPT.json';
+import BPTGauge from './export/BPTGauge.json';
+import BalancerVault from './export/BalancerVault.json';
+import BalancerMinter from './export/BalancerMinter.json';
+import BalancerGaugeController from './export/BalancerGaugeController.json';
+import BAL from './export/BAL.json';
+import Launchpad from './export/Launchpad.json';
+// Tokens
+import THXERC20_LimitedSupply from './export/THXERC20_LimitedSupply.json';
+import THXERC20_UnlimitedSupply from './export/THXERC20_UnlimitedSupply.json';
+import THXERC721 from './export/THXERC721.json';
+import THXERC1155 from './export/THXERC1155.json';
+// Protocol
+import THXPaymentSplitter from './export/THXPaymentSplitter.json';
+import THXRegistry from './export/THXRegistry.json';
+import VotingEscrow from './export/VotingEscrow.json';
+import RewardDistributor from './export/RewardDistributor.json';
+import RewardFaucet from './export/RewardFaucet.json';
+import SmartWalletWhitelist from './export/SmartWalletWhitelist.json';
+import LensReward from './export/LensReward.json';
 
-import Launchpad from './abis/Launchpad.json';
-import VotingEscrow from './abis/VotingEscrow.json';
-import RewardDistributor from './abis/RewardDistributor.json';
-import SmartWalletWhitelist from './abis/SmartWalletWhitelist.json';
-import RewardFaucet from './abis/RewardFaucet.json';
-import LensReward from './abis/LensReward.json';
-import BalMinter from './abis/BalancerMinter.json';
-import BPT from './abis/BPT.json';
-import BPTGauge from './abis/BPTGauge.json';
-import BAL from './abis/BAL.json';
-import THX from './abis/THX.json';
-import USDC from './abis/USDC.json';
-import BalancerVault from './abis/BalancerVault.json';
-import BalancerGaugeController from './abis/BalancerGaugeController.json';
-import THXRegistry from './abis/THXRegistry.json';
-import THXPaymentSplitter from './abis/THXPaymentSplitter.json';
+export const getArtifact = (contractName: TContractName) => {
+    if (!contractArtifacts[contractName]) {
+        throw new Error(`Contract ${contractName} not found in contractArtifacts`);
+    }
+    return contractArtifacts[contractName];
+};
 
 export const contractNetworks = {
     '31337': {
         // Safe
-        simulateTxAccessorAddress: '0xB952d9b5de7804691e7936E88915A669B15822ef',
-        safeProxyFactoryAddress: '0x50aF0922d65D04D87d810048Dc640E2474eBfbd9',
-        fallbackHandlerAddress: '0x278Ff6d33826D906070eE938CDc9788003749e93',
-        createCallAddress: '0xEAB9a65eB0F098f822033192802B53EE159De5F0',
-        multiSendAddress: '0x15FC0878406CcF4d2963235A5B1EF68C67F17Ee5',
-        multiSendCallOnlyAddress: '0xa4E84979c95cD4f12C53E73d63E0A8634A1f44Ae',
-        signMessageLibAddress: '0xd916a690676e925Ac9Faf2d01869c13Fd9757ef2',
-        safeMasterCopyAddress: '0xb63564A81D5d4004F4f22E9aB074cE25540B0C26',
+        simulateTxAccessorAddress: '0x278Ff6d33826D906070eE938CDc9788003749e93',
+        safeProxyFactoryAddress: '0xEAB9a65eB0F098f822033192802B53EE159De5F0',
+        fallbackHandlerAddress: '0x055cBfeD6df4AFE2452b18fd3D2592D1795592b4',
+        createCallAddress: '0xb63564A81D5d4004F4f22E9aB074cE25540B0C26',
+        multiSendAddress: '0x50aF0922d65D04D87d810048Dc640E2474eBfbd9',
+        multiSendCallOnlyAddress: '0x15FC0878406CcF4d2963235A5B1EF68C67F17Ee5',
+        signMessageLibAddress: '0xa4E84979c95cD4f12C53E73d63E0A8634A1f44Ae',
+        safeMasterCopyAddress: '0xd916a690676e925Ac9Faf2d01869c13Fd9757ef2',
 
         // Tokens
-        THX: '0xf228ADAa4c3D07C8285C1025421afe2c4F320C59',
-        USDC: '0x8613B8E442219e4349fa5602C69431131a7ED114',
-        BAL: '0x7150A3CC09429583471020A6CE5228A57736180a',
-        BPT: '0xe1c01805a21ee0DC535afa93172a5F21CE160649',
-        BPTGauge: '0x8B219D3d1FC64e03F6cF3491E7C7A732bF253EC8',
-        BalancerVault: '0xeDdBA2bDeE7c9006944aCF9379Daa64478E02290',
+        THX: '0xB952d9b5de7804691e7936E88915A669B15822ef',
+        USDC: '0x7150A3CC09429583471020A6CE5228A57736180a',
+        BAL: '0xe1c01805a21ee0DC535afa93172a5F21CE160649',
+        BPT: '0xf228ADAa4c3D07C8285C1025421afe2c4F320C59',
+        BPTGauge: '0x8613B8E442219e4349fa5602C69431131a7ED114',
+        BalancerVault: '0x8B219D3d1FC64e03F6cF3491E7C7A732bF253EC8',
 
         // veTHX
-        VotingEscrow: '0xdb8549fdb720C35b926fC3fFF2FfBec61383E994',
-        RewardDistributor: '0xD98E8ac8D53e3330b5DBc3425FB178810128A9e5',
-        RewardFaucet: '0x3e3B1997c3Bc3Cf512359EEa6d9cAd19394D51B4',
-        SmartWalletWhitelist: '0x774442713f32fa98bf27bEc78c96fb7186f7C223',
-        LensReward: '0xb2Bea6009625407C3c3cF7158185125Ed2C7f101',
+        VotingEscrow: '0x1280809d06C42E68063305235813e52c8Bb03a58',
+        RewardDistributor: '0xd0507c5363AeCfe8231FF4110e05AFf611d7F7B6',
+        RewardFaucet: '0x33599eaec2752DB3242323483A7313bA3b1111cd',
+        SmartWalletWhitelist: '0xb3B2b0fc5ce12aE58EEb13E19547Eb2Dd61A79D5',
+        LensReward: '0x774442713f32fa98bf27bEc78c96fb7186f7C223',
 
         // Company
-        THXRegistry: '0xa4cBDae70871E8664b8de077765DDA2f4cc90d02',
-        THXPaymentSplitter: '0xe42CA31C24ee6bA76DBd87D86ab66D45b65ee5A2',
+        THXRegistry: '0x0Bb5Cb54566cEEf9dF1F60d8D7d2Fd01eA88279e',
+        THXPaymentSplitter: '0x58C0e64cBB7E5C7D0201A3a5c2D899cC70B0dc4c',
+
         CompanyMultiSig: '0xaf9d56684466fcFcEA0a2B7fC137AB864d642946',
     },
     '137': {
@@ -77,44 +99,74 @@ export const contractNetworks = {
     },
 } as ContractNetworksConfig & any;
 
+export type TContractName = (typeof contractNames)[number];
+
 export const contractArtifacts: { [contractName: string]: { abi: any; bytecode: string } } = {
-    RewardFaucet,
-    RewardDistributor,
-    SmartWalletWhitelist,
-    Launchpad,
-    LensReward,
-    BalMinter,
-    VotingEscrow,
-    BalancerVault,
-    BalancerGaugeController,
-    BPT,
-    BPTGauge,
+    // Safe
+    DefaultCallbackHandler,
+    CreateCall,
+    GnosisSafeL2,
+    GnosisSafeProxyFactory,
+    MultiSend,
+    MultiSendCallOnly,
+    SignMessageLib,
+    SimulateTxAccessor,
+    // Balancer
     USDC,
     THX,
+    BPT,
+    BPTGauge,
+    BalancerVault,
+    BalancerMinter,
+    BalancerGaugeController,
     BAL,
-    THXRegistry,
+    Launchpad,
+    // Tokens
+    THXERC20_LimitedSupply,
+    THXERC20_UnlimitedSupply,
+    THXERC721,
+    THXERC1155,
+    // Protocol
     THXPaymentSplitter,
+    THXRegistry,
+    VotingEscrow,
+    RewardDistributor,
+    RewardFaucet,
+    SmartWalletWhitelist,
+    LensReward,
 };
 
-export const contractNames = ['BalancerVault'] as const;
-export const tokenContractNames = [
-    'LimitedSupplyToken',
-    'UnlimitedSupplyToken',
-    'NonFungibleToken',
-    'UnlimitedSupplyToken',
-    'THX_ERC1155',
-    'VotingEscrow',
-    'BPT',
-    'BPTGauge',
+export const contractNames = [
+    // Safe
+    'DefaultCallbackHandler',
+    'CreateCall',
+    'GnosisSafeL2',
+    'GnosisSafeProxyFactory',
+    'MultiSend',
+    'MultiSendCallOnly',
+    'SignMessageLib',
+    'SimulateTxAccessor',
+    // Balancer
     'USDC',
     'THX',
+    'BPT',
+    'BPTGauge',
+    'BalancerVault',
+    'BalancerMinter',
+    'BalancerGaugeController',
     'BAL',
+    'Launchpad',
+    // Tokens
+    'THXERC20_LimitedSupply',
+    'THXERC20_UnlimitedSupply',
+    'THXERC721',
+    'THXERC1155',
+    // Protocol
     'THXPaymentSplitter',
+    'THXRegistry',
+    'VotingEscrow',
+    'RewardDistributor',
+    'RewardFaucet',
+    'SmartWalletWhitelist',
+    'LensReward',
 ] as const;
-export type TokenContractName = (typeof tokenContractNames)[number];
-
-export interface ContractConfig {
-    address: string;
-    abi: AbiItem[];
-    bytecode: string;
-}

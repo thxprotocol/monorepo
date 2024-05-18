@@ -86,7 +86,7 @@ import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
 import { roundUpFixed, toFiatPrice } from '@thxnetwork/app/utils/price';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
-import { BigNumber } from 'ethers';
+import { BigNumber } from 'alchemy-sdk';
 import { startOfWeek, addWeeks, format, eachWeekOfInterval } from 'date-fns';
 
 export default defineComponent({

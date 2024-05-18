@@ -1,5 +1,5 @@
 import { getProvider } from '@thxnetwork/api/util/network';
-import { contractArtifacts, contractNetworks } from '@thxnetwork/api/contracts';
+import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
 import { ChainId } from '@thxnetwork/common/enums';
 import { WalletDocument } from '@thxnetwork/api/models';
 import { toChecksumAddress } from 'web3-utils';

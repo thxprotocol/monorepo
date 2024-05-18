@@ -1,13 +1,13 @@
 import { API_URL, MINIMUM_GAS_LIMIT, VERSION } from '@thxnetwork/api/config/secrets';
-import ContractService from '@thxnetwork/api/services/ContractService';
 import { ChainId } from '@thxnetwork/common/enums';
 import { getProvider } from '../network';
+import { getArtifact } from '@thxnetwork/api/hardhat';
 
 export async function deployERC721(nftName: string, nftSymbol: string) {
     const { web3, defaultAccount } = getProvider(ChainId.Hardhat);
-    const contractName = 'NonFungibleToken';
-    const contract = ContractService.getContractFromName(ChainId.Hardhat, contractName);
-    const bytecode = ContractService.getByteCodeForContractName(contractName);
+    const contractName = 'THXERC721';
+    const { abi, bytecode } = getArtifact(contractName);
+    const contract = new web3.eth.Contract(abi);
     const baseURL = `${API_URL}/${VERSION}/erc721/metadata/`;
     const fn = contract.deploy({
         data: bytecode,

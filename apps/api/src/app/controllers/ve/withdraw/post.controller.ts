@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ForbiddenError } from '@thxnetwork/api/util/errors';
-import { contractArtifacts, contractNetworks } from '@thxnetwork/api/contracts';
+import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
 import { getProvider } from '@thxnetwork/api/util/network';
 import { body, query } from 'express-validator';
 import VoteEscrowService from '@thxnetwork/api/services/VoteEscrowService';

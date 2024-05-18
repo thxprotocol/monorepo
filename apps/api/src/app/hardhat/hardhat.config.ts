@@ -29,10 +29,6 @@ const config: HardhatUserConfig = {
                     privateKey: 'eea0247bd059ac4d2528adb36bb0de003d62ba568e3197984b61c41d9a132df0',
                 },
             ],
-            ignition: {
-                // maxFeePerGasLimit: 50_000_000_000n, // 50 gwei
-                // maxPriorityFeePerGas: 2_000_000_000n, // 2 gwei
-            },
         },
     },
     paths: {

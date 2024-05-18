@@ -56,7 +56,7 @@ import { ChainId } from '@thxnetwork/common/enums';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { roundDownFixed } from '@thxnetwork/app/utils/price';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
-import { BigNumber } from 'ethers';
+import { BigNumber } from 'alchemy-sdk';
 
 export default defineComponent({
     name: 'BaseModalDeposit',

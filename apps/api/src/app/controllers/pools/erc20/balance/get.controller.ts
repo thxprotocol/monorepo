@@ -14,14 +14,14 @@ const controller = async (req: Request, res: Response) => {
     const safe = await SafeService.findOneByPool(pool, pool.chainId);
     if (!safe) throw new NotFoundError('Campaign Safe not found.');
 
-    const contract = ContractService.getContractFromAbi(
+    const contract = ContractService.getContract(
+        'THXERC20_LimitedSupply',
         safe.chainId,
-        ContractService.getAbiForContractName('LimitedSupplyToken'),
         req.query.tokenAddress as string,
     );
-    const balanceInWei = await contract.methods.balanceOf(safe.address).call();
+    const balance = await contract.balanceOf(safe.address);
 
-    res.json({ balanceInWei: String(balanceInWei) });
+    res.json({ balanceInWei: balance.toString() });
 };
 
 export { controller, validation };

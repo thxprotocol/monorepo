@@ -15,13 +15,13 @@ const controller = async (req: Request, res: Response) => {
     const wallet = await WalletService.findById(walletId);
     if (!wallet) throw new NotFoundError('Could not find wallet for account');
 
-    const contract = ContractService.getContractFromName(
+    const contract = ContractService.getContract(
+        'THXERC20_LimitedSupply',
         wallet.chainId,
-        'LimitedSupplyToken',
         req.query.tokenAddress as string,
     );
-    const allowanceInWei = await contract.methods.allowance(wallet.address, req.query.spender).call();
+    const allowance = await contract.allowance(wallet.address, req.query.spender);
 
-    res.json({ allowanceInWei: String(allowanceInWei) });
+    res.json({ allowanceInWei: allowance.toString() });
 };
 export { controller, validation };
