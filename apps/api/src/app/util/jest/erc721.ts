@@ -38,14 +38,20 @@ export const mockGetNftsForOwner = (contractAddress: string, nftName: string, nf
                     symbol: nftSymbol,
                 },
                 tokenId: '1',
-                tokenUri: {
-                    raw: 'https://ipfs.io/ipfs/QmRvCinGkzqDdmSZ3PzQRyHbQVqaFLTDyfyMMD54Bwcjsi',
-                },
+                tokenUri: 'https://ipfs.io/ipfs/QmRvCinGkzqDdmSZ3PzQRyHbQVqaFLTDyfyMMD54Bwcjsi',
                 rawMetadata: {
                     name: '#1',
                     description: 'image description piece #1',
                     image: 'https://gateway.pinata.cloud/ipfs/QmemtAVJMkfUj3bAXee1H7vccbX6nC6Vbkbu6gBjdn1Kdh/1.png',
-                    external_url: 'https://externalurl.com',
+                },
+                name: 'Test Collection',
+                description: 'Test Collection description',
+                image: {
+                    originalUrl: 'ipfs://QmRvCinGkzqDdmSZ3PzQRyHbQVqaFLTDyfyMMD54Bwcjsi/1.png',
+                },
+
+                collection: {
+                    externalUrl: 'https://example.com',
                 },
             },
         ],

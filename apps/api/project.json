@@ -87,7 +87,7 @@
                 "jestConfig": "apps/api/jest.config.ts",
                 "testTimeout": 60000,
                 "passWithNoTests": false,
-                "bail": true,
+                "bail": false,
                 "runInBand": true,
                 "logHeapUsage": true
             }

@@ -32,12 +32,18 @@ export const mockGetNftsForOwner = (contractAddress: string) => {
     return {
         ownedNfts: [
             {
+                name: 'Test Collection',
+                description: 'Test Collection description',
+                image: {
+                    originalUrl: 'ipfs://QmRvCinGkzqDdmSZ3PzQRyHbQVqaFLTDyfyMMD54Bwcjsi/1.png',
+                },
                 contract: {
                     address: contractAddress,
                 },
                 tokenId: '1',
-                tokenUri: {
-                    raw: 'https://ipfs.io/ipfs/QmRvCinGkzqDdmSZ3PzQRyHbQVqaFLTDyfyMMD54Bwcjsi',
+                tokenUri: 'https://ipfs.io/ipfs/QmRvCinGkzqDdmSZ3PzQRyHbQVqaFLTDyfyMMD54Bwcjsi',
+                collection: {
+                    externalUrl: 'https://example.com',
                 },
                 rawMetadata: {
                     name: '#1',

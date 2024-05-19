@@ -136,7 +136,6 @@ describe('QR Codes', () => {
             .query({ walletId: String(wallet._id) })
             .set({ Authorization: widgetAccessToken })
             .expect(({ body }: request.Response) => {
-                console.log(body);
                 expect(body.erc721).toBeDefined();
                 expect(body.entry).toBeDefined();
                 expect(body.payment).toBeDefined();
