@@ -154,7 +154,6 @@ export default class RewardNFTService implements IRewardService {
     }
 
     findTokenById(nft: TERC721 | TERC1155, tokenId: string) {
-        console.log(nft.variant, tokenId);
         return this.services[nft.variant].findTokenById(tokenId);
     }
 

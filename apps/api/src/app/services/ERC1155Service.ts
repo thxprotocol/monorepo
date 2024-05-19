@@ -45,8 +45,8 @@ async function deploy(data: TERC1155, forceSync = true): Promise<ERC1155Document
 }
 
 async function deployCallback({ erc1155Id }: TERC1155DeployCallbackArgs, receipt: TransactionReceipt) {
-    const erc1155 = await ERC1155.findById(erc1155Id);
-    const events = parseLogs(erc1155.contract.options.jsonInterface, receipt.logs);
+    const { abi } = getArtifact(contractName);
+    const events = parseLogs(abi, receipt.logs);
 
     if (!findEvent('OwnershipTransferred', events) && !findEvent('Transfer', events)) {
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');

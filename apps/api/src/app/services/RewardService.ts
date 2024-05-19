@@ -195,7 +195,7 @@ export default class RewardService {
         }
     }
 
-    static async create(variant: RewardVariant, poolId: string, data: Partial<TReward>, file?: Express.Multer.File) {
+    static async create(variant: RewardVariant, poolId: string, data: Partial<TReward>, file: Express.Multer.File) {
         if (file) {
             data.image = await ImageService.upload(file);
         }

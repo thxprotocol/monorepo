@@ -129,7 +129,7 @@ async function sendAsync(
             from: defaultAccount,
             to,
             data,
-            gas: gas + 100000,
+            gas: gas + 100000, // This was originally added for relayed transactions, not sure if still  needed
         });
 
         await transactionMined(tx, receipt);

@@ -23,9 +23,9 @@ const schema = new mongoose.Schema(
 
 schema.virtual('contract').get(function () {
     if (!this.address) return;
-    const { web3, defaultAccount } = getProvider(this.chainId);
+    const { web3 } = getProvider(this.chainId);
     const { abi } = getArtifact('THXERC721');
-    return new web3.eth.Contract(abi, this.address, { from: defaultAccount });
+    return new web3.eth.Contract(abi, this.address);
 });
 
 export const ERC721 = mongoose.model<ERC721Document>('ERC721', schema, 'erc721');

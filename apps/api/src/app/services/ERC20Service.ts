@@ -83,11 +83,8 @@ export const deploy = async (params: Partial<TERC20>, forceSync = true) => {
 
 export async function deployCallback({ erc20Id }: TERC20DeployCallbackArgs, receipt: TransactionReceipt) {
     const erc20 = await ERC20.findById(erc20Id);
-    const { chainId } = erc20;
-    const { web3 } = getProvider(chainId);
     const { abi } = getArtifact(erc20.contractName);
-    const contract = new web3.eth.Contract(abi);
-    const events = parseLogs(contract.options.jsonInterface, receipt.logs);
+    const events = parseLogs(abi, receipt.logs);
 
     // Limited and unlimited tokes emit different events. Check if one of the two is emitted.
     if (!findEvent('OwnershipTransferred', events) && !findEvent('Transfer', events)) {

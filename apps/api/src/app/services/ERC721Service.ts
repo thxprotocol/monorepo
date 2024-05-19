@@ -32,12 +32,12 @@ async function deploy(data: TERC721, forceSync = true): Promise<ERC721Document> 
         args: { erc721Id: String(erc721._id) },
     });
 
-    return ERC721.findByIdAndUpdate(erc721._id, { transactions: [txId] }, { new: true });
+    return await ERC721.findByIdAndUpdate(erc721._id, { transactions: [txId] }, { new: true });
 }
 
 async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: TransactionReceipt) {
-    const erc721 = await ERC721.findById(erc721Id);
-    const events = parseLogs(erc721.contract.options.jsonInterface, receipt.logs);
+    const { abi } = getArtifact(contractName);
+    const events = parseLogs(abi, receipt.logs);
 
     if (!findEvent('OwnershipTransferred', events) && !findEvent('Transfer', events)) {
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
