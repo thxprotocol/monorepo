@@ -6,7 +6,7 @@ import { AUTH_URL } from '../config/secrets';
 export const validateJwt = expressjwt({
     secret: jwksRsa.expressJwtSecret({
         cache: true,
-        rateLimit: true,
+        rateLimit: false,
         jwksRequestsPerMinute: 10,
         jwksUri: `${AUTH_URL}/jwks`, // Unnecessary, keys are provided through getKeysInterceptor.
     }),

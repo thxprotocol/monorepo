@@ -32,12 +32,12 @@ JEn/NS0gRKfNh6bwZaSTfhFxALmKApVNTPm2UT9G5hADTcw4xTQf
 export const jwksResponse = {
     keys: [
         {
-            alg: 'RS256',
             kty: 'RSA',
             use: 'sig',
-            n: 'waZ3afW0_zYy3HfJwAAr83PDdZvADuSJ6jTZk1-jprdHdG6PzH9XaB6xhzvwTIJFcWuREkNSC06MDLCuvmZ8fj93FcNaZ2ZJ0LFvY4SODMDqFekE5vD2Y15aSI2Y69qwKlVLphvEEXJ_FRqIHQX9wwCtwVsnqcLt_f5aNWRHyk2jwhz7IBm-dLu9_CV8AsvE5ddgOYYbNk-SMCjznESZcMg1KRzbdawnOklzloc-Q0iCxQK7022ukVxFbmT7U1hTVOTOzrruqBxptPDiutkKfOXebzYyZodlFFL5MWcatCWS3XL51KBIeKWny5mExZPzIf1ofGuJe0zxllw8olgMqQ', //eslint-disable-line max-len
+            kid: 'qSjSTujaClXGGkwW4zdC1zpRHxAq099krc8TTFfXYlg',
+            alg: 'RS256',
             e: 'AQAB',
-            kid: '0',
+            n: 'oGGYqftZswJRU_vfKDi7jFNgH20LOVfOgSYBu39GEvYWeygBTGuHmf2Ict7m70IKiFAY24kOhMnNjFJ6B0dxdBt5Hf3Kw-VoTKp1MDuy6_wao51WbR5G6II7ND3_2jucyNLeHpYwKHmk00yo4XTBlihNB_ogLCsblupHFceULfq5DN1whTGp-ZHTdYZaSZGXBC_v046vzqIqdKF785AzN56fBDlWhJ0CB9PdLSqj5hd91mxIbJqarHHWR844R5gOLE5ZMJMwX7SUgirFXhDo_VPVKJsP06SxGWBHe8HaYYi6DSXA7i59yBWyJy80F4t3OBTX-AWkzSfJ-_O9zPEBXQ',
         },
     ],
 };

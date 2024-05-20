@@ -1,9 +1,10 @@
 import request from 'supertest';
 import app from '../../app';
 import db from '../../util/database';
-import { accountAddress, accountEmail } from '../../util/jest';
+import { accountAddress, accountEmail, jwksResponse } from '../../util/jest';
 import { INITIAL_ACCESS_TOKEN } from '@thxnetwork/auth/config/secrets';
 import { AccountVariant, AccountPlanType } from '@thxnetwork/common/enums';
+import { mockAuthPath } from '@thxnetwork/auth/util/jest/mock';
 import AuthService from '@thxnetwork/auth/services/AuthService';
 
 const http = request.agent(app);
@@ -13,6 +14,9 @@ describe('Account Controller', () => {
 
     beforeAll(async () => {
         await db.truncate();
+
+        // Mock jwks endpoint as jwks-rsa getKeyInterceptor does not work with supertest.
+        await mockAuthPath('get', '/jwks', 200, jwksResponse);
 
         async function requestToken() {
             const res = await http

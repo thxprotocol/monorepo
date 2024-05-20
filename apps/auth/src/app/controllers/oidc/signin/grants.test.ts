@@ -3,8 +3,9 @@ import app from '../../../app';
 import db from '../../../util/database';
 import { AccountService } from '../../../services/AccountService';
 import { INITIAL_ACCESS_TOKEN } from '../../../config/secrets';
-import { accountEmail } from '../../../util/jest';
+import { accountEmail, jwksResponse } from '../../../util/jest';
 import { AccountVariant, AccountPlanType } from '@thxnetwork/common/enums';
+import { mockAuthPath } from '@thxnetwork/auth/util/jest/mock';
 
 const http = request.agent(app);
 
@@ -13,6 +14,9 @@ describe('OAuth2 Grants', () => {
 
     beforeAll(async () => {
         await db.truncate();
+
+        // Mock jwks endpoint as jwks-rsa getKeyInterceptor does not work with supertest.
+        await mockAuthPath('get', '/jwks', 200, jwksResponse);
 
         const account = await AccountService.create({
             plan: AccountPlanType.Lite,

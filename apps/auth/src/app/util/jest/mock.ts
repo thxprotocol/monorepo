@@ -3,6 +3,7 @@ import { getToken, jwksResponse } from './constants';
 import { API_URL, AUTH_URL } from '../../config/secrets';
 
 export function mockAuthPath(method: string, path: string, status: number, callback: any = {}) {
+    console.log(AUTH_URL);
     const n = nock(AUTH_URL).persist() as any;
     return n[method](path).reply(status, callback);
 }
