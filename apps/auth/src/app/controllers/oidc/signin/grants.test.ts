@@ -20,7 +20,7 @@ describe('OAuth2 Grants', () => {
             variant: AccountVariant.EmailPassword,
             active: true,
         });
-        sub = account._id;
+        sub = account.id;
     });
 
     afterAll(async () => {

@@ -60,7 +60,12 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
             "options": {
-                "jestConfig": "apps/auth/jest.config.ts"
+                "jestConfig": "apps/auth/jest.config.ts",
+                "testTimeout": 60000,
+                "passWithNoTests": false,
+                "bail": false,
+                "runInBand": true,
+                "logHeapUsage": true
             }
         }
     }
