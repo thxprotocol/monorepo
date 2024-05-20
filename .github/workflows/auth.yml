@@ -7,6 +7,9 @@ jobs:
     buildAndTest:
         name: CI Pipeline
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: ['18'] # Add other versions if needed
 
         steps:
             - name: Checkout repository
