@@ -12,8 +12,8 @@
     "license": "AGPL-3.0",
     "version": "1.52.134",
     "scripts": {
-        "migrate": "yarn run migrate:db && yarn run migrate:contracts",
-        "migrate:contracts": "node upgradeContractsToLatest.js",
+        "migrate": "yarn run migrate:db && yarn run migrate:post-migrate",
+        "migrate:post-migrate": "node post-migrate.js",
         "migrate:db": "node migrate-mongo.js up",
         "migrate:db:down": "node migrate-mongo.js down"
     }

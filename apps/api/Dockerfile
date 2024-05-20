@@ -29,6 +29,7 @@ WORKDIR /usr/src/app
 COPY --from=develop ./usr/src/app/ ./
 RUN npx nx build api --prod
 COPY ./newrelic.js ./yarn.lock ./dist/apps/api/
+RUN ls -la
 
 #####################################################################################################
 ## Production stage

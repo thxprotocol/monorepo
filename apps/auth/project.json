@@ -16,7 +16,7 @@
                 "main": "apps/auth/src/main.ts",
                 "tsConfig": "apps/auth/tsconfig.app.json",
                 "assets": ["apps/auth/src/assets", "apps/auth/src/app/migrations"],
-                "webpackConfig": "apps/api/webpack.config.js",
+                "webpackConfig": "apps/auth/webpack.config.js",
                 "generatePackageJson": true,
                 "additionalEntryPoints": [
                     {

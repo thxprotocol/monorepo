@@ -20,16 +20,16 @@
                 "generatePackageJson": true,
                 "additionalEntryPoints": [
                     {
-                        "entryPath": "apps/api/scripts/upgradeContractsToLatest.ts",
-                        "entryName": "upgradeContractsToLatest"
-                    },
-                    {
                         "entryPath": "apps/api/scripts/migrate-mongo.ts",
                         "entryName": "migrate-mongo"
                     },
                     {
                         "entryPath": "apps/api/scripts/script.ts",
                         "entryName": "script"
+                    },
+                    {
+                        "entryPath": "apps/api/scripts/post-migrate.ts",
+                        "entryName": "post-migrate"
                     }
                 ]
             },
@@ -100,11 +100,11 @@
                 "cwd": "dist/apps/api"
             }
         },
-        "migrate-contracts": {
+        "post-migrate": {
             "dependsOn": ["^build"],
             "executor": "nx:run-commands",
             "options": {
-                "command": "node upgradeContractsToLatest.js",
+                "command": "node post-migrate.js",
                 "cwd": "dist/apps/api"
             }
         },
