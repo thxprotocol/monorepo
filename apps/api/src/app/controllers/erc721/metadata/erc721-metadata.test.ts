@@ -120,7 +120,6 @@ describe('ERC721 Metadata', () => {
             user.get('/v1/erc721/' + erc721ID + '/metadata')
                 .set('Authorization', dashboardAccessToken)
                 .expect(({ body }: request.Response) => {
-                    console.log(body.results);
                     expect(body.results.length).toBe(4);
                     expect(body.total).toBe(4);
                 })

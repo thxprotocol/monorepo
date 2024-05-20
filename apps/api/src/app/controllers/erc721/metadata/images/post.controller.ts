@@ -11,6 +11,7 @@ import { Request, Response } from 'express';
 import { body, check, param } from 'express-validator';
 import short from 'short-uuid';
 import IPFSService from '@thxnetwork/api/services/IPFSService';
+import fileType from 'magic-bytes.js';
 
 const validation = [
     param('id').isMongoId(),
@@ -47,7 +48,8 @@ const controller = async (req: Request, res: Response) => {
             if (!isValidExtension(extension)) continue;
 
             const file = await zip.file(fileName).async('nodebuffer');
-            if (!(await isValidFileType(file))) continue;
+            const isValid = await isValidFileType(file);
+            if (!isValid) continue;
 
             const filename = parseFilename(originalFileName, extension);
             await s3Client.send(
@@ -67,7 +69,7 @@ const controller = async (req: Request, res: Response) => {
             }
 
             await ERC721Metadata.create({
-                erc721Id: String(erc721._id),
+                erc721Id: erc721.id,
                 name: req.body.name,
                 description: req.body.description,
                 externalUrl: req.body.externalUrl,
@@ -87,15 +89,9 @@ function isValidExtension(extension: string) {
     return ['jpg', 'jpeg', 'gif', 'png'].includes(extension);
 }
 
-async function isValidFileType(buffer: Buffer) {
-    const { fileTypeFromBuffer } = await import('file-type');
-    const { mime } = await fileTypeFromBuffer(buffer);
-
-    if (!['image/jpeg', 'image/png', 'image/gif'].includes(mime)) {
-        return false;
-    }
-
-    return true;
+function isValidFileType(buffer: Buffer) {
+    const [type] = fileType(buffer);
+    return ['image/jpeg', 'image/png', 'image/gif'].includes(type.mime);
 }
 
 export { controller, validation };

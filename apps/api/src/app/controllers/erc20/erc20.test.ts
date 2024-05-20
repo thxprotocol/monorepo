@@ -2,10 +2,10 @@ import request from 'supertest';
 import app from '@thxnetwork/api/';
 import { ChainId, ERC20Type } from '@thxnetwork/common/enums';
 import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
-import { isAddress } from 'ethers';
 import { dashboardAccessToken } from '@thxnetwork/api/util/jest/constants';
 import { createImage } from '@thxnetwork/api/util/jest/images';
 import { toWei } from 'web3-utils';
+import { isAddress } from 'ethers/lib/utils';
 
 const http = request.agent(app);
 
