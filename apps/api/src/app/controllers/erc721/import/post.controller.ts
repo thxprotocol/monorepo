@@ -2,7 +2,7 @@ import { body } from 'express-validator';
 import { Request, Response } from 'express';
 import { ERC721, ERC721Token, ERC721Metadata, Wallet } from '@thxnetwork/api/models';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
-import { getNFTsForOwner } from '@thxnetwork/api/util/alchemy';
+import { getNFTsForOwner, parseIPFSImageUrl } from '@thxnetwork/api/util/alchemy';
 import { ChainId, ERC721TokenState, NFTVariant } from '@thxnetwork/common/enums';
 import { toChecksumAddress } from 'web3-utils';
 
@@ -40,17 +40,19 @@ const controller = async (req: Request, res: Response) => {
     const erc721Tokens = await Promise.all(
         ownedNfts.map(async ({ name, description, collection, tokenId, tokenUri, image }) => {
             try {
+                const erc721Id = erc721.id;
+                const imageUrl = parseIPFSImageUrl(image.originalUrl);
                 const metadata = await ERC721Metadata.findOneAndUpdate(
                     {
-                        erc721Id: erc721.id,
+                        erc721Id,
                         externalUrl: collection.externalUrl,
                     },
                     {
-                        erc721Id: erc721.id,
+                        erc721Id,
                         name,
                         description,
-                        image,
-                        imageUrl: image.originalUrl,
+                        imageUrl,
+                        image: imageUrl,
                         externalUrl: collection.externalUrl,
                     },
                     { upsert: true, new: true },

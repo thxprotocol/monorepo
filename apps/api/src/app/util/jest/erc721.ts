@@ -49,7 +49,6 @@ export const mockGetNftsForOwner = (contractAddress: string, nftName: string, nf
                 image: {
                     originalUrl: 'ipfs://QmRvCinGkzqDdmSZ3PzQRyHbQVqaFLTDyfyMMD54Bwcjsi/1.png',
                 },
-
                 collection: {
                     externalUrl: 'https://example.com',
                 },

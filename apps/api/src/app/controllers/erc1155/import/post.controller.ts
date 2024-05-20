@@ -52,7 +52,7 @@ const controller = async (req: Request, res: Response) => {
     const erc1155Tokens = await Promise.all(
         ownedNfts.map(async ({ name, description, image, collection, tokenId, tokenUri }) => {
             try {
-                const erc1155Id = String(erc1155._id);
+                const erc1155Id = erc1155.id;
                 const imageUrl = parseIPFSImageUrl(image.originalUrl);
                 const metadata = await ERC1155Metadata.findOneAndUpdate(
                     {
