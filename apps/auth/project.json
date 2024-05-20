@@ -54,7 +54,11 @@
             }
         },
         "lint": {
-            "executor": "@nx/eslint:lint"
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["apps/auth/**/*.ts"]
+            }
         },
         "test": {
             "executor": "@nx/jest:jest",
@@ -66,6 +70,29 @@
                 "bail": false,
                 "runInBand": true,
                 "logHeapUsage": true
+            }
+        },
+        "script": {
+            "dependsOn": ["^build"],
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "node script.js",
+                "cwd": "dist/apps/auth"
+            }
+        },
+        "migrate-db": {
+            "dependsOn": ["^build"],
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "node migrate-mongo.js up",
+                "cwd": "dist/apps/auth"
+            }
+        },
+        "migrate-db-create": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "migrate-mongo create -f src/app/config/migrate-mongo-create-only.json",
+                "cwd": "apps/auth"
             }
         }
     }

@@ -7,7 +7,6 @@ import { AccountService } from './AccountService';
 import { Token } from '../models/Token';
 import { UnauthorizedError } from '@thxnetwork/auth/util/errors';
 import { oidc } from '@thxnetwork/auth/util/oidc';
-import { DASHBOARD_URL } from '@thxnetwork/auth/config/secrets';
 import { MailService } from './MailService';
 import TokenService from './TokenService';
 import EthereumService from './EthereumService';
