@@ -39,30 +39,7 @@
             </div>
         </template>
         <template #secondary>
-            <b-card class="border-0 gradient-shadow-xl" style="min-height: 415px">
-                <b-tabs v-model="tabIndex" pills justified content-class="mt-3" nav-wrapper-class="text-white">
-                    <b-tab>
-                        <template #title>
-                            <i class="fas fa-balance-scale me-1" />
-                            Liquidity
-                        </template>
-                        <hr />
-                        <BaseTabLiquidity @change-tab="tabIndex = $event" />
-                    </b-tab>
-                    <b-tab>
-                        <template #title>
-                            <i class="fas fa-id-card me-1" />
-                            Membership
-                        </template>
-                        <hr />
-                        <BaseTabDeposit
-                            v-if="veStore.lock && !Number(veStore.lock.amount)"
-                            @change-tab="tabIndex = $event"
-                        />
-                        <BaseTabWithdraw v-else @change-tab="tabIndex = $event" />
-                    </b-tab>
-                </b-tabs>
-            </b-card>
+            <BaseCardMembership :tab-index="0" />
         </template>
     </BaseCardHeader>
     <b-container class="mb-5">

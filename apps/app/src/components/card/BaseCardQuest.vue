@@ -117,11 +117,11 @@
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
 import { format, formatDistance } from 'date-fns';
-import { QuestVariant } from '@thxnetwork/sdk';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
 import { decodeHTML } from '@thxnetwork/app/utils/decode-html';
+import { QuestVariant } from '@thxnetwork/sdk/types/enums';
 
 export default defineComponent({
     name: 'BaseCardQuest',

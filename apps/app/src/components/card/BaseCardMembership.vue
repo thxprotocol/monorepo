@@ -1,46 +1,54 @@
 <template>
-    <div class="text-center">
-        <div class="position-relative rounded-circle m-auto gradient-border-xl" style="width: 75px; height: 75px">
-            <div
-                class="position-relative bg-dark rounded-circle d-flex align-items-center justify-content-center"
-                style="z-index: 1; width: 65px; height: 65px"
-            >
-                <i class="fas fa-id-card" style="font-size: 1.5rem" />
-            </div>
-        </div>
-        <b-badge class="mt-2 p-2" variant="primary">
-            <i class="fas fa-trophy me-1 text-opaque" />
-            {{ membership }}
-        </b-badge>
-    </div>
+    <b-card class="border-0 gradient-shadow-xl" style="min-height: 415px">
+        <b-tabs v-model="index" pills justified content-class="mt-3" nav-wrapper-class="text-white">
+            <b-tab>
+                <template #title>
+                    <i class="fas fa-balance-scale me-1" />
+                    Liquidity
+                </template>
+                <hr />
+                <BaseTabLiquidity @change-tab="index = $event" />
+            </b-tab>
+            <b-tab>
+                <template #title>
+                    <i class="fas fa-id-card me-1" />
+                    Membership
+                </template>
+                <hr />
+                <BaseTabDeposit v-if="veStore.lock && !Number(veStore.lock.amount)" @change-tab="index = $event" />
+                <BaseTabWithdraw v-else @change-tab="index = $event" />
+            </b-tab>
+        </b-tabs>
+    </b-card>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
-import { fromWei } from 'web3-utils';
 
 export default defineComponent({
     name: 'BaseCardMembership',
+    props: {
+        tabIndex: {
+            type: Number,
+            default: 0,
+        },
+    },
     data() {
-        return {};
+        return {
+            index: 0,
+        };
     },
     computed: {
-        ...mapStores(useVeStore, useLiquidityStore),
-        membership() {
-            if (!this.veStore.lock) return;
-            const price = this.liquidityStore.pricing['20USDC-80THX'];
-            const amount = Number(fromWei(String(this.veStore.lock.amount)));
-            const amountInUSD = amount * price;
-
-            if (amountInUSD < 5) return 'No Rank';
-            if (amountInUSD > 5 && amountInUSD < 50) return 'Rookie';
-            if (amountInUSD > 50 && amountInUSD < 500) return 'Pro';
-            if (amountInUSD > 500 && amountInUSD < 5000) return 'Elite';
-            if (amountInUSD > 5000 && amountInUSD < 50000) return 'Master';
-            if (amountInUSD > 50000 && amountInUSD < 500000) return 'Legend';
+        ...mapStores(useVeStore),
+    },
+    watch: {
+        tabIndex: {
+            handler(value: number) {
+                this.index = value;
+            },
+            immediate: true,
         },
     },
     methods: {},

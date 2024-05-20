@@ -35,6 +35,7 @@ const config: UserConfigExport = {
         alias: [
             { find: '@thxnetwork/app', replacement: path.resolve(__dirname, './src') },
             { find: '@thxnetwork/common', replacement: path.resolve(__dirname, '../../libs/common/src/lib') },
+            { find: '@thxnetwork/sdk', replacement: path.resolve(__dirname, '../../libs/sdk/src/lib') },
         ],
     },
     optimizeDeps: {

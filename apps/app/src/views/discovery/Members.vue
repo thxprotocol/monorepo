@@ -11,10 +11,7 @@
             </p>
         </template>
         <template #secondary>
-            <BaseCardMembershipOnboarding v-if="!Number(formatUnits(veStore.lock.amount, 18))" />
-            <div v-else class="h-100 d-flex align-items-center justify-content-center">
-                <BaseCardMembership />
-            </div>
+            <BaseCardMembership :tab-index="1" />
         </template>
     </BaseCardHeader>
     <b-container class="mt-5">
