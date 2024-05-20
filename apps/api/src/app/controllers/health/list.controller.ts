@@ -7,6 +7,7 @@ import { getProvider } from '@thxnetwork/api/util/network';
 import { ethers } from 'ethers';
 import { getArtifact, contractNetworks } from '@thxnetwork/api/hardhat';
 import { BigNumber } from 'alchemy-sdk';
+import { name, version, license } from '../../../../package.json';
 
 function handleError(error: Error) {
     logger.error(error);
@@ -46,8 +47,8 @@ async function getNetworkDetails(chainId: ChainId) {
             registry: registry.address,
             relayer: defaultAccount,
             bptGauge: bptGauge.address,
-            bpt: await bpt.getAddress(),
-            bal: await bal.getAddress(),
+            bpt: bpt.address,
+            bal: bal.address,
             thx: contractNetworks[chainId].THX,
             usdc: contractNetworks[chainId].USDC,
             vault: contractNetworks[chainId].BalancerVault,
@@ -86,13 +87,13 @@ async function getNetworkDetails(chainId: ChainId) {
             total,
             balances: await Promise.all([
                 {
-                    bpt: fromWei(String(await bpt.balanceOf(rfthx.address)), 'ether'),
-                    bal: fromWei(String(await bal.balanceOf(rfthx.address)), 'ether'),
+                    bpt: fromWei(String(bpt.address), 'ether'),
+                    bal: fromWei(String(bal.address), 'ether'),
                 },
             ]),
             rewards: {
-                bpt: await getRewards(await bpt.getAddress(), String(currentBlock.timestamp)),
-                bal: await getRewards(await bal.getAddress(), String(currentBlock.timestamp)),
+                bpt: await getRewards(bpt.address, String(currentBlock.timestamp)),
+                bal: await getRewards(bal.address, String(currentBlock.timestamp)),
             },
         };
         const splitter = new ethers.Contract(
@@ -124,7 +125,14 @@ async function getNetworkDetails(chainId: ChainId) {
 }
 
 const controller = async (req: Request, res: Response) => {
+    const jsonData = {
+        name,
+        version,
+        license,
+    };
+
     const result = {
+        ...jsonData,
         networks: {},
     };
 
