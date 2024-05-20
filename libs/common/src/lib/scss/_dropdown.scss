@@ -1,0 +1,24 @@
+.b-dropdown-text {
+    font-weight: bold;
+}
+
+.dropdown-select {
+    display: flex;
+}
+
+.dropdown-select .dropdown-item {
+    white-space: normal;
+    border-bottom: 1px solid $light;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: $light;
+    color: $dark;
+
+    a:hover {
+        color: $primary !important;
+    }
+}
