@@ -124,7 +124,7 @@ async function createCampaignWidgetPreviewImage({ poolId, logoImgUrl, background
 export async function captureScreenshot(url, outputFileName, width, height) {
     const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
 
     await page.setViewport({ width, height });
