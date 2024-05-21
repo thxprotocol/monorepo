@@ -100,6 +100,17 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: eu-west-3
 
+            - name: Restore Node.js dependencies
+              uses: actions/cache@v3
+              with:
+                  path: ./node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - name: Build App
+              run: yarn nx run app:build --prod --skip-nx-cache
+
             - name: Deploy
               run: aws s3 sync ./dist/apps/app s3://dev-app.thx.network --delete
 
