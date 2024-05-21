@@ -2,8 +2,7 @@ name: App CI
 
 on:
     push:
-        branches:
-            - develop
+
 jobs:
     buildAndTest:
         name: CI Pipeline
@@ -51,21 +50,17 @@ jobs:
             - name: Build App
               run: yarn nx run app:build --prod --skip-nx-cache
 
-    autodeploy:
-        name: Auto deploy develop to dev-app.thx.network
+    bumpVersion:
+        name: 'Bump Version on develop'
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/develop'
-        needs: [buildAndTest]
+        needs: buildAndTest
         outputs:
             newTag: ${{ steps.version-bump.outputs.newTag }}
-        steps:
-            - name: Install Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ matrix.node-version }}
 
+        steps:
             - name: 'Checkout source code'
-              uses: 'actions/checkout@v2'
+              uses: actions/checkout@v3
               with:
                   ref: ${{ github.ref }}
 
@@ -79,6 +74,24 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   PACKAGEJSON_DIR: 'apps/app'
+
+    autodeploy:
+        name: Auto deploy develop to dev-app.thx.network
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/develop'
+        needs: [buildAndTest, bumpVersion]
+        outputs:
+            newTag: ${{ steps.version-bump.outputs.newTag }}
+        steps:
+            - name: 'Checkout source code'
+              uses: 'actions/checkout@v3'
+              with:
+                  ref: ${{ github.ref }}
+
+            - name: Install Node.js ${{ matrix.node-version }}
+              uses: actions/checkout@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
@@ -94,7 +107,7 @@ jobs:
         name: Update Discord
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/develop'
-        needs: [autodeploy, bumpVersion]
+        needs: [autodeploy]
         steps:
             - name: Send message
               env:
