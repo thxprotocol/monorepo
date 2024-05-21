@@ -1,0 +1,104 @@
+name: App CI
+
+on:
+    push:
+        - develop
+
+jobs:
+    buildAndTest:
+        name: CI Pipeline
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: ['18'] # Add other versions if needed
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: us-east-1
+
+            - name: Install Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Restore Node.js dependencies
+              uses: actions/cache@v3
+              with:
+                  path: ./node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - name: Install Node.js dependencies
+              run: yarn install --frozen-lockfile
+
+            - name: Cache Node.js dependencies
+              uses: actions/cache/save@v3
+              if: always()
+              with:
+                  path: ./node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+
+            - name: Build App
+              run: yarn nx run app:build --prod --skip-nx-cache
+
+    autodeploy:
+        name: Auto deploy develop to dev-app.thx.network
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/develop'
+        needs: [buildAndTest]
+        outputs:
+            newTag: ${{ steps.version-bump.outputs.newTag }}
+        steps:
+            - name: Install Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: 'Checkout source code'
+              uses: 'actions/checkout@v2'
+              with:
+                  ref: ${{ github.ref }}
+
+            - name: 'Automated Version Bump'
+              id: version-bump
+              uses: 'phips28/gh-action-bump-version@master'
+              with:
+                  tag-prefix: 'v'
+                  tag-suffix: '-app'
+                  commit-message: 'CI: bumps version to {{version}}'
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  PACKAGEJSON_DIR: 'apps/app'
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: eu-west-3
+
+            - name: Deploy-script
+              run: thx-deploy ApiDev sha-$(echo ${{github.sha}} | cut -c1-7)
+
+    discord:
+        name: Update Discord
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/develop'
+        needs: [autodeploy, bumpVersion]
+        steps:
+            - name: Send message
+              env:
+                  DISCORD_WEBHOOK: ${{ secrets.DISCORD_AWS_WEBHOOK }}
+              uses: Ilshidur/action-discord@master
+              with:
+                  args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released AppDev `${{ needs.bumpVersion.outputs.newTag }}`"
