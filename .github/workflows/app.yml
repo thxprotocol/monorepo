@@ -100,6 +100,9 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: eu-west-3
 
+            - name: Set build mode based on branch
+              run: echo "BUILD_MODE=$([[ '${{ github.ref_name }}' == 'main' ]] && echo 'prod' || ([[ '${{ github.ref_name }}' == 'develop' ]] && echo 'dev' || echo 'unknown'))" >> $GITHUB_ENV
+
             - name: Restore Node.js dependencies
               uses: actions/cache@v3
               with:
@@ -109,7 +112,7 @@ jobs:
                       ${{ runner.os }}-node-
 
             - name: Build App
-              run: yarn nx run app:build --prod --skip-nx-cache
+              run: yarn nx run app:build --prod --mode $BUILD_MODE --skip-nx-cache
 
             - name: Deploy
               run: aws s3 sync ./dist/apps/app s3://dev-app.thx.network --delete

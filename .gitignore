@@ -41,6 +41,9 @@ Thumbs.db
 .env*
 !.env.ci
 !.env.example
+!apps/app/.env.prod
+!apps/app/.env.dev
+
 certs/*
 
 .nx/cache
