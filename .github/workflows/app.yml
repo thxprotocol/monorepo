@@ -2,8 +2,8 @@ name: App CI
 
 on:
     push:
-        - develop
-
+        branches:
+            - develop
 jobs:
     buildAndTest:
         name: CI Pipeline
