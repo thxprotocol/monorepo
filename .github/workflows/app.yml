@@ -100,7 +100,7 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: eu-west-3
 
-            - name: Set build mode based on branch
+            - name: Set BUILD_MODE based on branch
               run: echo "BUILD_MODE=$([[ '${{ github.ref_name }}' == 'main' ]] && echo 'prod' || ([[ '${{ github.ref_name }}' == 'develop' ]] && echo 'dev' || echo 'unknown'))" >> $GITHUB_ENV
 
             - name: Restore Node.js dependencies
@@ -120,12 +120,19 @@ jobs:
     discord:
         name: Update Discord
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/develop'
         needs: [autodeploy]
         steps:
+            - name: 'Checkout source code'
+              uses: 'actions/checkout@v3'
+              with:
+                  ref: ${{ github.ref }}
+
+            - name: Set DISCORD_WEBHOOK based on branch
+              run: echo "DISCORD_WEBHOOK=${{ secrets['DISCORD_WEBHOOK_' }}${{ github.ref == 'refs/heads/develop' && 'DEV' || github.ref == 'refs/heads/main' && 'PROD' }}" >> $GITHUB_ENV
+
             - name: Send message
               env:
-                  DISCORD_WEBHOOK: ${{ secrets.DISCORD_AWS_WEBHOOK }}
+                  DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
               uses: Ilshidur/action-discord@master
               with:
-                  args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released AppDev `${{ needs.bumpVersion.outputs.newTag }}`"
+                  args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App `${{ needs.bumpVersion.outputs.newTag }}`"
