@@ -87,8 +87,8 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: eu-west-3
 
-            - name: Deploy-script
-              run: thx-deploy ApiDev sha-$(echo ${{github.sha}} | cut -c1-7)
+            - name: Deploy
+              run: aws s3 sync ./dist/apps/app s3://dev-app.thx.network --delete
 
     discord:
         name: Update Discord

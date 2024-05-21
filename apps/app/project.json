@@ -20,14 +20,6 @@
             },
             "configurations": {}
         },
-        "notify": {
-            "dependsOn": ["^build"],
-            "executor": "nx:run-commands",
-            "options": {
-                "command": "node notify.js {args.branch} {args.version} {args.webhook}",
-                "cwd": "dist/apps/dashboard"
-            }
-        },
         "lint": {
             "executor": "@nx/eslint:lint",
             "outputs": ["{options.outputFile}"]
