@@ -128,7 +128,7 @@ jobs:
                   ref: ${{ github.ref }}
 
             - name: Set DISCORD_WEBHOOK based on branch
-              run: echo "DISCORD_WEBHOOK=${{ secrets['DISCORD_WEBHOOK_' }}${{ github.ref == 'refs/heads/develop' && 'DEV' || github.ref == 'refs/heads/main' && 'PROD' }}" >> $GITHUB_ENV
+              run: echo "DISCORD_WEBHOOK=${{ secrets[${{ github.ref == 'refs/heads/develop' && 'DISCORD_WEBHOOK_DEV' || github.ref == 'refs/heads/main' && 'DISCORD_WEBHOOK_PROD' }}] }}" >> $GITHUB_ENV
 
             - name: Send message
               env:
