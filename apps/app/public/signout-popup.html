@@ -24,9 +24,13 @@
                 } else {
                     window.location.href = url.origin
                 }
-            }).catch(console.error);
+            }).catch((error) => console.error)
         } else {
-            mgr.signoutPopupCallback().then(() => window.close()).catch(console.error);
+            mgr.signoutPopupCallback().then(() => window.close()).catch((error) => {
+                console.error(error)
+                //No window.opener. Can't complete notification
+                windo.close();
+            });
         }
     </script>
 </body>
