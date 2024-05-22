@@ -6,7 +6,7 @@ on:
 jobs:
     buildAndTest:
         if: "!contains(github.event.head_commit.message, 'CI:')" # Skip if commit message contains 'CI:'
-        name: CI Pipeline
+        name: 'Build & Test'
         runs-on: ubuntu-latest
         strategy:
             matrix:
@@ -52,7 +52,7 @@ jobs:
               run: yarn nx run app:build --prod --skip-nx-cache
 
     bumpVersion:
-        name: 'Bump Version on develop'
+        name: 'Bump version'
         runs-on: ubuntu-latest
         if: "(github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')"
         needs: buildAndTest
@@ -77,7 +77,7 @@ jobs:
                   PACKAGEJSON_DIR: 'apps/app'
 
     autodeploy:
-        name: Auto deploy develop to dev-app.thx.network
+        name: 'Auto deploy'
         runs-on: ubuntu-latest
         if: "(github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')"
         needs: [buildAndTest, bumpVersion]
@@ -145,7 +145,7 @@ jobs:
 
             - name: Send message
               env:
-                  DISCORD_WEBHOOK: ${{ vars.DISCORD_WEBHOOK }}
+                  DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
               uses: Ilshidur/action-discord@master
               with:
                   args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App `${{ needs.bumpVersion.outputs.newTag }}`"
