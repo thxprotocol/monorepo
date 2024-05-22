@@ -6,7 +6,7 @@ on:
 jobs:
     buildAndTest:
         if: "(github.ref != 'refs/heads/main' && !contains(github.event.head_commit.message, 'CI:'))"
-        name: CI Pipeline
+        name: 'Build & Test'
         runs-on: ubuntu-latest
         strategy:
             matrix:
@@ -79,7 +79,7 @@ jobs:
             #       projectBaseDir: apps/api
 
     bumpVersion:
-        name: 'Bump Version on develop'
+        name: 'Bump version'
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/develop'
         needs: buildAndTest
@@ -201,7 +201,7 @@ jobs:
                   labels: ${{ steps.meta.outputs.labels }}
 
     autodeploy:
-        name: Auto deploy develop to dev.api.thx.network
+        name: 'Auto deploy'
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/develop'
         needs: [buildAndPushImage, bumpVersion]
