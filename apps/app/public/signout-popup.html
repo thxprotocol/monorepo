@@ -29,7 +29,7 @@
             mgr.signoutPopupCallback().then(() => window.close()).catch((error) => {
                 console.error(error)
                 //No window.opener. Can't complete notification
-                windo.close();
+                window.close();
             });
         }
     </script>

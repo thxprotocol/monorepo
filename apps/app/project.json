@@ -16,7 +16,10 @@
             "defaultConfiguration": "development",
             "options": {
                 "buildTarget": "app:build",
-                "port": 8080
+                "port": 8080,
+                "fs": {
+                    "allow": [".."]
+                }
             },
             "configurations": {}
         },

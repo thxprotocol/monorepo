@@ -68,9 +68,20 @@ export default defineComponent({
     },
     methods: {
         onClickClose() {
+            // If the widget is in an iframe, send a message to the parent window to close the widget
             if (this.accountStore.isIFrame) {
                 window.top?.postMessage({ message: 'thx.widget.toggle' }, this.accountStore.config.origin);
-            } else {
+            }
+            // If the widget is not in an iframe and there are no quests or rewards, redirect to the origin
+            else if (!this.questStore.quests.length && this.accountStore.config.domain) {
+                window.open(this.accountStore.config.domain, '_self');
+            }
+            // If this page is opened by a script close the window
+            else if (window.opener) {
+                window.close();
+            }
+            // All other cases redirect to the app homepage
+            else {
                 this.$router.push('/');
             }
         },
