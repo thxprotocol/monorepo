@@ -54,7 +54,7 @@ jobs:
     bumpVersion:
         name: 'Bump version'
         runs-on: ubuntu-latest
-        if: "(github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')"
+        if: "(github.ref == 'refs/heads/develop')"
         needs: buildAndTest
         outputs:
             newTag: ${{ steps.version-bump.outputs.newTag }}
@@ -151,6 +151,7 @@ jobs:
             - name: Send message
               env:
                   DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
+                  PACKAGE_VERSION: $(cat apps/app/package.json | jq '.version' | tr -d '"')
               uses: Ilshidur/action-discord@master
               with:
-                  args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App `${{ needs.bumpVersion.outputs.newTag }}`"
+                  args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App $PACKAGE_VERSION"
