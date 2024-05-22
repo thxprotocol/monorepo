@@ -43,7 +43,6 @@ import { useWalletStore } from '../../stores/Wallet';
 import { MAX_LOCK_TIME, contractNetworks } from '../../config/constants';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { calculatePenalty, toFiatPrice } from '@thxnetwork/app/utils/price';
-import { formatUnits } from 'ethers/lib/utils';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
 
 export default defineComponent({
@@ -73,8 +72,7 @@ export default defineComponent({
             return calculatePenalty(this.veStore.lock.amount, 1, end - now, MAX_LOCK_TIME);
         },
         penalty() {
-            const penaltyInUSDC = this.penaltyInWei * this.liquidityStore.pricing['20USDC-80THX'];
-            return Number(formatUnits(String(penaltyInUSDC), 18));
+            return (this.penaltyInWei * this.liquidityStore.pricing['20USDC-80THX']) / 10 ** 18;
         },
         withdrawAmount() {
             const lock = this.veStore.lock;

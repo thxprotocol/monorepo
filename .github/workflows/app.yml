@@ -113,9 +113,11 @@ jobs:
               run: |
                   if [[ $GITHUB_REF == 'refs/heads/develop' ]]; then
                     echo "S3_URL=s3://dev-app.thx.network" >> $GITHUB_ENV
+                    echo "DISTRIBUTION=${{ secrets.CLOUDFRONT_DISTRIBUTION_APP_DEV }}" >> $GITHUB_ENV
                     echo "BUILD_MODE=dev" >> $GITHUB_ENV
                   elif [[ $GITHUB_REF == 'refs/heads/main' ]]; then
                     echo "S3_URL=s3://app.thx.network" >> $GITHUB_ENV
+                    echo "DISTRIBUTION=${{ secrets.CLOUDFRONT_DISTRIBUTION_APP_PROD }}" >> $GITHUB_ENV
                     echo "BUILD_MODE=prod" >> $GITHUB_ENV
                   fi
 
@@ -124,6 +126,9 @@ jobs:
 
             - name: Deploy
               run: aws s3 sync ./dist/apps/app $S3_URL --delete
+
+            - name: Invalidate CloudFront cache
+              run: aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths "/*"
 
     discord:
         name: Update Discord
