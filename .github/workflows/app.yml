@@ -127,7 +127,7 @@ jobs:
     discord:
         name: Update Discord
         runs-on: ubuntu-latest
-        needs: [autodeploy]
+        needs: [autodeploy, bumpVersion]
         steps:
             - name: 'Checkout source code'
               uses: 'actions/checkout@v3'
