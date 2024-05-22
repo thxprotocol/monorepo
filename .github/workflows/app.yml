@@ -122,7 +122,7 @@ jobs:
               run: yarn nx run app:build --prod --mode $BUILD_MODE --skip-nx-cache
 
             - name: Deploy
-              run: aws s3 sync ./dist/apps/app ${{ S3_URL }} --delete
+              run: aws s3 sync ./dist/apps/app $S3_URL --delete
 
     discord:
         name: Update Discord
@@ -144,7 +144,7 @@ jobs:
 
             - name: Send message
               env:
-                  DISCORD_WEBHOOK: ${{ DISCORD_WEBHOOK }}
+                  DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
               uses: Ilshidur/action-discord@master
               with:
                   args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App `${{ needs.bumpVersion.outputs.newTag }}`"
