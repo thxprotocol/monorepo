@@ -154,4 +154,4 @@ jobs:
                   PACKAGE_VERSION: $(cat apps/app/package.json | jq '.version' | tr -d '"')
               uses: Ilshidur/action-discord@master
               with:
-                  args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App $PACKAGE_VERSION"
+                  args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App ${{ env.PACKAGE_VERSION }}"
