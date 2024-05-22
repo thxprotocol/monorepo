@@ -144,7 +144,7 @@ jobs:
 
             - name: Send message
               env:
-                  DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
+                  DISCORD_WEBHOOK: ${{ vars.DISCORD_WEBHOOK }}
               uses: Ilshidur/action-discord@master
               with:
                   args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App `${{ needs.bumpVersion.outputs.newTag }}`"
