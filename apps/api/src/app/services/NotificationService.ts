@@ -129,14 +129,21 @@ async function sendQuestEntryNotification(pool: PoolDocument, quest: TQuest, acc
     const index = Math.floor(Math.random() * celebratoryWords.length);
     const discord = account.tokens && account.tokens.find((a) => a.kind === 'discord');
     const user = discord && discord.userId ? `<@${discord.userId}>` : `**${account.username}**`;
-    const button = {
-        customId: `${DiscordButtonVariant.QuestComplete}:${quest.variant}:${quest._id}`,
-        label: 'Complete Quest',
-        style: ButtonStyle.Primary,
-    };
     const content = `${celebratoryWords[index]} ${user} completed the **${quest.title}** quest and earned **${amount} points.**`;
 
-    await DiscordDataProxy.sendChannelMessage(pool, content, [], [button]);
+    await DiscordDataProxy.sendChannelMessage(
+        pool,
+        content,
+        [],
+        [
+            {
+                customId: `${DiscordButtonVariant.QuestComplete}:${quest.variant}:${quest._id}`,
+                label: 'Complete Quest',
+                style: ButtonStyle.Primary,
+            },
+            { label: 'More Info', style: ButtonStyle.Link, url: WIDGET_URL + `/c/${pool.settings.slug}/quests` },
+        ],
+    );
 }
 
 export default { send, notify, sendQuestEntryNotification };

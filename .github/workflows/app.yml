@@ -148,10 +148,12 @@ jobs:
                     echo "DISCORD_WEBHOOK=${{ secrets.DISCORD_WEBHOOK_PROD }}" >> $GITHUB_ENV
                   fi
 
+            - name: Get version
+              run: echo "PACKAGE_VERSION=$(cat apps/app/package.json | jq -r '.version' | tr -d '"')" >> $GITHUB_ENV
+
             - name: Send message
               env:
                   DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
-                  PACKAGE_VERSION: $(cat apps/app/package.json | jq '.version' | tr -d '"')
               uses: Ilshidur/action-discord@master
               with:
                   args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App ${{ env.PACKAGE_VERSION }}"
