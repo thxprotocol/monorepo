@@ -5,6 +5,7 @@ on:
 
 jobs:
     buildAndTest:
+        if: "(github.ref != 'refs/heads/main' && !contains(github.event.head_commit.message, 'CI:'))"
         name: CI Pipeline
         runs-on: ubuntu-latest
         strategy:

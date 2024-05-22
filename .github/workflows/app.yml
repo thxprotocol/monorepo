@@ -5,6 +5,7 @@ on:
 
 jobs:
     buildAndTest:
+        if: "!contains(github.event.head_commit.message, 'CI:')" # Skip if commit message contains 'CI:'
         name: CI Pipeline
         runs-on: ubuntu-latest
         strategy:
@@ -53,7 +54,7 @@ jobs:
     bumpVersion:
         name: 'Bump Version on develop'
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/develop'
+        if: "(github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')"
         needs: buildAndTest
         outputs:
             newTag: ${{ steps.version-bump.outputs.newTag }}
@@ -78,7 +79,7 @@ jobs:
     autodeploy:
         name: Auto deploy develop to dev-app.thx.network
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/develop'
+        if: "(github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')"
         needs: [buildAndTest, bumpVersion]
         outputs:
             newTag: ${{ steps.version-bump.outputs.newTag }}
