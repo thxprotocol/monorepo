@@ -128,8 +128,6 @@ export default defineComponent({
             try {
                 const walletStore = useWalletStore();
 
-                if (!this.wallet) throw new Error('Please select a wallet.');
-
                 await this.rewardStore.createPayment(this.reward.variant, this.reward._id, this.wallet);
 
                 walletStore.list();
