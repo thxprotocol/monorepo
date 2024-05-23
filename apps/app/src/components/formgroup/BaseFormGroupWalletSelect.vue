@@ -52,11 +52,7 @@ export default defineComponent({
                 return this.wallet;
             },
             set(value: TWallet) {
-                if (this.wallets.includes(value)) {
-                    this.$emit('update', value);
-                } else {
-                    this.$emit('update', null);
-                }
+                this.$emit('update', value);
             },
         },
         wallets() {

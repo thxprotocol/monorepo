@@ -174,7 +174,7 @@ export default class RewardService {
                 const payments = await serviceMap[rewardVariant].models.payment.find({ sub });
                 const callback = payments.map(async (p: Document & TRewardPayment) => {
                     const decorated = await serviceMap[rewardVariant].decoratePayment(p);
-                    return { ...decorated, rewardVariant };
+                    return { ...decorated.toJSON(), rewardVariant };
                 });
                 return await Promise.all(callback);
             }),
