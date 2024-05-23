@@ -32,12 +32,13 @@
         <BaseFormGroupWalletSelect
             v-if="accountStore.isAuthenticated"
             description="Add or connect the wallet you will use for this quest."
-            :variants="[WalletVariant.WalletConnect]"
+            :wallet="walletStore.wallet"
+            :variants="walletVariants"
             @update="onUpdate"
         />
 
         <template #button>
-            <b-button variant="primary" class="w-100" :disabled="isSubmitting" @click="onClickSign">
+            <b-button variant="primary" class="w-100" :disabled="isDisabled" @click="onClickSign">
                 <b-spinner v-if="isSubmitting" small />
                 <template v-else-if="quest.amount">
                     Claim
@@ -76,6 +77,7 @@ export default defineComponent({
             imgLogoGitcoin,
             error: '',
             isSubmitting: false,
+            walletVariants: [WalletVariant.WalletConnect],
             show: false,
             message:
                 'This signed message will be used to proof ownership of your web3 account and verify the quest requirements.',
@@ -86,12 +88,19 @@ export default defineComponent({
         isAlertDangerShown() {
             return !!this.error && !this.isSubmitting;
         },
+        isDisabled() {
+            return (
+                this.isSubmitting ||
+                !this.walletStore.wallet ||
+                !this.walletVariants.includes(this.walletStore.wallet.variant)
+            );
+        },
     },
     mounted() {
         if (!this.quest.isAvailable) return;
     },
     methods: {
-        onUpdate(wallet: TWallet) {
+        onUpdate(wallet: TWallet | null) {
             this.walletStore.setWallet(wallet, true);
         },
         async onClickSign() {

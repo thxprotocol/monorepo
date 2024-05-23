@@ -41,12 +41,13 @@
         <BaseFormGroupWalletSelect
             v-if="accountStore.isAuthenticated"
             description="Add or connect the wallet you will use for this quest."
+            :wallet="walletStore.wallet"
             :variants="[WalletVariant.WalletConnect]"
             @update="onUpdate"
         />
 
         <template #button>
-            <b-button variant="primary" class="w-100" :disabled="isSubmitting" @click="onClickSign">
+            <b-button variant="primary" class="w-100" :disabled="isDisabled" @click="onClickSign">
                 <b-spinner v-if="isSubmitting" small />
                 <template v-else-if="quest.amount">
                     Claim
@@ -84,6 +85,7 @@ export default defineComponent({
             error: '',
             message: '',
             isSubmitting: false,
+            walletVariants: [WalletVariant.WalletConnect],
             chainList,
             getAddressURL,
             chainId: ChainId.Polygon,
@@ -92,6 +94,13 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore, useWalletStore),
+        isDisabled() {
+            return (
+                this.isSubmitting ||
+                !this.walletStore.wallet ||
+                !this.walletVariants.includes(this.walletStore.wallet.variant)
+            );
+        },
     },
     mounted() {
         if (!this.quest.isAvailable) return;
@@ -99,7 +108,7 @@ export default defineComponent({
         this.message = `This signature will be used to validate if the result of calling ${this.quest.methodName} on chain ${this.chainId} with the address used to sign this message is above the threshold of ${this.quest.threshold}.`;
     },
     methods: {
-        onUpdate(wallet: TWallet) {
+        onUpdate(wallet: TWallet | null) {
             this.walletStore.setWallet(wallet, true);
         },
         async onClickSign() {
