@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 import { RewardVariant } from '@thxnetwork/common/enums';
-import { Participant, QRCodeEntry, WalletDocument } from '@thxnetwork/api/models';
+import { Participant, QRCodeEntry, Wallet, WalletDocument } from '@thxnetwork/api/models';
 import { v4 } from 'uuid';
 import { logger } from '../util/logger';
 import { Job } from '@hokify/agenda';
@@ -42,6 +42,7 @@ export default class RewardService {
     }
 
     static async list({ pool, account }) {
+        const owner = await AccountProxy.findById(pool.sub);
         const rewardVariants = Object.keys(RewardVariant).filter((v) => !isNaN(Number(v)));
         const callback: any = async (variant: RewardVariant) => {
             const Reward = serviceMap[variant].models.reward;
@@ -64,18 +65,43 @@ export default class RewardService {
                     try {
                         const decorated = await serviceMap[reward.variant].decorate({ reward, account });
                         const isLocked = await this.isLocked({ reward, account });
-                        const isStocked = await this.isStocked(reward);
+                        const isLimitReached = await this.isLimitReached({ reward, account });
+                        const isLimitSupplyReached = await this.isLimitSupplyReached(reward);
                         const isExpired = this.isExpired(reward);
-                        const isAvailable = await this.isAvailable({ reward, account });
-                        const progress = {
-                            count: await serviceMap[reward.variant].models.payment.countDocuments({
-                                rewardId: reward._id,
-                            }),
-                            limit: reward.limit,
+                        const isAvailable = account
+                            ? !isLocked && !isExpired && !isLimitSupplyReached && !isLimitReached
+                            : true;
+                        const limit = {
+                            count: account
+                                ? await serviceMap[reward.variant].models.payment.countDocuments({
+                                      rewardId: reward.id,
+                                      sub: account.sub,
+                                  })
+                                : 0,
+                            max: reward.limit,
                         };
-
-                        // Decorated properties may override generic properties
-                        return { progress, isLocked, isStocked, isExpired, isAvailable, ...decorated };
+                        const paymentCount = await serviceMap[reward.variant].models.payment.countDocuments({
+                            rewardId: reward.id,
+                        });
+                        const limitSupply = {
+                            count: paymentCount,
+                            max: reward.limitSupply,
+                        };
+                        return {
+                            isLocked,
+                            isLimitReached,
+                            isLimitSupplyReached,
+                            isExpired,
+                            isAvailable,
+                            paymentCount,
+                            author: {
+                                username: owner.username,
+                            },
+                            // Decorated properties may override generic properties
+                            ...decorated,
+                            limit,
+                            limitSupply,
+                        };
                     } catch (error) {
                         logger.error(error);
                     }
@@ -167,14 +193,17 @@ export default class RewardService {
             const account = await AccountProxy.findById(sub);
             const reward = await this.findById(variant, rewardId);
             const pool = await PoolService.getById(reward.poolId);
-            const wallet = walletId && (await WalletService.findById(walletId));
+            const wallet = walletId && (await Wallet.findById(walletId));
 
             // Validate supply, expiry, locked and reward specific validation
-            const validationResult = await this.getValidationResult({ reward, account, safe: pool.safe });
+            const validationResult = await this.getValidationResult({ reward, account, wallet, safe: pool.safe });
             if (!validationResult.result) return validationResult.reason;
 
             // Subtract points for account
             await PointBalanceService.subtract(pool, account, reward.pointPrice);
+
+            // Create the payment
+            await serviceMap[variant].createPayment({ reward, account, safe: pool.safe, wallet });
 
             // Send email notification
             let html = `<p style="font-size: 18px">Congratulations!🚀</p>`;
@@ -182,13 +211,8 @@ export default class RewardService {
             html += `<p class="btn"><a href="${pool.campaignURL}">View Wallet</a></p>`;
             await MailService.send(account.email, `🎁 Reward Received!`, html);
 
-            const payment = await serviceMap[variant].createPayment({ reward, account, safe: pool.safe, wallet });
-
             // Register THX onboarding campaign event
             await THXService.createEvent(account, 'reward_payment_created');
-
-            // Register the payment for the account
-            return payment;
         } catch (error) {
             console.log(error);
             logger.error(error);
@@ -240,7 +264,7 @@ export default class RewardService {
         wallet,
     }: {
         reward: TReward;
-        account?: TAccount;
+        account: TAccount;
         safe?: WalletDocument;
         wallet?: WalletDocument;
     }) {
@@ -255,38 +279,53 @@ export default class RewardService {
         const isExpired = this.isExpired(reward);
         if (isExpired) return { result: false, reason: 'This reward claim has expired.' };
 
-        const isStocked = await this.isStocked(reward);
-        if (!isStocked) return { result: false, reason: 'This reward is out of stock.' };
+        const isLimitSupplyReached = await this.isLimitSupplyReached(reward);
+        if (isLimitSupplyReached) return { result: false, reason: "This reward has reached it's supply limit." };
+
+        const isLimitReached = await this.isLimitReached(reward);
+        if (isLimitReached) return { result: false, reason: 'This reward has reached your personal limit.' };
 
         return serviceMap[reward.variant].getValidationResult({ reward, account, wallet, safe });
     }
 
+    // Checks if the account has reached the max amount of payments for this reward
+    static async isLimitReached({ reward, account }: { reward: TReward; account?: TAccount }) {
+        if (!account || !reward.limit) return false;
+        const Payment = await serviceMap[reward.variant].models.payment;
+        const paymentCount = await Payment.countDocuments({ rewardId: reward.id, sub: account.sub });
+        return paymentCount >= reward.limit;
+    }
+
+    // Checks if the reward is locked with a quest
     static async isLocked({ reward, account }) {
         if (!account || !reward.locks.length) return false;
         return await LockService.getIsLocked(reward.locks, account);
     }
 
+    // Checks if the reward is expired
     static isExpired(reward: TReward) {
         if (!reward.expiryDate) return false;
         return Date.now() > new Date(reward.expiryDate).getTime();
     }
 
-    static async isStocked(reward) {
-        if (!reward.limit) return true;
+    // Checks if the reward supply is sufficient
+    static async isLimitSupplyReached(reward: TReward) {
+        if (!reward.limitSupply) return false;
         // Check if reward has a limit and if limit has been reached
-        const amountOfPayments = await serviceMap[reward.variant].models.payment.countDocuments({
-            rewardId: reward._id,
+        const paymentCount = await serviceMap[reward.variant].models.payment.countDocuments({
+            rewardId: reward.id,
         });
-        return amountOfPayments < reward.limit;
+        return paymentCount >= reward.limitSupply;
     }
 
     static async isAvailable({ reward, account }: { reward: TReward; account?: TAccount }) {
         if (!account) return true;
 
         const isLocked = await this.isLocked({ reward, account });
-        const isStocked = await this.isStocked(reward);
+        const isLimitSupplyReached = await this.isLimitSupplyReached(reward);
+        const isLimitReached = await this.isLimitReached({ reward, account });
         const isExpired = this.isExpired(reward);
 
-        return !isLocked && !isExpired && isStocked;
+        return !isLocked && !isExpired && !isLimitSupplyReached && !isLimitReached;
     }
 }

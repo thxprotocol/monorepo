@@ -39,7 +39,7 @@ describe('QR Codes', () => {
         pool = await PoolService.deploy(sub, 'My Reward Campaign');
         poolId = String(pool._id);
 
-        const safe = await SafeService.create({ sub, chainId, safeVersion, poolId });
+        const safe = await SafeService.create({ sub, safeVersion, poolId });
 
         // Wait for campaign safe to be deployed
         const { web3 } = getProvider(ChainId.Hardhat);

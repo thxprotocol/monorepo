@@ -21,16 +21,25 @@ type TReward = {
     erc1155Amount: number;
     variant: RewardVariant;
     locks: { questId: string; variant: QuestVariant }[];
-    progress: {
-        limit: number;
-        count: number;
-    };
     expiry: {
         date: number;
         now: number;
     };
+    limit: { count: number; max: number };
+    limitSupply: {
+        count: number;
+        max: number;
+    };
+    author: {
+        username: string;
+    };
+    isLimitReached: boolean;
+    isLimitSupplyReached: boolean;
     isLocked: boolean;
+    isAvailable: boolean;
     isOwner: boolean;
+    paymentCount: number;
+    createdAt: Date;
 };
 
 type TRewardCoin = TReward & {

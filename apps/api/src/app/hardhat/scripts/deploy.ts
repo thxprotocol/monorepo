@@ -111,6 +111,9 @@ async function main() {
     // Deploy PaymentSplitter
     const splitter = await deploy('THXPaymentSplitter', [await signer.getAddress(), registry.address], signer);
     await splitter.setRegistry(registry.address);
+
+    // Skip 7 days
+    await hre.network.provider.send('evm_increaseTime', [60 * 60 * 24 * 7]);
 }
 
 main().catch(console.error);

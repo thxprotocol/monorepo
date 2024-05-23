@@ -92,6 +92,14 @@ export default defineComponent({
                     variant: 1,
                     amount: 1,
                     image: 'https://i.seadn.io/s/raw/files/77485858457f42c1e4a3f5d89436cced.png?auto=format&dpr=1&w=1000',
+                    limit: {
+                        max: 0,
+                        count: 0,
+                    },
+                    limitSupply: {
+                        max: 0,
+                        count: 0,
+                    },
                 },
                 {
                     title: 'Big bag of $KNIGHT',
@@ -104,6 +112,14 @@ export default defineComponent({
                     isDisabled: true,
                     variant: 0,
                     image: 'https://miro.medium.com/v2/resize:fit:1000/format:webp/1*-TH_NNMfBLgtbZhvZmNoCA.png',
+                    limit: {
+                        max: 0,
+                        count: 0,
+                    },
+                    limitSupply: {
+                        max: 0,
+                        count: 0,
+                    },
                 },
                 {
                     title: 'Clockwork Codex',
@@ -117,6 +133,14 @@ export default defineComponent({
                     variant: 1,
                     amount: 4,
                     image: 'https://i.seadn.io/s/raw/files/71fdb00461b8d0d6d0db8e2c714eee8e.png?auto=format&dpr=1&w=1000',
+                    limit: {
+                        max: 0,
+                        count: 0,
+                    },
+                    limitSupply: {
+                        max: 0,
+                        count: 0,
+                    },
                 },
             ] as any[],
         };

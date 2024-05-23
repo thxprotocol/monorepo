@@ -41,24 +41,24 @@ export default class WalletService {
     }
 
     static create(variant: WalletVariant, data: Partial<TWallet>) {
-        const chainId = ContractService.getChainId();
         const map = {
             [WalletVariant.Safe]: WalletService.createSafe,
             [WalletVariant.WalletConnect]: WalletService.createWalletConnect,
         };
-        return map[variant]({ ...(data as TWallet), chainId });
+        return map[variant]({ ...(data as TWallet) });
     }
 
-    static async createSafe({ sub, address, chainId }) {
+    static async createSafe({ sub, address }) {
         const safeWallet = await SafeService.findOne({ sub });
         // An account can have max 1 Safe
         if (safeWallet) throw new Error('Already has a Safe.');
 
         // Deploy a Safe with Web3Auth address and relayer as signers
-        await SafeService.create({ sub, chainId, safeVersion }, address);
+        await SafeService.create({ sub, safeVersion }, address);
     }
 
-    static async createWalletConnect({ sub, address, chainId }) {
+    static async createWalletConnect({ sub, address }) {
+        const chainId = ContractService.getChainId();
         const data: Partial<TWallet> = { variant: WalletVariant.WalletConnect, sub, address, chainId };
 
         await Wallet.findOneAndUpdate({ sub, address, chainId }, data, { upsert: true });

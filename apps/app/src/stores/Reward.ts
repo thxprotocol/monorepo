@@ -12,7 +12,8 @@ export const useRewardStore = defineStore('reward', {
     actions: {
         updateSupply: function (id: string) {
             const index = this.rewards.findIndex((reward) => reward._id === id);
-            this.rewards[index].progress.count = this.rewards[index].progress.count + 1;
+            this.rewards[index].limitSupply.count = this.rewards[index].limitSupply.count + 1;
+            this.rewards[index].limit.count = this.rewards[index].limit.count + 1;
         },
         trackEvent(variant: RewardVariant) {
             const { account, poolId } = useAccountStore();

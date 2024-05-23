@@ -295,7 +295,7 @@ export const useAccountStore = defineStore('account', {
         async waitForJob(jobId: string) {
             const taskFn = async () => {
                 const job = await this.api.request.get(`/v1/jobs/${jobId}`);
-                return job && !!job.lastRunAt ? Promise.resolve() : Promise.reject('Job not finished');
+                return job && !!job.lastFinishedAt ? Promise.resolve() : Promise.reject('Job not finished');
             };
 
             // Poll for job to finish

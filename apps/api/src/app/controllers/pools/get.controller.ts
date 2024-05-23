@@ -13,12 +13,11 @@ const validation = [param('id').isMongoId()];
 
 const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(req.params.id);
-    let safe = await SafeService.findOneByPool(pool, pool.chainId);
+    let safe = await SafeService.findOneByPool(pool);
 
     // Deploy a Safe if none is found
     if (!safe) {
         safe = await SafeService.create({
-            chainId: pool.chainId,
             sub: pool.sub,
             safeVersion,
             poolId: req.params.id,

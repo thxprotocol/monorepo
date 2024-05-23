@@ -63,14 +63,19 @@ export default class RewardNFTService implements IRewardService {
 
             const owner = await contract.methods.ownerOf(token.tokenId).call();
             if (owner.toLowerCase() !== safe.address.toLowerCase()) {
-                return { result: false, reason: 'Token is no longer owner by campaign Safe.' };
+                return { result: false, reason: 'Token is no longer owned by campaign Safe.' };
             }
         }
 
-        // Will require a mint
+        // This will require a mint
         if (reward.metadataId) {
             const isMinter = await this.services[nft.variant].isMinter(nft, safe.address);
             if (!isMinter) return { result: false, reason: 'Campaign Safe is not a minter of the NFT contract.' };
+        }
+
+        // Check if wallet exists
+        if (!wallet) {
+            return { result: false, reason: 'Your wallet is not found. Please try again.' };
         }
 
         // Check receiving wallet for chain compatibility
@@ -117,11 +122,9 @@ export default class RewardNFTService implements IRewardService {
         // and mint if metadataId is present or transfer if tokenId is present
         let token: ERC721TokenDocument | ERC1155TokenDocument,
             metadata: ERC721MetadataDocument | ERC1155MetadataDocument;
-
         // Mint a token if metadataId is present
         if (reward.metadataId) {
             metadata = await this.findMetadataById(nft, reward.metadataId);
-
             // Mint the token to wallet address
             token = await this.services[nft.variant].mint(safe, nft, wallet, metadata, erc1155Amount);
         }

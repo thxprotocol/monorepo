@@ -7,6 +7,7 @@ export const rewardSchema = {
     pointPrice: Number,
     expiryDate: Date,
     limit: Number,
+    limitSupply: Number,
     isPromoted: { type: Boolean, default: false },
     isPublished: { type: Boolean, default: false },
     locks: { type: [{ questId: String, variant: Number }], default: [] },

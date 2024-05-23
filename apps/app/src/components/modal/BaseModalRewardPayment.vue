@@ -128,12 +128,15 @@ export default defineComponent({
             try {
                 const walletStore = useWalletStore();
 
+                if (!this.wallet) throw new Error('Please select a wallet.');
+
                 await this.rewardStore.createPayment(this.reward.variant, this.reward._id, this.wallet);
 
                 walletStore.list();
                 this.isAlertSuccessShown = true;
             } catch (res) {
-                this.error = (res as { error: { message: string } }).error.message;
+                const { error } = res as { error: { message: string } };
+                this.error = error ? error.message : 'An error occurred. Please try again.';
             } finally {
                 this.isSubmitting = false;
             }

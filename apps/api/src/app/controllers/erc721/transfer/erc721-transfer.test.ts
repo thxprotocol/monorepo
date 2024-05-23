@@ -47,7 +47,7 @@ describe('ERC721 Transfer', () => {
     it('Deploy Campaign Safe', async () => {
         const { web3 } = getProvider(chainId);
         pool = await PoolService.deploy(sub, 'My Reward Campaign');
-        const safe = await SafeService.create({ chainId, sub, safeVersion, poolId: String(pool._id) });
+        const safe = await SafeService.create({ sub, safeVersion, poolId: String(pool._id) });
 
         // Wait for safe address to return code
         await poll(

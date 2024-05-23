@@ -8,7 +8,6 @@ import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit';
 import {
     SafeMultisigTransactionResponse,
-    SafeTransactionData,
     SafeTransactionDataPartial,
     SafeVersion,
 } from '@safe-global/safe-core-sdk-types';
@@ -29,10 +28,11 @@ function reset(wallet: WalletDocument, userWalletAddress: string) {
 }
 
 async function create(
-    data: { chainId: ChainId; sub: string; safeVersion?: SafeVersion; address?: string; poolId?: string },
+    data: { sub: string; safeVersion?: SafeVersion; address?: string; poolId?: string },
     userWalletAddress?: string,
 ) {
-    const { safeVersion, chainId, sub, address, poolId } = data;
+    const { safeVersion, sub, address, poolId } = data;
+    const chainId = ContractService.getChainId();
     const { defaultAccount } = getProvider(chainId);
     const wallet = await Wallet.create({ variant: WalletVariant.Safe, sub, chainId, address, safeVersion, poolId });
 
