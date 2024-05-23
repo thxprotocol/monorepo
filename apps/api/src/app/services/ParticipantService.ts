@@ -1,9 +1,10 @@
 import { Document } from 'mongoose';
-import { DiscordReaction, Participant, TwitterUser } from '../models';
-import ReCaptchaService from '@thxnetwork/api/services/ReCaptchaService';
+import { Participant, Pool, TwitterUser } from '../models';
 import { AccessTokenKind } from '@thxnetwork/common/enums';
-import DiscordService from './DiscordService';
 import { DiscordUser } from '../models/DiscordUser';
+import ReCaptchaService from '@thxnetwork/api/services/ReCaptchaService';
+import AnalyticsService from './AnalyticsService';
+import { logger } from '../util/logger';
 
 export default class ParticipantService {
     static async decorate(
@@ -56,5 +57,36 @@ export default class ParticipantService {
             metadata: token.metadata,
             user,
         } as unknown as TToken;
+    }
+
+    static async updateRanksJob(job: TJob) {
+        if (!job.attrs.data) return;
+
+        try {
+            const pool = await Pool.findById(job.attrs.data.poolId);
+            const leaderboard = await AnalyticsService.createLeaderboard(pool);
+
+            // Update ranks based on query result
+            const updates = leaderboard.map(
+                (entry: { sub: string; score: number; questEntryCount: number }, index: number) => ({
+                    updateOne: {
+                        filter: { poolId: String(pool._id), sub: entry.sub },
+                        update: {
+                            $set: {
+                                rank: Number(index) + 1,
+                                score: entry.score,
+                                questEntryCount: entry.questEntryCount,
+                            },
+                        },
+                    },
+                }),
+            );
+
+            await Participant.bulkWrite(updates);
+
+            logger.info('Updated participant ranks.');
+        } catch (error) {
+            logger.error(error);
+        }
     }
 }

@@ -14,7 +14,6 @@ import {
     QuestWeb3Entry,
     RewardCoinPayment,
     RewardNFTPayment,
-    WalletDocument,
     Participant,
     RewardCouponDocument,
     RewardCustom,
@@ -32,7 +31,6 @@ import {
     QuestDaily,
     QuestGitcoin,
     QuestGitcoinEntry,
-    Wallet,
     RewardGalachainDocument,
     RewardGalachain,
     QuestGitcoinDocument,
@@ -325,7 +323,7 @@ async function getPoolMetrics(pool: PoolDocument, dateRange?: { startDate: Date;
     };
 }
 
-async function createLeaderboard(pool: PoolDocument, dateRange?: { startDate: Date; endDate: Date }) {
+async function createLeaderboard(pool: PoolDocument, options?: { startDate: Date; endDate: Date; limit: number }) {
     const collections = [
         QuestDailyEntry,
         QuestSocialEntry,
@@ -334,78 +332,58 @@ async function createLeaderboard(pool: PoolDocument, dateRange?: { startDate: Da
         QuestWeb3Entry,
         QuestGitcoinEntry,
     ];
+
+    // Creates an array of quest entries that match the filters grouped by sub
     const result = await Promise.all(
         collections.map(async (Model) => {
-            const $match = { poolId: String(pool._id) };
+            const $match = { poolId: pool.id };
 
             // Extend the $match filter with optional dateRange
-            if (dateRange) {
-                $match['createdAt'] = { $gte: dateRange.startDate, $lte: dateRange.endDate };
+            if (options) {
+                $match['createdAt'] = { $gte: options.startDate, $lte: options.endDate };
             }
 
-            // Extend the $match filter with model specific properties
-            switch (Model) {
-                case QuestDailyEntry:
-                    $match['state'] = 1;
-                    break;
-                case QuestCustomEntry:
-                    $match['isClaimed'] = true;
-                    break;
-            }
-
-            const $group = {
-                _id: '$sub',
-                totalCompleted: { $sum: 1 },
-                totalAmount: { $sum: { $convert: { input: '$amount', to: 'int' } } },
-            };
-
-            return await Model.aggregate([{ $match }, { $group }]);
+            return await Model.aggregate([
+                { $match },
+                {
+                    $group: {
+                        _id: '$sub',
+                        questEntryCount: { $sum: 1 },
+                        score: { $sum: { $convert: { input: '$amount', to: 'int' } } },
+                    },
+                },
+            ]);
         }),
     );
 
     // Combine results from all collections and calculate overall totals
-    const walletTotals = {};
+    const totals = {};
     for (const collectionResults of result) {
         for (const r of collectionResults) {
             if (!r) continue;
-            if (walletTotals[r._id]) {
-                walletTotals[r._id].totalCompleted += r.totalCompleted;
-                walletTotals[r._id].totalAmount += r.totalAmount;
+            if (totals[r._id]) {
+                totals[r._id].questEntryCount += r.questEntryCount;
+                totals[r._id].score += r.score;
             } else {
-                walletTotals[r._id] = {
-                    totalCompleted: r.totalCompleted,
-                    totalAmount: r.totalAmount,
+                totals[r._id] = {
+                    questEntryCount: r.questEntryCount,
+                    score: r.score,
                 };
             }
         }
     }
 
-    const wallets = await Wallet.find({ _id: Object.keys(walletTotals), sub: { $exists: true } });
-    const leaderboard = wallets
-        .map((wallet: WalletDocument) => ({
-            score: walletTotals[wallet._id].totalAmount || 0,
-            questEntryCount: walletTotals[wallet._id].totalCompleted || 0,
-            sub: wallet.sub,
+    const subs = Object.keys(totals);
+    const participants = await Participant.find({ poolId: pool.id, sub: { $in: subs } });
+
+    return participants
+        .map((p) => ({
+            sub: p.sub,
+            score: totals[p.sub].score || 0,
+            questEntryCount: totals[p.sub].questEntryCount || 0,
         }))
         .filter((entry) => entry.score > 0)
         .sort((a: any, b: any) => b.score - a.score);
-
-    const updates = leaderboard.map(
-        (entry: { sub: string; score: number; questEntryCount: number }, index: number) => ({
-            updateOne: {
-                filter: { poolId: String(pool._id), sub: entry.sub },
-                update: {
-                    $set: {
-                        rank: Number(index) + 1,
-                        score: entry.score,
-                        questEntryCount: entry.questEntryCount,
-                    },
-                },
-            },
-        }),
-    );
-
-    await Participant.bulkWrite(updates);
 }
 
 async function queryQuestEntries<T>(args: {

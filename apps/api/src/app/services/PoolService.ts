@@ -52,7 +52,8 @@ async function isSubjectAllowed(sub: string, poolId: string) {
 
 async function getById(id: string) {
     const pool = await Pool.findById(id);
-    const safe = await SafeService.findOneByPool(pool, pool.chainId);
+    const chainId = ContractService.getChainId();
+    const safe = await SafeService.findOneByPool(pool, chainId);
     pool.safe = safe;
     return pool;
 }
@@ -223,7 +224,7 @@ async function findCouponCodes(
 async function findParticipants(pool: PoolDocument, page: number, limit: number, query = '') {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-    const poolId = String(pool._id);
+    const poolId = pool.id;
     const total = await Participant.countDocuments({ poolId });
     const $match = { poolId };
 
@@ -273,16 +274,15 @@ async function findParticipants(pool: PoolDocument, page: number, limit: number,
         results,
     };
 
+    // Try to get the guild for the pool in case bot is in the server
     const guild = await DiscordService.getGuild(poolId);
 
     participants.results = await Promise.all(
-        participants.results.map(async (participant) => {
+        participants.results.map(async (participant, index) => {
             let account: TAccount;
 
             try {
                 account = accounts.find((a) => a.sub === participant.sub);
-                if (!account) throw new Error('Account not found');
-
                 account.tokens = await Promise.all(
                     account.tokens.map(async (token: TToken) =>
                         ParticipantService.findUser(token, { userId: token.userId, guildId: guild && guild.id }),

@@ -151,6 +151,9 @@ export const useWalletStore = defineStore('wallet', {
             return switchChain(wagmiConfig, { chainId });
         },
         signMessage(message: string) {
+            if (!this.account.isConnected) {
+                throw new Error('Please connect your wallet first!');
+            }
             return signMessage(wagmiConfig, { message });
         },
         async connect() {

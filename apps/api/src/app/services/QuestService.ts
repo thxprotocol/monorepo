@@ -217,13 +217,14 @@ export default class QuestService {
 
             // Should make sure quest entry is properly created
             await PointBalanceService.add(pool, account, amount);
+
+            // Update participant ranks async
+            await agenda.now(JobType.UpdateParticipantRanks, { poolId: pool.id });
+
             await NotificationService.sendQuestEntryNotification(pool, quest, account, amount);
 
             // Register THX onboarding campaign event
             await THXService.createEvent(account, 'quest_entry_created');
-
-            // Update participant ranks async
-            agenda.now(JobType.UpdateParticipantRanks, { poolId: pool._id });
         } catch (error) {
             logger.error(error);
         }
