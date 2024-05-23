@@ -8,9 +8,9 @@ export const Participant = mongoose.model<ParticipantDocument>(
         {
             sub: String,
             poolId: String,
+            balance: { type: Number, default: 0 },
             rank: Number,
             score: Number,
-            balance: { type: Number, default: 0 },
             questEntryCount: Number,
             riskAnalysis: { score: Number, reasons: [String] },
             isSubscribed: { type: Boolean, default: false },

@@ -3,7 +3,6 @@ import { Agenda, Job } from '@hokify/agenda';
 import { updatePendingTransactions } from '@thxnetwork/api/jobs/updatePendingTransactions';
 import { sendPoolAnalyticsReport } from '@thxnetwork/api/jobs/sendPoolAnalyticsReport';
 import { updateCampaignRanks } from '@thxnetwork/api/jobs/updateCampaignRanks';
-import { updateParticipantRanks } from '@thxnetwork/api/jobs/updateParticipantRanks';
 import { logger } from './logger';
 import { MONGODB_URI } from '../config/secrets';
 import { JobType } from '@thxnetwork/common/enums';
@@ -17,6 +16,7 @@ import RewardService from '../services/RewardService';
 import PaymentService from '../services/PaymentService';
 import TwitterQueryService from '../services/TwitterQueryService';
 import VoteEscrowService from '../services/VoteEscrowService';
+import ParticipantService from '../services/ParticipantService';
 
 const agenda = new Agenda({
     db: {
@@ -29,7 +29,7 @@ const agenda = new Agenda({
 });
 
 agenda.define(JobType.UpdateCampaignRanks, updateCampaignRanks);
-agenda.define(JobType.UpdateParticipantRanks, updateParticipantRanks);
+agenda.define(JobType.UpdateParticipantRanks, (job: Job) => ParticipantService.updateRanksJob(job));
 agenda.define(JobType.UpdatePendingTransactions, updatePendingTransactions);
 agenda.define(JobType.CreateTwitterQuests, () => TwitterQueryService.searchJob());
 agenda.define(JobType.CreateQuestEntry, (job: Job) => QuestService.createEntryJob(job));

@@ -68,7 +68,7 @@ type TAccountState = {
     account: TAccount | null;
     subscription: TSubscription | null;
     participants: TParticipant[];
-    leaderboard: { score: number; wallet: TWallet; questsCompleted: number; account: TAccount }[];
+    leaderboard: { rank: number; score: number; questEntryCount: number; account: TAccount }[];
 };
 
 type TWidgetTheme = {

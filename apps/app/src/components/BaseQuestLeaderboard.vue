@@ -12,7 +12,7 @@
         </b-card-title>
         <b-list-group>
             <b-list-group-item v-for="(entry, key) of accountStore.leaderboard" :key="key" class="d-flex px-0 pe-3">
-                <span class="list-item-field-rank">{{ key + 1 }}</span>
+                <span class="list-item-field-rank">{{ entry.rank }}</span>
                 <span class="list-item-field-address flex-grow-1 ps-2">
                     <b-avatar
                         size="sm"
@@ -24,7 +24,7 @@
                     {{ entry.account.username }}
                 </span>
                 <span class="list-item-field-questcount flex-grow-1 text-opaque pe-3">
-                    {{ entry.questsCompleted }}
+                    {{ entry.questEntryCount }}
                     <i class="fas fa-tasks ms-1" />
                 </span>
                 <strong class="list-item-field-score">{{ entry.score }}</strong>
