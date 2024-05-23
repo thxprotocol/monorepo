@@ -17,7 +17,6 @@ import RewardDiscordRoleService from './RewardDiscordRoleService';
 import RewardCustomService from './RewardCustomService';
 import RewardGalachainService from './RewardGalachainService';
 import PoolService from './PoolService';
-import WalletService from './WalletService';
 import THXService from './THXService';
 
 const serviceMap = {

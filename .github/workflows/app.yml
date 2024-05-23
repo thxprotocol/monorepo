@@ -156,4 +156,4 @@ jobs:
                   DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
               uses: Ilshidur/action-discord@master
               with:
-                  args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App `${{ env.PACKAGE_VERSION }}`"
+                  args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released App `v${{ env.PACKAGE_VERSION }}-app`"
