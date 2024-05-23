@@ -64,11 +64,15 @@ export default class TwitterQueryService {
 
         // Iterate over posts and create quests
         for (const post of postsWithoutQuest) {
-            await this.createQuest(
-                query,
-                await TwitterCacheService.savePost(post, post.media, query),
-                await TwitterCacheService.saveUser(post.user),
-            );
+            try {
+                await this.createQuest(
+                    query,
+                    await TwitterCacheService.savePost(post, post.media, query),
+                    await TwitterCacheService.saveUser(post.user),
+                );
+            } catch (error) {
+                logger.error(error);
+            }
         }
 
         return postsWithoutQuest;
@@ -107,7 +111,7 @@ export default class TwitterQueryService {
         const quest = {
             kind: 'twitter',
             interaction: QuestSocialRequirement.TwitterLikeRetweet,
-            title: 'Repost & Like',
+            title: query.defaults.title,
             description: query.defaults.description,
             amount: query.defaults.amount,
             locks: query.defaults.locks,
