@@ -1,6 +1,6 @@
 <template>
     <b-card no-body class="mb-2 x-lg-0 my-lg-3" :class="{ 'card-promoted': reward.isPromoted }">
-        <header class="card-img" :style="{ backgroundImage: image && `url(${image})`, height: '200px' }">
+        <header class="card-img" :style="{ backgroundImage: image && `url(${image})`, height: '240px' }">
             <b-badge
                 v-if="reward.expiry && reward.expiry.date"
                 v-b-tooltip.hover.left
@@ -75,9 +75,9 @@
             <div class="d-flex align-items-center justify-content-between pb-2 mt-2" style="opacity: 0.5">
                 <div class="d-flex align-items-center text-opaque small">
                     <span v-if="reward.author" class="text-white me-1"> {{ reward.author.username }} &CenterDot; </span>
-                    <span>{{ format(new Date(reward.createdAt), 'MMMM do') }} </span>
+                    <span v-if="reward.createdAt">{{ format(new Date(reward.createdAt), 'MMMM do') }} </span>
                 </div>
-                <div class="d-flex align-items-center text-opaque small">
+                <div v-if="reward.paymentCount" class="d-flex align-items-center text-opaque small">
                     <i class="fas fa-users me-1" />
                     {{ reward.paymentCount }}
                 </div>

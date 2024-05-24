@@ -3,13 +3,9 @@
         <template #primary>
             <h1 class="text-opaque">Protocol Governance</h1>
             <p class="lead mb-4">Vote on proposals that determine the future of the protocol.</p>
-            <b-button
-                href="https://snapshot.org/#/thxprotocol.eth/proposal/0x5e270d1a0243119fb922aac887b68320128254546a410225893473381219623e"
-                target="_blank"
-                variant="success"
-                class="px-5"
-            >
+            <b-button href="https://snapshot.org/#/thxprotocol.eth/" target="_blank" variant="success" class="px-5">
                 Snapshot Space
+                <i class="fas fa-external-link-alt ms-2" />
             </b-button>
             <b-button variant="link" class="text-white" href="https://gov.thx.network" target="_blank">
                 Discussion
@@ -39,7 +35,11 @@
         </template>
     </BaseCardHeader>
     <b-container>
-        <BaseCardSnapshotProposal v-for="proposal of proposals" :proposal="proposal" class="mt-3" />
+        <b-row>
+            <b-col md="8" offset-md="2">
+                <BaseCardSnapshotProposal v-for="proposal of proposals" :proposal="proposal" class="mt-3" />
+            </b-col>
+        </b-row>
     </b-container>
 </template>
 <script lang="ts">
