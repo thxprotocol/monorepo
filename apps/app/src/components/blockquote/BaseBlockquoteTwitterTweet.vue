@@ -22,7 +22,6 @@ import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
 import { QuestSocialRequirement } from '../../types/enums/rewards';
-import { interactionLabelMap } from '../../utils/social';
 
 export default defineComponent({
     name: 'BaseBlockquoteTweet',
@@ -32,12 +31,6 @@ export default defineComponent({
             required: true,
         },
     },
-    data: function (): any {
-        return {
-            interactionLabelMap,
-            tooltipContent: 'Copy URL',
-        };
-    },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useQuestStore),
@@ -45,7 +38,7 @@ export default defineComponent({
             return this.quest.contentMetadata;
         },
         url() {
-            if (!this.interactionLabel[this.quest.interaction] || !this.quest.content) return '';
+            if (!this.quest.content) return '';
             return this.post.url || this.getChannelActionURL(this.quest.interaction, this.quest.content);
         },
     },
