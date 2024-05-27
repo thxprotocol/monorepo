@@ -25,6 +25,7 @@ import {
     QuestDaily,
     CouponCode,
     WalletDocument,
+    Brand,
 } from '@thxnetwork/api/models';
 
 import AccountProxy from '../proxies/AccountProxy';
@@ -108,11 +109,22 @@ async function getAllBySub(sub: string): Promise<PoolDocument[]> {
         pools = pools.concat(collaborationPools);
     }
 
+    // Get usernames for pool owners
+    const subs = pools.map((p) => p.sub);
+    const accounts = await AccountProxy.find({ subs });
+
     // Add Safes to pools
     return await Promise.all(
         pools.map(async (pool) => {
+            const brand = await Brand.findOne({ poolId: pool.id });
             const safe = await SafeService.findOneByPool(pool);
-            return { ...pool.toJSON(), safe };
+            const participantCount = await Participant.countDocuments({ poolId: pool.id });
+            const account = accounts.find((a) => a.sub === pool.sub);
+            const author = account && {
+                username: account.username,
+            };
+
+            return { ...pool.toJSON(), participantCount, author, brand, safe };
         }),
     );
 }
