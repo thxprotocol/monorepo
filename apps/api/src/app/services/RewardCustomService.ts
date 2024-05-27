@@ -1,4 +1,4 @@
-import { Identity, RewardCustom, RewardCustomPayment, Webhook } from '../models';
+import { Identity, RewardCustom, RewardCustomPayment, RewardCustomPaymentDocument, Webhook } from '../models';
 import { IRewardService } from './interfaces/IRewardService';
 import { Event } from '@thxnetwork/common/enums';
 import WebhookService from './WebhookService';
@@ -14,8 +14,8 @@ export default class RewardCustomService implements IRewardService {
         return { ...reward.toJSON(), isDisabled: !identities.length };
     }
 
-    async decoratePayment(payment: TRewardPayment): Promise<TRewardPayment> {
-        return payment;
+    async decoratePayment(payment: RewardCustomPaymentDocument): Promise<TRewardPayment> {
+        return payment.toJSON();
     }
 
     async getValidationResult({ reward, account }: { reward: TReward; account?: TAccount }) {

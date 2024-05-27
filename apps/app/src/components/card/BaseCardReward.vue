@@ -33,14 +33,8 @@
                 <div v-if="reward.limitSupply.max" class="d-flex align-items-center">
                     <span class="card-text me-1"> Supply: </span>
                     <b-badge variant="primary" class="ms-1 p-1 px-2 bg-primary">
-                        <span
-                            :class="{
-                                'text-danger': progressPercentage >= 0.9,
-                                'text-warning': progressPercentage > 0.75 && progressPercentage < 0.9,
-                                'text-accent': progressPercentage >= 0 && progressPercentage <= 0.75,
-                            }"
-                        >
-                            {{ reward.limitSupply.count }}
+                        <span :class="limitSupplyVariant">
+                            {{ reward.limitSupply.max - reward.limitSupply.count }}
                         </span>
                         <span class="card-text">/{{ reward.limitSupply.max }}</span>
                     </b-badge>
@@ -63,8 +57,8 @@
                     {{ btnLabel }}
                     <b-progress
                         v-if="reward.limit.max"
-                        v-b-tooltip
-                        variant="primary"
+                        v-b-tooltip.bottom
+                        :variant="limitVariant"
                         :title="`You can purchase this reward ${reward.limit.max} times.`"
                         :value="reward.limit.count"
                         :max="reward.limit.max"
@@ -118,6 +112,16 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        limitSupplyVariant() {
+            if (this.limitSupplyPerct >= 0.9) return 'text-danger';
+            if (this.limitSupplyPerct > 0.75 && this.limitSupplyPerct < 0.9) return 'text-warning';
+            if (this.limitSupplyPerct >= 0 && this.limitSupplyPerct <= 0.75) return 'text-success';
+        },
+        limitVariant() {
+            if (this.limitPerct >= 0.75) return 'danger';
+            if (this.limitPerct > 0.5 && this.limitPerct < 0.75) return 'warning';
+            if (this.limitPerct >= 0 && this.limitPerct <= 0.5) return 'success';
+        },
         btnLabel() {
             if (this.reward.isLimitSupplyReached) {
                 return 'Sold out';
@@ -138,9 +142,13 @@ export default defineComponent({
         isDisabled() {
             return !this.reward.isAvailable;
         },
-        progressPercentage: function () {
-            if (!this.reward.limitSupply.max) return 100;
+        limitSupplyPerct: function () {
+            if (!this.reward.limitSupply.max) return 1;
             return this.reward.limitSupply.count / this.reward.limitSupply.max;
+        },
+        limitPerct: function () {
+            if (!this.reward.limit.max) return 1;
+            return this.reward.limit.count / this.reward.limit.max;
         },
         expiryDate: function () {
             return !this.reward.isExpired && this.reward.expiry

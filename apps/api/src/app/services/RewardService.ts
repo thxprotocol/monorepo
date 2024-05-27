@@ -96,10 +96,10 @@ export default class RewardService {
                             author: {
                                 username: owner.username,
                             },
+                            limitSupply,
                             // Decorated properties may override generic properties
                             ...decorated,
                             limit,
-                            limitSupply,
                         };
                     } catch (error) {
                         logger.error(error);
@@ -174,12 +174,11 @@ export default class RewardService {
                 const payments = await serviceMap[rewardVariant].models.payment.find({ sub });
                 const callback = payments.map(async (p: Document & TRewardPayment) => {
                     const decorated = await serviceMap[rewardVariant].decoratePayment(p);
-                    return { ...decorated.toJSON(), rewardVariant };
+                    return { ...decorated, rewardVariant };
                 });
                 return await Promise.all(callback);
             }),
         );
-
         return payments
             .filter((result) => result.status === 'fulfilled')
             .map((result: any) => result.value)

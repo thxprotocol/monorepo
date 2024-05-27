@@ -3,6 +3,7 @@ import {
     ERC20Document,
     RewardCoin,
     RewardCoinDocument,
+    RewardCoinPaymentDocument,
     Transaction,
     WalletDocument,
 } from '@thxnetwork/api/models';
@@ -27,8 +28,8 @@ export default class RewardCoinService implements IRewardService {
         return { ...reward.toJSON(), erc20 };
     }
 
-    async decoratePayment(payment: TBaseRewardPayment) {
-        return payment;
+    async decoratePayment(payment: RewardCoinPaymentDocument) {
+        return payment.toJSON();
     }
 
     findById(id: string) {

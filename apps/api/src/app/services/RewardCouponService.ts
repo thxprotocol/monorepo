@@ -9,14 +9,14 @@ export default class RewardCouponService implements IRewardService {
 
     async decorate({ reward }) {
         const couponCodes = await CouponCode.find({ couponRewardId: reward._id });
-        const progress = {
+        const limitSupply = {
             count: await this.models.payment.countDocuments({
-                rewardId: reward._id,
+                rewardId: reward.id,
             }),
-            limit: couponCodes.length,
+            max: couponCodes.length,
         };
 
-        return { ...reward.toJSON(), progress, limit: couponCodes.length };
+        return { ...reward.toJSON(), limitSupply };
     }
 
     async decoratePayment(payment: TRewardPayment) {

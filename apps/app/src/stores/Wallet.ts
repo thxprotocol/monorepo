@@ -216,21 +216,22 @@ export const useWalletStore = defineStore('wallet', {
             this.erc721[index] = { ...token, component: 'BaseCardERC721' };
         },
         async list() {
-            if (!this.wallet) return;
             const { api } = useAccountStore();
             this.isLoading = true;
 
-            const [erc20, erc721, erc1155, payments] = await Promise.all([
-                api.erc20.list({ walletId: this.wallet._id }),
-                api.erc721.list({ walletId: this.wallet._id }),
-                api.erc1155.list({ walletId: this.wallet._id }),
+            const [payments] = await Promise.all([
+                // api.erc20.list(this.wallet ? { walletId: this.wallet._id } : {}),
+                // api.erc721.list(this.wallet ? { walletId: this.wallet._id } : {}),
+                // api.erc1155.list(this.wallet ? { walletId: this.wallet._id } : {}),
                 api.request.get('/v1/rewards/payments'),
             ]);
 
+            console.log(payments);
+
             // TODO Refactor to using a component map with r.variant as key
-            this.erc20 = erc20.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' }));
-            this.erc721 = erc721.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
-            this.erc1155 = erc1155.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
+            // this.erc20 = erc20.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' }));
+            // this.erc721 = erc721.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
+            // this.erc1155 = erc1155.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' }));
             this.couponCodes = payments
                 .filter((p: { rewardVariant: RewardVariant }) => p.rewardVariant === RewardVariant.Coupon)
                 .map((t: TRewardCouponPayment[]) => ({
