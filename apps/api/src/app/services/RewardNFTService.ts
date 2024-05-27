@@ -38,7 +38,7 @@ export default class RewardNFTService implements IRewardService {
     }
 
     async decoratePayment(payment: TRewardPayment): Promise<TRewardPayment> {
-        return payment;
+        return payment.toJSON();
     }
 
     async getValidationResult({
