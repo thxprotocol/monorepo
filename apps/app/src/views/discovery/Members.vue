@@ -116,7 +116,7 @@ export default defineComponent({
                         max: 0,
                         count: 0,
                     },
-                    limitSupplProgressy: {
+                    limitSupplyProgress: {
                         max: 0,
                         count: 0,
                     },
