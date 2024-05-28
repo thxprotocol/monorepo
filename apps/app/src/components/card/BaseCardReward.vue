@@ -16,13 +16,13 @@
             <b-img v-if="!image" class="card-img-logo" :src="accountStore.config.logoUrl" widht="auto" height="100" />
         </header>
         <b-card-body class="pb-0">
-            <b-card-title class="d-flex">
-                <i class="me-2" :class="iconMap[reward.variant]"></i>
-                <slot name="title"></slot>
+            <b-card-title class="d-flex align-items-center">
+                <i class="me-2 text-opaque small" :class="iconMap[reward.variant]" />
+                <slot name="title" />
             </b-card-title>
             <b-card-text class="card-description" v-html="reward.description" />
-            <div class="d-flex pb-3">
-                <div v-if="reward.pointPrice" class="d-flex align-items-center me-auto">
+            <div class="d-flex">
+                <div v-if="reward.pointPrice" class="d-flex align-items-center me-auto pb-3">
                     <span class="card-text me-1"> Price: </span>
                     <b-badge variant="primary" class="ms-1 p-1 bg-primary">
                         <span class="text-accent">
@@ -30,7 +30,7 @@
                         </span>
                     </b-badge>
                 </div>
-                <div v-if="reward.limitSupplyProgress.max" class="d-flex align-items-center">
+                <div v-if="reward.limitSupplyProgress.max" class="d-flex align-items-center pb-3">
                     <span class="card-text me-1"> Supply: </span>
                     <b-badge variant="primary" class="ms-1 p-1 px-2 bg-primary">
                         <span :class="limitSupplyVariant">

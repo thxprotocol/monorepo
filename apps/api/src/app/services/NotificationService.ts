@@ -16,10 +16,10 @@ import BrandService from './BrandService';
 import DiscordDataProxy from '../proxies/DiscordDataProxy';
 import AnalyticsService from '../services/AnalyticsService';
 import { subDays } from 'date-fns';
+import * as html from 'html-entities';
 
 const MAIL_CHUNK_SIZE = 600;
 const emojiMap = ['🥇', '🥈', '🥉'];
-const oneDay = 86400000; // one day in milliseconds
 
 async function send(
     pool: PoolDocument,
@@ -135,7 +135,9 @@ async function sendQuestEntryNotification(pool: PoolDocument, quest: TQuest, acc
     const index = Math.floor(Math.random() * celebratoryWords.length);
     const discord = account.tokens && account.tokens.find((a) => a.kind === 'discord');
     const user = discord && discord.userId ? `<@${discord.userId}>` : `**${account.username}**`;
-    const content = `${celebratoryWords[index]} ${user} completed the **${quest.title}** quest and earned **${amount} points.**`;
+    const content = `${celebratoryWords[index]} ${user} completed the **${html.decode(
+        quest.title,
+    )}** quest and earned **${amount} points.**`;
 
     await DiscordDataProxy.sendChannelMessage(
         pool,
@@ -182,7 +184,7 @@ export async function sendWeeklyDigestJob() {
 
             const leaderboard = await PoolService.getLeaderboard(pool, {
                 ...dateRange,
-                limit: 5,
+                limit: 3,
             });
 
             const entryCount = [dailyQuest, socialQuest, inviteQuest, customQuest, web3Quest, gitcoinQuest].reduce(
