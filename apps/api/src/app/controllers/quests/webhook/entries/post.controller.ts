@@ -31,7 +31,7 @@ const controller = async ({ account, body, params }: Request, res: Response) => 
     // Schedule the job
     const job = await agenda.now(JobType.CreateQuestEntry, {
         variant: QuestVariant.Webhook,
-        questId: String(quest._id),
+        questId: quest.id,
         sub: account.sub,
         data: { ...data, metadata: validationResult },
     });

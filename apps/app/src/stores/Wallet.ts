@@ -219,14 +219,17 @@ export const useWalletStore = defineStore('wallet', {
             const { api } = useAccountStore();
             this.isLoading = true;
 
-            const promises = [api.request.get('/v1/rewards/payments')];
-            if (this.wallet) {
-                promises.concat([
-                    api.erc20.list({ walletId: this.wallet._id }),
-                    api.erc721.list({ walletId: this.wallet._id }),
-                    api.erc1155.list({ walletId: this.wallet._id }),
-                ]);
-            }
+            const promises = [
+                api.request.get('/v1/rewards/payments'),
+                ...(this.wallet
+                    ? [
+                          api.erc20.list({ walletId: this.wallet._id }),
+                          api.erc721.list({ walletId: this.wallet._id }),
+                          api.erc1155.list({ walletId: this.wallet._id }),
+                      ]
+                    : []),
+            ];
+
             const [payments, erc20, erc721, erc1155] = await Promise.all(promises);
             this.erc20 = erc20 ? erc20.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' })) : [];
             this.erc721 = erc721 ? erc721.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' })) : [];

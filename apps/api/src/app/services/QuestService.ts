@@ -207,10 +207,10 @@ export default class QuestService {
             // Create the quest entry
             const entry = await Entry.create({
                 ...data,
-                sub: account.sub,
                 amount,
-                questId: String(quest._id),
-                poolId: pool._id,
+                sub: account.sub,
+                questId: quest.id,
+                poolId: pool.id,
                 uuid: v4(),
             } as TQuestEntry);
             if (!entry) throw new Error('Entry creation failed.');
@@ -221,6 +221,7 @@ export default class QuestService {
             // Update participant ranks async
             await agenda.now(JobType.UpdateParticipantRanks, { poolId: pool.id });
 
+            // Send Discord and e-mail notifications
             await NotificationService.sendQuestEntryNotification(pool, quest, account, amount);
 
             // Register THX onboarding campaign event

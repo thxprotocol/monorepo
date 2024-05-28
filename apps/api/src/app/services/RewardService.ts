@@ -70,7 +70,7 @@ export default class RewardService {
                         const isAvailable = account
                             ? !isLocked && !isExpired && !isLimitSupplyReached && !isLimitReached
                             : true;
-                        const limit = {
+                        const limitProgress = {
                             count: account
                                 ? await serviceMap[reward.variant].models.payment.countDocuments({
                                       rewardId: reward.id,
@@ -82,7 +82,7 @@ export default class RewardService {
                         const paymentCount = await serviceMap[reward.variant].models.payment.countDocuments({
                             rewardId: reward.id,
                         });
-                        const limitSupply = {
+                        const limitSupplyProgress = {
                             count: paymentCount,
                             max: reward.limitSupply,
                         };
@@ -96,10 +96,9 @@ export default class RewardService {
                             author: {
                                 username: owner.username,
                             },
-                            limitSupply,
-                            // Decorated properties may override generic properties
+                            limitSupplyProgress,
+                            limitProgress,
                             ...decorated,
-                            limit,
                         };
                     } catch (error) {
                         logger.error(error);

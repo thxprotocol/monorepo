@@ -25,11 +25,11 @@ type TReward = {
         date: number;
         now: number;
     };
-    limit: { count: number; max: number };
-    limitSupply: {
+    limitSupplyProgress: {
         count: number;
         max: number;
     };
+    limitProgress: { count: number; max: number };
     author: {
         username: string;
     };

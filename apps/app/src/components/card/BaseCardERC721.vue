@@ -22,6 +22,7 @@
                 <div v-else-if="token.nft.variant === NFTVariant.ERC721" class="text-accent fw-bold">
                     #{{ token.tokenId }}
                 </div>
+
                 <div v-else-if="token.nft.variant === NFTVariant.ERC1155" class="text-accent fw-bold">
                     {{ Number(balance) }}
                 </div>
@@ -204,13 +205,12 @@ export default defineComponent({
                 this.isSubmitting = false;
             }
         },
-        waitForMinted() {
+        async waitForMinted() {
             const taskFn = async () => {
                 this.walletStore.getERC721Token(this.token);
                 return this.token.tokenId ? Promise.resolve() : Promise.reject('Could not find token for ID');
             };
-
-            return poll({ taskFn, interval: 3000, retries: 20 });
+            return await poll({ taskFn, interval: 3000, retries: 20 });
         },
     },
 });

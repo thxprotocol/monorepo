@@ -30,13 +30,13 @@
                         </span>
                     </b-badge>
                 </div>
-                <div v-if="reward.limitSupply.max" class="d-flex align-items-center">
+                <div v-if="reward.limitSupplyProgress.max" class="d-flex align-items-center">
                     <span class="card-text me-1"> Supply: </span>
                     <b-badge variant="primary" class="ms-1 p-1 px-2 bg-primary">
                         <span :class="limitSupplyVariant">
-                            {{ reward.limitSupply.max - reward.limitSupply.count }}
+                            {{ reward.limitSupplyProgress.max - reward.limitSupplyProgress.count }}
                         </span>
-                        <span class="card-text">/{{ reward.limitSupply.max }}</span>
+                        <span class="card-text">/{{ reward.limitSupplyProgress.max }}</span>
                     </b-badge>
                 </div>
             </div>
@@ -56,12 +56,12 @@
                 >
                     {{ btnLabel }}
                     <b-progress
-                        v-if="reward.limit.max"
+                        v-if="reward.limitProgress.max"
                         v-b-tooltip.bottom
                         :variant="limitVariant"
-                        :title="`You can purchase this reward ${reward.limit.max} times.`"
-                        :value="reward.limit.count"
-                        :max="reward.limit.max"
+                        :title="`You can purchase this reward ${reward.limitProgress.max} times.`"
+                        :value="reward.limitProgress.count"
+                        :max="reward.limitProgress.max"
                         style="height: 6px"
                     />
                 </b-button>
@@ -143,12 +143,12 @@ export default defineComponent({
             return !this.reward.isAvailable;
         },
         limitSupplyPerct: function () {
-            if (!this.reward.limitSupply.max) return 1;
-            return this.reward.limitSupply.count / this.reward.limitSupply.max;
+            if (!this.reward.limitSupplyProgress.max) return 1;
+            return this.reward.limitSupplyProgress.count / this.reward.limitSupplyProgress.max;
         },
         limitPerct: function () {
-            if (!this.reward.limit.max) return 1;
-            return this.reward.limit.count / this.reward.limit.max;
+            if (!this.reward.limitProgress.max) return 1;
+            return this.reward.limitProgress.count / this.reward.limitProgress.max;
         },
         expiryDate: function () {
             return !this.reward.isExpired && this.reward.expiry
