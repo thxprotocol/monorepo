@@ -7,13 +7,19 @@ import { DiscordButtonVariant } from '../events/InteractionCreated';
 import { ButtonStyle } from 'discord.js';
 import { WIDGET_URL } from '../config/secrets';
 import { celebratoryWords } from '../util/dictionaries';
+import { Pool } from '@thxnetwork/api/models';
+import { DASHBOARD_URL } from '../config/secrets';
 import AccountProxy from '../proxies/AccountProxy';
 import MailService from './MailService';
 import PoolService from './PoolService';
 import BrandService from './BrandService';
 import DiscordDataProxy from '../proxies/DiscordDataProxy';
+import AnalyticsService from '../services/AnalyticsService';
+import { subDays } from 'date-fns';
 
 const MAIL_CHUNK_SIZE = 600;
+const emojiMap = ['🥇', '🥈', '🥉'];
+const oneDay = 86400000; // one day in milliseconds
 
 async function send(
     pool: PoolDocument,
@@ -146,4 +152,92 @@ async function sendQuestEntryNotification(pool: PoolDocument, quest: TQuest, acc
     );
 }
 
-export default { send, notify, sendQuestEntryNotification };
+export async function sendWeeklyDigestJob() {
+    const endDate = new Date();
+    endDate.setHours(0, 0, 0, 0);
+
+    const startDate = new Date(new Date(endDate).getTime() - oneDay * 7);
+    const dateRange = { startDate, endDate };
+
+    let account: TAccount;
+
+    for await (const pool of Pool.find({ 'settings.isWeeklyDigestEnabled': true })) {
+        try {
+            if (!account || account.sub != pool.sub) account = await AccountProxy.findById(pool.sub);
+            if (!account.email) continue;
+
+            const {
+                dailyQuest,
+                socialQuest,
+                inviteQuest,
+                customQuest,
+                web3Quest,
+                gitcoinQuest,
+                coinReward,
+                nftReward,
+                customReward,
+                couponReward,
+                discordRoleReward,
+                galachainReward,
+            } = await AnalyticsService.getPoolMetrics(pool, dateRange);
+
+            const endDate = new Date();
+            const startDate = subDays(endDate, 7);
+            startDate.setHours(0, 0, 0, 0);
+            const leaderboard = await PoolService.getLeaderboard(pool, {
+                startDate,
+                endDate,
+                limit: 5,
+            });
+
+            const entryCount = [dailyQuest, socialQuest, inviteQuest, customQuest, web3Quest, gitcoinQuest].reduce(
+                (acc, entry) => acc + entry.totalCreated,
+                0,
+            );
+
+            const paymentCount = [
+                coinReward,
+                nftReward,
+                customReward,
+                couponReward,
+                discordRoleReward,
+                galachainReward,
+            ].reduce((acc, payment) => acc + payment.totalCreated, 0);
+
+            // Skip if nothing happened.
+            if (!entryCount && !paymentCount) continue;
+            console.log(leaderboard);
+            let html = `<p style="font-size: 18px">Hi there!👋</p>`;
+            html += `<p>We're pleased to bring you the <strong>Weekly Digest</strong> for "${pool.settings.title}".</p>`;
+            html += `<hr />`;
+
+            html += `<p><strong>🏆 Quests: </strong> ${entryCount} completed</p>`;
+            html += `<hr />`;
+
+            html += `<p><strong>🎁 Rewards: </strong> ${paymentCount} purchased</p>`;
+            html += `<hr />`;
+
+            html += `<p style="font-size:16px"><strong>Top 5</strong></p>`;
+            html += `<table role="presentation" border="0" cellpadding="0" cellspacing="0">`;
+
+            for (const index in leaderboard) {
+                const entry = leaderboard[index];
+
+                html += `<tr>
+                <td width="5%">${emojiMap[index]}</td>
+                <td><strong>${entry.account.username || 'Unknown'}</strong></td>
+                <td align="right" width="25%"><strong>${entry.questEntryCount} quests</strong></td>
+                <td align="right" width="25%"><strong>${entry.score} points</strong></td>
+                </tr>`;
+            }
+            html += '</table>';
+            html += `<a href="${DASHBOARD_URL}/pool/${pool.id}/participants">All participants</a>`;
+
+            await MailService.send(account.email, `🎁 Weekly Digest: "${pool.settings.title}"`, html);
+        } catch (error) {
+            logger.error(error);
+        }
+    }
+}
+
+export default { send, notify, sendQuestEntryNotification, sendWeeklyDigestJob };

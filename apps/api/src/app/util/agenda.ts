@@ -1,7 +1,6 @@
 import db from './database';
 import { Agenda, Job } from '@hokify/agenda';
 import { updatePendingTransactions } from '@thxnetwork/api/jobs/updatePendingTransactions';
-import { sendPoolAnalyticsReport } from '@thxnetwork/api/jobs/sendPoolAnalyticsReport';
 import { updateCampaignRanks } from '@thxnetwork/api/jobs/updateCampaignRanks';
 import { logger } from './logger';
 import { MONGODB_URI } from '../config/secrets';
@@ -17,6 +16,7 @@ import PaymentService from '../services/PaymentService';
 import TwitterQueryService from '../services/TwitterQueryService';
 import VoteEscrowService from '../services/VoteEscrowService';
 import ParticipantService from '../services/ParticipantService';
+import NotificationService from '../services/NotificationService';
 
 const agenda = new Agenda({
     db: {
@@ -35,7 +35,7 @@ agenda.define(JobType.CreateTwitterQuests, () => TwitterQueryService.searchJob()
 agenda.define(JobType.CreateQuestEntry, (job: Job) => QuestService.createEntryJob(job));
 agenda.define(JobType.CreateRewardPayment, (job: Job) => RewardService.createPaymentJob(job));
 agenda.define(JobType.DeploySafe, (job: Job) => SafeService.createJob(job));
-agenda.define(JobType.SendCampaignReport, sendPoolAnalyticsReport);
+agenda.define(JobType.SendCampaignReport, () => NotificationService.sendWeeklyDigestJob());
 agenda.define(JobType.RequestAttemp, (job: Job) => WebhookService.requestAttemptJob(job));
 agenda.define(JobType.UpdateTwitterLikeCache, (job: Job) => TwitterCacheService.updateLikeCacheJob(job));
 agenda.define(JobType.UpdateTwitterRepostCache, (job: Job) => TwitterCacheService.updateRepostCacheJob(job));

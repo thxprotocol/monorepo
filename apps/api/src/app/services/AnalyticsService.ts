@@ -293,11 +293,11 @@ async function getPoolMetrics(pool: PoolDocument, dateRange?: { startDate: Date;
                 },
             ]);
 
-            const query = { poolId: String(pool._id) };
+            const query = { poolId: pool.id };
             if (dateRange) {
                 query['createdAt'] = { $gte: dateRange.startDate, $lte: dateRange.endDate };
             }
-            const totalCreated = await Model.countDocuments(query as any);
+            const totalCreated = await Model.countDocuments(query);
 
             return {
                 totalCompleted: result && result.totalCompleted ? result.totalCompleted : 0,

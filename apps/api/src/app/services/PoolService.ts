@@ -35,6 +35,7 @@ import SafeService from './SafeService';
 import ParticipantService from './ParticipantService';
 import DiscordService from './DiscordService';
 import ContractService from './ContractService';
+import AnalyticsService from './AnalyticsService';
 
 export const ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -61,6 +62,22 @@ async function getById(id: string) {
 
 function getByAddress(address: string) {
     return Pool.findOne({ address });
+}
+
+async function getLeaderboard(pool: PoolDocument, options: { startDate: Date; endDate: Date; limit: number }) {
+    const leaderboard = await AnalyticsService.createLeaderboard(pool, options);
+    const topTen = leaderboard.slice(0, options.limit);
+    const subs = topTen.map((p) => p.sub);
+    const accounts = await AccountProxy.find({ subs });
+    return topTen.map((p, index) => {
+        const { username, profileImg } = accounts.find((a) => a.sub === p.sub);
+        return {
+            rank: Number(index) + 1,
+            account: { username, profileImg },
+            score: p.score,
+            questEntryCount: p.questEntryCount,
+        };
+    });
 }
 
 async function deploy(sub: string, title: string): Promise<PoolDocument> {
@@ -417,4 +434,5 @@ export default {
     findCollaborators,
     findCouponCodes,
     inviteCollaborator,
+    getLeaderboard,
 };
