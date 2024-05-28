@@ -154,17 +154,16 @@ async function sendQuestEntryNotification(pool: PoolDocument, quest: TQuest, acc
 
 export async function sendWeeklyDigestJob() {
     const endDate = new Date();
-    endDate.setHours(0, 0, 0, 0);
-
-    const startDate = new Date(new Date(endDate).getTime() - oneDay * 7);
+    const startDate = subDays(endDate, 7);
+    startDate.setHours(0, 0, 0, 0);
     const dateRange = { startDate, endDate };
-
-    let account: TAccount;
-
-    for await (const pool of Pool.find({ 'settings.isWeeklyDigestEnabled': true })) {
+    const pools = await Pool.find({ 'settings.isWeeklyDigestEnabled': true });
+    const subs = pools.map((p) => p.sub);
+    const accounts = await AccountProxy.find({ subs });
+    for (const pool of pools) {
         try {
-            if (!account || account.sub != pool.sub) account = await AccountProxy.findById(pool.sub);
-            if (!account.email) continue;
+            const account = accounts.find(({ sub }) => sub === pool.sub);
+            if (!account || !account.email) continue;
 
             const {
                 dailyQuest,
@@ -181,12 +180,8 @@ export async function sendWeeklyDigestJob() {
                 galachainReward,
             } = await AnalyticsService.getPoolMetrics(pool, dateRange);
 
-            const endDate = new Date();
-            const startDate = subDays(endDate, 7);
-            startDate.setHours(0, 0, 0, 0);
             const leaderboard = await PoolService.getLeaderboard(pool, {
-                startDate,
-                endDate,
+                ...dateRange,
                 limit: 5,
             });
 
@@ -206,7 +201,7 @@ export async function sendWeeklyDigestJob() {
 
             // Skip if nothing happened.
             if (!entryCount && !paymentCount) continue;
-            console.log(leaderboard);
+
             let html = `<p style="font-size: 18px">Hi there!👋</p>`;
             html += `<p>We're pleased to bring you the <strong>Weekly Digest</strong> for "${pool.settings.title}".</p>`;
             html += `<hr />`;
@@ -218,11 +213,10 @@ export async function sendWeeklyDigestJob() {
             html += `<hr />`;
 
             html += `<p style="font-size:16px"><strong>Top 5</strong></p>`;
-            html += `<table role="presentation" border="0" cellpadding="0" cellspacing="0">`;
+            html += `<p><table role="presentation" border="0" cellpadding="0" cellspacing="0">`;
 
             for (const index in leaderboard) {
                 const entry = leaderboard[index];
-
                 html += `<tr>
                 <td width="5%">${emojiMap[index]}</td>
                 <td><strong>${entry.account.username || 'Unknown'}</strong></td>
@@ -230,7 +224,7 @@ export async function sendWeeklyDigestJob() {
                 <td align="right" width="25%"><strong>${entry.score} points</strong></td>
                 </tr>`;
             }
-            html += '</table>';
+            html += '</table></p>';
             html += `<a href="${DASHBOARD_URL}/pool/${pool.id}/participants">All participants</a>`;
 
             await MailService.send(account.email, `🎁 Weekly Digest: "${pool.settings.title}"`, html);
