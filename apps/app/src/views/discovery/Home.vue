@@ -134,7 +134,7 @@ export default defineComponent({
             const url = new URL(API_URL);
             url.pathname = '/v1/leaderboards';
             url.searchParams.append('page', this.page.toString());
-            url.searchParams.append('limit', this.limitProgress.toString());
+            url.searchParams.append('limit', this.limit.toString());
             if (this.search) {
                 url.searchParams.append('search', this.search);
             }
