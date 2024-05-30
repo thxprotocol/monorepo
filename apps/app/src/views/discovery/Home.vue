@@ -28,13 +28,7 @@
                 <BaseCardCampaign v-for="campaign of campaigns.results" class="mt-3" :campaign="campaign" />
             </b-col>
         </b-row>
-        <b-pagination
-            v-model="page"
-            :per-page="limit"
-            :total-rows="campaigns.total"
-            align="center"
-            class="mt-3 mb-0"
-        ></b-pagination>
+        <b-pagination v-model="page" :per-page="limit" :total-rows="campaigns.total" align="center" class="mt-3 mb-0" />
     </b-container>
     <b-container class="mb-5">
         <b-row class="mt-5 mb-3">
