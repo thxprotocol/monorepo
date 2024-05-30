@@ -8,7 +8,8 @@
         </template>
         <VueDatePicker
             v-model="date"
-            :enable-time-picker="enableTimePicke"
+            :disabled="isDisabled"
+            :enable-time-picker="enableTimePicker"
             :min-date="minDate"
             :max-date="maxDate"
             :start-date="date"
@@ -39,17 +40,22 @@ export default defineComponent({
         description: String,
         tooltip: String,
         placeholder: String,
-        minDate: Date,
-        maxDate: Date,
+        minDate: { type: Date, required: true },
+        maxDate: { type: Date, required: true },
         startDate: Date,
         allowedDates: Array as () => number[],
-        enableTimePicke: Boolean,
+        enableTimePicker: Boolean,
         value: { type: Date, required: true },
     },
     data() {
         return {
             date: new Date(),
         };
+    },
+    computed: {
+        isDisabled() {
+            return this.minDate.getTime() >= this.maxDate.getTime();
+        },
     },
     watch: {
         startDate: {

@@ -11,7 +11,10 @@
             {{ error }}
         </b-alert>
         <BaseFormGroupLockEnd :value="lockEnd" @update="lockEnd = $event" />
-        <b-button variant="primary" class="w-100" :disabled="isPolling" @click="onClickIncreaseLockEnd">
+        <p class="text-opaque">
+            Current: <strong>{{ format(new Date(veStore.lock.end), 'MMMM do yyyy hh:mm:ss') }}</strong>
+        </p>
+        <b-button variant="primary" class="w-100" :disabled="isDisabled" @click="onClickIncreaseLockEnd">
             <b-spinner v-if="isPolling" small />
             <template v-else>Increase End Date</template>
         </b-button>
@@ -28,6 +31,8 @@ import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
+import { format } from 'date-fns';
+import { getThursdaysUntilTimestamp, NinetyDaysInMs } from '@thxnetwork/app/utils/date';
 
 export default defineComponent({
     name: 'BaseModalIncreaseLockEnd',
@@ -37,6 +42,7 @@ export default defineComponent({
     },
     data() {
         return {
+            format,
             WalletVariant,
             isShown: false,
             error: '',
@@ -48,6 +54,10 @@ export default defineComponent({
         ...mapStores(useWalletStore, useVeStore, useLiquidityStore),
         isAlertInfoShown() {
             return !!this.error;
+        },
+        isDisabled() {
+            const availableDates = getThursdaysUntilTimestamp(this.veStore.lock.end, this.veStore.now + NinetyDaysInMs);
+            return this.isPolling || !this.lockEnd || !availableDates.length;
         },
     },
     watch: {

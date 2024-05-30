@@ -1,5 +1,5 @@
 const OneDayInMs = 60 * 60 * 24 * 1000;
-
+export const OneWeekInMs = OneDayInMs * 7;
 export const NinetyDaysInMs = OneDayInMs * 90;
 
 export function getThursdaysUntilTimestamp(now: number, futureTimestamp: number) {

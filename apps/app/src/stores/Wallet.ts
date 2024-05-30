@@ -175,12 +175,19 @@ export const useWalletStore = defineStore('wallet', {
         async sendTransaction(from: string, to: `0x${string}`, data: `0x${string}`, gas?: any) {
             await this.createWeb3Modal();
 
-            if (!this.account || this.account.address !== from) {
-                await this.connect();
+            if (
+                !this.account ||
+                !this.account.address ||
+                !this.wallet ||
+                this.wallet.address.toLowerCase() !== this.account.address.toLowerCase()
+            ) {
+                this.isModalChainSwitchShown = true;
+                throw new Error(`Please connect address ${from}.`);
             }
 
-            if (this.chainId && this.chainId !== this.chainId) {
-                await this.switchChain(this.chainId);
+            if (this.chainId && this.wallet && this.wallet.chainId !== this.chainId) {
+                this.isModalChainSwitchShown = true;
+                throw new Error(`Please set your network to ${this.wallet.chainId}.`);
             }
 
             return sendTransaction(wagmiConfig, { to, data, gas });

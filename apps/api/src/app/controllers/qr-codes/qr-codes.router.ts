@@ -5,7 +5,7 @@ import * as CreateEntry from './post.controller';
 import * as ReadEntry from './get.controller';
 import * as DeleteEntryController from './delete.controller';
 import * as ReadRedirectEntry from './redirect/get.controller';
-import * as UpdateEntryController from './collect/post.controller';
+import * as UpdateEntryController from './collect/patch.controller';
 
 const router: express.Router = express.Router();
 

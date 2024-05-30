@@ -37,7 +37,7 @@ export default defineComponent({
             return {
                 balancerAPR: balancer.apr.toFixed(2),
                 balancerSwapFees: balancer.swapFees.toFixed(2),
-                thx: thx.toFixed(2),
+                thx: thx && thx.toFixed(2),
                 total: (balancer.apr + balancer.swapFees + thx).toFixed(2),
             };
         },

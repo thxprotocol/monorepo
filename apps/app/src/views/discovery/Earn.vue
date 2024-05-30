@@ -39,7 +39,7 @@
             </div>
         </template>
         <template #secondary>
-            <BaseCardMembership :tab-index="0" />
+            <BaseCardMembership />
         </template>
     </BaseCardHeader>
     <b-container class="mb-5">

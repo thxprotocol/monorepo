@@ -135,6 +135,7 @@ type TVeLock = {
 };
 
 type TVeState = {
+    isAccepted: boolean;
     lock: TVeLock;
     now: number;
     balance: BigNumber;

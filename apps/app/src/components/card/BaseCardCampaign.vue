@@ -1,5 +1,17 @@
 <template>
-    <b-card no-body class="cursor-pointer gradient-shadow card-campaign" @click="goTo(`/c/${campaign.slug}`)">
+    <b-card
+        no-body
+        class="cursor-pointer gradient-shadow card-campaign"
+        :style="{ opacity: isLoading ? 0.5 : 1 }"
+        @click="goTo(`/c/${campaign.slug}`)"
+    >
+        <b-spinner
+            v-if="isLoading"
+            small
+            variant="light"
+            class="position-absolute"
+            style="top: 50%; left: 50%; margin-left: -8px; margin-top: -8px"
+        />
         <b-row>
             <b-col md="2">
                 <div
@@ -118,6 +130,7 @@ export default defineComponent({
     data() {
         return {
             decodeHTML,
+            isLoading: false,
             isModalExternalURLShown: false,
         };
     },
@@ -138,6 +151,7 @@ export default defineComponent({
     },
     methods: {
         goTo(path: string) {
+            this.isLoading = true;
             this.$router.push(path);
         },
         onClickSubscribe() {
@@ -154,7 +168,7 @@ export default defineComponent({
         opacity: 0;
     }
     &:hover:before {
-        opacity: 0.5;
+        opacity: 0.15;
     }
 }
 </style>

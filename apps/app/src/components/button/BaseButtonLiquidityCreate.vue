@@ -15,6 +15,7 @@ import { ChainId } from '@thxnetwork/common/enums';
 import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import { POLYGON_RPC } from '@thxnetwork/app/config/secrets';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
+import { useVeStore } from '@thxnetwork/app/stores/VE';
 
 export default defineComponent({
     name: 'BaseButtonLiquidityCreate',
@@ -30,7 +31,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useWalletStore, useLiquidityStore),
+        ...mapStores(useVeStore, useWalletStore, useLiquidityStore),
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
@@ -42,7 +43,15 @@ export default defineComponent({
             return BigNumber.from(this.walletStore.balances[this.address.THX]);
         },
         isDisabled() {
-            return this.isPolling;
+            const usdcAmountInWei = BigNumber.from(this.amounts[0]);
+            const thxAmountInWei = BigNumber.from(this.amounts[1]);
+            return (
+                this.isPolling ||
+                !this.veStore.isAccepted ||
+                this.balanceUSDC.lt(usdcAmountInWei) ||
+                this.balanceTHX.lt(thxAmountInWei) ||
+                (this.balanceUSDC.eq(0) && this.balanceTHX.eq(0))
+            );
         },
     },
     methods: {

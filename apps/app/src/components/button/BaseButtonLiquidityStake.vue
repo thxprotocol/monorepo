@@ -8,11 +8,12 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { BigNumber } from 'ethers/lib/ethers';
-import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
 import { mapStores } from 'pinia';
 import { contractNetworks } from '@thxnetwork/app/config/constants';
 import { ChainId } from '@thxnetwork/common/enums';
+import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
+import { useVeStore } from '@thxnetwork/app/stores/VE';
 
 export default defineComponent({
     name: 'BaseButtonLiquidityStake',
@@ -26,7 +27,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useWalletStore, useLiquidityStore),
+        ...mapStores(useVeStore, useWalletStore, useLiquidityStore),
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
@@ -38,7 +39,12 @@ export default defineComponent({
             return BigNumber.from(this.walletStore.balances[this.address.BPT]);
         },
         isDisabled() {
-            return this.balanceBPT.lt(this.amountInWei) || this.isPolling;
+            return (
+                this.isPolling ||
+                !this.veStore.isAccepted ||
+                this.balanceBPT.lt(this.amountInWei) ||
+                this.balanceBPT.eq(0)
+            );
         },
     },
     methods: {

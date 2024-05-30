@@ -10,6 +10,7 @@ import { defineComponent, PropType } from 'vue';
 import { BigNumber } from 'ethers/lib/ethers';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
+import { useVeStore } from '@thxnetwork/app/stores/VE';
 import { mapStores } from 'pinia';
 import { contractNetworks } from '@thxnetwork/app/config/constants';
 import { ChainId } from '@thxnetwork/common/enums';
@@ -22,6 +23,7 @@ export default defineComponent({
         amount: { type: String, required: true },
         token: { type: Object as PropType<{ address: string; decimals: number }>, required: true },
         spender: { type: String, required: true },
+        disabled: { type: Boolean, default: false },
     },
     data() {
         return {
@@ -29,7 +31,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useWalletStore),
+        ...mapStores(useVeStore, useWalletStore),
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
@@ -49,7 +51,7 @@ export default defineComponent({
             return BigNumber.from(this.allowanceInWei).gte(this.amountInWei);
         },
         isDisabled() {
-            return !this.amountInWei.gt(0) || this.isPolling;
+            return this.isPolling || !this.amountInWei.gt(0) || this.disabled;
         },
     },
     methods: {

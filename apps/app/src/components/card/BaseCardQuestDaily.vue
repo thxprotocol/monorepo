@@ -8,11 +8,11 @@
         :error="error"
         @modal-close="isModalQuestEntryShown = false"
     >
-        <div class="d-flex flex-wrap pb-3 justify-content-between">
+        <div class="d-flex flex-wrap pb-3 justify-content-start">
             <b-badge
                 v-for="(amount, key) of quest.amounts"
-                style="width: 40px; height: 40px"
-                class="m-1 d-flex flex-column align-items-center justify-content-center"
+                style="width: 50px; height: 50px"
+                class="me-3 d-flex flex-column align-items-center justify-content-center"
                 :variant="key < quest.entries.length ? 'success' : 'primary'"
                 :class="key < quest.entries.length ? 'bg-success text-white' : 'bg-primary text-white'"
             >

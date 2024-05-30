@@ -33,7 +33,7 @@
             </div>
         </template>
         <template #secondary>
-            <BaseCardMembershipOnboarding />
+            <BaseCardMembership />
         </template>
     </BaseCardHeader>
 </template>

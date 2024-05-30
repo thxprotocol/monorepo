@@ -13,7 +13,7 @@ export default async function main() {
     const HARDHAT_RPC = 'http://127.0.0.1:8545/';
     const hardhatProvider = new ethers.providers.JsonRpcProvider(HARDHAT_RPC);
     // const TO = '0x029E2d4D2b6938c92c48dbf422a4e500425a08D8';
-    const TO = '0xaf9d56684466fcFcEA0a2B7fC137AB864d642946';
+    const TO = '0xf4b70b3931166B422bBC772a2EafcE8BD5A017F9';
     // const TO = '0x7b8fc09eb5D80eadA6AE74b112463eA006DC25B5';
     const AMOUNT_USDC = parseUnits('12300', 6).toString();
     const AMOUNT_THX = parseUnits('45600', 18).toString();

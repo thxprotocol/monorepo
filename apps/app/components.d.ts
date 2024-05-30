@@ -111,6 +111,9 @@ declare module 'vue' {
     BaseSidebar: typeof import('./src/components/BaseSidebar.vue')['default']
     BaseTabDeposit: typeof import('./src/components/tabs/BaseTabDeposit.vue')['default']
     BaseTabLiquidity: typeof import('./src/components/tabs/BaseTabLiquidity.vue')['default']
+    BaseTabLiquidityCreate: typeof import('./src/components/tabs/BaseTabLiquidityCreate.vue')['default']
+    BaseTabLiquidityLock: typeof import('./src/components/tabs/BaseTabLiquidityLock.vue')['default']
+    BaseTabLiquidityStake: typeof import('./src/components/tabs/BaseTabLiquidityStake.vue')['default']
     BaseTabWalletVariant: typeof import('./src/components/tabs/BaseTabWalletVariant.vue')['default']
     BaseTabWalletWalletConnect: typeof import('./src/components/tabs/BaseTabWalletWalletConnect.vue')['default']
     BaseTabWalletWeb3Auth: typeof import('./src/components/tabs/BaseTabWalletWeb3Auth.vue')['default']
@@ -159,6 +162,7 @@ declare module 'vue' {
     BSpinner: typeof import('bootstrap-vue-next')['BSpinner']
     BTab: typeof import('bootstrap-vue-next')['BTab']
     BTabs: typeof import('bootstrap-vue-next')['BTabs']
+    copy: typeof import('./src/components/tabs/BaseTabDeposit copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

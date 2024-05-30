@@ -11,7 +11,7 @@
             </p>
         </template>
         <template #secondary>
-            <BaseCardMembership :tab-index="1" />
+            <BaseCardMembership :tab-index="2" />
         </template>
     </BaseCardHeader>
     <b-container class="mt-5">

@@ -1,7 +1,7 @@
 <template>
     <BaseFormGroupInputDate
         label="Lock duration"
-        tooltip="The longer you lock, the more rewards you get. You will be able to withdraw early, but a penalty will be applied."
+        tooltip="The longer you lock, the more veTHX you'll get and the more rewards you can claim. You will be able to withdraw early, but a penalty will be applied."
         :enable-time-picker="false"
         :min-date="minDate"
         :max-date="maxDate"
@@ -9,30 +9,15 @@
         :start-date="minDate"
         :value="value"
         @update="$emit('update', $event)"
-    >
-        <template #description>
-            <div class="d-flex justify-content-start">
-                <b-button
-                    v-for="{ timestamp, label } of suggestedDates"
-                    size="sm"
-                    variant="primary"
-                    class="rounded-pill me-2 mt-2 mb-0"
-                    :disabled="value.getTime() === timestamp"
-                    @click="$emit('update', new Date(timestamp))"
-                >
-                    {{ label }}
-                </b-button>
-            </div>
-        </template>
-    </BaseFormGroupInputDate>
+    />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { NinetyDaysInMs, getThursdaysUntilTimestamp } from '@thxnetwork/app/utils/date';
 import { mapStores } from 'pinia';
 import { useVeStore } from '@thxnetwork/app/stores/VE';
 import { BigNumber } from 'alchemy-sdk';
+import { getThursdaysUntilTimestamp, NinetyDaysInMs, OneWeekInMs } from '@thxnetwork/app/utils/date';
 
 export default defineComponent({
     name: 'BaseFormGroupLockEnd',
@@ -51,31 +36,10 @@ export default defineComponent({
         allowedDates() {
             return getThursdaysUntilTimestamp(this.startDate, this.startDate + NinetyDaysInMs);
         },
-        suggestedDates() {
-            if (!this.allowedDates.length) return [];
-            return [
-                {
-                    label: '2 Weeks',
-                    timestamp: this.allowedDates[1],
-                },
-                {
-                    label: '4 Weeks',
-                    timestamp: this.allowedDates[3],
-                },
-                {
-                    label: '8 Weeks',
-                    timestamp: this.allowedDates[7],
-                },
-                {
-                    label: '12 Weeks',
-                    timestamp: this.allowedDates[11],
-                },
-            ];
-        },
         minDate() {
-            // If there is a lock the min date should be the current lock end date
+            // If there is a lock the min date should be the current lock end date + 1 week
             if (!BigNumber.from(this.veStore.lock.amount).eq(0)) {
-                return new Date(this.veStore.lock.end);
+                return new Date(this.veStore.lock.end + OneWeekInMs);
             }
 
             // If not we pick the first suggested allowed date

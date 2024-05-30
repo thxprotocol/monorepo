@@ -1,0 +1,12 @@
+.b-tooltip {
+    .tooltip-arrow:before {
+        border-top-color: $primary !important;
+    }
+    .tooltip-inner {
+        max-width: 280px;
+        background-color: $primary;
+        text-align: left;
+        padding: .75rem;
+        color: $light
+    }
+}

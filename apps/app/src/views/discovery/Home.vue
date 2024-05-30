@@ -87,6 +87,7 @@ import { decodeHTML } from '../../utils/decode-html';
 import imgJumbotron from '../../assets/thx_token_governance.png';
 import imgLogo from '../../assets/logo.png';
 import imgHeader from '../../assets/thx_token_governance.png';
+import * as html from 'html-entities';
 
 export default defineComponent({
     name: 'Home',
@@ -127,7 +128,6 @@ export default defineComponent({
         await this.getCampaigns();
         await this.getQuests();
         this.isLoading = false;
-        this.accountStore.getParticipants();
     },
     methods: {
         async getCampaigns() {
@@ -148,7 +148,11 @@ export default defineComponent({
             const res = await fetch(url);
             const questLists = await res.json();
 
-            this.questLists = questLists;
+            this.questLists = questLists.map((quest: TBaseQuest) => ({
+                ...quest,
+                title: html.decode(quest.title),
+                description: html.decode(quest.description),
+            }));
         },
         onInputSearch() {
             this.isLoadingSearch = true;

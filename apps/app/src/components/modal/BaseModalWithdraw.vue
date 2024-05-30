@@ -10,9 +10,13 @@
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ error }}
         </b-alert>
+
+        <b-alert v-model="isEarlyAlertShown" class="p-2" variant="primary">
+            <i class="fas fa-info-circle me-1" />
+            A penalty will be applied on early withdrawals!
+        </b-alert>
         <p class="text-opaque">
-            A penalty is applied to early withdraws. This penalty will be subtracted from your locked amount and
-            redistributed as rewards.
+            This penalty will be subtracted from your locked amount and redistributed to other lockers as rewards.
         </p>
         <b-form-group v-if="isEarly">
             <b-form-checkbox v-model="isEarlyAttempt">
@@ -65,6 +69,9 @@ export default defineComponent({
         ...mapStores(useWalletStore, useVeStore, useLiquidityStore),
         isAlertInfoShown() {
             return !!this.error;
+        },
+        isEarlyAlertShown() {
+            return this.isEarly;
         },
         penaltyInWei() {
             const end = Math.floor(this.veStore.lock.end / 1000);

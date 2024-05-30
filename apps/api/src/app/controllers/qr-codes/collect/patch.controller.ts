@@ -23,7 +23,7 @@ const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(reward.poolId);
     if (!pool) throw new BadRequestError('Campaign not found.');
 
-    const safe = await SafeService.findOneByPool(pool, pool.chainId);
+    const safe = await SafeService.findOneByPool(pool);
     if (!safe) throw new BadRequestError('Safe not found.');
 
     // Find wallet for the authenticated user

@@ -1,10 +1,26 @@
 <template>
     <b-row>
         <b-col>
-            <b-form-group label="Voting power" label-class="text-opaque">
-                {{ fromWei(String(veStore.balance)) }}
+            <b-form-group label="Voting power">
+                <template #label>
+                    <span class="text-opaque">Balance veTHX</span>
+                    <i
+                        v-b-tooltip
+                        class="fas fa-question-circle text-opaque ms-1"
+                        title="Your veTHX balance determines your governance voting power and your share in the BAL and 20USDC-80THX rewards."
+                    />
+                </template>
+                {{ balance }}
             </b-form-group>
-            <b-form-group label="Locked amount" label-class="text-opaque">
+            <b-form-group>
+                <template #label>
+                    <span class="text-opaque">Locked 20USDC-80THX</span>
+                    <i
+                        v-b-tooltip
+                        class="fas fa-question-circle text-opaque ms-1"
+                        title="Your locked amount determines your veTHX balance together with your lock duration. Locking more 20USDC-80THX will increase your veTHX balance."
+                    />
+                </template>
                 {{ amount }}
                 <b-link
                     size="sm"
@@ -18,13 +34,16 @@
                     @hidden="isModalIncreaseAmountShown = false"
                 />
             </b-form-group>
-            <b-form-group label="Locked ends" label-class="text-opaque">
+            <b-form-group>
+                <template #label>
+                    <span class="text-opaque">Lock duration</span>
+                    <i
+                        v-b-tooltip
+                        class="fas fa-question-circle text-opaque ms-1"
+                        title="Your lock duration and locked amount determine your veTHX balance. Locking your 20USDC-80THX for longer will increase your veTHX balance. Only Thurdays up to 90 days from now are allowed."
+                    />
+                </template>
                 {{ differenceInDays(veStore.lock.end, veStore.now) }} days
-                <i
-                    v-b-tooltip
-                    :title="`${format(new Date(veStore.lock.end), 'MMMM do yyyy hh:mm:ss')}`"
-                    class="fas fa-info-circle me-1 cursor-pointer text-opaque"
-                />
                 <b-link
                     size="sm"
                     class="text-accent text-decoration-underline ms-2"
@@ -58,12 +77,9 @@
             </div>
         </b-col>
     </b-row>
-    <hr />
-    <b-alert v-model="isEarly" class="p-2" variant="primary">
-        <i class="fas fa-info-circle me-1" />
-        A penalty will be applied on early withdrawals!
-    </b-alert>
-    <b-button class="w-100" variant="primary" @click="isModalWithdrawShown = true"> Withdraw </b-button>
+    <b-button class="w-100 mt-3" variant="primary" :disabled="isDisabled" @click="isModalWithdrawShown = true">
+        Withdraw
+    </b-button>
     <BaseModalWithdraw :show="isModalWithdrawShown" :is-early="isEarly" @hidden="isModalWithdrawShown = false" />
 </template>
 
@@ -103,15 +119,15 @@ export default defineComponent({
             return contractNetworks[this.walletStore.wallet.chainId];
         },
         isEarly() {
-            if (!this.veStore.lock) return;
             return Number(this.veStore.now) < Number(this.veStore.lock.end);
         },
+        balance() {
+            return Number(fromWei(String(this.veStore.balance))).toFixed(6);
+        },
         amount() {
-            if (!this.veStore.lock) return;
-            return fromWei(String(this.veStore.lock.amount));
+            return Number(fromWei(String(this.veStore.lock.amount))).toFixed(6);
         },
         membership() {
-            if (!this.veStore.lock) return;
             const price = this.liquidityStore.pricing['20USDC-80THX'];
             const amount = Number(fromWei(String(this.veStore.lock.amount)));
             const amountInUSD = amount * price;
@@ -122,6 +138,9 @@ export default defineComponent({
             if (amountInUSD > 500 && amountInUSD < 5000) return 'Elite';
             if (amountInUSD > 5000 && amountInUSD < 50000) return 'Master';
             if (amountInUSD > 50000 && amountInUSD < 500000) return 'Legend';
+        },
+        isDisabled() {
+            return this.isLoadingAmount || this.isLoadingLockEnd;
         },
     },
     methods: {

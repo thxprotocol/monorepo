@@ -20,7 +20,7 @@
         >
             Approve Transfer
         </BaseButtonApprove>
-        <b-button v-else variant="success" class="w-100" :disabled="isPolling" @click="onClickIncreaseAmount">
+        <b-button v-else variant="success" class="w-100" :disabled="isDisabled" @click="onClickIncreaseAmount">
             <b-spinner v-if="isPolling" small />
             <template v-else>Increase Amount</template>
         </b-button>
@@ -37,7 +37,7 @@ import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
-import { formatUnits, parseUnits } from 'ethers/lib/utils';
+import { parseUnits } from 'ethers/lib/utils';
 import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
 import { BigNumber } from 'ethers/lib/ethers';
@@ -65,6 +65,9 @@ export default defineComponent({
         isAlertInfoShown() {
             return !!this.error;
         },
+        isDisabled() {
+            return this.isPolling || this.balanceBPTGauge.lt(this.amountInWei) || this.balanceBPTGauge.eq(0);
+        },
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
@@ -72,15 +75,14 @@ export default defineComponent({
         amountInWei() {
             return parseUnits(this.lockAmount, 18);
         },
+        balanceBPTGauge() {
+            return BigNumber.from(this.walletStore.balances[this.address.BPTGauge]);
+        },
         isAllowanceSufficient() {
             if (!this.walletStore.allowances[this.address.BPTGauge]) return false;
             if (!this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow]) return false;
             const allowanceInWei = this.walletStore.allowances[this.address.BPTGauge][this.address.VotingEscrow];
             return BigNumber.from(allowanceInWei).gte(this.amountInWei);
-        },
-        balanceBPTGauge() {
-            if (!this.walletStore.balances[this.address.BPTGauge]) return 0;
-            return Number(formatUnits(this.walletStore.balances[this.address.BPTGauge], 'ether'));
         },
     },
     watch: {

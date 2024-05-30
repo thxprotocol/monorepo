@@ -18,6 +18,7 @@ export const useVeStore = defineStore('ve', {
         now: Date.now(),
         balance: 0,
         rewards: [],
+        isAccepted: false,
         isModalClaimTokensShown: false,
     }),
     actions: {

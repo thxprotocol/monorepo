@@ -15,7 +15,5 @@ export const toast = (message: string, theme = 'dark', autoClose: number, onClos
 export function parseError(response: any) {
     return response && response.error // Axios error
         ? response.error.message
-        : response.code // Metamask error
-        ? response.message
-        : 'Unknown error occurred. Please try again later.';
+        : response.message;
 }
