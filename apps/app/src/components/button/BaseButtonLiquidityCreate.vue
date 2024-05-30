@@ -15,7 +15,9 @@ import { ChainId } from '@thxnetwork/common/enums';
 import { BalancerSDK, Network } from '@balancer-labs/sdk';
 import { POLYGON_RPC } from '@thxnetwork/app/config/secrets';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
+import { useAccountStore } from '@thxnetwork/app/stores/Account';
 import { useVeStore } from '@thxnetwork/app/stores/VE';
+import { track } from '@thxnetwork/common/mixpanel';
 
 export default defineComponent({
     name: 'BaseButtonLiquidityCreate',
@@ -31,7 +33,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useVeStore, useWalletStore, useLiquidityStore),
+        ...mapStores(useVeStore, useWalletStore, useLiquidityStore, useAccountStore),
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
@@ -80,12 +82,18 @@ export default defineComponent({
                 await this.liquidityStore.createLiquidity(wallet, data);
                 await this.liquidityStore.waitForLiquidity(wallet, data);
 
+                this.trackEvent(data);
                 this.$emit('success');
             } catch (error) {
                 this.$emit('error', error);
             } finally {
                 this.isPolling = false;
             }
+        },
+        trackEvent(data: any) {
+            const { poolId, account } = this.accountStore;
+            const { wallet } = this.walletStore;
+            track('UserCreates', [account?.sub, 'liquidity', { poolId, address: wallet?.address, ...data }]);
         },
     },
 });

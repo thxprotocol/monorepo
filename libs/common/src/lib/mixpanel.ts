@@ -63,4 +63,4 @@ export const track = (event: string, params: any[]) => {
     }
 };
 
-export default { init, client, track };
+export default { init, client, track, mixpanel };

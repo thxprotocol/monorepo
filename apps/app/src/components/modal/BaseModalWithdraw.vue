@@ -46,8 +46,10 @@ import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
 import { MAX_LOCK_TIME, contractNetworks } from '../../config/constants';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
+import { useAccountStore } from '@thxnetwork/app/stores/Account';
 import { calculatePenalty, toFiatPrice } from '@thxnetwork/app/utils/price';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
+import { track } from '@thxnetwork/common/mixpanel';
 
 export default defineComponent({
     name: 'BaseModalWithdraw',
@@ -66,7 +68,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useWalletStore, useVeStore, useLiquidityStore),
+        ...mapStores(useWalletStore, useVeStore, useLiquidityStore, useAccountStore),
         isAlertInfoShown() {
             return !!this.error;
         },
@@ -108,6 +110,7 @@ export default defineComponent({
 
                 this.walletStore.getBalance(contractNetworks[wallet.chainId].BPTGauge);
 
+                this.trackEvent({ isEarly: this.isEarly, isEarlyAttempt: this.isEarlyAttempt });
                 this.$emit('hidden');
             } catch (response) {
                 this.onError(response);
@@ -117,6 +120,11 @@ export default defineComponent({
         },
         onError(response: any) {
             this.error = response && response.error ? response.error.message : 'Something went wrong...';
+        },
+        trackEvent(data: any) {
+            const { poolId, account } = this.accountStore;
+            const { wallet } = this.walletStore;
+            track('UserCreates', [account?.sub, 'withdrawal', { poolId, address: wallet?.address, ...data }]);
         },
     },
 });

@@ -11,8 +11,10 @@ import { BigNumber } from 'ethers/lib/ethers';
 import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
 import { mapStores } from 'pinia';
 import { useVeStore } from '@thxnetwork/app/stores/VE';
+import { useAccountStore } from '@thxnetwork/app/stores/Account';
 import { contractNetworks } from '../../config/constants';
 import { ChainId } from '@thxnetwork/common/enums';
+import { track } from '@thxnetwork/common/mixpanel';
 
 export default defineComponent({
     name: 'BaseButtonLiquidityLock',
@@ -27,7 +29,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useWalletStore, useVeStore),
+        ...mapStores(useWalletStore, useVeStore, useAccountStore),
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
@@ -66,6 +68,11 @@ export default defineComponent({
             } finally {
                 this.isPolling = false;
             }
+        },
+        trackEvent(data: any) {
+            const { poolId, account } = this.accountStore;
+            const { wallet } = this.walletStore;
+            track('UserCreates', [account?.sub, 'locked liquidity', { poolId, address: wallet?.address, ...data }]);
         },
     },
 });

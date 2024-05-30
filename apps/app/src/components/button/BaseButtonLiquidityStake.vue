@@ -14,6 +14,8 @@ import { ChainId } from '@thxnetwork/common/enums';
 import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { useVeStore } from '@thxnetwork/app/stores/VE';
+import { useAccountStore } from '@thxnetwork/app/stores/Account';
+import { track } from '@thxnetwork/common/mixpanel';
 
 export default defineComponent({
     name: 'BaseButtonLiquidityStake',
@@ -27,7 +29,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useVeStore, useWalletStore, useLiquidityStore),
+        ...mapStores(useVeStore, useWalletStore, useLiquidityStore, useAccountStore),
         address() {
             if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
             return contractNetworks[this.walletStore.wallet.chainId];
@@ -55,15 +57,22 @@ export default defineComponent({
 
                 this.isPolling = true;
 
-                await this.liquidityStore.stake(wallet, { amountInWei: this.amountInWei.toString() });
+                const data = { amountInWei: this.amountInWei.toString() };
+                await this.liquidityStore.stake(wallet, data);
                 await this.liquidityStore.waitForStake(wallet, this.amountInWei);
 
+                this.trackEvent(data);
                 this.$emit('success');
             } catch (error) {
                 this.$emit('error', error);
             } finally {
                 this.isPolling = false;
             }
+        },
+        trackEvent(data: any) {
+            const { poolId, account } = this.accountStore;
+            const { wallet } = this.walletStore;
+            track('UserCreates', [account?.sub, 'staked liquidity', { poolId, address: wallet?.address, ...data }]);
         },
     },
 });
