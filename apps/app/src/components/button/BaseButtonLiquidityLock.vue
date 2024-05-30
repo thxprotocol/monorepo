@@ -58,10 +58,12 @@ export default defineComponent({
                 this.isPolling = true;
 
                 const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
-                await this.veStore.deposit(wallet, { amountInWei: this.amountInWei.toString(), lockEndTimestamp });
+                const data = { amountInWei: this.amountInWei.toString(), lockEndTimestamp };
+                await this.veStore.deposit(wallet, data);
                 await this.veStore.waitForLock(wallet, this.amountInWei, lockEndTimestamp);
                 await this.walletStore.getBalance(this.address.BPTGauge);
 
+                this.trackEvent(data);
                 this.$emit('success');
             } catch (error) {
                 this.$emit('error', error);
