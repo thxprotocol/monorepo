@@ -148,7 +148,7 @@ export default defineComponent({
             return contractNetworks[this.walletStore.wallet.chainId];
         },
         isAlertInsufficientTokensShown() {
-            return this.accountStore.isAuthenticated ? !this.balanceUSDC || !this.balanceTHX : false;
+            return this.accountStore.isAuthenticated ? !this.balanceUSDC && !this.balanceTHX : false;
         },
         isSufficientUSDCAllowance() {
             if (!this.walletStore.allowances[this.address.USDC]) return false;
