@@ -50,6 +50,7 @@ const controller = async (req: Request, res: Response) => {
                 rank: pool.rank,
                 slug: pool.settings.slug || pool._id,
                 title: pool.settings.title,
+                description: pool.settings.description,
                 domain: widget ? widget.domain : 'https://app.thx.network',
                 logoImgUrl: brand && brand.logoImgUrl,
                 backgroundImgUrl: brand && brand.backgroundImgUrl,
