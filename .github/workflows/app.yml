@@ -39,10 +39,10 @@ jobs:
                       ${{ runner.os }}-node-
 
             - name: Install Node.js dependencies
-              run:
-                  - corepack enable
-                  - yarn set version berry
-                  - yarn install --frozen-lockfile
+              run: |
+                  corepack enable
+                  yarn set version berry
+                  yarn install --frozen-lockfile
 
             - name: Cache Node.js dependencies
               uses: actions/cache/save@v3
