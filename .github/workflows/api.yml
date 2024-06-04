@@ -48,9 +48,6 @@ jobs:
                   path: ./node_modules
                   key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
 
-            - name: Override sharp lib
-              run: yarn add sharp --ignore-engines
-
             - name: Start Hardhat RPC
               run: |
                   yarn hardhat > /dev/null &
