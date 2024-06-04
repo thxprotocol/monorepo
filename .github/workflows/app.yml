@@ -127,8 +127,6 @@ jobs:
             - name: Build App
               run: |
                   corepack enable
-                  yarn set version 3.6.4
-                  yarn install --frozen-lockfile
                   yarn nx run app:build --prod --mode $BUILD_MODE --skip-nx-cache
 
             - name: Deploy
