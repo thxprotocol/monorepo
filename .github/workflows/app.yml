@@ -39,10 +39,7 @@ jobs:
                       ${{ runner.os }}-node-
 
             - name: Install Node.js dependencies
-              run: |
-                  corepack enable
-                  yarn set version 3.6.4
-                  yarn install --frozen-lockfile
+              run: yarn
 
             - name: Cache Node.js dependencies
               uses: actions/cache/save@v3
@@ -125,9 +122,7 @@ jobs:
                   fi
 
             - name: Build App
-              run: |
-                  corepack enable
-                  yarn nx run app:build --prod --mode $BUILD_MODE --skip-nx-cache
+              run: yarn nx run app:build --prod --mode $BUILD_MODE --skip-nx-cache
 
             - name: Deploy
               run: aws s3 sync ./dist/apps/app $S3_URL --delete
