@@ -23,6 +23,18 @@
             },
             "configurations": {}
         },
+        "lambda-zip": {
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "rm AppDev-ModifyResponse.zip",
+                    "zip -r AppDev-ModifyResponse.zip .",
+                    "aws lambda update-function-code --function-name AppDev-ModifyResponse --region us-east-1 --zip-file fileb://AppDev-ModifyResponse.zip",
+                    "aws lambda publish-version --function-name AppDev-ModifyResponse --region us-east-1"
+                ],
+                "cwd": "apps/app/src/lambda/AppDev-ModifyResponse"
+            }
+        },
         "lint": {
             "executor": "@nx/eslint:lint",
             "outputs": ["{options.outputFile}"]
