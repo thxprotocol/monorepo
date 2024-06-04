@@ -204,5 +204,6 @@
     },
     "resolutions": {
         "@achrinza/node-ipc": "9.2.7"
-    }
+    },
+    "packageManager": "yarn@4.2.2"
 }
