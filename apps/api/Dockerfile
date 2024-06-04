@@ -13,7 +13,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package.json yarn.lock ./
-RUN yarn
+RUN corepack enable
+RUN yarn set version berry
+RUN yarn install
 COPY . .
 
 CMD [ "npx", "nx", "serve", "api" ]
@@ -48,7 +50,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install your application dependencies (assuming it uses Node.js)
-RUN yarn
+RUN corepack enable
+RUN yarn set version berry
+RUN yarn install
 
 # Clean up unnecessary packages and files
 RUN apt-get purge -y --auto-remove build-essential && \
