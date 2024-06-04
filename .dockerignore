@@ -1,6 +1,7 @@
 node_modules
 .github
 cache
+!.yarn/cache
 dist
 docker-compose*
 .env*
