@@ -18,7 +18,7 @@ RUN yarn set version berry
 RUN yarn install
 COPY . .
 
-CMD [ "npx", "nx", "serve", "api" ]
+CMD [ "yarn", "nx", "serve", "api" ]
 
 #####################################################################################################
 ## Build stage
@@ -29,7 +29,7 @@ ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
 COPY --from=develop ./usr/src/app/ ./
-RUN npx nx build api --prod
+RUN yarn nx build api --prod
 COPY ./newrelic.js ./yarn.lock ./dist/apps/api/
 RUN ls -la
 
