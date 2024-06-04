@@ -125,7 +125,11 @@ jobs:
                   fi
 
             - name: Build App
-              run: yarn nx run app:build --prod --mode $BUILD_MODE --skip-nx-cache
+              run: |
+                  corepack enable
+                  yarn set version 3.6.4
+                  yarn install --frozen-lockfile
+                  yarn nx run app:build --prod --mode $BUILD_MODE --skip-nx-cache
 
             - name: Deploy
               run: aws s3 sync ./dist/apps/app $S3_URL --delete
