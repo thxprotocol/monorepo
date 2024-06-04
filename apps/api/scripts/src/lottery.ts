@@ -31,8 +31,11 @@ export default async function main() {
         .toArray();
 
     // Iterate over codes to fetch user details
-    for (const code of codes) {
+    for (const winner of winners) {
         try {
+            const code = codes.find((code) => code && code.code === winner);
+            if (!code) continue;
+
             const account = accounts.find((account) => String(account._id) === code.sub);
             const tokens = await db
                 .collection('tokens')
@@ -41,7 +44,7 @@ export default async function main() {
             const userIds = tokens.map((token) => token.userId).join(' ');
             console.log(code.code, userIds, account.username, account.email);
         } catch (error) {
-            console.error(code.code, error);
+            console.error(winner, error);
         }
     }
 }
