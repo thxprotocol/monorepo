@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y g++ make python3-pip build-essential li
 
 COPY package.json yarn.lock ./
 RUN yarn
+RUN yarn add sharp --ignore-engines
 COPY . .
 
 CMD [ "npx", "nx", "serve", "api" ]
@@ -49,6 +50,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install your application dependencies (assuming it uses Node.js)
 RUN yarn
+RUN yarn add sharp --ignore-engines
 
 # Clean up unnecessary packages and files
 RUN apt-get purge -y --auto-remove build-essential && \
