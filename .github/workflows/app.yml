@@ -41,7 +41,7 @@ jobs:
             - name: Install Node.js dependencies
               run: |
                   corepack enable
-                  yarn set version berry
+                  yarn set version 3.6.4
                   yarn install --frozen-lockfile
 
             - name: Cache Node.js dependencies

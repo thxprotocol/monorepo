@@ -14,7 +14,7 @@ RUN apt-get update \
 
 COPY package.json yarn.lock ./
 RUN corepack enable
-RUN yarn set version berry
+RUN yarn set version 3.6.4
 RUN yarn install
 COPY . .
 
@@ -51,7 +51,7 @@ RUN apt-get update \
 
 # Install your application dependencies (assuming it uses Node.js)
 RUN corepack enable
-RUN yarn set version berry
+RUN yarn set version 3.6.4
 RUN yarn install
 
 # Clean up unnecessary packages and files
