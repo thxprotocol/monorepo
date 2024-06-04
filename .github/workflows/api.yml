@@ -39,10 +39,7 @@ jobs:
                       ${{ runner.os }}-node-
 
             - name: Install Node.js dependencies
-              run: |
-                  corepack enable
-                  yarn set version 3.6.4
-                  yarn install --frozen-lockfile
+              run: yarn
 
             - name: Cache Node.js dependencies
               uses: actions/cache/save@v3
@@ -50,6 +47,9 @@ jobs:
               with:
                   path: ./node_modules
                   key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+
+            - name: Override sharp lib
+              run: yarn add sharp --ignore-engines
 
             - name: Start Hardhat RPC
               run: |

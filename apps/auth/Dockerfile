@@ -25,7 +25,6 @@ COPY --from=develop ./usr/src/app/ ./
 RUN npx nx build auth --prod
 COPY ./newrelic.js ./yarn.lock ./dist/apps/auth/
 
-
 #####################################################################################################
 ## Production stage
 #####################################################################################################
@@ -46,8 +45,7 @@ RUN apt-get update && apt-get install -y \
     libpango1.0-dev \
     libjpeg-dev \
     libgif-dev \
-    librsvg2-dev \
-    && rm -rf /var/lib/apt/lists/*
+    librsvg2-dev
 
 # Install your application dependencies (assuming it uses Node.js)
 RUN yarn
