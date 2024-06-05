@@ -169,10 +169,11 @@ class BalancerService {
     }
 
     async calculateTHXAPR(gauge: ethers.Contract, veTHX: ethers.Contract, rewardsInBPT: string, pricePerBPT: number) {
-        const monthlyEmissions = Number(formatUnits(rewardsInBPT, 18));
-        const totalShares = Number(formatUnits(await gauge.balanceOf(veTHX.address), 18));
-        const pricePerShare = pricePerBPT;
-        return ((monthlyEmissions * 12) / totalShares / pricePerShare) * 100;
+        // const monthlyEmissions = Number(formatUnits(rewardsInBPT, 18));
+        // const totalShares = Number(formatUnits(await gauge.balanceOf(veTHX.address), 18));
+        // const pricePerShare = pricePerBPT;
+        // return ((monthlyEmissions * 12) / totalShares / pricePerShare) * 100;
+        return 0;
     }
 
     async calculateBalancerAPR(gauge: ethers.Contract, priceOfBAL: number, pricePerBPT: number) {
