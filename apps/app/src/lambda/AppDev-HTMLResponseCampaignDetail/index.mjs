@@ -1,41 +1,59 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 
-const BUCKET_NAME = 'dev-app.thx.network';
-const API_URL = 'https://dev.api.thx.network';
+console.log('Lambda started!');
 
+const BUCKET_NAME = 'dev-app.thx.network';
+const APP_URL = 'https://dev-app.thx.network';
+const API_URL = 'https://dev.api.thx.network';
 const s3 = new S3Client({ region: 'eu-west-3' });
-const response = await fetch('https://dev.api.thx.network/v1/leaderboards?page=1&limit=50');
-const { results: campaigns } = await response.json();
+
+console.log('Fetch campaigns...');
+const httpResponse = await fetch(`${API_URL}/v1/leaderboards?page=1&limit=50`);
+const { results: campaigns } = await httpResponse.json();
+console.log('Fetched campaigns!');
+
+console.log('Fetch HTML...');
+const command = new GetObjectCommand({
+    Bucket: BUCKET_NAME,
+    Key: 'index.html',
+});
+const res = await s3.send(command);
+const content = await res.Body.transformToString();
+console.log('Fetched HTML!');
+
+const responseDefault = {
+    body: content,
+    bodyEncoding: 'text',
+    status: '200',
+    statusDescription: 'OK',
+    headers: {
+        'content-type': [
+            {
+                value: 'text/html',
+            },
+        ],
+    },
+};
 
 export const handler = async (event) => {
-    const request = event.Records[0].cf.request;
     const response = event.Records[0].cf.response;
-    console.log(request);
+    const request = event.Records[0].cf.request;
+    console.log('Request incoming...', request);
 
     // If no request or request.uri, return the response as is
-    if (!request || !request.uri) return response;
+    if (!request || !request.uri) return responseDefault;
+    console.log(request.uri);
 
-    const url = new URL(request.uri);
-    const campaign = campaigns.find((c) => url.pathname.startsWith(`/c/${c.slug}`));
-    console.log(campaign);
-    if (!campaign) return response;
+    const campaign = campaigns.find((c) => request.uri.includes(`/c/${c.slug}`));
+    if (!campaign) return responseDefault;
 
-    const command = new GetObjectCommand({
-        Bucket: BUCKET_NAME,
-        Key: 'index.html',
-    });
-    console.log(command);
-    const res = await s3.send(command);
-    console.log(response);
-    const content = await res.Body.transformToString();
-    console.log(content);
     const metadata = {
         id: campaign._id,
         title: `#${campaign.rank} | ${campaign.title}`,
-        description: `Already ${campaign.participantCount} completed quests! ${campaign.description}`,
-        image: `${API_URL}/v1/leaderboards/facebook/${metadata.id}.png`,
+        description: `Already ${campaign.participantCount} completed quests! ${campaign.description || ''}`,
+        image: `${API_URL}/v1/leaderboards/facebook/${campaign._id}.png`,
         type: 'website',
-        url: request.uri,
+        url: `${APP_URL}${request.uri}`,
     };
     console.log(metadata);
 

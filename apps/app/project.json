@@ -27,12 +27,11 @@
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
-                    "rm AppDev-ModifyResponse.zip",
-                    "zip -r AppDev-ModifyResponse.zip .",
-                    "aws lambda update-function-code --function-name AppDev-ModifyResponse --region us-east-1 --zip-file fileb://AppDev-ModifyResponse.zip",
-                    "aws lambda publish-version --function-name AppDev-ModifyResponse --region us-east-1"
+                    "zip -r AppDev-HTMLResponseCampaignDetail.zip .",
+                    "aws lambda update-function-code --function-name AppDev-HTMLResponseCampaignDetail --region us-east-1 --zip-file fileb://AppDev-HTMLResponseCampaignDetail.zip",
+                    "aws lambda publish-version --function-name AppDev-HTMLResponseCampaignDetail --region us-east-1"
                 ],
-                "cwd": "apps/app/src/lambda/AppDev-ModifyResponse"
+                "cwd": "apps/app/src/lambda/AppDev-HTMLResponseCampaignDetail"
             }
         },
         "lint": {
