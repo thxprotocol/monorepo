@@ -1,35 +1,43 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 
-const s3 = new S3Client({ region: 'eu-west-3' });
 const BUCKET_NAME = 'dev-app.thx.network';
+const API_URL = 'https://dev.api.thx.network';
+
+const s3 = new S3Client({ region: 'eu-west-3' });
 const response = await fetch('https://dev.api.thx.network/v1/leaderboards?page=1&limit=50');
 const { results: campaigns } = await response.json();
 
 export const handler = async (event) => {
     const request = event.Records[0].cf.request;
     const response = event.Records[0].cf.response;
+    console.log(request);
 
-    // If no request, uri or metatags, return the response as is
-    if (!request || !request.uri || !metatags[request.uri]) {
-        return response;
-    }
-    const campaign = campaigns.find((c) => c.slug === request.uri);
+    // If no request or request.uri, return the response as is
+    if (!request || !request.uri) return response;
+
+    const url = new URL(request.uri);
+    const campaign = campaigns.find((c) => url.pathname.startsWith(`/c/${c.slug}`));
+    console.log(campaign);
     if (!campaign) return response;
 
     const command = new GetObjectCommand({
         Bucket: BUCKET_NAME,
         Key: 'index.html',
     });
-    const { Body } = await s3.send(command);
-    const content = await Body.transformToString();
-
+    console.log(command);
+    const res = await s3.send(command);
+    console.log(response);
+    const content = await res.Body.transformToString();
+    console.log(content);
     const metadata = {
         id: campaign._id,
-        title: `${campaign.participantCount} completed "${metatags[path].title}" quests!`,
-        description: `#${campaign.rank}: ${metatags[path].description}`,
+        title: `#${campaign.rank} | ${campaign.title}`,
+        description: `Already ${campaign.participantCount} completed quests! ${campaign.description}`,
+        image: `${API_URL}/v1/leaderboards/facebook/${metadata.id}.png`,
         type: 'website',
         url: request.uri,
     };
+    console.log(metadata);
 
     return {
         body: upsertMetaTags(metadata, content),
@@ -50,12 +58,11 @@ export const handler = async (event) => {
 function upsertMetaTags(metadata, currentBody) {
     let newBody = currentBody;
     const ogToChange = [
-        { key: 'og:type', value: metadata.type },
         { key: 'og:title', value: metadata.title },
         { key: 'og:description', value: metadata.description },
-        { key: 'og:image', value: `https://dev.api.thx.network/v1/leaderboards/facebook/${metadata.id}.png` },
+        { key: 'og:image', value: metadata.image },
         { key: 'og:url', value: metadata.url },
-        { key: 'twitter:image', value: `https://dev.api.thx.network/leaderboards/twitter/${metadata.id}.png` },
+        { key: 'twitter:image', value: metadata.image },
         { key: 'twitter:title', value: metadata.title },
         { key: 'twitter:description', value: metadata.description },
     ];
