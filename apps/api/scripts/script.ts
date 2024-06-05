@@ -1,5 +1,5 @@
 import db from '@thxnetwork/api/util/database';
-// import main from './src/veLiquidity';
+import main from './src/veLiquidity';
 // import main from './src/veTransfer';
 // import main from './src/veRewards';
 // import main from './src/time';
@@ -12,7 +12,7 @@ import db from '@thxnetwork/api/util/database';
 // import main from './src/demo';
 // import main from './src/preview';
 // import main from './src/metamask';
-import main from './src/lottery';
+// import main from './src/lottery';
 
 db.connect(process.env.MONGODB_URI_PROD);
 

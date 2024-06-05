@@ -61,18 +61,12 @@ export default defineComponent({
                 await this.liquidityStore.stake(wallet, data);
                 await this.liquidityStore.waitForStake(wallet, this.amountInWei);
 
-                this.trackEvent(data);
                 this.$emit('success');
             } catch (error) {
                 this.$emit('error', error);
             } finally {
                 this.isPolling = false;
             }
-        },
-        trackEvent(data: any) {
-            const { poolId, account } = this.accountStore;
-            const { wallet } = this.walletStore;
-            track('UserCreates', [account?.sub, 'staked liquidity', { poolId, address: wallet?.address, ...data }]);
         },
     },
 });

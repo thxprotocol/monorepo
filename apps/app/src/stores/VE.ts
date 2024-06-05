@@ -7,6 +7,7 @@ import { WalletVariant } from '../types/enums/accountVariant';
 import { contractNetworks } from '../config/constants';
 import { BigNumber } from 'alchemy-sdk';
 import poll, { CANCEL_TOKEN } from 'promise-poller';
+import { track } from '@thxnetwork/common/mixpanel';
 
 export function getChainId() {
     return MODE !== 'production' ? ChainId.Hardhat : ChainId.Polygon;
@@ -129,9 +130,18 @@ export const useVeStore = defineStore('ve', {
             const expectedAmount = BigNumber.from(this.lock.amount).add(amountInWei);
             const taskFn = async () => {
                 await this.getLocks(wallet);
-                return BigNumber.from(this.lock.amount).eq(expectedAmount)
-                    ? Promise.resolve()
-                    : Promise.reject('Increase amount');
+                const isDone = BigNumber.from(this.lock.amount).eq(expectedAmount);
+
+                if (isDone) {
+                    const { poolId, account } = useAccountStore();
+                    track('UserCreates', [
+                        account?.sub,
+                        'increased lock amount',
+                        { poolId, address: wallet?.address, amountInWei },
+                    ]);
+                }
+
+                return isDone ? Promise.resolve() : Promise.reject('Increase amount');
             };
             return await poll({ taskFn, interval: 3000, retries: 20 });
         },
@@ -181,7 +191,18 @@ export const useVeStore = defineStore('ve', {
         async waitForIncreaseUnlockTime(wallet: TWallet, timestamp: number) {
             const taskFn = async () => {
                 await this.getLocks(wallet);
-                return this.lock.end === timestamp * 1000 ? Promise.resolve() : Promise.reject('Increase lock end');
+                const isDone = this.lock.end === timestamp * 1000;
+
+                if (isDone) {
+                    const { poolId, account } = useAccountStore();
+                    track('UserCreates', [
+                        account?.sub,
+                        'increased lock duration',
+                        { poolId, address: wallet?.address, timestamp },
+                    ]);
+                }
+
+                return isDone ? Promise.resolve() : Promise.reject('Increase lock end');
             };
             return await poll({ taskFn, interval: 3000, retries: 20 });
         },
@@ -279,16 +300,27 @@ export const useVeStore = defineStore('ve', {
         async waitForWithdrawal(wallet: TWallet) {
             const taskFn = async () => {
                 await this.getLocks(wallet);
-                return BigNumber.from(this.lock.amount).eq(0) ? Promise.resolve() : Promise.reject('Withdraw');
+                const isDone = BigNumber.from(this.lock.amount).eq(0);
+                if (isDone) {
+                    const { poolId, account } = useAccountStore();
+                    track('UserCreates', [account?.sub, 'liquidity withdrawal', { poolId, address: wallet?.address }]);
+                }
+
+                return isDone ? Promise.resolve() : Promise.reject('Withdraw');
             };
             return poll({ taskFn, interval: 3000, retries: 20 });
         },
         async waitForLock(wallet: TWallet, amountInWei: BigNumber, lockEndTimestamp: number) {
             const taskFn = async () => {
                 await this.getLocks(wallet);
-                return this.lock && this.lock.amount === amountInWei.toString() && this.lock.end === lockEndTimestamp
-                    ? Promise.reject(CANCEL_TOKEN)
-                    : Promise.reject('Ve amount');
+                const isDone =
+                    this.lock && this.lock.amount === amountInWei.toString() && this.lock.end === lockEndTimestamp;
+                if (isDone) {
+                    const { poolId, account } = useAccountStore();
+                    track('UserCreates', [account?.sub, 'locked liquidity', { poolId, address: wallet?.address }]);
+                }
+
+                return isDone ? Promise.resolve() : Promise.reject('Ve amount');
             };
             return await poll({ taskFn, interval: 3000, retries: 20 });
         },

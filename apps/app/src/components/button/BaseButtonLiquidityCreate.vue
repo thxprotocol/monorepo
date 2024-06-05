@@ -82,18 +82,12 @@ export default defineComponent({
                 await this.liquidityStore.createLiquidity(wallet, data);
                 await this.liquidityStore.waitForLiquidity(wallet, data);
 
-                this.trackEvent(data);
                 this.$emit('success');
             } catch (error) {
                 this.$emit('error', error);
             } finally {
                 this.isPolling = false;
             }
-        },
-        trackEvent(data: any) {
-            const { poolId, account } = this.accountStore;
-            const { wallet } = this.walletStore;
-            track('UserCreates', [account?.sub, 'liquidity', { poolId, address: wallet?.address, ...data }]);
         },
     },
 });

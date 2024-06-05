@@ -1,11 +1,9 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 
 console.log('Lambda started!');
-
 const BUCKET_NAME = 'dev-app.thx.network';
 const APP_URL = 'https://dev-app.thx.network';
 const API_URL = 'https://dev.api.thx.network';
-const s3 = new S3Client({ region: 'eu-west-3' });
 
 console.log('Fetch campaigns...');
 const httpResponse = await fetch(`${API_URL}/v1/leaderboards?page=1&limit=50`);
@@ -13,39 +11,32 @@ const { results: campaigns } = await httpResponse.json();
 console.log('Fetched campaigns!');
 
 console.log('Fetch HTML...');
-const command = new GetObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: 'index.html',
-});
-const res = await s3.send(command);
-const content = await res.Body.transformToString();
+const s3 = new S3Client({ region: 'eu-west-3' });
+const responseS3 = await s3.send(
+    new GetObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: 'index.html',
+    }),
+);
+const html = await responseS3.Body.transformToString();
 console.log('Fetched HTML!');
-
-const responseDefault = {
-    body: content,
-    bodyEncoding: 'text',
-    status: '200',
-    statusDescription: 'OK',
-    headers: {
-        'content-type': [
-            {
-                value: 'text/html',
-            },
-        ],
-    },
-};
 
 export const handler = async (event) => {
     const response = event.Records[0].cf.response;
     const request = event.Records[0].cf.request;
-    console.log('Request incoming...', request);
+    console.log(request);
+    console.log(response);
 
     // If no request or request.uri, return the response as is
-    if (!request || !request.uri) return responseDefault;
-    console.log(request.uri);
+    // Also Check the requests accept header for being html
+    const acceptHeader = request.headers['accept'] || request.headers['Accept'];
+    if (!acceptHeader || !acceptHeader[0].value.toLowerCase().includes('text/html')) {
+        return event.Records[0].cf.response;
+    }
 
+    // Search the campaign in the cached campaign results
     const campaign = campaigns.find((c) => request.uri.includes(`/c/${c.slug}`));
-    if (!campaign) return responseDefault;
+    if (!campaign) return response;
 
     const metadata = {
         id: campaign._id,
@@ -55,10 +46,9 @@ export const handler = async (event) => {
         type: 'website',
         url: `${APP_URL}${request.uri}`,
     };
-    console.log(metadata);
 
     return {
-        body: upsertMetaTags(metadata, content),
+        body: upsertMetaTags(metadata, html),
         bodyEncoding: 'text',
         status: '200',
         statusDescription: 'OK',

@@ -1,4 +1,4 @@
-import poll from 'promise-poller';
+import poll, { CANCEL_TOKEN } from 'promise-poller';
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
@@ -7,6 +7,7 @@ import { WalletVariant } from '../types/enums/accountVariant';
 import { BigNumber } from 'alchemy-sdk';
 import { PoolWithMethods } from '@balancer-labs/sdk';
 import { ChainId } from '@thxnetwork/common/enums';
+import { track } from '@thxnetwork/common/mixpanel';
 
 type TCreateLiquidityOptions = {
     thxAmountInWei: string;
@@ -139,10 +140,14 @@ export const useLiquidityStore = defineStore('liquidity', {
                 const thxBalanceExpected = BigNumber.from(currentTHXBalanceInWei).sub(data.thxAmountInWei);
                 const usdcBalance = useWalletStore().balances[USDC];
                 const thxBalance = useWalletStore().balances[THX];
+                const isDone = usdcBalanceExpected.eq(usdcBalance) && thxBalanceExpected.eq(thxBalance);
 
-                return usdcBalanceExpected.eq(usdcBalance) && thxBalanceExpected.eq(thxBalance)
-                    ? Promise.resolve()
-                    : Promise.reject('Liquidity');
+                if (isDone) {
+                    const { poolId, account } = useAccountStore();
+                    track('UserCreates', [account?.sub, 'liquidity', { poolId, address: wallet?.address, ...data }]);
+                }
+
+                return isDone ? Promise.resolve() : Promise.reject('Liquidity');
             };
 
             return poll({ taskFn, interval: 3000, retries: 20 });
@@ -209,8 +214,18 @@ export const useLiquidityStore = defineStore('liquidity', {
 
                 const bptGaugeBalance = useWalletStore().balances[bptGaugeAddress];
                 const bptGaugeBalanceExpected = amountInWei.add(oldBalanceInWei);
+                const isDone = bptGaugeBalanceExpected.eq(bptGaugeBalance);
 
-                return bptGaugeBalanceExpected.eq(bptGaugeBalance) ? Promise.resolve() : Promise.reject('Stake');
+                if (isDone) {
+                    const { poolId, account } = useAccountStore();
+                    track('UserCreates', [
+                        account?.sub,
+                        'staked liquidity',
+                        { poolId, address: wallet?.address, amountInWei },
+                    ]);
+                }
+
+                return isDone ? Promise.resolve() : Promise.reject('Stake');
             };
 
             return poll({ taskFn, interval: 3000, retries: 20 });

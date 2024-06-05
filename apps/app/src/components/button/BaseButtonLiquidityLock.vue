@@ -63,18 +63,12 @@ export default defineComponent({
                 await this.veStore.waitForLock(wallet, this.amountInWei, lockEndTimestamp);
                 await this.walletStore.getBalance(this.address.BPTGauge);
 
-                this.trackEvent(data);
                 this.$emit('success');
             } catch (error) {
                 this.$emit('error', error);
             } finally {
                 this.isPolling = false;
             }
-        },
-        trackEvent(data: any) {
-            const { poolId, account } = this.accountStore;
-            const { wallet } = this.walletStore;
-            track('UserCreates', [account?.sub, 'locked liquidity', { poolId, address: wallet?.address, ...data }]);
         },
     },
 });
