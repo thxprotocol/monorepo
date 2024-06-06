@@ -1,4 +1,4 @@
-import poll, { CANCEL_TOKEN } from 'promise-poller';
+import poll from 'promise-poller';
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
@@ -143,8 +143,16 @@ export const useLiquidityStore = defineStore('liquidity', {
                 const isDone = usdcBalanceExpected.eq(usdcBalance) && thxBalanceExpected.eq(thxBalance);
 
                 if (isDone) {
-                    const { poolId, account } = useAccountStore();
-                    track('UserCreates', [account?.sub, 'liquidity', { poolId, address: wallet?.address, ...data }]);
+                    track('UserCreates', [
+                        useAccountStore().account?.sub,
+                        'liquidity',
+                        {
+                            address: wallet?.address,
+                            usdcAmountInWei: data.usdcAmountInWei,
+                            thxAmountInWei: data.thxAmountInWei,
+                            slippage: data.slippage,
+                        },
+                    ]);
                 }
 
                 return isDone ? Promise.resolve() : Promise.reject('Liquidity');
@@ -217,11 +225,10 @@ export const useLiquidityStore = defineStore('liquidity', {
                 const isDone = bptGaugeBalanceExpected.eq(bptGaugeBalance);
 
                 if (isDone) {
-                    const { poolId, account } = useAccountStore();
                     track('UserCreates', [
-                        account?.sub,
+                        useAccountStore().account?.sub,
                         'staked liquidity',
-                        { poolId, address: wallet?.address, amountInWei },
+                        { address: wallet?.address, amountInWei: amountInWei.toString() },
                     ]);
                 }
 

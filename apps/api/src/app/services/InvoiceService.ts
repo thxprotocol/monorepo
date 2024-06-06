@@ -84,6 +84,8 @@ export default class InvoiceService {
                     logger.info(`Account ${account.sub} has no plan for invoicing.`);
                 }
 
+                const plan = account.plan || AccountPlanType.Lite;
+
                 return {
                     updateOne: {
                         filter: {
@@ -97,8 +99,8 @@ export default class InvoiceService {
                                 periodStartDate: invoicePeriodstartDate,
                                 periodEndDate: invoicePeriodEndDate,
                                 mapCount,
-                                mapLimit: planPricingMap[account.plan].subscriptionLimit,
-                                ...this.createInvoiceDetails(account, mapCount),
+                                mapLimit: planPricingMap[plan].subscriptionLimit,
+                                ...this.createInvoiceDetails(plan, mapCount),
                             },
                         },
                         upsert: true,
@@ -119,11 +121,10 @@ export default class InvoiceService {
      * @param mapCount
      * @returns invoice details used for upsert in db
      */
-    static createInvoiceDetails(account: TAccount, mapCount: number) {
+    static createInvoiceDetails(plan: AccountPlanType, mapCount: number) {
         const countAdditionalUnits = (mapCount: number, limit: number) => {
             return Math.max(0, mapCount - limit);
         };
-        const plan = account.plan || AccountPlanType.Lite;
         const { subscriptionLimit, costPerUnit, costSubscription } = planPricingMap[plan];
 
         // Plan limit is subtracted from unit count as costs are included in subscription costs
@@ -135,7 +136,7 @@ export default class InvoiceService {
             costSubscription,
             costTotal: costSubscription + additionalUnitCount * costPerUnit,
             currency: 'USDC',
-            plan: account.plan,
+            plan,
         };
     }
 }

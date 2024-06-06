@@ -6,8 +6,8 @@ import { MODE } from '../config/secrets';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { contractNetworks } from '../config/constants';
 import { BigNumber } from 'alchemy-sdk';
-import poll, { CANCEL_TOKEN } from 'promise-poller';
 import { track } from '@thxnetwork/common/mixpanel';
+import poll from 'promise-poller';
 
 export function getChainId() {
     return MODE !== 'production' ? ChainId.Hardhat : ChainId.Polygon;
@@ -133,11 +133,10 @@ export const useVeStore = defineStore('ve', {
                 const isDone = BigNumber.from(this.lock.amount).eq(expectedAmount);
 
                 if (isDone) {
-                    const { poolId, account } = useAccountStore();
                     track('UserCreates', [
-                        account?.sub,
+                        useAccountStore().account?.sub,
                         'increased lock amount',
-                        { poolId, address: wallet?.address, amountInWei },
+                        { address: wallet?.address, amountInWei: amountInWei.toString() },
                     ]);
                 }
 
@@ -194,11 +193,10 @@ export const useVeStore = defineStore('ve', {
                 const isDone = this.lock.end === timestamp * 1000;
 
                 if (isDone) {
-                    const { poolId, account } = useAccountStore();
                     track('UserCreates', [
-                        account?.sub,
+                        useAccountStore().account?.sub,
                         'increased lock duration',
-                        { poolId, address: wallet?.address, timestamp },
+                        { address: wallet?.address, timestamp },
                     ]);
                 }
 
@@ -302,8 +300,11 @@ export const useVeStore = defineStore('ve', {
                 await this.getLocks(wallet);
                 const isDone = BigNumber.from(this.lock.amount).eq(0);
                 if (isDone) {
-                    const { poolId, account } = useAccountStore();
-                    track('UserCreates', [account?.sub, 'liquidity withdrawal', { poolId, address: wallet?.address }]);
+                    track('UserCreates', [
+                        useAccountStore().account?.sub,
+                        'liquidity withdrawal',
+                        { address: wallet?.address },
+                    ]);
                 }
 
                 return isDone ? Promise.resolve() : Promise.reject('Withdraw');
@@ -313,11 +314,14 @@ export const useVeStore = defineStore('ve', {
         async waitForLock(wallet: TWallet, amountInWei: BigNumber, lockEndTimestamp: number) {
             const taskFn = async () => {
                 await this.getLocks(wallet);
-                const isDone =
-                    this.lock && this.lock.amount === amountInWei.toString() && this.lock.end === lockEndTimestamp;
+                // We dont test for lockEndTimestamp here as an amount is the only requirement for creating a lock
+                const isDone = this.lock && this.lock.amount === amountInWei.toString();
                 if (isDone) {
-                    const { poolId, account } = useAccountStore();
-                    track('UserCreates', [account?.sub, 'locked liquidity', { poolId, address: wallet?.address }]);
+                    track('UserCreates', [
+                        useAccountStore().account?.sub,
+                        'locked liquidity',
+                        { address: wallet?.address, ...this.lock },
+                    ]);
                 }
 
                 return isDone ? Promise.resolve() : Promise.reject('Ve amount');
