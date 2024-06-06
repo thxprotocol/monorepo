@@ -28,7 +28,8 @@
                     <i class="fas fa-balance-scale h2 text-opaque" />
                     <div>Balancer APR</div>
                     <p class="mb-1 text-opaque">
-                        Members automagically earn up to {{ Number(liquidityStore.apr.balancer.max).toFixed(2) }}% APR
+                        Members can earn up to {{ Number(liquidityStore.apr.balancer.apr).toFixed(2) }}% APR on locked
+                        liquidity
                     </p>
                 </b-card>
             </b-col>
@@ -43,18 +44,28 @@
                 <b-card class="gradient-bg mb-3" body-class="text-center py-4">
                     <i class="fas fa-gift h2 text-opaque" />
                     <div>Exclusive Rewards</div>
-                    <p class="mb-1 text-opaque">Members can buy discounted rewards from partners</p>
+                    <p class="mb-1 text-opaque">Members can buy discounted lottery tickets</p>
                 </b-card>
             </b-col>
         </b-row>
     </b-container>
     <b-container class="mb-5">
         <div class="text-center">
-            <h2 class="mt-5">Members Only</h2>
-            <p class="lead">Members can use their points to buy rewards from partners at a discount!</p>
+            <h2 class="mt-5">Lottery</h2>
+            <p class="lead">Members can buy lottery tickets for partner rewards!</p>
         </div>
+        <h2>Upcoming</h2>
+        ..
+        <h2>Past Rounds</h2>
         <b-row>
             <b-col v-for="reward of rewards" lg="4">
+                <b-card>
+                    <b-card-img :src="reward.image" alt="Card image" top />
+                    <b-card-body>
+                        <b-card-title>{{ reward.title }}</b-card-title>
+                        <b-card-text>{{ reward.description }}</b-card-text>
+                    </b-card-body>
+                </b-card>
                 <BaseCardReward :reward="reward" :image="reward.image">
                     <template #title>
                         <div class="flex-grow-1">{{ reward.title }}</div>

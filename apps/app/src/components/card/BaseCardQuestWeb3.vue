@@ -24,7 +24,7 @@
                     </b-link>
                 </div>
             </b-form-group>
-            <b-row>
+            <!-- <b-row>
                 <b-col>
                     <b-form-group label="Method" class="mb-0">
                         <code>{{ quest.methodName }}</code>
@@ -35,7 +35,7 @@
                         <code>{{ quest.threshold }}</code>
                     </b-form-group>
                 </b-col>
-            </b-row>
+            </b-row> -->
         </blockquote>
 
         <BaseFormGroupWalletSelect

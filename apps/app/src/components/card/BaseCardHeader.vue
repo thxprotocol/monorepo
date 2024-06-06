@@ -3,7 +3,7 @@
         class="mt-4"
         :style="{
             backgroundSize: 'cover',
-            backgroundImage: `url(${imgBgOverlay})`,
+            backgroundImage: `url(${imgSrc || imgBgOverlay})`,
             borderRadius: '15px',
         }"
     >
@@ -13,7 +13,16 @@
                     <slot name="primary" />
                 </div>
             </b-col>
-            <b-col lg="5" offset-lg="1" class="py-4 py-lg-0">
+            <b-col
+                lg="5"
+                offset-lg="1"
+                class="py-4 py-lg-0"
+                :style="{
+                    backgroundImage: `url(${imgEnd})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center top',
+                }"
+            >
                 <slot name="secondary" />
             </b-col>
         </b-row>
@@ -30,6 +39,10 @@ export default defineComponent({
         rowClass: {
             type: String,
             default: 'py-md-5',
+        },
+        imgSrc: {
+            type: String,
+            default: '',
         },
     },
     data(): any {

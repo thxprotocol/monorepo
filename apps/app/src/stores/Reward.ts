@@ -40,11 +40,11 @@ export const useRewardStore = defineStore('reward', {
             this.updateSupply(id);
             this.trackEvent(variant);
         },
-        async list() {
+        async list(poolId?: string) {
             const { api } = useAccountStore();
             this.isLoading = true;
 
-            const { coin, nft, custom, coupon, discordRole, galachain } = await api.rewards.list();
+            const { coin, nft, custom, coupon, discordRole, galachain } = await api.rewards.list(poolId);
             this.rewards = [...coin, ...nft, ...custom, ...coupon, ...discordRole, ...galachain]
                 .sort((a: any, b: any) => toNumber(b.createdAt) - toNumber(a.createdAt))
                 .sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
