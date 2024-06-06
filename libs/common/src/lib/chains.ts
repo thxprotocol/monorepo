@@ -39,6 +39,12 @@ const chainList: { [chainId: number]: ChainInfo } = {
         blockExplorer: 'https://lineascan.build',
         rpc: 'https://rpc.linea.build',
     },
+    [ChainId.Metis]: {
+        chainId: ChainId.Metis,
+        name: 'Metis',
+        blockExplorer: 'https://explorer.metis.io',
+        rpc: 'https://andromeda.metis.io',
+    },
 };
 
 if (process.env['NODE_ENV'] !== 'production') {

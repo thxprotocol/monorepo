@@ -120,6 +120,7 @@ function findOneByAddress(address: string) {
 }
 
 async function findOneByPool(pool: PoolDocument, chainId?: ChainId) {
+    if (!pool) return;
     return await Wallet.findOne({
         poolId: pool.id,
         chainId: chainId || ContractService.getChainId(),

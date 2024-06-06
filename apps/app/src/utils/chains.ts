@@ -4,7 +4,8 @@ import ImgLogoBinanceSmartChain from '../assets/thx_logo_bsc.svg';
 import ImgLogoPolygon from '../assets/thx_logo_polygon.svg';
 import ImgLogoHardhat from '../assets/thx_logo_hardhat.svg';
 import ImgLogoLinea from '../assets/thx_logo_linea.svg';
-import { arbitrum, mainnet, bsc, polygon, hardhat, polygonZkEvm, linea } from '@wagmi/core/chains';
+import ImgLogoMetis from '../assets/thx_logo_metis.svg';
+import { arbitrum, mainnet, bsc, polygon, hardhat, polygonZkEvm, linea, metis } from '@wagmi/core/chains';
 import { ChainId } from '@thxnetwork/common/enums';
 
 const chainList: { [chainId: number]: ChainInfo } = {
@@ -49,6 +50,13 @@ const chainList: { [chainId: number]: ChainInfo } = {
         logo: ImgLogoLinea,
         blockExplorer: 'https://zkevm.polygonscan.com',
         chain: linea,
+    },
+    [ChainId.Metis]: {
+        chainId: ChainId.Metis,
+        name: 'Metis',
+        logo: ImgLogoMetis,
+        blockExplorer: 'https://explorer.metis.io',
+        chain: metis,
     },
 };
 
