@@ -26,6 +26,7 @@ import RouterData from './data/data.router';
 import RouterLiquidity from './liquidity/liquidity.router';
 import RouterVoteEscrow from './ve/ve.router';
 import RouterJobs from './jobs/jobs.router';
+import RouterLotteries from './lotteries/lotteries.router';
 import RouterCoupons from './coupons/coupons.router';
 import { checkJwt, corsHandler } from '@thxnetwork/api/middlewares';
 
@@ -45,6 +46,7 @@ router.use('/quests', RouterQuests);
 router.use('/rewards', RouterRewards);
 router.use('/webhook', RouterWebhook);
 router.use('/earn', RouterPrices);
+router.use('/lotteries', RouterLotteries);
 router.use(checkJwt, corsHandler);
 router.use('/jobs', RouterJobs);
 router.use('/upload', RouterUpload);

@@ -23,7 +23,7 @@
                 variant="link"
                 to="/learn"
             >
-                Start
+                Learn
             </b-button>
             <b-button
                 class="me-lg-3 mb-3 mb-lg-0 py-2 px-4 rounded text-decoration-none text-white"
