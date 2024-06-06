@@ -1,6 +1,6 @@
 <template>
     <b-card no-body class="mb-2 x-lg-0 my-lg-3" :class="{ 'card-promoted': reward.isPromoted }">
-        <header class="card-img" :style="{ backgroundImage: image && `url(${image})`, height: '240px' }">
+        <header v-if="image" class="card-img" :style="{ backgroundImage: image && `url(${image})`, height: '240px' }">
             <b-badge
                 v-if="reward.expiry && reward.expiry.date"
                 v-b-tooltip.hover.left
@@ -174,6 +174,8 @@ export default defineComponent({
     display: flex;
     justify-content: center;
     align-items: center;
+    border-top-left-radius: var(--bs-border-radius) !important;
+    border-top-right-radius: var(--bs-border-radius) !important;
 
     .badge-expiry {
         position: absolute;

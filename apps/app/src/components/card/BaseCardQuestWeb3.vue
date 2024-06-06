@@ -24,18 +24,6 @@
                     </b-link>
                 </div>
             </b-form-group>
-            <!-- <b-row>
-                <b-col>
-                    <b-form-group label="Method" class="mb-0">
-                        <code>{{ quest.methodName }}</code>
-                    </b-form-group>
-                </b-col>
-                <b-col>
-                    <b-form-group label="Threshold" class="mb-0">
-                        <code>{{ quest.threshold }}</code>
-                    </b-form-group>
-                </b-col>
-            </b-row> -->
         </blockquote>
 
         <BaseFormGroupWalletSelect

@@ -19,49 +19,30 @@
         </template>
     </BaseCardHeader>
     <b-container>
-        <b-tabs justified pills class="mt-3">
-            <b-tab title-link-class="py-3" active>
-                <template #title>
-                    <span class="h5 my-3">
-                        <i class="fas fa-tasks text-opaque mb-1" style="font-size: 1.5rem" /><br />
-                        Onboarding Quests
-                    </span>
-                </template>
-                <b-row>
-                    <b-col md="8" offset-md="2">
-                        <div
-                            v-for="(quest, index) of questStore.quests"
-                            class="d-flex align-items-start quest-wrapper py-5"
-                        >
-                            <div
-                                style="width: 50px; height: 50px; font-size: 1.5rem"
-                                class="rounded-pill bg-primary mx-3 d-flex align-items-center justify-content-center"
-                                variant="primary"
-                            >
-                                <span class="text-opaque">{{ index + 1 }}</span>
-                            </div>
-                            <component :is="questComponentMap[quest.variant]" :quest="quest" />
+        <b-row>
+            <b-col md="8">
+                <div v-for="(quest, index) of questStore.quests" class="d-flex align-items-start quest-wrapper py-5">
+                    <div
+                        style="width: 50px; height: 50px; font-size: 1.5rem"
+                        class="rounded-pill bg-primary mx-3 d-flex align-items-center justify-content-center"
+                        variant="primary"
+                    >
+                        <span class="text-opaque">{{ index + 1 }}</span>
+                    </div>
+                    <component :is="questComponentMap[quest.variant]" :quest="quest" />
+                </div>
+            </b-col>
+            <b-col md="4">
+                <BaseCardReward v-for="reward of rewards" :image="reward.image" :reward="reward">
+                    <template #title>
+                        <div class="flex-grow-1">{{ reward.title }}</div>
+                        <div class="text-accent fw-bold">
+                            {{ reward.amount }} {{ reward.erc20 && reward.erc20.symbol }}
                         </div>
-                    </b-col>
-                </b-row>
-            </b-tab>
-            <b-tab title-link-class="py-3">
-                <template #title>
-                    <!-- <sup class="rounded bg-danger p-1 px-2 small ms-2">{{ rewardStore.rewards.length }}</sup> -->
-                    <span class="h5 my-3">
-                        <i class="fas fa-gift text-opaque mb-1" style="font-size: 1.5rem" /><br />
-                        Lottery Rewards
-                    </span>
-                </template>
-                <b-container>
-                    <b-row>
-                        <b-col v-for="reward of rewards" md="4">
-                            <BaseCardReward :reward="reward" />
-                        </b-col>
-                    </b-row>
-                </b-container>
-            </b-tab>
-        </b-tabs>
+                    </template>
+                </BaseCardReward>
+            </b-col>
+        </b-row>
     </b-container>
 </template>
 
@@ -81,6 +62,7 @@ import BaseCardQuestWebhook from '../../components/card/BaseCardQuestWebhook.vue
 import { useAccountStore } from '@thxnetwork/app/stores/Account';
 import { useAuthStore } from '@thxnetwork/app/stores/Auth';
 import { useRewardStore } from '@thxnetwork/app/stores/Reward';
+import { CAMPAIGN_ID } from '@thxnetwork/app/config/secrets';
 
 export default defineComponent({
     name: 'Learn',
@@ -98,7 +80,7 @@ export default defineComponent({
             imgTreasury,
             questComponentMap,
             isAlertShown: true,
-            campaignId: '6650460c800266db72f63c57' || '663259683f597135e0007c60',
+            campaignId: CAMPAIGN_ID,
         };
     },
     computed: {

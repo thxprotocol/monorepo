@@ -12,7 +12,7 @@
             <b-badge
                 v-for="(amount, key) of quest.amounts"
                 style="width: 50px; height: 50px"
-                class="me-3 d-flex flex-column align-items-center justify-content-center"
+                class="my-1 me-3 d-flex flex-column align-items-center justify-content-center"
                 :variant="key < quest.entries.length ? 'success' : 'primary'"
                 :class="key < quest.entries.length ? 'bg-success text-white' : 'bg-primary text-white'"
             >
