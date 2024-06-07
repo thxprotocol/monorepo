@@ -8,8 +8,13 @@ import VueClipboard from 'vue3-clipboard';
 import Vue3Toastify from 'vue3-toastify';
 import router from './router';
 import Mixpanel from '@thxnetwork/common/mixpanel';
-
 import './scss/main.scss';
+
+declare global {
+    interface Window {
+        ethereum: any;
+    }
+}
 
 const pinia = createPinia();
 const app = createApp(App);
