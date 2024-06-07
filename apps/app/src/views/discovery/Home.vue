@@ -99,7 +99,7 @@ export default defineComponent({
             imgLogo,
             isLoading: true,
             page: 1,
-            limit: 15,
+            limit: 20,
             search: '',
             debouncedSearch: null as any,
             screenWidth: window.innerWidth,
@@ -134,7 +134,8 @@ export default defineComponent({
             }
             const res = await fetch(url);
             const campaigns = await res.json();
-            this.campaigns.results = campaigns.results.map((campaign: any) => ({
+            this.campaigns = campaigns;
+            this.campaigns.results = this.campaigns.results.map((campaign: any) => ({
                 ...campaign,
                 title: html.decode(campaign.title),
                 description: html.decode(campaign.description),
