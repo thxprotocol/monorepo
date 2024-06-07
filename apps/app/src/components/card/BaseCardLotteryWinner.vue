@@ -25,7 +25,7 @@
                 <i class="fas fa-tags me-2 text-opaque" />
                 <span class="">{{ winner.code }}</span>
             </b-badge>
-            <div class="d-flex mt-3 align-items-center ms-auto">
+            <div v-if="winner.account" class="d-flex mt-3 align-items-center ms-auto">
                 <b-avatar :src="winner.account.avatarURL" size="1.5rem" class="me-2" />
                 <span>{{ winner.account.username }}</span>
             </div>

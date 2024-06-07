@@ -14,7 +14,6 @@ import { useVeStore } from '@thxnetwork/app/stores/VE';
 import { useAccountStore } from '@thxnetwork/app/stores/Account';
 import { contractNetworks } from '../../config/constants';
 import { ChainId } from '@thxnetwork/common/enums';
-import { track } from '@thxnetwork/common/mixpanel';
 
 export default defineComponent({
     name: 'BaseButtonLiquidityLock',

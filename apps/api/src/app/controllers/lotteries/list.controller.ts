@@ -9,18 +9,18 @@ const lotteries = [
         description:
             'In the realms of Forest Knight, many items are digital collectibles allowing the players a full ownership. You as a player can decide what you want to do with them, use them, trade them or combine them! A new frontier of gaming is here.',
         participantCount: 100,
-        winners: {
-            THX02G6NMUMU0052024: Rewards.ForestKnight.RunestoneOfTheEclipse,
-            THXSUR9F62ZRE052024: Rewards.ForestKnight.RunestoneOfTheEclipse,
-            THXT51NWPZY0Z052024: Rewards.ForestKnight.RunestoneOfTheEclipse,
-            THXH7TQX5FETL052024: Rewards.ForestKnight.RunestoneOfTheEclipse,
-            THXMYH9D2GFAI052024: Rewards.ForestKnight.RunestoneOfTheEclipse,
-            THXNDZDDSSI3O052024: Rewards.ForestKnight.RunestoneOfTheEclipse,
-            THXEUIAY54H01052024: Rewards.ForestKnight.RunestoneOfTheEclipse,
-            THXV1BVL7XZBF052024: Rewards.ForestKnight.RunestoneOfTheEclipse,
-            THXBI11LY2C2P052024: Rewards.ForestKnight.RunestoneOfTheEclipse,
-            THXNT5QAUHBNN052024: Rewards.ForestKnight.RunestoneOfTheEclipse,
-        },
+        winners: [
+            { code: 'THX02G6NMUMU0052024', reward: Rewards.ForestKnight.RunestoneOfTheEclipse },
+            { code: 'THXSUR9F62ZRE052024', reward: Rewards.ForestKnight.RunestoneOfTheEclipse },
+            { code: 'THXT51NWPZY0Z052024', reward: Rewards.ForestKnight.RunestoneOfTheEclipse },
+            { code: 'THXH7TQX5FETL052024', reward: Rewards.ForestKnight.BigBagOfKnight },
+            { code: 'THXMYH9D2GFAI052024', reward: Rewards.ForestKnight.BigBagOfKnight },
+            { code: 'THXNDZDDSSI3O052024', reward: Rewards.ForestKnight.BigBagOfKnight },
+            { code: 'THXEUIAY54H01052024', reward: Rewards.ForestKnight.BigBagOfKnight },
+            { code: 'THXV1BVL7XZBF052024', reward: Rewards.ForestKnight.ClockworkCodex },
+            { code: 'THXBI11LY2C2P052024', reward: Rewards.ForestKnight.ClockworkCodex },
+            { code: 'THXNT5QAUHBNN052024', reward: Rewards.ForestKnight.ClockworkCodex },
+        ],
     },
 ];
 

@@ -40,7 +40,7 @@
         <b-collapse v-model="isCollapsed">
             <b-row>
                 <b-col v-for="winner of lottery.winners" lg="6">
-                    <BaseCardLotteryWinner v-if="winner.account" class="mb-3" :winner="winner" />
+                    <BaseCardLotteryWinner class="mb-3" :winner="winner" />
                 </b-col>
             </b-row>
         </b-collapse>

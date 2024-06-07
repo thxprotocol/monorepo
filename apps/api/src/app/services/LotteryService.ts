@@ -34,7 +34,9 @@ export default class LotteryService {
             lotteries.map(async (lottery) => {
                 try {
                     // Get CouponCode for winning codes
-                    const codes = await CouponCode.find({ code: { $in: lottery.winners } });
+                    const codes = await CouponCode.find({
+                        code: { $in: lottery.winners.map((winner) => winner.code) },
+                    });
 
                     // Get subs for winning codes
                     const subs = codes.map((code) => code.sub);
@@ -44,16 +46,15 @@ export default class LotteryService {
 
                     return {
                         ...lottery,
-                        winners: lottery.winners.map((winner: string) => {
-                            const code = codes.find(({ code }) => code === winner);
+                        winners: lottery.winners.map((winner) => {
+                            const code = codes.find(({ code }) => code === winner.code);
                             const account = accounts.find((a) => a.sub === code.sub);
                             return {
-                                code,
+                                ...winner,
                                 account: {
                                     avatarURL: account.profileImg,
                                     username: account.username,
                                 },
-                                reward: Rewards.ForestKnight.RunestoneOfTheEclipse,
                             };
                         }),
                     };
