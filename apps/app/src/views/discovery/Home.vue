@@ -134,7 +134,11 @@ export default defineComponent({
             }
             const res = await fetch(url);
             const campaigns = await res.json();
-            this.campaigns = campaigns;
+            this.campaigns.results = campaigns.results.map((campaign: any) => ({
+                ...campaign,
+                title: html.decode(campaign.title),
+                description: html.decode(campaign.description),
+            }));
         },
         async getQuests() {
             const url = new URL(API_URL);
