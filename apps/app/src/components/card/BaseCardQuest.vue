@@ -159,7 +159,7 @@ export default defineComponent({
             });
         },
         isAlertMinFollowersShown() {
-            return this.quest.contentMetadata && !!this.quest.contentMetadata.minFollowersCount;
+            return this.quest.contentMetadata && !!Number(this.quest.contentMetadata.minFollowersCount);
         },
         hasExpiry() {
             return !!this.expiryDate;

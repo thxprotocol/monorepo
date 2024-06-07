@@ -97,7 +97,7 @@ export default defineComponent({
             return !!this.error || !!this.subscribeError;
         },
         isAlertSuccessShown() {
-            return !this.error && !this.subscribeError;
+            return !this.error && this.amount && !this.subscribeError;
         },
         isEmailValid: function () {
             if (!this.email) return null;
