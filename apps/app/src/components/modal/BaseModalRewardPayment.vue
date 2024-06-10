@@ -14,11 +14,8 @@
         </template>
         <b-alert v-if="isAlertSuccessShown" v-model="isAlertSuccessShown" show variant="success" class="p-2 mb-0">
             <i class="fas fa-gift me-2"></i>
-            Your reward has been successfully redeemed.
+            Your reward has been successfully purchased!
         </b-alert>
-        <div v-else-if="isLoading" class="text-center">
-            <b-spinner show small variant="primary" />
-        </div>
         <template v-else>
             <b-alert v-model="isAlertDangerShown" show variant="danger" class="p-2">
                 <i class="fas fa-exclamation-circle me-2"></i>
@@ -46,7 +43,7 @@
                 :disabled="isDisabled"
                 @click="onSubmit"
             >
-                <b-spinner v-if="isSubmitting" small variant="primary" />
+                <b-spinner v-if="isLoading" small variant="primary" />
                 <template v-else-if="reward.isLocked"> <i class="fas fa-lock"></i></template>
                 <template v-else>
                     Pay {{ reward.pointPrice }} {{ reward.pointPrice === 1 ? 'point' : 'points' }}
@@ -77,7 +74,6 @@ export default defineComponent({
             required: true,
         },
         show: Boolean,
-        isLoading: Boolean,
     },
     data() {
         return {
@@ -86,7 +82,7 @@ export default defineComponent({
             error: '',
             wallet: null,
             isModalShown: false,
-            isSubmitting: false,
+            isLoading: false,
         };
     },
     computed: {
@@ -100,12 +96,7 @@ export default defineComponent({
             return this.participantBalance < this.reward.pointPrice;
         },
         isDisabled() {
-            return (
-                this.isLoading ||
-                this.isSubmitting ||
-                this.isInsufficientPoints ||
-                (this.reward.chainId && !this.wallet)
-            );
+            return this.isLoading || this.isInsufficientPoints || (this.reward.chainId && !this.wallet);
         },
         isAlertDangerShown() {
             return !!this.error;
@@ -119,11 +110,11 @@ export default defineComponent({
     methods: {
         onShow() {
             this.isAlertSuccessShown = false;
-            this.isSubmitting = false;
+            this.isLoading = false;
             this.error = '';
         },
         async onSubmit() {
-            this.isSubmitting = true;
+            this.isLoading = true;
 
             try {
                 const walletStore = useWalletStore();
@@ -137,7 +128,7 @@ export default defineComponent({
                 const { error } = res as { error: { message: string } };
                 this.error = error ? error.message : 'An error occurred. Please try again.';
             } finally {
-                this.isSubmitting = false;
+                this.isLoading = false;
             }
         },
         async onClickContinue() {
