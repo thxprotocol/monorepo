@@ -224,8 +224,10 @@ export default class QuestService {
             // Send Discord and e-mail notifications
             await NotificationService.sendQuestEntryNotification(pool, quest, account, amount);
 
-            // Register THX onboarding campaign event
-            await THXService.createEvent(account, 'quest_entry_created');
+            // Register THX onboarding campaign event for completed daily quests
+            if (quest.variant === QuestVariant.Daily) {
+                await THXService.createEvent(account, 'quest_entry_created');
+            }
         } catch (error) {
             logger.error(error);
         }

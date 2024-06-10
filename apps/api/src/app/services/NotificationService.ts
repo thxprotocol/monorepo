@@ -214,7 +214,7 @@ export async function sendWeeklyDigestJob() {
             html += `<p><strong>🎁 Rewards: </strong> ${paymentCount} purchased</p>`;
             html += `<hr />`;
 
-            html += `<p style="font-size:16px"><strong>Top 5</strong></p>`;
+            html += `<p style="font-size:16px"><strong>Top 3</strong></p>`;
             html += `<p><table role="presentation" border="0" cellpadding="0" cellspacing="0">`;
 
             for (const index in leaderboard) {
