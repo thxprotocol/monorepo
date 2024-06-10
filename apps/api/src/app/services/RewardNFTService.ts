@@ -61,9 +61,11 @@ export default class RewardNFTService implements IRewardService {
             const token = await this.findTokenById(nft, reward.tokenId);
             if (!token) return { result: false, reason: 'Token not found' };
 
-            const owner = await contract.methods.ownerOf(token.tokenId).call();
-            if (owner.toLowerCase() !== safe.address.toLowerCase()) {
-                return { result: false, reason: 'Token is no longer owned by campaign Safe.' };
+            if (nft.variant === NFTVariant.ERC721) {
+                const owner = await contract.methods.ownerOf(token.tokenId).call();
+                if (owner.toLowerCase() !== safe.address.toLowerCase()) {
+                    return { result: false, reason: 'Token is no longer owned by campaign Safe.' };
+                }
             }
         }
 
