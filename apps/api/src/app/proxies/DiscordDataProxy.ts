@@ -35,11 +35,9 @@ export default class DiscordDataProxy {
         embeds: TDiscordEmbed[] = [],
         buttons?: TDiscordButton[],
     ) {
-        try {
-            const discordGuild = await DiscordGuild.findOne({ poolId: String(pool._id) });
-            const url = WIDGET_URL + `/c/${pool.settings.slug}/quests`;
-
-            if (discordGuild && discordGuild.channelId) {
+        const discordGuild = await DiscordGuild.findOne({ poolId: String(pool._id) });
+        if (discordGuild && discordGuild.channelId) {
+            try {
                 const channel: any = await client.channels.fetch(discordGuild.channelId);
                 const components = [];
                 if (buttons) components.push(this.createButtonActionRow(buttons));
@@ -49,14 +47,10 @@ export default class DiscordDataProxy {
                     throw new Error('Insufficient channel permissions for bot to send messages.');
                 }
 
-                channel.send({ content, embeds, components });
-            } else if (pool.settings.discordWebhookUrl) {
-                // Extending the content with a link as we're not allowed to send button components over webhooks
-                content += ` [Complete Quest ▸](<${url}>)`;
-                axios.post(pool.settings.discordWebhookUrl, { content, embeds });
+                await channel.send({ content, embeds, components });
+            } catch (error) {
+                logger.error(error);
             }
-        } catch (error) {
-            logger.error(error);
         }
     }
 

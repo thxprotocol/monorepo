@@ -16,12 +16,6 @@ const validation = [
     body('settings.isArchived').optional().isBoolean(),
     body('settings.isPublished').optional().isBoolean(),
     body('settings.isWeeklyDigestEnabled').optional().isBoolean(),
-    body('settings.isTwitterSyncEnabled').optional().isBoolean(),
-    body('settings.defaults.conditionalRewards.title').optional().isString(),
-    body('settings.defaults.conditionalRewards.description').optional().isString(),
-    body('settings.defaults.conditionalRewards.amount').optional().isInt(),
-    body('settings.defaults.conditionalRewards.hashtag').optional().isString(),
-    body('settings.defaults.conditionalRewards.isPublished').optional().isBoolean(),
     body('settings.authenticationMethods').optional().isArray(),
 ];
 

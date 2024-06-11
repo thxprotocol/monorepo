@@ -5,19 +5,24 @@ import { body, param } from 'express-validator';
 
 const validation = [
     param('id').isMongoId(),
-    body('settings.channelId').optional().isString(),
     body('settings.adminRoleId').optional().isString(),
+    body('notifications.questCreated.isDisabled').optional().isBoolean(),
+    body('notifications.questCreated.message').optional().isString(),
+    body('notifications.questCreated.channelId').optional().isString(),
+    body('notifications.questEntryCreated.isDisabled').optional().isBoolean(),
+    body('notifications.questEntryCreated.message').optional().isString(),
+    body('notifications.questEntryCreated.channelId').optional().isString(),
 ];
 
 const controller = async (req: Request, res: Response) => {
-    const { guildId, name, adminRoleId, channelId } = req.body;
+    const { guildId, name, adminRoleId, notifications } = req.body;
     const guild = await DiscordGuild.create({
+        poolId: req.params.id,
         sub: req.auth.sub,
         guildId,
         name,
-        channelId,
         adminRoleId,
-        poolId: req.params.id,
+        notifications,
     });
     const result = await DiscordDataProxy.getGuild({ ...guild.toJSON(), isConnected: true });
 
