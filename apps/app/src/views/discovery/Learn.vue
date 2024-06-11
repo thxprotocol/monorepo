@@ -5,6 +5,10 @@
             <p class="lead">
                 Get lottery tickets for NFT's at a discount and claim the Discord Role for your membership rank.
             </p>
+            <b-button class="px-5" variant="success" href="https://docs.thx.network/faq/lottery" target="_blank">
+                Learn more
+                <i class="fas fa-chevron-right ms-2" />
+            </b-button>
         </template>
         <template #secondary>
             <div class="d-flex align-items-center justify-content-center h-100 p-5 position-relative">
