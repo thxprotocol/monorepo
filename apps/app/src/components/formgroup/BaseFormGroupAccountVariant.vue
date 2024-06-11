@@ -30,7 +30,7 @@ import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { AccountVariant } from '../../types/enums/accountVariant';
 import { AccessTokenKind } from '../../types/enums/accessTokenKind';
-import { OAuthRequiredScopes, getConnectionStatus } from '../../utils/social';
+import { OAuthRequiredScopes, getConnectedUser } from '../../utils/social';
 
 const NULL_METHOD = { label: 'None', value: null };
 export default defineComponent({
@@ -65,7 +65,7 @@ export default defineComponent({
                     value: AccountVariant.SSOGoogle,
                     getValidationResult: () => {
                         if (!this.accountStore.account) return;
-                        const result = getConnectionStatus(
+                        const result = getConnectedUser(
                             this.accountStore.account,
                             AccessTokenKind.Google,
                             OAuthRequiredScopes.GoogleAuth,
@@ -78,7 +78,7 @@ export default defineComponent({
                     value: AccountVariant.SSODiscord,
                     getValidationResult: () => {
                         if (!this.accountStore.account) return;
-                        const result = getConnectionStatus(
+                        const result = getConnectedUser(
                             this.accountStore.account,
                             AccessTokenKind.Discord,
                             OAuthRequiredScopes.DiscordAuth,

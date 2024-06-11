@@ -5,7 +5,7 @@ import { API_URL, AUTH_URL, CLIENT_ID, WIDGET_URL } from '../config/secrets';
 import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
 import { BREAKPOINT_LG } from '../config/constants';
 import { useAuthStore } from './Auth';
-import { getConnectionStatus } from '../utils/social';
+import { getConnectedUser } from '../utils/social';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { User } from 'oidc-client-ts';
 import { decodeHTML } from '../utils/decode-html';
@@ -182,7 +182,7 @@ export const useAccountStore = defineStore('account', {
             const taskFn = async () => {
                 if (!this.account) return;
                 await this.getAccount();
-                return getConnectionStatus(this.account, kind, scopes)
+                return getConnectedUser(this.account, kind, scopes)
                     ? Promise.resolve()
                     : Promise.reject('Could no validate connection status...');
             };

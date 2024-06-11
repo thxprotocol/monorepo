@@ -3,14 +3,24 @@
         <b-alert v-model="isErrorShown" show variant="danger" class="p-2">{{ error }}</b-alert>
         <template v-for="provider of providers">
             <div class="px-3 py-2 d-flex align-items-center">
-                <strong class="me-auto">
+                <strong>
                     <i :class="platformIconMap[provider.kind]" class="me-2" :style="{ color: provider.color }"></i>
-                    {{ provider.label }}
                 </strong>
+                <div class="me-auto">
+                    <strong>{{ provider.label }}</strong>
+                    <div v-if="provider.user" class="small">
+                        <span class="text-opaque">{{ provider.user.userId }}</span>
+                        <i
+                            v-b-tooltip
+                            class="fas fa-question-circle ms-1 text-opaque"
+                            :title="`${provider.label} User ID`"
+                        />
+                    </div>
+                </div>
                 <b-spinner v-if="provider.isSubmitting" small />
                 <template v-else>
                     <b-button
-                        v-if="provider.isConnected"
+                        v-if="provider.user"
                         :disabled="provider.isDisabled"
                         variant="link"
                         class="text-decoration-none text-primary"
@@ -31,7 +41,7 @@
 import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-import { OAuthRequiredScopes, getConnectionStatus, kindAccountVariantMap, platformIconMap } from '../../utils/social';
+import { OAuthRequiredScopes, getConnectedUser, kindAccountVariantMap, platformIconMap } from '../../utils/social';
 import { AccessTokenKind } from '../../types/enums/accessTokenKind';
 
 export default defineComponent({
@@ -52,8 +62,8 @@ export default defineComponent({
                     scopes: OAuthRequiredScopes.GoogleAuth,
                     label: 'YouTube',
                     color: '#FF0000',
+                    user: null,
                     isDisabled: true,
-                    isConnected: false,
                     isSubmitting: false,
                 },
                 [AccessTokenKind.Twitter]: {
@@ -61,8 +71,8 @@ export default defineComponent({
                     scopes: OAuthRequiredScopes.TwitterAuth,
                     label: 'Twitter',
                     color: '#1DA1F2',
+                    user: null,
                     isDisabled: true,
-                    isConnected: false,
                     isSubmitting: false,
                 },
                 [AccessTokenKind.Discord]: {
@@ -70,8 +80,8 @@ export default defineComponent({
                     scopes: OAuthRequiredScopes.DiscordAuth,
                     color: '#7289DA',
                     label: 'Discord',
+                    user: null,
                     isDisabled: true,
-                    isConnected: false,
                     isSubmitting: false,
                 },
             } as any,
@@ -120,14 +130,14 @@ export default defineComponent({
             if (!this.accountStore.account) return;
             for (const kind of Object.keys(this.providers)) {
                 const provider = this.providers[kind];
-                this.providers[provider.kind].isDisabled = this.getPlatformConnectionDisabledStatus(
-                    this.accountStore.account,
-                    provider.kind,
-                );
-                this.providers[provider.kind].isConnected = getConnectionStatus(
+                this.providers[provider.kind].user = getConnectedUser(
                     this.accountStore.account as any,
                     provider.kind,
                     provider.scopes,
+                );
+                this.providers[provider.kind].isDisabled = this.getPlatformConnectionDisabledStatus(
+                    this.accountStore.account,
+                    provider.kind,
                 );
                 this.providers[provider.kind].isSubmitting = false;
             }

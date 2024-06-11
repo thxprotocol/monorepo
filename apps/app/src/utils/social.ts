@@ -1,7 +1,7 @@
 import { QuestSocialRequirement } from '../types/enums/rewards';
 import { AccountVariant } from '../types/enums/accountVariant';
 
-function getConnectionStatus(account: TAccount, kind: AccessTokenKind, requiredScopes: TOAuthScope[] = []) {
+function getConnectedUser(account: TAccount, kind: AccessTokenKind, requiredScopes: TOAuthScope[] = []) {
     return account.tokens.find((a) => a.kind === kind && requiredScopes.every((scope) => a.scopes.includes(scope)));
 }
 
@@ -152,7 +152,7 @@ const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; sco
 
 export {
     interactionLabelMap,
-    getConnectionStatus,
+    getConnectedUser,
     interactionComponentMap,
     platformIconMap,
     kindAccountVariantMap,

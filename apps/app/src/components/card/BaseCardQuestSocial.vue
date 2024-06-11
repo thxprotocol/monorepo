@@ -62,7 +62,7 @@ import { useQuestStore } from '../../stores/Quest';
 import { QuestSocialRequirement } from '../../types/enums/rewards';
 import {
     interactionComponentMap,
-    getConnectionStatus,
+    getConnectedUser,
     platformIconMap,
     tokenInteractionMap,
     AccessTokenKind,
@@ -123,7 +123,7 @@ export default defineComponent({
             const { account } = useAccountStore();
             if (!account) return;
             const { kind, scopes } = tokenInteractionMap[this.quest.interaction];
-            return getConnectionStatus(account, kind, scopes);
+            return getConnectedUser(account, kind, scopes);
         },
         contentURL() {
             const map: { [i: number]: string } = {

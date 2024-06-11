@@ -94,7 +94,7 @@ export class TwitterQuery {
                             .map((tag: string) => `#${tag}`)
                             .filter((v) => !!v)
                             .join(' OR ');
-                        return (items.length > 1 ? `(${hashtags})` : hashtags) + media;
+                        return items.length > 1 ? `(${hashtags})` : hashtags;
                     }
                     case 'mentions': {
                         const items = operators[key] as string[];
@@ -103,7 +103,7 @@ export class TwitterQuery {
                             .map((tag: string) => `@${tag}`)
                             .filter((v) => !!v)
                             .join(' OR ');
-                        return (items.length > 1 ? `(${mentions})` : mentions) + media;
+                        return items.length > 1 ? `(${mentions})` : mentions;
                     }
                     case 'excludes': {
                         const items = operators[key] as string[];
@@ -119,6 +119,6 @@ export class TwitterQuery {
             .filter((query) => !!query)
             .join(' ');
 
-        return `${query}`;
+        return `${query} ${media}`;
     }
 }

@@ -96,7 +96,7 @@ export default defineComponent({
 
                 this.error = '';
             } catch (error) {
-                this.error = 'This email is not valid.';
+                this.error = 'This email is in use already.';
             } finally {
                 this.$emit('error', this.error);
                 this.isLoading = false;
