@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, User } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, GuildMember, User } from 'discord.js';
 import { WIDGET_URL } from '@thxnetwork/api/config/secrets';
 import { handleError } from '../error';
 import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
@@ -15,7 +15,7 @@ async function removePoints(
     sender: TAccount,
     receiver: TAccount,
     senderUser: User,
-    receiverUser: User,
+    receiverUser: GuildMember,
     amount: number,
 ) {
     await PointBalanceService.subtract(pool, receiver, amount);
@@ -36,7 +36,7 @@ async function addPoints(
     sender: TAccount,
     receiver: TAccount,
     senderUser: User,
-    receiverUser: User,
+    receiverUser: GuildMember,
     amount: number,
 ) {
     await PointBalanceService.add(pool, receiver, amount);
@@ -74,16 +74,13 @@ export async function getDiscordGuild(interaction: CommandInteraction | ButtonIn
 export const onSubcommandPoints = async (interaction: CommandInteraction, variant: DiscordCommandVariant) => {
     try {
         const account = await AccountProxy.getByDiscordId(interaction.user.id);
-        if (!account) throw new Error('Please, connect your THX Account with Discord first.');
+        if (!account) throw new Error(`Please, connect your THX Account with Discord first. [Sign in](${WIDGET_URL})`);
 
         const query = interaction.options.get('user').value as string;
         if (!query) throw new Error('Please, provide a valid username.');
 
-        const result = await interaction.guild.members.search({ query, limit: 1 });
-        if (!result) throw new Error('Could not find user');
-        if (!result[query]) throw new Error('Could not find user');
-        const user = result[query];
-        if (!result[query]) throw new Error('Could not find user in search result');
+        const member = await interaction.guild.members.fetch({ user: query });
+        if (!member) throw new Error('Could not find user');
 
         const { discordGuild, error } = await getDiscordGuild(interaction);
         if (error) throw new Error(error);
@@ -95,9 +92,9 @@ export const onSubcommandPoints = async (interaction: CommandInteraction, varian
             if (discordGuild.secret !== secret.value) throw new Error('Please, provide a valid secret.');
         }
 
-        // Check role
-        const member = await interaction.guild.members.fetch(interaction.user.id);
-        if (!member.roles.cache.has(discordGuild.adminRoleId)) {
+        // Check role for the member sending the interaction
+        const user = await interaction.guild.members.fetch({ user: interaction.user.id });
+        if (!user.roles.cache.has(discordGuild.adminRoleId)) {
             const role = await interaction.guild.roles.fetch(discordGuild.adminRoleId);
             throw new Error(`Only **${role.name}** roles have access to this command!`);
         }
@@ -108,9 +105,9 @@ export const onSubcommandPoints = async (interaction: CommandInteraction, varian
         const pool = await Pool.findById(discordGuild.poolId);
         if (!pool) throw new Error('Could not find connected campaign.');
 
-        const receiver = await AccountProxy.getByDiscordId(user.id);
+        const receiver = await AccountProxy.getByDiscordId(member.id);
         if (!receiver) {
-            user.send({
+            await member.send({
                 content: `<@${interaction.user.id}> failed to send you ${amount.value} points. Please [sign in](${WIDGET_URL}/c/${pool._id}), connect Discord and notify the sender!`,
             });
             throw new Error('Please, ask the receiver to connect a Discord account.');
@@ -122,7 +119,7 @@ export const onSubcommandPoints = async (interaction: CommandInteraction, varian
             account,
             receiver,
             interaction.user,
-            user,
+            member,
             Number(amount.value),
         );
 
@@ -133,7 +130,7 @@ export const onSubcommandPoints = async (interaction: CommandInteraction, varian
         });
 
         // Send DM to user
-        user.send({ content: receiverMessage });
+        member.send({ content: receiverMessage });
     } catch (error) {
         handleError(error, interaction);
     }

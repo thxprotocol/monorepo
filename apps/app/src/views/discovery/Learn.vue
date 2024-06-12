@@ -11,8 +11,8 @@
             </b-button>
         </template>
         <template #secondary>
-            <div class="d-flex align-items-center justify-content-center h-100 p-5 position-relative">
-                <div class="p-5 rounded text-center" :style="{ background: 'rgba(0, 0, 0, 0.5)' }">
+            <div class="d-flex align-items-center justify-content-end h-100 p-5 position-relative">
+                <div class="w-100 p-5 rounded text-center" :style="{ background: 'rgba(0, 0, 0, 0.5)' }">
                     <strong class="text-success h1 fw-bold">
                         {{ participant ? participant.balance : 0 }}
                     </strong>

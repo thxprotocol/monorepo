@@ -90,10 +90,6 @@ async function deploy(sub: string, title: string): Promise<PoolDocument> {
             description: '',
             isArchived: false,
             isWeeklyDigestEnabled: true,
-            isTwitterSyncEnabled: false,
-            defaults: {
-                conditionalRewards: { title: '', description: '', amount: 50 },
-            },
             authenticationMethods: [
                 AccountVariant.EmailPassword,
                 AccountVariant.Metamask,

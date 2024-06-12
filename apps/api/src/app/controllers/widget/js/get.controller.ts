@@ -1,7 +1,6 @@
 import { API_URL, AUTH_URL, DASHBOARD_URL, NODE_ENV, WIDGET_URL } from '@thxnetwork/api/config/secrets';
 import BrandService from '@thxnetwork/api/services/BrandService';
 import PoolService from '@thxnetwork/api/services/PoolService';
-import { QuestInvite } from '@thxnetwork/api/models/QuestInvite';
 import { Widget } from '@thxnetwork/api/models/Widget';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { Request, Response } from 'express';
@@ -15,25 +14,9 @@ const validation = [
 ];
 
 const controller = async (req: Request, res: Response) => {
-    // #swagger.tags = ['Widget']
-    const referralRewards = await QuestInvite.find({
-        poolId: req.params.id,
-    });
-    const refs = JSON.stringify(
-        referralRewards
-            .filter((r) => r.successUrl)
-            .map((r) => {
-                return {
-                    uuid: r.uuid,
-                    successUrl: r.successUrl,
-                };
-            }),
-    );
-
     const pool = await PoolService.getById(req.params.id);
     if (!pool) throw new NotFoundError('Pool not found.');
 
-    const expired = pool.settings.endDate ? pool.settings.endDate.getTime() <= Date.now() : false;
     const brand = await BrandService.get(pool._id);
     const widget = await Widget.findOne({ poolId: req.params.id });
     const referrerHeader = req.header('Referrer');
@@ -137,7 +120,6 @@ if (typeof window.THXWidget !== 'undefined') {
         }
 
         onLoad() {
-            this.referrals = JSON.parse(this.settings.refs).filter((r) => r.successUrl);
             this.iframe = this.createIframe();
 
             if (this.settings.isPublished) {
@@ -147,21 +129,10 @@ if (typeof window.THXWidget !== 'undefined') {
                 this.container = this.createContainer(this.iframe, this.launcher, this.message);
             }
 
-            this.parseURL();
-            
             window.matchMedia('(max-width: 990px)').addListener(this.onMatchMedia.bind(this));
             window.onmessage = this.onMessage.bind(this);
         }
 
-        parseURL() {
-            const url = new URL(window.location.href)
-            this.ref = url.searchParams.get('ref');
-            if (!this.ref) return;
-
-            this.successUrls = this.referrals.map((r) => r.successUrl);
-            if (!this.successUrls.length) return;
-        }
-    
         get isSmallMedia() {
             const getWidth = () => window.innerWidth;
             return getWidth() < this.MD_BREAKPOINT;
@@ -170,7 +141,7 @@ if (typeof window.THXWidget !== 'undefined') {
         createURL() {
             const parentUrl = new URL(window.location.href)
             const path = parentUrl.searchParams.get('thx_widget_path');
-            const { widgetUrl, poolId, chainId, theme, expired, logoUrl, backgroundUrl, title } = this.settings;
+            const { widgetUrl, poolId, chainId, theme, logoUrl, backgroundUrl, title } = this.settings;
             const url = new URL(widgetUrl);
 
             url.pathname = this.widgetPath = '/c/' + poolId + (path || '/quests');
@@ -180,7 +151,7 @@ if (typeof window.THXWidget !== 'undefined') {
         }
 
         createIframe() {
-            const { widgetUrl, poolId, chainId, theme, align, expired, containerSelector } = this.settings;
+            const { widgetUrl, poolId, chainId, theme, align, containerSelector } = this.settings;
             const iframe = document.createElement('iframe');
             const styles = this.isSmallMedia ? this.defaultStyles['sm'] : this.defaultStyles['md'];
             const url = this.createURL();
@@ -427,15 +398,7 @@ if (typeof window.THXWidget !== 'undefined') {
             }
             return container;
         }
-
-        storeRef(ref) {
-            if (!ref) return;
-            
-            window.localStorage.setItem('thx:widget:' + this.settings.poolId + ':ref', ref);
-            this.iframe.contentWindow.postMessage({ message: 'thx.config.ref', ref }, this.settings.widgetUrl);
-            this.timer = window.setInterval(this.onURLDetectionCallback.bind(this), 500);
-        }
-        
+ 
         onMessage(event) {
             if (event.origin !== this.settings.widgetUrl) return;
             const { message, amount, isAuthenticated, url } = event.data;
@@ -489,7 +452,6 @@ if (typeof window.THXWidget !== 'undefined') {
             const widgetPath = parentUrl.searchParams.get('thx_widget_path');
 
             this.open(widgetPath);
-            this.storeRef(this.ref);
 
             if (this.settings.identity) {
                 this.setIdentity(this.settings.identity)
@@ -509,20 +471,6 @@ if (typeof window.THXWidget !== 'undefined') {
         
             if (shouldShow) this.message.remove();
         }
-
-        onURLDetectionCallback() {
-            for (const ref of this.referrals) {
-                if (!(this.successUrls.filter((url) => url.includes(window.location.origin + window.location.pathname))).length) continue;
-                this.iframe.contentWindow.postMessage({ message: 'thx.referral.claim.create', uuid: ref.uuid, }, this.settings.widgetUrl);
-
-                const index = this.referrals.findIndex((r) => ref.uuid);
-                this.referrals.splice(index, 1);
-            }
-            
-            if (!this.referrals.length) {
-                window.clearInterval(this.timer);
-            }
-        }
     
         onMatchMedia(x) {
             if (x.matches) {
@@ -534,6 +482,7 @@ if (typeof window.THXWidget !== 'undefined') {
             }
         }
     }
+    
     window.THXWidget = new THXWidget({
         apiUrl: '${API_URL}',
         isPublished: window.location.origin.includes("${DASHBOARD_URL}") || ${widget.isPublished},
@@ -548,8 +497,6 @@ if (typeof window.THXWidget !== 'undefined') {
         message: '${widget.message || ''}',
         align: '${widget.align || 'right'}',
         theme: '${widget.theme}',
-        refs: ${JSON.stringify(refs)},
-        expired: '${expired}',
         identity: '${req.query.identity || ''}',
         containerSelector: '${req.query.containerSelector || ''}'
     });
