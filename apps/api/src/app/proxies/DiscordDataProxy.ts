@@ -1,8 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { client, PermissionFlagsBits } from '../../discord';
-import { DiscordGuild, DiscordGuildDocument, PoolDocument } from '@thxnetwork/api/models';
+import { DiscordGuildDocument } from '@thxnetwork/api/models';
 import { ActionRowBuilder, ButtonBuilder, Guild } from 'discord.js';
-import { WIDGET_URL } from '../config/secrets';
 import { logger } from '../util/logger';
 import { AccessTokenKind, OAuthRequiredScopes } from '@thxnetwork/common/enums';
 import { DISCORD_API_ENDPOINT } from '@thxnetwork/common/constants';
@@ -30,27 +29,26 @@ export async function discordClient(config: AxiosRequestConfig) {
 
 export default class DiscordDataProxy {
     static async sendChannelMessage(
-        pool: PoolDocument,
-        content: string,
+        channelId: string,
+        message: string,
         embeds: TDiscordEmbed[] = [],
         buttons?: TDiscordButton[],
     ) {
-        const discordGuild = await DiscordGuild.findOne({ poolId: String(pool._id) });
-        if (discordGuild && discordGuild.channelId) {
-            try {
-                const channel: any = await client.channels.fetch(discordGuild.channelId);
-                const components = [];
-                if (buttons) components.push(this.createButtonActionRow(buttons));
+        if (!channelId) return;
 
-                const botMember = channel.guild.members.cache.get(client.user.id);
-                if (!botMember.permissionsIn(channel).has(PermissionFlagsBits.SendMessages)) {
-                    throw new Error('Insufficient channel permissions for bot to send messages.');
-                }
+        try {
+            const channel: any = await client.channels.fetch(channelId);
+            const components = [];
+            if (buttons) components.push(this.createButtonActionRow(buttons));
 
-                await channel.send({ content, embeds, components });
-            } catch (error) {
-                logger.error(error);
+            const botMember = channel.guild.members.cache.get(client.user.id);
+            if (!botMember.permissionsIn(channel).has(PermissionFlagsBits.SendMessages)) {
+                throw new Error('Insufficient channel permissions for bot to send messages.');
             }
+
+            await channel.send({ content: message, embeds, components });
+        } catch (error) {
+            logger.error(error);
         }
     }
 

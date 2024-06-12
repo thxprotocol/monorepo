@@ -15,6 +15,23 @@ export default class DiscordService {
         }
     }
 
+    static async getGuilds(poolId: string): Promise<TDiscordGuild[]> {
+        const discordGuilds = await DiscordGuild.find({ poolId });
+        if (!discordGuilds.length) return;
+
+        const guilds = [];
+        for (const g of discordGuilds) {
+            try {
+                // Might fail if bot is removed from the guild
+                await client.guilds.fetch(g.guildId);
+                guilds.push(g);
+            } catch (error) {
+                logger.error(error);
+            }
+        }
+        return guilds;
+    }
+
     static async getMember(guildId: string, userId: string) {
         try {
             // Might fail if bot is removed from the guild
