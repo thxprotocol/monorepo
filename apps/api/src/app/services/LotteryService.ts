@@ -6,24 +6,23 @@ export const Rewards = {
     ForestKnight: {
         RunestoneOfTheEclipse: {
             title: 'Runestone of the Eclipse',
-            description:
-                'Rate items from the Mines of Eragoth collection can be bought at a discount using your THX campaign points.',
-            marketValue: '199 MATIC',
+            marketValue: '75 USD',
             image: 'https://i.seadn.io/s/raw/files/77485858457f42c1e4a3f5d89436cced.png?auto=format&dpr=1&w=1000',
         },
-        BigBagOfKnight: {
-            title: 'Big bag of $KNIGHT',
-            description:
-                'We distribute 375 USD worth of $KNIGHT as coin rewards ready to be redeemed for your THX campaign points.',
-            marketValue: '375 USD',
-            image: 'https://miro.medium.com/v2/resize:fit:1000/format:webp/1*-TH_NNMfBLgtbZhvZmNoCA.png',
+        RunestoneOfTheEthereal: {
+            title: 'Runestone of the Ethereal',
+            marketValue: '120 USD',
+            image: 'https://i.seadn.io/s/raw/files/b5f30b83dd6409b12a9113dca62f75ca.png?auto=format&dpr=1&w=1000',
         },
-        ClockworkCodex: {
-            title: 'Clockwork Codex',
-            description:
-                'A bunch of these will be made available for redemption at a discount using your THX campaign points.',
-            marketValue: '30 MATIC',
-            image: 'https://i.seadn.io/s/raw/files/71fdb00461b8d0d6d0db8e2c714eee8e.png?auto=format&dpr=1&w=1000',
+        EpicArcticFin: {
+            title: 'Epic Arctic Fin',
+            marketValue: '50 USD',
+            image: 'https://i.seadn.io/s/raw/files/ad579adb4566c4203176f5a5b8748286.png?auto=format&dpr=1&w=1000',
+        },
+        EpicZothsAmulet: {
+            title: "Zoth's Amulet",
+            marketValue: '55 USD',
+            image: 'https://i.seadn.io/s/raw/files/b894bc39670f99f427e1e5594c91c210.png?auto=format&dpr=1&w=1000',
         },
     },
 };

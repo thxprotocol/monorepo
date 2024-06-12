@@ -11,6 +11,10 @@ function findUserById(users: { id: string }[], userId: string) {
     return users.find((user: { id: string }) => user.id === userId);
 }
 
+function findPostById(posts: { id: string }[], postId: string) {
+    return posts.find((post: { id: string }) => post.id === postId);
+}
+
 export default class TwitterCacheService {
     static savePosts(posts: TTwitterPostWithUserAndMedia[] = [], query?: TwitterQueryDocument) {
         return Promise.all(
@@ -144,27 +148,23 @@ export default class TwitterCacheService {
         try {
             logger.info(`[${quest.poolId}][${account.sub}] X Quest ${quest._id} Like verification calls X API.`);
             const data = await TwitterDataProxy.request(token, {
-                url: `/tweets/${postId}/liking_users`,
+                url: `/users/${token.userId}/liked_tweets`,
                 method: 'GET',
                 params,
             });
             logger.info(`Fetched ${data.meta.result_count} likes from X.`);
-
             // If no results return early
             if (!data.meta.result_count) return;
 
-            // If not then we upsert all TwitterLikes into the database
-            const operations = data.data.map((user: { id: string }) => ({
-                updateOne: {
-                    filter: { userId: user.id, postId },
-                    update: { userId: user.id, postId },
-                    upsert: true,
-                },
-            }));
-            await TwitterLike.bulkWrite(operations);
-
-            // If the user has liked the post, we return early
-            if (findUserById(data.data, token.userId)) return;
+            // If the user has liked the post, we store it and return early
+            const like = findPostById(data.data, postId);
+            if (like) {
+                await TwitterLike.create({
+                    userId: token.userId,
+                    postId,
+                });
+                return;
+            }
 
             // If there is a next_token, we store the next_token in case we get rate limited
             // and continue on the next page
