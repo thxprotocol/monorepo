@@ -5,7 +5,11 @@ import { TwitterQuery as TwitterQueryParser } from '@thxnetwork/common/twitter';
 import { BadRequestError } from '@thxnetwork/api/util/errors';
 import TwitterQueryService from '@thxnetwork/api/services/TwitterQueryService';
 
-const validation = [param('id').isMongoId(), body('operators').customSanitizer((ops) => TwitterQueryParser.parse(ops))];
+const validation = [
+    param('id').isMongoId(),
+    body('frequencyInHours').isInt(),
+    body('operators').customSanitizer((ops) => TwitterQueryParser.parse(ops)),
+];
 
 const controller = async (req: Request, res: Response) => {
     const query = TwitterQueryParser.create(req.body.operators);
@@ -17,6 +21,7 @@ const controller = async (req: Request, res: Response) => {
 
     const twitterQuery = await TwitterQuery.create({
         poolId: req.params.id,
+        frequencyInHours: req.body.frequencyInHours,
         operators: req.body.operators,
         defaults: req.body.defaults,
         query,

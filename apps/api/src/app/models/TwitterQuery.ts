@@ -8,6 +8,7 @@ export const TwitterQuery = mongoose.model<TwitterQueryDocument>(
         {
             poolId: String,
             query: String,
+            frequencyInHours: Number,
             operators: {
                 from: [String],
                 to: [String],
