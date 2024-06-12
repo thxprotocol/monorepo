@@ -36,7 +36,7 @@
         <b-row>
             <b-col md="8">
                 <div class="my-5">
-                    <h2 class="mt-5">NFT Lottery</h2>
+                    <h2 class="mt-5">Partner Lottery</h2>
                     <p class="lead">
                         Members can buy lottery tickets with up to a 90% discount for NFT rewards from web3 game
                         partners!
@@ -48,11 +48,12 @@
                 <b-card class="mt-5" header-class="py-3">
                     <template #header>
                         <i class="fas fa-search text-opaque me-2" />
-                        Suggest the next lottery project!
+                        Suggest the next parner lottery!
                     </template>
+                    <p class="text-opaque">Let us know which project to feature in our bi-weekly Partner Lottery!</p>
                     <p class="text-opaque">
-                        We're always looking for new projects with rate and valuable assets that we can purchase on the
-                        open market to feature in the bi-weekly THX Network lottery.
+                        The projects needs to offer rare and valuable assets that we can purchase with our $500USD
+                        budget on the open market.
                     </p>
                     <b-button
                         variant="success"
@@ -60,7 +61,8 @@
                         target="_blank"
                         class="w-100"
                     >
-                        <strong>Suggest Project</strong>
+                        Suggest Project
+                        <i class="fas fa-external-link-alt ms-2" />
                     </b-button>
                 </b-card>
                 <b-card class="mt-3" header-class="py-3" no-body>
