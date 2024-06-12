@@ -107,7 +107,7 @@ export const onSubcommandPoints = async (interaction: CommandInteraction, varian
 
         const receiver = await AccountProxy.getByDiscordId(member.id);
         if (!receiver) {
-            member.send({
+            await member.send({
                 content: `<@${interaction.user.id}> failed to send you ${amount.value} points. Please [sign in](${WIDGET_URL}/c/${pool._id}), connect Discord and notify the sender!`,
             });
             throw new Error('Please, ask the receiver to connect a Discord account.');

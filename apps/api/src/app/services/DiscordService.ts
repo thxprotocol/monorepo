@@ -17,7 +17,7 @@ export default class DiscordService {
 
     static async getGuilds(poolId: string): Promise<TDiscordGuild[]> {
         const discordGuilds = await DiscordGuild.find({ poolId });
-        if (!discordGuilds.length) return;
+        if (!discordGuilds.length) return [];
 
         const guilds = [];
         for (const g of discordGuilds) {
