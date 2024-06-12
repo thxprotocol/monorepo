@@ -43,7 +43,9 @@ export * as SafeService from './SafeService';
 export * as THXService from './THXService';
 export * as TransactionService from './TransactionService';
 export * as TwitterCacheService from './TwitterCacheService';
-export * as TwitterQueryService from './TwitterQueryService';
 export * as VoteEscrowService from './VoteEscrowService';
 export * as WalletService from './WalletService';
 export * as WebhookService from './WebhookService';
+
+import TwitterQueryService from './TwitterQueryService';
+export { TwitterQueryService };

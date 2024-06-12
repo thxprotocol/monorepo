@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { TwitterQuery } from '@thxnetwork/api/models';
 import { param } from 'express-validator';
 import TwitterQueryService from '@thxnetwork/api/services/TwitterQueryService';
 

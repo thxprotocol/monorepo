@@ -8,16 +8,27 @@ import { DASHBOARD_URL } from '../config/secrets';
 import { QuestSocialRequirement, QuestVariant } from '@thxnetwork/common/enums';
 import { logger } from '../util/logger';
 import { TwitterPost } from '../models/TwitterPost';
+import { agenda } from '../util/agenda';
+import { Job } from '@hokify/agenda';
 
 const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 
-export default class TwitterQueryService {
-    static async searchJob() {
-        const queries = await TwitterQuery.find();
-        await this.run(queries);
+class TwitterQueryService {
+    constructor() {
+        // Define all the existing queries as agenda jobs
+        TwitterQuery.find({}).then((queries) =>
+            queries.map((query) => agenda.define(query.jobName, (job: Job) => this.searchJob(job))),
+        );
     }
 
-    static async list(query: { poolId: string }): Promise<TwitterQueryDocument[]> {
+    async searchJob(job: TJob) {
+        if (!job.attrs.data.queryId) return;
+        logger.info(`Running ${job.attrs.name}`, job.attrs.data);
+        const query = await TwitterQuery.findById(job.attrs.data.queryId);
+        await this.run([query]);
+    }
+
+    async list(query: { poolId: string }): Promise<TwitterQueryDocument[]> {
         const queries = await TwitterQuery.find(query);
         return await Promise.all(
             queries.map(async (query) => {
@@ -27,7 +38,7 @@ export default class TwitterQueryService {
         );
     }
 
-    static async run(queries: TwitterQueryDocument[]) {
+    async run(queries: TwitterQueryDocument[]) {
         const poolIds = queries.map((query) => query.poolId);
         const pools = await Pool.find({ _id: { $in: poolIds } });
         const subs = pools.map((pool) => pool.sub);
@@ -52,7 +63,7 @@ export default class TwitterQueryService {
         }
     }
 
-    static async search(account: TAccount, query: TwitterQueryDocument) {
+    async search(account: TAccount, query: TwitterQueryDocument) {
         const posts = await TwitterDataProxy.search(account, query.query);
 
         // Filter out the posts that already have a quest
@@ -78,7 +89,7 @@ export default class TwitterQueryService {
         return postsWithoutQuest;
     }
 
-    static async sendMail(account: TAccount, pool: PoolDocument, posts: TTwitterPostWithUserAndMedia[]) {
+    async sendMail(account: TAccount, pool: PoolDocument, posts: TTwitterPostWithUserAndMedia[]) {
         const src = new URL(DASHBOARD_URL);
         src.pathname = `/pool/${pool.id}/quests`;
         src.searchParams.append('isPublished', 'false');
@@ -106,7 +117,7 @@ export default class TwitterQueryService {
         );
     }
 
-    static async createQuest(query: TTwitterQuery, post: TTwitterPost, user: TTwitterUser) {
+    async createQuest(query: TTwitterQuery, post: TTwitterPost, user: TTwitterUser) {
         const file = null; // TODO Download buffer for the media first URL and upload with quest
         const quest = {
             kind: 'twitter',
@@ -133,3 +144,5 @@ export default class TwitterQueryService {
         await QuestService.create(QuestVariant.Twitter, query.poolId, quest, file);
     }
 }
+
+export default new TwitterQueryService();

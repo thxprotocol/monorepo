@@ -3,6 +3,7 @@ type TTwitterQuery = {
     createdAt: Date;
     poolId: string;
     query: string;
+    jobName: string;
     frequencyInHours: number;
     posts: TTwitterPost[];
     operators: TTwitterOperators;

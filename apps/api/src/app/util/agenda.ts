@@ -13,7 +13,6 @@ import InvoiceService from '../services/InvoiceService';
 import BalancerService from '../services/BalancerService';
 import RewardService from '../services/RewardService';
 import PaymentService from '../services/PaymentService';
-import TwitterQueryService from '../services/TwitterQueryService';
 import VoteEscrowService from '../services/VoteEscrowService';
 import ParticipantService from '../services/ParticipantService';
 import NotificationService from '../services/NotificationService';
@@ -31,7 +30,6 @@ const agenda = new Agenda({
 agenda.define(JobType.UpdateCampaignRanks, updateCampaignRanks);
 agenda.define(JobType.UpdateParticipantRanks, (job: Job) => ParticipantService.updateRanksJob(job));
 agenda.define(JobType.UpdatePendingTransactions, updatePendingTransactions);
-agenda.define(JobType.CreateTwitterQuests, () => TwitterQueryService.searchJob());
 agenda.define(JobType.CreateQuestEntry, (job: Job) => QuestService.createEntryJob(job));
 agenda.define(JobType.CreateRewardPayment, (job: Job) => RewardService.createPaymentJob(job));
 agenda.define(JobType.DeploySafe, (job: Job) => SafeService.createJob(job));
@@ -53,9 +51,8 @@ db.connection.once('open', async () => {
     await agenda.every('5 minutes', JobType.UpdateCampaignRanks);
     await agenda.every('15 minutes', JobType.UpsertInvoices);
     await agenda.every('15 minutes', JobType.UpdateAPR);
-    await agenda.every('1 day', JobType.CreateTwitterQuests);
-    await agenda.every('1 day', JobType.AssertPayments);
-    await agenda.every('1 day', JobType.ClaimExternalRewards);
+    await agenda.every('0 9 * * *', JobType.AssertPayments);
+    await agenda.every('0 9 * * *', JobType.ClaimExternalRewards);
     await agenda.every('0 9 * * MON', JobType.SendCampaignReport);
 
     logger.info('AgendaJS started job processor');
