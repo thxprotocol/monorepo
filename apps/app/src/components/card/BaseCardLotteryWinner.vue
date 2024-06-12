@@ -14,13 +14,9 @@
             </div>
         </div>
         <b-card-body class="p-3">
-            <span class="cursor-pointer d-flex align-items-center" @click="isCollapsed = !isCollapsed">
+            <span class="cursor-pointer d-flex align-items-center">
                 {{ winner.reward.title }}
-                <i class="fas ms-auto" :class="isCollapsed ? 'fa-caret-up' : 'fa-caret-down'" />
             </span>
-            <b-collapse v-model="isCollapsed">
-                <b-card-text>{{ winner.reward.description }}</b-card-text>
-            </b-collapse>
             <b-badge variant="primary" class="mt-3 w-100 p-2" style="font-size: 0.8rem">
                 <i class="fas fa-tags me-2 text-opaque" />
                 <span class="">{{ winner.code }}</span>
