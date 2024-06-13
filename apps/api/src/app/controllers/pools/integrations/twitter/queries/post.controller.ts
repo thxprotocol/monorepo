@@ -30,7 +30,7 @@ const controller = async (req: Request, res: Response) => {
 
     // Start an agenda job that runs every frequencyInHours from now
     // Will be deleted when the query is deleted
-    await agenda.every(`${req.body.frequencyInHours} minutes`, twitterQuery.jobName, {
+    await agenda.every(`${req.body.frequencyInHours} hours`, twitterQuery.jobName, {
         queryId: twitterQuery.id,
     });
 

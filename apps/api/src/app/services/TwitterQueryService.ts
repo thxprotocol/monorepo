@@ -9,15 +9,14 @@ import { QuestSocialRequirement, QuestVariant } from '@thxnetwork/common/enums';
 import { logger } from '../util/logger';
 import { TwitterPost } from '../models/TwitterPost';
 import { agenda } from '../util/agenda';
-import { Job } from '@hokify/agenda';
 
 const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 
 class TwitterQueryService {
     constructor() {
         // Define all the existing queries as agenda jobs
-        TwitterQuery.find({}).then((queries) =>
-            queries.map((query) => agenda.define(query.jobName, (job: Job) => this.searchJob(job))),
+        TwitterQuery.find({}).then((queries: TwitterQueryDocument[]) =>
+            queries.map((query) => agenda.define(query.jobName, this.searchJob)),
         );
     }
 
