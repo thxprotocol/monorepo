@@ -299,7 +299,7 @@ export const useAccountStore = defineStore('account', {
             };
 
             // Poll for job to finish
-            await poll({ taskFn, interval: 1000 });
+            await poll({ taskFn, interval: 1000, retries: 60 });
         },
     },
 });
