@@ -44,7 +44,7 @@ export default class InvoiceService {
         ];
 
         // Get all relevant pools
-        const pools = await Pool.find({ 'settings.isPublished': true });
+        const pools = await Pool.find({});
         const questEntriesByCampaign = await Promise.all(
             pools.map(async (pool) => {
                 const uniqueEntriesByVariant = await Promise.all(
