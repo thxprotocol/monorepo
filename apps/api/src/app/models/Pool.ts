@@ -18,6 +18,7 @@ const schema = new mongoose.Schema(
             title: String,
             slug: String,
             description: String,
+            leaderboardInWeeks: Number,
             galachainPrivateKey: String,
             isArchived: Boolean,
             isPublished: { type: Boolean, default: false },

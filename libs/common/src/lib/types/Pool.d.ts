@@ -47,6 +47,7 @@ type TPoolSettings = {
     title: string;
     slug: string;
     description: string;
+    leaderboardInWeeks: number;
     isArchived: boolean;
     isPublished: boolean;
     isWeeklyDigestEnabled: boolean;
