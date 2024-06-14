@@ -40,7 +40,16 @@
                     </b-badge>
                 </div>
             </div>
-            <span id="disabled-wrapper" class="d-block" tabindex="0">
+            <b-button
+                v-if="!accountStore.isAuthenticated"
+                class="w-100"
+                variant="primary"
+                @click="authStore.isModalLoginShown = !authStore.isModalLoginShown"
+            >
+                <template v-if="reward.pointPrice"> Purchase </template>
+                <template v-else> Free </template>
+            </b-button>
+            <span v-else id="disabled-wrapper" class="d-block" tabindex="0">
                 <BaseButtonQuestLocked
                     v-if="reward.isLocked"
                     :id="`modalQuestLock${reward._id}`"
@@ -87,6 +96,7 @@ import { format, formatDistance } from 'date-fns';
 import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { RewardVariant } from '../../types/enums/rewards';
+import { useAuthStore } from '@thxnetwork/app/stores/Auth';
 
 export default defineComponent({
     name: 'BaseCardReward',
@@ -111,7 +121,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
+        ...mapStores(useAccountStore, useAuthStore),
         limitSupplyVariant() {
             if (this.limitSupplyPerct >= 0.9) return 'text-danger';
             if (this.limitSupplyPerct > 0.75 && this.limitSupplyPerct < 0.9) return 'text-warning';

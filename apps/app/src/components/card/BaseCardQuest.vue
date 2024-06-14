@@ -77,8 +77,10 @@
                     block
                     class="w-100"
                 >
-                    Sign in &amp;
-                    <span v-html="quest.amount ? `claim <strong>${quest.amount} points</strong>` : 'complete quest'" />
+                    <template v-if="quest.amount">
+                        Earn <strong>{{ quest.amount }} points</strong>
+                    </template>
+                    <template v-else> Complete </template>
                 </b-button>
 
                 <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>

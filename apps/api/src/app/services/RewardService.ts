@@ -17,7 +17,6 @@ import RewardDiscordRoleService from './RewardDiscordRoleService';
 import RewardCustomService from './RewardCustomService';
 import RewardGalachainService from './RewardGalachainService';
 import PoolService from './PoolService';
-import THXService from './THXService';
 
 const serviceMap = {
     [RewardVariant.Coin]: new RewardCoinService(),
