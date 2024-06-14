@@ -32,7 +32,7 @@ export default class InvoiceService {
      * @param invoicePeriodstartDate
      * @param invoicePeriodEndDate
      */
-    static async upsertInvoices(invoicePeriodstartDate: Date, invoicePeriodEndDate: Date) {
+    static async upsertInvoices(invoicePeriodstartDate: Date, invoicePeriodEndDate: Date, accountsColl?: TAccount[]) {
         // Determine the lookup stages for the quest entries in the pools pipeline
         const questEntryModels = [
             QuestDailyEntry,
@@ -65,7 +65,8 @@ export default class InvoiceService {
 
         // Get the pool owner accounts to send the invoices
         const subs = questEntriesByCampaign.map(({ poolSub }) => poolSub);
-        const accounts = await AccountProxy.find({ subs });
+        const accounts =
+            accountsColl.map((a) => Object.assign(a, { sub: String(a._id) })) || (await AccountProxy.find({ subs }));
 
         // Build operations array for the current month metrics
         const operations = questEntriesByCampaign.map(({ poolId, poolSub, mapCount }) => {

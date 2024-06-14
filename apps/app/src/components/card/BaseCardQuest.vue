@@ -80,7 +80,7 @@
                     <template v-if="quest.amount">
                         Earn <strong>{{ quest.amount }} points</strong>
                     </template>
-                    <template v-else> Complete </template>
+                    <strong v-else> Complete! </strong>
                 </b-button>
 
                 <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>

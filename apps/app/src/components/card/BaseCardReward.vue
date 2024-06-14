@@ -46,8 +46,10 @@
                 variant="primary"
                 @click="authStore.isModalLoginShown = !authStore.isModalLoginShown"
             >
-                <template v-if="reward.pointPrice"> Purchase </template>
-                <template v-else> Free </template>
+                <template v-if="reward.pointPrice">
+                    Pay <strong>{{ reward.pointPrice }} points</strong>
+                </template>
+                <strong v-else> Free! </strong>
             </b-button>
             <span v-else id="disabled-wrapper" class="d-block" tabindex="0">
                 <BaseButtonQuestLocked
