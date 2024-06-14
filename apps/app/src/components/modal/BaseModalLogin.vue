@@ -7,7 +7,10 @@
             </h5>
             <b-link class="btn-close" @click="authStore.isModalLoginShown = false"><i class="fas fa-times"></i></b-link>
         </template>
-        <b-alert v-model="isAlertErrorShown" class="p-2" variant="primary">{{ error }}</b-alert>
+        <b-alert v-model="isAlertErrorShown" class="p-2" variant="primary">
+            <i class="fas fa-exclamation-triangle me-2" />
+            {{ error }}
+        </b-alert>
         <b-form-group>
             <b-form-input v-model="email" :state="isEmailValid" placeholder="E-mail" />
         </b-form-group>

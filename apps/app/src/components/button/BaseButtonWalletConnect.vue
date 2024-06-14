@@ -73,7 +73,8 @@ export default defineComponent({
             window.location.reload();
         },
         async onClick() {
-            if (!this.walletStore.account) {
+            if (!this.walletStore.account || !this.walletStore.account.isConnected) {
+                await this.walletStore.disconnect();
                 await this.walletStore.connect();
             } else if (this.chainId && this.walletStore.chainId !== this.chainId) {
                 await this.walletStore.switchChain(this.chainId);

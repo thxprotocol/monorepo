@@ -158,7 +158,9 @@ export const useWalletStore = defineStore('wallet', {
         },
         async connect() {
             await this.createWeb3Modal();
-            this.modal.open();
+            this.modal.open({
+                view: 'account',
+            });
         },
         async disconnect() {
             if (this.account) {
