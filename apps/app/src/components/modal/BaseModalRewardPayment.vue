@@ -29,7 +29,7 @@
                 Do you want to use {{ reward.pointPrice }} points for <strong>{{ reward.title }} </strong>?
             </p>
             <BaseFormGroupWalletSelect
-                v-if="[RewardVariant.Coin, RewardVariant.NFT, RewardVariant.Galachain].includes(reward.variant)"
+                v-if="isWalletRequired"
                 :chain-id="reward.chainId"
                 class="mb-0"
                 @update="wallet = $event"
@@ -96,10 +96,13 @@ export default defineComponent({
             return this.participantBalance < this.reward.pointPrice;
         },
         isDisabled() {
-            return this.isLoading || this.isInsufficientPoints || (this.reward.chainId && !this.wallet);
+            return this.isLoading || this.isInsufficientPoints || (this.isWalletRequired && !this.wallet);
         },
         isAlertDangerShown() {
             return !!this.error;
+        },
+        isWalletRequired() {
+            return [RewardVariant.Coin, RewardVariant.NFT, RewardVariant.Galachain].includes(this.reward.variant);
         },
     },
     watch: {

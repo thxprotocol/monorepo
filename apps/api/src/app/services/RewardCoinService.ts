@@ -84,9 +84,24 @@ export default class RewardCoinService implements IRewardService {
         });
     }
 
-    async getValidationResult({ reward, safe }: { reward: RewardCoinDocument; safe: WalletDocument }) {
+    async getValidationResult({
+        reward,
+        safe,
+        wallet,
+    }: {
+        reward: RewardCoinDocument;
+        safe: WalletDocument;
+        wallet: WalletDocument;
+    }) {
+        if (!wallet) return { result: false, reason: `No wallet provided for this reward transfer.` };
+
+        // Check if wallet exists
+        if (!wallet) {
+            return { result: false, reason: 'Your wallet is not found. Please try again.' };
+        }
+
         const erc20 = await ERC20.findById(reward.erc20Id);
-        if (!erc20) throw new Error('ERC20 not found');
+        if (!erc20) return { result: false, reason: `ERC20 not found.` };
 
         // Check if there are pending transactions that are not mined or failed.
         const txs = await Transaction.find({
