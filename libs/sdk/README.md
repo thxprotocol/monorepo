@@ -98,10 +98,10 @@ Quests can be managed programatically. Specify `content` and `contentMetadata` a
 
 #### Twitter Post Previews
 
-Use this `content` and `contentMetadata` for these `interaction` variants: `QuestRequirement.TwitterLike`, `QuestRequirement.TwitterRetweet`, `QuestRequirement.TwitterLikeRetweet`.
+Use this `content` and `contentMetadata` for these `interaction` variants: `QuestRequirement.TwitterRetweet`.
 
 ```javascript
-const interaction = QuestRequirement.TwitterLikeRetweet;
+const interaction = QuestRequirement.TwitteRetweet;
 const content = '46927555';
 const contentMetadata = {
     url: 'https://twitter.com/twitter/status/1603121182101970945',

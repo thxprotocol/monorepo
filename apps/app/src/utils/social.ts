@@ -18,9 +18,7 @@ export enum AccessTokenKind {
 
 const interactionLabelMap: { [i: number]: string } = {
     [QuestSocialRequirement.TwitterFollow]: 'Follow on 𝕏',
-    [QuestSocialRequirement.TwitterLike]: 'Like on 𝕏',
     [QuestSocialRequirement.TwitterRetweet]: 'Repost on 𝕏',
-    [QuestSocialRequirement.TwitterLikeRetweet]: 'Repost & Like on 𝕏',
     [QuestSocialRequirement.TwitterQuery]: 'Post on 𝕏',
     [QuestSocialRequirement.YouTubeLike]: 'Watch & Like on YouTube',
     [QuestSocialRequirement.YouTubeSubscribe]: 'Subscribe on YouTube',
@@ -45,9 +43,7 @@ const kindAccountVariantMap: { [kind: string]: number } = {
 const interactionComponentMap: { [req: number]: string } = {
     [QuestSocialRequirement.YouTubeLike]: 'BaseBlockquoteVideo',
     [QuestSocialRequirement.YouTubeSubscribe]: 'BaseBlockquoteYoutubeChannelSubscription',
-    [QuestSocialRequirement.TwitterLike]: 'BaseBlockquoteTwitterTweet',
     [QuestSocialRequirement.TwitterRetweet]: 'BaseBlockquoteTwitterTweet',
-    [QuestSocialRequirement.TwitterLikeRetweet]: 'BaseBlockquoteTwitterTweet',
     [QuestSocialRequirement.TwitterFollow]: 'BaseBlockquoteTwitterUser',
     [QuestSocialRequirement.TwitterQuery]: 'BaseBlockquoteTwitterQuery',
     [QuestSocialRequirement.DiscordGuildJoined]: 'BaseBlockquoteDiscordServerJoin',
@@ -118,10 +114,6 @@ const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; sco
         kind: AccessTokenKind.Google,
         scopes: OAuthRequiredScopes.GoogleYoutubeSubscribe,
     },
-    [QuestSocialRequirement.TwitterLike]: {
-        kind: AccessTokenKind.Twitter,
-        scopes: OAuthRequiredScopes.TwitterValidateLike,
-    },
     [QuestSocialRequirement.TwitterRetweet]: {
         kind: AccessTokenKind.Twitter,
         scopes: OAuthRequiredScopes.TwitterValidateRepost,
@@ -131,10 +123,6 @@ const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; sco
         scopes: OAuthRequiredScopes.TwitterValidateFollow,
     },
     [QuestSocialRequirement.TwitterQuery]: { kind: AccessTokenKind.Twitter, scopes: OAuthRequiredScopes.TwitterAuth },
-    [QuestSocialRequirement.TwitterLikeRetweet]: {
-        kind: AccessTokenKind.Twitter,
-        scopes: OAuthRequiredScopes.TwitterValidateLike,
-    },
     [QuestSocialRequirement.DiscordGuildJoined]: {
         kind: AccessTokenKind.Discord,
         scopes: OAuthRequiredScopes.DiscordValidateGuild,

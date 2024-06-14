@@ -45,9 +45,7 @@ export default defineComponent({
     methods: {
         getChannelActionURL(interaction: QuestSocialRequirement, content: string) {
             switch (interaction) {
-                case QuestSocialRequirement.TwitterLike:
                 case QuestSocialRequirement.TwitterRetweet:
-                case QuestSocialRequirement.TwitterLikeRetweet:
                     return `https://www.x.com/twitter/status/${content}`;
                 default:
                     return '';

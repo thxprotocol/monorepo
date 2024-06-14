@@ -128,8 +128,6 @@ export default defineComponent({
         contentURL() {
             const map: { [i: number]: string } = {
                 [QuestSocialRequirement.TwitterFollow]: `https://www.x.com/${this.quest.contentMetadata.username}`,
-                [QuestSocialRequirement.TwitterLikeRetweet]: this.quest.contentMetadata.url,
-                [QuestSocialRequirement.TwitterLike]: this.quest.contentMetadata.url,
                 [QuestSocialRequirement.TwitterRetweet]: this.quest.contentMetadata.url,
                 [QuestSocialRequirement.TwitterQuery]: this.queryToURL(this.quest),
                 [QuestSocialRequirement.YouTubeLike]: `https://www.youtube.com/watch?v=${this.quest.content}`,

@@ -120,7 +120,7 @@ class TwitterQueryService {
         const file = null; // TODO Download buffer for the media first URL and upload with quest
         const quest = {
             kind: 'twitter',
-            interaction: QuestSocialRequirement.TwitterLikeRetweet,
+            interaction: QuestSocialRequirement.TwitterRetweet,
             title: query.defaults.title,
             description: query.defaults.description,
             amount: query.defaults.amount,

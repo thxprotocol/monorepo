@@ -165,22 +165,11 @@ function getQuestRequirements(quest: TQuest, variant: QuestVariant) {
             const { interaction: interactionString, contentMetadata } = quest as QuestSocialDocument;
             const interaction = Number(interactionString);
             const metadata = JSON.parse(contentMetadata);
-            const twitterPostQuests = [
-                QuestRequirement.TwitterLike,
-                QuestRequirement.TwitterRetweet,
-                QuestRequirement.TwitterLikeRetweet,
-            ];
-
-            if (twitterPostQuests.includes(interaction)) {
-                const labelMap = {
-                    [QuestRequirement.TwitterLike]: 'Like',
-                    [QuestRequirement.TwitterRetweet]: 'Retweet',
-                    [QuestRequirement.TwitterLikeRetweet]: 'Like & Retweet',
-                };
+            if (interaction === QuestRequirement.TwitterRetweet) {
                 return [
                     {
                         name: 'Requirement',
-                        value: `[${labelMap[interaction]}](${metadata.url})`,
+                        value: `[Repost & Like](${metadata.url})`,
                         inline: false,
                     },
                 ];

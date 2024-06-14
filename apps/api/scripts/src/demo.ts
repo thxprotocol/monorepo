@@ -139,7 +139,7 @@ export default async function main() {
                     description: '',
                     amount: 50,
                     kind: AccessTokenKind.Twitter,
-                    interaction: QuestSocialRequirement.TwitterLikeRetweet,
+                    interaction: QuestSocialRequirement.TwitterRetweet,
                     content: tweetId,
                     contentMetadata: JSON.stringify({
                         url: tweetUrl,

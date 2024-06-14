@@ -13,29 +13,11 @@ export const requirementMap: {
     [QuestSocialRequirement.YouTubeSubscribe]: async (account, quest) => {
         return await YouTubeDataProxy.validateSubscribe(account, quest.content);
     },
-    [QuestSocialRequirement.TwitterLike]: async (account, quest) => {
-        logger.info(`[${quest.poolId}][${account.sub}] X Quest ${quest._id} Like verification started`);
-
-        const validationResultUser = await TwitterDataProxy.validateUser(account, quest);
-        if (!validationResultUser.result) return validationResultUser;
-        const validationResultLike = await TwitterDataProxy.validateLike(account, quest);
-        if (!validationResultLike.result) return validationResultLike;
-    },
     [QuestSocialRequirement.TwitterRetweet]: async (account, quest) => {
         logger.info(`[${quest.poolId}][${account.sub}] X Quest ${quest._id} Repost verification started`);
 
         const validationResultUser = await TwitterDataProxy.validateUser(account, quest);
         if (!validationResultUser.result) return validationResultUser;
-        const validationResultRepost = await TwitterDataProxy.validateRetweet(account, quest);
-        if (!validationResultRepost.result) return validationResultRepost;
-    },
-    [QuestSocialRequirement.TwitterLikeRetweet]: async (account, quest) => {
-        logger.info(`[${quest.poolId}][${account.sub}] X Quest ${quest._id} LikeRepost verification started`);
-
-        const validationResultUser = await TwitterDataProxy.validateUser(account, quest);
-        if (!validationResultUser.result) return validationResultUser;
-        const validationResultLike = await TwitterDataProxy.validateLike(account, quest);
-        if (!validationResultLike.result) return validationResultLike;
         const validationResultRepost = await TwitterDataProxy.validateRetweet(account, quest);
         if (!validationResultRepost.result) return validationResultRepost;
     },
@@ -78,10 +60,6 @@ export const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKi
         kind: AccessTokenKind.Google,
         scopes: OAuthRequiredScopes.GoogleYoutubeSubscribe,
     },
-    [QuestSocialRequirement.TwitterLike]: {
-        kind: AccessTokenKind.Twitter,
-        scopes: OAuthRequiredScopes.TwitterValidateLike,
-    },
     [QuestSocialRequirement.TwitterRetweet]: {
         kind: AccessTokenKind.Twitter,
         scopes: OAuthRequiredScopes.TwitterValidateRepost,
@@ -91,10 +69,6 @@ export const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKi
         scopes: OAuthRequiredScopes.TwitterValidateFollow,
     },
     [QuestSocialRequirement.TwitterQuery]: { kind: AccessTokenKind.Twitter, scopes: OAuthRequiredScopes.TwitterAuth },
-    [QuestSocialRequirement.TwitterLikeRetweet]: {
-        kind: AccessTokenKind.Twitter,
-        scopes: OAuthRequiredScopes.TwitterValidateLike,
-    },
     [QuestSocialRequirement.DiscordGuildJoined]: {
         kind: AccessTokenKind.Discord,
         scopes: OAuthRequiredScopes.DiscordValidateGuild,
