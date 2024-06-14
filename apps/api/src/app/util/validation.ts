@@ -16,7 +16,7 @@ export const defaults = {
         body('index').optional().isInt(),
         body('title').optional().isString().trim().escape(),
         body('description').optional().isString().trim().escape(),
-        body('expiryDate').optional().isISO8601(),
+        body('expiryDate').optional({ checkFalsy: true }).isISO8601(),
         body('isPublished')
             .optional()
             .isBoolean()
@@ -42,7 +42,7 @@ export const defaults = {
     reward: [
         body('title').optional().isString().trim().escape(),
         body('description').optional().isString().trim().escape(),
-        body('expiryDate').optional().isISO8601(),
+        body('expiryDate').optional({ checkFalsy: true }).isISO8601(),
         body('limit').optional().isNumeric(),
         body('pointPrice').optional().isNumeric(),
         body('isPublished')
