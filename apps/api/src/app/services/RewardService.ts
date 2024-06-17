@@ -277,7 +277,7 @@ export default class RewardService {
         const isLimitSupplyReached = await this.isLimitSupplyReached(reward);
         if (isLimitSupplyReached) return { result: false, reason: "This reward has reached it's supply limit." };
 
-        const isLimitReached = await this.isLimitReached(reward);
+        const isLimitReached = await this.isLimitReached({ reward, account });
         if (isLimitReached) return { result: false, reason: 'This reward has reached your personal limit.' };
 
         return serviceMap[reward.variant].getValidationResult({ reward, account, wallet, safe });
