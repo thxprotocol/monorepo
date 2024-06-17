@@ -48,7 +48,7 @@
                 <b-card class="mt-5" header-class="py-3">
                     <template #header>
                         <i class="fas fa-search text-opaque me-2" />
-                        Suggest the next parner lottery!
+                        Suggest the next partner lottery!
                     </template>
                     <p class="text-opaque">Let us know which project to feature in our bi-weekly Partner Lottery!</p>
                     <p class="text-opaque">

@@ -8,11 +8,22 @@ import {
     QuestCustomEntry,
     QuestWeb3Entry,
     QuestGitcoinEntry,
+    PoolDocument,
 } from '../models';
 import AccountProxy from '../proxies/AccountProxy';
 import { logger } from '../util/logger';
 import { AccountPlanType } from '@thxnetwork/common/enums';
 import { startOfMonth, endOfMonth } from 'date-fns';
+
+// Determine the lookup stages for the quest entries in the pools pipeline
+const questEntryModels = [
+    QuestDailyEntry,
+    QuestInviteEntry,
+    QuestSocialEntry,
+    QuestCustomEntry,
+    QuestWeb3Entry,
+    QuestGitcoinEntry,
+];
 
 export default class InvoiceService {
     /**
@@ -33,18 +44,32 @@ export default class InvoiceService {
      * @param invoicePeriodEndDate
      */
     static async upsertInvoices(invoicePeriodstartDate: Date, invoicePeriodEndDate: Date, accountsColl?: TAccount[]) {
-        // Determine the lookup stages for the quest entries in the pools pipeline
-        const questEntryModels = [
-            QuestDailyEntry,
-            QuestInviteEntry,
-            QuestSocialEntry,
-            QuestCustomEntry,
-            QuestWeb3Entry,
-            QuestGitcoinEntry,
-        ];
+        // Iterate over all pools in chunks of 1000
+        const poolCount = await Pool.countDocuments({});
+        const chunkSize = 1000;
+        const chunkCount = Math.ceil(poolCount / chunkSize);
+        for (let i = 0; i < chunkCount; i++) {
+            const pools = await Pool.find({})
+                .skip(i * chunkSize)
+                .limit(chunkSize);
+            await this.upsertInvoicesForPools(pools, invoicePeriodstartDate, invoicePeriodEndDate, accountsColl);
+        }
+    }
 
+    /**
+     * Upsert invoices for the given pools and period
+     * @param pools
+     * @param questEntryModels
+     * @param invoicePeriodstartDate
+     * @param invoicePeriodEndDate
+     */
+    static async upsertInvoicesForPools(
+        pools: PoolDocument[],
+        invoicePeriodstartDate: Date,
+        invoicePeriodEndDate: Date,
+        accountsColl?: TAccount[],
+    ) {
         // Get all relevant pools
-        const pools = await Pool.find({});
         const questEntriesByCampaign = await Promise.all(
             pools.map(async (pool) => {
                 const uniqueEntriesByVariant = await Promise.all(
