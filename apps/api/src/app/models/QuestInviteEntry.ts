@@ -8,11 +8,8 @@ export const QuestInviteEntry = mongoose.model<QuestInviteEntryDocument>(
         {
             questId: String,
             sub: String,
-            uuid: String,
+            code: String,
             amount: String,
-            isApproved: Boolean,
-            poolId: String,
-            metadata: String,
         },
         { timestamps: true },
     ),

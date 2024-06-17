@@ -14,8 +14,6 @@ export default class QuestInviteService implements IQuestService {
     async decorate({ quest }: { quest: TQuestInvite; data: Partial<TQuestInviteEntry> }): Promise<TQuestInvite> {
         return {
             ...quest,
-            pathname: quest.pathname,
-            successUrl: quest.successUrl,
         };
     }
 

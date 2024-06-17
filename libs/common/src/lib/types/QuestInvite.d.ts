@@ -1,7 +1,11 @@
 type TQuestInvite = TBaseQuest & {
-    successUrl: string;
-    pathname: string;
-    token: string;
     amount: number;
-    isMandatoryReview: boolean;
+    amountInvitee: number;
+    requiredQuests: { questId: string; variant: TQuest }[];
+};
+
+type TQuestInviteCode = {
+    questId: string;
+    sub: string;
+    code: string;
 };
