@@ -35,6 +35,7 @@ export default class QuestService {
         const callback: any = async (variant: QuestVariant) => {
             const Quest = serviceMap[variant].models.quest;
             const quests = await Quest.find({
+                variant,
                 poolId: pool.id,
                 isPublished: true,
                 $or: [

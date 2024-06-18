@@ -93,6 +93,9 @@ export default class QuestInviteService implements IQuestService {
             const inviter = await AccountProxy.findById(participant.invitedBySub);
             if (!inviter) throw new Error('Inviter not found');
 
+            // Update entry for invites
+            // Update entry for invitee
+
             // Transfer points to invitee
             await PointBalanceService.add(pool, inviter, inviteQuest.amount);
             await PointBalanceService.add(pool, account, inviteQuest.amountInvitee);
