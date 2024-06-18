@@ -56,6 +56,7 @@ export default class RewardService {
                     { expiryDate: { $exists: true, $gte: new Date() } },
                     // Include quests with no expiryDate
                     { expiryDate: { $exists: false } },
+                    { expiryDate: null },
                 ],
             });
             return await Promise.all(
