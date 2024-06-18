@@ -8,8 +8,8 @@
         :error="error"
         @modal-close="isModalQuestEntryShown = false"
     >
-        <template v-if="inviteUrl">
-            <BaseFormGroup label="Your Invite Link" tooltip="Your Invite Link ">
+        <BaseFormGroup label="Your Invite Link" tooltip="Your Invite Link ">
+            <template v-if="inviteUrl">
                 <b-input-group>
                     <b-form-input :model-value="inviteUrl" />
                     <b-input-group-append>
@@ -24,25 +24,33 @@
                         </b-button>
                     </b-input-group-append>
                 </b-input-group>
-            </BaseFormGroup>
+            </template>
+            <template v-else>
+                <b-alert v-model="isAlertInviteURLShown" class="p-2 mb-0" variant="primary">
+                    <i class="fas fa-exclamation-circle mx-1" />
+                    Sign in to see your Invite Link
+                </b-alert>
+            </template>
+        </BaseFormGroup>
 
-            <!-- <div class="py-2">
-                <BaseBtnShareTwitter :url="inviteUrl" text="Please have a look at this:" class="me-2" />
-                <BaseBtnShareLinkedin :url="inviteUrl" class="me-2" />
-                <BaseBtnShareWhatsapp :url="inviteUrl" class="me-2" />
-                <BaseBtnShareTelegram :url="inviteUrl" text="Please have a look at this!" class="me-2" />
-                <BaseBtnShareEmail :url="inviteUrl" subject="Please have a look at this!" class="me-2" />
-            </div> -->
+        <!-- 
+        <div class="py-2">
+            <BaseBtnShareTwitter :url="inviteUrl" text="Please have a look at this:" class="me-2" />
+            <BaseBtnShareLinkedin :url="inviteUrl" class="me-2" />
+            <BaseBtnShareWhatsapp :url="inviteUrl" class="me-2" />
+            <BaseBtnShareTelegram :url="inviteUrl" text="Please have a look at this!" class="me-2" />
+            <BaseBtnShareEmail :url="inviteUrl" subject="Please have a look at this!" class="me-2" />
+        </div> 
+        -->
 
-            <BaseFormGroup
-                label="Requirements"
-                tooltip="The invitee needs to complete this quest before points are transferred."
-            >
-                {{ requiredQuest.title }}
-                <span v-if="requiredQuest.amount" class="me-1">[{{ requiredQuest.amount }}]</span>
-                <span v-if="quest.amountInvitee" class="text-accent">+ {{ quest.amountInvitee }}</span>
-            </BaseFormGroup>
-        </template>
+        <BaseFormGroup
+            label="Requirements"
+            tooltip="The invitee needs to complete this quest before points are transferred to both parties."
+        >
+            {{ requiredQuest.title }}
+            <span v-if="requiredQuest.amount" class="me-1">[{{ requiredQuest.amount }}]</span>
+            <span v-if="quest.amountInvitee" class="text-accent">+ {{ quest.amountInvitee }}</span>
+        </BaseFormGroup>
     </BaseCardQuest>
 </template>
 
@@ -70,6 +78,7 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useQuestStore),
         inviteUrl(): string {
+            if (!this.quest.codes.length) return '';
             return WIDGET_URL + `/i/${this.quest.codes[0].code}`;
         },
         isDisabled() {
@@ -77,6 +86,9 @@ export default defineComponent({
         },
         requiredQuest() {
             return this.questStore.quests.find((q) => q._id === this.quest.requiredQuest.questId) as TBaseQuest;
+        },
+        isAlertInviteURLShown() {
+            return !this.accountStore.isAuthenticated;
         },
     },
     methods: {

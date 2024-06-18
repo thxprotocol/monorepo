@@ -1,8 +1,10 @@
 <template>
     <template v-if="invite">
-        <b-modal v-model="isShown" centered>
-            <template #title>
-                You have been invited by <strong>{{ invite.account.username }}!</strong>
+        <b-modal v-model="isShown" centered no-close-on-backdrop no-close-on-esc>
+            <template #header>
+                <b-card-title class="text-accent">
+                    Hi!👋 You have been invited by <strong>{{ invite.account.username }}!</strong>
+                </b-card-title>
             </template>
             <b-alert v-model="isAlertErrorShown">
                 <i class="fas fa-exclamation-circle me-1" />
@@ -11,22 +13,25 @@
             <span v-if="invite">
                 <b-alert v-model="isAlertPrimaryShown" variant="primary" class="p-2">
                     <i class="fas fa-exclamation-circle mx-2"></i>
-                    Hi!👋 Complete the <strong>"{{ invite.requiredQuest.title }}"</strong> quest.
+                    Complete the <strong>"{{ invite.requiredQuest.title }}"</strong> quest
                     <strong>{{ invite.requiredQuest.amount }}</strong>
                 </b-alert>
                 <ul class="m-0">
                     <li>
-                        <strong>{{ invite.account.username }}</strong> will earn
-                        <strong class="text-accent">{{ invite.quest.amount }}</strong> points<br />
-                    </li>
-                    <li>
                         You earn
                         <strong class="text-accent">{{ invite.quest.amountInvitee }}</strong> bonus points
+                    </li>
+                    <li>
+                        <strong>{{ invite.account.username }}</strong> will earn
+                        <strong class="text-accent">{{ invite.quest.amount }}</strong> points<br />
                     </li>
                 </ul>
             </span>
             <template #footer>
-                <b-button variant="success" class="w-100"> Continue </b-button>
+                <b-button v-if="!accountStore.isAuthenticated" variant="success" class="w-100" @click="onClickSignin">
+                    Sign In
+                </b-button>
+                <b-button v-else :to="`/c/${invite.quest.poolId}`" variant="success" class="w-100"> Continue </b-button>
             </template>
         </b-modal>
     </template>
@@ -66,6 +71,12 @@ export default defineComponent({
         } finally {
             this.isLoading = false;
         }
+    },
+    methods: {
+        onClickSignin() {
+            if (!this.invite) return;
+            this.authStore.signin({ poolId: this.invite.quest.poolId, inviteCode: this.$route.params.code });
+        },
     },
 });
 </script>
