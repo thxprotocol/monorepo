@@ -96,7 +96,7 @@ export default defineComponent({
             return this.questStore.quests;
         },
         rewards() {
-            const blacklist = [''];
+            const blacklist = ['66670a9f2a21f23e65dbc1b1'];
             return this.rewardStore.rewards.filter((r) => !blacklist.includes(r._id));
         },
     },

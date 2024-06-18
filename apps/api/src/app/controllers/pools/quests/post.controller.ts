@@ -1,6 +1,5 @@
 import { body, param } from 'express-validator';
 import { Request, Response } from 'express';
-import { isValidUrl } from '@thxnetwork/api/util/url';
 import { ChainId } from '@thxnetwork/common/enums';
 import { isAddress } from 'web3-utils';
 import { defaults } from '@thxnetwork/api/util/validation';
@@ -21,13 +20,14 @@ const validationBaseQuest = [
         .customSanitizer((amounts) => JSON.parse(amounts)),
     body('eventName').optional().isString(),
     // Invite
-    body('successUrl')
+    body('amountInvitee').optional().isNumeric(),
+    body('requiredQuest.questId').optional().isMongoId(),
+    body('requiredQuest.variant').optional().isInt(),
+    body('requiredQuest')
         .optional()
-        .custom((value) => {
-            if (value === '' || isValidUrl(value)) return true;
-            return false;
+        .customSanitizer((quest) => {
+            return quest && JSON.parse(quest);
         }),
-    body('isMandatoryReview').optional().isBoolean(),
     // Social
     body('kind').optional().isString(),
     body('interaction').optional().isNumeric(),

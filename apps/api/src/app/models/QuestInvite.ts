@@ -10,7 +10,7 @@ export const QuestInvite = mongoose.model<QuestInviteDocument>(
             ...(questSchema as any),
             amount: Number,
             amountInvitee: Number,
-            requiredQuests: { type: [{ questId: String, variant: Number }], default: [] },
+            requiredQuest: { questId: String, variant: Number },
         },
         { timestamps: true },
     ),

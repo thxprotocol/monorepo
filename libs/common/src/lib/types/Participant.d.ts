@@ -8,5 +8,7 @@ type TParticipant = {
     questEntryCount: number;
     isSubscribed: boolean;
     balance: number;
+    invitedBySub: string;
+    createdAt: Date;
     updatedAt: Date;
 };

@@ -40,10 +40,7 @@
                 </template>
             </b-button>
             <b-button v-else variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickComplete">
-                <template v-if="isSubmitting">
-                    <b-spinner small></b-spinner>
-                    Adding points...
-                </template>
+                <b-spinner v-if="isSubmitting" small />
                 <template v-else-if="quest.amount">
                     Claim <strong>{{ quest.amount }} points</strong>
                 </template>

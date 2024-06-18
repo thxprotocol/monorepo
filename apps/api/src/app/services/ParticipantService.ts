@@ -2,9 +2,9 @@ import { Document } from 'mongoose';
 import { Participant, Pool, TwitterUser } from '../models';
 import { AccessTokenKind } from '@thxnetwork/common/enums';
 import { DiscordUser } from '../models/DiscordUser';
+import { logger } from '../util/logger';
 import ReCaptchaService from '@thxnetwork/api/services/ReCaptchaService';
 import AnalyticsService from './AnalyticsService';
-import { logger } from '../util/logger';
 
 export default class ParticipantService {
     static async decorate(

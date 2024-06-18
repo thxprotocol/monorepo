@@ -1,5 +1,5 @@
 import { AUTH_URL } from '@thxnetwork/api/config/secrets';
-import { Brand, Pool, Widget } from '@thxnetwork/api/models';
+import { Brand, Pool, QRCodeEntry, RewardNFT, Widget } from '@thxnetwork/api/models';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { Request, Response } from 'express';
 import { param } from 'express-validator';
@@ -14,8 +14,11 @@ const controller = async (req: Request, res: Response) => {
     if (!pool) throw new NotFoundError('Pool not found');
 
     const brand = await Brand.findOne({ poolId: req.params.id });
+    const nftRewards = await RewardNFT.find({ poolId: req.params.id }).distinct('_id');
+    const qrCodeEntries = await QRCodeEntry.find({ rewardId: { $in: nftRewards } });
 
     res.json({
+        isQRCodeCampaign: !!qrCodeEntries.length,
         title: pool.settings.title,
         description: pool.settings.description,
         logoUrl: brand ? brand.logoImgUrl : AUTH_URL + '/img/logo-padding.png',

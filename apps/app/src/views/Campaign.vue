@@ -58,15 +58,12 @@ export default defineComponent({
         // This redirects the user to the wallet if there are no quest and rewards
         redirect() {
             const basePath = `/c/${this.accountStore.config.slug}`;
-            const isQuestCampaign =
-                (!this.questStore.isLoading && this.questStore.quests.length) ||
-                (!this.rewardStore.isLoading && this.rewardStore.rewards.length);
+            const isQuestCampaign = !this.accountStore.config.isQRCodeCampaign;
 
             // Skip redirect for regular campaigns and the NFT collect page
             if (isQuestCampaign || this.$route.name === 'collect') return;
 
             if (this.accountStore.isAuthenticated === null) {
-                debugger;
                 return this.$router.push(`${basePath}/about`);
             }
 

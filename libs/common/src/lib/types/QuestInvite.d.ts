@@ -1,8 +1,11 @@
 type TQuestInvite = TBaseQuest & {
     amount: number;
     amountInvitee: number;
-    requiredQuests: { questId: string; variant: TQuest }[];
+    requiredQuest: { questId: string; variant: QuestVariant };
+    codes: TQuestInviteCode[];
 };
+
+type TInvitee = { username: string; createdAt: Date };
 
 type TQuestInviteCode = {
     questId: string;

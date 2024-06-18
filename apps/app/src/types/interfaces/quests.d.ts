@@ -76,11 +76,6 @@ type TQuestCustom = TBaseQuest & {
     events: TEvent[];
 };
 
-type TQuestInvite = TBaseQuest & {
-    pathname: string;
-    referralUrl?: string;
-};
-
 type TQuestDaily = TBaseQuest & {
     amounts: number[];
     entries: TDailyRewardClaim[];

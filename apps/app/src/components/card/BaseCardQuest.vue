@@ -142,6 +142,7 @@ export default defineComponent({
             isVisible: false,
             iconMap: {
                 [QuestVariant.Daily]: 'fas fa-calendar',
+                [QuestVariant.Invite]: 'fas fa-comments',
                 [QuestVariant.Discord]: 'fab fa-discord',
                 [QuestVariant.Twitter]: 'fab fa-twitter',
                 [QuestVariant.YouTube]: 'fab fa-youtube',

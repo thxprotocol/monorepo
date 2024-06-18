@@ -59,6 +59,7 @@ export const useQuestStore = defineStore('quest', {
                 [QuestVariant.Twitter]: questEntrySocialDetails,
                 [QuestVariant.YouTube]: questEntrySocialDetails,
                 [QuestVariant.Discord]: questEntrySocialDetails,
+                [QuestVariant.Invite]: { apiKey: 'invite', eventKey: 'invite quest entry', callback },
                 [QuestVariant.Web3]: { apiKey: 'web3', eventKey: 'web3 quest entry', callback },
                 [QuestVariant.Custom]: {
                     apiKey: 'custom',

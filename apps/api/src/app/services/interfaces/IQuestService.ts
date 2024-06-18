@@ -9,7 +9,16 @@ import QuestGitcoinService from '../QuestGitcoinService';
 import QuestWeb3Service from '../QuestWeb3Service';
 import QuestWebhookService from '../QuestWebhookService';
 import { QuestVariant } from '@thxnetwork/common/enums';
+import { PoolDocument } from '@thxnetwork/api/models';
 
+export interface IInviteService extends IQuestService {
+    assertQuestEntry(options: {
+        pool: PoolDocument;
+        quest: TQuest;
+        entry: TQuestEntry;
+        account: TAccount;
+    }): Promise<void>;
+}
 export interface IQuestService {
     models: { quest: Model<TQuest>; entry: Model<TQuestEntry> };
     decorate(options: { quest: TQuest; account?: TAccount; data: Partial<TQuestEntry> }): Promise<TQuest>;

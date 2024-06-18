@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { agenda } from '../util/agenda';
 import { logger } from '../util/logger';
 import { Job } from '@hokify/agenda';
-import { serviceMap } from './interfaces/IQuestService';
+import { IInviteService, serviceMap } from './interfaces/IQuestService';
 import { tokenInteractionMap } from './maps/quests';
 import { NODE_ENV } from '../config/secrets';
 import PoolService from './PoolService';
@@ -16,6 +16,7 @@ import AccountProxy from '../proxies/AccountProxy';
 import ParticipantService from './ParticipantService';
 import THXService from './THXService';
 
+const InviteService = serviceMap[QuestVariant.Invite] as IInviteService;
 export default class QuestService {
     static async count({ poolId }) {
         const variants = Object.keys(QuestVariant).filter((v) => !isNaN(Number(v)));
@@ -34,38 +35,40 @@ export default class QuestService {
         const callback: any = async (variant: QuestVariant) => {
             const Quest = serviceMap[variant].models.quest;
             const quests = await Quest.find({
-                poolId: pool._id,
-                variant,
+                poolId: pool.id,
                 isPublished: true,
                 $or: [
                     // Include quests with expiryDate less than or equal to now
                     { expiryDate: { $exists: true, $gte: new Date() } },
                     // Include quests with no expiryDate
                     { expiryDate: { $exists: false } },
+                    { expiryDate: null },
                 ],
             });
 
-            return await Promise.all(
-                quests.map(async (q) => {
-                    try {
-                        const quest = q.toJSON() as TQuest;
-                        const decorated = await serviceMap[variant].decorate({ quest, account, data });
-                        const isLocked = await LockService.getIsLocked(quest.locks, account);
-                        const isExpired = this.isExpired(quest);
-                        const QuestEntry = serviceMap[variant].models.entry;
-                        const distinctSubs = await QuestEntry.countDocuments({ questId: q.id }).distinct('sub');
-                        return {
-                            ...decorated,
-                            entryCount: distinctSubs.length,
-                            author: { username: author.username },
-                            isLocked,
-                            isExpired,
-                        };
-                    } catch (error) {
-                        logger.error(error);
-                    }
-                }),
-            );
+            return (
+                await Promise.all(
+                    quests.map(async (q) => {
+                        try {
+                            const quest = q.toJSON() as TQuest;
+                            const decorated = await serviceMap[variant].decorate({ quest, account, data });
+                            const isLocked = await LockService.getIsLocked(quest.locks, account);
+                            const isExpired = this.isExpired(quest);
+                            const QuestEntry = serviceMap[variant].models.entry;
+                            const distinctSubs = await QuestEntry.countDocuments({ questId: q.id }).distinct('sub');
+                            return {
+                                ...decorated,
+                                entryCount: distinctSubs.length,
+                                author: { username: author.username },
+                                isLocked,
+                                isExpired,
+                            };
+                        } catch (error) {
+                            logger.error(error);
+                        }
+                    }),
+                )
+            ).filter((result) => !!result);
         };
 
         return await Promise.all(questVariants.map(callback));
@@ -215,7 +218,10 @@ export default class QuestService {
             } as TQuestEntry);
             if (!entry) throw new Error('Entry creation failed.');
 
-            // Should make sure quest entry is properly created
+            // Assert if a required quest for invite quests has been completed
+            await InviteService.assertQuestEntry({ pool, quest, entry, account });
+
+            // Add points to participant balance
             await PointBalanceService.add(pool, account, amount);
 
             // Update participant ranks async
