@@ -52,7 +52,7 @@ export const useAuthStore = defineStore('auth', {
             this.user = user;
             this.isModalLoginShown = false;
         },
-        signin(extraQueryParams?: { [key: string]: any }) {
+        signin(extraQueryParams: { [key: string]: any } = {}, state = {}) {
             const { poolId, config, isMobileDevice } = useAccountStore();
             const { entry } = useQRCodeStore();
             const returnUrl = window.location.href;
@@ -63,6 +63,7 @@ export const useAuthStore = defineStore('auth', {
                     returnUrl,
                     client_id: CLIENT_ID,
                     origin: config.origin,
+                    ...state,
                 },
                 extraQueryParams: {
                     return_url: returnUrl,

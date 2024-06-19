@@ -4,6 +4,8 @@ import { QuestInviteCode, QuestInviteCodeDocument } from '../models/QuestInviteC
 import { serviceMap } from './interfaces/IQuestService';
 import PointBalanceService from './PointBalanceService';
 import AccountProxy from '../proxies/AccountProxy';
+import { logger } from '../util/logger';
+import MailService from './MailService';
 
 export default class QuestInviteService implements IQuestService {
     models = {
@@ -36,7 +38,11 @@ export default class QuestInviteService implements IQuestService {
         };
     }
 
-    async isAvailable(options: {
+    async isAvailable({
+        quest,
+        account,
+        data,
+    }: {
         quest: TQuestInvite;
         account?: TAccount;
         data: Partial<TQuestInviteEntry>;
@@ -44,8 +50,10 @@ export default class QuestInviteService implements IQuestService {
         return { result: true, reason: '' };
     }
 
-    async getAmount({ quest }: { quest: TQuestInvite; account: TAccount }): Promise<number> {
-        return quest.amount;
+    async getAmount({ quest, account }: { quest: TQuestInvite; account: TAccount }): Promise<number> {
+        const entries = await this.getEntries({ quest, account });
+        if (!account || !entries.length) return quest.amount;
+        return entries.length * quest.amount;
     }
 
     async getValidationResult(options: {
@@ -75,29 +83,51 @@ export default class QuestInviteService implements IQuestService {
         entry: TQuestEntry;
         account: TAccount;
     }) {
-        // Return early if participant has not been invited
-        const participant = await Participant.findOne({ poolId: quest.poolId, sub: account.sub });
-        if (!participant.invitedBySub) return;
-
         // Return early if no QuestInvite for this poolId
         const inviteQuests = await QuestInvite.find({ poolId: entry.poolId });
         if (!inviteQuests.length) return;
 
+        // Return early if participant has not been invited
+        const participant = await Participant.findOne({ poolId: quest.poolId, sub: account.sub });
+        if (!participant.inviteCode) return;
+
         // Iterate over invite quests and assert if all quests for this invite quests have been completed
         for (const inviteQuest of inviteQuests) {
             const Entry = serviceMap[inviteQuest.requiredQuest.variant].models.entry;
-            const questEntry = await Entry.findOne({ questId: inviteQuest.requiredQuest.questId, sub: account.sub });
-            if (!questEntry) continue;
+            const requiredQuestEntry = await Entry.findOne({
+                questId: inviteQuest.requiredQuest.questId,
+                sub: account.sub,
+            });
+            if (!requiredQuestEntry) continue;
 
             // Transfer points to inviter
-            const inviter = await AccountProxy.findById(participant.invitedBySub);
-            if (!inviter) throw new Error('Inviter not found');
+            const code = await QuestInviteCode.findOne({ code: participant.inviteCode });
+            if (!code) {
+                logger.error('Invite code not found');
+                return;
+            }
+            const inviter = await AccountProxy.findById(code.sub);
+            if (!inviter) {
+                logger.error('Inviter not found');
+                return;
+            }
 
-            // Update entry for invites
-            // Update entry for invitee
+            // Send notification to inviter
+            await MailService.send(
+                inviter.email,
+                'Invite Quest Completed',
+                `Your invitee ${account.username} has completed the required quest. You have earned ${inviteQuest.amount} points.`,
+            );
+
+            // Create entry for invitee
+            await QuestInviteEntry.create({
+                questId: inviteQuest.id,
+                inviteCodeId: code.id,
+                sub: account.sub,
+            });
 
             // Transfer points to invitee
-            await PointBalanceService.add(pool, inviter, inviteQuest.amount);
+            // await PointBalanceService.add(pool, inviter, inviteQuest.amount);
             await PointBalanceService.add(pool, account, inviteQuest.amountInvitee);
         }
     }
@@ -115,6 +145,17 @@ export default class QuestInviteService implements IQuestService {
             questId: String(quest._id),
             sub: account.sub,
             code,
+        });
+    }
+
+    // Get all entries created through a code owned by the account
+    private async getEntries({ quest, account }: { quest: TQuestInvite; account: TAccount }) {
+        const codes = await this.getCodes({ quest, account });
+        const inviteCodeIds = codes.map(({ _id }) => String(_id));
+
+        return await QuestInviteEntry.find({
+            questId: String(quest._id),
+            inviteCodeId: { $in: inviteCodeIds },
         });
     }
 

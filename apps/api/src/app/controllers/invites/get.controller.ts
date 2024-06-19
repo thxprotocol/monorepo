@@ -4,6 +4,9 @@ import { Participant, QuestInvite, QuestInviteCode } from '@thxnetwork/api/model
 import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 import QuestService from '@thxnetwork/api/services/QuestService';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
+import PoolService from '@thxnetwork/api/services/PoolService';
+import { id } from 'date-fns/locale';
+import BrandService from '@thxnetwork/api/services/BrandService';
 
 const validation = [param('code').isString()];
 
@@ -13,6 +16,9 @@ const controller = async (req: Request, res: Response) => {
 
     const quest = await QuestInvite.findById(code.questId);
     if (!quest) throw new NotFoundError('Quest not found');
+
+    const pool = await PoolService.getById(quest.poolId);
+    if (!pool) throw new NotFoundError('Campaign not found');
 
     const { variant, questId } = quest.requiredQuest;
     const requiredQuest = await QuestService.findById(variant, questId);
@@ -24,6 +30,8 @@ const controller = async (req: Request, res: Response) => {
     const participant = await Participant.findOne({ poolId: quest.poolId, sub: account.sub });
     if (!participant) throw new NotFoundError('Inviter is not a campaign participant');
 
+    const brand = await BrandService.get(pool.id);
+
     res.json({
         quest,
         requiredQuest,
@@ -31,6 +39,12 @@ const controller = async (req: Request, res: Response) => {
         account: {
             username: account.username,
             rank: participant.rank,
+        },
+        campaign: {
+            id: pool.id,
+            title: pool.settings.title,
+            slug: pool.settings.slug,
+            image: brand ? brand.backgroundImgUrl : '',
         },
     });
 };

@@ -7,6 +7,7 @@ export const Participant = mongoose.model<ParticipantDocument>(
     new mongoose.Schema(
         {
             sub: String,
+            inviteCode: String,
             poolId: String,
             balance: { type: Number, default: 0 },
             rank: Number,
@@ -14,7 +15,6 @@ export const Participant = mongoose.model<ParticipantDocument>(
             questEntryCount: Number,
             riskAnalysis: { score: Number, reasons: [String] },
             isSubscribed: { type: Boolean, default: false },
-            invitedBySub: String,
         },
         { timestamps: true },
     ),

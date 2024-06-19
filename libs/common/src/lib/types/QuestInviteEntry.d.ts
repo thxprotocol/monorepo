@@ -1,6 +1,6 @@
 type TQuestInviteEntry = {
     questId: string;
+    inviteCodeId: string;
     sub: string;
-    code: string;
     amount: string;
 };

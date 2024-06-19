@@ -14,7 +14,10 @@ import { logger } from '../util/logger';
 const mailTemplatePath = path.join(assetsPath, 'views', 'email');
 
 const send = async (to: string, subject: string, htmlContent: string, link = { src: '', text: '' }) => {
-    if (!to) return;
+    if (!to) {
+        logger.error({ message: 'No recipient e-mail address provided', subject });
+        return;
+    }
 
     const html = await ejs.renderFile(
         path.join(mailTemplatePath, 'base-template.ejs'),

@@ -51,6 +51,15 @@
             <span v-if="requiredQuest.amount" class="me-1">[{{ requiredQuest.amount }}]</span>
             <span v-if="quest.amountInvitee" class="text-accent">+ {{ quest.amountInvitee }}</span>
         </BaseFormGroup>
+
+        <template #button>
+            <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClick">
+                <b-spinner v-if="isSubmitting" small></b-spinner>
+                <template v-else>
+                    Claim <strong>{{ quest.amount }} points</strong>
+                </template>
+            </b-button>
+        </template>
     </BaseCardQuest>
 </template>
 
@@ -99,6 +108,7 @@ export default defineComponent({
                 await this.questStore.completeQuest(this.quest);
                 this.isModalQuestEntryShown = false;
             } catch (error) {
+                console.error(error);
                 this.error = String(error);
             } finally {
                 this.isSubmitting = false;

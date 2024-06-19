@@ -7,8 +7,8 @@ export const QuestInviteEntry = mongoose.model<QuestInviteEntryDocument>(
     new mongoose.Schema(
         {
             questId: String,
+            inviteCodeId: String,
             sub: String,
-            code: String,
             amount: String,
         },
         { timestamps: true },

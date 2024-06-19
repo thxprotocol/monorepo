@@ -173,7 +173,7 @@ export default class QuestService {
         );
 
         // Defaults: 0.1, 0.3, 0.7 and 0.9. Ranges from 0 (Bot) to 1 (User)
-        if (riskAnalysis.score >= 0.9) {
+        if (riskAnalysis.score >= 0.7) {
             return { result: true, reasons: '' };
         }
 
