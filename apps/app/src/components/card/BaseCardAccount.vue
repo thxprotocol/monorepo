@@ -5,24 +5,21 @@
             style="border-radius: 5px; background-color: rgba(0, 0, 0, 0.35); width: 100%"
         >
             <template v-if="accountStore.account">
-                <b-link
-                    class="rounded-circle position-relative gradient-border-xl"
-                    @click="accountStore.isModalAccountShown = true"
-                >
+                <b-link class="rounded-circle position-relative" @click="accountStore.isModalAccountShown = true">
                     <b-avatar size="50" :src="accountStore.account.profileImg" variant="dark" />
                     <b-button
-                        variant="light"
+                        variant="primary"
                         size="sm"
                         class="d-flex align-items-center justify-content-center position-absolute rounded-circle"
                         style="width: 19px; height: 19px; top: 35px; right: -5px"
                     >
-                        <i class="fas fa-pencil text-primary" style="font-size: 0.6rem" />
+                        <i class="fas fa-pencil" style="font-size: 0.6rem" />
                     </b-button>
                 </b-link>
-                <div class="ps-3 flex-grow-1" style="min-width: 200px">
-                    <h3 class="text-white mb-0">
+                <div class="d-flex pt-2 align-items-center flex-wrap ps-3 flex-grow-1" style="min-width: 200px">
+                    <div class="h4 text-white w-100 mb-0">
                         {{ accountStore.account.username }}
-                    </h3>
+                    </div>
                     <div class="d-flex align-items-center justify-content-between">
                         <BaseDropdownWallets />
                     </div>
