@@ -1,12 +1,15 @@
 .b-tooltip {
+    opacity: 1 !important;
+
     .tooltip-arrow:before {
-        border-top-color: $primary !important;
+        border-top-color: var(--bs-primary) !important;
     }
+    
     .tooltip-inner {
         max-width: 280px;
-        background-color: $primary;
+        background-color: var(--bs-primary) !important;
         text-align: left;
         padding: .75rem;
-        color: $light
+        color: var(--bs-body-color) !important;      
     }
 }
