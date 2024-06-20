@@ -12,13 +12,9 @@ import { QuestVariant } from '@thxnetwork/common/enums';
 import { PoolDocument } from '@thxnetwork/api/models';
 
 export interface IInviteService extends IQuestService {
-    assertQuestEntry(options: {
-        pool: PoolDocument;
-        quest: TQuest;
-        entry: TQuestEntry;
-        account: TAccount;
-    }): Promise<void>;
+    assertQuestEntry(options: { pool: PoolDocument; quest: TQuest; account: TAccount }): Promise<void>;
 }
+
 export interface IQuestService {
     models: { quest: Model<TQuest>; entry: Model<TQuestEntry> };
     decorate(options: { quest: TQuest; account?: TAccount; data: Partial<TQuestEntry> }): Promise<TQuest>;

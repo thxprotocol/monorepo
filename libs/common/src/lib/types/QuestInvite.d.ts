@@ -2,6 +2,7 @@ type TQuestInvite = TBaseQuest & {
     amount: number;
     amountInvitee: number;
     requiredQuest: { questId: string; variant: QuestVariant };
+    uses: number;
     codes: TQuestInviteCode[];
 };
 

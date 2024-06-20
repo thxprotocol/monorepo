@@ -29,7 +29,7 @@
                 </ul>
             </span>
             <template #footer>
-                <b-button v-if="!accountStore.isAuthenticated" variant="success" class="w-100" @click="onClickSignin">
+                <b-button v-if="!accountStore.isAuthenticated" variant="primary" class="w-100" @click="onClickSignin">
                     Sign in <i class="fas fa-chevron-right ms-2" />
                 </b-button>
                 <b-button v-else :to="campaignPath" variant="success" class="w-100">

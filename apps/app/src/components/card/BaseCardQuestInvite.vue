@@ -8,6 +8,10 @@
         :error="error"
         @modal-close="isModalQuestEntryShown = false"
     >
+        <b-alert v-model="isAlertInviteLinkUsesShown" class="p-2" variant="primary">
+            <i class="fas fa-sparkles mx-2" />
+            Your Invite Link has been used <strong>{{ quest.uses }} {{ quest.uses > 1 ? 'times' : 'time' }}!</strong>
+        </b-alert>
         <BaseFormGroup label="Your Invite Link" tooltip="Your Invite Link ">
             <template v-if="inviteUrl">
                 <b-input-group>
@@ -44,7 +48,7 @@
         -->
 
         <BaseFormGroup
-            label="Requirements"
+            label="Invitee Requirement"
             tooltip="The invitee needs to complete this quest before points are transferred to both parties."
         >
             {{ requiredQuest.title }}
@@ -53,7 +57,7 @@
         </BaseFormGroup>
 
         <template #button>
-            <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClick">
+            <b-button variant="primary" block class="w-100" :disabled="isDisabled" @click="onClick">
                 <b-spinner v-if="isSubmitting" small></b-spinner>
                 <template v-else>
                     Claim <strong>{{ quest.amount }} points</strong>
@@ -86,12 +90,15 @@ export default defineComponent({
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
         ...mapStores(useQuestStore),
+        isAlertInviteLinkUsesShown() {
+            return !!this.quest.uses;
+        },
         inviteUrl(): string {
             if (!this.quest.codes.length) return '';
             return WIDGET_URL + `/i/${this.quest.codes[0].code}`;
         },
         isDisabled() {
-            return false;
+            return this.isSubmitting || !this.quest.amount;
         },
         requiredQuest() {
             return this.questStore.quests.find((q) => q._id === this.quest.requiredQuest.questId) as TBaseQuest;

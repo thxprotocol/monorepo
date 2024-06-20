@@ -208,6 +208,9 @@ export default class QuestService {
             const isAvailable = await this.isAvailable(variant, { quest, account, data });
             if (!isAvailable.result) throw new Error(isAvailable.reason);
 
+            // Assert if a required quest for invite quests has been completed
+            await InviteService.assertQuestEntry({ pool, quest, account });
+
             // Create the quest entry
             const entry = await Entry.create({
                 ...data,
@@ -218,9 +221,6 @@ export default class QuestService {
                 uuid: v4(),
             } as TQuestEntry);
             if (!entry) throw new Error('Entry creation failed.');
-
-            // Assert if a required quest for invite quests has been completed
-            await InviteService.assertQuestEntry({ pool, quest, entry, account });
 
             // Add points to participant balance
             await PointBalanceService.add(pool, account, amount);

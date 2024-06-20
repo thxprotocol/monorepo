@@ -7,9 +7,12 @@ export const QuestInviteEntry = mongoose.model<QuestInviteEntryDocument>(
     new mongoose.Schema(
         {
             questId: String,
-            inviteCodeId: String,
             sub: String,
             amount: String,
+            metadata: {
+                code: String,
+                inviter: String,
+            },
         },
         { timestamps: true },
     ),
