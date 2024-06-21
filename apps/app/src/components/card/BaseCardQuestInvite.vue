@@ -112,8 +112,8 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
+                this.isModalQuestEntryShown = true;
                 await this.questStore.completeQuest(this.quest);
-                this.isModalQuestEntryShown = false;
             } catch (error) {
                 console.error(error);
                 this.error = String(error);
