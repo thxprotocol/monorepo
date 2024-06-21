@@ -21,6 +21,7 @@ export const useAccountStore = defineStore('account', {
         isPreview: false,
         api: null,
         account: null,
+        invite: null,
         balance: 0,
         config: {},
         css: null,
@@ -59,6 +60,10 @@ export const useAccountStore = defineStore('account', {
             const css = getStyles(elements, colors);
             document.title = decodeHTML(title) as string;
             this.css = document.head.appendChild(css);
+        },
+        async getInvite(code: string) {
+            if (this.invite && this.invite.code.code === code) return;
+            this.invite = await this.api.request.get(`/v1/invites/${code}`);
         },
         reset() {
             this.poolId = '';

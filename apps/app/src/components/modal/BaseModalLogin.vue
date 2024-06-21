@@ -110,7 +110,15 @@ export default defineComponent({
         },
         async onClickSignin(variant: AccountVariant) {
             this.isLoading = true;
-            await this.authStore.signin({ auth_variant: variant, auth_email: this.email });
+            await this.authStore.signin(
+                {
+                    auth_variant: variant,
+                    auth_email: this.email,
+                    return_url: window.location.href,
+                    poolId: this.accountStore.poolId,
+                },
+                { inviteCode: this.$route.params.code },
+            );
             this.isLoading = false;
         },
     },

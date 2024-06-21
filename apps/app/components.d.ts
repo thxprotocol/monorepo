@@ -95,6 +95,7 @@ declare module 'vue' {
     BaseModalExternalURL: typeof import('./src/components/modal/BaseModalExternalURL.vue')['default']
     BaseModalIncreaseAmount: typeof import('./src/components/modal/BaseModalIncreaseAmount.vue')['default']
     BaseModalIncreaseLockEnd: typeof import('./src/components/modal/BaseModalIncreaseLockEnd.vue')['default']
+    BaseModalInvite: typeof import('./src/components/modal/BaseModalInvite.vue')['default']
     BaseModalLogin: typeof import('./src/components/modal/BaseModalLogin.vue')['default']
     BaseModalMembershipCreate: typeof import('./src/components/modal/BaseModalMembershipCreate.vue')['default']
     BaseModalQuestEntry: typeof import('./src/components/modal/BaseModalQuestEntry.vue')['default']

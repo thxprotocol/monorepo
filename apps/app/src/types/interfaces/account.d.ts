@@ -48,8 +48,17 @@ type TAccountGlobals = {
     activeWalletId: string;
 };
 
+type TInvite = {
+    account: { username: string };
+    quest: TQuestInvite;
+    code: { code: string };
+    requiredQuest: TBaseQuest;
+    campaign: { title: string; slug: string; id: string; image: string };
+} | null;
+
 type TAccountState = {
     css: HTMLStyleElement | null;
+    invite: TInvite;
     isAuthenticated: boolean | null;
     isIFrame: boolean;
     isMobile: boolean;

@@ -62,7 +62,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore, useQuestStore),
         isRouteRanking() {
-            return this.$route.name !== 'ranking';
+            return !['ranking'].includes(this.$route.name as string);
         },
         participant() {
             return this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
