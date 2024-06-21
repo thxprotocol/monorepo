@@ -49,6 +49,9 @@ import { useAccountStore } from '../../stores/Account';
 import { decode } from 'html-entities';
 
 export default defineComponent({
+    props: {
+        show: Boolean,
+    },
     data() {
         return {
             decode,
@@ -62,7 +65,7 @@ export default defineComponent({
             return this.accountStore.invite;
         },
         isShown() {
-            return true;
+            return this.show;
         },
         campaignPath() {
             return this.invite ? `/c/${this.invite.campaign.slug}` : '';

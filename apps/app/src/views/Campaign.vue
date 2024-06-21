@@ -13,7 +13,7 @@
             <router-view class="order-lg-2 overflow-mobile flex-grow-1" />
         </template>
         <BaseNavbarPrimary :screen-width="screenWidth" />
-        <BaseModalInvite v-if="isModalInviteShown" />
+        <BaseModalInvite :show="isModalInviteShown" />
     </div>
 </template>
 <script lang="ts">
@@ -37,7 +37,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore, useRewardStore),
         isModalInviteShown() {
-            return this.$route.params.code;
+            return !!this.$route.params.code;
         },
     },
     watch: {
