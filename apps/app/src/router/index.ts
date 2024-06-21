@@ -29,8 +29,9 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'inviteRedirect',
                 beforeEnter: async (to, from, next) => {
                     const { code } = to.params;
-                    const accountStore = useAccountStore();
+                    if (!code) return next();
 
+                    const accountStore = useAccountStore();
                     await accountStore.getInvite(code as string);
 
                     next({ name: 'questsInvite', params: { slug: accountStore.invite?.campaign.slug, code } });

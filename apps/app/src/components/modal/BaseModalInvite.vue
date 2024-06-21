@@ -80,7 +80,7 @@ export default defineComponent({
     watch: {
         'accountStore.isAuthenticated': {
             handler: async function (isAuthenticated: boolean) {
-                if (!this.invite) {
+                if (!this.invite && this.$route.params.code) {
                     await this.getInvite();
                 }
                 if (!isAuthenticated) return;
