@@ -16,6 +16,7 @@ import PaymentService from '../services/PaymentService';
 import VoteEscrowService from '../services/VoteEscrowService';
 import ParticipantService from '../services/ParticipantService';
 import NotificationService from '../services/NotificationService';
+import AnalyticsService from '../services/AnalyticsService';
 
 const agenda = new Agenda({
     db: {
@@ -29,6 +30,7 @@ const agenda = new Agenda({
 
 agenda.define(JobType.UpdateCampaignRanks, updateCampaignRanks);
 agenda.define(JobType.UpdateParticipantRanks, (job: Job) => ParticipantService.updateRanksJob(job));
+agenda.define(JobType.UpdateLeaderboard, (job: Job) => AnalyticsService.updateLeaderboardJob(job));
 agenda.define(JobType.UpdatePendingTransactions, updatePendingTransactions);
 agenda.define(JobType.CreateQuestEntry, (job: Job) => QuestService.createEntryJob(job));
 agenda.define(JobType.CreateRewardPayment, (job: Job) => RewardService.createPaymentJob(job));
