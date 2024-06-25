@@ -38,6 +38,7 @@ export class AccountService {
         // Send verification email when changing email
         if (data.email) {
             // Only check if email is different than the current one
+            console.log(data.email, account.email);
             if (data.email !== account.email) {
                 const isUsed = await Account.exists({
                     email: data.email,

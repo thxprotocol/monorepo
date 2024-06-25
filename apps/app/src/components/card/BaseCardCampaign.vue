@@ -106,7 +106,7 @@ import { mapStores } from 'pinia';
 import { useAccountStore } from '@thxnetwork/app/stores/Account';
 
 type TCampaignProps = {
-    id: string;
+    _id: string;
     title: string;
     rank: number;
     slug: string;
@@ -146,7 +146,10 @@ export default defineComponent({
             return this.campaign.domain && new URL(this.campaign.domain).hostname;
         },
         isSubscribed() {
-            return this.accountStore.isAuthenticated && this.accountStore.isSubscribed(this.campaign.id);
+            return this.accountStore.isAuthenticated && this.accountStore.isSubscribed(this.campaign._id);
+        },
+        participant() {
+            return this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
         },
     },
     methods: {
@@ -154,8 +157,23 @@ export default defineComponent({
             this.isLoading = true;
             this.$router.push(path);
         },
-        onClickSubscribe() {
-            debugger;
+        async onClickSubscribe() {
+            if (!this.accountStore.isAuthenticated) return;
+
+            try {
+                this.isLoading = true;
+                await this.accountStore.api.request.patch(`/v1/participants/${this.participant?._id}`, {
+                    data: {
+                        isSubscribed: !this.participant?.isSubscribed,
+                        email: this.accountStore.account ? this.accountStore.account.email : null,
+                    },
+                });
+                await this.accountStore.getParticipants(this.campaign._id);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                this.isLoading = false;
+            }
         },
     },
 });
@@ -170,5 +188,8 @@ export default defineComponent({
     &:hover:before {
         opacity: 0.15;
     }
+}
+.btn .fa-star:hover {
+    color: var(--bs-warning) !important;
 }
 </style>
