@@ -30,8 +30,9 @@ const controller = async (req: Request, res: Response) => {
         }
     }
 
-    // If subscribed is true and email we set the participant flag to true and patch the account
     const account = await AccountProxy.findById(req.auth.sub);
+
+    // If subscribed is true and email we set the participant flag to true and patch the account
     if ([true, false].includes(req.body.isSubscribed)) {
         if (account.email !== req.body.email) {
             try {

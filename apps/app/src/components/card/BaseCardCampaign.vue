@@ -37,7 +37,13 @@
                     <div class="d-flex w-100 mb-2">
                         <div class="d-flex align-items-center">
                             <div class="text-white text-decoration-none lead">{{ campaign.title }}</div>
-                            <b-button size="sm" variant="link" class="px-0 ms-1" @click.stop="onClickSubscribe">
+                            <b-button
+                                :disabled="!accountStore.isAuthenticated"
+                                size="sm"
+                                variant="link"
+                                class="px-0 ms-1"
+                                @click.stop="onClickSubscribe"
+                            >
                                 <i
                                     class="fa-star text-opaque text-white"
                                     :class="{ fas: isSubscribed, far: !isSubscribed }"
@@ -158,8 +164,6 @@ export default defineComponent({
             this.$router.push(path);
         },
         async onClickSubscribe() {
-            if (!this.accountStore.isAuthenticated) return;
-
             try {
                 this.isLoading = true;
                 await this.accountStore.api.request.patch(`/v1/participants/${this.participant?._id}`, {
