@@ -233,7 +233,8 @@ export async function sendWeeklyDigestJob() {
     const endDate = new Date();
     const startDate = subDays(endDate, 7);
     startDate.setHours(0, 0, 0, 0);
-    const dateRange = { startDate, endDate };
+
+    const options = { startDate, endDate };
     const pools = await Pool.find({ 'settings.isWeeklyDigestEnabled': true });
     const subs = pools.map((p) => p.sub);
     const accounts = await AccountProxy.find({ subs });
@@ -255,12 +256,10 @@ export async function sendWeeklyDigestJob() {
                 couponReward,
                 discordRoleReward,
                 galachainReward,
-            } = await AnalyticsService.getPoolMetrics(pool, dateRange);
+            } = await AnalyticsService.getPoolMetrics(pool, options);
 
-            const leaderboard = await PoolService.getLeaderboard(pool, {
-                ...dateRange,
-                limit: 3,
-            });
+            const leaderboardCache = await PoolService.getLeaderboardFromCache(pool, options);
+            const leaderboard = await PoolService.getLeaderboardTop(leaderboardCache, 3);
 
             const entryCount = [dailyQuest, socialQuest, inviteQuest, customQuest, web3Quest, gitcoinQuest].reduce(
                 (acc, entry) => acc + entry.totalCreated,

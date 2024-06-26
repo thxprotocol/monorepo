@@ -30,7 +30,6 @@ const agenda = new Agenda({
 
 agenda.define(JobType.UpdateCampaignRanks, updateCampaignRanks);
 agenda.define(JobType.UpdateParticipantRanks, (job: Job) => ParticipantService.updateRanksJob(job));
-agenda.define(JobType.UpdateLeaderboard, (job: Job) => AnalyticsService.updateLeaderboardJob(job));
 agenda.define(JobType.UpdatePendingTransactions, updatePendingTransactions);
 agenda.define(JobType.CreateQuestEntry, (job: Job) => QuestService.createEntryJob(job));
 agenda.define(JobType.CreateRewardPayment, (job: Job) => RewardService.createPaymentJob(job));
@@ -39,6 +38,7 @@ agenda.define(JobType.SendCampaignReport, () => NotificationService.sendWeeklyDi
 agenda.define(JobType.RequestAttemp, (job: Job) => WebhookService.requestAttemptJob(job));
 agenda.define(JobType.UpdateTwitterLikeCache, (job: Job) => TwitterCacheService.updateLikeCacheJob(job));
 agenda.define(JobType.UpdateTwitterRepostCache, (job: Job) => TwitterCacheService.updateRepostCacheJob(job));
+agenda.define(JobType.UpdateLeaderboard, (job: Job) => AnalyticsService.updateLeaderboardJob(job));
 agenda.define(JobType.UpsertInvoices, () => InvoiceService.upsertJob());
 agenda.define(JobType.UpdatePrices, () => BalancerService.updatePricesJob());
 agenda.define(JobType.UpdateAPR, () => BalancerService.updateMetricsJob());

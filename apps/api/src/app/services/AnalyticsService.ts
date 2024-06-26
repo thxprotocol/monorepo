@@ -40,19 +40,108 @@ import {
     QuestWebhookDocument,
     Pool,
 } from '@thxnetwork/api/models';
-import { agenda } from '../util/agenda';
 import { subWeeks } from 'date-fns';
+import { logger } from '../util/logger';
 
 class AnalyticsService {
     public leaderboards: { [poolId: string]: TLeaderboardEntry[] } = {};
 
     constructor() {
-        agenda.define('createLeaderboard', async (job) => {
-            const { poolId, startDate, endDate, limit } = job.attrs.data;
+        //
+    }
+
+    // Triggered when a quest entry is added
+    async updateLeaderboardJob(job: TJob) {
+        logger.debug('UpdateLeaderboard Start', job.attrs.data);
+        try {
+            const { poolId } = job.attrs.data;
             const pool = await Pool.findById(poolId);
-            const leaderboard = await this.createLeaderboard(pool, { startDate, endDate, limit });
-            this.leaderboards[poolId] = leaderboard;
-        });
+            const endDate = new Date();
+            const startDate = subWeeks(endDate, pool.settings.leaderboardInWeeks);
+            const leaderboard = await this.createLeaderboard(pool, { startDate, endDate });
+
+            this.cacheLeaderboard(poolId, leaderboard);
+        } catch (error) {
+            logger.error('UpdateLeaderboard Failed:', error);
+        }
+    }
+
+    cacheLeaderboard(poolId: string, leaderboard: TLeaderboardEntry[]) {
+        this.leaderboards[poolId] = leaderboard;
+    }
+
+    async createLeaderboard(pool: PoolDocument, options?: { startDate: Date; endDate: Date }) {
+        const collections = [
+            QuestDailyEntry,
+            QuestSocialEntry,
+            QuestInviteEntry,
+            QuestCustomEntry,
+            QuestWeb3Entry,
+            QuestGitcoinEntry,
+            QuestWebhookEntry,
+        ];
+
+        // Extend the $match filter with optional dateRange
+        const $match = { poolId: pool.id };
+        if (options) {
+            $match['createdAt'] = { $gte: options.startDate, $lte: options.endDate };
+        }
+
+        let result = [];
+        const chunkSize = 1000;
+        for (const Model of collections) {
+            let chunk = [];
+            let skip = 0;
+            let currentChunk;
+
+            do {
+                currentChunk = await Model.aggregate([
+                    { $match },
+                    {
+                        $group: {
+                            _id: '$sub',
+                            questEntryCount: { $sum: 1 },
+                            score: { $sum: { $convert: { input: '$amount', to: 'int' } } },
+                        },
+                    },
+                    { $skip: skip },
+                    { $limit: chunkSize },
+                ]);
+
+                chunk = chunk.concat(currentChunk);
+                skip += chunkSize;
+            } while (currentChunk.length === chunkSize);
+
+            result = result.concat(chunk);
+        }
+
+        // Combine results from all collections and calculate overall totals
+        const totals = {};
+        for (const r of result) {
+            if (!r) continue;
+            if (totals[r._id]) {
+                totals[r._id].questEntryCount += r.questEntryCount;
+                totals[r._id].score += r.score;
+            } else {
+                totals[r._id] = {
+                    questEntryCount: r.questEntryCount,
+                    score: r.score,
+                };
+            }
+        }
+        // Add participant data to leaderboard
+        const subs = Object.keys(totals);
+        const participants = await Participant.find({ poolId: pool.id, sub: { $in: subs } });
+        const leaderboard = participants
+            .map((p) => ({
+                sub: p.sub,
+                score: totals[p.sub].score || 0,
+                questEntryCount: totals[p.sub].questEntryCount || 0,
+            }))
+            .filter((entry) => entry.score > 0)
+            .sort((a: any, b: any) => b.score - a.score);
+
+        return leaderboard;
     }
 
     async getPoolAnalyticsForChart(pool: PoolDocument, startDate: Date, endDate: Date) {
@@ -359,82 +448,6 @@ class AnalyticsService {
         };
     }
 
-    async createLeaderboard(pool: PoolDocument, options?: { startDate: Date; endDate: Date; limit: number }) {
-        const collections = [
-            QuestDailyEntry,
-            QuestSocialEntry,
-            QuestInviteEntry,
-            QuestCustomEntry,
-            QuestWeb3Entry,
-            QuestGitcoinEntry,
-            QuestWebhookEntry,
-        ];
-
-        // Extend the $match filter with optional dateRange
-        const $match = { poolId: pool.id };
-        if (options) {
-            $match['createdAt'] = { $gte: options.startDate, $lte: options.endDate };
-        }
-
-        let result = [];
-        const chunkSize = 1000;
-        for (const Model of collections) {
-            let chunk = [];
-            let skip = 0;
-            let currentChunk;
-
-            do {
-                currentChunk = await Model.aggregate([
-                    { $match },
-                    {
-                        $group: {
-                            _id: '$sub',
-                            questEntryCount: { $sum: 1 },
-                            score: { $sum: { $convert: { input: '$amount', to: 'int' } } },
-                        },
-                    },
-                    { $skip: skip },
-                    { $limit: chunkSize },
-                ]);
-
-                chunk = chunk.concat(currentChunk);
-                skip += chunkSize;
-            } while (currentChunk.length === chunkSize);
-
-            result = result.concat(chunk);
-        }
-
-        // Combine results from all collections and calculate overall totals
-        const totals = {};
-        for (const collectionResults of result) {
-            for (const r of collectionResults) {
-                if (!r) continue;
-                if (totals[r._id]) {
-                    totals[r._id].questEntryCount += r.questEntryCount;
-                    totals[r._id].score += r.score;
-                } else {
-                    totals[r._id] = {
-                        questEntryCount: r.questEntryCount,
-                        score: r.score,
-                    };
-                }
-            }
-        }
-
-        const subs = Object.keys(totals);
-        const participants = await Participant.find({ poolId: pool.id, sub: { $in: subs } });
-        const leaderboard = participants
-            .map((p) => ({
-                sub: p.sub,
-                score: totals[p.sub].score || 0,
-                questEntryCount: totals[p.sub].questEntryCount || 0,
-            }))
-            .filter((entry) => entry.score > 0)
-            .sort((a: any, b: any) => b.score - a.score);
-
-        return leaderboard;
-    }
-
     async queryQuestEntries<T>(args: {
         model: mongoose.Model<T>;
         poolId: string;
@@ -575,16 +588,6 @@ class AnalyticsService {
         ]);
 
         return queryResult;
-    }
-
-    // Shoudl be triggered when quest entry is added
-    async updateLeaderboardJob(job: TJob) {
-        for (const pool of await Pool.find()) {
-            const endDate = new Date();
-            const startDate = subWeeks(endDate, pool.settings.leaderboardInWeeks);
-
-            await this.createLeaderboard(pool, { startDate, endDate, limit: 10 });
-        }
     }
 }
 
