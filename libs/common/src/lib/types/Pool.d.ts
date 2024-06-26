@@ -69,3 +69,9 @@ type TPoolTransferResponse = TPoolTransfer & {
     url: string;
     now: number;
 };
+
+type TLeaderboardEntry = {
+    sub: string;
+    score: number;
+    questEntryCount: number;
+};

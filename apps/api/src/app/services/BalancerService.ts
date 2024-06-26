@@ -6,7 +6,6 @@ import { logger } from '../util/logger';
 import { WalletDocument } from '../models';
 import { ChainId } from '@thxnetwork/common/enums';
 import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
-import { formatUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'alchemy-sdk';
 
 class BalancerService {

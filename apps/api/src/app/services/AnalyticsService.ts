@@ -44,14 +44,15 @@ import { agenda } from '../util/agenda';
 import { subWeeks } from 'date-fns';
 
 class AnalyticsService {
-    leaderboards: { [poolId: string]: { [start: string]: { [end: string]: [] } } } = {};
+    public leaderboards: { [poolId: string]: TLeaderboardEntry[] } = {};
 
     constructor() {
         agenda.define('createLeaderboard', async (job) => {
             const { poolId, startDate, endDate, limit } = job.attrs.data;
             const pool = await Pool.findById(poolId);
-            await this.createLeaderboard(pool, { startDate, endDate, limit });
-        }
+            const leaderboard = await this.createLeaderboard(pool, { startDate, endDate, limit });
+            this.leaderboards[poolId] = leaderboard;
+        });
     }
 
     async getPoolAnalyticsForChart(pool: PoolDocument, startDate: Date, endDate: Date) {
@@ -375,10 +376,15 @@ class AnalyticsService {
             $match['createdAt'] = { $gte: options.startDate, $lte: options.endDate };
         }
 
-        // Creates an array of quest entries that match the filters grouped by sub
-        const result = await Promise.all(
-            collections.map(async (Model) => {
-                return await Model.aggregate([
+        let result = [];
+        const chunkSize = 1000;
+        for (const Model of collections) {
+            let chunk = [];
+            let skip = 0;
+            let currentChunk;
+
+            do {
+                currentChunk = await Model.aggregate([
                     { $match },
                     {
                         $group: {
@@ -387,9 +393,16 @@ class AnalyticsService {
                             score: { $sum: { $convert: { input: '$amount', to: 'int' } } },
                         },
                     },
+                    { $skip: skip },
+                    { $limit: chunkSize },
                 ]);
-            }),
-        );
+
+                chunk = chunk.concat(currentChunk);
+                skip += chunkSize;
+            } while (currentChunk.length === chunkSize);
+
+            result = result.concat(chunk);
+        }
 
         // Combine results from all collections and calculate overall totals
         const totals = {};
@@ -418,13 +431,6 @@ class AnalyticsService {
             }))
             .filter((entry) => entry.score > 0)
             .sort((a: any, b: any) => b.score - a.score);
-
-        // Cache the result for this pool and duration
-        if (options) {
-            const start = new Date(options.startDate).getTime();
-            const end = new Date(options.endDate).getTime();
-            this.leaderboards[pool.id][start][end] = leaderboard;
-        }
 
         return leaderboard;
     }
@@ -576,8 +582,8 @@ class AnalyticsService {
         for (const pool of await Pool.find()) {
             const endDate = new Date();
             const startDate = subWeeks(endDate, pool.settings.leaderboardInWeeks);
-            
-            await this.createLeaderboard(pool, {startDate, endDate, limit: 10})
+
+            await this.createLeaderboard(pool, { startDate, endDate, limit: 10 });
         }
     }
 }

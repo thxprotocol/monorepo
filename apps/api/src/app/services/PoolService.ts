@@ -64,20 +64,18 @@ function getByAddress(address: string) {
     return Pool.findOne({ address });
 }
 
-async function getLeaderboardFromCache(pool: PoolDocument, options: { startDate: Date; endDate: Date; limit: number }) {
-    const start = new Date(options.startDate).getTime().toString();
-    const end = new Date(options.endDate).getTime().toString();
-
+async function getLeaderboardFromCache(pool, options) {
     try {
-        // If we can not get it from cache then create and return it
-        return AnalyticsService.leaderboards[pool.id][start][end];
+        return leaderboard;
     } catch (error) {
-        return await AnalyticsService.createLeaderboard(pool, options);
+        const leaderboard = await AnalyticsService.createLeaderboard(pool, options);
     }
 }
 
-async function getLeaderboard(pool: PoolDocument, options: { startDate: Date; endDate: Date; limit: number }) {
-    const leaderboard = await getLeaderboardFromCache(pool, options);
+async function getLeaderboard(
+    leaderboard: TLeaderboardEntry[],
+    options: { startDate: Date; endDate: Date; limit: number },
+) {
     const topTen = leaderboard.slice(0, options.limit);
     const subs = topTen.map((p) => p.sub);
     const accounts = await AccountProxy.find({ subs });
