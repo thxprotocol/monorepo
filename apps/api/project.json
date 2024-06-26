@@ -93,7 +93,6 @@
             }
         },
         "script": {
-            "dependsOn": ["^build"],
             "executor": "nx:run-commands",
             "options": {
                 "command": "node script.js",

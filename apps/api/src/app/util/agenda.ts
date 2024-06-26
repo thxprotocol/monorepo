@@ -16,6 +16,7 @@ import PaymentService from '../services/PaymentService';
 import VoteEscrowService from '../services/VoteEscrowService';
 import ParticipantService from '../services/ParticipantService';
 import NotificationService from '../services/NotificationService';
+import AnalyticsService from '../services/AnalyticsService';
 
 const agenda = new Agenda({
     db: {
@@ -37,6 +38,7 @@ agenda.define(JobType.SendCampaignReport, () => NotificationService.sendWeeklyDi
 agenda.define(JobType.RequestAttemp, (job: Job) => WebhookService.requestAttemptJob(job));
 agenda.define(JobType.UpdateTwitterLikeCache, (job: Job) => TwitterCacheService.updateLikeCacheJob(job));
 agenda.define(JobType.UpdateTwitterRepostCache, (job: Job) => TwitterCacheService.updateRepostCacheJob(job));
+agenda.define(JobType.UpdateLeaderboard, (job: Job) => AnalyticsService.updateLeaderboardJob(job));
 agenda.define(JobType.UpsertInvoices, () => InvoiceService.upsertJob());
 agenda.define(JobType.UpdatePrices, () => BalancerService.updatePricesJob());
 agenda.define(JobType.UpdateAPR, () => BalancerService.updateMetricsJob());

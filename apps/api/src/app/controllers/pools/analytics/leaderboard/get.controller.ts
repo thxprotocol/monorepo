@@ -14,14 +14,14 @@ const controller = async (req: Request, res: Response) => {
     const { startDate, endDate, limit } = req.query;
 
     let options;
-    if (startDate && endDate && limit) {
+    if (startDate && endDate) {
         options = {};
         options['startDate'] = new Date(String(startDate));
         options['endDate'] = new Date(String(endDate));
-        options['limit'] = Number(limit);
     }
 
-    const result = await PoolService.getLeaderboard(pool, options);
+    const leaderboard = await PoolService.createLeaderboard(pool, options);
+    const result = await PoolService.getLeaderboardTop(leaderboard, Number(limit));
 
     res.json(result);
 };

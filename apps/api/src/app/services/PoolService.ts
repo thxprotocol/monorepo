@@ -64,9 +64,23 @@ function getByAddress(address: string) {
     return Pool.findOne({ address });
 }
 
-async function getLeaderboard(pool: PoolDocument, options: { startDate: Date; endDate: Date; limit: number }) {
+async function getLeaderboardFromCache(pool: PoolDocument, options: { startDate: Date; endDate: Date }) {
+    if (AnalyticsService.leaderboards[pool.id]) {
+        return AnalyticsService.leaderboards[pool.id];
+    }
+
+    // If not cached create the leaderboard and store in cache
     const leaderboard = await AnalyticsService.createLeaderboard(pool, options);
-    const topTen = leaderboard.slice(0, options.limit);
+    AnalyticsService.cacheLeaderboard(pool.id, leaderboard);
+    return leaderboard;
+}
+
+async function createLeaderboard(pool: PoolDocument, options: { startDate: Date; endDate: Date }) {
+    return await AnalyticsService.createLeaderboard(pool, options);
+}
+
+async function getLeaderboardTop(leaderboard: TLeaderboardEntry[], limit: number) {
+    const topTen = leaderboard.slice(0, limit);
     const subs = topTen.map((p) => p.sub);
     const accounts = await AccountProxy.find({ subs });
     return topTen.map((p, index) => {
@@ -430,5 +444,7 @@ export default {
     findCollaborators,
     findCouponCodes,
     inviteCollaborator,
-    getLeaderboard,
+    getLeaderboardTop,
+    getLeaderboardFromCache,
+    createLeaderboard,
 };
