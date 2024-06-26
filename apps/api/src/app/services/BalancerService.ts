@@ -6,7 +6,6 @@ import { logger } from '../util/logger';
 import { WalletDocument } from '../models';
 import { ChainId } from '@thxnetwork/common/enums';
 import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
-import { formatUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'alchemy-sdk';
 
 class BalancerService {
@@ -98,27 +97,35 @@ class BalancerService {
         }
     }
 
+    async fetchPool() {
+        try {
+            return await this.balancer.pools.find(BALANCER_POOL_ID);
+        } catch (error) {
+            logger.error(error);
+            return;
+        }
+    }
+
     async updatePricesJob() {
-        // const pool = await this.balancer.pools.find(BALANCER_POOL_ID);
-        // const [usdc, thx] = pool.tokens as unknown as {
-        //     symbol: string;
-        //     balance: number;
-        //     token: { latestUSDPrice: number };
-        // }[];
-        // const totalShares = pool.totalShares as unknown as number;
-        // const thxValue = thx.balance * thx.token.latestUSDPrice;
-        // const usdcValue = usdc.balance * usdc.token.latestUSDPrice;
-        // const btpPrice = (thxValue + usdcValue) / totalShares;
+        const pool = await this.fetchPool();
+        if (!pool) return;
+
+        const [usdc, thx] = pool.tokens as unknown as {
+            symbol: string;
+            balance: number;
+            token: { latestUSDPrice: number };
+        }[];
+        const totalShares = pool.totalShares as unknown as number;
+        const thxValue = thx.balance * thx.token.latestUSDPrice;
+        const usdcValue = usdc.balance * usdc.token.latestUSDPrice;
+        const btpPrice = (thxValue + usdcValue) / totalShares;
         const balPrice = await this.fetchPrice('BAL', 'USDC');
 
         this.pricing = {
             'BAL': Number(balPrice),
-            '20USDC-80THX': 0,
-            'USDC': 0,
-            'THX': 0,
-            // '20USDC-80THX': btpPrice,
-            // 'USDC': Number(usdc.token.latestUSDPrice),
-            // 'THX': Number(thx.token.latestUSDPrice),
+            '20USDC-80THX': btpPrice,
+            'USDC': Number(usdc.token.latestUSDPrice),
+            'THX': Number(thx.token.latestUSDPrice),
         };
     }
 
