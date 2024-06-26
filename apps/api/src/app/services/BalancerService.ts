@@ -97,8 +97,19 @@ class BalancerService {
         }
     }
 
+    async fetchPool() {
+        try {
+            return await this.balancer.pools.find(BALANCER_POOL_ID);
+        } catch (error) {
+            logger.error(error);
+            return;
+        }
+    }
+
     async updatePricesJob() {
-        const pool = await this.balancer.pools.find(BALANCER_POOL_ID);
+        const pool = await this.fetchPool();
+        if (!pool) return;
+
         const [usdc, thx] = pool.tokens as unknown as {
             symbol: string;
             balance: number;
@@ -111,8 +122,8 @@ class BalancerService {
         const balPrice = await this.fetchPrice('BAL', 'USDC');
 
         this.pricing = {
-            '20USDC-80THX': btpPrice,
             'BAL': Number(balPrice),
+            '20USDC-80THX': btpPrice,
             'USDC': Number(usdc.token.latestUSDPrice),
             'THX': Number(thx.token.latestUSDPrice),
         };
