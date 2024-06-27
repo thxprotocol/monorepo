@@ -5,7 +5,8 @@ import ImgLogoPolygon from '../assets/thx_logo_polygon.svg';
 import ImgLogoHardhat from '../assets/thx_logo_hardhat.svg';
 import ImgLogoLinea from '../assets/thx_logo_linea.svg';
 import ImgLogoMetis from '../assets/thx_logo_metis.svg';
-import { arbitrum, mainnet, bsc, polygon, hardhat, polygonZkEvm, linea, metis } from '@wagmi/core/chains';
+import ImgLogoBase from '../assets/thx_logo_base.svg';
+import { arbitrum, mainnet, bsc, polygon, hardhat, polygonZkEvm, linea, metis, base } from '@wagmi/core/chains';
 import { ChainId } from '@thxnetwork/common/enums';
 
 const chainList: { [chainId: number]: ChainInfo } = {
@@ -57,6 +58,13 @@ const chainList: { [chainId: number]: ChainInfo } = {
         logo: ImgLogoMetis,
         blockExplorer: 'https://explorer.metis.io',
         chain: metis,
+    },
+    [ChainId.Base]: {
+        chainId: ChainId.Base,
+        name: 'Base',
+        logo: ImgLogoBase,
+        blockExplorer: 'https://basescan.org',
+        chain: base,
     },
 };
 
