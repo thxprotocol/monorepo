@@ -1,6 +1,6 @@
 import db from '@thxnetwork/auth/util/database';
 
-db.connect(process.env.MONGODB_URI_PROD);
+// db.connect(process.env.MONGODB_URI_PROD);
 
 async function main() {
     //

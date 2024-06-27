@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 
-export type TBrandUpdate = Partial<TBrand>;
-
 export const Brand = mongoose.model<TBrand>(
     'Brand',
     new mongoose.Schema({

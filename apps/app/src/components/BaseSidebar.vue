@@ -3,6 +3,7 @@
         <div class="sidebar-panel h-100">
             <BaseCardAccount />
             <BaseCardRewards />
+            <BaseCardDiscord class="mt-auto" />
         </div>
     </aside>
 </template>

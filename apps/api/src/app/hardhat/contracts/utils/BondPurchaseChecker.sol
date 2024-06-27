@@ -30,7 +30,9 @@ contract BondPurchaseChecker {
 
         for (uint i = 0; i < billIds.length; i++) {
             uint256 payout = bond.getBillInfo(billIds[i]).payout;
-            largestPayout = payout > largestPayout ? payout : largestPayout;
+            uint256 truePricePaid = bond.getBillInfo(billIds[i]).truePricePaid;
+            uint256 payoutValue = payout * truePricePaid / 1e18;
+            largestPayout = payoutValue > largestPayout ? payoutValue : largestPayout;
         }
 
         return largestPayout;

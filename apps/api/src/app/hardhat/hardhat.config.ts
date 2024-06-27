@@ -6,6 +6,7 @@ dotenv.config();
 
 const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID || '';
 const POLYGON_PRIVATE_KEY = process.env.POLYGON_PRIVATE_KEY || '';
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || '';
 
 const config: HardhatUserConfig = {
     defaultNetwork: 'hardhat',
@@ -108,6 +109,13 @@ if (POLYGON_PRIVATE_KEY && INFURA_PROJECT_ID && config.networks) {
         url: `https://polygon-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         accounts: [POLYGON_PRIVATE_KEY],
         timeout: 2483647,
+    };
+}
+
+if (ETHERSCAN_API_KEY) {
+    if (!config.etherscan) config['etherscan'] = {};
+    config.etherscan.apiKey = {
+        polygon: ETHERSCAN_API_KEY,
     };
 }
 
