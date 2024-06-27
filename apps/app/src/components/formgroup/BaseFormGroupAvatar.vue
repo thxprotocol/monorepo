@@ -2,7 +2,7 @@
     <b-form-group class="text-center">
         <b-form-file v-model="profileImgFile" accept="image/*" size="sm" class="d-none" @input="onChangeProfileImg">
             <template #label>
-                <b-avatar size="100" class="cursor-pointer gradient-border-xl" :src="profileImg" variant="primary" />
+                <b-avatar size="100" class="cursor-pointer gradient-border-xl" :src="profileImg" />
                 <br />
                 <div v-if="!isRemoveable" class="mt-2 cursor-pointer text-primary">Upload</div>
             </template>
@@ -33,7 +33,7 @@ export default defineComponent({
             return this.accountStore.account.profileImg || '';
         },
         isPlaceholder() {
-            return this.profileImg.includes('https://api.dicebear.com');
+            return this.profileImg.startsWith('https://api.dicebear.com');
         },
         isRemoveable() {
             return (this.profileImg && !this.isPlaceholder) || this.profileImgFile;

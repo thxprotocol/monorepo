@@ -15,9 +15,18 @@
         <div v-if="!accountStore.account" class="d-flex justify-content-center">
             <b-spinner small />
         </div>
+
         <b-form v-else>
-            <b-alert v-if="error" show variant="danger" class="p-2">
+            <b-alert v-model="isErrorShown" variant="danger" class="p-2">
                 {{ error }}
+            </b-alert>
+            <b-alert v-model="isUsernameMissing" variant="danger" class="p-2">
+                <i class="fas fa-exclamation-circle mx-2" />
+                Please, set a username!
+            </b-alert>
+            <b-alert v-model="isProfileImgPlaceholder" variant="danger" class="p-2">
+                <i class="fas fa-exclamation-circle mx-2" />
+                Please, upload a profile picture!
             </b-alert>
             <b-row>
                 <b-col cols="8">
@@ -50,7 +59,7 @@
             <b-button
                 class="w-100"
                 variant="primary"
-                :disabled="!isEmailVerified"
+                :disabled="isDisabled"
                 @click="accountStore.isModalAccountShown = false"
             >
                 Close
@@ -84,6 +93,17 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore, useWalletStore),
+        isErrorShown() {
+            return !!this.error;
+        },
+        isUsernameMissing() {
+            if (!this.accountStore.account) return;
+            return !this.accountStore.account.username;
+        },
+        isProfileImgPlaceholder() {
+            if (!this.accountStore.account) return;
+            return this.accountStore.account.profileImg.startsWith('https://api.dicebear.com');
+        },
         isMetamaskAccount() {
             if (!this.accountStore.account) return false;
             return this.accountStore.account.variant === AccountVariant.Metamask;
@@ -91,6 +111,10 @@ export default defineComponent({
         isEmailVerified() {
             if (!this.accountStore.account) return false;
             return this.accountStore.account.isEmailVerified;
+        },
+        isDisabled() {
+            if (!this.accountStore.account) return true;
+            return !this.isEmailVerified || !this.accountStore.account.username || this.isProfileImgPlaceholder;
         },
     },
     methods: {

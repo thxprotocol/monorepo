@@ -146,6 +146,12 @@ export const useAccountStore = defineStore('account', {
         },
         async getAccount() {
             this.account = await this.api.request.get('/v1/account');
+            if (
+                this.account &&
+                (!this.account.username || this.account.profileImg.startsWith('https://api.dicebear.com'))
+            ) {
+                this.isModalAccountShown = true;
+            }
         },
         async getParticipants(poolId?: string) {
             const params: { poolId?: string } = {};
