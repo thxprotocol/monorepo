@@ -1,4 +1,4 @@
-import { CouponCode, RewardCoupon, RewardCouponPayment } from '../models';
+import { Brand, CouponCode, Pool, RewardCoupon, RewardCouponPayment } from '../models';
 import { IRewardService } from './interfaces/IRewardService';
 
 export default class RewardCouponService implements IRewardService {
@@ -21,7 +21,16 @@ export default class RewardCouponService implements IRewardService {
 
     async decoratePayment(payment: TRewardPayment) {
         const code = await CouponCode.findById(payment.couponCodeId);
-        return { ...payment.toJSON(), code: code && code.code };
+        const pool = await Pool.findById(payment.poolId);
+        const brand = await Brand.findOne({ poolId: pool.id });
+        const reward = await RewardCoupon.findById(code.couponRewardId);
+
+        return {
+            ...payment.toJSON(),
+            code: code && code.code,
+            brand: { name: pool && pool.settings.title, logoImgURL: brand && brand.logoImgUrl },
+            reward: { title: reward && reward.title, webshopURL: reward && reward.webshopURL },
+        };
     }
 
     async getValidationResult({ reward }: { reward: TReward; account?: TAccount }) {

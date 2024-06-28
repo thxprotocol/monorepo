@@ -70,7 +70,6 @@ export default defineComponent({
     },
     async mounted() {
         const { data } = await axios('https://discord.com/api/guilds/836147176270856243/widget.json');
-        console.log(data);
         this.presenceCount = data.presence_count;
         this.members = data.members;
         this.inviteURL = data.instant_invite;

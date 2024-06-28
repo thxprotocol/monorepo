@@ -88,8 +88,15 @@ type TRewardCustomPayment = TBaseRewardPayment & {
 
 type TRewardCouponPayment = TBaseRewardPayment & {
     code: string;
-    webshopURL: string;
     couponCodeId: string;
+    brand: {
+        name: string;
+        logoImgURL: string;
+    };
+    reward: {
+        title: string;
+        webshopURL: string;
+    };
 };
 
 type TRewardDiscordRolePayment = TRewardPayment & {

@@ -29,19 +29,19 @@
         <blockquote v-if="operators.hashtags && operators.hashtags.length" class="mb-1">
             <div class="card-text ps-2 position-relative">
                 <div class="d-flex text-opaque pb-1">Your post contains hashtags:</div>
-                <em v-for="hashtag of operators.hashtags">#{{ hashtag }}</em>
+                <em v-for="hashtag of operators.hashtags" class="me-1">#{{ hashtag }}</em>
             </div>
         </blockquote>
         <blockquote v-if="operators.mentions && operators.mentions.length" class="mb-1">
             <div class="card-text ps-2 position-relative">
                 <div class="d-flex text-opaque pb-1">Your post mentions:</div>
-                <em v-for="mention of operators.mentions">@{{ mention }}</em>
+                <em v-for="mention of operators.mentions" class="me-1">@{{ mention }}</em>
             </div>
         </blockquote>
         <blockquote v-if="operators.url && operators.url.length" class="mb-1">
             <div class="card-text ps-2 position-relative">
                 <div class="d-flex text-opaque pb-1">Your post contains URL:</div>
-                <span v-for="(url, index) of operators.url">
+                <span v-for="(url, index) of operators.url" class="me-1">
                     <code> https://{{ url }} </code>
                     <span v-if="index === operators.url.length">,</span>
                 </span>

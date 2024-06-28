@@ -24,11 +24,12 @@
                 />
             </b-badge>
         </div>
-        <b-dropdown v-if="token.discordServerURL" variant="link" size="sm" no-caret end>
+        <b-dropdown variant="link" size="sm" no-caret end>
             <template #button-content>
                 <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
             </template>
             <b-dropdown-item
+                v-if="token.discordServerURL"
                 target="_blank"
                 :href="token.discordServerURL"
                 link-class="d-flex justify-content-between align-items-center"
@@ -36,6 +37,10 @@
                 Server URL
                 <i class="fas fa-caret-right text-opaque"></i>
             </b-dropdown-item>
+            <b-dropdown-divider />
+            <b-dropdown-text class="text-end small text-opaque">
+                {{ format(new Date(token.createdAt), 'MMMM do hh:mm') }}
+            </b-dropdown-text>
         </b-dropdown>
     </b-card>
 </template>
@@ -45,6 +50,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 import { useWalletStore } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
+import { format } from 'date-fns';
 
 export default defineComponent({
     name: 'BaseCardCouponCode',
@@ -56,6 +62,7 @@ export default defineComponent({
     },
     data() {
         return {
+            format,
             isVisible: false,
             isModalURLShown: false,
         };

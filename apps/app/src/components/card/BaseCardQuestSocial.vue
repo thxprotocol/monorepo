@@ -139,11 +139,14 @@ export default defineComponent({
     methods: {
         queryToURL(quest: TQuestSocial) {
             if (!quest.contentMetadata || !quest.contentMetadata.operators) return 'https://x.com';
-            const { text, hashtags, url } = quest.contentMetadata.operators;
+            const { mentions, text, hashtags, url } = quest.contentMetadata.operators;
             const intentURL = new URL('https://x.com/intent/tweet');
-            intentURL.searchParams.append('text', text);
+            const message = mentions.length ? mentions.map((m) => `@${m}`).join(' ') + ` ${text}` : text;
+            intentURL.searchParams.append('text', message);
             intentURL.searchParams.append('hashtags', hashtags.join(','));
-            intentURL.searchParams.append('url', url[0]);
+            if (url.length) {
+                intentURL.searchParams.append('url', url[0]);
+            }
             return intentURL.toString();
         },
         onClickCancel() {
