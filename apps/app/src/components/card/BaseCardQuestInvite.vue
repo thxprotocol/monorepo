@@ -37,23 +37,23 @@
             </template>
         </BaseFormGroup>
 
-        <!-- 
-        <div class="py-2">
+        <!-- <div class="py-2">
             <BaseBtnShareTwitter :url="inviteUrl" text="Please have a look at this:" class="me-2" />
             <BaseBtnShareLinkedin :url="inviteUrl" class="me-2" />
             <BaseBtnShareWhatsapp :url="inviteUrl" class="me-2" />
             <BaseBtnShareTelegram :url="inviteUrl" text="Please have a look at this!" class="me-2" />
             <BaseBtnShareEmail :url="inviteUrl" subject="Please have a look at this!" class="me-2" />
-        </div> 
-        -->
+        </div> -->
 
         <BaseFormGroup
             label="Invitee Requirement"
             tooltip="The invitee needs to complete this quest before points are transferred to both parties."
         >
             {{ requiredQuest.title }}
-            <span v-if="requiredQuest.amount" class="me-1">[{{ requiredQuest.amount }}]</span>
-            <span v-if="quest.amountInvitee" class="text-accent">+ {{ quest.amountInvitee }}</span>
+            <strong>
+                <span v-if="requiredQuest.amount" class="text-accent">{{ requiredQuest.amount }}</span>
+                <span v-if="quest.amountInvitee" class="text-accent"> + {{ quest.amountInvitee }} </span>
+            </strong>
         </BaseFormGroup>
 
         <template #button>

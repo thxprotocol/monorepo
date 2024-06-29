@@ -104,10 +104,12 @@ export default defineComponent({
     width: 245px;
     white-space: nowrap;
     overflow: hidden;
+    font-size: 0.8rem;
 }
 
 .truncate-text-ellipsis {
     display: inline-block;
+    font-size: 0.8rem;
     width: 245px;
     white-space: nowrap;
     overflow: hidden;
