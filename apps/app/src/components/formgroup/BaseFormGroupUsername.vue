@@ -38,7 +38,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         isInvalidInput() {
-            return !this.value || !this.value.length || this.value.length < 3;
+            return !this.value || !this.value.length || this.value.length < 3 || this.value.length > 50;
         },
         isValidUsername() {
             if (this.isInvalidInput || this.error.length) return false;
