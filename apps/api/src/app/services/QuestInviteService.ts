@@ -106,13 +106,13 @@ export default class QuestInviteService implements IQuestService {
 
         // Iterate over invite quests and assert if all quests for this invite quest have been completed
         for (const inviteQuest of inviteQuests) {
-            // Search for a single required quest entry by another user and continue if it already exists
+            // Search for a single required quest entry by another user and continue if it does not exist
             const Entry = serviceMap[inviteQuest.requiredQuest.variant].models.entry;
             const requiredQuestEntry = await Entry.findOne({
                 questId: inviteQuest.requiredQuest.questId,
                 sub: account.sub,
             });
-            if (requiredQuestEntry) continue;
+            if (!requiredQuestEntry) continue;
 
             // If the participant has received the invite quest bonus already continue
             const inviteQuestEntry = await QuestInviteEntry.findOne({

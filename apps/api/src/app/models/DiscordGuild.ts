@@ -9,20 +9,33 @@ export const DiscordGuild = mongoose.model<DiscordGuildDocument>(
             sub: String,
             poolId: String,
             guildId: String,
-            // channelId: String,
             adminRoleId: String,
             name: String,
             secret: String,
             notifications: {
-                questCreate: {
-                    isEnabled: Boolean,
-                    message: String,
-                    channelId: String,
+                type: {
+                    questCreate: {
+                        isEnabled: Boolean,
+                        message: String,
+                        channelId: String,
+                    },
+                    questEntryCreate: {
+                        isEnabled: Boolean,
+                        message: String,
+                        channelId: String,
+                    },
                 },
-                questEntryCreate: {
-                    isEnabled: Boolean,
-                    message: String,
-                    channelId: String,
+                default: {
+                    questCreate: {
+                        isEnabled: false,
+                        message: '',
+                        channelId: '',
+                    },
+                    questEntryCreate: {
+                        isEnabled: false,
+                        message: '',
+                        channelId: '',
+                    },
                 },
             },
         },

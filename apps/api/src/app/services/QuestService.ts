@@ -16,7 +16,6 @@ import AccountProxy from '../proxies/AccountProxy';
 import ParticipantService from './ParticipantService';
 import THXService from './THXService';
 
-const InviteService = serviceMap[QuestVariant.Invite] as IInviteService;
 export default class QuestService {
     static async count({ poolId }) {
         const variants = Object.keys(QuestVariant).filter((v) => !isNaN(Number(v)));
@@ -208,9 +207,6 @@ export default class QuestService {
             const isAvailable = await this.isAvailable(variant, { quest, account, data });
             if (!isAvailable.result) throw new Error(isAvailable.reason);
 
-            // Assert if a required quest for invite quests has been completed
-            await InviteService.assertQuestEntry({ pool, quest, account });
-
             // Create the quest entry
             const entry = await Entry.create({
                 ...data,
@@ -221,6 +217,10 @@ export default class QuestService {
                 uuid: v4(),
             } as TQuestEntry);
             if (!entry) throw new Error('Entry creation failed.');
+
+            // Assert if a required quest for invite quests has been completed
+            const InviteService = serviceMap[QuestVariant.Invite] as IInviteService;
+            await InviteService.assertQuestEntry({ pool, quest, account });
 
             // Add points to participant balance
             await PointBalanceService.add(pool, account, amount);
