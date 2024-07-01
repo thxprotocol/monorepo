@@ -15,12 +15,9 @@
 
         <template #button>
             <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
-                <template v-if="isSubmitting">
-                    <b-spinner small></b-spinner>
-                    Adding points...
-                </template>
+                <b-spinner v-if="isSubmitting" small />
                 <template v-else-if="quest.amount">
-                    Claim
+                    Earn
                     <strong>
                         {{ `${pendingCount} x` }}
                         {{ quest.amount }} points

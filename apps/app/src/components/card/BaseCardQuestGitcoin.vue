@@ -41,7 +41,7 @@
             <b-button variant="primary" class="w-100" :disabled="isDisabled" @click="onClickSign">
                 <b-spinner v-if="isSubmitting" small />
                 <template v-else-if="quest.amount">
-                    Claim
+                    Earn
                     <strong>{{ quest.amount }}</strong>
                     points
                 </template>

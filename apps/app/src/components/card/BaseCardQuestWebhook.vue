@@ -20,13 +20,9 @@
                 :disabled="isSubmitting || !quest.identities.length"
                 @click="onClickClaim"
             >
-                <template v-if="isSubmitting">
-                    <b-spinner small></b-spinner>
-                    Adding points...
-                </template>
+                <b-spinner v-if="isSubmitting" small />
                 <template v-else-if="quest.amount">
-                    Claim
-                    <strong> {{ quest.amount }} points </strong>
+                    Earn <strong>{{ quest.amount }}</strong> points
                 </template>
                 <template v-else>Complete Quest</template>
             </b-button>

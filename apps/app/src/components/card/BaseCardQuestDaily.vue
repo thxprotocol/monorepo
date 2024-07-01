@@ -30,6 +30,22 @@
                 <strong class="h5 mb-0">{{ amount }}</strong>
             </b-badge>
         </div>
+
+        <template #button>
+            <b-button
+                class="w-100"
+                block
+                variant="primary"
+                :disabled="isSubmitting || !quest.isAvailable"
+                @click="onClickClaim"
+            >
+                <b-spinner v-if="isSubmitting" small />
+                <template v-else-if="quest.amount">
+                    Earn <strong>{{ quest.amount }} points</strong>
+                </template>
+                <template v-else>Complete Quest</template>
+            </b-button>
+        </template>
     </BaseCardQuest>
 </template>
 
