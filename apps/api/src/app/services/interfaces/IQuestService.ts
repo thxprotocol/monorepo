@@ -19,7 +19,11 @@ export interface IQuestService {
     models: { quest: Model<TQuest>; entry: Model<TQuestEntry> };
     decorate(options: { quest: TQuest; account?: TAccount; data: Partial<TQuestEntry> }): Promise<TQuest>;
     isAvailable(options: { quest: TQuest; account?: TAccount; data: Partial<TQuestEntry> }): Promise<TValidationResult>;
-    getAmount(options: { quest: TQuest; account?: TAccount }): Promise<number>;
+    getAmount(options: {
+        quest: TQuest;
+        account?: TAccount;
+        data?: Partial<{ metadata: { data: { amount: number } } }>;
+    }): Promise<number>;
     getValidationResult(options: {
         quest: TQuest;
         account: TAccount;

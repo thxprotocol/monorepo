@@ -14,6 +14,9 @@ const rateLimiter = rateLimit({ windowMs: 60 * 1000, max: 10 });
 
 // Rate limit these public endpoints to max 10 req per minute
 router.get('/', rateLimiter, Root.controller);
+router.post('/testhook', (req, res) => {
+    res.json({ result: true, amount: 2500 });
+});
 router.use('/health', rateLimiter, json(), urlencoded({ extended: true }), RouterHealth);
 router.use('/me', rateLimiter, json(), urlencoded({ extended: true }), RouterMe);
 router.use('/oidc', rateLimiter, RouterOIDC);

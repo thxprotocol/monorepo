@@ -40,8 +40,16 @@ export default class QuestWebhookService implements IQuestService {
         return { result: true, reason: '' };
     }
 
-    async getAmount({ quest }: { quest: QuestWebhookDocument; wallet: WalletDocument; account: TAccount }) {
-        return quest.amount;
+    async getAmount({
+        quest,
+        data,
+    }: {
+        quest: QuestWebhookDocument;
+        wallet: WalletDocument;
+        account: TAccount;
+        data?: { metadata: { result: boolean; data: { amount: number } } };
+    }) {
+        return quest.isAmountCustom ? data.metadata.data.amount : quest.amount;
     }
 
     async decorate({
@@ -72,7 +80,7 @@ export default class QuestWebhookService implements IQuestService {
         quest: QuestWebhookDocument;
         account: TAccount;
         data: Partial<TQuestWebhookEntry>;
-    }): Promise<{ reason: string; result: boolean; data?: any }> {
+    }): Promise<{ reason: string; result: boolean; data?: { result: boolean; amount?: number } }> {
         // See if there are identities
         const identities = await this.findIdentities({ quest, account });
         if (!identities.length) {

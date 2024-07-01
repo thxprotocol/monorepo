@@ -12,6 +12,7 @@ type TWebhook = {
 type TWebhookRequest = {
     _id?: string;
     webhookId: string;
+    response: string;
     payload: string;
     payloadFormatted?: HighlightResult;
     attempts: number;

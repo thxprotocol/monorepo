@@ -11,6 +11,7 @@ export const QuestWebhook = mongoose.model<QuestWebhookDocument>(
             amount: Number,
             webhookId: String,
             metadata: String,
+            isAmountCustom: Boolean,
         },
         { timestamps: true },
     ),

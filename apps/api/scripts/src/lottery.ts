@@ -8,8 +8,9 @@ export default async function main() {
 
     // Get CouponCode for winning codes
     const winners = [
-        'THXMM5E1YQG2X052024',
-        'THX5UATMVUKHY052024',
+        'THXV1BVL7XZBF052024',
+        // 'THXMM5E1YQG2X052024',
+        // 'THX5UATMVUKHY052024',
         // 'THXH2VRRBB8DE052024',
         // 'THX3VE7PIVKGO052024',
         // 'THXKGN5GUSQM5052024',

@@ -8,6 +8,7 @@ export const WebhookRequest = mongoose.model<WebhookRequestDocument>(
         {
             webhookId: String,
             payload: String,
+            response: String,
             attempts: { type: Number, default: 0 },
             state: Number,
             httpStatus: Number,

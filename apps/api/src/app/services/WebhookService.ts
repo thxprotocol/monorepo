@@ -67,6 +67,7 @@ export default class WebhookService {
                 },
             });
 
+            webhookRequest.response = JSON.stringify(response.data);
             webhookRequest.state = WebhookRequestState.Received;
             webhookRequest.httpStatus = response.status;
 

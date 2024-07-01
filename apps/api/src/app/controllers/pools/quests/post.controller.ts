@@ -47,6 +47,9 @@ const validationBaseQuest = [
     body('threshold').optional().isString(),
     // Gitcoin
     //
+    // Webhook
+    body('metadata').optional().isString(),
+    body('isAmountCustom').optional().isBoolean(),
 ];
 
 const validation = [param('id').isMongoId(), ...validationBaseQuest];
