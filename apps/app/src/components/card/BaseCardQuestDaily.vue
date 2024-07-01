@@ -8,6 +8,16 @@
         :error="error"
         @modal-close="isModalQuestEntryShown = false"
     >
+        <b-alert v-model="isAlertWaitDurationShown" variant="primary" class="p-2">
+            <i class="fas fa-clock mx-2" />
+            <span v-if="waitDuration">
+                You can claim again in
+                <strong>{{ waitDuration.hours }}</strong
+                >:<strong>{{ waitDuration.minutes }}</strong
+                >:<strong>{{ waitDuration.seconds }}</strong>
+            </span>
+        </b-alert>
+
         <div class="d-flex flex-wrap pb-3 justify-content-start">
             <b-badge
                 v-for="(amount, key) of quest.amounts"
@@ -20,26 +30,6 @@
                 <strong class="h5 mb-0">{{ amount }}</strong>
             </b-badge>
         </div>
-
-        <template #button>
-            <b-button
-                class="w-100"
-                block
-                variant="primary"
-                :disabled="isSubmitting || !quest.isAvailable"
-                @click="onClickClaim"
-            >
-                <template v-if="!quest.isAvailable && waitDuration">
-                    Wait for {{ waitDuration.hours }}: {{ waitDuration.minutes }}:{{ waitDuration.seconds }}
-                </template>
-                <template v-else-if="!quest.isAvailable && !waitDuration"> Not available </template>
-                <template v-else-if="isSubmitting"><b-spinner small></b-spinner> Adding points...</template>
-                <template v-else-if="quest.amount">
-                    Claim <strong>{{ quest.amount }} points </strong>
-                </template>
-                <template v-else>Complete Quest</template>
-            </b-button>
-        </template>
     </BaseCardQuest>
 </template>
 
@@ -81,6 +71,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore),
+        isAlertWaitDurationShown() {
+            return !!this.waitDuration;
+        },
         waitDuration: function () {
             if (!this.quest.claimAgainDuration) return;
 
