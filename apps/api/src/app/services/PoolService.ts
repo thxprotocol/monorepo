@@ -102,7 +102,8 @@ async function deploy(sub: string, title: string): Promise<PoolDocument> {
         settings: {
             title,
             description: '',
-            isArchived: false,
+            leaderboardInWeeks: 4,
+            isPublished: false,
             isWeeklyDigestEnabled: true,
             authenticationMethods: [
                 AccountVariant.EmailPassword,

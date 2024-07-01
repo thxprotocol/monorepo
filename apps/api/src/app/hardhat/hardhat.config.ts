@@ -4,9 +4,10 @@ import '@nomicfoundation/hardhat-toolbox';
 
 dotenv.config();
 
-const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID || '';
+const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || '';
 const POLYGON_PRIVATE_KEY = process.env.POLYGON_PRIVATE_KEY || '';
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || '';
+const ETHERSCAN_POLYGON_API_KEY = process.env.ETHERSCAN_POLYGON_API_KEY || '';
+const ETHERSCAN_BASE_API_KEY = process.env.ETHERSCAN_BASE_API_KEY || '';
 
 const config: HardhatUserConfig = {
     defaultNetwork: 'hardhat',
@@ -102,20 +103,34 @@ const config: HardhatUserConfig = {
             },
         ],
     },
+    etherscan: {
+        apiKey: {
+            polygon: ETHERSCAN_POLYGON_API_KEY,
+            base: ETHERSCAN_BASE_API_KEY,
+        },
+        customChains: [
+            {
+                network: 'base',
+                chainId: 8453,
+                urls: {
+                    apiURL: 'https://api.basescan.org/api',
+                    browserURL: 'https://basescan.org',
+                },
+            },
+        ],
+    },
 };
 
-if (POLYGON_PRIVATE_KEY && INFURA_PROJECT_ID && config.networks) {
+if (POLYGON_PRIVATE_KEY && ALCHEMY_API_KEY && config.networks) {
     config.networks.matic = {
-        url: `https://polygon-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
         accounts: [POLYGON_PRIVATE_KEY],
         timeout: 2483647,
     };
-}
-
-if (ETHERSCAN_API_KEY) {
-    if (!config.etherscan) config['etherscan'] = {};
-    config.etherscan.apiKey = {
-        polygon: ETHERSCAN_API_KEY,
+    config.networks.base = {
+        url: `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+        accounts: [POLYGON_PRIVATE_KEY],
+        timeout: 2483647,
     };
 }
 

@@ -67,12 +67,10 @@ describe('Default Pool', () => {
                 .send({
                     settings: {
                         title: 'My Pool 2',
-                        isArchived: true,
                     },
                 })
                 .expect(({ body }: request.Response) => {
                     expect(body.settings.title).toBe('My Pool 2');
-                    expect(body.settings.isArchived).toBe(true);
                 })
                 .expect(200, done);
         });

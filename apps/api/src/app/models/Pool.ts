@@ -20,7 +20,6 @@ const schema = new mongoose.Schema(
             description: String,
             leaderboardInWeeks: Number,
             galachainPrivateKey: String,
-            isArchived: Boolean,
             isPublished: { type: Boolean, default: false },
             isWeeklyDigestEnabled: { type: Boolean, default: true },
             authenticationMethods: [Number],

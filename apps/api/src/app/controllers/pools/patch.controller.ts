@@ -13,7 +13,7 @@ const validation = [
     body('settings.startDate').optional({ nullable: true }).isString(),
     body('settings.endDate').optional({ nullable: true }).isString(),
     body('settings.discordWebhookUrl').optional({ checkFalsy: true }).isURL(),
-    body('settings.isArchived').optional().isBoolean(),
+    body('settings.leaderboardInWeeks').optional().isInt({ min: 0, max: 52 }),
     body('settings.isPublished').optional().isBoolean(),
     body('settings.isWeeklyDigestEnabled').optional().isBoolean(),
     body('settings.authenticationMethods').optional().isArray(),

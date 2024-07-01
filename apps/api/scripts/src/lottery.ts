@@ -8,18 +8,15 @@ export default async function main() {
 
     // Get CouponCode for winning codes
     const winners = [
-        'THX02G6NMUMU0052024',
-        'THXSUR9F62ZRE052024',
-        'THXT51NWPZY0Z052024',
-        'THXH7TQX5FETL052024',
-        'THXMYH9D2GFAI052024',
-        'THXNDZDDSSI3O052024',
-        'THXEUIAY54H01052024',
-        'THXV1BVL7XZBF052024',
-        'THXBI11LY2C2P052024',
-        'THXNT5QAUHBNN052024',
+        'THXMM5E1YQG2X052024',
+        'THX5UATMVUKHY052024',
+        // 'THXH2VRRBB8DE052024',
+        // 'THX3VE7PIVKGO052024',
+        // 'THXKGN5GUSQM5052024',
+        // 'THXU8DOC8DIVN052024',
+        // 'THXCY3R2NO6P2052024',
     ];
-    const codes = await CouponCode.find({ code: { $in: winners } });
+    const codes = await CouponCode.find({ code: { $in: winners }, sub: { $exists: true } });
 
     // Get subs for winning codes
     const subs = codes.map((code) => code.sub);
@@ -35,14 +32,15 @@ export default async function main() {
         try {
             const code = codes.find((code) => code && code.code === winner);
             if (!code) continue;
-
-            const account = accounts.find((account) => String(account._id) === code.sub);
+            const account = accounts.find((account) => String(account._id) == code.sub);
+            console.log(account);
             const tokens = await db
                 .collection('tokens')
                 .find({ sub: String(account._id) })
                 .toArray();
-            const userIds = tokens.map((token) => token.userId).join(' ');
-            console.log(code.code, userIds, account.username, account.email);
+            console.log(tokens);
+            // const userIds = tokens.map((token) => token.userId).join(' ');
+            // console.log(code.code, userIds, account.username, account.email);
         } catch (error) {
             console.error(winner, error);
         }
