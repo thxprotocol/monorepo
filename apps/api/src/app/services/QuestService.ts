@@ -202,8 +202,6 @@ export default class QuestService {
             const pool = await PoolService.getById(quest.poolId);
             const amount = await this.getAmount(variant, quest, account, data);
 
-            console.log({ data });
-
             // Test availabily of quest once more as it could be completed by a job that was scheduled already
             // if the jobs were created in parallel.
             const isAvailable = await this.isAvailable(variant, { quest, account, data });
