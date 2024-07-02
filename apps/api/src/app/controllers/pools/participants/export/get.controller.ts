@@ -14,16 +14,37 @@ const controller = async (req: Request, res: Response) => {
     // Export all participant data
     const data = await ParticipantService.export(pool);
 
-    // Write CSV file
-    const csv = await CSVService.stringify(data);
-
     // Prepare the response headers for file download
     const fileName = `participants${pool.id}.csv`;
     res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
     res.setHeader('Content-Type', 'text/csv');
 
-    // Stream the CSV data to the client
-    res.send(csv);
+    // Define columns for CSV
+    const columns = Object.keys(data[0]);
+
+    // Write the CSV header
+    const csvHeader = CSVService.stringify([], { columns, header: true });
+    res.write(csvHeader);
+
+    // Write each row
+    for (const row of data) {
+        const csvRow = CSVService.stringify([
+            [
+                row.accountId,
+                row.twitterId,
+                row.discordId,
+                row.googleId,
+                row.username,
+                row.email,
+                row.wallets,
+                row.createdAt,
+            ],
+        ]);
+        res.write(csvRow);
+    }
+
+    // End the response
+    res.end();
 };
 
 export { controller, validation };
