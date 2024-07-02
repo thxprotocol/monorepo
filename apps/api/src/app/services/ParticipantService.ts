@@ -1,12 +1,39 @@
 import { Document } from 'mongoose';
-import { Participant, Pool, TwitterUser } from '../models';
+import { Participant, Pool, PoolDocument, TwitterUser } from '../models';
 import { AccessTokenKind } from '@thxnetwork/common/enums';
-import { DiscordUser } from '../models/DiscordUser';
+import { Wallet, DiscordUser } from '../models';
 import { logger } from '../util/logger';
 import ReCaptchaService from '@thxnetwork/api/services/ReCaptchaService';
 import AnalyticsService from './AnalyticsService';
+import AccountProxy from '../proxies/AccountProxy';
 
 export default class ParticipantService {
+    static async export(pool: PoolDocument) {
+        const participants = await Participant.find({ poolId: pool.id });
+        const subs = participants.map((p) => p.sub);
+        const accounts = await AccountProxy.find({ subs });
+        const wallets = await Wallet.find({ sub: { $in: subs } });
+
+        return participants.map((p) => {
+            const account = accounts.find((a) => a.sub === p.sub);
+            const accountWallets = wallets.filter((w) => w.sub === p.sub);
+            const discord = account.tokens.find((t) => t.kind === 'discord');
+            const twitter = account.tokens.find((t) => t.kind === 'twitter');
+            const google = account.tokens.find((t) => t.kind === 'google');
+
+            return {
+                accountId: account.sub,
+                twitterId: twitter ? twitter.userId : '',
+                discordId: discord ? discord.userId : '',
+                googleId: google ? google.userId : '',
+                username: account.username,
+                email: account.email,
+                wallets: accountWallets.length ? accountWallets.map((aw) => aw.address).join(' ') : '',
+                createdAt: p.createdAt,
+            };
+        });
+    }
+
     static async decorate(
         data: Document & (TQuestEntry | TRewardPayment),
         { accounts, participants }: { accounts: TAccount[]; participants: TParticipant[] },

@@ -4,6 +4,7 @@ export { Client, ClientDocument } from './Client';
 export { Collaborator, CollaboratorDocument } from './Collaborator';
 export { CouponCode, CouponCodeDocument } from './CouponCode';
 export { DiscordGuild, DiscordGuildDocument } from './DiscordGuild';
+export { DiscordUser, DiscordUserDocument } from './DiscordUser';
 export { DiscordMessage, DiscordMessageDocument } from './DiscordMessage';
 export { DiscordReaction, DiscordReactionDocument } from './DiscordReaction';
 export { ERC1155, ERC1155Document } from './ERC1155';
