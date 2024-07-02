@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { Pool } from '@thxnetwork/api/models';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { Request, Response } from 'express';

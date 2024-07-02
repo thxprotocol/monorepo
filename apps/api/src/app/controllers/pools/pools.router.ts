@@ -6,6 +6,7 @@ import * as ReadController from './get.controller';
 import * as CreateController from './post.controller';
 import * as UpdateController from './patch.controller';
 import * as DeleteController from './delete.controller';
+import * as CreateDuplicate from './duplicate/post.controller';
 
 import RouterCollaborators from './collaborators/collaborators.router';
 import RouterParticipants from './participants/participants.router';
@@ -54,6 +55,12 @@ router.delete(
     guard.check(['pools:write']),
     assertRequestInput(DeleteController.validation),
     DeleteController.controller,
+);
+router.post(
+    '/:id/duplicate',
+    guard.check(['pools:read', 'pools:write']),
+    assertRequestInput(CreateDuplicate.validation),
+    CreateDuplicate.controller,
 );
 
 // Payment related routes that require access event if payment assertion fails
