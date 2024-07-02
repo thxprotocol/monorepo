@@ -37,6 +37,10 @@ createApp({
     onClickSubmit() {
         this.isLoading = true;
     },
+    onClickProvider(url) {
+        this.isLoading = true;
+        window.location.href = url;
+    },
 }).mount();
 
 /* eslint-enable no-undef */

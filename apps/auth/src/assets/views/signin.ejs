@@ -289,11 +289,6 @@
             </div>
             <% } %>
 
-            <% if (params.mfaEnabled) { %>
-            <label>MFA code:</label>
-            <input class="form-control mb-4" required name="code">
-            <% } %>
-
             <input type="hidden" name="signupEmail" value="<%= params.signup_email %>" />
             <input type="hidden" name="returnUrl" value="<%= params.return_url %>" />
             <input type="hidden" name="isWidget" value="<%= params.isWidget %>" />
@@ -319,35 +314,40 @@
           <div class="d-flex align-items-center justify-content-start flex-wrap">
             <% if (params.googleLoginUrl) { %>
             <a style="width: 40px; height: 40px;" class="mr-2 mb-2 d-block p-1 btn btn-light"
-               href="<%= params.googleLoginUrl %>" data-toggle="tooltip" title="Sign in with Google">
+               :class=" {'disabled': isLoading}" @click=" onClickProvider('<%= params.googleLoginUrl %>')"
+               data-toggle="tooltip" title="Sign in with Google">
               <img width="20" src="/img/g-logo.png" alt="Google logo" />
             </a>
             <% } %>
 
             <% if (params.twitterLoginUrl) { %>
             <a style="width: 40px; height: 40px;" class="mr-2 mb-2 d-block p-1 btn btn-light"
-               href="<%= params.twitterLoginUrl %>" data-toggle="tooltip" title="Sign in with Twitter">
+               :class=" {'disabled': isLoading}" @click=" onClickProvider('<%= params.twitterLoginUrl %>')"
+               data-toggle="tooltip" title="Sign in with Twitter">
               <img width="20" src="/img/t-logo.png" alt="Twitter logo" />
             </a>
             <% } %>
 
             <% if (params.discordLoginUrl && !params.isSignup) { %>
             <a style="width: 40px; height: 40px;" class="mr-2 mb-2 d-block p-1 btn btn-light"
-               href="<%= params.discordLoginUrl %>" data-toggle="tooltip" title="Sign in with Discord">
+               :class=" {'disabled': isLoading}" @click=" onClickProvider('<%= params.discordLoginUrl %>')"
+               data-toggle="tooltip" title="Sign in with Discord">
               <img width="20" src="/img/discord-logo.png" alt="Discord logo" />
             </a>
             <% } %>
 
             <% if (params.githubLoginUrl) { %>
             <a style="width: 40px; height: 40px;" class="mr-2 mb-2 d-block p-1 btn btn-light"
-               href="<%= params.githubLoginUrl %>" data-toggle="tooltip" title="Sign in with Github">
+               :class=" {'disabled': isLoading}" @click=" onClickProvider('<%= params.githubLoginUrl %>')"
+               data-toggle="tooltip" title="Sign in with Github">
               <img width="20" src="/img/github-logo.png" alt="github logo" />
             </a>
             <% } %>
 
             <% if (params.twitchLoginUrl) { %>
             <a style="width: 40px; height: 40px;" class="mr-2 mb-2 d-block p-1 btn btn-light"
-               href="<%= params.twitchLoginUrl %>" data-toggle="tooltip" title="Sign in with Twitch">
+               :class=" {'disabled': isLoading}" @click=" onClickProvider('<%= params.twitchLoginUrl %>')"
+               href="<%= params.twitterLoginUrl %>" data-toggle="tooltip" title="Sign in with Twitch">
               <img width="20" src="/img/twitch-logo.png" alt="twitch logo" />
             </a>
             <% } %>
