@@ -23,6 +23,7 @@ export default class ParticipantService {
 
             return {
                 accountId: account.sub,
+                points: p.balance,
                 twitterId: twitter ? twitter.userId : '',
                 discordId: discord ? discord.userId : '',
                 googleId: google ? google.userId : '',

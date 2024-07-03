@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
 import { param } from 'express-validator';
+import { Request, Response } from 'express';
 import { safeVersion } from '@thxnetwork/api/services/ContractService';
+import { Pool } from '@thxnetwork/api/models';
 import PoolService from '@thxnetwork/api/services/PoolService';
 import SafeService from '@thxnetwork/api/services/SafeService';
-import { Pool } from '@thxnetwork/api/models';
 
 const validation = [param('id').isMongoId()];
 
