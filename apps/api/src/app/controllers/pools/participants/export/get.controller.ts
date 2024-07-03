@@ -31,6 +31,7 @@ const controller = async (req: Request, res: Response) => {
         const csvRow = CSVService.stringify([
             [
                 row.accountId,
+                row.points,
                 row.twitterId,
                 row.discordId,
                 row.googleId,
