@@ -127,8 +127,27 @@ export default async function main() {
                     }),
                     isPublished: true,
                 };
-                await QuestSocial.create(socialQuestFollow);
+                const followQuest = await QuestSocial.create(socialQuestFollow);
 
+                // Create invite quest
+                await QuestInvite.create({
+                    poolId,
+                    index: 1,
+                    uuid: db.createUUID(),
+                    title: `Invite your friends!`,
+                    description:
+                        'You and the invitee will receive 500 points and the invitee 250 additional points for completing the required quest.',
+                    amount: 500,
+                    amountInvitee: 250,
+                    requiredQuest: {
+                        questId: followQuest.id,
+                        variant: QuestVariant.Invite,
+                    },
+                    variant: QuestVariant.Invite,
+                    isPublished: true,
+                });
+
+                // Create repost quest
                 const tweetId = tweetUrl.match(/\/(\d+)(?:\?|$)/)[1];
                 const [tweet] = await getTwitterTWeet(tweetId);
                 const socialQuestRetweet = {
@@ -151,7 +170,7 @@ export default async function main() {
                 await QuestSocial.create(socialQuestRetweet);
             }
 
-            // Create social quest twitter retweet
+            // Create social quest discord join
             if (serverId && serverId !== 'N/A') {
                 const inviteURL = sql['Discord Invite URL'];
                 const socialQuestJoin = {

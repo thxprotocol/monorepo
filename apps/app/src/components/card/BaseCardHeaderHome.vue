@@ -1,7 +1,7 @@
 <template>
     <BaseCardHeader>
         <template #primary>
-            <h1 class="text-opaque">Join today!</h1>
+            <h1>Join today!</h1>
             <p class="lead mb-4">
                 Members earn weekly rewards and gain access to exclusive quests &amp; rewards of listed projects.
             </p>

@@ -1,33 +1,28 @@
 <template>
-    <b-card body-class="d-flex align-items-center py-2">
-        <div v-if="token.guild" v-b-tooltip class="pe-3" :title="token.guild.name">
-            <b-img v-if="token.guild.icon" :src="token.guild.icon" height="30" class="rounded" />
-            <i v-else class="fab fa-discord text-primary"></i>
-        </div>
-        <div class="flex-grow-1">
-            <b-badge
+    <BaseCardPayment
+        :reward-variant="RewardVariant.DiscordRole"
+        :icon="token.guild && token.guild.icon"
+        :created-at="token.createdAt"
+    >
+        <template #header>
+            <strong
                 v-if="token.role"
-                class="p-2"
                 :style="{
-                    color: 'white !important',
-                    backgroundColor: `${token.role.color} !important`,
+                    color: `${token.role.color} !important`,
                 }"
             >
                 {{ token.role.name }}
-            </b-badge>
-            <b-badge v-else variant="dark" class="p-2">
-                Role not found
+            </strong>
+            <div v-else>
+                <span class="text-opaque me-2">Role no longer available</span>
                 <i
                     v-b-tooltip
-                    class="fas fa-info-circle"
+                    class="fas fa-info-circle text-opaque"
                     title="THX Bot is no longerin this server or the role has been removed."
                 />
-            </b-badge>
-        </div>
-        <b-dropdown variant="link" size="sm" no-caret end>
-            <template #button-content>
-                <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
-            </template>
+            </div>
+        </template>
+        <template #dropdown-items>
             <b-dropdown-item
                 v-if="token.discordServerURL"
                 target="_blank"
@@ -37,12 +32,8 @@
                 Server URL
                 <i class="fas fa-caret-right text-opaque"></i>
             </b-dropdown-item>
-            <b-dropdown-divider />
-            <b-dropdown-text class="text-end small text-opaque">
-                {{ format(new Date(token.createdAt), 'MMMM do hh:mm') }}
-            </b-dropdown-text>
-        </b-dropdown>
-    </b-card>
+        </template>
+    </BaseCardPayment>
 </template>
 
 <script lang="ts">
@@ -51,6 +42,7 @@ import { defineComponent, PropType } from 'vue';
 import { useWalletStore } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { format } from 'date-fns';
+import { RewardVariant } from '@thxnetwork/common/enums';
 
 export default defineComponent({
     name: 'BaseCardCouponCode',
@@ -65,6 +57,7 @@ export default defineComponent({
             format,
             isVisible: false,
             isModalURLShown: false,
+            RewardVariant,
         };
     },
     computed: {

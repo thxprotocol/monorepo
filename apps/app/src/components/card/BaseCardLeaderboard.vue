@@ -1,18 +1,21 @@
 <template>
-    <b-card header-class="p-0" body-class="d-flex flex-column p-2 pt-0">
-        <b-card-title class="d-flex px-1 py-1 m-0 align-items-center">
+    <div v-if="accountStore.config.slug && participant" class="d-flex flex-column">
+        <div class="d-flex p-2 m-0 align-items-center">
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fa fa-trophy me-2 text-opaque" />
             </div>
             <div class="flex-grow-1 pe-2">Leaderboard</div>
-            <b-button class="text-primary" variant="link" @click="onClickRefresh">
+            <b-button size="sm" variant="primary" @click="onClickRefresh">
                 <b-spinner v-if="isLoading" small />
-                <i v-else class="fas fa-sync-alt" />
+                <i v-else class="fas small fa-sync-alt" />
             </b-button>
-        </b-card-title>
+        </div>
         <b-list-group>
             <b-list-group-item v-for="(entry, key) of accountStore.leaderboard" :key="key" class="d-flex px-0 pe-3">
-                <span class="list-item-field-rank">{{ entry.rank }}</span>
+                <span class="list-item-field-rank">
+                    <i class="fas fa-hashtag me-1 text-opaque" />
+                    {{ entry.rank }}
+                </span>
                 <span class="list-item-field-address flex-grow-1 ps-2">
                     <b-avatar
                         size="sm"
@@ -30,17 +33,17 @@
                 <strong class="list-item-field-score">{{ entry.score }}</strong>
             </b-list-group-item>
         </b-list-group>
-    </b-card>
+    </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useAccountStore } from '../stores/Account';
-import { useQuestStore } from '../stores/Quest';
+import { useAccountStore } from '../../stores/Account';
+import { useQuestStore } from '../../stores/Quest';
 
 export default defineComponent({
-    name: 'BaseQuestLeaderboard',
+    name: 'BaseCardLeaderboard',
     data() {
         return {
             isLoading: false,
@@ -49,6 +52,9 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useQuestStore),
+        participant() {
+            return this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
+        },
     },
     mounted() {
         this.accountStore.getLeaderboard();
@@ -76,7 +82,6 @@ export default defineComponent({
     left: 1px;
     bottom: 1px;
     width: 40px;
-    border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -96,3 +101,4 @@ export default defineComponent({
     text-align: right;
 }
 </style>
+../../stores/Account../../stores/Quest

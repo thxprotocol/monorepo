@@ -1,7 +1,7 @@
 <template>
     <BaseCardHeader>
         <template #primary>
-            <h1 class="text-opaque">Protocol Governance</h1>
+            <h1>Governance</h1>
             <p class="lead mb-4">Vote on proposals that determine the future of the protocol.</p>
             <b-button href="https://snapshot.org/#/thxprotocol.eth/" target="_blank" variant="success" class="px-5">
                 Snapshot Space
@@ -52,7 +52,7 @@ import { formatUnits } from 'ethers/lib/utils';
 import imgJumbotron from '../../assets/thx_token_governance.png';
 
 export default defineComponent({
-    name: 'Community',
+    name: 'Governance',
     data() {
         return {
             imgJumbotron,

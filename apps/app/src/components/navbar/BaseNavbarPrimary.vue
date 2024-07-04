@@ -1,5 +1,9 @@
 <template>
-    <b-navbar v-if="isQuestCampaign" :container="false" class="navbar-bottom mb-lg-3 px-lg-3 order-lg-0">
+    <b-navbar
+        v-if="!accountStore.config.isQRCodeCampaign"
+        :container="false"
+        class="navbar-bottom shadow px-lg-3 order-lg-0"
+    >
         <div
             v-if="accountStore.config"
             style="width: 120px"

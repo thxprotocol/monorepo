@@ -100,6 +100,15 @@ import { mapStores } from 'pinia';
 import { RewardVariant } from '../../types/enums/rewards';
 import { useAuthStore } from '@thxnetwork/app/stores/Auth';
 
+export const iconMap = {
+    [RewardVariant.Coin]: 'fas fa-coins',
+    [RewardVariant.NFT]: 'fas fa-palette',
+    [RewardVariant.Coupon]: 'fas fa-tags',
+    [RewardVariant.Custom]: 'fas fa-gift',
+    [RewardVariant.DiscordRole]: 'fab fa-discord',
+    [RewardVariant.Galachain]: 'fas fa-box',
+} as { [variant: string]: string };
+
 export default defineComponent({
     name: 'BaseCardReward',
     props: {
@@ -112,14 +121,7 @@ export default defineComponent({
     data() {
         return {
             format,
-            iconMap: {
-                [RewardVariant.Coin]: 'fas fa-coins',
-                [RewardVariant.NFT]: 'fas fa-palette',
-                [RewardVariant.Coupon]: 'fas fa-tags',
-                [RewardVariant.Custom]: 'fas fa-gift',
-                [RewardVariant.DiscordRole]: 'fab fa-discord',
-                [RewardVariant.Galachain]: 'fas fa-box',
-            } as { [variant: string]: string },
+            iconMap,
         };
     },
     computed: {

@@ -2,7 +2,7 @@
     <b-container>
         <b-row>
             <b-col lg="6" offset-xl="3">
-                <BaseQuestLeaderboard />
+                <BaseCardLeaderboard />
             </b-col>
         </b-row>
     </b-container>

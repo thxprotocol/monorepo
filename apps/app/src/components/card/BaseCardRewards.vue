@@ -1,46 +1,24 @@
 <template>
-    <b-tabs class="tabs-rewards" nav-class="px-3" content-class="p-2">
-        <template #tabs-end>
-            <b-button
-                v-if="accountStore.isAuthenticated"
-                class="text-primary ms-auto"
-                size="sm"
-                variant="link"
-                @click="onClickRefresh"
-            >
-                <b-spinner v-if="isRefreshing" small />
-                <i v-else class="fas fa-sync-alt" style="font-size: 0.8rem" />
-            </b-button>
-        </template>
-        <b-tab title="Coins">
-            <div v-for="(token, key) of walletStore.erc20" :key="key" class="mb-1">
-                <component :is="token.component" :token="token" />
+    <div>
+        <div class="d-flex p-2 m-0 align-items-center">
+            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
+                <i class="fas fa-wallet me-2 text-opaque" />
             </div>
-        </b-tab>
-        <b-tab v-if="walletStore.erc721.length || walletStore.erc1155.length" title="NFT">
-            <div v-for="(token, key) of walletStore.erc1155" :key="key" class="mb-1">
-                <component :is="token.component" :token="token" />
-            </div>
-            <div v-for="(token, key) of walletStore.erc721" :key="key" class="mb-1">
-                <component :is="token.component" :token="token" />
-            </div>
-        </b-tab>
-        <b-tab v-if="walletStore.couponCodes.length" title="Secrets">
-            <div v-for="(token, key) of walletStore.couponCodes" :key="key" class="mb-1">
-                <component :is="token.component" :token="token" />
-            </div>
-        </b-tab>
-        <b-tab v-if="walletStore.discordRoles.length" title="Discord">
-            <div v-for="(token, key) of walletStore.discordRoles" :key="key" class="mb-1">
-                <component :is="token.component" :token="token" />
-            </div>
-        </b-tab>
-        <b-tab v-if="walletStore.galachain.length" title="Galachain">
-            <div v-for="(token, key) of walletStore.galachain" :key="key" class="mb-1">
-                <component :is="token.component" :token="token" />
-            </div>
-        </b-tab>
-    </b-tabs>
+            <div class="flex-grow-1 pe-2">Your Wallet</div>
+            <b-dropdown variant="primary" size="sm" no-caret>
+                <template #button-content>
+                    {{ activeFilter.label }}
+                    <i class="fas fa-caret-down ms-1" />
+                </template>
+                <b-dropdown-item-button v-for="filter of filters" @click="activeFilter = filter">
+                    {{ filter.label }}
+                </b-dropdown-item-button>
+            </b-dropdown>
+        </div>
+        <div v-for="(token, key) of list" :key="key" class="mb-1">
+            <component :is="token.component" :token="token" />
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -48,6 +26,7 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
 import { useAuthStore } from '../../stores/Auth';
+import { RewardVariant } from '@thxnetwork/common/enums';
 import { useAccountStore } from '../../stores/Account';
 import BaseCardERC20 from '../../components/card/BaseCardERC20.vue';
 import BaseCardERC721 from '../../components/card/BaseCardERC721.vue';
@@ -69,18 +48,51 @@ export default defineComponent({
             error: '',
             isSubmitting: false,
             isRefreshing: false,
+            activeFilter: { label: 'All', key: [] } as { label: string; key: number[] },
+            RewardVariant,
+            filters: [
+                {
+                    label: 'All',
+                    key: [],
+                },
+                {
+                    label: 'Coins',
+                    key: [RewardVariant.Coin],
+                },
+                {
+                    label: 'NFT',
+                    key: [RewardVariant.NFT],
+                },
+                {
+                    label: 'Discord',
+                    key: [RewardVariant.DiscordRole],
+                },
+                {
+                    label: 'Codes',
+                    key: [RewardVariant.Coupon],
+                },
+                {
+                    label: 'Galachain',
+                    key: [RewardVariant.Galachain],
+                },
+            ] as { label: string; key: number[] }[],
         };
     },
     computed: {
         ...mapStores(useAuthStore, useAccountStore, useWalletStore),
         list() {
             return [
-                ...this.walletStore.discordRoles,
-                ...this.walletStore.couponCodes,
                 ...this.walletStore.erc20,
                 ...this.walletStore.erc721,
                 ...this.walletStore.erc1155,
+                ...this.walletStore.couponCodes,
+                ...this.walletStore.discordRoles,
+                ...this.walletStore.galachain,
             ]
+                .filter((item) => {
+                    if (!this.activeFilter.key.length) return true;
+                    return this.activeFilter.key.includes(item.rewardVariant);
+                })
                 .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
                 .reverse();
         },

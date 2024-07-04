@@ -67,6 +67,7 @@ export const useAccountStore = defineStore('account', {
         },
         reset() {
             this.poolId = '';
+            this.participants = [];
             this.api.setCampaignId('');
             this.setTheme({
                 title: 'THX Network',
@@ -300,6 +301,7 @@ export const useAccountStore = defineStore('account', {
             return window.sessionStorage.getItem(`thx:${this.poolId}:id`);
         },
         async getLeaderboard() {
+            if (!this.poolId) return;
             this.leaderboard = await this.api.request.get(`/v1/leaderboards/${this.poolId}`);
         },
         async waitForJob(jobId: string) {

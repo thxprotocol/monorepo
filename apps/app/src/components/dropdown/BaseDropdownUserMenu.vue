@@ -3,20 +3,18 @@
         <b-spinner v-if="accountStore.isAuthenticated === false" small />
         <template v-else> Sign in </template>
     </b-button>
-    <b-dropdown v-else variant="link" no-caret end>
+    <b-dropdown v-else-if="accountStore.account" variant="link" no-caret end>
         <template #button-content>
-            <i class="fas fa-ellipsis-v" />
+            <b-avatar size="30" :src="accountStore.account.profileImg" variant="dark" />
         </template>
         <b-dropdown-item @click="accountStore.isModalAccountShown = true"> Account </b-dropdown-item>
-        <b-dropdown-item
-            v-if="questStore.quests.length"
-            size="sm"
-            @click="$router.push(`/c/${accountStore.config.slug}/w`)"
-        >
-            Identities
-        </b-dropdown-item>
-        <b-dropdown-divider />
-        <b-dropdown-item @click="$router.push(`/c/${accountStore.config.slug}/about`)"> About </b-dropdown-item>
+        <template v-if="accountStore.config.slug">
+            <b-dropdown-item size="sm" @click="$router.push(`/c/${accountStore.config.slug}/w`)">
+                Identities
+            </b-dropdown-item>
+            <b-dropdown-divider />
+            <b-dropdown-item @click="$router.push(`/c/${accountStore.config.slug}/about`)"> About </b-dropdown-item>
+        </template>
         <b-dropdown-item href="https://discord.com/invite/TzbbSmkE7Y" target="_blank"> Support </b-dropdown-item>
         <b-dropdown-divider />
         <b-dropdown-item

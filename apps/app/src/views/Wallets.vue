@@ -6,7 +6,6 @@
         </b-alert>
         <b-row v-else>
             <b-col lg="6" offset-lg="3" class="px-0">
-                <BaseCardAccount v-if="accountStore.isMobile" />
                 <BaseCardRewards />
             </b-col>
         </b-row>

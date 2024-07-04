@@ -4,7 +4,7 @@
             v-model="isOpenWallet"
             variant="link"
             class="w-100"
-            toggle-class="d-flex align-items-center justify-content-end text-white text-decoration-none px-0 "
+            toggle-class="d-flex align-items-center justify-content-end text-white text-decoration-none px-2"
             auto-close="outside"
             menu-class="bg-body"
             no-caret
@@ -18,7 +18,7 @@
                     }"
                     class="fas fa-circle me-2"
                 />
-                <div>{{ walletStore.wallet ? walletStore.wallet.short : 'No Wallet' }}</div>
+                <div>{{ walletStore.wallet ? walletStore.wallet.short : 'Connect' }}</div>
             </template>
             <b-dropdown-text v-if="walletStore.wallet" text-class="bg-dark">
                 <b-form-group label-class="d-flex align-items-center mb-1 ">

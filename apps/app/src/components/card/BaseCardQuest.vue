@@ -129,7 +129,7 @@ export default defineComponent({
     name: 'BaseCardQuest',
     props: {
         id: String,
-        visible: Boolean,
+        // visible: Boolean,
         loading: Boolean,
         completing: Boolean,
         error: String,
@@ -173,11 +173,11 @@ export default defineComponent({
     },
     watch: {
         visible(value: boolean) {
-            this.isVisible = window.innerWidth > 768 || value;
+            this.isVisible = value;
         },
     },
     mounted() {
-        this.isVisible = window.innerWidth > 768 || this.visible;
+        this.isVisible = !this.quest.index;
     },
     methods: {
         onClickLink(url: string) {

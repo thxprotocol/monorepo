@@ -9,10 +9,10 @@
             <b-spinner type="grow" variant="primary" small />
         </b-container>
         <template v-else>
-            <BaseCardAccountRank :height="200" />
+            <BaseCardCampaignJumbotron :height="100" />
             <router-view class="order-lg-2 overflow-mobile flex-grow-1" />
         </template>
-        <BaseNavbarPrimary :screen-width="screenWidth" />
+        <BaseNavbarPrimary v-if="accountStore.isMobile" />
         <BaseModalInvite :show="isModalInviteShown" />
     </div>
 </template>
@@ -124,10 +124,6 @@ export default defineComponent({
 }
 
 .h-vertical {
-    height: 100% !important;
-
-    @media (min-width: 991px) {
-        height: calc(100% - 30px) !important;
-    }
+    height: calc(100% - 30px) !important;
 }
 </style>

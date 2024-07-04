@@ -112,6 +112,7 @@ type TERC20Token = {
     migrationBalance: string;
     logoImg: string;
     erc20: TERC20;
+    createdAt: Date;
 };
 
 type TERC20TransferConfig = {

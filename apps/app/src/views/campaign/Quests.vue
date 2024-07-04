@@ -2,10 +2,17 @@
     <b-container>
         <b-row>
             <b-col lg="7" xl="6" offset-xl="1">
+                <div v-if="!accountStore.isMobile" class="mb-2 ps-3 d-flex align-items-center bg-primary rounded p-2">
+                    <div>
+                        <strong>Quests</strong>
+                        <div class="text-opaque">Earn points with tasks</div>
+                    </div>
+                    <i class="fas fa-tasks text-opaque ms-auto me-3" style="font-size: 1.2rem" />
+                </div>
                 <div v-if="questStore.isLoading" class="d-flex justify-content-center py-5">
                     <b-spinner variant="primary" small />
                 </div>
-                <b-tabs v-else content-class="mt-3" justified>
+                <b-tabs v-else content-class="mt-3" justified class="mt-3">
                     <b-tab active>
                         <template #title>
                             Available
@@ -40,8 +47,20 @@
                     </b-tab>
                 </b-tabs>
             </b-col>
-            <b-col lg="5" xl="4">
-                <BaseQuestLeaderboard class="d-none d-lg-block mb-2 mx-lg-0 mb-lg-3" />
+            <b-col v-if="!accountStore.isMobile" lg="5" xl="4">
+                <div class="mb-2 ps-3 d-flex align-items-center bg-primary rounded p-2">
+                    <div>
+                        <strong>Reward Shop</strong>
+                        <div class="text-opaque">Spend your points!</div>
+                    </div>
+                    <i class="fas fa-store text-opaque ms-auto me-3" style="font-size: 1.2rem" />
+                </div>
+                <component
+                    :is="componentMap[reward.variant]"
+                    v-for="reward of rewardStore.rewards"
+                    :reward="reward"
+                    class="mb-2"
+                />
             </b-col>
         </b-row>
     </b-container>
@@ -63,6 +82,22 @@ import BaseCardQuestDaily from '../../components/card/BaseCardQuestDaily.vue';
 import BaseCardQuestWeb3 from '../../components/card/BaseCardQuestWeb3.vue';
 import BaseCardQuestGitcoin from '../../components/card/BaseCardQuestGitcoin.vue';
 import BaseCardQuestWebhook from '../../components/card/BaseCardQuestWebhook.vue';
+import { RewardVariant } from '../../types/enums/rewards';
+import BaseCardRewardCoin from '../../components/card/BaseCardRewardCoin.vue';
+import BaseCardRewardNFT from '../../components/card/BaseCardRewardNFT.vue';
+import BaseCardRewardCustom from '../../components/card/BaseCardRewardCustom.vue';
+import BaseCardRewardCoupon from '../../components/card/BaseCardRewardCoupon.vue';
+import BaseCardRewardDiscordRole from '../../components/card/BaseCardRewardDiscordRole.vue';
+import BaseCardRewardGalachain from '../../components/card/BaseCardRewardGalachain.vue';
+
+const componentMap: { [variant: string]: string } = {
+    [RewardVariant.Coin]: 'BaseCardRewardCoin',
+    [RewardVariant.NFT]: 'BaseCardRewardNFT',
+    [RewardVariant.Custom]: 'BaseCardRewardCustom',
+    [RewardVariant.Coupon]: 'BaseCardRewardCoupon',
+    [RewardVariant.DiscordRole]: 'BaseCardRewardDiscordRole',
+    [RewardVariant.Galachain]: 'BaseCardRewardGalachain',
+};
 
 export default defineComponent({
     name: 'Quests',
@@ -74,9 +109,16 @@ export default defineComponent({
         BaseCardQuestWeb3,
         BaseCardQuestGitcoin,
         BaseCardQuestWebhook,
+        BaseCardRewardCoin,
+        BaseCardRewardNFT,
+        BaseCardRewardCustom,
+        BaseCardRewardCoupon,
+        BaseCardRewardDiscordRole,
+        BaseCardRewardGalachain,
     },
     data() {
         return {
+            componentMap,
             questComponentMap,
             isLgScreen: window.innerWidth > 1000,
             selectedSort: { label: 'Default', key: RewardSortVariant.Default },
@@ -101,7 +143,7 @@ export default defineComponent({
         },
         quests() {
             const { quests } = this.questStore;
-            return quests.sort(sortMap[this.selectedSort.key]);
+            return quests.sort(sortMap[this.selectedSort.key]).map((quest, index) => ({ ...quest, index }));
         },
     },
     watch: {
@@ -112,6 +154,8 @@ export default defineComponent({
                     await this.accountStore.getAccount();
                 }
                 this.questStore.list();
+                this.rewardStore.list();
+                this.accountStore.getParticipants();
             },
             immediate: true,
         },

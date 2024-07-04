@@ -1,7 +1,10 @@
 <template>
     <aside v-if="isShown" class="sidebar">
         <div class="sidebar-panel h-100">
-            <BaseCardAccount />
+            <BaseCardAccountRank />
+            <hr class="mt-2 mb-0" style="opacity: 0.1" />
+            <BaseCardLeaderboard />
+            <hr class="mt-2 mb-0" style="opacity: 0.1" />
             <BaseCardRewards />
             <BaseCardDiscord class="mt-auto" />
         </div>

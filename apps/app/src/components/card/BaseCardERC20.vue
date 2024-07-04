@@ -1,19 +1,16 @@
 <template>
-    <b-card body-class="d-flex align-items-center" class="mb-1">
-        <div v-if="token.erc20" class="pe-3">
-            <img height="20" :src="token.erc20.logoImgUrl" />
-        </div>
-        <div class="flex-grow-1">
-            {{ token.erc20.symbol }}
-        </div>
-        <div class="text-success">{{ token.walletBalance }}</div>
-        <div>
-            <b-dropdown variant="link" size="sm" no-caret end toggle-class="py-0">
-                <template #button-content>
-                    <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
-                </template>
-                <b-dropdown-item @click="isModalTransferShown = true"> Transfer </b-dropdown-item>
-            </b-dropdown>
+    <BaseCardPayment
+        :reward-variant="RewardVariant.Coin"
+        :icon="token.erc20 && token.erc20.logoImgUrl"
+        :created-at="token.createdAt"
+    >
+        <template #header>
+            <div class="text-success fw-bold me-auto">{{ token.walletBalance }}</div>
+            <span class="text-opaque">{{ token.erc20.symbol }}</span>
+        </template>
+
+        <template #dropdown-items>
+            <b-dropdown-item @click="isModalTransferShown = true"> Transfer </b-dropdown-item>
             <BaseModalERC20Transfer
                 :id="`modalERC20Transfer${token.erc20._id}`"
                 :show="isModalTransferShown"
@@ -23,8 +20,8 @@
                 @hidden="onModalTransferHidden"
                 @submit="onSubmitTransfer"
             />
-        </div>
-    </b-card>
+        </template>
+    </BaseCardPayment>
 </template>
 
 <script lang="ts">
@@ -34,6 +31,7 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { toast } from '../../utils/toast';
 import { fromWei } from 'web3-utils';
+import { RewardVariant } from '@thxnetwork/common/enums';
 
 export default defineComponent({
     name: 'BaseCardERC20',
@@ -51,6 +49,7 @@ export default defineComponent({
             error: '',
             isPendingApproval: false,
             isPendingTransfer: false,
+            RewardVariant,
         };
     },
     computed: {
