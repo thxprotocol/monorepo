@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="overflow: auto">
         <div class="d-flex p-2 m-0 align-items-center">
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="fas fa-wallet me-2 text-opaque" />
