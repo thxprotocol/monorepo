@@ -37,26 +37,27 @@
                 <sup><i class="fas fa-circle text-danger" /></sup>
             </b-button>
 
-            <b-button class="ps-4 pe-3 rounded py-2 ms-2" variant="primary" :href="dashboardURL">
+            <b-button class="ps-4 pe-3 rounded py-2 ms-2" variant="primary" target="_blank" :href="dashboardURL">
                 Create Campaign
                 <i class="fas fa-plus ms-2 text-opaque" />
             </b-button>
 
-            <b-navbar-nav class="ms-auto mb-2 mb-lg-0 justify-content-end align-items-center">
-                <template v-if="!authStore.user">
-                    <b-button v-b-modal="'modalLogin'" class="px-4 ms-2 rounded py-2" variant="outline-light">
-                        Sign up
-                    </b-button>
-                    <b-button v-b-modal="'modalLogin'" class="px-4 ms-2 rounded py-2" variant="primary">
-                        Sign in
-                        <i class="fas fa-sign-in-alt ms-2" />
-                    </b-button>
-                </template>
+            <b-navbar-nav
+                v-if="!accountStore.isAuthenticated"
+                class="ms-auto mb-2 mb-lg-0 justify-content-end align-items-center"
+            >
+                <b-button v-b-modal="'modalLogin'" class="px-4 ms-2 rounded py-2" variant="outline-light">
+                    Sign up
+                </b-button>
+                <b-button v-b-modal="'modalLogin'" class="px-4 ms-2 rounded py-2" variant="primary">
+                    Sign in
+                    <i class="fas fa-sign-in-alt ms-2" />
+                </b-button>
             </b-navbar-nav>
         </b-collapse>
         <div class="d-flex align-items-center">
-            <BaseDropdownWallets v-if="accountStore.isAuthenticated" />
-            <BaseDropdownUserMenu />
+            <BaseDropdownWallets v-if="accountStore.isAuthenticated" class="me-3" />
+            <BaseDropdownUserMenu class="ms-auto" />
             <b-button variant="link" class="d-block d-lg-none" @click="isNavbarOffcanvasShown = true">
                 <i class="fas fa-bars text-white"></i>
             </b-button>
@@ -102,7 +103,7 @@
             </b-list-group-item>
         </b-list-group>
 
-        <b-button class="ps-4 pe-3 rounded py-2 ms-2" variant="primary" :href="dashboardURL">
+        <b-button class="ps-4 pe-3 rounded py-2 ms-2" variant="primary" target="_blank" :href="dashboardURL">
             Create Campaign
             <i class="fas fa-plus ms-2 text-opaque" />
         </b-button>

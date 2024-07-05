@@ -20,7 +20,7 @@
                 </b-col>
                 <b-col lg="3">
                     <div class="d-none d-lg-flex align-items-center justify-content-end">
-                        <BaseDropdownWallets />
+                        <BaseDropdownWallets class="me-3" />
                         <BaseDropdownUserMenu />
                     </div>
                 </b-col>

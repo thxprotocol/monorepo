@@ -6,10 +6,6 @@
                     <i class="fas fa-exclamation-circle me-1"></i>
                     {{ error }}
                 </b-alert>
-                <b-alert v-else v-model="isAlertInfoShown" variant="info" show class="p-2">
-                    <i class="fas fa-gift me-1"></i>
-                    Sign in to collect your NFT
-                </b-alert>
                 <b-card v-if="qrcodeStore.entry && qrcodeStore.metadata && qrcodeStore.erc721" class="mx-auto my-2">
                     <b-alert v-model="isAlertErrorShown" variant="danger" show class="p-2">
                         <i class="fas fa-exclamation-circle me-1"></i>
@@ -29,23 +25,22 @@
                             :force="0.5"
                         />
                     </div>
-                    <div class="d-flex">
-                        <div class="d-flex justify-content-center align-items-center" style="width: 75px">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex justify-content-center align-items-center">
                             <div>
                                 <b-spinner v-if="isLoadingImage" small variant="light" />
                                 <b-img
                                     :src="qrcodeStore.metadata.imageUrl"
-                                    width="60"
-                                    class="me-3 rounded shadow-sm"
+                                    fluid
+                                    style="max-height: 200px"
+                                    class="rounded shadow-sm"
                                     :class="{ 'd-none': isLoadingImage }"
                                     @load="isLoadingImage = false"
                                 />
                             </div>
                         </div>
-                        <div>
-                            <b-card-title> {{ qrcodeStore.metadata.name }}</b-card-title>
-                            <p class="m-0">{{ qrcodeStore.metadata.description }}</p>
-                        </div>
+                        <b-card-title class="mt-3"> {{ qrcodeStore.metadata.name }}</b-card-title>
+                        <p class="m-0">{{ qrcodeStore.metadata.description }}</p>
                     </div>
                     <hr />
                     <p class="d-flex align-items-center small">

@@ -50,10 +50,10 @@
             <b-col v-if="!accountStore.isMobile" lg="5" xl="4">
                 <div class="mb-2 ps-3 d-flex align-items-center bg-primary rounded p-2">
                     <div>
-                        <strong>Reward Shop</strong>
+                        <strong>Rewards</strong>
                         <div class="text-opaque">Spend your points!</div>
                     </div>
-                    <i class="fas fa-store text-opaque ms-auto me-3" style="font-size: 1.2rem" />
+                    <i class="fas fa-gift text-opaque ms-auto me-3" style="font-size: 1.2rem" />
                 </div>
                 <component
                     :is="componentMap[reward.variant]"

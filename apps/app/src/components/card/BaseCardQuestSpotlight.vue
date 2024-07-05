@@ -14,7 +14,7 @@
                     backgroundPosition: 'center center',
                 }"
             >
-                <BImg
+                <b-img
                     lazy
                     :src="logoImage"
                     class="m-3 rounded"

@@ -48,23 +48,19 @@
         </template>
         <template #secondary>
             <div class="py-lg-5 pe-lg-5">
-                <h1 class="mt-lg-3">
-                    Quest<br />
-                    Campaigns
-                </h1>
-                <p class="lead mb-4">
-                    Give back to your community while increasing engagement with effective Quest Campaigns.
-                </p>
-                <b-button :href="`${publicURL}/pricing`" variant="primary" class="me-3 px-5" target="_blank">
-                    Campaign Pricing
+                <h1 class="mt-lg-3">Launch a campaign!</h1>
+                <p class="lead mb-4">Reward your community and increase engagement with effective quest campaigns.</p>
+                <b-button :href="`${publicURL}/pricing`" variant="primary" class="me-3 px-4" target="_blank">
+                    Pricing
+                    <i class="fas fa-external-link-alt ms-2" />
                 </b-button>
                 <b-button
-                    href="https://discord.com/invite/TzbbSmkE7Y"
+                    href="https://discord.com/invite/uHHheeEJ"
                     target="_blank"
                     variant="link"
-                    class="text-white"
+                    class="text-white text-decoration-none"
                 >
-                    Reach out! We don't bite😉
+                    Reach out! <span class="text-opaque">We don't bite</span> 😉
                 </b-button>
             </div>
         </template>
@@ -91,7 +87,7 @@ export default defineComponent({
             decodeHTML,
             publicURL: PUBLIC_URL,
             dashboardURL: DASHBOARD_URL,
-            questLists: { daily: [], invite: [], social: [], custom: [], web3: [], gitcoin: [] },
+            questLists: [],
             isLoadingSearch: false,
             isLoadingPage: false,
             isAlertShown: true,
@@ -161,8 +157,8 @@ export default defineComponent({
 
             this.questLists = questLists.map((quest: TBaseQuest) => ({
                 ...quest,
-                title: html.decode(quest.title),
-                description: html.decode(quest.description),
+                title: quest.title && html.decode(quest.title),
+                description: quest.description && html.decode(quest.description),
             }));
         },
         onInputSearch() {

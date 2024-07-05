@@ -1,9 +1,15 @@
 <template>
-    <b-button v-if="!accountStore.isAuthenticated" v-b-modal="'modalLogin'" variant="link">
-        <b-spinner v-if="accountStore.isAuthenticated === false" small />
-        <template v-else> Sign in </template>
-    </b-button>
-    <b-dropdown v-else-if="accountStore.account" variant="link" no-caret end>
+    <!-- <div v-if="!accountStore.isAuthenticated" class="d-flex align-items-center">
+        <b-button v-b-modal="'modalLogin'" variant="link" class="text-white text-decoration-none">
+            <b-spinner v-if="accountStore.isAuthenticated === false" small />
+            <template v-else> Sign up </template>
+        </b-button>
+        <b-button v-b-modal="'modalLogin'" variant="primary">
+            <b-spinner v-if="accountStore.isAuthenticated === false" small />
+            <template v-else> Sign in </template>
+        </b-button>
+    </div> -->
+    <b-dropdown v-if="accountStore.account" variant="link" toggle-class="p-0" no-caret end>
         <template #button-content>
             <div :style="{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }" class="p-1 rounded-circle">
                 <b-avatar size="35" :src="accountStore.account.profileImg" variant="dark" />
@@ -17,7 +23,7 @@
             <b-dropdown-divider />
             <b-dropdown-item @click="$router.push(`/c/${accountStore.config.slug}/about`)"> About </b-dropdown-item>
         </template>
-        <b-dropdown-item href="https://discord.com/invite/TzbbSmkE7Y" target="_blank"> Support </b-dropdown-item>
+        <b-dropdown-item href="https://discord.com/invite/uHHheeEJ" target="_blank"> Support </b-dropdown-item>
         <b-dropdown-divider />
         <b-dropdown-item
             size="sm"

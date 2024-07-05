@@ -8,12 +8,7 @@ import path from 'path';
 import CanvasService from '@thxnetwork/api/services/CanvasService';
 
 // Provide before running
-const poolIds = [
-    '667bfae884c2d2389dd974f3',
-    '667bfaee84c2d2389dd9751d',
-    '667bfaf184c2d2389dd9753d',
-    '667bfaf684c2d2389dd97560',
-];
+const poolIds = ['668663438b8ba79a477ce0c3'];
 
 // Load on boot as registration on runtime results in font not being loaded in time
 const fontPath = path.resolve(assetsPath, 'fa-solid-900.ttf');

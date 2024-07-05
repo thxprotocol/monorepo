@@ -1,5 +1,10 @@
 <template>
-    <div class="d-flex flex-column h-100 p-0 h-vertical">
+    <div
+        class="d-flex flex-column h-100 p-0"
+        :class="{
+            'h-vertical': !accountStore.isIFrame,
+        }"
+    >
         <BaseNavbarSecondary v-if="accountStore.isMobile" />
         <b-container
             v-if="accountStore.isAuthenticated === false"

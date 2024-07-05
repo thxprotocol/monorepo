@@ -4,7 +4,6 @@
             <BaseCardAccountRank />
             <hr class="mt-2 mb-0" style="opacity: 0.1" />
             <BaseCardLeaderboard />
-            <hr class="mt-2 mb-0" style="opacity: 0.1" />
             <BaseCardRewards />
             <BaseCardDiscord class="mt-auto" />
         </div>

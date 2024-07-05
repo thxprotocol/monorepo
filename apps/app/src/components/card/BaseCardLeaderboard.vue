@@ -33,6 +33,7 @@
                 <strong class="list-item-field-score">{{ entry.score }}</strong>
             </b-list-group-item>
         </b-list-group>
+        <hr class="mt-2 mb-0" style="opacity: 0.1" />
     </div>
 </template>
 

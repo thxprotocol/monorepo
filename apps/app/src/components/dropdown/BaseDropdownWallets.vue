@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex">
+    <div v-if="accountStore.isAuthenticated" class="d-flex">
         <b-dropdown
             v-model="isOpenWallet"
             variant="link"
@@ -23,7 +23,9 @@
                     }"
                     class="fas fa-circle me-2"
                 />
-                <div>{{ walletStore.wallet ? walletStore.wallet.short : 'Connect' }}</div>
+                <div>
+                    {{ walletStore.wallet ? walletStore.wallet.short : 'Connect' }}
+                </div>
             </template>
             <b-dropdown-text v-if="walletStore.wallet" text-class="bg-dark">
                 <b-form-group label-class="d-flex align-items-center mb-1 ">
@@ -128,6 +130,7 @@
             no-caret
             end
             toggle-class="p-2"
+            :disabled="!accountStore.isAuthenticated"
             :style="{
                 backgroundColor: 'rgba(0, 0, 0, 0.3)',
                 borderTopLeftRadius: '0 !important',
@@ -171,7 +174,6 @@ import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { WalletVariant } from '../../types/enums/accountVariant';
 import { chainList } from '@thxnetwork/app/utils/chains';
-import { registerables } from 'chart.js';
 
 export default defineComponent({
     name: 'BaseDropdownWallets',
