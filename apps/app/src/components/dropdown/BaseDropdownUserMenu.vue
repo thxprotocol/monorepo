@@ -5,7 +5,9 @@
     </b-button>
     <b-dropdown v-else-if="accountStore.account" variant="link" no-caret end>
         <template #button-content>
-            <b-avatar size="30" :src="accountStore.account.profileImg" variant="dark" />
+            <div :style="{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }" class="p-1 rounded-circle">
+                <b-avatar size="35" :src="accountStore.account.profileImg" variant="dark" />
+            </div>
         </template>
         <b-dropdown-item @click="accountStore.isModalAccountShown = true"> Account </b-dropdown-item>
         <template v-if="accountStore.config.slug">
