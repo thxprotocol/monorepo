@@ -211,8 +211,8 @@ export default class TwitterDataProxy {
             // the query logic in order to find matches similar to how X would
             const username = token.metadata.username.toLowerCase();
             const query = `from:${username} conversation_id:${postId}`;
-            const posts = await this.search(account, query);
-            if (posts.length) {
+            const replies = await this.search(account, query);
+            if (replies.length) {
                 return { result: true, reason: '' };
             }
 
