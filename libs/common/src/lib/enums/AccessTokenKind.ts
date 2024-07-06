@@ -47,14 +47,9 @@ export const OAuthRequiredScopes = {
     GoogleYoutubeLike: [OAuthGoogleScope.OpenID, OAuthGoogleScope.Email, OAuthGoogleScope.YoutubeReadOnly],
     TwitterAuth: [OAuthTwitterScope.OfflineAccess, OAuthTwitterScope.UsersRead, OAuthTwitterScope.TweetRead],
     TwitterValidateUser: [OAuthTwitterScope.OfflineAccess, OAuthTwitterScope.UsersRead, OAuthTwitterScope.TweetRead],
+    TwitterValidateReply: [OAuthTwitterScope.OfflineAccess, OAuthTwitterScope.UsersRead, OAuthTwitterScope.TweetRead],
     TwitterValidateRepost: [OAuthTwitterScope.OfflineAccess, OAuthTwitterScope.UsersRead, OAuthTwitterScope.TweetRead],
     TwitterValidateMessage: [OAuthTwitterScope.OfflineAccess, OAuthTwitterScope.UsersRead, OAuthTwitterScope.TweetRead],
-    TwitterValidateLike: [
-        OAuthTwitterScope.OfflineAccess,
-        OAuthTwitterScope.UsersRead,
-        OAuthTwitterScope.TweetRead,
-        OAuthTwitterScope.LikeRead,
-    ],
     TwitterValidateFollow: [
         OAuthTwitterScope.OfflineAccess,
         OAuthTwitterScope.UsersRead,

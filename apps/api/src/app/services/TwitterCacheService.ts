@@ -137,49 +137,6 @@ export default class TwitterCacheService {
         }
     }
 
-    static async updateLikeCache(
-        account: TAccount,
-        quest: TQuestSocial,
-        token: TToken,
-        params: TTwitterRequestParams = { max_results: 100 },
-    ) {
-        const postId = quest.content;
-
-        try {
-            logger.info(`[${quest.poolId}][${account.sub}] X Quest ${quest._id} Like verification calls X API.`);
-            const data = await TwitterDataProxy.request(token, {
-                url: `/users/${token.userId}/liked_tweets`,
-                method: 'GET',
-                params,
-            });
-            logger.info(`Fetched ${data.meta.result_count} likes from X.`);
-            // If no results return early
-            if (!data.meta.result_count) return;
-
-            // If the user has liked the post, we store it and return early
-            const like = findPostById(data.data, postId);
-            if (like) {
-                await TwitterLike.create({
-                    userId: token.userId,
-                    postId,
-                });
-                return;
-            }
-
-            // If there is a next_token, we store the next_token in case we get rate limited
-            // and continue on the next page
-            if (data.meta.next_token) {
-                // Start with caching the next 100 results
-                await this.updateLikeCache(account, quest, token, {
-                    ...params,
-                    pagination_token: data.meta.next_token,
-                });
-            }
-        } catch (res) {
-            await this.handleRateLimitError(res, account, quest, params, JobType.UpdateTwitterLikeCache);
-        }
-    }
-
     static async handleRateLimitError(
         res: AxiosResponse,
         account: TAccount,
@@ -218,10 +175,6 @@ export default class TwitterCacheService {
 
     static async updateRepostCacheJob(job: TJob) {
         await this.updateCacheJob(job, OAuthRequiredScopes.TwitterValidateRepost, this.updateRepostCache.bind(this));
-    }
-
-    static async updateLikeCacheJob(job: TJob) {
-        await this.updateCacheJob(job, OAuthRequiredScopes.TwitterValidateLike, this.updateLikeCache.bind(this));
     }
 
     static async updateCacheJob(

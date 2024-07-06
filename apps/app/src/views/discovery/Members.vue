@@ -74,7 +74,7 @@
                             class="w-100 mt-3"
                             @click="onClickRewards"
                         >
-                            <template v-if="!rewardsInUSD">
+                            <template v-if="rewardsInUSD">
                                 Claim <strong>{{ toFiatPrice(rewardsInUSD) }}</strong>
                             </template>
                             <template v-else>No rewards yet!</template>

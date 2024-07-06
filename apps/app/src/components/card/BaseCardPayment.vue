@@ -3,17 +3,22 @@
         <template #header>
             <div class="d-flex justify-content-between w-100 align-items-center" @click.stop="isVisible = !isVisible">
                 <div
-                    v-b-tooltip
-                    :title="RewardVariant[rewardVariant]"
                     style="height: 30px; width: 30px"
                     class="d-flex align-items-center justify-content-center rounded position-relative me-3"
                 >
-                    <b-img v-if="icon" :src="icon" width="40" height="40" class="rounded" />
-                    <i
-                        class=""
-                        style="right: 0; bottom: 0"
-                        :class="(icon ? 'small position-absolute ' : 'text-opaque ') + iconMap[rewardVariant]"
-                    />
+                    <b-img v-if="icon" :src="icon" width="30" height="30" class="rounded" />
+                    <div
+                        v-b-tooltip
+                        :title="RewardVariant[rewardVariant]"
+                        :class="
+                            icon
+                                ? 'small position-absolute bg-primary rounded-circle d-flex align-items-center justify-content-center'
+                                : ''
+                        "
+                        style="right: -5px; bottom: -5px; width: 20px; height: 20px"
+                    >
+                        <i class="text-opaque" :class="(icon ? 'small mt-1 ' : ' ') + iconMap[rewardVariant]" />
+                    </div>
                 </div>
                 <div class="d-flex flex-grow-1 justify-content-between pe-3">
                     <slot name="header" />

@@ -1,7 +1,7 @@
 <template>
-    <b-card class="rounded-0" header-class="py-3 d-flex align-items-center">
+    <b-card class="rounded-0" header-class="p-2 ps-3 d-flex align-items-center " body-class="p-1">
         <template #header>
-            <i class="fab fa-discord text-white me-3" style="font-size: 1.8rem" />
+            <i class="fab fa-discord text-opaque mt-1 me-3" style="font-size: 1.3rem" />
             <div>
                 <span>Got questions?</span>
                 <div>
@@ -22,7 +22,7 @@
             class="m-1"
             :src="member.avatar_url"
             badge
-            size="2rem"
+            size="2.1rem"
             :badge-variant="member.isOnline ? 'success' : 'warning'"
         />
         <b-link :href="inviteURL">
@@ -61,7 +61,7 @@ export default defineComponent({
         ...mapStores(useAccountStore, useWalletStore),
         membersTruncated() {
             return shuffleArray(this.members)
-                .slice(0, 26)
+                .slice(0, 17)
                 .map((member) => ({
                     ...member,
                     isOnline: member.status !== 'idle',

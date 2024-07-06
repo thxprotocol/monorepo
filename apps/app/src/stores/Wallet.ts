@@ -240,9 +240,27 @@ export const useWalletStore = defineStore('wallet', {
             ];
 
             const [payments, erc20, erc721, erc1155] = await Promise.all(promises);
-            this.erc20 = erc20 ? erc20.map((t: TERC20Token) => ({ ...t, component: 'BaseCardERC20' })) : [];
-            this.erc721 = erc721 ? erc721.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' })) : [];
-            this.erc1155 = erc1155 ? erc1155.map((t: TERC721Token) => ({ ...t, component: 'BaseCardERC721' })) : [];
+            this.erc20 = erc20
+                ? erc20.map((t: TERC20Token) => ({
+                      ...t,
+                      rewardVariant: RewardVariant.Coin,
+                      component: 'BaseCardERC20',
+                  }))
+                : [];
+            this.erc721 = erc721
+                ? erc721.map((t: TERC721Token) => ({
+                      ...t,
+                      rewardVariant: RewardVariant.NFT,
+                      component: 'BaseCardERC721',
+                  }))
+                : [];
+            this.erc1155 = erc1155
+                ? erc1155.map((t: TERC721Token) => ({
+                      ...t,
+                      rewardVariant: RewardVariant.NFT,
+                      component: 'BaseCardERC721',
+                  }))
+                : [];
             this.couponCodes = payments
                 .filter((p: { rewardVariant: RewardVariant }) => p.rewardVariant === RewardVariant.Coupon)
                 .map((t: TRewardCouponPayment[]) => ({

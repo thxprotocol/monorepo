@@ -124,11 +124,12 @@ export default defineComponent({
         },
         contentURL() {
             const map: { [i: number]: string } = {
+                [QuestSocialRequirement.YouTubeLike]: `https://www.youtube.com/watch?v=${this.quest.content}`,
+                [QuestSocialRequirement.YouTubeSubscribe]: `https://www.youtube.com/channel/${this.quest.content}`,
+                [QuestSocialRequirement.TwitterReply]: `https://www.x.com/intent/tweet?in_reply_to=${this.quest.content}`,
                 [QuestSocialRequirement.TwitterFollow]: `https://www.x.com/${this.quest.contentMetadata.username}`,
                 [QuestSocialRequirement.TwitterRetweet]: `https://twitter.com/intent/retweet?tweet_id=${this.quest.content}`,
                 [QuestSocialRequirement.TwitterQuery]: this.queryToURL(this.quest),
-                [QuestSocialRequirement.YouTubeLike]: `https://www.youtube.com/watch?v=${this.quest.content}`,
-                [QuestSocialRequirement.YouTubeSubscribe]: `https://www.youtube.com/channel/${this.quest.content}`,
                 [QuestSocialRequirement.DiscordGuildJoined]: this.quest.contentMetadata.inviteURL,
                 [QuestSocialRequirement.DiscordGuildRole]: '',
                 [QuestSocialRequirement.DiscordMessage]: '',

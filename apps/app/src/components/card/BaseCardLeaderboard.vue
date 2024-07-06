@@ -1,10 +1,10 @@
 <template>
     <div v-if="accountStore.config.slug && participant" class="d-flex flex-column">
         <div class="d-flex p-2 m-0 align-items-center">
-            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i class="fa fa-trophy me-2 text-opaque" />
+            <div class="flex-grow-1 pe-2">
+                Leaderboard
+                <i v-b-tooltip class="fas fa-info-circle small text-opaque" :title="`Since ${leaderboardStart}`" />
             </div>
-            <div class="flex-grow-1 pe-2">Leaderboard</div>
             <b-button size="sm" variant="primary" @click="onClickRefresh">
                 <b-spinner v-if="isLoading" small />
                 <i v-else class="fas small fa-sync-alt" />
@@ -42,6 +42,7 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
+import { subWeeks, format } from 'date-fns';
 
 export default defineComponent({
     name: 'BaseCardLeaderboard',
@@ -55,6 +56,9 @@ export default defineComponent({
         ...mapStores(useQuestStore),
         participant() {
             return this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
+        },
+        leaderboardStart() {
+            return format(subWeeks(new Date(), this.accountStore.config.leaderboardInWeeks), 'MMMM dd, yyyy');
         },
     },
     mounted() {
@@ -102,4 +106,3 @@ export default defineComponent({
     text-align: right;
 }
 </style>
-../../stores/Account../../stores/Quest

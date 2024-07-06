@@ -21,13 +21,14 @@ const controller = async (req: Request, res: Response) => {
         isQRCodeCampaign: !!qrCodeEntries.length,
         title: pool.settings.title,
         description: pool.settings.description,
+        leaderboardInWeeks: pool.settings.leaderboardInWeeks,
         logoUrl: brand ? brand.logoImgUrl : AUTH_URL + '/img/logo-padding.png',
         backgroundUrl: brand ? brand.backgroundImgUrl : '',
         theme: widget.theme,
         domain: widget.domain,
         chainId: pool.chainId,
-        poolId: pool._id,
-        slug: pool.settings.slug || pool._id,
+        poolId: pool.id,
+        slug: pool.settings.slug || pool.id,
     });
 };
 

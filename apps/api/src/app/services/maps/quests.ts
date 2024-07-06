@@ -13,6 +13,13 @@ export const requirementMap: {
     [QuestSocialRequirement.YouTubeSubscribe]: async (account, quest) => {
         return await YouTubeDataProxy.validateSubscribe(account, quest.content);
     },
+    [QuestSocialRequirement.TwitterReply]: async (account, quest) => {
+        logger.info(`[${quest.poolId}][${account.sub}] X Quest ${quest._id} Reply verification started`);
+        const resultUser = await TwitterDataProxy.validateUser(account, quest);
+        if (!resultUser.result) return resultUser;
+        const validationResultMessage = await TwitterDataProxy.validateReply(account, quest);
+        if (!validationResultMessage.result) return validationResultMessage;
+    },
     [QuestSocialRequirement.TwitterRetweet]: async (account, quest) => {
         logger.info(`[${quest.poolId}][${account.sub}] X Quest ${quest._id} Repost verification started`);
 
@@ -59,6 +66,10 @@ export const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKi
     [QuestSocialRequirement.YouTubeSubscribe]: {
         kind: AccessTokenKind.Google,
         scopes: OAuthRequiredScopes.GoogleYoutubeSubscribe,
+    },
+    [QuestSocialRequirement.TwitterReply]: {
+        kind: AccessTokenKind.Twitter,
+        scopes: OAuthRequiredScopes.TwitterValidateReply,
     },
     [QuestSocialRequirement.TwitterRetweet]: {
         kind: AccessTokenKind.Twitter,

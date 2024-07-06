@@ -1,9 +1,6 @@
 <template>
-    <div style="overflow: auto">
+    <div style="overflow: auto; min-height: 260px">
         <div class="d-flex p-2 m-0 align-items-center">
-            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i class="fas fa-wallet me-2 text-opaque" />
-            </div>
             <div class="flex-grow-1 pe-2">Your Wallet</div>
             <b-dropdown variant="primary" size="sm" no-caret>
                 <template #button-content>
@@ -18,6 +15,7 @@
         <div v-for="(token, key) of list" :key="key" class="mb-1">
             <component :is="token.component" :token="token" />
         </div>
+        <div v-if="!list.length" class="text-center text-opaque">Nothing here...</div>
     </div>
 </template>
 

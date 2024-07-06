@@ -36,7 +36,6 @@ agenda.define(JobType.CreateRewardPayment, (job: Job) => RewardService.createPay
 agenda.define(JobType.DeploySafe, (job: Job) => SafeService.createJob(job));
 agenda.define(JobType.SendCampaignReport, () => NotificationService.sendWeeklyDigestJob());
 agenda.define(JobType.RequestAttemp, (job: Job) => WebhookService.requestAttemptJob(job));
-agenda.define(JobType.UpdateTwitterLikeCache, (job: Job) => TwitterCacheService.updateLikeCacheJob(job));
 agenda.define(JobType.UpdateTwitterRepostCache, (job: Job) => TwitterCacheService.updateRepostCacheJob(job));
 agenda.define(JobType.UpdateLeaderboard, (job: Job) => AnalyticsService.updateLeaderboardJob(job));
 agenda.define(JobType.UpsertInvoices, () => InvoiceService.upsertJob());

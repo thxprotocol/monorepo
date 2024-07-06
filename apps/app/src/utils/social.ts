@@ -17,6 +17,7 @@ export enum AccessTokenKind {
 }
 
 const interactionLabelMap: { [i: number]: string } = {
+    [QuestSocialRequirement.TwitterReply]: 'Reply on 𝕏',
     [QuestSocialRequirement.TwitterFollow]: 'Follow on 𝕏',
     [QuestSocialRequirement.TwitterRetweet]: 'Repost on 𝕏',
     [QuestSocialRequirement.TwitterQuery]: 'Post on 𝕏',
@@ -43,6 +44,7 @@ const kindAccountVariantMap: { [kind: string]: number } = {
 const interactionComponentMap: { [req: number]: string } = {
     [QuestSocialRequirement.YouTubeLike]: 'BaseBlockquoteVideo',
     [QuestSocialRequirement.YouTubeSubscribe]: 'BaseBlockquoteYoutubeChannelSubscription',
+    [QuestSocialRequirement.TwitterReply]: 'BaseBlockquoteTwitterTweet',
     [QuestSocialRequirement.TwitterRetweet]: 'BaseBlockquoteTwitterTweet',
     [QuestSocialRequirement.TwitterFollow]: 'BaseBlockquoteTwitterUser',
     [QuestSocialRequirement.TwitterQuery]: 'BaseBlockquoteTwitterQuery',
@@ -85,13 +87,8 @@ export const OAuthRequiredScopes = {
     GoogleYoutubeSubscribe: [OAuthGoogleScope.OpenID, OAuthGoogleScope.Email, OAuthGoogleScope.YoutubeReadOnly],
     GoogleYoutubeLike: [OAuthGoogleScope.OpenID, OAuthGoogleScope.Email, OAuthGoogleScope.YoutubeReadOnly],
     TwitterAuth: [OAuthTwitterScope.OfflineAccess, OAuthTwitterScope.UsersRead, OAuthTwitterScope.TweetRead],
+    TwitterValidateReply: [OAuthTwitterScope.OfflineAccess, OAuthTwitterScope.UsersRead, OAuthTwitterScope.TweetRead],
     TwitterValidateRepost: [OAuthTwitterScope.OfflineAccess, OAuthTwitterScope.UsersRead, OAuthTwitterScope.TweetRead],
-    TwitterValidateLike: [
-        OAuthTwitterScope.OfflineAccess,
-        OAuthTwitterScope.UsersRead,
-        OAuthTwitterScope.TweetRead,
-        OAuthTwitterScope.LikeRead,
-    ],
     TwitterValidateFollow: [
         OAuthTwitterScope.OfflineAccess,
         OAuthTwitterScope.UsersRead,
@@ -113,6 +110,10 @@ const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; sco
     [QuestSocialRequirement.YouTubeSubscribe]: {
         kind: AccessTokenKind.Google,
         scopes: OAuthRequiredScopes.GoogleYoutubeSubscribe,
+    },
+    [QuestSocialRequirement.TwitterReply]: {
+        kind: AccessTokenKind.Twitter,
+        scopes: OAuthRequiredScopes.TwitterValidateReply,
     },
     [QuestSocialRequirement.TwitterRetweet]: {
         kind: AccessTokenKind.Twitter,

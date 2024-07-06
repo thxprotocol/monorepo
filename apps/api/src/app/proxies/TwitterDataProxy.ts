@@ -197,6 +197,31 @@ export default class TwitterDataProxy {
         }
     }
 
+    static async validateReply(account: TAccount, quest: TQuestSocial) {
+        const postId = quest.content;
+        const token = await AccountProxy.getToken(
+            account,
+            AccessTokenKind.Twitter,
+            OAuthRequiredScopes.TwitterValidateReply,
+        );
+        if (!token) return { result: false, reason: 'X: Could not find a connection for this account.' };
+
+        try {
+            // Not checking the cache here on purpose as we would need to reverse engineer
+            // the query logic in order to find matches similar to how X would
+            const username = token.metadata.username.toLowerCase();
+            const query = `from:${username} conversation_id:${postId}`;
+            const posts = await this.search(account, query);
+            if (posts.length) {
+                return { result: true, reason: '' };
+            }
+
+            return { result: false, reason: `X: Could not find a reply to this post within the last 7 days.` };
+        } catch (res) {
+            return this.handleError(account, token, res);
+        }
+    }
+
     static async validateFollow(account: TAccount, userId: string) {
         const token = await AccountProxy.getToken(
             account,
@@ -230,44 +255,6 @@ export default class TwitterDataProxy {
 
             return { result: false, reason: 'X: Account is not found as a follower.' };
         } catch (res) {
-            return this.handleError(account, token, res);
-        }
-    }
-
-    static async validateLike(account: TAccount, quest: TQuestSocial) {
-        const postId = quest.content;
-        const token = await AccountProxy.getToken(
-            account,
-            AccessTokenKind.Twitter,
-            OAuthRequiredScopes.TwitterValidateLike,
-        );
-        if (!token) return { result: false, reason: 'X: Could not find a connection for this account.' };
-
-        // Search for TwitterLikes with this userId and postId in the cache
-        const like = await TwitterLike.findOne({ userId: token.userId, postId });
-        if (like) {
-            logger.info(
-                `[${quest.poolId}][${account.sub}] X Quest ${quest._id} Like verification resolves from cache.`,
-            );
-            return { result: true, reason: '' };
-        }
-
-        try {
-            // No cache result means we should update the cache.
-            await TwitterCacheService.updateLikeCache(account, quest, token);
-
-            // Search the database again after a complete cache update that is not rate limited
-            const like = await this.findLike(token.userId, postId);
-            if (like) return { result: true, reason: '' };
-
-            // Fail if nothing is found
-            return { result: false, reason: 'X: Post has not been not liked.' };
-        } catch (res) {
-            // Search the database again after a partial cache update that threw an error
-            const like = await this.findLike(token.userId, postId);
-            if (like) return { result: true, reason: '' };
-
-            // If not found amongst the latest cache update then we show the rate limit error
             return this.handleError(account, token, res);
         }
     }
@@ -367,10 +354,6 @@ export default class TwitterDataProxy {
         } catch (res) {
             return this.handleError(account, token, res);
         }
-    }
-
-    static findLike(userId: string, postId: string) {
-        return TwitterLike.findOne({ userId, postId });
     }
 
     static findRepost(userId: string, postId: string) {
