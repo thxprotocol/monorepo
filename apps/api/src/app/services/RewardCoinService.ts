@@ -16,6 +16,7 @@ import ERC20Service from './ERC20Service';
 import MailService from './MailService';
 import PoolService from './PoolService';
 import { toWei } from 'web3-utils';
+import SafeService from './SafeService';
 
 export default class RewardCoinService implements IRewardService {
     models = {
@@ -54,19 +55,15 @@ export default class RewardCoinService implements IRewardService {
         await this.models.reward.findOneAndDelete(reward._id);
     }
 
-    async createPayment({
-        reward,
-        safe,
-        wallet,
-    }: {
-        reward: TRewardCoin;
-        safe: WalletDocument;
-        wallet?: WalletDocument;
-    }) {
+    async createPayment({ reward, wallet }: { reward: TRewardCoin; wallet?: WalletDocument }) {
         if (!wallet) return { result: false, reason: 'Wallet not found' };
 
         const erc20 = await ERC20.findById(reward.erc20Id);
         if (!erc20) return { result: false, reason: 'ERC20 not found' };
+
+        const pool = await PoolService.getById(reward.poolId);
+        const safe = await SafeService.findOneByPool(pool, erc20.chainId);
+        if (!safe) return { result: false, reason: 'Safe not found' };
 
         // TODO Wei should be determined in the FE
         const amount = toWei(reward.amount as string);
@@ -84,15 +81,7 @@ export default class RewardCoinService implements IRewardService {
         });
     }
 
-    async getValidationResult({
-        reward,
-        safe,
-        wallet,
-    }: {
-        reward: RewardCoinDocument;
-        safe: WalletDocument;
-        wallet: WalletDocument;
-    }) {
+    async getValidationResult({ reward, wallet }: { reward: RewardCoinDocument; wallet: WalletDocument }) {
         if (!wallet) return { result: false, reason: `No wallet provided for this reward transfer.` };
 
         // Check if wallet exists
@@ -102,6 +91,10 @@ export default class RewardCoinService implements IRewardService {
 
         const erc20 = await ERC20.findById(reward.erc20Id);
         if (!erc20) return { result: false, reason: `ERC20 not found.` };
+
+        const pool = await PoolService.getById(reward.poolId);
+        const safe = await SafeService.findOneByPool(pool, erc20.chainId);
+        if (!safe) return { result: false, reason: 'Campaign Safe is no longer available for this network' };
 
         // Check if there are pending transactions that are not mined or failed.
         const txs = await Transaction.find({

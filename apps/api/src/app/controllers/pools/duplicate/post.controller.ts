@@ -1,21 +1,13 @@
 import { param } from 'express-validator';
 import { Request, Response } from 'express';
-import { safeVersion } from '@thxnetwork/api/services/ContractService';
 import { Pool } from '@thxnetwork/api/models';
 import PoolService from '@thxnetwork/api/services/PoolService';
-import SafeService from '@thxnetwork/api/services/SafeService';
 
 const validation = [param('id').isMongoId()];
 
 const controller = async (req: Request, res: Response) => {
     const pool = await Pool.findById(req.params.id);
-
     const duplicatePool = await PoolService.deploy(req.auth.sub, `${pool.settings.title} (clone)`);
-
-    // Deploy a Safe for the campaign
-    const safe = await SafeService.create({ sub: req.auth.sub, safeVersion, poolId: duplicatePool.id });
-    // Update predicted safe address for pool
-    await pool.updateOne({ safeAddress: safe.address });
 
     // Duplicate Quests
     // TODO
@@ -23,7 +15,7 @@ const controller = async (req: Request, res: Response) => {
     // Duplicate Rewards
     // TODO
 
-    res.status(201).json({ ...duplicatePool.toJSON(), safeAddress: safe.address, safe });
+    res.status(201).json(duplicatePool.toJSON());
 };
 
 export { controller, validation };

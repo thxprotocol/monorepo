@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { WalletVariant, AccountVariant } from '@thxnetwork/common/enums';
+import { WalletVariant, AccountVariant, ChainId } from '@thxnetwork/common/enums';
 import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 import WalletService from '@thxnetwork/api/services/WalletService';
 import THXService from '@thxnetwork/api/services/THXService';
@@ -20,13 +20,16 @@ const controller = async (req: Request, res: Response) => {
         metadata,
     })) as TToken[];
 
-    // If account variant is metamask and no wallet is found then create it
+    // If account variant is metamask and no wallet is found then create it for all networks
     if (account.variant === AccountVariant.Metamask) {
         const wallet = await WalletService.findOne({ sub: req.auth.sub, variant: WalletVariant.WalletConnect });
         if (!wallet) {
-            await WalletService.createWalletConnect({
-                sub: req.auth.sub,
-                address: account.address,
+            Object.keys(ChainId).map(async (chainId) => {
+                await WalletService.createWalletConnect({
+                    chainId,
+                    sub: req.auth.sub,
+                    address: account.address,
+                });
             });
         }
     }

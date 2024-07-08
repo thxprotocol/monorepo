@@ -9,6 +9,7 @@ const validation = [
     param('id').isMongoId(),
     query('tokenAddress').isEthereumAddress(),
     query('spender').isEthereumAddress(),
+    query('walletId').isMongoId(),
 ];
 
 const controller = async (req: Request, res: Response) => {
@@ -16,8 +17,8 @@ const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(poolId);
     if (!pool) throw new NotFoundError('Pool not found');
 
-    const safe = await SafeService.findOneByPool(pool);
-    if (!safe) throw new NotFoundError('Wallet not found');
+    const safe = await SafeService.findById(req.query.walletId as string);
+    if (!safe) throw new NotFoundError('Safe not found');
 
     const contract = ContractService.getContract(
         'THXERC20_LimitedSupply',

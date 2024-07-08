@@ -53,11 +53,7 @@ async function isSubjectAllowed(sub: string, poolId: string) {
 }
 
 async function getById(id: string) {
-    const pool = await Pool.findById(id);
-    const chainId = ContractService.getChainId();
-    const safe = await SafeService.findOneByPool(pool, chainId);
-    pool.safe = safe;
-    return pool;
+    return await Pool.findById(id);
 }
 
 function getByAddress(address: string) {
@@ -145,14 +141,13 @@ async function getAllBySub(sub: string): Promise<PoolDocument[]> {
     return await Promise.all(
         pools.map(async (pool) => {
             const brand = await Brand.findOne({ poolId: pool.id });
-            const safe = await SafeService.findOneByPool(pool);
             const participantCount = await Participant.countDocuments({ poolId: pool.id });
             const account = accounts.find((a) => a.sub === pool.sub);
             const author = account && {
                 username: account.username,
             };
 
-            return { ...pool.toJSON(), participantCount, author, brand, safe };
+            return { ...pool.toJSON(), participantCount, author, brand };
         }),
     );
 }

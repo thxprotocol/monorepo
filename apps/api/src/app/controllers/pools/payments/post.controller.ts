@@ -8,7 +8,12 @@ import PoolService from '@thxnetwork/api/services/PoolService';
 import SafeService from '@thxnetwork/api/services/SafeService';
 import PaymentService from '@thxnetwork/api/services/PaymentService';
 
-const validation = [param('id').isMongoId(), body('amountInWei').exists(), body('planType').isInt()];
+const validation = [
+    param('id').isMongoId(),
+    body('chainId').isInt(),
+    body('amountInWei').exists(),
+    body('planType').isInt(),
+];
 
 // TODO
 // 1. Customer approves USDC for Campaign Safe for x allowance
@@ -23,7 +28,7 @@ const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(req.params.id);
     if (!pool) throw new NotFoundError('Could not find campaign');
 
-    const safe = await SafeService.findOneByPool(pool, pool.chainId);
+    const safe = await SafeService.findOneByPool(pool, req.body.chainId);
     if (!safe) throw new NotFoundError('Could not find campaign Safe');
 
     const amountInWei = BigNumber.from(req.body.amountInWei);

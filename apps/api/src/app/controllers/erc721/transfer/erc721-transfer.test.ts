@@ -47,7 +47,7 @@ describe('ERC721 Transfer', () => {
     it('Deploy Campaign Safe', async () => {
         const { web3 } = NetworkService.getProvider(chainId);
         pool = await PoolService.deploy(sub, 'My Reward Campaign');
-        const safe = await SafeService.create({ sub, safeVersion, poolId: String(pool._id) });
+        const safe = await SafeService.create({ sub, safeVersion, chainId: ChainId.Hardhat, poolId: String(pool._id) });
 
         // Wait for safe address to return code
         await poll(
@@ -96,7 +96,7 @@ describe('ERC721 Transfer', () => {
     it('Add ERC721 minter', async () => {
         pool = await Pool.findById(pool._id);
 
-        const safe = await SafeService.findOneByPool(pool);
+        const safe = await SafeService.findOneByPool(pool, ChainId.Hardhat);
         erc721 = await ERC721.findById(erc721._id);
 
         await ERC721Service.addMinter(erc721, safe.address);
@@ -122,7 +122,7 @@ describe('ERC721 Transfer', () => {
             description: metadataDescription,
             externalUrl: metadataExternalUrl,
         });
-        const safe = await SafeService.findOneByPool(pool);
+        const safe = await SafeService.findOneByPool(pool, ChainId.Hardhat);
 
         // Wait for safe address to return code
         const { web3 } = NetworkService.getProvider(chainId);

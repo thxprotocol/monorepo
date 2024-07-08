@@ -12,6 +12,7 @@ const validation = [
     body('tokenAddress').isEthereumAddress(),
     body('spender').isEthereumAddress(),
     body('amountInWei').isString(),
+    body('chainId').isInt(),
 ];
 
 const controller = async (req: Request, res: Response) => {
@@ -19,7 +20,7 @@ const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(poolId);
     if (!pool) throw new NotFoundError('Pool not found');
 
-    const safe = await SafeService.findOneByPool(pool);
+    const safe = await SafeService.findOneByPool(pool, req.body.chainId);
     if (!safe) throw new NotFoundError('Wallet not found');
 
     const { web3 } = NetworkService.getProvider(safe.chainId);

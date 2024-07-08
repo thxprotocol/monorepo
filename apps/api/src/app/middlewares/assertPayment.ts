@@ -4,6 +4,7 @@ import { logger } from '../util/logger';
 import SafeService from '../services/SafeService';
 import PoolService from '../services/PoolService';
 import PaymentService from '../services/PaymentService';
+import { ChainId } from '@thxnetwork/common/enums';
 
 /*
  * This middleware function is used to assert payments of the pool owner.
@@ -11,7 +12,7 @@ import PaymentService from '../services/PaymentService';
  */
 export async function assertPayment(req: Request, res: Response, next: NextFunction) {
     const pool = await PoolService.getById(req.params.id);
-    const safe = await SafeService.findOneByPool(pool);
+    const safe = await SafeService.findOneByPool(pool, ChainId.Polygon);
     const balanceInWei = await PaymentService.balanceOf(safe);
 
     // If pool.createdAt + 2 weeks is larger than now there should be a payment

@@ -1,7 +1,7 @@
 import { Wallet } from '@thxnetwork/api/models/Wallet';
 import { TransactionState, WalletVariant } from '@thxnetwork/common/enums';
 import { Transaction } from '@thxnetwork/api/models/Transaction';
-import ContractService, { safeVersion } from './ContractService';
+import { safeVersion } from './ContractService';
 import SafeService from './SafeService';
 
 export default class WalletService {
@@ -48,17 +48,16 @@ export default class WalletService {
         return map[variant]({ ...(data as TWallet) });
     }
 
-    static async createSafe({ sub, address }) {
+    static async createSafe({ sub, chainId, address }) {
         const safeWallet = await SafeService.findOne({ sub });
         // An account can have max 1 Safe
         if (safeWallet) throw new Error('Already has a Safe.');
 
         // Deploy a Safe with Web3Auth address and relayer as signers
-        await SafeService.create({ sub, safeVersion }, address);
+        await SafeService.create({ sub, chainId, safeVersion }, address);
     }
 
-    static async createWalletConnect({ sub, address }) {
-        const chainId = ContractService.getChainId();
+    static async createWalletConnect({ sub, chainId, address }) {
         const data: Partial<TWallet> = { variant: WalletVariant.WalletConnect, sub, address, chainId };
 
         await Wallet.findOneAndUpdate({ sub, address, chainId }, data, { upsert: true });

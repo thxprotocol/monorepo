@@ -1,8 +1,7 @@
 import { Wallet, WalletDocument, Pool, PoolDocument, Transaction } from '@thxnetwork/api/models';
 import { ChainId, WalletVariant } from '@thxnetwork/common/enums';
-import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { contractNetworks } from '@thxnetwork/api/hardhat';
-import ContractService, { safeVersion } from '@thxnetwork/api/services/ContractService';
+import { safeVersion } from '@thxnetwork/api/services/ContractService';
 import { toChecksumAddress } from 'web3-utils';
 import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
@@ -16,6 +15,7 @@ import { agenda, JobType } from '@thxnetwork/api/util/agenda';
 import { Job } from '@hokify/agenda';
 import { convertObjectIdToNumber } from '../util';
 import TransactionService from './TransactionService';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 
 function getSafeApiKit(chainId: ChainId) {
     const { txServiceUrl, ethAdapter } = NetworkService.getProvider(chainId);
@@ -28,13 +28,19 @@ function reset(wallet: WalletDocument, userWalletAddress: string) {
 }
 
 async function create(
-    data: { sub: string; safeVersion?: SafeVersion; address?: string; poolId?: string },
+    data: { sub: string; chainId: ChainId; safeVersion?: SafeVersion; address?: string; poolId?: string },
     userWalletAddress?: string,
 ) {
     const { safeVersion, sub, address, poolId } = data;
-    const chainId = ContractService.getChainId();
-    const { defaultAccount } = NetworkService.getProvider(chainId);
-    const wallet = await Wallet.create({ variant: WalletVariant.Safe, sub, chainId, address, safeVersion, poolId });
+    const { defaultAccount } = NetworkService.getProvider(data.chainId);
+    const wallet = await Wallet.create({
+        variant: WalletVariant.Safe,
+        chainId: data.chainId,
+        sub,
+        address,
+        safeVersion,
+        poolId,
+    });
 
     // Concerns a Metamask account so we do not deploy and return early
     if (!safeVersion && address) return wallet;
@@ -44,7 +50,7 @@ async function create(
     // Add user address as a signer and consider this a participant safe
     if (userWalletAddress) owners.push(toChecksumAddress(userWalletAddress));
 
-    // If campaign safe we provide a nonce based on the timestamp in the MongoID the pool (poolId value)
+    // If campaign safe we provide a nonce based on the timestamp in the MongoID of the pool (poolId value)
     const nonce = wallet.poolId && String(convertObjectIdToNumber(wallet.poolId));
 
     return await deploy(wallet, owners, nonce);
@@ -119,11 +125,11 @@ function findOneByAddress(address: string) {
     return Wallet.findOne({ address: toChecksumAddress(address) });
 }
 
-async function findOneByPool(pool: PoolDocument, chainId?: ChainId) {
+async function findOneByPool(pool: PoolDocument, chainId: ChainId) {
     if (!pool) return;
     return await Wallet.findOne({
         poolId: pool.id,
-        chainId: chainId || ContractService.getChainId(),
+        chainId,
         sub: pool.sub,
         safeVersion,
     });

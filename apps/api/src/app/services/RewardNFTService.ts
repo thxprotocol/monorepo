@@ -41,18 +41,13 @@ export default class RewardNFTService implements IRewardService {
         return payment.toJSON();
     }
 
-    async getValidationResult({
-        reward,
-        safe,
-        wallet,
-    }: {
-        reward: TRewardNFT;
-        safe?: WalletDocument;
-        wallet?: WalletDocument;
-        account?: TAccount;
-    }) {
+    async getValidationResult({ reward, wallet }: { reward: TRewardNFT; wallet?: WalletDocument; account?: TAccount }) {
         const nft = await this.findNFT(reward);
         if (!nft) return { result: false, reason: 'NFT contract is no longer available' };
+
+        const pool = await PoolService.getById(reward.poolId);
+        const safe = await SafeService.findOneByPool(pool, nft.chainId);
+        if (!safe) return { result: false, reason: 'Campaign Safe is no longer available for this network' };
 
         // This will require a transfer
         if (reward.tokenId) {
@@ -107,18 +102,14 @@ export default class RewardNFTService implements IRewardService {
         await this.models.reward.findOneAndDelete(reward._id);
     }
 
-    async createPayment({
-        reward,
-        safe,
-        wallet,
-    }: {
-        reward: RewardNFTDocument;
-        safe: WalletDocument;
-        wallet?: WalletDocument;
-    }) {
+    async createPayment({ reward, wallet }: { reward: RewardNFTDocument; wallet?: WalletDocument }) {
         const erc1155Amount = reward.erc1155Amount && String(reward.erc1155Amount);
         const nft = await this.findNFT(reward);
         if (!nft) throw new Error('NFT not found');
+
+        const pool = await PoolService.getById(reward.poolId);
+        const safe = await SafeService.findOneByPool(pool, nft.chainId);
+        if (!safe) return { result: false, reason: 'Campaign Safe is no longer available for this network' };
 
         // Get token and metadata for either ERC721 or ERC1155 based contracts
         // and mint if metadataId is present or transfer if tokenId is present

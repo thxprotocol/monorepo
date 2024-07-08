@@ -88,7 +88,7 @@ export default class PaymentService {
         const pools = await Pool.find({ trialEndsAt: { $exists: true, $lt: subWeeks(new Date(), 1) } });
         for (const pool of pools) {
             // Get campaing safe
-            const safe = await SafeService.findOneByPool(pool);
+            const safe = await SafeService.findOneByPool(pool, ChainId.Polygon);
             const timeLeftInSeconds = await this.getTimeLeftInSeconds(safe, pool);
 
             // Insufficient payments
