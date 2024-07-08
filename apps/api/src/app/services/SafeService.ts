@@ -1,6 +1,6 @@
 import { Wallet, WalletDocument, Pool, PoolDocument, Transaction } from '@thxnetwork/api/models';
 import { ChainId, WalletVariant } from '@thxnetwork/common/enums';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { contractNetworks } from '@thxnetwork/api/hardhat';
 import ContractService, { safeVersion } from '@thxnetwork/api/services/ContractService';
 import { toChecksumAddress } from 'web3-utils';
@@ -18,12 +18,12 @@ import { convertObjectIdToNumber } from '../util';
 import TransactionService from './TransactionService';
 
 function getSafeApiKit(chainId: ChainId) {
-    const { txServiceUrl, ethAdapter } = getProvider(chainId);
+    const { txServiceUrl, ethAdapter } = NetworkService.getProvider(chainId);
     return new SafeApiKit({ txServiceUrl, ethAdapter });
 }
 
 function reset(wallet: WalletDocument, userWalletAddress: string) {
-    const { defaultAccount } = getProvider(wallet.chainId);
+    const { defaultAccount } = NetworkService.getProvider(wallet.chainId);
     return deploy(wallet, [toChecksumAddress(defaultAccount), toChecksumAddress(userWalletAddress)]);
 }
 
@@ -33,7 +33,7 @@ async function create(
 ) {
     const { safeVersion, sub, address, poolId } = data;
     const chainId = ContractService.getChainId();
-    const { defaultAccount } = getProvider(chainId);
+    const { defaultAccount } = NetworkService.getProvider(chainId);
     const wallet = await Wallet.create({ variant: WalletVariant.Safe, sub, chainId, address, safeVersion, poolId });
 
     // Concerns a Metamask account so we do not deploy and return early
@@ -51,7 +51,7 @@ async function create(
 }
 
 async function deploy(wallet: WalletDocument, owners: string[], nonce?: string) {
-    const { ethAdapter } = getProvider(wallet.chainId);
+    const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
     const safeFactory = await SafeFactory.create({
         safeVersion: wallet.safeVersion as SafeVersion,
         ethAdapter,
@@ -86,7 +86,7 @@ async function createJob(job: Job) {
     if (!safeAccountConfig || !safeVersion || !safeAddress || !safeWalletId) return;
 
     const wallet = await Wallet.findById(safeWalletId);
-    const { ethAdapter } = getProvider(wallet.chainId);
+    const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
     const safeFactory = await SafeFactory.create({
         safeVersion,
         ethAdapter,
@@ -130,7 +130,7 @@ async function findOneByPool(pool: PoolDocument, chainId?: ChainId) {
 }
 
 async function getOwners(wallet: WalletDocument) {
-    const { ethAdapter } = getProvider(wallet.chainId);
+    const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
     const safeSdk = await Safe.create({
         ethAdapter,
         safeAddress: wallet.address,
@@ -141,7 +141,7 @@ async function getOwners(wallet: WalletDocument) {
 }
 
 async function createSwapOwnerTransaction(wallet: WalletDocument, oldOwnerAddress: string, newOwnerAddress: string) {
-    const { ethAdapter } = getProvider(wallet.chainId);
+    const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
     const safeSdk = await Safe.create({
         ethAdapter,
         safeAddress: wallet.address,
@@ -152,7 +152,7 @@ async function createSwapOwnerTransaction(wallet: WalletDocument, oldOwnerAddres
 }
 
 async function proposeTransaction(wallet: WalletDocument, safeTransactionData: SafeTransactionDataPartial) {
-    const { ethAdapter, signer } = getProvider(wallet.chainId);
+    const { ethAdapter, signer } = NetworkService.getProvider(wallet.chainId);
     const safe = await Safe.create({
         ethAdapter,
         safeAddress: wallet.address,
@@ -190,7 +190,7 @@ async function proposeTransaction(wallet: WalletDocument, safeTransactionData: S
 }
 
 async function confirmTransaction(wallet: WalletDocument, safeTxHash: string) {
-    const { ethAdapter } = getProvider(wallet.chainId);
+    const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
     const safe = await Safe.create({
         ethAdapter,
         safeAddress: wallet.address,
@@ -201,13 +201,13 @@ async function confirmTransaction(wallet: WalletDocument, safeTxHash: string) {
 }
 
 async function confirm(wallet: WalletDocument, safeTxHash: string, signatureData: string) {
-    const { txServiceUrl, ethAdapter } = getProvider(wallet.chainId);
+    const { txServiceUrl, ethAdapter } = NetworkService.getProvider(wallet.chainId);
     const apiKit = new SafeApiKit({ ethAdapter, txServiceUrl });
     return await apiKit.confirmTransaction(safeTxHash, signatureData);
 }
 
 async function executeTransaction(wallet: WalletDocument, safeTxHash: string) {
-    const { ethAdapter } = getProvider(wallet.chainId);
+    const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
     const apiKit = getSafeApiKit(wallet.chainId);
     const safe = await Safe.create({
         ethAdapter,

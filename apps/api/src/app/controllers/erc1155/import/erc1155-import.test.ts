@@ -9,7 +9,7 @@ import { alchemy } from '@thxnetwork/api/util/alchemy';
 import { deployERC1155, mockGetNftsForOwner } from '@thxnetwork/api/util/jest/erc1155';
 import { PoolDocument } from '@thxnetwork/api/models';
 import { Contract } from 'web3-eth-contract';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { ethers } from 'ethers';
 import TransactionService from '@thxnetwork/api/services/TransactionService';
 
@@ -69,7 +69,7 @@ describe('ERC1155 import', () => {
     });
 
     describe('GET /erc1155/:id', () => {
-        const { defaultAccount } = getProvider(chainId);
+        const { defaultAccount } = NetworkService.getProvider(chainId);
 
         it('HTTP 200', (done) => {
             user.get(`/v1/erc1155/${erc1155._id}`)

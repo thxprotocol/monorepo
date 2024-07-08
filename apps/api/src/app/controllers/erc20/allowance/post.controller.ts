@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { body, query } from 'express-validator';
 import { ForbiddenError, NotFoundError } from '@thxnetwork/api/util/errors';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { BigNumber } from 'alchemy-sdk';
 import { getArtifact } from '@thxnetwork/api/hardhat';
 import TransactionService from '@thxnetwork/api/services/TransactionService';
@@ -20,7 +20,7 @@ const controller = async (req: Request, res: Response) => {
     if (!wallet) throw new NotFoundError('Wallet not found');
     if (wallet.sub !== req.auth.sub) throw new ForbiddenError('Wallet not owned by sub.');
 
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const { abi } = getArtifact('THXERC20_LimitedSupply');
     const contract = new web3.eth.Contract(abi, req.body.tokenAddress);
     const amount = await contract.methods.balanceOf(wallet.address).call();

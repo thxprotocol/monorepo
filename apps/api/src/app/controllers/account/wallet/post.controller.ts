@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { recoverSigner } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { body } from 'express-validator';
 import WalletService from '@thxnetwork/api/services/WalletService';
 
@@ -15,7 +15,7 @@ const controller = async (req: Request, res: Response) => {
 
     // If no message and signature are present prepare a wallet to connect later
     if (signature && message) {
-        data.address = recoverSigner(message, signature);
+        data.address = NetworkService.recoverSigner(message, signature);
     }
 
     await WalletService.create(variant, data);

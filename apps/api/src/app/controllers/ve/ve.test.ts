@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '@thxnetwork/api/';
 import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { BigNumber, Contract, ethers } from 'ethers';
 import { ChainId } from '@thxnetwork/common/enums';
 import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
@@ -12,7 +12,7 @@ import { poll } from '@thxnetwork/api/util/polling';
 import SafeService from '@thxnetwork/api/services/SafeService';
 
 const user = request.agent(app);
-const { signer } = getProvider(ChainId.Hardhat);
+const { signer } = NetworkService.getProvider(ChainId.Hardhat);
 
 describe('VESytem', () => {
     beforeAll(beforeAllCallback);

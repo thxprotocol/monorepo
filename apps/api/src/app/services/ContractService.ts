@@ -1,5 +1,5 @@
 import { ChainId } from '@thxnetwork/common/enums';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { SafeVersion } from '@safe-global/safe-core-sdk-types';
 import { TContractName, getArtifact } from '@thxnetwork/api/hardhat';
 import { ethers } from 'ethers';
@@ -12,7 +12,7 @@ export default class ContractService {
     }
 
     static getContract(contractName: TContractName, chainId: ChainId, address: string) {
-        const { signer } = getProvider(chainId);
+        const { signer } = NetworkService.getProvider(chainId);
         const artifact = getArtifact(contractName);
         return new ethers.Contract(address, artifact.abi, signer);
     }

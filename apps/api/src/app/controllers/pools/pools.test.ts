@@ -5,7 +5,7 @@ import { isAddress } from 'web3-utils';
 import { timeTravel } from '@thxnetwork/api/util/jest/network';
 import { dashboardAccessToken } from '@thxnetwork/api/util/jest/constants';
 import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { poll } from '@thxnetwork/api/util/polling';
 
 const user = request.agent(app);
@@ -31,7 +31,7 @@ describe('Default Pool', () => {
 
         it('HTTP 200 (multisig deployed)', async () => {
             // Wait for campaign safe to be deployed
-            const { web3 } = getProvider(ChainId.Hardhat);
+            const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
             await poll(
                 () => web3.eth.getCode(safe.address),
                 (data: string) => data === '0x',

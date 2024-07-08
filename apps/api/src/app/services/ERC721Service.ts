@@ -6,7 +6,7 @@ import { ERC721Token, ERC721TokenDocument } from '@thxnetwork/api/models/ERC721T
 import { Transaction } from '@thxnetwork/api/models/Transaction';
 import { ERC721TokenState, TransactionState } from '@thxnetwork/common/enums';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { WalletDocument } from '../models/Wallet';
 import { RewardNFT } from '../models/RewardNFT';
@@ -19,7 +19,7 @@ import WalletService from './WalletService';
 const contractName = 'THXERC721';
 
 async function deploy(data: TERC721, forceSync = true): Promise<ERC721Document> {
-    const { web3, defaultAccount } = getProvider(data.chainId);
+    const { web3, defaultAccount } = NetworkService.getProvider(data.chainId);
     const { abi, bytecode } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi);
     const erc721 = await ERC721.create(data);
@@ -193,7 +193,7 @@ async function findMetadataByNFT(erc721Id: string, page = 1, limit = 10) {
 }
 
 export const getOnChainERC721Token = async (chainId: number, address: string) => {
-    const { web3 } = getProvider(chainId);
+    const { web3 } = NetworkService.getProvider(chainId);
     const { abi } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi, address);
     const [name, symbol, totalSupply] = await Promise.all([

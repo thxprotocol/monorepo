@@ -7,7 +7,7 @@ import { dashboardAccessToken, sub } from '@thxnetwork/api/util/jest/constants';
 import { alchemy } from '@thxnetwork/api/util/alchemy';
 import { deployERC721, mockGetNftsForOwner } from '@thxnetwork/api/util/jest/erc721';
 import { ERC721Document, PoolDocument } from '@thxnetwork/api/models';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import TransactionService from '@thxnetwork/api/services/TransactionService';
 
 const user = request.agent(app);
@@ -65,7 +65,7 @@ describe('ERC721 import', () => {
     });
 
     describe('GET /erc721/:id', () => {
-        const { defaultAccount } = getProvider(chainId);
+        const { defaultAccount } = NetworkService.getProvider(chainId);
 
         it('HTTP 200', (done) => {
             user.get(`/v1/erc721/${erc721._id}`)

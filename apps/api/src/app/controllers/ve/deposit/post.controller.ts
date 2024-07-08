@@ -2,8 +2,9 @@ import { Request, Response } from 'express';
 import { body, query } from 'express-validator';
 import { ForbiddenError } from '@thxnetwork/api/util/errors';
 import { BigNumber } from 'alchemy-sdk';
-import { getProvider } from '@thxnetwork/api/util/network';
 import { contractNetworks } from '@thxnetwork/api/hardhat';
+import { ChainId } from '@thxnetwork/common/enums';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import VoteEscrowService from '@thxnetwork/api/services/VoteEscrowService';
 
 const validation = [body('amountInWei').isString(), body('lockEndTimestamp').isInt(), query('walletId').isMongoId()];
@@ -18,7 +19,7 @@ const controller = async ({ body, wallet }: Request, res: Response) => {
     if (BigNumber.from(amount).lt(body.amountInWei)) throw new ForbiddenError('Insufficient allowance');
 
     // Check lockEndTimestamp to be more than today + 3 months
-    const { web3 } = getProvider();
+    const { web3 } = NetworkService.getProvider(ChainId.Polygon);
     const latest = await web3.eth.getBlockNumber();
     const now = (await web3.eth.getBlock(latest)).timestamp;
     if (now > body.lockEndTimestamp) throw new ForbiddenError('lockEndTimestamp needs be larger than today');

@@ -1,4 +1,4 @@
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { ChainId, TransactionState, TransactionType } from '@thxnetwork/common/enums';
 import { MINIMUM_GAS_LIMIT, RELAYER_SPEED } from '@thxnetwork/api/config/secrets';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
@@ -18,7 +18,7 @@ function getById(id: string) {
 }
 
 async function sendValue(to: string, value: string, chainId: ChainId) {
-    const { web3, defaultAccount } = getProvider(chainId);
+    const { web3, defaultAccount } = NetworkService.getProvider(chainId);
     const from = defaultAccount;
     const gas = '21000';
 
@@ -47,7 +47,7 @@ async function sendValue(to: string, value: string, chainId: ChainId) {
 }
 
 async function send(to: string, fn: any, chainId: ChainId) {
-    const { web3, defaultAccount } = getProvider(chainId);
+    const { web3, defaultAccount } = NetworkService.getProvider(chainId);
     const from = defaultAccount;
     const data = fn.encodeABI();
     const estimate = await fn.estimateGas({ from });
@@ -82,7 +82,7 @@ async function sendAsync(
     forceSync = true,
     callback?: TTransactionCallback,
 ) {
-    const { web3, relayer, defaultAccount } = getProvider(chainId);
+    const { web3, relayer, defaultAccount } = NetworkService.getProvider(chainId);
     const data = fn.encodeABI();
 
     const estimate = await fn.estimateGas({ from: defaultAccount });
@@ -140,7 +140,7 @@ async function sendAsync(
 }
 
 async function execSafeAsync(wallet: WalletDocument, tx: TransactionDocument) {
-    const { relayer } = getProvider(wallet.chainId);
+    const { relayer } = NetworkService.getProvider(wallet.chainId);
     const safeTransaction = await SafeService.getTransaction(wallet, tx.safeTxHash);
 
     // If there is no relayer for the network the safe executes immediately
@@ -172,7 +172,7 @@ async function proposeSafeAsync(
     data: string,
     callback?: TTransactionCallback,
 ) {
-    const { relayer, defaultAccount } = getProvider(wallet.chainId);
+    const { relayer, defaultAccount } = NetworkService.getProvider(wallet.chainId);
     const safeTxHash = await SafeService.proposeTransaction(wallet, {
         to,
         data,
@@ -200,7 +200,7 @@ async function sendSafeAsync(wallet: WalletDocument, to: string | null, fn: any,
 }
 
 async function deploy(abi: any, bytecode: any, arg: any[], chainId: ChainId) {
-    const { web3, defaultAccount } = getProvider(chainId);
+    const { web3, defaultAccount } = NetworkService.getProvider(chainId);
     const contract = new web3.eth.Contract(abi) as unknown as Contract;
     const gas = await contract
         .deploy({
@@ -295,7 +295,7 @@ async function queryTransactionStatusDefender(tx: TransactionDocument) {
     if ([TransactionState.Mined, TransactionState.Failed].includes(tx.state)) {
         return tx;
     }
-    const { web3, relayer } = getProvider(tx.chainId);
+    const { web3, relayer } = NetworkService.getProvider(tx.chainId);
 
     const defenderTx = await relayer.query(tx.transactionId);
 
@@ -320,7 +320,7 @@ async function queryTransactionStatusReceipt(tx: TransactionDocument) {
     if ([TransactionState.Mined, TransactionState.Failed].includes(tx.state)) {
         return tx;
     }
-    const { web3 } = getProvider(tx.chainId);
+    const { web3 } = NetworkService.getProvider(tx.chainId);
 
     const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
 

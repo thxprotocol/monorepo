@@ -3,11 +3,11 @@ import { body, param } from 'express-validator';
 import { QuestWeb3 } from '@thxnetwork/api/models/QuestWeb3';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { agenda } from '@thxnetwork/api/util/agenda';
-import { recoverSigner } from '@thxnetwork/api/util/network';
 import { chainList } from '@thxnetwork/common/chains';
 import { JobType, QuestVariant } from '@thxnetwork/common/enums';
 import QuestWeb3Service from '@thxnetwork/api/services/QuestWeb3Service';
 import QuestService from '@thxnetwork/api/services/QuestService';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 
 const validation = [
     param('id').isMongoId(),
@@ -20,7 +20,7 @@ const controller = async ({ account, body, params }: Request, res: Response) => 
     const quest = await QuestWeb3.findById(params.id);
     if (!quest) throw new NotFoundError('Quest not found');
 
-    const address = recoverSigner(body.message, body.signature);
+    const address = NetworkService.recoverSigner(body.message, body.signature);
     if (!address) throw new NotFoundError(`Could not recover address from signature.`);
 
     const { rpc, name } = chainList[body.chainId];

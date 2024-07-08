@@ -13,7 +13,7 @@ import {
 } from '@thxnetwork/api/models';
 import { IPFS_BASE_URL } from '@thxnetwork/api/config/secrets';
 import { safeVersion } from '@thxnetwork/api/services/ContractService';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { poll } from '@thxnetwork/api/util/polling';
 import { WalletDocument } from '@thxnetwork/api/models/Wallet';
 import PoolService from '@thxnetwork/api/services/PoolService';
@@ -42,7 +42,7 @@ describe('QR Codes', () => {
         const safe = await SafeService.create({ sub, safeVersion, poolId });
 
         // Wait for campaign safe to be deployed
-        const { web3 } = getProvider(ChainId.Hardhat);
+        const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
         await poll(
             () => web3.eth.getCode(safe.address),
             (data: string) => data === '0x',

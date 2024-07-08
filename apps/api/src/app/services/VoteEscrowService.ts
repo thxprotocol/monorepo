@@ -1,14 +1,14 @@
-import { getProvider } from '@thxnetwork/api/util/network';
 import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
 import { ChainId } from '@thxnetwork/common/enums';
 import { WalletDocument } from '@thxnetwork/api/models';
 import { toChecksumAddress } from 'web3-utils';
-import TransactionService from '@thxnetwork/api/services/TransactionService';
 import { logger } from '../util/logger';
 import { NODE_ENV } from '../config/secrets';
+import TransactionService from '@thxnetwork/api/services/TransactionService';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 
 async function isApprovedAddress(address: string, chainId: ChainId) {
-    const { web3 } = getProvider(chainId);
+    const { web3 } = NetworkService.getProvider(chainId);
     const whitelist = new web3.eth.Contract(
         contractArtifacts['SmartWalletWhitelist'].abi,
         contractNetworks[chainId].SmartWalletWhitelist,
@@ -17,7 +17,7 @@ async function isApprovedAddress(address: string, chainId: ChainId) {
 }
 
 async function list(wallet: WalletDocument) {
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const ve = new web3.eth.Contract(
         contractArtifacts['VotingEscrow'].abi,
         contractNetworks[wallet.chainId].VotingEscrow,
@@ -26,13 +26,13 @@ async function list(wallet: WalletDocument) {
 }
 
 async function getAllowance(wallet: WalletDocument, tokenAddress: string, spender: string) {
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const bpt = new web3.eth.Contract(contractArtifacts['BPT'].abi, tokenAddress);
     return await bpt.methods.allowance(wallet.address, spender).call();
 }
 
 async function approve(wallet: WalletDocument, tokenAddress: string, spender: string, amount: string) {
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const bpt = new web3.eth.Contract(contractArtifacts['BPT'].abi, tokenAddress);
     const fn = bpt.methods.approve(spender, amount);
 
@@ -41,7 +41,7 @@ async function approve(wallet: WalletDocument, tokenAddress: string, spender: st
 }
 
 async function increaseAmount(wallet: WalletDocument, amountInWei: string) {
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const ve = new web3.eth.Contract(
         contractArtifacts['VotingEscrow'].abi,
         contractNetworks[wallet.chainId].VotingEscrow,
@@ -51,7 +51,7 @@ async function increaseAmount(wallet: WalletDocument, amountInWei: string) {
 }
 
 async function increaseUnlockTime(wallet: WalletDocument, endTimestamp: number) {
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const ve = new web3.eth.Contract(
         contractArtifacts['VotingEscrow'].abi,
         contractNetworks[wallet.chainId].VotingEscrow,
@@ -61,7 +61,7 @@ async function increaseUnlockTime(wallet: WalletDocument, endTimestamp: number) 
 }
 
 async function deposit(wallet: WalletDocument, amountInWei: string, endTimestamp: number) {
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const ve = new web3.eth.Contract(
         contractArtifacts['VotingEscrow'].abi,
         contractNetworks[wallet.chainId].VotingEscrow,
@@ -71,7 +71,7 @@ async function deposit(wallet: WalletDocument, amountInWei: string, endTimestamp
 }
 
 async function withdraw(wallet: WalletDocument, isEarlyWithdraw: boolean) {
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const ve = new web3.eth.Contract(
         contractArtifacts['VotingEscrow'].abi,
         contractNetworks[wallet.chainId].VotingEscrow,
@@ -87,7 +87,7 @@ async function withdraw(wallet: WalletDocument, isEarlyWithdraw: boolean) {
 }
 
 async function listRewards(wallet: WalletDocument) {
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
 
     // Get reward tokens
     const lr = new web3.eth.Contract(contractArtifacts['LensReward'].abi, contractNetworks[wallet.chainId].LensReward);
@@ -144,7 +144,7 @@ async function listRewards(wallet: WalletDocument) {
 }
 
 async function claimTokens(wallet: WalletDocument) {
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const rewardDistributor = new web3.eth.Contract(
         contractArtifacts['RewardDistributor'].abi,
         contractNetworks[wallet.chainId].RewardDistributor,
@@ -164,7 +164,7 @@ async function claimExternalRewardsJob() {
     for (const chainId of [ChainId.Hardhat, ChainId.Polygon]) {
         try {
             if (NODE_ENV === 'production' && chainId === ChainId.Hardhat) continue;
-            const { web3 } = getProvider(chainId);
+            const { web3 } = NetworkService.getProvider(chainId);
             const ve = new web3.eth.Contract(
                 contractArtifacts['VotingEscrow'].abi,
                 contractNetworks[chainId].VotingEscrow,

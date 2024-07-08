@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { ForbiddenError } from '@thxnetwork/api/util/errors';
 import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
-import { getProvider } from '@thxnetwork/api/util/network';
 import { body, query } from 'express-validator';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import VoteEscrowService from '@thxnetwork/api/services/VoteEscrowService';
 
 const validation = [
@@ -14,7 +14,7 @@ const validation = [
 
 const controller = async ({ wallet, body }: Request, res: Response) => {
     // Check sufficient BPT approval
-    const { web3 } = getProvider();
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const ve = new web3.eth.Contract(
         contractArtifacts['VotingEscrow'].abi,
         contractNetworks[wallet.chainId].VotingEscrow,

@@ -3,7 +3,7 @@ import { fromWei } from 'web3-utils';
 import { NODE_ENV } from '@thxnetwork/api/config/secrets';
 import { ChainId } from '@thxnetwork/common/enums';
 import { logger } from '@thxnetwork/api/util/logger';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { ethers } from 'ethers';
 import { getArtifact, contractNetworks } from '@thxnetwork/api/hardhat';
 import { BigNumber } from 'alchemy-sdk';
@@ -16,7 +16,7 @@ function handleError(error: Error) {
 
 async function getNetworkDetails(chainId: ChainId) {
     try {
-        const { defaultAccount, web3, signer } = getProvider(chainId);
+        const { defaultAccount, web3, signer } = NetworkService.getProvider(chainId);
         const rfthx = new ethers.Contract(
             contractNetworks[chainId].RewardFaucet,
             getArtifact('RewardFaucet').abi,

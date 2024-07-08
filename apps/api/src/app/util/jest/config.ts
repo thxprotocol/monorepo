@@ -1,7 +1,7 @@
 import db from '@thxnetwork/api/util/database';
 import { mockStart } from './mock';
 import { safeVersion } from '@thxnetwork/api/services/ContractService';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { ChainId, WalletVariant } from '@thxnetwork/common/enums';
 import {
     sub,
@@ -22,7 +22,7 @@ import { agenda } from '../agenda';
 export async function beforeAllCallback(options = { skipWalletCreation: false }) {
     mockStart();
 
-    const { web3, defaultAccount, ethAdapter } = getProvider(ChainId.Hardhat);
+    const { web3, defaultAccount, ethAdapter } = NetworkService.getProvider(ChainId.Hardhat);
     // Wait for this hardhat log:
     const lastDeployedContractAddress = '0x58C0e64cBB7E5C7D0201A3a5c2D899cC70B0dc4c';
     const fn = () => web3.eth.getCode(lastDeployedContractAddress);

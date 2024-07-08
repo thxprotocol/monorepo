@@ -2,7 +2,7 @@ import { safeVersion } from '@thxnetwork/api/services/ContractService';
 import { toChecksumAddress } from 'web3-utils';
 import { Wallet } from '@thxnetwork/api/models/Wallet';
 import { ChainId } from '@thxnetwork/common/enums';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { SafeFactory } from '@safe-global/protocol-kit';
 
 export default async function main() {
@@ -15,7 +15,7 @@ export default async function main() {
     });
     if (SAFE !== wallet.address) throw new Error('Provided address does not equal Safe address.');
 
-    const { ethAdapter } = getProvider(ChainId.Polygon);
+    const { ethAdapter } = NetworkService.getProvider(ChainId.Polygon);
     const safeFactory = await SafeFactory.create({
         safeVersion,
         ethAdapter,

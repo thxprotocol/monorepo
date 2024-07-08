@@ -56,6 +56,8 @@ if (process.env.NODE_ENV === 'test') {
 
 export const VERSION = 'v1';
 export const CWD = process.env.CWD || path.resolve(__dirname, '../../../apps/api/src');
+export const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || '';
+export const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID || '';
 export const NODE_ENV = process.env.NODE_ENV || 'development';
 export const AUTH_URL = process.env.AUTH_URL || '';
 export const API_URL = process.env.API_URL || '';
@@ -63,9 +65,12 @@ export const WALLET_URL = process.env.WALLET_URL || '';
 export const DASHBOARD_URL = process.env.DASHBOARD_URL || '';
 export const WIDGET_URL = process.env.WIDGET_URL || '';
 export const PUBLIC_URL = process.env.PUBLIC_URL || '';
+
 export const HARDHAT_RPC = process.env.HARDHAT_RPC || '';
 export const POLYGON_RPC = process.env.POLYGON_RPC || 'https://rpc.ankr.com/polygon';
+export const LINEA_RPC = `https://linea-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`;
 export const ETHEREUM_RPC = process.env.ETHEREUM_RPC || 'https://rpc.ankr.com/eth';
+
 export const MONGODB_URI = String(process.env.MONGODB_URI) || '';
 export const PRIVATE_KEY = process.env.PRIVATE_KEY || '';
 export const PORT = process.env.PORT || '';
@@ -77,9 +82,10 @@ export const RATE_LIMIT_REWARD_GIVE_WINDOW = Number(process.env.RATE_LIMIT_REWAR
 export const RATE_LIMIT_REWARD_CLAIM_WINDOW = Number(process.env.RATE_LIMIT_REWARD_CLAIM_WINDOW) || '';
 export const INITIAL_ACCESS_TOKEN = process.env.INITIAL_ACCESS_TOKEN || '';
 export const CIRCULATING_SUPPLY = process.env.CIRCULATING_SUPPLY || '';
-export const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID || '';
+
 export const INFURA_IPFS_PROJECT_ID = process.env.INFURA_IPFS_PROJECT_ID || '';
 export const INFURA_IPFS_PROJECT_SECRET = process.env.INFURA_IPFS_PROJECT_SECRET || '';
+
 export const MINIMUM_GAS_LIMIT = 54680 || '';
 export const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || '';
 export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || '';
@@ -87,19 +93,25 @@ export const AWS_S3_PUBLIC_BUCKET_NAME = process.env.AWS_S3_PUBLIC_BUCKET_NAME |
 export const AWS_S3_PUBLIC_BUCKET_REGION = process.env.AWS_S3_PUBLIC_BUCKET_REGION || '';
 export const AWS_S3_PRIVATE_BUCKET_NAME = process.env.AWS_S3_PRIVATE_BUCKET_NAME || '';
 export const AWS_S3_PRIVATE_BUCKET_REGION = process.env.AWS_S3_PRIVATE_BUCKET_REGION || '';
+
 export const POLYGON_RELAYER = process.env.POLYGON_RELAYER || '';
 export const POLYGON_RELAYER_API_KEY = process.env.POLYGON_RELAYER_API_KEY || '';
 export const POLYGON_RELAYER_API_SECRET = process.env.POLYGON_RELAYER_API_SECRET || '';
+
+export const LINEA_RELAYER = process.env.LINEA_RELAYER || '0x47B6E9f120ad7985826A990Ce1100c23af89Daa7';
+export const LINEA_RELAYER_API_KEY = process.env.LINEA_RELAYER_API_KEY || '';
+export const LINEA_RELAYER_API_SECRET = process.env.LINEA_RELAYER_API_SECRET || '';
+
+export const RELAYER_SPEED = (process.env.RELAYER_SPEED || 'fastest') as Speed;
+
 export const LOCAL_CERT = process.env.LOCAL_CERT || '';
 export const LOCAL_CERT_KEY = process.env.LOCAL_CERT_KEY || '';
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
-export const RELAYER_SPEED = (process.env.RELAYER_SPEED || 'fastest') as Speed;
 export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN || '';
 export const MIXPANEL_API_URL = 'https://api.mixpanel.com';
 export const CYPRESS_EMAIL = process.env.CYPRESS_EMAIL || 'cypress@thx.network';
 export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
 export const STRIPE_SECRET_WEBHOOK = process.env.STRIPE_SECRET_WEBHOOK || '';
-export const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || '';
 export const TWITTER_API_TOKEN = process.env.TWITTER_API_TOKEN || '';
 export const IPFS_BASE_URL = 'https://ipfs.io/ipfs/';
 export const WEBHOOK_REFERRAL = process.env.WEBHOOK_REFERRAL || '';

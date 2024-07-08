@@ -1,7 +1,7 @@
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { TransactionReceipt } from 'web3-core';
 import { ChainId, TransactionState, ERC1155TokenState } from '@thxnetwork/common/enums';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import { API_URL, VERSION } from '../config/secrets';
@@ -26,7 +26,7 @@ import { getArtifact } from '../hardhat';
 const contractName = 'THXERC1155';
 
 async function deploy(data: TERC1155, forceSync = true): Promise<ERC1155Document> {
-    const { web3, defaultAccount } = getProvider(data.chainId);
+    const { web3, defaultAccount } = NetworkService.getProvider(data.chainId);
     const { abi, bytecode } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi);
     const erc1155 = await ERC1155.create(data);
@@ -309,7 +309,7 @@ export const update = (erc1155: ERC1155Document, updates: Partial<TERC1155>) => 
 };
 
 export const getOnChainERC1155Token = async (chainId: number, address: string) => {
-    const { web3 } = getProvider(chainId);
+    const { web3 } = NetworkService.getProvider(chainId);
     const { abi } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi, address);
     const uri = await contract.methods.uri(1).call();

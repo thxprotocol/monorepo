@@ -1,13 +1,13 @@
 import { ethers } from 'ethers';
 import { VOTER_PK, DEPOSITOR_PK } from './constants';
-import { getProvider } from '@thxnetwork/api/util/network';
 import { ChainId } from '@thxnetwork/common/enums';
 import { contractNetworks } from '@thxnetwork/api/hardhat';
 import { HARDHAT_RPC, SAFE_TXS_SERVICE } from '@thxnetwork/api/config/secrets';
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 
-const { web3 } = getProvider(ChainId.Hardhat);
+const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
 
 const voter = web3.eth.accounts.privateKeyToAccount(VOTER_PK) as any;
 const depositor = web3.eth.accounts.privateKeyToAccount(DEPOSITOR_PK) as any;

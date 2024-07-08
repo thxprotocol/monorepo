@@ -6,7 +6,7 @@ import { sub, sub2, userWalletPrivateKey, widgetAccessToken } from '@thxnetwork/
 import { poll } from '@thxnetwork/api/util/polling';
 import { signTxHash } from '@thxnetwork/api/util/jest/network';
 import { safeVersion } from '@thxnetwork/api/services/ContractService';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import {
     ERC721Token,
     ERC721TokenDocument,
@@ -45,7 +45,7 @@ describe('ERC721 Transfer', () => {
     afterAll(afterAllCallback);
 
     it('Deploy Campaign Safe', async () => {
-        const { web3 } = getProvider(chainId);
+        const { web3 } = NetworkService.getProvider(chainId);
         pool = await PoolService.deploy(sub, 'My Reward Campaign');
         const safe = await SafeService.create({ sub, safeVersion, poolId: String(pool._id) });
 
@@ -62,7 +62,7 @@ describe('ERC721 Transfer', () => {
     });
 
     it('Deploy ERC721', async () => {
-        const { web3 } = getProvider(chainId);
+        const { web3 } = NetworkService.getProvider(chainId);
 
         erc721 = await ERC721Service.deploy(
             {
@@ -125,7 +125,7 @@ describe('ERC721 Transfer', () => {
         const safe = await SafeService.findOneByPool(pool);
 
         // Wait for safe address to return code
-        const { web3 } = getProvider(chainId);
+        const { web3 } = NetworkService.getProvider(chainId);
         await poll(
             () => web3.eth.getCode(safe.address),
             (data: string) => data === '0x',

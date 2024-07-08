@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { query } from 'express-validator';
 import WalletService from '@thxnetwork/api/services/WalletService';
 import VoteEscrowService from '@thxnetwork/api/services/VoteEscrowService';
@@ -13,7 +13,7 @@ const controller = async (req: Request, res: Response) => {
     const wallet = await WalletService.findById(walletId);
     if (!wallet) throw new NotFoundError('Wallet not found.');
 
-    const { web3 } = getProvider(wallet.chainId);
+    const { web3 } = NetworkService.getProvider(wallet.chainId);
     const ve = new web3.eth.Contract(
         contractArtifacts['VotingEscrow'].abi,
         contractNetworks[wallet.chainId].VotingEscrow,

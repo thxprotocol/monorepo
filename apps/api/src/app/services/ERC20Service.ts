@@ -2,7 +2,7 @@ import { toChecksumAddress } from 'web3-utils';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import { ChainId, ERC20Type, TransactionState } from '@thxnetwork/common/enums';
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { TransactionReceipt } from 'web3-core';
 import { contractNetworks, getArtifact } from '@thxnetwork/api/hardhat';
 import {
@@ -35,7 +35,7 @@ async function decorate(token: ERC20TokenDocument, wallet: WalletDocument) {
 }
 
 function getDeployArgs(erc20: ERC20Document, totalSupply?: string) {
-    const { defaultAccount } = getProvider(erc20.chainId);
+    const { defaultAccount } = NetworkService.getProvider(erc20.chainId);
 
     switch (erc20.type) {
         case ERC20Type.Limited: {
@@ -65,7 +65,7 @@ export const deploy = async (params: Partial<TERC20>, forceSync = true) => {
         sub: params.sub,
         logoImgUrl: params.logoImgUrl,
     });
-    const { web3 } = getProvider(erc20.chainId);
+    const { web3 } = NetworkService.getProvider(erc20.chainId);
     const { abi, bytecode } = getArtifact(erc20.contractName);
     const contract = new web3.eth.Contract(abi);
     const fn = contract.deploy({
@@ -186,7 +186,7 @@ export const addTokenForWallet = async (erc20: ERC20Document, wallet: WalletDocu
 };
 
 export const importToken = async (chainId: number, address: string, sub: string, logoImgUrl: string) => {
-    const { web3 } = getProvider(chainId);
+    const { web3 } = NetworkService.getProvider(chainId);
     const { abi } = getArtifact('THXERC20_LimitedSupply');
     const contract = new web3.eth.Contract(abi);
     const [name, symbol] = await Promise.all([contract.methods.name().call(), contract.methods.symbol().call()]);
@@ -299,7 +299,7 @@ async function findDefaultTokens(wallet: WalletDocument) {
     ];
 
     const promises = defaultContracts.map(async (erc20) => {
-        const { web3 } = getProvider(erc20.chainId);
+        const { web3 } = NetworkService.getProvider(erc20.chainId);
         const { abi } = getArtifact('THXERC20_LimitedSupply');
         const contract = new web3.eth.Contract(abi, erc20.address);
         const walletBalanceInWei = await contract.methods.balanceOf(wallet.address).call();

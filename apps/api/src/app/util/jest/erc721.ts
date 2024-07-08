@@ -1,10 +1,10 @@
 import { API_URL, MINIMUM_GAS_LIMIT, VERSION } from '@thxnetwork/api/config/secrets';
 import { ChainId } from '@thxnetwork/common/enums';
-import { getProvider } from '../network';
 import { getArtifact } from '@thxnetwork/api/hardhat';
+import NetworkService from '../../services/NetworkService';
 
 export async function deployERC721(nftName: string, nftSymbol: string) {
-    const { web3, defaultAccount } = getProvider(ChainId.Hardhat);
+    const { web3, defaultAccount } = NetworkService.getProvider(ChainId.Hardhat);
     const contractName = 'THXERC721';
     const { abi, bytecode } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi);
