@@ -11,18 +11,24 @@
             <i class="fas fa-exclamation-triangle me-2" />
             {{ error }}
         </b-alert>
-        <b-form-group>
-            <b-form-input v-model="email" :state="isEmailValid" placeholder="E-mail" />
-        </b-form-group>
-        <b-button
-            variant="primary"
-            :disabled="!isEmailValid"
-            class="w-100"
-            @click="onClickSignin(AccountVariant.EmailPassword)"
-        >
-            Send one-time password
-            <i class="fas fa-chevron-right ms-2"></i>
-        </b-button>
+        <template v-if="!isEmailSent">
+            <b-form-group>
+                <b-form-input v-model="email" :state="isEmailValid" placeholder="E-mail" />
+            </b-form-group>
+            <b-button variant="primary" :disabled="!isEmailValid" class="w-100" @click="onClickSigninOTP()">
+                Send one-time password
+                <i class="fas fa-chevron-right ms-2"></i>
+            </b-button>
+        </template>
+        <template v-else>
+            <b-form-group>
+                <b-form-input v-model="otp" placeholder="One-time password" />
+            </b-form-group>
+            <b-button variant="primary" :disabled="!isOTPValid" class="w-100" @click="onClickVerifyOTP()">
+                Verify OTP
+                <i class="fas fa-chevron-right ms-2"></i>
+            </b-button>
+        </template>
         <hr />
         <b-form-group>
             <BaseButtonWalletConnect
@@ -39,19 +45,27 @@
         </b-form-group>
         <hr class="or-separator" />
         <b-form-group label="Use a trusted provider" label-class="text-opaque">
-            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSignin(AccountVariant.SSOGoogle)">
+            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSigninOAuth(AccountVariant.SSOGoogle)">
                 <i class="fab fa-google"></i>
             </b-button>
-            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSignin(AccountVariant.SSODiscord)">
+            <b-button
+                variant="primary"
+                class="rounded me-2 px-3"
+                @click="onClickSigninOAuth(AccountVariant.SSODiscord)"
+            >
                 <i class="fab fa-discord"></i>
             </b-button>
-            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSignin(AccountVariant.SSOTwitter)">
+            <b-button
+                variant="primary"
+                class="rounded me-2 px-3"
+                @click="onClickSigninOAuth(AccountVariant.SSOTwitter)"
+            >
                 <i class="fab fa-twitter"></i>
             </b-button>
-            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSignin(AccountVariant.SSOTwitch)">
+            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSigninOAuth(AccountVariant.SSOTwitch)">
                 <i class="fab fa-twitch"></i>
             </b-button>
-            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSignin(AccountVariant.SSOGithub)">
+            <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSigninOAuth(AccountVariant.SSOGithub)">
                 <i class="fab fa-github"></i>
             </b-button>
         </b-form-group>
@@ -67,6 +81,7 @@ import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { AccountVariant } from '../../types/enums/accountVariant';
 import { shortenAddress } from '../../utils/address';
+import { accountVariantProviderKindMap } from '../../utils/social';
 import imgWalletConnect from '../../assets/walletconnect-logo.png';
 
 export default defineComponent({
@@ -77,6 +92,8 @@ export default defineComponent({
             imgWalletConnect,
             error: '',
             email: '',
+            otp: '',
+            isEmailSubmitted: false,
             isShown: false,
             isLoading: false,
             shortenAddress,
@@ -93,6 +110,13 @@ export default defineComponent({
                 this.email.length && this.email.length > 3 && this.email.includes('@') && this.email.includes('.');
             return !!isEmail;
         },
+        isOTPValid() {
+            if (!this.otp) return null;
+            return this.otp.length === 6;
+        },
+        isEmailSent() {
+            return !this.error && this.email && this.isEmailSubmitted;
+        },
     },
     methods: {
         onClickSignout() {
@@ -108,18 +132,38 @@ export default defineComponent({
             });
             this.isLoading = false;
         },
-        async onClickSignin(variant: AccountVariant) {
+        async onClickSigninOTP() {
+            try {
+                this.isLoading = true;
+                await this.accountStore.signInWithOtp({ email: this.email });
+                this.isEmailSubmitted = true;
+            } catch (error) {
+                this.error = (error as any).message;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async onClickVerifyOTP() {
+            try {
+                this.isLoading = true;
+                await this.accountStore.verifyOtp({ email: this.email, token: this.otp });
+            } catch (error) {
+                this.error = (error as any).message;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async onClickSigninOAuth(variant: AccountVariant) {
             this.isLoading = true;
-            await this.authStore.signin(
-                {
-                    auth_variant: variant,
-                    auth_email: this.email,
-                    return_url: window.location.href,
-                    poolId: this.accountStore.poolId,
-                },
-                { inviteCode: this.$route.params.code },
-            );
-            this.isLoading = false;
+            try {
+                await this.accountStore.signInWithOAuth({
+                    provider: accountVariantProviderKindMap[variant],
+                });
+            } catch (error) {
+                this.error = (error as any).message;
+            } finally {
+                this.isLoading = false;
+            }
         },
     },
 });

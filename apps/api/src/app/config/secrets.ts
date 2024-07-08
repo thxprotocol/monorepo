@@ -119,3 +119,5 @@ export const GCLOUD_RECAPTCHA_SITE_KEY = process.env.GCLOUD_RECAPTCHA_SITE_KEY |
 export const THX_CLIENT_ID = process.env.THX_CLIENT_ID || '';
 export const THX_CLIENT_SECRET = process.env.THX_CLIENT_SECRET || '';
 export const WEBHOOK_SIGNING_SECRET = process.env.WEBHOOK_SIGNING_SECRET || '';
+export const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
+export const SUPABASE_URL = process.env.SUPABASE_URL || '';

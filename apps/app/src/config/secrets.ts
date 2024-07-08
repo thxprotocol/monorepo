@@ -19,3 +19,5 @@ export const SENTRY_AUTH_TOKEN = import.meta.env.VITE_SENTRY_AUTH_TOKEN || '';
 export const MAINTENANCE = import.meta.env.VITE_MAINTENANCE || '';
 export const GCLOUD_RECAPTCHA_SITE_KEY = import.meta.env.VITE_GCLOUD_RECAPTCHA_SITE_KEY || '';
 export const CAMPAIGN_ID = import.meta.env.VITE_CAMPAIGN_ID || '663259683f597135e0007c60';
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+export const SUPABASE_PUBLIC_KEY = import.meta.env.VITE_SUPABASE_PUBLIC_KEY || '';

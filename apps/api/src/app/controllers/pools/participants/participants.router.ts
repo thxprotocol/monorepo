@@ -9,7 +9,7 @@ const router: express.Router = express.Router({ mergeParams: true });
 
 router.get(
     '/',
-    guard.check(['pools:read']),
+    // guard.check(['pools:read']),
     assertPoolAccess,
     assertRequestInput(ListParticipants.validation),
     ListParticipants.controller,

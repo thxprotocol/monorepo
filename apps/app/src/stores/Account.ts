@@ -1,22 +1,26 @@
+import { API_URL, AUTH_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from '../config/secrets';
+import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
 import { defineStore } from 'pinia';
 import { track } from '@thxnetwork/common/mixpanel';
 import { THXBrowserClient } from '@thxnetwork/sdk/clients';
-import { API_URL, AUTH_URL, CLIENT_ID, WIDGET_URL } from '../config/secrets';
-import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
 import { BREAKPOINT_LG } from '../config/constants';
 import { useAuthStore } from './Auth';
-import { getConnectedUser } from '../utils/social';
+import { OAuthScopes } from '../utils/social';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
-import { User } from 'oidc-client-ts';
 import { decodeHTML } from '../utils/decode-html';
-import poll from 'promise-poller';
 import { useWalletStore } from './Wallet';
+import { createClient, Provider, Session } from '@supabase/supabase-js';
+import poll from 'promise-poller';
 
 // Feature only available on mobile devices
 const isMobileDevice = !!window.matchMedia('(pointer:coarse)').matches;
 
+// Create Supabase client for authentication
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
+
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
+        session: null,
         poolId: '',
         isPreview: false,
         api: null,
@@ -84,7 +88,7 @@ export const useAccountStore = defineStore('account', {
                     apiUrl: API_URL,
                     authUrl: AUTH_URL,
                 } as any);
-                this.addEventListeners();
+                this.setAuthListener();
                 this.setStatus(false);
                 this.getUserData();
             }
@@ -97,50 +101,34 @@ export const useAccountStore = defineStore('account', {
 
             this.setConfig(config.poolId, { ...config, origin });
             this.setTheme(config);
-
-            // Disabled to save credits on high volume campaigns
-            // track('UserVisits', [this.account?.sub, slug, { poolId: this.poolId }]);
         },
-        onLoad() {
-            // debugger;
+        setAuthListener() {
+            supabase.auth.onAuthStateChange((event, session) => {
+                console.log(event, session);
+                if (event === 'INITIAL_SESSION') {
+                    // handle initial session
+                    if (session) this.setSession(session);
+                } else if (event === 'SIGNED_IN') {
+                    // handle sign in event
+                    if (session) this.setSession(session);
+                } else if (event === 'SIGNED_OUT') {
+                    // handle sign out event
+                } else if (event === 'PASSWORD_RECOVERY') {
+                    // handle password recovery event
+                } else if (event === 'TOKEN_REFRESHED') {
+                    // handle token refreshed event
+                } else if (event === 'USER_UPDATED') {
+                    // handle user updated event
+                }
+            });
+        },
+        setSession(session: Session) {
+            this.isAuthenticated = true;
+            this.api.request.setUser(session);
         },
         onResize() {
             this.isMobile = window.innerWidth < BREAKPOINT_LG;
             this.windowHeight = window.innerHeight;
-        },
-        addEventListeners() {
-            const authStore = useAuthStore();
-
-            authStore.userManager.events.addUserLoaded(this.onUserLoaded);
-            authStore.userManager.events.addUserUnloaded(this.onUserUnloaded);
-            authStore.userManager.events.load(this.onLoad);
-            authStore
-                .getUser()
-                .then(() => {
-                    if (!authStore.user) {
-                        this.setStatus(null);
-                    }
-                })
-                .catch((error) => {
-                    this.setStatus(null);
-                    console.log(error);
-                });
-        },
-        async onUserLoaded(user: User) {
-            // Set user in API SDK
-            if (user.access_token) {
-                useAuthStore().onUserLoadedCallback(user);
-                this.api.request.setUser(user);
-                await this.getAccount();
-                track('UserSignsIn', [this.account, { poolId: this.poolId }]);
-
-                this.connectIdentity();
-            }
-
-            this.getUserData();
-        },
-        onUserUnloaded() {
-            return useAuthStore().onUserUnloadedCallback();
         },
         isSubscribed(id: string) {
             return this.participants.find((p) => p.poolId === id)?.isSubscribed;
@@ -190,55 +178,43 @@ export const useAccountStore = defineStore('account', {
         disconnect(kind: AccessTokenKind) {
             return this.api.request.post('/v1/account/disconnect', { data: { kind } });
         },
-        waitForConnectionStatus(kind: AccessTokenKind, scopes: TOAuthScope[]) {
-            const taskFn = async () => {
-                if (!this.account) return;
-                await this.getAccount();
-                return getConnectedUser(this.account, kind, scopes)
-                    ? Promise.resolve()
-                    : Promise.reject('Could no validate connection status...');
-            };
-            return poll({
-                taskFn,
-                interval: 3000,
-                retries: 20, // 3s * 20 = 60s
+        async verifyOtp({ email, token }: { email: string; token: string }) {
+            await supabase.auth.verifyOtp({
+                email,
+                token,
+                type: 'email',
             });
         },
-        signinParent() {
-            const url = `${WIDGET_URL}/c/${this.config.slug}/signin`;
-            this.postMessage({ message: 'thx.auth.signin', url });
+        async getSession() {
+            const { data, error } = await supabase.auth.getSession();
         },
-        signin(extraQueryParams?: { [key: string]: string }) {
+        async signInWithOtp({ email }: { email: string }) {
             this.setStatus(false);
-            if (this.isMobileIFrame) {
-                this.signinParent();
-            } else {
-                useAuthStore().signin(extraQueryParams);
-            }
-        },
-        async verifyEmail(token: string, returnUrl: string) {
-            const { userManager } = useAuthStore();
-            await userManager.signinRedirect({
-                state: {
-                    isMobile: isMobileDevice,
-                    returnUrl,
-                    client_id: CLIENT_ID,
-                    origin: this.config.origin,
+            await supabase.auth.signInWithOtp({
+                email,
+                options: {
+                    shouldCreateUser: false,
+                    // emailRedirectTo: window.location.href, // User for magic links
                 },
-                extraQueryParams: {
-                    prompt: 'verify_email',
-                    pool_id: this.poolId,
-                    return_url: returnUrl,
-                    verifyEmailToken: token,
+            });
+        },
+        async signInWithOAuth({ provider }: { provider: string }) {
+            this.setStatus(false);
+            await supabase.auth.signInWithOAuth({
+                provider: provider as Provider,
+                options: {
+                    scopes: OAuthScopes[provider].join(' '),
+                    redirectTo: window.location.href,
+                    // skipBrowserRedirect?: boolean; // Use this to create a popup for a URL from in case called from an iframe
                 },
             });
         },
         async signout() {
             const walletStore = useWalletStore();
-            const { signout } = useAuthStore();
             walletStore.wallet = null;
             await walletStore.disconnect();
-            await signout();
+
+            await supabase.auth.signOut();
             this.setStatus(null);
             this.account = null;
         },

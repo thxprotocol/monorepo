@@ -1,5 +1,6 @@
 import { QuestSocialRequirement } from '../types/enums/rewards';
 import { AccountVariant } from '../types/enums/accountVariant';
+import { Provider } from '@supabase/supabase-js';
 
 function getConnectedUser(account: TAccount, kind: AccessTokenKind, requiredScopes: TOAuthScope[] = []) {
     return account.tokens.find((a) => a.kind === kind && requiredScopes.every((scope) => a.scopes.includes(scope)));
@@ -39,6 +40,14 @@ const kindAccountVariantMap: { [kind: string]: number } = {
     [AccessTokenKind.Discord]: AccountVariant.SSODiscord,
     [AccessTokenKind.Github]: AccountVariant.SSOGithub,
     [AccessTokenKind.Twitch]: AccountVariant.SSOTwitch,
+};
+
+const accountVariantProviderKindMap: { [variant: number]: string } = {
+    [AccountVariant.SSOGoogle]: 'google',
+    [AccountVariant.SSOTwitter]: 'twitter',
+    [AccountVariant.SSODiscord]: 'discord',
+    [AccountVariant.SSOGithub]: 'github',
+    [AccountVariant.SSOTwitch]: 'twitch',
 };
 
 const interactionComponentMap: { [req: number]: string } = {
@@ -102,6 +111,14 @@ export const OAuthRequiredScopes = {
     GithubAuth: [OAuthGithubScope.PublicRepo],
 };
 
+export const OAuthScopes: { [provider: string]: string[] } = {
+    [AccessTokenKind.Google]: OAuthRequiredScopes.GoogleAuth,
+    [AccessTokenKind.Discord]: OAuthRequiredScopes.DiscordAuth,
+    [AccessTokenKind.Twitter]: OAuthRequiredScopes.TwitterAuth,
+    [AccessTokenKind.Github]: OAuthRequiredScopes.GithubAuth,
+    [AccessTokenKind.Twitch]: OAuthRequiredScopes.TwitchAuth,
+};
+
 const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; scopes: TOAuthScope[] } } = {
     [QuestSocialRequirement.YouTubeLike]: {
         kind: AccessTokenKind.Google,
@@ -146,4 +163,5 @@ export {
     platformIconMap,
     kindAccountVariantMap,
     tokenInteractionMap,
+    accountVariantProviderKindMap,
 };

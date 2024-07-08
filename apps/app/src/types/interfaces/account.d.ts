@@ -57,6 +57,7 @@ type TInvite = {
 } | null;
 
 type TAccountState = {
+    session: null | Session;
     css: HTMLStyleElement | null;
     invite: TInvite;
     isAuthenticated: boolean | null;

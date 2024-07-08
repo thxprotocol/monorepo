@@ -2,6 +2,9 @@ import { authClient, getAuthAccessToken } from '@thxnetwork/api/util/auth';
 import { BadRequestError } from '../util/errors';
 import { AccessTokenKind, OAuthScope } from '@thxnetwork/common/enums';
 import { AxiosRequestConfig } from 'axios';
+import { supabaseClient } from '../util/supabase';
+
+export const supabase = supabaseClient();
 
 export default class AccountProxy {
     static async request(config: AxiosRequestConfig) {
@@ -34,11 +37,9 @@ export default class AccountProxy {
         });
     }
 
-    static findById(sub: string): Promise<TAccount> {
-        return this.request({
-            method: 'GET',
-            url: `/accounts/${sub}`,
-        });
+    static async findById(sub: string): Promise<TAccount> {
+        const user = await supabase.auth.admin.getUserById(sub);
+        return user as unknown as TAccount;
     }
 
     static update(sub: string, updates: Partial<TAccount>): Promise<TAccount> {
@@ -56,7 +57,7 @@ export default class AccountProxy {
         });
     }
 
-    static find({ subs, query }: Partial<{ subs: string[]; query: string }>): Promise<TAccount[]> {
+    static async find({ subs, query }: Partial<{ subs: string[]; query: string }>): Promise<TAccount[]> {
         return this.request({
             method: 'POST',
             url: '/accounts',
