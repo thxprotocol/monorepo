@@ -6,11 +6,9 @@
     <div v-else id="main" :class="{ 'overflow-hidden': accountStore.isMobile }">
         <BaseNavbarTop />
         <div class="d-flex h-100">
-            <router-view v-slot="{ Component }" class="router-view-app order-lg-0">
-                <transition name="fade" mode="out-in">
-                    <component :is="Component" />
-                </transition>
-            </router-view>
+            <transition name="fade" mode="out-in">
+                <router-view class="router-view-app order-lg-0" />
+            </transition>
             <BaseSidebar />
         </div>
         <BaseModalLogin />
