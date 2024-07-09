@@ -1,6 +1,7 @@
 import express from 'express';
 import { assertRequestInput, assertPoolAccess, guard } from '@thxnetwork/api/middlewares';
 import * as ListWallets from './list.controller';
+import * as CreateWallets from './post.controller';
 
 const router: express.Router = express.Router({ mergeParams: true });
 
@@ -10,6 +11,13 @@ router.get(
     assertPoolAccess,
     assertRequestInput(ListWallets.validation),
     ListWallets.controller,
+);
+router.post(
+    '/',
+    guard.check(['pools:read', 'pools:write']),
+    assertPoolAccess,
+    assertRequestInput(CreateWallets.validation),
+    CreateWallets.controller,
 );
 
 export default router;
