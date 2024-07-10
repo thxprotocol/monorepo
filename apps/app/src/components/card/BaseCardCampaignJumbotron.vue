@@ -9,7 +9,7 @@
     >
         <b-container>
             <b-row>
-                <b-col lg="7" offset-lg="1" class="pt-lg-5">
+                <b-col lg="7" offset-lg="1" class="pt-lg-5 px-lg-0">
                     <div class="d-flex py-3 pt-lg-5">
                         <b-img :src="accountStore.config.logoUrl" height="50" alt="logo" class="rounded me-3" />
                         <div>
@@ -20,7 +20,7 @@
                         </div>
                     </div>
                 </b-col>
-                <b-col lg="3">
+                <b-col lg="3" class="px-lg-0">
                     <div class="d-none d-lg-flex align-items-center justify-content-end">
                         <BaseDropdownWallets class="me-3" />
                         <BaseDropdownUserMenu />
