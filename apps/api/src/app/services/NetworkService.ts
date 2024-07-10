@@ -77,6 +77,8 @@ class NetworkService {
         relayer: { apiKey: string; apiSecret: string };
         txServiceUrl: string;
     }) {
+        if (!options.rpc) return;
+
         const { apiKey, apiSecret } = options.relayer;
         const provider = new DefenderRelayProvider({ apiKey, apiSecret }, { speed: RELAYER_SPEED });
         const relayer = new Relayer({ apiKey, apiSecret });
