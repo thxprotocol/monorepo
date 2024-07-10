@@ -10,7 +10,7 @@
         <b-container>
             <b-row>
                 <b-col lg="7" offset-lg="1" class="pt-lg-5">
-                    <div class="d-flex py-3 pt-lg-5">
+                    <div class="d-flex py-3 pt-lg-5 px-lg-0">
                         <b-img :src="accountStore.config.logoUrl" height="50" alt="logo" class="rounded me-3" />
                         <div>
                             <div class="lead text-white">{{ accountStore.config.title }}</div>
