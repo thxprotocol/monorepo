@@ -2,13 +2,17 @@
     <b-container>
         <b-row>
             <b-col lg="7" xl="6" offset-xl="1">
-                <div v-if="!accountStore.isMobile" class="mb-2 ps-3 d-flex align-items-center bg-primary rounded p-2">
+                <blockquote
+                    v-if="!accountStore.isMobile"
+                    class="mb-2 ps-3 d-flex align-items-center p-2"
+                    style="background-color: rgba(0, 0, 0, 0.15)"
+                >
                     <div>
                         <strong>Quests</strong>
                         <div class="text-opaque">Earn points with tasks</div>
                     </div>
-                    <i class="fas fa-tasks text-opaque ms-auto me-3" style="font-size: 1.2rem" />
-                </div>
+                    <i class="fas fa-tasks text-opaque ms-auto me-3" style="font-size: 1.1rem" />
+                </blockquote>
                 <div v-if="questStore.isLoading" class="d-flex justify-content-center py-5">
                     <b-spinner variant="primary" small />
                 </div>
@@ -48,13 +52,16 @@
                 </b-tabs>
             </b-col>
             <b-col v-if="!accountStore.isMobile" lg="5" xl="4">
-                <div class="mb-2 ps-3 d-flex align-items-center bg-primary rounded p-2">
+                <blockquote
+                    class="mb-2 ps-3 d-flex align-items-center p-2"
+                    style="background-color: rgba(0, 0, 0, 0.15)"
+                >
                     <div>
                         <strong>Rewards</strong>
                         <div class="text-opaque">Spend your points!</div>
                     </div>
-                    <i class="fas fa-gift text-opaque ms-auto me-3" style="font-size: 1.2rem" />
-                </div>
+                    <i class="fas fa-gift text-opaque ms-auto me-3" style="font-size: 1.1rem" />
+                </blockquote>
                 <component
                     :is="componentMap[reward.variant]"
                     v-for="reward of rewardStore.rewards"
