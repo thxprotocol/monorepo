@@ -18,9 +18,9 @@
                     </b-button>
                     <b-button
                         v-if="!isQuestCampaign && !accountStore.isAuthenticated"
-                        v-b-modal="'modalLogin'"
                         variant="primary"
                         class="w-100"
+                        @click="authStore.isModalLoginShown = true"
                     >
                         Sign in
                         <i class="fas fa-sign-in-alt ms-2" />
@@ -33,10 +33,11 @@
 
 <script lang="ts">
 import { mapStores } from 'pinia';
-import { useAccountStore } from '../../stores/Account';
 import { defineComponent } from 'vue';
-import { useQuestStore } from '../../stores/Quest';
+import { useAccountStore } from '../../stores/Account';
 import { useRewardStore } from '../../stores/Reward';
+import { useQuestStore } from '../../stores/Quest';
+import { useAuthStore } from '../../stores/Auth';
 import { decodeHTML } from '../../utils/decode-html';
 
 export default defineComponent({
@@ -51,6 +52,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        ...mapStores(useAuthStore),
         ...mapStores(useQuestStore),
         ...mapStores(useRewardStore),
         isQuestCampaign() {

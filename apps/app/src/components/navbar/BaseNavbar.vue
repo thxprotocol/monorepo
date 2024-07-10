@@ -46,10 +46,14 @@
                 v-if="!accountStore.isAuthenticated"
                 class="ms-auto mb-2 mb-lg-0 justify-content-end align-items-center"
             >
-                <b-button v-b-modal="'modalLogin'" class="px-4 ms-2 rounded py-2" variant="outline-light">
+                <b-button
+                    class="px-4 ms-2 rounded py-2"
+                    variant="outline-light"
+                    @click="authStore.isModalLoginShown = true"
+                >
                     Sign up
                 </b-button>
-                <b-button v-b-modal="'modalLogin'" class="px-4 ms-2 rounded py-2" variant="primary">
+                <b-button class="px-4 ms-2 rounded py-2" variant="primary" @click="authStore.isModalLoginShown = true">
                     Sign in
                     <i class="fas fa-sign-in-alt ms-2" />
                 </b-button>
@@ -110,9 +114,9 @@
         <div class="text-center">
             <b-button
                 v-if="!accountStore.isAuthenticated"
-                v-b-modal="'modalLogin'"
                 variant="link"
                 class="text-white text-decoration-none text-opaque"
+                @click="authStore.isModalLoginShown = true"
             >
                 Sign in
                 <i class="fas fa-sign-in-alt ml-auto"></i>

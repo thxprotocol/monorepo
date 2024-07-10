@@ -15,7 +15,6 @@ export const VERIFIER_NETWORK = import.meta.env.VITE_VERIFIER_NETWORK || '';
 export const HARDHAT_RPC = import.meta.env.VITE_HARDHAT_RPC || '';
 export const POLYGON_RPC = import.meta.env.VITE_POLYGON_RPC || '';
 export const WALLET_CONNECT_PROJECT_ID = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || '';
-export const SENTRY_AUTH_TOKEN = import.meta.env.VITE_SENTRY_AUTH_TOKEN || '';
 export const MAINTENANCE = import.meta.env.VITE_MAINTENANCE || '';
 export const GCLOUD_RECAPTCHA_SITE_KEY = import.meta.env.VITE_GCLOUD_RECAPTCHA_SITE_KEY || '';
 export const CAMPAIGN_ID = import.meta.env.VITE_CAMPAIGN_ID || '663259683f597135e0007c60';

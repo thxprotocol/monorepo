@@ -1,5 +1,5 @@
 <template>
-    <b-modal id="modalLogin" v-model="authStore.isModalLoginShown" centered hide-footer>
+    <b-modal v-model="authStore.isModalLoginShown" centered hide-footer @hidden="authStore.isModalLoginShown = false">
         <template #header>
             <h5 class="modal-title">
                 <i class="fas fa-id-badge me-2" />
@@ -77,7 +77,6 @@ export default defineComponent({
             imgWalletConnect,
             error: '',
             email: '',
-            isShown: false,
             isLoading: false,
             shortenAddress,
         };
