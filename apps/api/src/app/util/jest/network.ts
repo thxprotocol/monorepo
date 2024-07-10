@@ -48,7 +48,7 @@ export async function signTxHash(safeAddress: string, safeTxHash: string, privat
         contractNetworks,
     });
     const signedTx = await safe.signTransactionHash(safeTxHash);
-    const apiKit = new SafeApiKit({ txServiceUrl: SAFE_TXS_SERVICE, ethAdapter });
+    const apiKit = new SafeApiKit({ txServiceUrl: SAFE_TXS_SERVICE, chainId: ChainId.Hardhat as unknown as bigint });
     const { signature } = await apiKit.confirmTransaction(safeTxHash, signedTx.data);
 
     return { safeTxHash, signature };

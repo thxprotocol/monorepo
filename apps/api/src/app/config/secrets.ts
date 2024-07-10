@@ -98,7 +98,7 @@ export const POLYGON_RELAYER = process.env.POLYGON_RELAYER || '';
 export const POLYGON_RELAYER_API_KEY = process.env.POLYGON_RELAYER_API_KEY || '';
 export const POLYGON_RELAYER_API_SECRET = process.env.POLYGON_RELAYER_API_SECRET || '';
 
-export const LINEA_RELAYER = process.env.LINEA_RELAYER || '0x47B6E9f120ad7985826A990Ce1100c23af89Daa7';
+export const LINEA_RELAYER = process.env.LINEA_RELAYER || '';
 export const LINEA_RELAYER_API_KEY = process.env.LINEA_RELAYER_API_KEY || '';
 export const LINEA_RELAYER_API_SECRET = process.env.LINEA_RELAYER_API_SECRET || '';
 
@@ -116,7 +116,7 @@ export const TWITTER_API_TOKEN = process.env.TWITTER_API_TOKEN || '';
 export const IPFS_BASE_URL = 'https://ipfs.io/ipfs/';
 export const WEBHOOK_REFERRAL = process.env.WEBHOOK_REFERRAL || '';
 export const WEBHOOK_MILESTONE = process.env.WEBHOOK_MILESTONE || '';
-export const SAFE_TXS_SERVICE = process.env.SAFE_TXS_SERVICE || 'https://safe-transaction-polygon.safe.global';
+export const SAFE_TXS_SERVICE = process.env.SAFE_TXS_SERVICE || '';
 export const BOT_TOKEN = process.env.BOT_TOKEN || '';
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
 export const GITCOIN_API_KEY = process.env.GITCOIN_API_KEY || '';

@@ -89,32 +89,32 @@ class TransactionService {
         return String(tx._id);
     }
 
-    async execSafeAsync(wallet: WalletDocument, tx: TransactionDocument) {
-        const { relayer } = NetworkService.getProvider(wallet.chainId);
-        const safeTransaction = await SafeService.getTransaction(wallet, tx.safeTxHash);
+    // async execSafeAsync(wallet: WalletDocument, tx: TransactionDocument) {
+    //     const { relayer } = NetworkService.getProvider(wallet.chainId);
+    //     const safeTransaction = await SafeService.getTransaction(wallet, tx.safeTxHash);
 
-        // If there is no relayer for the network the safe executes immediately
-        if (!relayer) {
-            const receipt = await SafeService.executeTransaction(wallet, tx.safeTxHash);
-            await this.transactionMined(tx, receipt as any);
-            return;
-        }
+    //     // If there is no relayer for the network the safe executes immediately
+    //     if (!relayer) {
+    //         const receipt = await SafeService.executeTransaction(wallet, tx.safeTxHash);
+    //         await this.transactionMined(tx, receipt as any);
+    //         return;
+    //     }
 
-        // If there is a relayer the transaction is sent to Defender and the job
-        // processor polls for the receipt and invokes callback
-        const defenderTx = await relayer.sendTransaction({
-            to: safeTransaction.to,
-            data: safeTransaction.data,
-            gasLimit: safeTransaction.safeTxGas || '196000',
-            speed: RELAYER_SPEED,
-        });
+    //     // If there is a relayer the transaction is sent to Defender and the job
+    //     // processor polls for the receipt and invokes callback
+    //     const defenderTx = await relayer.sendTransaction({
+    //         to: safeTransaction.to,
+    //         data: safeTransaction.data,
+    //         gasLimit: safeTransaction.safeTxGas || '196000',
+    //         speed: RELAYER_SPEED,
+    //     });
 
-        await tx.updateOne({
-            transactionId: defenderTx.transactionId,
-            transactionHash: defenderTx.hash,
-            state: TransactionState.Sent,
-        });
-    }
+    //     await tx.updateOne({
+    //         transactionId: defenderTx.transactionId,
+    //         transactionHash: defenderTx.hash,
+    //         state: TransactionState.Sent,
+    //     });
+    // }
 
     async proposeSafeAsync(wallet: WalletDocument, to: string | null, data: string, callback?: TTransactionCallback) {
         const { relayer, defaultAccount } = NetworkService.getProvider(wallet.chainId);
@@ -198,7 +198,6 @@ class TransactionService {
             return tx;
         }
         const { web3, relayer } = NetworkService.getProvider(tx.chainId);
-
         const defenderTx = await relayer.query(tx.transactionId);
 
         // Hash has been updated
@@ -242,14 +241,11 @@ class TransactionService {
         const { web3, defaultAccount } = NetworkService.getProvider(chainId);
         const from = defaultAccount;
         const data = fn.encodeABI();
-        const estimate = await fn.estimateGas({ from });
-        const gas = estimate < MINIMUM_GAS_LIMIT ? MINIMUM_GAS_LIMIT : estimate;
 
         return web3.eth.sendTransaction({
             from,
             to,
             data,
-            gas,
         });
     }
 

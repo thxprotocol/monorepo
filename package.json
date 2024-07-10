@@ -32,7 +32,7 @@
         "@openzeppelin/defender-relay-client": "^1.54.2",
         "@pinata/sdk": "^2.1.0",
         "@popperjs/core": "^2.11.6",
-        "@safe-global/api-kit": "^1.1.0",
+        "@safe-global/api-kit": "^2.4.2",
         "@safe-global/protocol-kit": "1.2.0",
         "@safe-global/safe-core-sdk-types": "^1.9.2",
         "@tkey/default": "10.1.0",

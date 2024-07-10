@@ -29,12 +29,14 @@ class NetworkService {
                 defaultAccount: LINEA_RELAYER,
                 rpc: LINEA_RPC,
                 relayer: { apiKey: LINEA_RELAYER_API_KEY, apiSecret: LINEA_RELAYER_API_SECRET },
+                txServiceUrl: 'https://gateway.safe.linea.build',
             },
             {
                 chainId: ChainId.Polygon,
                 defaultAccount: POLYGON_RELAYER,
                 rpc: POLYGON_RPC,
                 relayer: { apiKey: POLYGON_RELAYER_API_KEY, apiSecret: POLYGON_RELAYER_API_SECRET },
+                txServiceUrl: 'https://safe-transaction-polygon.safe.global',
             },
         ],
     };
@@ -73,6 +75,7 @@ class NetworkService {
         defaultAccount: string;
         rpc: string;
         relayer: { apiKey: string; apiSecret: string };
+        txServiceUrl: string;
     }) {
         const { apiKey, apiSecret } = options.relayer;
         const provider = new DefenderRelayProvider({ apiKey, apiSecret }, { speed: RELAYER_SPEED });
@@ -90,8 +93,8 @@ class NetworkService {
             ethAdapter,
             signer,
             relayer,
-            defaultAccount: POLYGON_RELAYER,
-            txServiceUrl: SAFE_TXS_SERVICE,
+            defaultAccount: options.defaultAccount,
+            txServiceUrl: options.txServiceUrl,
         };
     }
 

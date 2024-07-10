@@ -140,10 +140,11 @@ export default class RewardCoinService implements IRewardService {
     private async addMinter(erc20: ERC20Document, poolId: string) {
         if (erc20.type !== ERC20Type.Unlimited) return;
 
-        const { safe } = await PoolService.getById(poolId);
-        const isMinter = await ERC20Service.isMinter(erc20, safe.address);
+        const pool = await PoolService.getById(poolId);
+        const wallet = await SafeService.findOneByPool(pool, erc20.chainId);
+        const isMinter = await ERC20Service.isMinter(erc20, wallet.address);
         if (!isMinter) {
-            await ERC20Service.addMinter(erc20, safe.address);
+            await ERC20Service.addMinter(erc20, wallet.address);
         }
     }
 }

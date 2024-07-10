@@ -23,8 +23,8 @@ class SafeService {
     }
 
     getSafeApiKit(chainId: ChainId) {
-        const { txServiceUrl, ethAdapter } = NetworkService.getProvider(chainId);
-        return new SafeApiKit({ txServiceUrl, ethAdapter });
+        const { txServiceUrl } = NetworkService.getProvider(chainId);
+        return new SafeApiKit({ txServiceUrl, chainId: chainId as unknown as bigint });
     }
 
     async create(
@@ -153,11 +153,10 @@ class SafeService {
         // Create hash for this transaction
         const safeTxHash = await safe.getTransactionHash(safeTransaction);
         const signature = await safe.signTransactionHash(safeTxHash);
-        const apiKit = this.getSafeApiKit(wallet.chainId);
-
         logger.info({ safeTxHash, nonce });
 
         try {
+            const apiKit = this.getSafeApiKit(wallet.chainId);
             await apiKit.proposeTransaction({
                 safeAddress: wallet.address,
                 safeTxHash,
@@ -185,8 +184,7 @@ class SafeService {
     }
 
     async confirm(wallet: WalletDocument, safeTxHash: string, signatureData: string) {
-        const { txServiceUrl, ethAdapter } = NetworkService.getProvider(wallet.chainId);
-        const apiKit = new SafeApiKit({ ethAdapter, txServiceUrl });
+        const apiKit = this.getSafeApiKit(wallet.chainId);
         return await apiKit.confirmTransaction(safeTxHash, signatureData);
     }
 
