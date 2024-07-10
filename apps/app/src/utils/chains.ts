@@ -8,6 +8,7 @@ import ImgLogoMetis from '../assets/thx_logo_metis.svg';
 import ImgLogoBase from '../assets/thx_logo_base.svg';
 import { arbitrum, mainnet, bsc, polygon, hardhat, polygonZkEvm, linea, metis, base } from '@wagmi/core/chains';
 import { ChainId } from '@thxnetwork/common/enums';
+import { PROD } from '../config/secrets';
 
 const chainList: { [chainId: number]: ChainInfo } = {
     [ChainId.Ethereum]: {
@@ -68,7 +69,7 @@ const chainList: { [chainId: number]: ChainInfo } = {
     },
 };
 
-if (process.env.NODE_ENV !== 'production') {
+if (PROD) {
     chainList[ChainId.Hardhat] = {
         chainId: ChainId.Hardhat,
         name: 'Hardhat',
