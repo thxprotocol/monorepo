@@ -9,6 +9,12 @@
             "executor": "@nx/vite:build",
             "options": {
                 "outputPath": "dist/apps/app"
+            },
+            "configurations": {
+                "production": {
+                    "sourcemap": false,
+                    "minify": true
+                }
             }
         },
         "serve": {

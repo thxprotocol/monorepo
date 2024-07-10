@@ -1,7 +1,6 @@
 import { UserConfigExport, defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { BootstrapVueNextResolver } from 'unplugin-vue-components/resolvers';
-import { sentryVitePlugin } from '@sentry/vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import mkcert from 'vite-plugin-mkcert';
 import eslintPlugin from 'vite-plugin-eslint';
@@ -9,7 +8,7 @@ import Components from 'unplugin-vue-components/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import path from 'path';
 
-const SENTRY_AUTH_TOKEN = process.env.SENTRY_AUTH_TOKEN || '';
+const isProd = process.env.NODE_ENV === 'production';
 
 const config: UserConfigExport = {
     plugins: [
@@ -50,7 +49,7 @@ const config: UserConfigExport = {
     build: {
         outDir: 'build',
         target: ['esnext'],
-        sourcemap: true,
+        sourcemap: !isProd,
         manifest: true,
         // used for "Graph" is undefined error with Dagre package https://github.com/vitejs/vite/issues/5759
         commonjsOptions: {
@@ -58,16 +57,5 @@ const config: UserConfigExport = {
         },
     },
 };
-
-if (config.plugins && SENTRY_AUTH_TOKEN) {
-    // Put the Sentry vite plugin after all other plugins
-    config.plugins.push(
-        sentryVitePlugin({
-            org: 'thx-network',
-            project: 'campaign',
-            authToken: SENTRY_AUTH_TOKEN,
-        }),
-    );
-}
 
 export default defineConfig(config);

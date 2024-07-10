@@ -1,14 +1,4 @@
 <template>
-    <!-- <div v-if="!accountStore.isAuthenticated" class="d-flex align-items-center">
-        <b-button v-b-modal="'modalLogin'" variant="link" class="text-white text-decoration-none">
-            <b-spinner v-if="accountStore.isAuthenticated === false" small />
-            <template v-else> Sign up </template>
-        </b-button>
-        <b-button v-b-modal="'modalLogin'" variant="primary">
-            <b-spinner v-if="accountStore.isAuthenticated === false" small />
-            <template v-else> Sign in </template>
-        </b-button>
-    </div> -->
     <b-dropdown v-if="accountStore.account" variant="link" toggle-class="p-0" no-caret end>
         <template #button-content>
             <div :style="{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }" class="p-1 rounded-circle">

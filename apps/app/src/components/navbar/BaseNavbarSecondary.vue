@@ -18,9 +18,9 @@
         <div class="ms-auto" style="width: 120px; text-align: right">
             <b-button
                 v-if="!accountStore.isAuthenticated"
-                v-b-modal="'modalLogin'"
                 class="ms-2 rounded py-2"
                 variant="primary"
+                @click="authStore.isModalLoginShown = true"
             >
                 Sign in
                 <i class="fas fa-sign-in-alt ms-2" />

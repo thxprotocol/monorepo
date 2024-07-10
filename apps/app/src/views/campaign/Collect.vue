@@ -96,7 +96,7 @@
                         <b-spinner v-if="isLoadingCollect" small variant="dark" />
                         <template v-else>Collect</template>
                     </b-button>
-                    <b-button v-else v-b-modal="'modalLogin'" variant="primary" class="w-100">
+                    <b-button v-else variant="primary" class="w-100" @click="authStore.isModalLoginShown = true">
                         Sign in &amp; Collect
                     </b-button>
                 </b-card>
