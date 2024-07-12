@@ -1,5 +1,4 @@
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
-import { TransactionReceipt } from 'web3-core';
 import { ChainId, TransactionState, ERC1155TokenState } from '@thxnetwork/common/enums';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
@@ -22,6 +21,7 @@ import {
     ERC1155Token,
 } from '@thxnetwork/api/models';
 import { getArtifact } from '../hardhat';
+import { TransactionReceipt } from 'web3';
 
 const contractName = 'THXERC1155';
 

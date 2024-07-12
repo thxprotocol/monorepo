@@ -46,9 +46,9 @@ class BalancerService {
     });
 
     constructor() {
-        this.updatePricesJob().then(() => {
-            this.updateMetricsJob();
-        });
+        // this.updatePricesJob().then(() => {
+        //     this.updateMetricsJob();
+        // });
     }
 
     async buildJoin(

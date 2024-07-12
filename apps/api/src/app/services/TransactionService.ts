@@ -7,7 +7,7 @@ import { poll } from '@thxnetwork/api/util/polling';
 import { deployCallback as erc20DeployCallback } from './ERC20Service';
 import { RelayerTransactionPayload } from '@openzeppelin/defender-relay-client';
 import { Transaction, TransactionDocument, WalletDocument } from '@thxnetwork/api/models';
-import { TransactionReceipt } from 'web3-core';
+import { TransactionReceipt } from 'web3';
 import ERC721Service from './ERC721Service';
 import ERC1155Service from './ERC1155Service';
 import SafeService from './SafeService';
@@ -33,11 +33,10 @@ class TransactionService {
      */
     async sendAsync(to: string | null, fn: any, chainId: ChainId, forceSync = true, callback?: TTransactionCallback) {
         const { web3, relayer, defaultAccount } = NetworkService.getProvider(chainId);
+        const from = defaultAccount;
+        const estimate = await fn.estimateGas({ from });
         const data = fn.encodeABI();
-
-        const estimate = await fn.estimateGas({ from: defaultAccount });
         const gas = estimate < MINIMUM_GAS_LIMIT ? MINIMUM_GAS_LIMIT : estimate;
-
         const tx = await Transaction.create({
             type: relayer && !forceSync ? TransactionType.Relayed : TransactionType.Default,
             state: TransactionState.Queued,
@@ -50,7 +49,7 @@ class TransactionService {
             const args: RelayerTransactionPayload = {
                 data,
                 speed: RELAYER_SPEED,
-                gasLimit: gas,
+                gasLimit: gas.toString(),
             };
             if (to) args.to = to;
 
@@ -67,8 +66,10 @@ class TransactionService {
             if (forceSync) {
                 await poll(
                     async () => {
-                        const transaction = await this.getById(tx._id);
-                        return this.queryTransactionStatusReceipt(transaction);
+                        const transaction = await this.getById(tx.id);
+                        const state = await this.queryTransactionStatusReceipt(transaction);
+                        console.log(state);
+                        return state;
                     },
                     (state: TransactionState) => state === TransactionState.Sent,
                     500,
@@ -86,62 +87,7 @@ class TransactionService {
         }
 
         // We return the id because the transaction might be out of date and the transaction is not used by callers anyway.
-        return String(tx._id);
-    }
-
-    // async execSafeAsync(wallet: WalletDocument, tx: TransactionDocument) {
-    //     const { relayer } = NetworkService.getProvider(wallet.chainId);
-    //     const safeTransaction = await SafeService.getTransaction(wallet, tx.safeTxHash);
-
-    //     // If there is no relayer for the network the safe executes immediately
-    //     if (!relayer) {
-    //         const receipt = await SafeService.executeTransaction(wallet, tx.safeTxHash);
-    //         await this.transactionMined(tx, receipt as any);
-    //         return;
-    //     }
-
-    //     // If there is a relayer the transaction is sent to Defender and the job
-    //     // processor polls for the receipt and invokes callback
-    //     const defenderTx = await relayer.sendTransaction({
-    //         to: safeTransaction.to,
-    //         data: safeTransaction.data,
-    //         gasLimit: safeTransaction.safeTxGas || '196000',
-    //         speed: RELAYER_SPEED,
-    //     });
-
-    //     await tx.updateOne({
-    //         transactionId: defenderTx.transactionId,
-    //         transactionHash: defenderTx.hash,
-    //         state: TransactionState.Sent,
-    //     });
-    // }
-
-    async proposeSafeAsync(wallet: WalletDocument, to: string | null, data: string, callback?: TTransactionCallback) {
-        const { relayer, defaultAccount } = NetworkService.getProvider(wallet.chainId);
-        const safeTxHash = await SafeService.proposeTransaction(wallet, {
-            to,
-            data,
-            value: '0',
-        });
-        if (!safeTxHash) throw new Error("Couldn't propose transaction.");
-
-        await SafeService.confirmTransaction(wallet, safeTxHash);
-
-        return await Transaction.create({
-            type: relayer ? TransactionType.Relayed : TransactionType.Default,
-            state: TransactionState.Confirmed,
-            safeTxHash,
-            chainId: wallet.chainId,
-            walletId: String(wallet._id),
-            from: defaultAccount,
-            to,
-            callback,
-        });
-    }
-
-    async sendSafeAsync(wallet: WalletDocument, to: string | null, fn: any, callback?: TTransactionCallback) {
-        const data = fn.encodeABI();
-        return this.proposeSafeAsync(wallet, to, data, callback);
+        return tx.id;
     }
 
     async transactionMined(tx: TransactionDocument, receipt: TransactionReceipt) {
@@ -169,6 +115,9 @@ class TransactionService {
     async executeCallback(tx: TransactionDocument, receipt: TransactionReceipt) {
         if (!tx || !tx.callback) return;
         switch (tx.callback.type) {
+            case 'SafeDeployCallback':
+                await SafeService.deployCallback(tx.callback.args, receipt);
+                break;
             case 'Erc20DeployCallback':
                 await erc20DeployCallback(tx.callback.args, receipt);
                 break;
@@ -222,19 +171,21 @@ class TransactionService {
             return tx;
         }
         const { web3 } = NetworkService.getProvider(tx.chainId);
+        try {
+            const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
+            if (receipt) {
+                // Wait 500 ms for transactions to be propagated to all nodes.
+                // Since we use multiple RPCs it happens we already have the receipt but the other RPC
+                // doesn't have the block available yet.
+                await new Promise((done) => setTimeout(done, 500));
 
-        const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
+                await this.transactionMined(tx, receipt);
+            }
 
-        if (receipt) {
-            // Wait 500 ms for transactions to be propagated to all nodes.
-            // Since we use multiple RPCs it happens we already have the receipt but the other RPC
-            // doesn't have the block available yet.
-            await new Promise((done) => setTimeout(done, 500));
-
-            await this.transactionMined(tx, receipt);
+            return tx.state;
+        } catch (error) {
+            console.error(error);
         }
-
-        return tx.state;
     }
 
     async send(to: string, fn: any, chainId: ChainId) {
@@ -265,6 +216,14 @@ class TransactionService {
 
     getById(id: string) {
         return Transaction.findById(id);
+    }
+
+    proposeSafeAsync(wallet: WalletDocument, to: string, fn: any) {
+        return {} as TransactionDocument;
+    }
+
+    sendSafeAsync(wallet: WalletDocument, to: string, fn: any, callback?: TTransactionCallback) {
+        return {} as TransactionDocument;
     }
 }
 

@@ -3,8 +3,6 @@ import { useAccountStore } from './Account';
 import { track } from '@thxnetwork/common/mixpanel';
 import { HARDHAT_RPC, POLYGON_RPC } from '../config/secrets';
 import { useAuthStore } from './Auth';
-import { EthersAdapter, SafeConfig } from '@safe-global/protocol-kit';
-import { ethers } from 'ethers';
 import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '../types/enums/accountVariant';
 import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
@@ -27,7 +25,6 @@ import { chainList } from '../utils/chains';
 import { RewardVariant } from '../types/enums/rewards';
 import { encodeFunctionData } from 'viem';
 import { contractNetworks } from '../config/constants';
-import Safe from '@safe-global/protocol-kit';
 import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
 
@@ -320,17 +317,8 @@ export const useWalletStore = defineStore('wallet', {
                 await authStore.getPrivateKey();
             }
 
-            const rpc = rpcMap[this.wallet.chainId];
-            const provider = new ethers.providers.JsonRpcProvider(rpc);
-            const signer = new ethers.Wallet(authStore.privateKey, provider);
-            const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer }) as any;
-            const config: SafeConfig = {
-                ethAdapter,
-                safeAddress: this.wallet.address,
-                contractNetworks,
-            };
-            const safe = await Safe.create(config);
-            const signature = await safe.signTransactionHash(safeTxHash);
+            // const rpc = rpcMap[this.wallet.chainId];
+            const signature = await authStore.wallet.signHash(this.wallet, safeTxHash);
 
             return await api.request.post(`/v1/account/wallets/confirm`, {
                 data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature: signature.data }),

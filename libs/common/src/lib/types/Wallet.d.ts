@@ -1,11 +1,11 @@
 type TNetworkConfig = {
+    rpc: string;
     web3: Web3;
     txServiceUrl: string;
     defaultAccount: string;
     signer: Signer;
     relayer?: Relayer;
     provider?: DefenderRelayProvider;
-    ethAdapter: any;
 };
 
 type TWallet = {

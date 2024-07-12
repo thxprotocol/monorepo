@@ -77,9 +77,9 @@ async function getNetworkDetails(chainId: ChainId) {
             locked: fromWei(amountLocked.toString(), 'ether'),
         };
         const getRewards = async (tokenAddress: string, now: string) => {
-            const currentWeek = fromWei(String(await rfthx.getTokenWeekAmounts(tokenAddress, now)));
+            const currentWeek = fromWei(String(await rfthx.getTokenWeekAmounts(tokenAddress, now)), 'ether');
             const upcomingWeeks = (await rfthx.getUpcomingRewardsForNWeeks(tokenAddress, 4)).map((amount: BigNumber) =>
-                fromWei(String(amount)),
+                fromWei(String(amount), 'ether'),
             );
             return [currentWeek, ...upcomingWeeks];
         };

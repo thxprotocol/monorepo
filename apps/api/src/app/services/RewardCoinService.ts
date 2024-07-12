@@ -66,7 +66,8 @@ export default class RewardCoinService implements IRewardService {
         if (!safe) return { result: false, reason: 'Safe not found' };
 
         // TODO Wei should be determined in the FE
-        const amount = toWei(reward.amount as string);
+        const decimals = await erc20.contract.methods.decimals().call();
+        const amount = toWei(reward.amount, Number(decimals));
 
         // Transfer ERC20 from safe to wallet
         await ERC20Service.transferFrom(erc20, safe, wallet.address, amount);
@@ -112,7 +113,10 @@ export default class RewardCoinService implements IRewardService {
         // Check balances
         const balanceOfPool = await erc20.contract.methods.balanceOf(safe.address).call();
         const isTransferable = [ERC20Type.Unknown, ERC20Type.Limited].includes(erc20.type);
-        const isBalanceInsufficient = BigNumber.from(balanceOfPool).lt(BigNumber.from(toWei(reward.amount)));
+        const decimals = await erc20.contract.methods.decimals().call();
+        const isBalanceInsufficient = BigNumber.from(balanceOfPool).lt(
+            BigNumber.from(toWei(reward.amount, Number(decimals))),
+        );
 
         // Notifiy the campaign owner if token is transferrable and balance is insufficient
         if (isTransferable && isBalanceInsufficient) {

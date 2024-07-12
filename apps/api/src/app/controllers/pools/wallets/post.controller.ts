@@ -18,7 +18,7 @@ const controller = async (req: Request, res: Response) => {
         safeVersion,
     });
 
-    res.end(204);
+    res.status(201).end();
 };
 
 export { controller, validation };

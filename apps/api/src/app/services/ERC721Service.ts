@@ -1,5 +1,4 @@
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
-import { TransactionReceipt } from 'web3-core';
 import { ERC721, ERC721Document } from '@thxnetwork/api/models/ERC721';
 import { ERC721Metadata, ERC721MetadataDocument } from '@thxnetwork/api/models/ERC721Metadata';
 import { ERC721Token, ERC721TokenDocument } from '@thxnetwork/api/models/ERC721Token';
@@ -15,6 +14,7 @@ import PoolService from './PoolService';
 import TransactionService from './TransactionService';
 import IPFSService from './IPFSService';
 import WalletService from './WalletService';
+import { TransactionReceipt } from 'web3';
 
 const contractName = 'THXERC721';
 

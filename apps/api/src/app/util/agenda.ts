@@ -33,7 +33,7 @@ agenda.define(JobType.UpdateParticipantRanks, (job: Job) => ParticipantService.u
 agenda.define(JobType.UpdatePendingTransactions, updatePendingTransactions);
 agenda.define(JobType.CreateQuestEntry, (job: Job) => QuestService.createEntryJob(job));
 agenda.define(JobType.CreateRewardPayment, (job: Job) => RewardService.createPaymentJob(job));
-agenda.define(JobType.DeploySafe, (job: Job) => SafeService.createJob(job));
+// agenda.define(JobType.DeploySafe, (job: Job) => SafeService.createJob(job));
 agenda.define(JobType.SendCampaignReport, () => NotificationService.sendWeeklyDigestJob());
 agenda.define(JobType.RequestAttemp, (job: Job) => WebhookService.requestAttemptJob(job));
 agenda.define(JobType.UpdateTwitterRepostCache, (job: Job) => TwitterCacheService.updateRepostCacheJob(job));

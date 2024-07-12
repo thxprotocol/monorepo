@@ -20,7 +20,7 @@ const controller = async (req: Request, res: Response) => {
     const tx = await Transaction.findOne({ safeTxHash: req.body.safeTxHash });
     if (!tx) throw new BadRequestError('Transaction not found.');
 
-    await SafeService.confirm(wallet, req.body.safeTxHash, req.body.signature);
+    await SafeService.confirmTransaction(wallet, req.body.safeTxHash, req.body.signature);
 
     res.json(wallet);
 };

@@ -3,7 +3,7 @@ import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxne
 import { ChainId, ERC20Type, TransactionState } from '@thxnetwork/common/enums';
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
-import { TransactionReceipt } from 'web3-core';
+import { TransactionReceipt } from 'web3';
 import { contractNetworks, getArtifact } from '@thxnetwork/api/hardhat';
 import {
     ERC20,
@@ -303,7 +303,7 @@ async function findDefaultTokens(wallet: WalletDocument) {
         const { abi } = getArtifact('THXERC20_LimitedSupply');
         const contract = new web3.eth.Contract(abi, erc20.address);
         const walletBalanceInWei = await contract.methods.balanceOf(wallet.address).call();
-        const walletBalance = Number(fromWei(walletBalanceInWei));
+        const walletBalance = Number(fromWei(walletBalanceInWei, 'ether'));
         return {
             sub: wallet.sub,
             erc20Id: '',

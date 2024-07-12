@@ -15,7 +15,6 @@ import {
 import Web3 from 'web3';
 import { ethers, Wallet } from 'ethers';
 import { recoverAddress, hashMessage } from 'ethers/lib/utils';
-import { EthersAdapter } from '@safe-global/protocol-kit';
 import { DefenderRelaySigner } from '@openzeppelin/defender-relay-client/lib/ethers';
 import { Relayer } from '@openzeppelin/defender-relay-client';
 import { DefenderRelayProvider } from '@openzeppelin/defender-relay-client/lib/web3';
@@ -36,7 +35,7 @@ class NetworkService {
                 defaultAccount: POLYGON_RELAYER,
                 rpc: POLYGON_RPC,
                 relayer: { apiKey: POLYGON_RELAYER_API_KEY, apiSecret: POLYGON_RELAYER_API_SECRET },
-                txServiceUrl: 'https://safe-transaction-polygon.safe.global',
+                txServiceUrl: 'https://safe-transaction-polygon.safe.global/api',
             },
         ],
     };
@@ -49,17 +48,19 @@ class NetworkService {
             web3.extend({
                 property: 'hardhat',
                 methods: [
-                    { name: 'setAutomine', call: 'evm_setAutomine', params: 1 },
-                    { name: 'setIntervalMining', call: 'evm_setIntervalMining', params: 1 },
+                    { name: 'setAutomine', call: 'evm_setAutomine' },
+                    { name: 'setIntervalMining', call: 'evm_setIntervalMining' },
                 ],
             });
-
-            const signer = new Wallet(PRIVATE_KEY, new ethers.providers.JsonRpcProvider(HARDHAT_RPC));
+            const provider = new ethers.providers.JsonRpcProvider(HARDHAT_RPC);
+            const signer = new Wallet(PRIVATE_KEY, provider);
+            const defaultAccount = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY).address;
             this.networks[ChainId.Hardhat] = {
+                rpc: HARDHAT_RPC,
                 web3,
-                ethAdapter: new EthersAdapter({ ethers, signerOrProvider: signer as any }),
+                provider,
                 signer,
-                defaultAccount: web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY).address,
+                defaultAccount,
                 txServiceUrl: SAFE_TXS_SERVICE,
             };
         }
@@ -86,17 +87,14 @@ class NetworkService {
             { apiKey, apiSecret },
             new ethers.providers.JsonRpcProvider(options.rpc),
             { speed: RELAYER_SPEED },
-        ) as unknown as Wallet;
-
-        const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer as any });
-
+        );
         this.networks[options.chainId] = {
+            rpc: options.rpc,
             web3: new Web3(provider),
-            ethAdapter,
             signer,
-            relayer,
             defaultAccount: options.defaultAccount,
             txServiceUrl: options.txServiceUrl,
+            relayer,
         };
     }
 

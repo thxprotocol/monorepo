@@ -12,45 +12,53 @@ export async function updatePendingTransactions() {
 
     // Iterate over all tx sent to or proposed and confirmed by the relayer
     for (const tx of transactions) {
-        switch (tx.state) {
-            // Legacy tx will not have this state
-            // Transactions is proposed and confirmed by the relayer, awaiting user wallet confirmation
-            case TransactionState.Confirmed: {
-                if (!tx.walletId) continue;
+        try {
+            switch (tx.state) {
+                // Legacy tx will not have this state
+                // Transactions is proposed and confirmed by the relayer, awaiting user wallet confirmation
+                case TransactionState.Confirmed: {
+                    if (!tx.walletId) continue;
 
-                const wallet = await Wallet.findById(tx.walletId);
+                    const wallet = await Wallet.findById(tx.walletId);
 
-                let pendingTx;
-                try {
-                    pendingTx = await SafeService.getTransaction(wallet, tx.safeTxHash);
-                    logger.debug(`Safe TX Found: ${tx.safeTxHash}`);
-                } catch (error) {
-                    logger.error(error);
-                }
-
-                // Safes for pools have a single signer (relayer) while safes for end users
-                // have 2 (relayer + web3auth mpc key)
-                const threshold = wallet.poolId ? 1 : 2;
-                if (pendingTx && pendingTx.confirmations.length >= threshold) {
-                    logger.debug(`Safe TX Confirmed: ${tx.safeTxHash}`);
-
+                    let pendingTx;
                     try {
-                        await SafeService.executeTransaction(wallet, tx.safeTxHash);
-                        logger.debug(`Safe TX Executed: ${tx.safeTxHash}`);
+                        pendingTx = await SafeService.getTransaction(wallet, tx.transactionHash);
+                        logger.debug(`Safe TX Found: ${tx.safeTxHash}`);
                     } catch (error) {
-                        await tx.updateOne({ state: TransactionState.Failed });
                         logger.error(error);
                     }
+
+                    // Safes for pools have a single signer (relayer) while safes for end users
+                    // have 2 (relayer + web3auth mpc key)
+                    const threshold = wallet.poolId ? 1 : 2;
+                    if (pendingTx && pendingTx.confirmations.length >= threshold) {
+                        logger.debug(`Safe TX Confirmed: ${tx.safeTxHash}`);
+
+                        try {
+                            await SafeService.executeTransaction(wallet, tx.safeTxHash);
+                            logger.debug(`Safe TX Executed: ${tx.safeTxHash}`);
+                        } catch (error) {
+                            await tx.updateOne({ state: TransactionState.Failed });
+                            logger.error(error);
+                        }
+                    }
+                    break;
                 }
-                break;
-            }
-            // TransactionType.Default is handled in tx service send methods
-            case TransactionState.Sent: {
-                if (tx.type == TransactionType.Relayed) {
-                    TransactionService.queryTransactionStatusDefender(tx).catch((error) => logger.error(error));
+                // TransactionType.Default is handled in tx service send methods
+                case TransactionState.Sent: {
+                    console.log(tx);
+                    if (tx.type == TransactionType.Relayed) {
+                        logger.debug(`Checking status for tx: ${tx.transactionHash}`);
+                        await TransactionService.queryTransactionStatusDefender(tx).catch((error) =>
+                            logger.error(error),
+                        );
+                    }
+                    break;
                 }
-                break;
             }
+        } catch (error) {
+            console.error(error);
         }
     }
 }

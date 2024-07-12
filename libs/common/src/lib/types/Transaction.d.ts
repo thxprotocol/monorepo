@@ -18,6 +18,11 @@ type TTransaction = {
     callback: TTransactionCallback;
 };
 
+type SafeDeployCallback = {
+    type: 'SafeDeployCallback';
+    args: { walletId: string };
+};
+
 type TERC20DeployCallbackArgs = {
     erc20Id: string;
 };
@@ -227,6 +232,7 @@ type TTransactionCallback =
     | ERC721DeployCallback
     | ERC1155DeployCallback
     | PoolDeployCallback
+    | SafeDeployCallback
     | TopupCallback
     | DepositCallback
     | SwapCreateCallback

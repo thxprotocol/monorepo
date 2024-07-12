@@ -159,7 +159,7 @@ const config: Configuration = {
         RefreshToken: 24 * 60 * 60, // 24 hours in seconds
         AccessToken: 24 * 60 * 60, // 24 hours in seconds,
         AuthorizationCode: 10 * 60, // 10 minutes in seconds
-        ClientCredentials: 1 * 60 * 60, // 10 minutes in seconds
+        ClientCredentials: 24 * 60 * 60, // 10 minutes in seconds
     },
     interactions: {
         policy: basePolicy,

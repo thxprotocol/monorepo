@@ -30,7 +30,6 @@ const controller = async (req: Request, res: Response) => {
 
     res.json({
         ...pool.toJSON(),
-        address: pool.safeAddress,
         identities,
         events,
         wallets,

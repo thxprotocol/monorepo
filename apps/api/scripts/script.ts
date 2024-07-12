@@ -6,7 +6,6 @@ import db from '@thxnetwork/api/util/database';
 // import main from './src/galachain';
 // import main from './src/sdk';
 // import main from './src/vethx';
-// import main from './src/safe';
 // import main from './src/ipfs';
 // import main from './src/invoices';
 // import main from './src/demo';

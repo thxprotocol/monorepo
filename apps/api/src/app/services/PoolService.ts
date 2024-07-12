@@ -140,14 +140,19 @@ async function getAllBySub(sub: string): Promise<PoolDocument[]> {
     // Add Safes to pools
     return await Promise.all(
         pools.map(async (pool) => {
-            const brand = await Brand.findOne({ poolId: pool.id });
-            const participantCount = await Participant.countDocuments({ poolId: pool.id });
-            const account = accounts.find((a) => a.sub === pool.sub);
-            const author = account && {
-                username: account.username,
-            };
+            try {
+                const brand = await Brand.findOne({ poolId: pool.id });
+                const participantCount = await Participant.countDocuments({ poolId: pool.id });
+                const account = accounts.find((a) => a.sub === pool.sub);
+                const author = account && {
+                    username: account.username,
+                };
 
-            return { ...pool.toJSON(), participantCount, author, brand };
+                console.log(account);
+                return { ...pool.toJSON(), participantCount, author, brand };
+            } catch (error) {
+                console.log(error);
+            }
         }),
     );
 }

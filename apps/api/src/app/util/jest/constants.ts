@@ -5,7 +5,7 @@ import { CYPRESS_EMAIL } from '@thxnetwork/api/config/secrets';
 
 export const tokenName = 'Volunteers United';
 export const tokenSymbol = 'VUT';
-export const tokenTotalSupply = toWei('100000000');
+export const tokenTotalSupply = toWei('100000000', 'ether');
 export const rewardWithdrawAmount = '1000';
 export const rewardWithdrawDuration = 60;
 export const rewardWithdrawUnlockDate = '2022-04-20';

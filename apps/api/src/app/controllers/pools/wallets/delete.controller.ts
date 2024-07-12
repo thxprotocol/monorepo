@@ -12,7 +12,7 @@ const controller = async (req: Request, res: Response) => {
 
     await wallet.deleteOne();
 
-    res.end(204);
+    res.status(204).end();
 };
 
 export { controller, validation };
