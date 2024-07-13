@@ -1,3 +1,5 @@
+import { ContractNetworkConfig } from '@safe-global/protocol-kit';
+
 // Safe
 import DefaultCallbackHandler from './export/DefaultCallbackHandler.json';
 import CreateCall from './export/CreateCall.json';
@@ -118,7 +120,7 @@ export const contractNetworks = {
         BalancerGaugeController: '0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD',
         BalancerRootGauge: '0x9902913ce5439d667774c8f9526064b2bc103b4a',
     },
-};
+} as unknown as { [chainId: string]: ContractNetworkConfig } as any;
 
 export type TContractName = (typeof contractNames)[number];
 

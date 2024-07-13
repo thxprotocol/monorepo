@@ -1,11 +1,8 @@
 import { VOTER_PK, DEPOSITOR_PK } from './constants';
 import { ChainId } from '@thxnetwork/common/enums';
-import { contractNetworks } from '@thxnetwork/api/hardhat';
-import { HARDHAT_RPC, SAFE_TXS_SERVICE } from '@thxnetwork/api/config/secrets';
+import { Wallet } from '@thxnetwork/api/models';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import SafeService from '@thxnetwork/api/services/SafeService';
-import { Wallet } from '@thxnetwork/api/models';
-import { ethers } from 'ethers';
 
 const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
 
@@ -42,7 +39,7 @@ export async function signTxHash(safeAddress: string, safeTxHash: string, privat
     const wallet = await Wallet.findOne({ address: safeAddress });
     const tx = await SafeService.getTransaction(wallet, safeTxHash);
     const signature = await signMessage(privateKey, tx.data);
-    await SafeService.confirmTransaction(wallet, safeTxHash, signature);
+    await SafeService.confirm(wallet, safeTxHash, signature);
 
     return { safeTxHash, signature };
 }

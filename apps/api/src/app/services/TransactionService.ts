@@ -218,12 +218,32 @@ class TransactionService {
         return Transaction.findById(id);
     }
 
-    proposeSafeAsync(wallet: WalletDocument, to: string, fn: any) {
-        return {} as TransactionDocument;
+    async proposeSafeAsync(wallet: WalletDocument, to: string | null, data: string, callback?: TTransactionCallback) {
+        const { relayer, defaultAccount } = NetworkService.getProvider(wallet.chainId);
+        const safeTxHash = await SafeService.proposeTransaction(wallet, {
+            to,
+            data,
+            value: '0',
+        });
+        if (!safeTxHash) throw new Error("Couldn't propose transaction.");
+
+        await SafeService.confirmTransaction(wallet, safeTxHash);
+
+        return await Transaction.create({
+            type: relayer ? TransactionType.Relayed : TransactionType.Default,
+            state: TransactionState.Confirmed,
+            safeTxHash,
+            chainId: wallet.chainId,
+            walletId: String(wallet._id),
+            from: defaultAccount,
+            to,
+            callback,
+        });
     }
 
-    sendSafeAsync(wallet: WalletDocument, to: string, fn: any, callback?: TTransactionCallback) {
-        return {} as TransactionDocument;
+    async sendSafeAsync(wallet: WalletDocument, to: string | null, fn: any, callback?: TTransactionCallback) {
+        const data = fn.encodeABI();
+        return this.proposeSafeAsync(wallet, to, data, callback);
     }
 }
 
