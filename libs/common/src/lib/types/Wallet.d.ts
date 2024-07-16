@@ -4,6 +4,7 @@ type TNetworkConfig = {
     txServiceUrl: string;
     defaultAccount: string;
     signer: Signer;
+    ethAdapter: EthersAdapter;
     relayer?: Relayer;
     provider?: DefenderRelayProvider;
 };

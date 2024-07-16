@@ -92,7 +92,7 @@ export async function deployCallback({ erc20Id }: TERC20DeployCallbackArgs, rece
     }
 
     await ERC20.findByIdAndUpdate(erc20Id, {
-        address: receipt.contractAddress,
+        address: toChecksumAddress(receipt.contractAddress),
     });
 }
 

@@ -15,6 +15,7 @@ import TransactionService from './TransactionService';
 import IPFSService from './IPFSService';
 import WalletService from './WalletService';
 import { TransactionReceipt } from 'web3';
+import { toChecksumAddress } from 'web3-utils';
 
 const contractName = 'THXERC721';
 
@@ -43,7 +44,7 @@ async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: 
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
     }
 
-    await ERC721.findByIdAndUpdate(erc721Id, { address: receipt.contractAddress });
+    await ERC721.findByIdAndUpdate(erc721Id, { address: toChecksumAddress(receipt.contractAddress) });
 }
 
 export async function queryDeployTransaction(erc721: ERC721Document): Promise<ERC721Document> {

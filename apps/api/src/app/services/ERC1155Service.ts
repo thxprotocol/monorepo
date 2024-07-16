@@ -22,6 +22,7 @@ import {
 } from '@thxnetwork/api/models';
 import { getArtifact } from '../hardhat';
 import { TransactionReceipt } from 'web3';
+import { toChecksumAddress } from 'web3-utils';
 
 const contractName = 'THXERC1155';
 
@@ -52,7 +53,7 @@ async function deployCallback({ erc1155Id }: TERC1155DeployCallbackArgs, receipt
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
     }
 
-    await ERC1155.findByIdAndUpdate(erc1155Id, { address: receipt.contractAddress });
+    await ERC1155.findByIdAndUpdate(erc1155Id, { address: toChecksumAddress(receipt.contractAddress) });
 }
 
 export async function queryDeployTransaction(erc1155: ERC1155Document): Promise<ERC1155Document> {

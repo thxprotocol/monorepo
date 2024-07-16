@@ -102,7 +102,7 @@ export const LINEA_RELAYER = process.env.LINEA_RELAYER || '';
 export const LINEA_RELAYER_API_KEY = process.env.LINEA_RELAYER_API_KEY || '';
 export const LINEA_RELAYER_API_SECRET = process.env.LINEA_RELAYER_API_SECRET || '';
 
-export const RELAYER_SPEED = (process.env.RELAYER_SPEED || 'fastest') as Speed;
+export const RELAYER_SPEED = 'fast' as Speed;
 
 export const LOCAL_CERT = process.env.LOCAL_CERT || '';
 export const LOCAL_CERT_KEY = process.env.LOCAL_CERT_KEY || '';

@@ -32,11 +32,11 @@ class TransactionService {
      * @returns The transaction ID. This can be stored so the status of the transaction can be queried.
      */
     async sendAsync(to: string | null, fn: any, chainId: ChainId, forceSync = true, callback?: TTransactionCallback) {
-        const { web3, relayer, defaultAccount } = NetworkService.getProvider(chainId);
+        const { relayer, defaultAccount } = NetworkService.getProvider(chainId);
         const from = defaultAccount;
         const estimate = await fn.estimateGas({ from });
-        const data = fn.encodeABI();
         const gas = estimate < MINIMUM_GAS_LIMIT ? MINIMUM_GAS_LIMIT : estimate;
+        const data = fn.encodeABI();
         const tx = await Transaction.create({
             type: relayer && !forceSync ? TransactionType.Relayed : TransactionType.Default,
             state: TransactionState.Queued,
@@ -45,13 +45,26 @@ class TransactionService {
             chainId,
             callback,
         });
+
+        return await this.execute(tx, data, gas, chainId, forceSync);
+    }
+
+    async estimateGas(chainId: ChainId, options: { to: string; value: string; data: string }) {
+        const { web3 } = NetworkService.getProvider(chainId);
+        return await web3.eth.estimateGas(options);
+    }
+
+    async execute(tx: TransactionDocument, data: string, gas: number, chainId: ChainId, forceSync = true) {
+        const { web3, relayer, defaultAccount } = NetworkService.getProvider(chainId);
+
         if (relayer) {
+            console.log({ gas });
             const args: RelayerTransactionPayload = {
                 data,
                 speed: RELAYER_SPEED,
-                gasLimit: gas.toString(),
+                gasLimit: '5000000', // This limit is arbitrary and should be adjusted when new transactions are tested.
             };
-            if (to) args.to = to;
+            if (tx.to) args.to = tx.to;
 
             const defenderTx = await relayer.sendTransaction(args);
 
@@ -78,7 +91,7 @@ class TransactionService {
         } else {
             const receipt = await web3.eth.sendTransaction({
                 from: defaultAccount,
-                to,
+                to: tx.to,
                 data,
                 gas: gas + 100000, // This was originally added for relayed transactions, not sure if still  needed
             });
@@ -115,9 +128,6 @@ class TransactionService {
     async executeCallback(tx: TransactionDocument, receipt: TransactionReceipt) {
         if (!tx || !tx.callback) return;
         switch (tx.callback.type) {
-            case 'SafeDeployCallback':
-                await SafeService.deployCallback(tx.callback.args, receipt);
-                break;
             case 'Erc20DeployCallback':
                 await erc20DeployCallback(tx.callback.args, receipt);
                 break;
@@ -148,6 +158,7 @@ class TransactionService {
         }
         const { web3, relayer } = NetworkService.getProvider(tx.chainId);
         const defenderTx = await relayer.query(tx.transactionId);
+        console.log({ defenderTx });
 
         // Hash has been updated
         if (tx.transactionHash != defenderTx.hash) {
@@ -192,11 +203,12 @@ class TransactionService {
         const { web3, defaultAccount } = NetworkService.getProvider(chainId);
         const from = defaultAccount;
         const data = fn.encodeABI();
-
+        const gas = await fn.estimateGas({ from });
         return web3.eth.sendTransaction({
             from,
             to,
             data,
+            gasLimit: gas,
         });
     }
 
@@ -220,14 +232,15 @@ class TransactionService {
 
     async proposeSafeAsync(wallet: WalletDocument, to: string | null, data: string, callback?: TTransactionCallback) {
         const { relayer, defaultAccount } = NetworkService.getProvider(wallet.chainId);
-        const safeTxHash = await SafeService.proposeTransaction(wallet, {
+        const safeTx = await SafeService.proposeTransaction(wallet, {
             to,
             data,
             value: '0',
         });
-        if (!safeTxHash) throw new Error("Couldn't propose transaction.");
+        if (!safeTx) throw new Error("Couldn't propose transaction.");
 
-        await SafeService.confirmTransaction(wallet, safeTxHash);
+        const safeTxHash = await SafeService.getTransactionHash(wallet, safeTx);
+        if (!safeTxHash) throw new Error("Couldn't propose transaction.");
 
         return await Transaction.create({
             type: relayer ? TransactionType.Relayed : TransactionType.Default,

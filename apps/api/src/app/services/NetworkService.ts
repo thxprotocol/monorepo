@@ -19,6 +19,7 @@ import { DefenderRelaySigner } from '@openzeppelin/defender-relay-client/lib/eth
 import { Relayer } from '@openzeppelin/defender-relay-client';
 import { DefenderRelayProvider } from '@openzeppelin/defender-relay-client/lib/web3';
 import { ChainId } from '@thxnetwork/common/enums';
+import { EthersAdapter } from '@safe-global/protocol-kit';
 
 class NetworkService {
     config = {
@@ -28,7 +29,7 @@ class NetworkService {
                 defaultAccount: LINEA_RELAYER,
                 rpc: LINEA_RPC,
                 relayer: { apiKey: LINEA_RELAYER_API_KEY, apiSecret: LINEA_RELAYER_API_SECRET },
-                txServiceUrl: 'https://gateway.safe.linea.build',
+                txServiceUrl: 'https://safe-transaction-linea.safe.global/api',
             },
             {
                 chainId: ChainId.Polygon,
@@ -60,6 +61,7 @@ class NetworkService {
                 web3,
                 provider,
                 signer,
+                ethAdapter: new EthersAdapter({ ethers, signerOrProvider: signer }),
                 defaultAccount,
                 txServiceUrl: SAFE_TXS_SERVICE,
             };
@@ -90,7 +92,8 @@ class NetworkService {
         );
         this.networks[options.chainId] = {
             rpc: options.rpc,
-            web3: new Web3(provider),
+            web3: new Web3(provider as any),
+            ethAdapter: new EthersAdapter({ ethers, signerOrProvider: signer }),
             signer,
             defaultAccount: options.defaultAccount,
             txServiceUrl: options.txServiceUrl,

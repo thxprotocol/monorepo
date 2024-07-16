@@ -21,28 +21,16 @@ export async function updatePendingTransactions() {
 
                     const wallet = await Wallet.findById(tx.walletId);
 
-                    let pendingTx;
                     try {
-                        pendingTx = await SafeService.getTransaction(wallet, tx.transactionHash);
-                        logger.debug(`Safe TX Found: ${tx.safeTxHash}`);
+                        await SafeService.executeTransaction(wallet, tx);
                     } catch (error) {
-                        logger.error(error);
+                        await tx.updateOne({ state: TransactionState.Failed });
+                        console.error(
+                            'Error executing transaction:',
+                            error.response ? error.response.data : error.message,
+                        );
                     }
 
-                    // Safes for pools have a single signer (relayer) while safes for end users
-                    // have 2 (relayer + web3auth mpc key)
-                    const threshold = wallet.poolId ? 1 : 2;
-                    if (pendingTx && pendingTx.confirmations.length >= threshold) {
-                        logger.debug(`Safe TX Confirmed: ${tx.safeTxHash}`);
-
-                        try {
-                            await SafeService.executeTransaction(wallet, tx.safeTxHash);
-                            logger.debug(`Safe TX Executed: ${tx.safeTxHash}`);
-                        } catch (error) {
-                            await tx.updateOne({ state: TransactionState.Failed });
-                            logger.error(error);
-                        }
-                    }
                     break;
                 }
                 // TransactionType.Default is handled in tx service send methods
