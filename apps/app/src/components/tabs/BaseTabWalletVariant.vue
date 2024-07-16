@@ -54,10 +54,7 @@ export default defineComponent({
             return !this.variant;
         },
         isDisabledSafeCreate() {
-            return (
-                !this.accountStore.config.isQRCodeCampaign ||
-                !!this.walletStore.wallets.find((wallet) => wallet.variant === WalletVariant.Safe)
-            );
+            return !!this.walletStore.wallets.find((wallet) => wallet.variant === WalletVariant.Safe);
         },
     },
 });

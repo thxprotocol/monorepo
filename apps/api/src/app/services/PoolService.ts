@@ -147,8 +147,6 @@ async function getAllBySub(sub: string): Promise<PoolDocument[]> {
                 const author = account && {
                     username: account.username,
                 };
-
-                console.log(account);
                 return { ...pool.toJSON(), participantCount, author, brand };
             } catch (error) {
                 console.log(error);

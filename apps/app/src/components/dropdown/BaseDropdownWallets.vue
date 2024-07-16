@@ -6,27 +6,22 @@
             class="w-100 rounded"
             :style="{
                 backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                borderTopRightRadius: '0 !important',
-                borderBottomRightRadius: '0 !important',
+                borderTopRightRadius: walletStore.wallets.length ? '0 !important' : null,
+                borderBottomRightRadius: walletStore.wallets.length ? '0 !important' : null,
             }"
-            toggle-class="d-flex align-items-center justify-content-end text-white text-decoration-none p-2"
+            :toggle-class="`d-flex align-items-center justify-content-end text-white text-decoration-none p-2  ${
+                !walletStore.wallets.length ? 'pe-3' : ''
+            }`"
             auto-close="outside"
             menu-class="bg-body"
             no-caret
             end
         >
-            <template #button-content>
-                <i
-                    :class="{
-                        'text-success': isConnected || !isWalletConnect,
-                        'text-danger': !isConnected && isWalletConnect,
-                    }"
-                    class="fas fa-circle me-2"
-                />
-                <div>
-                    {{ walletStore.wallet ? walletStore.wallet.short : 'Connect' }}
-                </div>
+            <template v-if="walletStore.wallet" #button-content>
+                <b-avatar badge-variant="light" :src="walletImgURL" size="1.2rem" class="me-2" />
+                {{ walletStore.wallet.short }}
             </template>
+            <template v-else #button-content> Connect </template>
             <b-dropdown-text v-if="walletStore.wallet" text-class="bg-dark">
                 <b-form-group label-class="d-flex align-items-center mb-1 ">
                     <template #label>
@@ -62,68 +57,71 @@
                         </template>
                     </template>
                     <div class="d-flex align-items-center">
-                        <b-avatar badge-variant="light" :src="walletImgURL" size="2.8rem" class="me-2">
-                            <template #badge>
-                                <b-img :src="chainList[walletStore.wallet.chainId].logo" width="12" height="12" />
-                            </template>
-                        </b-avatar>
-                        <div>
-                            <div class="d-flex align-items-center">
-                                <strong class="me-5">
-                                    {{ walletStore.wallet.short }}
-                                </strong>
-                                <b-button
-                                    v-clipboard:copy="walletStore.wallet?.address"
-                                    v-clipboard:success="() => (isCopied = true)"
-                                    variant="primary"
-                                    size="sm"
-                                    class="ms-2 px-2 p-1"
-                                >
-                                    <i
-                                        class="fas fa-clipboard"
-                                        :class="{ 'fa-clipboard-check': isCopied, 'fa-clipboard': !isCopied }"
-                                        style="font-size: 0.7rem"
-                                    />
-                                </b-button>
-                                <b-button
-                                    variant="primary"
-                                    size="sm"
-                                    class="ms-2 px-2 p-1"
-                                    :href="
-                                        chainList[walletStore.wallet.chainId].blockExplorer +
-                                        '/address/' +
-                                        walletStore.wallet?.address
-                                    "
-                                    target="_blank"
-                                >
-                                    <i class="fas fa-external-link-alt" style="font-size: 0.7rem" />
-                                </b-button>
-                            </div>
-                            <div v-if="walletStore.wallet" class="d-flex align-items-center me-2">
-                                {{ walletVariantMap[walletStore.wallet.variant] }}
-                                <b-img
-                                    :src="walletLogoMap[walletStore.wallet.variant]"
-                                    width="15"
-                                    height="15"
-                                    style="border-radius: 3px"
-                                    class="ms-1"
-                                />
-                            </div>
-                        </div>
+                        <i
+                            class="fas fa-circle me-2"
+                            :class="{ 'text-success': isConnected, 'text-danger': !isConnected }"
+                        />
+                        <strong class="me-5">
+                            {{ walletStore.wallet.short }}
+                        </strong>
+                        <b-button
+                            v-clipboard:copy="walletStore.wallet?.address"
+                            v-clipboard:success="() => (isCopied = true)"
+                            variant="primary"
+                            size="sm"
+                            class="ms-2 px-2 p-1"
+                        >
+                            <i
+                                class="fas fa-clipboard"
+                                :class="{ 'fa-clipboard-check': isCopied, 'fa-clipboard': !isCopied }"
+                                style="font-size: 0.7rem"
+                            />
+                        </b-button>
+                        <b-button
+                            variant="primary"
+                            size="sm"
+                            class="ms-2 px-2 p-1"
+                            :href="
+                                chainList[walletStore.chainId].blockExplorer + '/address/' + walletStore.wallet?.address
+                            "
+                            target="_blank"
+                        >
+                            <i class="fas fa-external-link-alt" style="font-size: 0.7rem" />
+                        </b-button>
+                    </div>
+                    <div v-if="walletStore.wallet" class="d-flex align-items-center me-2">
+                        {{ walletVariantMap[walletStore.wallet.variant] }}
+                        <b-img
+                            :src="walletLogoMap[walletStore.wallet.variant]"
+                            width="15"
+                            height="15"
+                            style="border-radius: 3px"
+                            class="ms-1"
+                        />
                     </div>
                 </b-form-group>
                 <b-form-group label="Network" label-class="text-opaque">
-                    <i
+                    <b-img
                         v-if="isWalletConnect"
-                        class="fas fa-circle me-2"
-                        :class="{ 'text-success': isConnected, 'text-danger': !isConnected }"
+                        :src="chainList[walletStore.wallet.chainId || walletStore.chainId].logo"
+                        width="15"
+                        height="15"
+                        class="me-1"
                     />
-                    {{ chainList[walletStore.wallet.chainId].name }}
-                    <span class="text-opaque">({{ walletStore.wallet.chainId }})</span>
+                    {{ chainList[walletStore.chainId].name }}
+                    <span class="text-opaque">({{ walletStore.chainId }})</span>
                 </b-form-group>
             </b-dropdown-text>
+            <b-dropdown-item
+                v-else
+                link-class="d-flex align-items-center"
+                @click="walletStore.isModalWalletCreateShown = true"
+            >
+                Add Wallet
+            </b-dropdown-item>
         </b-dropdown>
         <b-dropdown
+            v-if="walletStore.wallets.length"
             v-model="isOpen"
             variant="link"
             menu-class="w-100"
@@ -161,7 +159,7 @@
                 link-class="d-flex align-items-center"
                 @click="walletStore.isModalWalletCreateShown = true"
             >
-                New Wallet
+                Add Wallet
             </b-dropdown-item>
         </b-dropdown>
     </div>
@@ -199,13 +197,9 @@ export default defineComponent({
             return this.walletStore.wallet?.variant === WalletVariant.WalletConnect;
         },
         isConnected() {
-            const { chainId, account, wallet } = this.walletStore;
+            const { account, wallet } = this.walletStore;
             if (!account || !wallet) return false;
-
-            const isAddressCorrect = account.address === wallet.address;
-            const isChainCorrect = chainId === wallet.chainId;
-
-            return isAddressCorrect && isChainCorrect;
+            return account.address === wallet.address;
         },
         walletImgURL() {
             if (!this.walletStore.wallet) return '';

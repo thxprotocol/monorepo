@@ -7,6 +7,7 @@ const validation = [
     body('variant').isString(),
     body('message').optional().isString(),
     body('signature').optional().isString(),
+    body('chainId').optional().isInt(),
 ];
 
 const controller = async (req: Request, res: Response) => {

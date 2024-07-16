@@ -58,7 +58,6 @@ class TransactionService {
         const { web3, relayer, defaultAccount } = NetworkService.getProvider(chainId);
 
         if (relayer) {
-            console.log({ gas });
             const args: RelayerTransactionPayload = {
                 data,
                 speed: RELAYER_SPEED,
@@ -80,9 +79,7 @@ class TransactionService {
                 await poll(
                     async () => {
                         const transaction = await this.getById(tx.id);
-                        const state = await this.queryTransactionStatusReceipt(transaction);
-                        console.log(state);
-                        return state;
+                        return await this.queryTransactionStatusReceipt(transaction);
                     },
                     (state: TransactionState) => state === TransactionState.Sent,
                     500,
@@ -158,7 +155,6 @@ class TransactionService {
         }
         const { web3, relayer } = NetworkService.getProvider(tx.chainId);
         const defenderTx = await relayer.query(tx.transactionId);
-        console.log({ defenderTx });
 
         // Hash has been updated
         if (tx.transactionHash != defenderTx.hash) {

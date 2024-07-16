@@ -99,11 +99,11 @@ export const useWalletStore = defineStore('wallet', {
             await reconnect(wagmiConfig);
 
             watchAccount(wagmiConfig, {
-                onChange: (account) => this.onChange({ account, ignoreChainId: false }),
+                onChange: (account) => this.onChange({ account }),
             });
 
             watchChainId(wagmiConfig, {
-                onChange: (chainId) => this.onChange({ chainId, ignoreChainId: false }),
+                onChange: (chainId) => this.onChange({ chainId }),
             });
 
             watchConnections(wagmiConfig, {
@@ -118,15 +118,7 @@ export const useWalletStore = defineStore('wallet', {
                 themeMode: 'dark',
             });
         },
-        onChange({
-            account,
-            chainId,
-            ignoreChainId,
-        }: {
-            account?: GetAccountReturnType;
-            chainId?: ChainId;
-            ignoreChainId: boolean;
-        }) {
+        onChange({ account, chainId }: { account?: GetAccountReturnType; chainId?: ChainId; ignoreChainId: boolean }) {
             if (account) this.account = account;
             if (chainId) this.chainId = chainId;
 
@@ -137,12 +129,9 @@ export const useWalletStore = defineStore('wallet', {
             const isWalletConnect = this.wallet.variant === WalletVariant.WalletConnect;
             if (!isWalletConnect) return;
 
-            // Show chain modal if an account is connected but the desired chain is not the current chain
-            // or if the desired address is not the current address
-            const isWalletAddressCorrect = this.account ? this.wallet.address === this.account.address : false;
-            const isWalletChainCorrect = ignoreChainId ? true : this.wallet.chainId === this.chainId;
-
-            this.isModalChainSwitchShown = !isWalletAddressCorrect || !isWalletChainCorrect;
+            if (chainId) {
+                this.switchChain(chainId);
+            }
         },
         switchChain(chainId: ChainId) {
             return switchChain(wagmiConfig, { chainId });
@@ -191,7 +180,7 @@ export const useWalletStore = defineStore('wallet', {
 
             return sendTransaction(wagmiConfig, { to, data, gas });
         },
-        async create(data: { variant: WalletVariant; message?: string; signature?: string }) {
+        async create(data: { variant: WalletVariant; message?: string; signature?: string; chainId: ChainId }) {
             const { api } = useAccountStore();
             await api.request.post('/v1/account/wallets', { data });
             await this.listWallets();
@@ -229,7 +218,7 @@ export const useWalletStore = defineStore('wallet', {
                 api.request.get('/v1/rewards/payments'),
                 ...(this.wallet
                     ? [
-                          api.erc20.list({ walletId: this.wallet._id }),
+                          //   api.erc20.list({ walletId: this.wallet._id }),
                           api.erc721.list({ walletId: this.wallet._id }),
                           api.erc1155.list({ walletId: this.wallet._id }),
                       ]

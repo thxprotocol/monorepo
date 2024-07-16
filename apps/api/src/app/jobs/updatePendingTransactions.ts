@@ -35,7 +35,6 @@ export async function updatePendingTransactions() {
                 }
                 // TransactionType.Default is handled in tx service send methods
                 case TransactionState.Sent: {
-                    console.log(tx);
                     if (tx.type == TransactionType.Relayed) {
                         logger.debug(`Checking status for tx: ${tx.transactionHash}`);
                         await TransactionService.queryTransactionStatusDefender(tx).catch((error) =>
