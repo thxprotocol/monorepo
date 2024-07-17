@@ -10,10 +10,13 @@ class AuthAccesTokenRequestError extends THXError {
 let authAccessToken = '';
 let authAccessTokenExpires = 0;
 
+const client = axios.create({
+    baseURL: AUTH_URL,
+});
+
 export const authClient = async (options: AxiosRequestConfig) => {
     try {
-        axios.defaults.baseURL = AUTH_URL;
-        return await axios(options);
+        return await client(options);
     } catch (error) {
         if (error && error.response && error.response.status >= 400 && error.response.status <= 600) {
             return error.response as AxiosResponse;

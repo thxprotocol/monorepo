@@ -13,15 +13,9 @@ import ERC1155Service from './ERC1155Service';
 import SafeService from './SafeService';
 
 class TransactionService {
-    constructor() {
-        //
-    }
-
     /**
      * Creates a transaction in the db and either executes or schedules a web3 transaction.
-     *
      * When the chain has a relayer configured the transaction is scheduled through it instead of directly executed.
-     *
      * By setting the forceSync bool to true you can force the call to behave synchronously. It will poll for the transaction to be executed and only return after the transaction and its callback are executed.
      *
      * @param to Recipient
@@ -61,19 +55,19 @@ class TransactionService {
             const args: RelayerTransactionPayload = {
                 data,
                 speed: RELAYER_SPEED,
-                gasLimit: '50000000', // This limit is arbitrary and should be adjusted when new transactions are tested.
+                gasLimit: 1000000,
             };
             if (tx.to) args.to = tx.to;
 
+            console.log('Transaction sent to Relayer', args);
             const defenderTx = await relayer.sendTransaction(args);
+            console.log('Transaction received by Relayer', defenderTx);
 
-            Object.assign(tx, {
+            await tx.updateOne({
                 transactionId: defenderTx.transactionId,
                 transactionHash: defenderTx.hash,
                 state: TransactionState.Sent,
             });
-
-            await tx.save();
 
             if (forceSync) {
                 await poll(
@@ -228,14 +222,12 @@ class TransactionService {
 
     async proposeSafeAsync(wallet: WalletDocument, to: string | null, data: string, callback?: TTransactionCallback) {
         const { relayer, defaultAccount } = NetworkService.getProvider(wallet.chainId);
-        const safeTx = await SafeService.proposeTransaction(wallet, {
+        const safeTxHash = await SafeService.proposeTransaction(wallet, {
             to,
             data,
             value: '0',
         });
-        if (!safeTx) throw new Error("Couldn't propose transaction.");
-
-        const safeTxHash = await SafeService.getTransactionHash(wallet, safeTx);
+        console.log({ safeTxHash });
         if (!safeTxHash) throw new Error("Couldn't propose transaction.");
 
         return await Transaction.create({

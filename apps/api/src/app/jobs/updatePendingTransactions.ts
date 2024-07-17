@@ -1,9 +1,8 @@
 import { TransactionState, TransactionType } from '@thxnetwork/common/enums';
 import { Transaction, TransactionDocument } from '@thxnetwork/api/models/Transaction';
 import { Wallet } from '../models/Wallet';
-import TransactionService from '@thxnetwork/api/services/TransactionService';
-import SafeService from '../services/SafeService';
 import { logger } from '../util/logger';
+import SafeService from '../services/SafeService';
 
 export async function updatePendingTransactions() {
     const transactions: TransactionDocument[] = await Transaction.find({
@@ -14,8 +13,6 @@ export async function updatePendingTransactions() {
     for (const tx of transactions) {
         try {
             switch (tx.state) {
-                // Legacy tx will not have this state
-                // Transactions is proposed and confirmed by the relayer, awaiting user wallet confirmation
                 case TransactionState.Confirmed: {
                     if (!tx.walletId) continue;
 
@@ -34,13 +31,11 @@ export async function updatePendingTransactions() {
 
                     break;
                 }
-                // TransactionType.Default is handled in tx service send methods
                 case TransactionState.Sent: {
                     if (tx.type == TransactionType.Relayed) {
-                        logger.debug(`Checking status for tx: ${tx.transactionHash}`);
-                        await TransactionService.queryTransactionStatusReceipt(tx).catch((error) =>
-                            console.error(error),
-                        );
+                        logger.debug(`Update transaction: ${tx.transactionHash}`);
+                        const wallet = await Wallet.findById(tx.walletId);
+                        await SafeService.updateTransactionState(wallet, tx.safeTxHash);
                     }
                     break;
                 }

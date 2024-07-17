@@ -74,9 +74,9 @@ export default class RewardCoinService implements IRewardService {
 
         // Register the payment
         await RewardCoinPayment.create({
-            rewardId: reward._id,
+            walletId: wallet.id,
+            rewardId: reward.id,
             sub: wallet.sub,
-            walletId: wallet._id,
             poolId: reward.poolId,
             amount: reward.pointPrice,
         });
