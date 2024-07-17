@@ -1,6 +1,6 @@
 import { Wallet, WalletDocument, PoolDocument, TransactionDocument } from '@thxnetwork/api/models';
-import { ChainId, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
-import { contractNetworks } from '@thxnetwork/api/hardhat';
+import { ChainId, WalletVariant } from '@thxnetwork/common/enums';
+import { contractNetworks, getArtifact } from '@thxnetwork/api/hardhat';
 import { toChecksumAddress } from 'web3-utils';
 import { convertObjectIdToNumber } from '../util';
 import { MetaTransactionData, SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types';
@@ -10,6 +10,8 @@ import NetworkService from '@thxnetwork/api/services/NetworkService';
 import axios from 'axios';
 import SafeApiKit from '@safe-global/api-kit';
 import SafeTransaction from '@safe-global/protocol-kit/dist/src/utils/transactions/SafeTransaction';
+import TransactionService from './TransactionService';
+import { ethers } from 'ethers';
 
 class SafeService {
     async create(
@@ -92,6 +94,7 @@ class SafeService {
         const apiKit = this.getApiKit(wallet);
         const safeTx = await this.createTransaction(wallet, options);
         const safeTxHash = await this.getTransactionHash(wallet, safeTx);
+        console.log(safeTxHash);
         const signedTx = await this.signTransaction(wallet, safeTx);
         const senderSignature = signedTx.signatures.get(defaultAccount.toLowerCase());
         try {
@@ -111,29 +114,29 @@ class SafeService {
         }
     }
 
-    // We can only use the protocol-kit for offchain purposes since the
-    // Defender Relayer will not be compatible.
     async createTransaction(wallet: WalletDocument, { to, data }: Partial<MetaTransactionData>) {
         const safe = await this.getSafe(wallet);
-        const safeTx = await safe.createTransaction({
-            safeTransactionData: {
-                to,
-                data,
-                value: '0',
-                operation: 0,
-            },
-        });
-        console.debug('Transaction created:', safeTx);
-        return safeTx;
+        try {
+            const safeTx = await safe.createTransaction({
+                safeTransactionData: {
+                    to,
+                    data,
+                    value: '0',
+                    operation: 0,
+                },
+            });
+            console.debug('Transaction created:', safeTx);
+            return safeTx;
+        } catch (error) {
+            console.error('Error creating transaction:', error.response ? error.response.data : error.message);
+        }
     }
 
     async signTransaction(wallet: WalletDocument, safeTx: SafeTransaction) {
         const safe = await this.getSafe(wallet);
-        console.debug('Data to sign', safeTx);
         try {
             const signedTx = await safe.signTransaction(safeTx as any);
             console.debug('Transaction Data signed:', signedTx);
-
             return signedTx;
         } catch (error) {
             console.error('Error signing transaction:', error.response ? error.response.data : error.message);
@@ -145,11 +148,11 @@ class SafeService {
         const safeTxHash = await this.getTransactionHash(wallet, safeTx);
         const signedTx = await this.signTransaction(wallet, safeTx);
         const signature = signedTx.signatures.get(defaultAccount);
+
         return await this.confirm(wallet, safeTxHash, signature.data);
     }
 
     async confirm(wallet: WalletDocument, safeTxHash: string, signature: string) {
-        const safe = await this.getSafe(wallet);
         const apiKit = this.getApiKit(wallet);
         try {
             await apiKit.confirmTransaction(safeTxHash, signature);
@@ -160,28 +163,47 @@ class SafeService {
     }
 
     async executeTransaction(wallet: WalletDocument, tx: TransactionDocument) {
-        // Safes for pools have a single signer (relayer) while safes for end users
-        // have 2 (relayer + web3auth mpc key)
-        const threshold = wallet.poolId ? 1 : 2;
         const pendingTx = await this.getTransaction(wallet, tx.safeTxHash);
-        if (pendingTx && pendingTx.confirmations.length >= threshold) {
-            const safe = await this.getSafe(wallet);
+        if (!pendingTx) return;
 
-            // Attempt to get the receipt for the stored hash first
+        const { confirmations, confirmationsRequired } = pendingTx;
+        if (confirmations && confirmations.length >= confirmationsRequired) {
+            const { web3 } = NetworkService.getProvider(wallet.chainId);
+            const contract = new web3.eth.Contract(getArtifact('GnosisSafeL2').abi, wallet.address);
+            const signatures = this.packSignatures(pendingTx);
+            console.log(
+                pendingTx.to, // 0x721Ad61566bbC64322aEcD3CD36aFaCd6a0caE5b
+                pendingTx.value, // 0
+                pendingTx.data, // 0xa9059cbb000000000000000000000000b5d481275264bb79591f26ad11cf8349986005560000000000000000000000000000000000000000000000004563918244f40000
+                pendingTx.operation, // 0
+                pendingTx.safeTxGas, // 0
+                pendingTx.baseGas, // 0
+                pendingTx.gasPrice, // 0
+                pendingTx.gasToken, // 0x0000000000000000000000000000000000000000
+                pendingTx.refundReceiver, // 0x0000000000000000000000000000000000000000
+                signatures, // 0x0cbf348ce07d079bd7d2f1456e42f5f1e4c1c9975b288da3a574a89d17a2a830346f7732856625b7cba75637b4996ff68aeea5d3f6b971cbdacfe7640e7ca5d01c
+            );
+            const fn = contract.methods.execTransaction(
+                pendingTx.to,
+                pendingTx.value,
+                pendingTx.data,
+                pendingTx.operation,
+                pendingTx.safeTxGas,
+                pendingTx.baseGas,
+                pendingTx.gasPrice,
+                pendingTx.gasToken,
+                pendingTx.refundReceiver,
+                signatures,
+            );
+            const data = fn.encodeABI();
 
-            const response = await safe.executeTransaction(pendingTx, { gasLimit: 5000000 });
-            const receipt = await response.transactionResponse.wait();
-            // TODO Check for success event
-
-            await tx.updateOne({
-                transactionHash: receipt.transactionHash,
-                state: TransactionState.Sent,
-            });
+            await TransactionService.execute(tx, data, null, wallet.chainId, false);
         } else {
             console.debug('Require more confirmations:', pendingTx);
         }
     }
 
+    // Using only the API call here will avoid reading for the RPC which speeds up the process significantly
     async getTransaction(wallet: WalletDocument, safeTxHash: string) {
         const { txServiceUrl } = NetworkService.getProvider(wallet.chainId);
         try {
@@ -198,9 +220,29 @@ class SafeService {
 
     async getTransactionHash(wallet: WalletDocument, safeTx: any) {
         const safe = await this.getSafe(wallet);
-        const safeTxHash = await safe.getTransactionHash(safeTx);
-        console.debug('Transaction Hash created:', safeTxHash);
-        return safeTxHash;
+        try {
+            const safeTxHash = await safe.getTransactionHash(safeTx);
+            console.debug('Transaction Hash created:', safeTxHash);
+            return safeTxHash;
+        } catch (error) {
+            console.error('Error creating transaction hash:', error.response ? error.response.data : error.message);
+        }
+    }
+
+    private packSignatures(safeTransaction: SafeMultisigTransactionResponse) {
+        // Sort confirmations by signer address
+        const sortedConfirmations = safeTransaction.confirmations.sort((a, b) =>
+            a.owner.toLowerCase().localeCompare(b.owner.toLowerCase()),
+        );
+
+        // Pack each signature
+        const packedSignatures = sortedConfirmations.map((confirmation) => {
+            const signature = ethers.utils.splitSignature(confirmation.signature);
+            return ethers.utils.solidityPack(['bytes32', 'bytes32', 'uint8'], [signature.r, signature.s, signature.v]);
+        });
+
+        // Concatenate all packed signatures
+        return ethers.utils.hexConcat(packedSignatures);
     }
 
     private async estimateGas(wallet: WalletDocument, safeTransaction: SafeMultisigTransactionResponse) {

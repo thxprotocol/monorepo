@@ -22,6 +22,7 @@ type TERC20Token = {
     erc20Id: string;
     balance?: number;
     walletId: string;
+    chainId: ChainId;
 };
 
 type TERC20Transfer = {

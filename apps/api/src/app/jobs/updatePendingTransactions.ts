@@ -24,6 +24,7 @@ export async function updatePendingTransactions() {
                     try {
                         await SafeService.executeTransaction(wallet, tx);
                     } catch (error) {
+                        console.debug(error);
                         await tx.updateOne({ state: TransactionState.Failed });
                         console.error(
                             'Error executing transaction:',
@@ -37,8 +38,8 @@ export async function updatePendingTransactions() {
                 case TransactionState.Sent: {
                     if (tx.type == TransactionType.Relayed) {
                         logger.debug(`Checking status for tx: ${tx.transactionHash}`);
-                        await TransactionService.queryTransactionStatusDefender(tx).catch((error) =>
-                            logger.error(error),
+                        await TransactionService.queryTransactionStatusReceipt(tx).catch((error) =>
+                            console.error(error),
                         );
                     }
                     break;

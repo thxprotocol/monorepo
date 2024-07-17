@@ -14,7 +14,7 @@ const validation = [
 
 const controller = async ({ wallet, body }: Request, res: Response) => {
     // Check SmartWalletWhitelist
-    const isApproved = await VoteEscrowService.isApprovedAddress(wallet.address, wallet.chainId);
+    const isApproved = await VoteEscrowService.isApprovedAddress(wallet.address);
     if (!isApproved) throw new ForbiddenError('Wallet address is not on whitelist.');
 
     const txList = [];

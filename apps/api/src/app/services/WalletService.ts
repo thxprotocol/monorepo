@@ -45,10 +45,10 @@ export default class WalletService {
             [WalletVariant.Safe]: WalletService.createSafe,
             [WalletVariant.WalletConnect]: WalletService.createWalletConnect,
         };
-        return map[variant]({ ...(data as TWallet) });
+        return map[variant](data);
     }
 
-    static async createSafe({ sub, chainId, address }) {
+    static async createSafe({ sub, chainId, address }: Partial<TWallet>) {
         // An account can have max 1 Safe per network
         const safeWallet = await SafeService.findOne({ sub, chainId });
         if (safeWallet) throw new Error('Already has a Safe.');
@@ -57,7 +57,7 @@ export default class WalletService {
         await SafeService.create({ sub, chainId, safeVersion }, address);
     }
 
-    static async createWalletConnect({ sub, address }) {
+    static async createWalletConnect({ sub, address }: Partial<TWallet>) {
         await Wallet.findOneAndUpdate(
             { sub, address },
             { variant: WalletVariant.WalletConnect, sub, address },

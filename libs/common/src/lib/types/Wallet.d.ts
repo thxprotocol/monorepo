@@ -13,7 +13,7 @@ type TWallet = {
     _id?: string;
     poolId: string;
     sub: string;
-    chainId: ChainId;
+    chainId?: ChainId;
     address: string;
     version: string;
     variant: WalletVariant;

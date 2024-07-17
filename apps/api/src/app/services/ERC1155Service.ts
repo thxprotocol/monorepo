@@ -21,7 +21,7 @@ import {
     ERC1155Token,
 } from '@thxnetwork/api/models';
 import { getArtifact } from '../hardhat';
-import { TransactionReceipt } from 'web3';
+import { TransactionReceipt } from 'web3-core';
 import { toChecksumAddress } from 'web3-utils';
 
 const contractName = 'THXERC1155';

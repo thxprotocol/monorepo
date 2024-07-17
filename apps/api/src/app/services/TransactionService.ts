@@ -4,10 +4,10 @@ import { MINIMUM_GAS_LIMIT, RELAYER_SPEED } from '@thxnetwork/api/config/secrets
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { toChecksumAddress } from 'web3-utils';
 import { poll } from '@thxnetwork/api/util/polling';
-import { deployCallback as erc20DeployCallback } from './ERC20Service';
 import { RelayerTransactionPayload } from '@openzeppelin/defender-relay-client';
 import { Transaction, TransactionDocument, WalletDocument } from '@thxnetwork/api/models';
-import { TransactionReceipt } from 'web3';
+import { TransactionReceipt } from 'web3-core';
+import ERC20Service from './ERC20Service';
 import ERC721Service from './ERC721Service';
 import ERC1155Service from './ERC1155Service';
 import SafeService from './SafeService';
@@ -61,7 +61,7 @@ class TransactionService {
             const args: RelayerTransactionPayload = {
                 data,
                 speed: RELAYER_SPEED,
-                gasLimit: '5000000', // This limit is arbitrary and should be adjusted when new transactions are tested.
+                gasLimit: '50000000', // This limit is arbitrary and should be adjusted when new transactions are tested.
             };
             if (tx.to) args.to = tx.to;
 
@@ -90,7 +90,7 @@ class TransactionService {
                 from: defaultAccount,
                 to: tx.to,
                 data,
-                gas: gas + 100000, // This was originally added for relayed transactions, not sure if still  needed
+                gas: gas + 100000, // Only used locally. Originally added for relayed transactions, not sure if still  needed
             });
 
             await this.transactionMined(tx, receipt);
@@ -126,7 +126,7 @@ class TransactionService {
         if (!tx || !tx.callback) return;
         switch (tx.callback.type) {
             case 'Erc20DeployCallback':
-                await erc20DeployCallback(tx.callback.args, receipt);
+                await ERC20Service.deployCallback(tx.callback.args, receipt);
                 break;
             case 'Erc721DeployCallback':
                 await ERC721Service.deployCallback(tx.callback.args, receipt);

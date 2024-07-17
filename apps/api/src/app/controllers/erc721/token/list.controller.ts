@@ -5,14 +5,15 @@ import { BadRequestError } from '@thxnetwork/api/util/errors';
 import ERC721Service from '@thxnetwork/api/services/ERC721Service';
 import SafeService from '@thxnetwork/api/services/SafeService';
 
-const validation = [query('walletId').isMongoId()];
+const validation = [query('walletId').isMongoId(), query('chainId').isInt()];
 
 const controller = async (req: Request, res: Response) => {
+    const chainId = Number(req.query.chainId);
     const wallet = await SafeService.findById(req.query.walletId as string);
     if (!wallet) throw new BadRequestError('Wallet not found');
 
-    const tokens = await ERC721Token.find({ walletId: wallet.id });
-    const result = await Promise.all(
+    const tokens = await ERC721Token.find({ walletId: wallet.id, chainId });
+    const results = await Promise.allSettled(
         tokens.map(async (token: ERC721TokenDocument) => {
             const erc721 = await ERC721Service.findById(token.erc721Id);
             if (!erc721) return;
@@ -24,7 +25,12 @@ const controller = async (req: Request, res: Response) => {
         }),
     );
 
-    res.json(result.reverse().filter((token) => !!token));
+    const response = results
+        .reverse()
+        .filter((result) => result.status === 'fulfilled')
+        .map((result: any) => result.value);
+
+    res.json(response);
 };
 
 export { controller, validation };

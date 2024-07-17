@@ -14,7 +14,7 @@ import PoolService from './PoolService';
 import TransactionService from './TransactionService';
 import IPFSService from './IPFSService';
 import WalletService from './WalletService';
-import { TransactionReceipt } from 'web3';
+import { TransactionReceipt } from 'web3-core';
 import { toChecksumAddress } from 'web3-utils';
 
 const contractName = 'THXERC721';
