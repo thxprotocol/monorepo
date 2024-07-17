@@ -34,6 +34,7 @@ describe('Account Wallets', () => {
                     variant: WalletVariant.Safe,
                     message,
                     signature,
+                    chainId: ChainId.Hardhat,
                 })
                 .expect(201, done);
         });
@@ -54,9 +55,7 @@ describe('Account Wallets', () => {
         });
     });
 
-    // Create WebConnect wallet
-
-    describe('GET /wallets', () => {
+    describe('GET /wallets (connected)', () => {
         it('HTTP 200 if OK', (done) => {
             user.get('/v1/account/wallets')
                 .set({ Authorization: widgetAccessToken })
@@ -64,7 +63,9 @@ describe('Account Wallets', () => {
                     expect(res.body.length).toEqual(2);
 
                     const safe = res.body.find((wallet: any) => wallet.variant === WalletVariant.Safe);
+                    console.log({ safe });
                     const wallet = res.body.find((wallet: any) => wallet.variant === WalletVariant.WalletConnect);
+                    console.log({ wallet });
                     expect(safe.sub).toEqual(sub);
                     expect(safe.chainId).toEqual(ChainId.Hardhat);
                     expect(safe.variant).toBe(WalletVariant.Safe);
@@ -72,7 +73,7 @@ describe('Account Wallets', () => {
                     expect(safe.safeVersion).toBe(safeVersion);
 
                     expect(wallet.sub).toEqual(sub);
-                    expect(wallet.chainId).toEqual(ChainId.Hardhat);
+                    expect(wallet.chainId).toBeUndefined();
                     expect(wallet.variant).toBe(WalletVariant.WalletConnect);
                     expect(wallet.address).toBeDefined();
                 })

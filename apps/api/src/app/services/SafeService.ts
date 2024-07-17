@@ -17,12 +17,12 @@ import TransactionService from './TransactionService';
 
 class SafeService {
     async create(
-        data: { sub: string; chainId: ChainId; safeVersion?: '1.3.0'; address?: string; poolId?: string },
+        data: { sub: string; chainId: ChainId; safeVersion: '1.3.0'; address?: string; poolId?: string },
         userWalletAddress?: string,
     ) {
+        console.log({ data });
         const wallet = await Wallet.create({
             variant: WalletVariant.Safe,
-            safeVersion,
             ...data,
         });
         // Present address means Metamask account so do not deploy and return early
@@ -86,7 +86,6 @@ class SafeService {
             contractNetworks,
         });
         const safeAddress = await safeFactory.predictSafeAddress(safeAccountConfig, saltNonce);
-        console.debug('Predicted Safe Address:', safeAddress, saltNonce);
 
         return toChecksumAddress(safeAddress);
     }

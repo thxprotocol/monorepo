@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { body } from 'express-validator';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import WalletService from '@thxnetwork/api/services/WalletService';
 
 const validation = [
@@ -11,8 +11,8 @@ const validation = [
 ];
 
 const controller = async (req: Request, res: Response) => {
-    const { message, signature, variant } = req.body;
-    const data: Partial<TWallet> = { sub: req.auth.sub };
+    const { message, signature, variant, chainId } = req.body;
+    const data: Partial<TWallet> = { sub: req.auth.sub, chainId };
 
     // If no message and signature are present prepare a wallet to connect later
     if (signature && message) {
