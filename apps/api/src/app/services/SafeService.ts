@@ -13,6 +13,7 @@ import {
 import SafeApiKit from '@safe-global/api-kit';
 import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/protocol-kit';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
+import TransactionService from './TransactionService';
 
 class SafeService {
     async create(
@@ -222,10 +223,17 @@ class SafeService {
         const safeTx = await this.getTransaction(wallet, safeTxHash);
         const tx = await Transaction.findOne({ safeTxHash });
         const isSent = tx.state === TransactionState.Sent;
+
         if (isSent && safeTx.isExecuted && safeTx.isSuccessful) {
-            await tx.updateOne({ state: TransactionState.Mined });
+            await TransactionService.queryTransactionStatus(
+                await tx.updateOne(
+                    { transactionHash: safeTx.transactionHash, state: TransactionState.Mined },
+                    { new: true },
+                ),
+            );
             console.debug('Transaction success:', safeTx);
         }
+
         if (isSent && safeTx.isExecuted && !safeTx.isSuccessful) {
             await tx.updateOne({ state: TransactionState.Failed });
             console.debug('Transaction failed:', safeTx);

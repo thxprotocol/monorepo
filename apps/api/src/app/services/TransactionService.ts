@@ -143,28 +143,21 @@ class TransactionService {
         }
     }
 
-    async queryTransactionStatusDefender(tx: TransactionDocument) {
-        if ([TransactionState.Mined, TransactionState.Failed].includes(tx.state)) {
-            return tx;
-        }
-        const { web3, relayer } = NetworkService.getProvider(tx.chainId);
-        const defenderTx = await relayer.query(tx.transactionId);
-
-        // Hash has been updated
-        if (tx.transactionHash != defenderTx.hash) {
-            tx.transactionHash = defenderTx.hash;
-            await tx.save();
-        }
-
-        if (['mined', 'confirmed'].includes(defenderTx.status)) {
+    async queryTransactionStatus(tx: TransactionDocument) {
+        const { web3 } = NetworkService.getProvider(tx.chainId);
+        try {
             const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-            await this.transactionMined(tx, receipt);
-        } else if (defenderTx.status === 'failed') {
-            tx.state = TransactionState.Failed;
-            await tx.save();
-        }
+            if (receipt) {
+                // Wait 500 ms for transactions to be propagated to all nodes.
+                // Since we use multiple RPCs it happens we already have the receipt but the other RPC
+                // doesn't have the block available yet.
+                await new Promise((done) => setTimeout(done, 500));
 
-        return tx.state;
+                await this.transactionMined(tx, receipt);
+            }
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     async queryTransactionStatusReceipt(tx: TransactionDocument) {
