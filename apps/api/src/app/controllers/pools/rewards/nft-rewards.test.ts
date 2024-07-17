@@ -10,6 +10,8 @@ import { RewardNFTDocument } from '@thxnetwork/api/models/RewardNFT';
 import { ERC721Document } from '@thxnetwork/api/models/ERC721';
 import { ERC721MetadataDocument } from '@thxnetwork/api/models/ERC721Metadata';
 import { RewardVariant } from '@thxnetwork/common/enums';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
+import { poll } from 'ethers/lib/utils';
 
 const user = request.agent(app);
 
@@ -64,14 +66,30 @@ describe('NFT Rewards', () => {
     it('POST /pools', (done) => {
         user.post('/v1/pools')
             .set('Authorization', dashboardAccessToken)
-            .send({
-                chainId: ChainId.Hardhat,
-            })
             .expect(({ body }: request.Response) => {
-                expect(isAddress(body.safeAddress)).toBe(true);
                 poolId = body._id;
             })
             .expect(201, done);
+    });
+
+    it('POST /pools/:poolId/wallets', async () => {
+        let walletAddress;
+        await user
+            .post(`/v1/pools/${poolId}/wallets`)
+            .set('Authorization', dashboardAccessToken)
+            .send({
+                chainId: ChainId.Hardhat,
+            })
+            .expect((res: request.Response) => {
+                walletAddress = res.body.address;
+            })
+            .expect(201);
+        const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
+        await poll(async () => {
+            const code = await web3.eth.getCode(walletAddress);
+            return code !== '0x';
+        });
+        expect(walletAddress).toBeDefined();
     });
 
     it('POST /pools/:poolId/rewards/:variant', (done) => {

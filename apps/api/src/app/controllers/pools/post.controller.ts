@@ -8,7 +8,7 @@ const controller = async (req: Request, res: Response) => {
     const { title } = req.body;
     const pool = await PoolService.deploy(req.auth.sub, title || 'My Quest Campaign');
 
-    res.status(201).json(pool.toJSON());
+    res.status(201).json(pool);
 };
 
 export { controller, validation };

@@ -43,11 +43,10 @@ async function isAudienceAllowed(aud: string, poolId: string) {
 }
 
 async function isSubjectAllowed(sub: string, poolId: string) {
-    const isOwner = await Pool.exists({
-        _id: poolId,
-        sub,
-    });
+    const pool = await Pool.findById(poolId);
+    const isOwner = pool && pool.sub === sub;
     const isCollaborator = await Collaborator.exists({ sub, poolId, state: CollaboratorInviteState.Accepted });
+
     return isOwner || isCollaborator;
 }
 
@@ -118,7 +117,7 @@ async function deploy(sub: string, title: string): Promise<PoolDocument> {
         theme: JSON.stringify({ elements: DEFAULT_ELEMENTS, colors: DEFAULT_COLORS }),
     });
 
-    return Pool.findByIdAndUpdate(pool._id, { 'settings.slug': String(pool._id) }, { new: true });
+    return await Pool.findByIdAndUpdate(pool.id, { 'settings.slug': pool.id }, { new: true });
 }
 
 async function getAllBySub(sub: string): Promise<PoolDocument[]> {
