@@ -11,11 +11,11 @@ import { RewardCoinPayment } from '@thxnetwork/api/models';
 import { IRewardService } from './interfaces/IRewardService';
 import { ChainId, ERC20Type, TransactionState } from '@thxnetwork/common/enums';
 import { BigNumber } from 'alchemy-sdk';
+import { parseUnits } from 'ethers/lib/utils';
 import AccountProxy from '../proxies/AccountProxy';
 import ERC20Service from './ERC20Service';
 import MailService from './MailService';
 import PoolService from './PoolService';
-import { toWei } from 'web3-utils';
 import SafeService from './SafeService';
 
 export default class RewardCoinService implements IRewardService {
@@ -67,7 +67,9 @@ export default class RewardCoinService implements IRewardService {
 
         // TODO Wei should be determined in the FE
         const decimals = await erc20.contract.methods.decimals().call();
-        const amount = toWei(reward.amount, Number(decimals));
+        console.log(decimals);
+        const amount = parseUnits(reward.amount, decimals).toString();
+        console.log({ amount });
 
         // Transfer ERC20 from safe to wallet
         await ERC20Service.transferFrom(erc20, safe, wallet.address, amount);
@@ -114,9 +116,7 @@ export default class RewardCoinService implements IRewardService {
         const balanceOfPool = await erc20.contract.methods.balanceOf(safe.address).call();
         const isTransferable = [ERC20Type.Unknown, ERC20Type.Limited].includes(erc20.type);
         const decimals = await erc20.contract.methods.decimals().call();
-        const isBalanceInsufficient = BigNumber.from(balanceOfPool).lt(
-            BigNumber.from(toWei(reward.amount, Number(decimals))),
-        );
+        const isBalanceInsufficient = BigNumber.from(balanceOfPool).lt(parseUnits(reward.amount, decimals));
 
         // Notifiy the campaign owner if token is transferrable and balance is insufficient
         if (isTransferable && isBalanceInsufficient) {

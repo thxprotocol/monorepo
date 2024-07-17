@@ -3,12 +3,15 @@ import { ChainId, TransactionState, WalletVariant } from '@thxnetwork/common/enu
 import { contractNetworks, getArtifact } from '@thxnetwork/api/hardhat';
 import { toChecksumAddress } from 'web3-utils';
 import { convertObjectIdToNumber } from '../util';
-import { MetaTransactionData, SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types';
 import { safeVersion } from '@thxnetwork/api/services/ContractService';
 import { MINIMUM_GAS_LIMIT } from '../config/secrets';
+import {
+    SafeTransaction,
+    SafeMultisigTransactionResponse,
+    MetaTransactionData,
+} from '@safe-global/safe-core-sdk-types';
 import SafeApiKit from '@safe-global/api-kit';
-import SafeTransaction from '@safe-global/protocol-kit/dist/src/utils/transactions/SafeTransaction';
-import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit';
+import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/protocol-kit';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 
 class SafeService {
