@@ -67,9 +67,7 @@ export default class RewardCoinService implements IRewardService {
 
         // TODO Wei should be determined in the FE
         const decimals = await erc20.contract.methods.decimals().call();
-        console.log(decimals);
         const amount = parseUnits(reward.amount, decimals).toString();
-        console.log({ amount });
 
         // Transfer ERC20 from safe to wallet
         await ERC20Service.transferFrom(erc20, safe, wallet.address, amount);

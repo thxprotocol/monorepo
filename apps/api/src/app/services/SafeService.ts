@@ -39,8 +39,8 @@ class SafeService {
         // If campaign safe we provide a nonce based on the timestamp in the MongoID the pool (poolId value)
         const saltNonce = wallet.poolId && String(convertObjectIdToNumber(wallet.poolId));
         const safeAddress = await this.deploy(wallet, owners, saltNonce);
-        if (safeAddress)
-            return await Wallet.findByIdAndUpdate(wallet.id, { address: safeAddress }, { new: true, upsert: true });
+
+        return await Wallet.findByIdAndUpdate(wallet.id, { address: safeAddress }, { new: true, upsert: true });
     }
 
     async deploy(wallet: WalletDocument, owners: string[], saltNonce?: string) {
