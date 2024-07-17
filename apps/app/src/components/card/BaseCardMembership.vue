@@ -103,8 +103,8 @@ export default defineComponent({
             return this.veStore.lock && !Number(this.veStore.lock.amount);
         },
         address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
+            if (!this.walletStore.chainId) return contractNetworks[ChainId.Polygon];
+            return contractNetworks[this.walletStore.chainId];
         },
         balanceUSDC() {
             if (!this.walletStore.balances[this.address.USDC]) return 0;

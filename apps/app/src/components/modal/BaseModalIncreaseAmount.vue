@@ -69,8 +69,8 @@ export default defineComponent({
             return this.isPolling || this.balanceBPTGauge.lt(this.amountInWei) || this.balanceBPTGauge.eq(0);
         },
         address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
+            if (!this.walletStore.chainId) return contractNetworks[ChainId.Polygon];
+            return contractNetworks[this.walletStore.chainId];
         },
         amountInWei() {
             return parseUnits(this.lockAmount, 18);

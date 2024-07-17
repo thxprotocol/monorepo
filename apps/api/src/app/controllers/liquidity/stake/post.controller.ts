@@ -6,11 +6,13 @@ import { Request, Response } from 'express';
 import { body, query } from 'express-validator';
 import { BigNumber } from 'alchemy-sdk';
 import LiquidityService from '@thxnetwork/api/services/LiquidityService';
+import { ChainId } from '@thxnetwork/common/enums';
 
-const validation = [body('amountInWei').isString(), query('walletId').isMongoId()];
+const validation = [body('amountInWei').isString(), query('walletId').isMongoId(), query('chainId').isInt()];
 
-const controller = async ({ wallet, body }: Request, res: Response) => {
-    const { web3 } = NetworkService.getProvider(wallet.chainId);
+const controller = async ({ query, wallet, body }: Request, res: Response) => {
+    const chainId = Number(query.chainId) as ChainId;
+    const { web3 } = NetworkService.getProvider(chainId);
     const bpt = new web3.eth.Contract(getArtifact('BPT').abi, contractNetworks[wallet.chainId].BPT);
 
     // Check if sender has sufficient BPT

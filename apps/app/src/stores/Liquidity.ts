@@ -44,7 +44,8 @@ export const useLiquidityStore = defineStore('liquidity', {
             await confirmTransactions(txs);
         },
         buildJoin(wallet: TWallet, data: TCreateLiquidityOptions) {
-            if (wallet.chainId === ChainId.Hardhat) {
+            const { chainId } = useWalletStore();
+            if (chainId === ChainId.Hardhat) {
                 const { encodeContractCall } = useWalletStore();
                 const abi = [
                     {
@@ -98,7 +99,7 @@ export const useLiquidityStore = defineStore('liquidity', {
                         type: 'function',
                     },
                 ];
-                return encodeContractCall(contractNetworks[wallet.chainId].BalancerVault, abi, 'joinPool', [
+                return encodeContractCall(contractNetworks[chainId].BalancerVault, abi, 'joinPool', [
                     BALANCER_POOL_ID,
                     wallet.address,
                     wallet.address,
@@ -124,11 +125,11 @@ export const useLiquidityStore = defineStore('liquidity', {
         async createLiquidityWalletConnect(wallet: TWallet, data: TCreateLiquidityOptions) {
             const { sendTransaction } = useWalletStore();
             const call = this.buildJoin(wallet, data);
-            await sendTransaction(wallet.address, call.to, call.data, '1000000'); // TODO Using a fixed gas limit for now
+            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon, '1000000'); // TODO Using a fixed gas limit for now
         },
         waitForLiquidity(wallet: TWallet, data: TCreateLiquidityOptions) {
-            const { balances, getBalance } = useWalletStore();
-            const { USDC, THX } = contractNetworks[wallet.chainId];
+            const { balances, getBalance, chainId } = useWalletStore();
+            const { USDC, THX } = contractNetworks[chainId];
             const currentUSDCBalanceInWei = BigNumber.from(balances[USDC]);
             const currentTHXBalanceInWei = BigNumber.from(balances[THX]);
 
@@ -176,7 +177,7 @@ export const useLiquidityStore = defineStore('liquidity', {
             await confirmTransactions(txs);
         },
         async stakeWalletConnect(wallet: TWallet, data: { amountInWei: string }) {
-            const { sendTransaction, encodeContractCall } = useWalletStore();
+            const { sendTransaction, encodeContractCall, chainId } = useWalletStore();
             const abi = [
                 {
                     stateMutability: 'nonpayable',
@@ -191,12 +192,10 @@ export const useLiquidityStore = defineStore('liquidity', {
                     outputs: [],
                 },
             ];
-            const call = encodeContractCall(contractNetworks[wallet.chainId].BPTGauge, abi, 'deposit', [
-                data.amountInWei,
-            ]);
+            const call = encodeContractCall(contractNetworks[chainId].BPTGauge, abi, 'deposit', [data.amountInWei]);
 
             // Sign and execute the transaction data
-            await sendTransaction(wallet.address, call.to, call.data);
+            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
         },
         async listPrices() {
             const { api } = useAccountStore();
@@ -214,8 +213,8 @@ export const useLiquidityStore = defineStore('liquidity', {
             this.schedule = schedule;
         },
         async waitForStake(wallet: TWallet, amountInWei: BigNumber) {
-            const { balances, getBalance } = useWalletStore();
-            const bptGaugeAddress = contractNetworks[wallet.chainId].BPTGauge;
+            const { balances, getBalance, chainId } = useWalletStore();
+            const bptGaugeAddress = contractNetworks[chainId].BPTGauge;
             const oldBalanceInWei = BigNumber.from(balances[bptGaugeAddress]);
             const taskFn = async () => {
                 await getBalance(bptGaugeAddress);

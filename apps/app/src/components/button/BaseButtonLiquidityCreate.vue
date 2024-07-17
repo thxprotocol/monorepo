@@ -35,8 +35,8 @@ export default defineComponent({
     computed: {
         ...mapStores(useVeStore, useWalletStore, useLiquidityStore, useAccountStore),
         address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
+            if (!this.walletStore.chainId) return contractNetworks[ChainId.Polygon];
+            return contractNetworks[this.walletStore.chainId];
         },
         balanceUSDC() {
             return BigNumber.from(this.walletStore.balances[this.address.USDC]);

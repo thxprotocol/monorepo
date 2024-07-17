@@ -5,6 +5,7 @@ import { BigNumber } from 'alchemy-sdk';
 import { contractNetworks } from '@thxnetwork/api/hardhat';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import VoteEscrowService from '@thxnetwork/api/services/VoteEscrowService';
+import { ChainId } from '@thxnetwork/common/enums';
 
 const validation = [
     query('walletId').isMongoId(),
@@ -12,7 +13,9 @@ const validation = [
     body('lockEndTimestamp').optional().isInt(),
 ];
 
-const controller = async ({ wallet, body }: Request, res: Response) => {
+const controller = async ({ query, wallet, body }: Request, res: Response) => {
+    const chainId = Number(query.chainId) as ChainId;
+
     // Check SmartWalletWhitelist
     const isApproved = await VoteEscrowService.isApprovedAddress(wallet.address);
     if (!isApproved) throw new ForbiddenError('Wallet address is not on whitelist.');
@@ -22,8 +25,8 @@ const controller = async ({ wallet, body }: Request, res: Response) => {
         // Check sufficient BPTGauge approval
         const amount = await VoteEscrowService.getAllowance(
             wallet,
-            contractNetworks[wallet.chainId].BPTGauge,
-            contractNetworks[wallet.chainId].VotingEscrow,
+            contractNetworks[chainId].BPTGauge,
+            contractNetworks[chainId].VotingEscrow,
         );
         if (BigNumber.from(amount).lt(body.amountInWei)) throw new ForbiddenError('Insufficient allowance');
 
@@ -34,7 +37,7 @@ const controller = async ({ wallet, body }: Request, res: Response) => {
 
     if (body.lockEndTimestamp) {
         // Check lockEndTimestamp to be more than today + 90 days
-        const { web3 } = NetworkService.getProvider(wallet.chainId);
+        const { web3 } = NetworkService.getProvider(chainId);
         const latest = await web3.eth.getBlockNumber();
         const now = (await web3.eth.getBlock(latest)).timestamp;
         if (body.lockEndTimestamp < now) {

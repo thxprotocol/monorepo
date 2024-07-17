@@ -57,7 +57,7 @@ export const useVeStore = defineStore('ve', {
             await confirmTransactions(txs);
         },
         async depositWalletConnect(wallet: TWallet, data: TRequestBodyDeposit) {
-            const { sendTransaction } = useWalletStore();
+            const { sendTransaction, chainId } = useWalletStore();
             const abi = [
                 {
                     stateMutability: 'nonpayable',
@@ -77,13 +77,13 @@ export const useVeStore = defineStore('ve', {
                 },
             ];
             const call = useWalletStore().encodeContractCall(
-                contractNetworks[wallet.chainId].VotingEscrow,
+                contractNetworks[chainId].VotingEscrow,
                 abi,
                 'create_lock',
                 [data.amountInWei, data.lockEndTimestamp],
             );
 
-            await sendTransaction(wallet.address, call.to, call.data);
+            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
         },
         async increaseAmount(wallet: TWallet, data: { amountInWei: string }) {
             const map: { [variant: string]: (wallet: TWallet, data: { amountInWei: string }) => Promise<void> } = {
@@ -103,7 +103,7 @@ export const useVeStore = defineStore('ve', {
             await confirmTransactions(txs);
         },
         async increaseAmountWalletConnect(wallet: TWallet, data: { amountInWei: string }) {
-            const { sendTransaction } = useWalletStore();
+            const { sendTransaction, chainId } = useWalletStore();
             const abi = [
                 {
                     stateMutability: 'nonpayable',
@@ -119,12 +119,12 @@ export const useVeStore = defineStore('ve', {
                 },
             ];
             const call = useWalletStore().encodeContractCall(
-                contractNetworks[wallet.chainId].VotingEscrow,
+                contractNetworks[chainId].VotingEscrow,
                 abi,
                 'increase_amount',
                 [data.amountInWei],
             );
-            await sendTransaction(wallet.address, call.to, call.data);
+            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
         },
         async waitForIncreaseAmount(wallet: TWallet, amountInWei: BigNumber) {
             const expectedAmount = BigNumber.from(this.lock.amount).add(amountInWei);
@@ -163,7 +163,7 @@ export const useVeStore = defineStore('ve', {
             await confirmTransactions(txs);
         },
         async increaseUnlockTimeWalletConnect(wallet: TWallet, data: { lockEndTimestamp: number }) {
-            const { sendTransaction } = useWalletStore();
+            const { sendTransaction, chainId } = useWalletStore();
             const abi = [
                 {
                     stateMutability: 'nonpayable',
@@ -179,13 +179,13 @@ export const useVeStore = defineStore('ve', {
                 },
             ];
             const call = useWalletStore().encodeContractCall(
-                contractNetworks[wallet.chainId].VotingEscrow,
+                contractNetworks[chainId].VotingEscrow,
                 abi,
                 'increase_unlock_time',
                 [data.lockEndTimestamp],
             );
 
-            await sendTransaction(wallet.address, call.to, call.data);
+            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
         },
         async waitForIncreaseUnlockTime(wallet: TWallet, timestamp: number) {
             const taskFn = async () => {
@@ -222,7 +222,7 @@ export const useVeStore = defineStore('ve', {
             await confirmTransactions(txs);
         },
         async claimTokenWalletConnect(wallet: TWallet) {
-            const { sendTransaction } = useWalletStore();
+            const { sendTransaction, chainId } = useWalletStore();
             const abi = [
                 {
                     inputs: [
@@ -250,12 +250,12 @@ export const useVeStore = defineStore('ve', {
                 },
             ];
 
-            const { RewardDistributor, BAL, BPT } = contractNetworks[wallet.chainId];
+            const { RewardDistributor, BAL, BPT } = contractNetworks[chainId];
             const call = useWalletStore().encodeContractCall(RewardDistributor, abi, 'claimTokens', [
                 wallet.address,
                 [BAL, BPT],
             ]);
-            await sendTransaction(wallet.address, call.to, call.data);
+            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
         },
         async withdraw(wallet: TWallet, isEarlyAttempt: boolean) {
             const map: { [variant: string]: (wallet: TWallet, isEarlyAttempt: boolean) => Promise<void> } = {
@@ -276,7 +276,7 @@ export const useVeStore = defineStore('ve', {
             await confirmTransactions(txs);
         },
         async withdrawWalletConnect(wallet: TWallet, isEarlyAttempt: boolean) {
-            const { sendTransaction } = useWalletStore();
+            const { sendTransaction, chainId } = useWalletStore();
             const method = isEarlyAttempt ? 'withdraw_early' : 'withdraw';
             const abi = [
                 {
@@ -287,13 +287,8 @@ export const useVeStore = defineStore('ve', {
                     outputs: [],
                 },
             ];
-            const call = useWalletStore().encodeContractCall(
-                contractNetworks[wallet.chainId].VotingEscrow,
-                abi,
-                method,
-                [],
-            );
-            await sendTransaction(wallet.address, call.to, call.data);
+            const call = useWalletStore().encodeContractCall(contractNetworks[chainId].VotingEscrow, abi, method, []);
+            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
         },
         async waitForWithdrawal(wallet: TWallet) {
             const taskFn = async () => {

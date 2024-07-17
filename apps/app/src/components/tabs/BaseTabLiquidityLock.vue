@@ -65,8 +65,8 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore, useWalletStore, useAuthStore, useVeStore, useLiquidityStore),
         address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
+            if (!this.walletStore.chainId) return contractNetworks[ChainId.Polygon];
+            return contractNetworks[this.walletStore.chainId];
         },
         isSufficientBPTGaugeAllowance() {
             if (!this.walletStore.allowances[this.address.BPTGauge]) return false;

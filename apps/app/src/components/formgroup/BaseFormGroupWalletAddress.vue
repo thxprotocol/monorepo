@@ -6,21 +6,21 @@
         <template #label>
             <div class="d-flex align-items-center">
                 <img
-                    :src="walletLogoMap[wallet.variant]"
+                    :src="walletLogoMap[wallet ? wallet.variant : 'walletconnect']"
                     width="15"
                     height="15"
                     style="border-radius: 3px"
                     class="me-2"
                     alt="Safe Logo"
                 />
-                Address on {{ chainList[wallet.chainId].name }}
+                Address on {{ chainList[walletStore.chainId].name }}
             </div>
         </template>
         <b-input-group>
             <b-form-input v-model="address" disabled />
             <b-input-group-append>
                 <b-button
-                    v-clipboard:copy="wallet.address"
+                    v-clipboard:copy="wallet ? wallet.address : ''"
                     v-clipboard:success="onCopySuccess"
                     size="sm"
                     variant="primary"
@@ -37,7 +37,7 @@
 import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-import { walletLogoMap } from '../../stores/Wallet';
+import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { chainList } from '../../utils/chains';
 
 export default defineComponent({
@@ -50,7 +50,7 @@ export default defineComponent({
         return { address: '', chainList, walletLogoMap, isCopied: false };
     },
     computed: {
-        ...mapStores(useAccountStore),
+        ...mapStores(useAccountStore, useWalletStore),
     },
     watch: {
         wallet(wallet) {

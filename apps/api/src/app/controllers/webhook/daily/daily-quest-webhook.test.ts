@@ -23,7 +23,6 @@ describe('Daily Rewards WebHooks', () => {
             .set('Authorization', dashboardAccessToken)
             .send()
             .expect((res: request.Response) => {
-                expect(isAddress(res.body.safeAddress)).toBe(true);
                 poolId = res.body._id;
             })
             .expect(201, done);

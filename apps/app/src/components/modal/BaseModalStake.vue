@@ -69,8 +69,8 @@ export default defineComponent({
     computed: {
         ...mapStores(useWalletStore, useVeStore, useLiquidityStore),
         address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
+            if (!this.walletStore.chainId) return contractNetworks[ChainId.Polygon];
+            return contractNetworks[this.walletStore.chainId];
         },
         isAlertInfoShown() {
             return !!this.error;

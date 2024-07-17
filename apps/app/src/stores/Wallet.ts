@@ -166,7 +166,7 @@ export const useWalletStore = defineStore('wallet', {
 
             if (this.wallet && this.chainId !== chainId) {
                 this.isModalChainSwitchShown = true;
-                throw new Error(`Please set your network to ${this.wallet.chainId}.`);
+                throw new Error(`Please set your network to ${chainId}.`);
             }
 
             return sendTransaction(wagmiConfig, { to, data, gas });
@@ -187,7 +187,7 @@ export const useWalletStore = defineStore('wallet', {
 
             const account = getAccount(wagmiConfig);
             const chainId = getChainId(wagmiConfig);
-            this.onChange({ account, chainId });
+            this.onChange({ account, chainId: wallet && wallet.chainId ? wallet.chainId : chainId });
         },
         async listWallets() {
             const { api, account } = useAccountStore();
@@ -314,7 +314,7 @@ export const useWalletStore = defineStore('wallet', {
 
             const { api } = useAccountStore();
             const { balanceInWei } = await api.request.get('/v1/erc20/balance', {
-                params: { tokenAddress, walletId: this.wallet._id },
+                params: { tokenAddress, walletId: this.wallet._id, chainId: this.chainId },
             });
             this.balances[tokenAddress] = balanceInWei;
         },
@@ -323,7 +323,7 @@ export const useWalletStore = defineStore('wallet', {
 
             const { api } = useAccountStore();
             const { allowanceInWei } = await api.request.get('/v1/erc20/allowance', {
-                params: { ...params, walletId: this.wallet._id },
+                params: { ...params, walletId: this.wallet._id, chainId: this.chainId },
             });
             if (!this.allowances[params.tokenAddress]) this.allowances[params.tokenAddress] = {};
             this.allowances[params.tokenAddress][params.spender] = allowanceInWei;
@@ -364,7 +364,7 @@ export const useWalletStore = defineStore('wallet', {
             const call = this.encodeContractCall(data.tokenAddress, abi, 'approve', [data.spender, data.amountInWei]);
 
             // Sign and execute the transaction data
-            await this.sendTransaction(wallet.address, call.to, call.data);
+            await this.sendTransaction(wallet.address, call.to, call.data, this.chainId);
         },
         encodeContractCall(contractAddress: string, abi: any[], functionName: string, args: any[]) {
             return {

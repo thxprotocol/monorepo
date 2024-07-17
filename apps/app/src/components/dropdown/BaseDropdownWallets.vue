@@ -103,7 +103,7 @@
                 <b-form-group label="Network" label-class="text-opaque">
                     <b-img
                         v-if="isWalletConnect"
-                        :src="chainList[walletStore.wallet.chainId || walletStore.chainId].logo"
+                        :src="chainList[walletStore.chainId].logo"
                         width="15"
                         height="15"
                         class="me-1"
