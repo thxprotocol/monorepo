@@ -135,7 +135,7 @@ class BalancerService {
 
             for (const chainId of [ChainId.Hardhat, ChainId.Polygon]) {
                 // Skip hardhat on production
-                if (NODE_ENV === 'production' && chainId === ChainId.Hardhat) continue;
+                if (['production', 'test'].includes(NODE_ENV) && chainId === ChainId.Hardhat) continue;
 
                 const provider = new ethers.providers.JsonRpcProvider(rpcMap[chainId]);
                 const gaugeAddress = contractNetworks[chainId].BPTGauge;

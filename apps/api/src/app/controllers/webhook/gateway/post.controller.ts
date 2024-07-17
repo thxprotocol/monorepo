@@ -1,13 +1,14 @@
 import crypto from 'crypto';
 import { Request, Response } from 'express';
 import { body } from 'express-validator';
-import { WEBHOOK_SIGNING_SECRET } from '@thxnetwork/api/config/secrets';
+import { NODE_ENV, WEBHOOK_SIGNING_SECRET } from '@thxnetwork/api/config/secrets';
 import { Wallet } from '@thxnetwork/api/models';
 import { logger } from '@thxnetwork/api/util/logger';
 import { formatUnits } from 'ethers/lib/utils';
 import VoteEscrowService from '@thxnetwork/api/services/VoteEscrowService';
 import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 import BalancerService from '@thxnetwork/api/services/BalancerService';
+import { ChainId } from '@thxnetwork/common/enums';
 
 const validation = [body('payload').isString(), body('signature').isString()];
 
@@ -42,7 +43,8 @@ const controller = async (req: Request, res: Response) => {
                 if (!wallets.length) throw new Error('No wallets found for the account');
 
                 // Get largest lock and validate with provided metadata
-                const promises = wallets.map(async (wallet) => await VoteEscrowService.list(wallet));
+                const chainId = NODE_ENV === 'production' ? ChainId.Polygon : ChainId.Hardhat;
+                const promises = wallets.map(async (wallet) => await VoteEscrowService.list(wallet, chainId));
                 const locks = await Promise.all(promises);
                 const [largestLock] = locks.sort((a, b) => b.amount - a.amount);
                 const lockAmount = formatUnits(largestLock.amount, 18);

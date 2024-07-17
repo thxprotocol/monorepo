@@ -3,7 +3,6 @@ import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
 import { ChainId } from '@thxnetwork/common/enums';
 import { MODE } from '../config/secrets';
-import { WalletVariant } from '../types/enums/accountVariant';
 import { contractNetworks } from '../config/constants';
 import { BigNumber } from 'alchemy-sdk';
 import { track } from '@thxnetwork/common/mixpanel';
@@ -31,7 +30,8 @@ export const useVeStore = defineStore('ve', {
         },
         async getLocks(wallet: TWallet) {
             const { api } = useAccountStore();
-            const locks = await api.request.get('/v1/ve', { params: { walletId: wallet._id } });
+            const { chainId } = useWalletStore();
+            const locks = await api.request.get('/v1/ve', { params: { walletId: wallet._id, chainId } });
             const { amount, end, now, balance, rewards } = locks[0];
             this.lock = { amount, end };
             this.now = now;
@@ -39,24 +39,6 @@ export const useVeStore = defineStore('ve', {
             this.balance = balance;
         },
         async deposit(wallet: TWallet, { lockEndTimestamp, amountInWei }: TRequestBodyDeposit) {
-            const map: { [variant: string]: (wallet: TWallet, data: TRequestBodyDeposit) => Promise<void> } = {
-                [WalletVariant.Safe]: this.depositSafe.bind(this),
-                [WalletVariant.WalletConnect]: this.depositWalletConnect.bind(this),
-            };
-
-            return await map[wallet.variant](wallet, { lockEndTimestamp, amountInWei });
-        },
-        async depositSafe(wallet: TWallet, data: TRequestBodyDeposit) {
-            const { confirmTransactions } = useWalletStore();
-            const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/deposit', {
-                data,
-                params: { walletId: wallet._id },
-            });
-
-            await confirmTransactions(txs);
-        },
-        async depositWalletConnect(wallet: TWallet, data: TRequestBodyDeposit) {
             const { sendTransaction, chainId } = useWalletStore();
             const abi = [
                 {
@@ -80,29 +62,12 @@ export const useVeStore = defineStore('ve', {
                 contractNetworks[chainId].VotingEscrow,
                 abi,
                 'create_lock',
-                [data.amountInWei, data.lockEndTimestamp],
+                [amountInWei, lockEndTimestamp],
             );
 
-            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
+            await sendTransaction(wallet.address, call.to, call.data, chainId);
         },
         async increaseAmount(wallet: TWallet, data: { amountInWei: string }) {
-            const map: { [variant: string]: (wallet: TWallet, data: { amountInWei: string }) => Promise<void> } = {
-                [WalletVariant.Safe]: this.increaseAmountSafe.bind(this),
-                [WalletVariant.WalletConnect]: this.increaseAmountWalletConnect.bind(this),
-            };
-            return await map[wallet.variant](wallet, data);
-        },
-        async increaseAmountSafe(wallet: TWallet, data: { amountInWei: string }) {
-            const { confirmTransactions } = useWalletStore();
-            const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/increase', {
-                data,
-                params: { walletId: wallet._id },
-            });
-
-            await confirmTransactions(txs);
-        },
-        async increaseAmountWalletConnect(wallet: TWallet, data: { amountInWei: string }) {
             const { sendTransaction, chainId } = useWalletStore();
             const abi = [
                 {
@@ -124,7 +89,7 @@ export const useVeStore = defineStore('ve', {
                 'increase_amount',
                 [data.amountInWei],
             );
-            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
+            await sendTransaction(wallet.address, call.to, call.data, chainId);
         },
         async waitForIncreaseAmount(wallet: TWallet, amountInWei: BigNumber) {
             const expectedAmount = BigNumber.from(this.lock.amount).add(amountInWei);
@@ -145,24 +110,6 @@ export const useVeStore = defineStore('ve', {
             return await poll({ taskFn, interval: 3000, retries: 20 });
         },
         async increasUnlockTime(wallet: TWallet, data: { lockEndTimestamp: number }) {
-            const map: { [variant: string]: (wallet: TWallet, data: { lockEndTimestamp: number }) => Promise<void> } = {
-                [WalletVariant.Safe]: this.increaseUnlockTimeSafe.bind(this),
-                [WalletVariant.WalletConnect]: this.increaseUnlockTimeWalletConnect.bind(this),
-            };
-
-            return await map[wallet.variant](wallet, data);
-        },
-        async increaseUnlockTimeSafe(wallet: TWallet, data: { lockEndTimestamp: number }) {
-            const { confirmTransactions } = useWalletStore();
-            const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/increase', {
-                data,
-                params: { walletId: wallet._id },
-            });
-
-            await confirmTransactions(txs);
-        },
-        async increaseUnlockTimeWalletConnect(wallet: TWallet, data: { lockEndTimestamp: number }) {
             const { sendTransaction, chainId } = useWalletStore();
             const abi = [
                 {
@@ -185,7 +132,7 @@ export const useVeStore = defineStore('ve', {
                 [data.lockEndTimestamp],
             );
 
-            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
+            await sendTransaction(wallet.address, call.to, call.data, chainId);
         },
         async waitForIncreaseUnlockTime(wallet: TWallet, timestamp: number) {
             const taskFn = async () => {
@@ -205,23 +152,6 @@ export const useVeStore = defineStore('ve', {
             return await poll({ taskFn, interval: 3000, retries: 20 });
         },
         async claimTokens(wallet: TWallet) {
-            const map: { [variant: string]: (wallet: TWallet) => Promise<void> } = {
-                [WalletVariant.Safe]: this.claimTokenSafe.bind(this),
-                [WalletVariant.WalletConnect]: this.claimTokenWalletConnect.bind(this),
-            };
-
-            return await map[wallet.variant](wallet);
-        },
-        async claimTokenSafe(wallet: TWallet) {
-            const { confirmTransactions } = useWalletStore();
-            const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/claim', {
-                params: { walletId: wallet._id },
-            });
-
-            await confirmTransactions(txs);
-        },
-        async claimTokenWalletConnect(wallet: TWallet) {
             const { sendTransaction, chainId } = useWalletStore();
             const abi = [
                 {
@@ -255,27 +185,9 @@ export const useVeStore = defineStore('ve', {
                 wallet.address,
                 [BAL, BPT],
             ]);
-            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
+            await sendTransaction(wallet.address, call.to, call.data, chainId);
         },
         async withdraw(wallet: TWallet, isEarlyAttempt: boolean) {
-            const map: { [variant: string]: (wallet: TWallet, isEarlyAttempt: boolean) => Promise<void> } = {
-                [WalletVariant.Safe]: this.withdrawSafe.bind(this),
-                [WalletVariant.WalletConnect]: this.withdrawWalletConnect.bind(this),
-            };
-
-            return await map[wallet.variant](wallet, isEarlyAttempt);
-        },
-        async withdrawSafe(wallet: TWallet, isEarlyAttempt: boolean) {
-            const { confirmTransactions } = useWalletStore();
-            const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/withdraw', {
-                data: { isEarlyAttempt: isEarlyAttempt },
-                params: { walletId: wallet._id },
-            });
-
-            await confirmTransactions(txs);
-        },
-        async withdrawWalletConnect(wallet: TWallet, isEarlyAttempt: boolean) {
             const { sendTransaction, chainId } = useWalletStore();
             const method = isEarlyAttempt ? 'withdraw_early' : 'withdraw';
             const abi = [
@@ -288,7 +200,7 @@ export const useVeStore = defineStore('ve', {
                 },
             ];
             const call = useWalletStore().encodeContractCall(contractNetworks[chainId].VotingEscrow, abi, method, []);
-            await sendTransaction(wallet.address, call.to, call.data, ChainId.Polygon);
+            await sendTransaction(wallet.address, call.to, call.data, chainId);
         },
         async waitForWithdrawal(wallet: TWallet) {
             const taskFn = async () => {
