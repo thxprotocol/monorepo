@@ -140,9 +140,7 @@ class SafeService {
         const safe = await this.getSafe(wallet);
         try {
             const apiKit = this.getApiKit(wallet);
-            console.log('get nonce');
             const nonce = await apiKit.getNextNonce(wallet.address);
-            console.log(nonce);
             const safeTx = await safe.createTransaction({
                 safeTransactionData: {
                     to,
