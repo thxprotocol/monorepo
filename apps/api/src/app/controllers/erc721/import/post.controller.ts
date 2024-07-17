@@ -5,18 +5,17 @@ import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { getNFTsForOwner, parseIPFSImageUrl } from '@thxnetwork/api/util/alchemy';
 import { ChainId, ERC721TokenState, NFTVariant } from '@thxnetwork/common/enums';
 import { toChecksumAddress } from 'web3-utils';
+import SafeService from '@thxnetwork/api/services/SafeService';
 
-const validation = [
-    body('address').isEthereumAddress(),
-    body('contractAddress').exists(),
-    body('chainId').exists().isNumeric(),
-];
+const validation = [body('walletId').isMongoId(), body('contractAddress').isEthereumAddress(), body('chainId').isInt()];
 
 const controller = async (req: Request, res: Response) => {
     const chainId = Number(req.body.chainId) as ChainId;
     const contractAddress = toChecksumAddress(req.body.contractAddress);
-    const safeAddress = toChecksumAddress(req.body.address);
-    const ownedNfts = await getNFTsForOwner(safeAddress, contractAddress);
+    const wallet = await SafeService.findById(req.body.walletId);
+    if (!wallet) throw new NotFoundError('No wallet found for this chain');
+
+    const ownedNfts = await getNFTsForOwner(wallet.address, contractAddress);
     if (!ownedNfts.length) throw new NotFoundError('Could not find NFT tokens for this contract address');
 
     const { address, name, symbol } = ownedNfts[0].contract;

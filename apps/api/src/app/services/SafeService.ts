@@ -20,7 +20,6 @@ class SafeService {
         data: { sub: string; chainId: ChainId; safeVersion: '1.3.0'; address?: string; poolId?: string },
         userWalletAddress?: string,
     ) {
-        console.log({ data });
         const wallet = await Wallet.create({
             variant: WalletVariant.Safe,
             ...data,
@@ -218,6 +217,8 @@ class SafeService {
 
     async updateTransactionState(wallet: WalletDocument, safeTxHash: string) {
         const safeTx = await this.getTransaction(wallet, safeTxHash);
+        if (!safeTx) return;
+
         const tx = await Transaction.findOne({ safeTxHash });
         const isSent = tx.state === TransactionState.Sent;
 

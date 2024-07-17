@@ -63,9 +63,7 @@ describe('Account Wallets', () => {
                     expect(res.body.length).toEqual(2);
 
                     const safe = res.body.find((wallet: any) => wallet.variant === WalletVariant.Safe);
-                    console.log({ safe });
                     const wallet = res.body.find((wallet: any) => wallet.variant === WalletVariant.WalletConnect);
-                    console.log({ wallet });
                     expect(safe.sub).toEqual(sub);
                     expect(safe.chainId).toEqual(ChainId.Hardhat);
                     expect(safe.variant).toBe(WalletVariant.Safe);

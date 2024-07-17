@@ -9,15 +9,17 @@ import { ChainId, NFTVariant } from '@thxnetwork/common/enums';
 import { logger } from '@thxnetwork/api/util/logger';
 import { ERC1155Metadata } from '@thxnetwork/api/models/ERC1155Metadata';
 import { toChecksumAddress } from 'web3-utils';
-import PoolService from '@thxnetwork/api/services/PoolService';
+import SafeService from '@thxnetwork/api/services/SafeService';
 
-const validation = [body('contractAddress').exists().isString(), body('chainId').exists().isNumeric()];
+const validation = [body('contractAddress').isEthereumAddress(), body('chainId').isInt(), body('walletId').isMongoId()];
 
 const controller = async (req: Request, res: Response) => {
     const chainId = Number(req.body.chainId) as ChainId;
     const contractAddress = toChecksumAddress(req.body.contractAddress);
-    const pool = await PoolService.getById(req.header('X-PoolId'));
-    const ownedNfts = await getNFTsForOwner(pool.safeAddress, contractAddress);
+    const wallet = await SafeService.findById(req.body.walletId);
+    if (!wallet) throw new NotFoundError('No wallet found for this chain');
+
+    const ownedNfts = await getNFTsForOwner(wallet.address, contractAddress);
     if (!ownedNfts.length) throw new NotFoundError('Could not find NFT tokens for this contract address');
 
     let erc1155 = await ERC1155.findOne({
@@ -49,6 +51,7 @@ const controller = async (req: Request, res: Response) => {
         },
         { upsert: true, new: true },
     );
+
     const erc1155Tokens = await Promise.all(
         ownedNfts.map(async ({ name, description, image, collection, tokenId, tokenUri }) => {
             try {
@@ -70,21 +73,20 @@ const controller = async (req: Request, res: Response) => {
                     },
                     { upsert: true, new: true },
                 );
-                const walletId = String(pool.safe._id);
                 const erc1155Token = await ERC1155Token.findOneAndUpdate(
                     {
                         erc1155Id,
                         tokenId,
                         sub: req.auth.sub,
-                        recipient: pool.safeAddress,
+                        recipient: wallet.address,
                     },
                     {
                         erc1155Id,
                         tokenId,
-                        walletId,
+                        walletId: wallet.id,
                         tokenUri,
                         sub: req.auth.sub,
-                        recipient: pool.safeAddress,
+                        recipient: wallet.address,
                         state: ERC1155TokenState.Minted,
                         metadataId: String(metadata._id),
                     },
