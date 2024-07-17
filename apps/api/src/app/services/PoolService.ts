@@ -31,7 +31,6 @@ import {
 import AccountProxy from '../proxies/AccountProxy';
 import DiscordDataProxy from '../proxies/DiscordDataProxy';
 import MailService from './MailService';
-import SafeService from './SafeService';
 import ParticipantService from './ParticipantService';
 import DiscordService from './DiscordService';
 import ContractService from './ContractService';

@@ -10,7 +10,7 @@ import { isAddress } from 'ethers/lib/utils';
 const http = request.agent(app);
 
 describe('ERC20', () => {
-    const totalSupply = toWei('1000'),
+    const totalSupply = toWei('1000', 'ether'),
         name = 'Test Token',
         symbol = 'TTK';
     let tokenAddress: string, tokenName: string, tokenSymbol: string, erc20Id: string;

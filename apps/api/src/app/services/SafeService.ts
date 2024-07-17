@@ -18,6 +18,7 @@ class SafeService {
     ) {
         const wallet = await Wallet.create({
             variant: WalletVariant.Safe,
+            safeVersion,
             ...data,
         });
         // Present address means Metamask account so do not deploy and return early
@@ -34,10 +35,9 @@ class SafeService {
 
         // If campaign safe we provide a nonce based on the timestamp in the MongoID the pool (poolId value)
         const saltNonce = wallet.poolId && String(convertObjectIdToNumber(wallet.poolId));
-
-        await this.deploy(wallet, owners, saltNonce);
-
-        return wallet;
+        const safeAddress = await this.deploy(wallet, owners, saltNonce);
+        if (safeAddress)
+            return await Wallet.findByIdAndUpdate(wallet.id, { address: safeAddress }, { new: true, upsert: true });
     }
 
     async deploy(wallet: WalletDocument, owners: string[], saltNonce?: string) {
@@ -46,14 +46,13 @@ class SafeService {
             owners,
             threshold: owners.length,
         };
+        const safeAddress = await this.predictAddress(wallet, safeAccountConfig, safeVersion, saltNonce);
         const safeFactory = await SafeFactory.create({
             safeVersion,
             ethAdapter,
             contractNetworks,
         });
 
-        const safeAddress = toChecksumAddress(await safeFactory.predictSafeAddress(safeAccountConfig, saltNonce));
-        console.debug('Predicted Safe Address:', safeAddress);
         try {
             await Safe.create({
                 ethAdapter,
@@ -61,8 +60,31 @@ class SafeService {
                 contractNetworks,
             });
         } catch (error) {
-            await safeFactory.deploySafe({ safeAccountConfig, options: { gasLimit: '3000000' } });
+            await safeFactory.deploySafe({ safeAccountConfig, saltNonce, options: { gasLimit: '3000000' } });
+            console.debug(`[${wallet.sub}] Deployed Safe: ${safeAddress}`, saltNonce);
         }
+
+        return safeAddress;
+    }
+
+    async predictAddress(
+        wallet: WalletDocument,
+        safeAccountConfig: SafeAccountConfig,
+        safeVersion: '1.3.0',
+        saltNonce?: string,
+    ) {
+        if (wallet.address) return wallet.address;
+
+        const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
+        const safeFactory = await SafeFactory.create({
+            safeVersion,
+            ethAdapter,
+            contractNetworks,
+        });
+        const safeAddress = await safeFactory.predictSafeAddress(safeAccountConfig, saltNonce);
+        console.debug('Predicted Safe Address:', safeAddress, saltNonce);
+
+        return toChecksumAddress(safeAddress);
     }
 
     findById(id: string) {
@@ -114,7 +136,9 @@ class SafeService {
         const safe = await this.getSafe(wallet);
         try {
             const apiKit = this.getApiKit(wallet);
+            console.log('get nonce');
             const nonce = await apiKit.getNextNonce(wallet.address);
+            console.log(nonce);
             const safeTx = await safe.createTransaction({
                 safeTransactionData: {
                     to,

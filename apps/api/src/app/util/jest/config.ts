@@ -26,7 +26,6 @@ export async function beforeAllCallback(options = { skipWalletCreation: false })
     const lastDeployedContractAddress = '0x58C0e64cBB7E5C7D0201A3a5c2D899cC70B0dc4c';
     const fn = () => web3.eth.getCode(lastDeployedContractAddress);
     const fnCondition = (result: string) => result === '0x';
-
     await poll(fn, fnCondition, 500);
 
     if (!options.skipWalletCreation) {

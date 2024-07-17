@@ -87,7 +87,9 @@ export default class RewardNFTService implements IRewardService {
         // If erc721Id or erc1155Id, check if campaign safe is minter
         if (data.metadataId) {
             const pool = await PoolService.getById(data.poolId);
+            console.log(pool.id);
             const safe = await SafeService.findOneByPool(pool, pool.chainId);
+            console.log({ safe });
             await this.addMinter(data, safe.address);
         }
 

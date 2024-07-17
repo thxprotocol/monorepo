@@ -83,6 +83,8 @@ class NetworkService {
         if (!options.rpc) return;
 
         const { apiKey, apiSecret } = options.relayer;
+        if (!apiKey || !apiSecret) return;
+
         const provider = new DefenderRelayProvider({ apiKey, apiSecret }, { speed: RELAYER_SPEED });
         const relayer = new Relayer({ apiKey, apiSecret });
         const signer = new DefenderRelaySigner(

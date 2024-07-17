@@ -6044,13 +6044,13 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.13.0.tgz#6abd79db7ff8d01a58865ba20a63cfd23d9e2a10"
   integrity sha512-UKXUQNbO3DOhzLRwHSpa0HnhhCgNODvfoPWv2FCXme8N/ANFfhIPMGuOT+QuKd16+B5yxZ0HdpNlqPvTMS1qfw==
 
-"@safe-global/api-kit@1.3.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@safe-global/api-kit/-/api-kit-1.3.0.tgz#3606aa52a3d5d0d46817fafc38572be7be1eaf31"
-  integrity sha512-3fdvoBtgufzmqmoBHir7vbS5N2t9Yc4kTeIJmAgmAGl8rHAy3z1bSv5uoEHYSMow34q1Am1aUar6vVAwwkIXhg==
+"@safe-global/api-kit@1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@safe-global/api-kit/-/api-kit-1.3.1.tgz#108f5ba2f3770354abcec91225cc1ae21ee417a8"
+  integrity sha512-JKvCNs8p+42+N8pV2MIqoXlBLckTe5CKboVT7t9mTluuA66i5W8+Kr+B5j9D//EIU5vO7iSOOIYnJuA2ck4XRQ==
   dependencies:
     "@ethersproject/abstract-signer" "^5.7.0"
-    "@safe-global/safe-core-sdk-types" "^2.2.0"
+    "@safe-global/safe-core-sdk-types" "^2.3.0"
     node-fetch "^2.6.6"
 
 "@safe-global/protocol-kit@1.3.0":
@@ -6085,7 +6085,7 @@
     "@safe-global/safe-gateway-typescript-sdk" "^3.5.3"
     viem "^1.0.0"
 
-"@safe-global/safe-core-sdk-types@^2.2.0":
+"@safe-global/safe-core-sdk-types@^2.3.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@safe-global/safe-core-sdk-types/-/safe-core-sdk-types-2.3.0.tgz#e3be109e58a2d224d1b89052563b04f3efed4bec"
   integrity sha512-dU0KkDV1KJNf11ajbUjWiSi4ygdyWfhk1M50lTJWUdCn1/2Bsb/hICM8LoEk6DCoFumxaoCet02SmYakXsW2CA==
