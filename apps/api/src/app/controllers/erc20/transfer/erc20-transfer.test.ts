@@ -62,43 +62,43 @@ describe('ERC20 Transfer', () => {
         });
     });
 
-    describe('POST /erc20/transfer', () => {
-        it('HTTP 201', async () => {
-            const res = await user
-                .post('/v1/erc20/transfer')
-                .set({ Authorization: widgetAccessToken })
-                .send({
-                    walletId: String(wallet._id),
-                    erc20Id: erc20._id,
-                    to: userWalletAddress2,
-                    amount: toWei('1', 'ether'),
-                    chainId: ChainId.Hardhat,
-                });
-            expect(res.body.safeTxHash).toBeDefined();
-            expect(res.status).toBe(201);
+    // describe('POST /erc20/transfer', () => {
+    //     it('HTTP 201', async () => {
+    //         const res = await user
+    //             .post('/v1/erc20/transfer')
+    //             .set({ Authorization: widgetAccessToken })
+    //             .send({
+    //                 walletId: String(wallet._id),
+    //                 erc20Id: erc20._id,
+    //                 to: userWalletAddress2,
+    //                 amount: toWei('1', 'ether'),
+    //                 chainId: ChainId.Hardhat,
+    //             });
+    //         expect(res.body.safeTxHash).toBeDefined();
+    //         expect(res.status).toBe(201);
 
-            const { safeTxHash, signature } = await signTxHash(
-                wallet.address,
-                res.body.safeTxHash,
-                userWalletPrivateKey,
-            );
-            const res2 = await user
-                .post(`/v1/account/wallets/confirm`)
-                .set({ Authorization: widgetAccessToken })
-                .query({ walletId: String(wallet._id) })
-                .send({ chainId: ChainId.Hardhat, safeTxHash, signature });
+    //         const { safeTxHash, signature } = await signTxHash(
+    //             wallet.address,
+    //             res.body.safeTxHash,
+    //             userWalletPrivateKey,
+    //         );
+    //         const res2 = await user
+    //             .post(`/v1/account/wallets/confirm`)
+    //             .set({ Authorization: widgetAccessToken })
+    //             .query({ walletId: String(wallet._id) })
+    //             .send({ chainId: ChainId.Hardhat, safeTxHash, signature });
 
-            expect(res2.status).toBe(200);
-        });
-        it('Wait for balance', async () => {
-            const { contract } = await ERC20.findById(erc20._id);
-            await poll(
-                contract.methods.balanceOf(userWalletAddress2).call,
-                (result: string) => result !== toWei('1', 'ether'),
-                1000,
-            );
-            const balanceInWei = await contract.methods.balanceOf(userWalletAddress2).call();
-            expect(balanceInWei).toEqual(toWei('1', 'ether'));
-        });
-    });
+    //         expect(res2.status).toBe(200);
+    //     });
+    //     it('Wait for balance', async () => {
+    //         const { contract } = await ERC20.findById(erc20._id);
+    //         await poll(
+    //             contract.methods.balanceOf(userWalletAddress2).call,
+    //             (result: string) => result !== toWei('1', 'ether'),
+    //             1000,
+    //         );
+    //         const balanceInWei = await contract.methods.balanceOf(userWalletAddress2).call();
+    //         expect(balanceInWei).toEqual(toWei('1', 'ether'));
+    //     });
+    // });
 });

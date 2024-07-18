@@ -18,7 +18,13 @@
             end
         >
             <template v-if="walletStore.wallet" #button-content>
-                <b-avatar badge-variant="light" :src="walletImgURL" size="1.2rem" class="me-2" />
+                <b-img
+                    v-if="isWalletConnect"
+                    :src="chainList[walletStore.chainId].logo"
+                    width="15"
+                    height="15"
+                    class="me-2"
+                />
                 {{ walletStore.wallet.short }}
             </template>
             <template v-else #button-content> Connect </template>

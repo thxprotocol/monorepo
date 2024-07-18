@@ -15,7 +15,7 @@
         <div v-for="(token, key) of list" :key="key" class="mb-1">
             <component :is="token.component" :token="token" />
         </div>
-        <div v-if="!list.length" class="text-center text-opaque">Nothing here...</div>
+        <div v-if="!isListShown" class="text-center text-opaque">Nothing here...</div>
     </div>
 </template>
 
@@ -93,6 +93,9 @@ export default defineComponent({
                 })
                 .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
                 .reverse();
+        },
+        isListShown() {
+            return !this.list.length;
         },
     },
     mounted() {

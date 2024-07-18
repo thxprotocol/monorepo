@@ -1,19 +1,16 @@
 import { Wallet, WalletDocument, PoolDocument, TransactionDocument, Transaction } from '@thxnetwork/api/models';
-import { ChainId, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
-import { contractNetworks, getArtifact } from '@thxnetwork/api/hardhat';
+import { ChainId, JobType, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
+import { contractNetworks } from '@thxnetwork/api/hardhat';
 import { toChecksumAddress } from 'web3-utils';
-import { convertObjectIdToNumber } from '../util';
 import { safeVersion } from '@thxnetwork/api/services/ContractService';
-import { MINIMUM_GAS_LIMIT } from '../config/secrets';
-import {
-    SafeTransaction,
-    SafeMultisigTransactionResponse,
-    MetaTransactionData,
-} from '@safe-global/safe-core-sdk-types';
+import { SafeTransaction, MetaTransactionData } from '@safe-global/safe-core-sdk-types';
+import { convertObjectIdToNumber } from '../util';
 import SafeApiKit from '@safe-global/api-kit';
 import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/protocol-kit';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import TransactionService from './TransactionService';
+import { Job } from '@hokify/agenda';
+import { agenda } from '../util/agenda';
 
 class SafeService {
     async create(
@@ -50,11 +47,6 @@ class SafeService {
             threshold: owners.length,
         };
         const safeAddress = await this.predictAddress(wallet, safeAccountConfig, safeVersion, saltNonce);
-        const safeFactory = await SafeFactory.create({
-            safeVersion,
-            ethAdapter,
-            contractNetworks,
-        });
 
         try {
             await Safe.create({
@@ -63,11 +55,31 @@ class SafeService {
                 contractNetworks,
             });
         } catch (error) {
-            await safeFactory.deploySafe({ safeAccountConfig, saltNonce, options: { gasLimit: '3000000' } });
+            await agenda.now(JobType.DeploySafe, { data: { safeAccountConfig, saltNonce, chainId: wallet.chainId } });
             console.debug(`[${wallet.sub}] Deployed Safe: ${safeAddress}`, saltNonce);
         }
 
         return safeAddress;
+    }
+
+    async deploySafeJob({ attrs: { data } }: Job) {
+        const { safeAccountConfig, saltNonce, chainId } = data as {
+            safeAccountConfig: SafeAccountConfig;
+            saltNonce: string;
+            chainId: ChainId;
+        };
+        const { ethAdapter } = NetworkService.getProvider(chainId);
+        const safeFactory = await SafeFactory.create({
+            ethAdapter,
+            safeVersion,
+            contractNetworks,
+        });
+
+        try {
+            await safeFactory.deploySafe({ safeAccountConfig, saltNonce, options: { gasLimit: '3000000' } });
+        } catch (error) {
+            console.error(error.response ? error.response.data : error.message);
+        }
     }
 
     async predictAddress(
@@ -185,33 +197,40 @@ class SafeService {
         }
     }
 
-    async executeTransaction(wallet: WalletDocument, tx: TransactionDocument) {
-        const pendingTx = await this.getTransaction(wallet, tx.safeTxHash);
-        if (!pendingTx) return;
+    async executeTransaction(tx: TransactionDocument) {
+        try {
+            const wallet = await Wallet.findById(tx.walletId);
+            if (!wallet) throw new Error('Wallet not found');
 
-        const { confirmations, confirmationsRequired } = pendingTx;
-        if (confirmations && confirmations.length >= confirmationsRequired) {
-            // Get encoded signatures for tx through sdk and use it for gas estimation
-            const safe = await this.getSafe(wallet);
-            const safeTx = await safe.toSafeTransactionType(pendingTx);
+            const pendingTx = await this.getTransaction(wallet, tx.safeTxHash);
+            if (!wallet) throw new Error('Pending TX not found');
 
-            try {
-                await safe.executeTransaction(safeTx);
-                await tx.updateOne({
-                    state: TransactionState.Sent,
-                });
-            } catch (error) {
-                // Suppress non breaking gas estimation error and start polling for state
-                if (error.message.includes('GS026')) {
-                    await tx.updateOne({
-                        state: TransactionState.Sent,
-                    });
-                } else {
-                    throw error;
+            const { confirmations, confirmationsRequired } = pendingTx;
+            if (confirmations && confirmations.length >= confirmationsRequired) {
+                const safe = await this.getSafe(wallet);
+                const safeTx = await safe.toSafeTransactionType(pendingTx);
+
+                try {
+                    const response = await safe.executeTransaction(safeTx);
+                    const receipt = await response.transactionResponse.wait();
+                    if (!receipt) throw new Error(`No receipt found for ${tx.safeTxHash}`);
+                    console.log(receipt);
+
+                    await tx.updateOne({ transactionHash: receipt.transactionHash, state: TransactionState.Sent });
+                } catch (error) {
+                    // Suppress non breaking gas estimation error and start polling for state
+                    if (error.message.includes('GS026')) {
+                        await tx.updateOne({ state: TransactionState.Sent });
+                    } else {
+                        throw error;
+                    }
                 }
+            } else {
+                console.debug('Require more confirmations:', pendingTx.safeTxHash);
             }
-        } else {
-            console.debug('Require more confirmations:', pendingTx);
+        } catch (error) {
+            await tx.updateOne({ state: TransactionState.Failed });
+            console.error('Error executing transaction:', error.response ? error.response.data : error.message);
         }
     }
 
@@ -223,12 +242,7 @@ class SafeService {
         const isSent = tx.state === TransactionState.Sent;
 
         if (isSent && safeTx.isExecuted && safeTx.isSuccessful) {
-            await TransactionService.queryTransactionStatus(
-                await tx.updateOne(
-                    { transactionHash: safeTx.transactionHash, state: TransactionState.Mined },
-                    { new: true },
-                ),
-            );
+            await TransactionService.queryTransactionStatusReceipt(tx);
             console.debug('Transaction success:', safeTx);
         }
 
@@ -238,19 +252,12 @@ class SafeService {
         }
     }
 
-    // Using only the API call here will avoid reading for the RPC which speeds up the process significantly
     async getTransaction(wallet: WalletDocument, safeTxHash: string) {
-        // const { txServiceUrl } = NetworkService.getProvider(wallet.chainId);
         const apiKit = this.getApiKit(wallet);
         try {
             const safeTx = await apiKit.getTransaction(safeTxHash);
-            // const { data: safeTx } = await axios({
-            //     url: `${txServiceUrl}/api/v1/multisig-transactions/${safeTxHash}`,
-            //     method: 'GET',
-            // });
             console.debug('Transaction get:', safeTx);
-
-            return safeTx as SafeMultisigTransactionResponse;
+            return safeTx;
         } catch (error) {
             console.error('Error transaction get:', error.response ? error.response.data : error.message);
         }
@@ -267,36 +274,9 @@ class SafeService {
         }
     }
 
-    private async estimateGas(wallet: WalletDocument, safeTxResponse: SafeMultisigTransactionResponse) {
-        try {
-            const safe = await this.getSafe(wallet);
-            const safeTx = await safe.toSafeTransactionType(safeTxResponse);
-            const { web3 } = NetworkService.getProvider(wallet.chainId);
-            const contract = new web3.eth.Contract(getArtifact('GnosisSafeL2').abi, wallet.address);
-            const fn = contract.methods.execTransaction(
-                safeTxResponse.to,
-                safeTxResponse.value,
-                safeTxResponse.data,
-                safeTxResponse.operation,
-                safeTxResponse.safeTxGas,
-                safeTxResponse.baseGas,
-                safeTxResponse.gasPrice,
-                safeTxResponse.gasToken,
-                safeTxResponse.refundReceiver,
-                safeTx.encodedSignatures,
-            );
-            const estimate = await fn.estimateGas({ from: wallet.address });
-            const gas = estimate < MINIMUM_GAS_LIMIT ? MINIMUM_GAS_LIMIT : estimate;
-            console.debug('Gas estimated:', gas);
-            return gas;
-        } catch (error) {
-            console.error('Error estimating transaction:', error.response ? error.response.data : error.message);
-        }
-    }
-
     async getLastPendingTransactions(wallet: WalletDocument) {
-        // pending tx
-        return {};
+        const apiKit = this.getApiKit(wallet);
+        return await apiKit.getPendingTransactions(wallet.address);
     }
 
     private async getSafe(wallet: WalletDocument) {

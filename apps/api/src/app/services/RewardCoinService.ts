@@ -144,6 +144,8 @@ export default class RewardCoinService implements IRewardService {
 
         const pool = await PoolService.getById(poolId);
         const wallet = await SafeService.findOneByPool(pool, erc20.chainId);
+        if (!wallet) throw new Error('No campaign wallet found for this network');
+
         const isMinter = await ERC20Service.isMinter(erc20, wallet.address);
         if (!isMinter) {
             await ERC20Service.addMinter(erc20, wallet.address);

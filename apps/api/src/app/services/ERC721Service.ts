@@ -85,16 +85,24 @@ export async function mint(
     wallet: WalletDocument,
     metadata: ERC721MetadataDocument,
 ): Promise<ERC721TokenDocument> {
-    const tokenUri = await IPFSService.getTokenURI(erc721, String(metadata._id));
-    const erc721token = await ERC721Token.create({
+    const tokenUri = await IPFSService.getTokenURI(erc721, metadata.id);
+    const query = {
+        erc721Id: erc721.id,
         sub: wallet.sub,
         tokenUri: erc721.baseURL + tokenUri,
-        recipient: wallet.address,
-        state: ERC721TokenState.Pending,
-        erc721Id: String(erc721._id),
-        metadataId: String(metadata._id),
-        walletId: wallet._id,
-    });
+        metadataId: metadata.id,
+        walletId: wallet.id,
+        chainId: erc721.chainId,
+    };
+    const erc721token = await ERC721Token.findOneAndUpdate(
+        query,
+        {
+            ...query,
+            state: ERC721TokenState.Pending,
+            recipient: wallet.address,
+        },
+        { upsert: true, new: true },
+    );
 
     const tx = await TransactionService.sendSafeAsync(
         safe,
@@ -102,13 +110,13 @@ export async function mint(
         erc721.contract.methods.mint(wallet.address, tokenUri),
         {
             type: 'erc721TokenMintCallback',
-            args: { erc721tokenId: String(erc721token._id) },
+            args: { erc721tokenId: erc721token.id },
         },
     );
 
     return await ERC721Token.findByIdAndUpdate(
-        erc721token._id,
-        { transactions: [String(tx._id)], state: ERC721TokenState.Transferring },
+        erc721token.id,
+        { transactions: [tx.id], state: ERC721TokenState.Transferring },
         { new: true },
     );
 }

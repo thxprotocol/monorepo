@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
+import { defineStore } from 'pinia';
 import { track } from '@thxnetwork/common/mixpanel';
 import { useAuthStore } from './Auth';
 import { ChainId } from '@thxnetwork/common/enums';
@@ -38,11 +38,16 @@ export const walletLogoMap: { [variant: string]: string } = {
 };
 
 const wagmiConfig = defaultWagmiConfig({
-    chains: [mainnet, ...Object.values(chainList).map((item) => item.chain)],
+    chains: [
+        mainnet,
+        ...Object.values(chainList)
+            .map((item) => item.chain)
+            .filter((chain) => chain !== mainnet),
+    ],
     projectId: WALLET_CONNECT_PROJECT_ID,
     metadata: {
         name: 'THX Network',
-        description: 'THX Network Campaign Discovery',
+        description: 'THX Network',
         url: WIDGET_URL,
         icons: [AUTH_URL + '/img/logo.png'],
     },

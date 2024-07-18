@@ -55,14 +55,11 @@ class TransactionService {
             const args: RelayerTransactionPayload = {
                 data,
                 speed: RELAYER_SPEED,
-                gasLimit: 1000000,
+                gasLimit: gas || 3000000,
             };
             if (tx.to) args.to = tx.to;
 
-            console.log('Transaction sent to Relayer', args);
             const defenderTx = await relayer.sendTransaction(args);
-            console.log('Transaction received by Relayer', defenderTx);
-
             await tx.updateOne({
                 transactionId: defenderTx.transactionId,
                 transactionHash: defenderTx.hash,
@@ -143,25 +140,8 @@ class TransactionService {
         }
     }
 
-    async queryTransactionStatus(tx: TransactionDocument) {
-        const { web3 } = NetworkService.getProvider(tx.chainId);
-        try {
-            const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-            if (receipt) {
-                // Wait 500 ms for transactions to be propagated to all nodes.
-                // Since we use multiple RPCs it happens we already have the receipt but the other RPC
-                // doesn't have the block available yet.
-                await new Promise((done) => setTimeout(done, 500));
-
-                await this.transactionMined(tx, receipt);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
     async queryTransactionStatusReceipt(tx: TransactionDocument) {
-        if ([TransactionState.Mined, TransactionState.Failed].includes(tx.state)) {
+        if ([TransactionState.Mined, TransactionState.Failed].includes(tx.state) || !tx.transactionHash) {
             return tx;
         }
         const { web3 } = NetworkService.getProvider(tx.chainId);
@@ -220,7 +200,6 @@ class TransactionService {
             data,
             value: '0',
         });
-        console.log({ safeTxHash });
         if (!safeTxHash) throw new Error("Couldn't propose transaction.");
 
         return await Transaction.create({
@@ -237,7 +216,7 @@ class TransactionService {
 
     async sendSafeAsync(wallet: WalletDocument, to: string | null, fn: any, callback?: TTransactionCallback) {
         const data = fn.encodeABI();
-        return this.proposeSafeAsync(wallet, to, data, callback);
+        return await this.proposeSafeAsync(wallet, to, data, callback);
     }
 }
 

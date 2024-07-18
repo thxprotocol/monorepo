@@ -67,6 +67,13 @@ const chainList: { [chainId: number]: ChainInfo } = {
         blockExplorer: 'https://basescan.org',
         chain: base,
     },
+    [ChainId.Hardhat]: {
+        chainId: ChainId.Hardhat,
+        name: 'Hardhat',
+        logo: ImgLogoHardhat,
+        blockExplorer: 'https://hardhatscan.org',
+        chain: hardhat,
+    },
 };
 
 if (PROD) {

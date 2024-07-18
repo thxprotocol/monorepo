@@ -1,8 +1,7 @@
 import { TransactionState, TransactionType } from '@thxnetwork/common/enums';
 import { Transaction, TransactionDocument } from '@thxnetwork/api/models/Transaction';
-import { Wallet } from '../models/Wallet';
-import { logger } from '../util/logger';
 import SafeService from '../services/SafeService';
+import TransactionService from '../services/TransactionService';
 
 export async function updatePendingTransactions() {
     const transactions: TransactionDocument[] = await Transaction.find({
@@ -14,28 +13,15 @@ export async function updatePendingTransactions() {
         try {
             switch (tx.state) {
                 case TransactionState.Confirmed: {
-                    if (!tx.walletId) continue;
-
-                    const wallet = await Wallet.findById(tx.walletId);
-
-                    try {
-                        await SafeService.executeTransaction(wallet, tx);
-                    } catch (error) {
-                        console.debug(error);
-                        await tx.updateOne({ state: TransactionState.Failed });
-                        console.error(
-                            'Error executing transaction:',
-                            error.response ? error.response.data : error.message,
-                        );
+                    if (tx.walletId) {
+                        await SafeService.executeTransaction(tx);
                     }
-
                     break;
                 }
                 case TransactionState.Sent: {
                     if (tx.type == TransactionType.Relayed) {
-                        logger.debug(`Update transaction: ${tx.transactionHash}`);
-                        const wallet = await Wallet.findById(tx.walletId);
-                        await SafeService.updateTransactionState(wallet, tx.safeTxHash);
+                        console.debug(`Update transaction: ${tx.transactionHash}`);
+                        await TransactionService.queryTransactionStatusReceipt(tx);
                     }
                     break;
                 }

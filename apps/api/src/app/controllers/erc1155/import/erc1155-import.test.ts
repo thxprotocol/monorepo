@@ -75,7 +75,6 @@ describe('ERC1155 import', () => {
             .send({ walletId: wallet._id, chainId, contractAddress: nftContract.options.address, name: nftName })
             .expect(201)
             .expect(({ body }: request.Response) => {
-                console.log(body);
                 expect(body.erc1155._id).toBeDefined();
                 expect(body.erc1155.address).toBe(nftContract.options.address);
 

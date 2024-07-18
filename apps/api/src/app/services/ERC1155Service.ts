@@ -112,22 +112,21 @@ export async function mint(
     amount: string,
 ): Promise<ERC1155TokenDocument> {
     const tokenUri = await IPFSService.getTokenURI(erc1155, String(metadata._id), String(metadata.tokenId));
+    const query = {
+        erc1155Id: erc1155.id,
+        tokenId: metadata.tokenId,
+        sub: wallet.sub,
+        walletId: wallet.id,
+        chainId: erc1155.chainId,
+    };
     const erc1155token = await ERC1155Token.findOneAndUpdate(
+        query,
         {
-            erc1155Id: String(erc1155._id),
-            tokenId: metadata.tokenId,
-            sub: wallet.sub,
-            walletId: String(wallet._id),
-        },
-        {
-            sub: wallet.sub,
+            ...query,
+            state: ERC1155TokenState.Pending,
             tokenUri: erc1155.baseURL.replace('{id}', tokenUri),
             recipient: wallet.address,
-            state: ERC1155TokenState.Pending,
-            erc1155Id: String(erc1155._id),
-            metadataId: String(metadata._id),
-            walletId: String(wallet._id),
-            tokenId: metadata.tokenId,
+            metadataId: metadata.id,
         },
         { upsert: true, new: true },
     );

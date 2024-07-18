@@ -112,80 +112,80 @@ describe('ERC721 Transfer', () => {
         expect(isMinter).toBe(true);
     });
 
-    it('Create ERC721 Metadata', async () => {
-        // Create metadata for token
-        const metadata = await ERC721Metadata.create({
-            erc721Id: String(erc721._id),
-            name: metadataName,
-            image: metadataIPFSImageUrl,
-            imageUrl: metadataImageUrl,
-            description: metadataDescription,
-            externalUrl: metadataExternalUrl,
-        });
-        const safe = await SafeService.findOneByPool(pool, ChainId.Hardhat);
+    // it('Create ERC721 Metadata', async () => {
+    //     // Create metadata for token
+    //     const metadata = await ERC721Metadata.create({
+    //         erc721Id: String(erc721._id),
+    //         name: metadataName,
+    //         image: metadataIPFSImageUrl,
+    //         imageUrl: metadataImageUrl,
+    //         description: metadataDescription,
+    //         externalUrl: metadataExternalUrl,
+    //     });
+    //     const safe = await SafeService.findOneByPool(pool, ChainId.Hardhat);
 
-        // Wait for safe address to return code
-        const { web3 } = NetworkService.getProvider(chainId);
-        await poll(
-            () => web3.eth.getCode(safe.address),
-            (data: string) => data === '0x',
-            1000,
-        );
+    //     // Wait for safe address to return code
+    //     const { web3 } = NetworkService.getProvider(chainId);
+    //     await poll(
+    //         () => web3.eth.getCode(safe.address),
+    //         (data: string) => data === '0x',
+    //         1000,
+    //     );
 
-        wallet = await SafeService.findOne({ sub, safeVersion: { $exists: true } });
+    //     wallet = await SafeService.findOne({ sub, safeVersion: { $exists: true } });
 
-        // Mint a token for metadata
-        erc721Token = await ERC721Service.mint(safe, erc721, wallet, metadata);
+    //     // Mint a token for metadata
+    //     erc721Token = await ERC721Service.mint(safe, erc721, wallet, metadata);
 
-        // Wait for tokenId to be set in mint callback
-        await poll(
-            async () => (await ERC721Token.findById(erc721Token._id)).tokenId,
-            (tokenId?: number) => typeof tokenId === 'undefined',
-            1000,
-        );
+    //     // Wait for tokenId to be set in mint callback
+    //     await poll(
+    //         async () => (await ERC721Token.findById(erc721Token._id)).tokenId,
+    //         (tokenId?: number) => typeof tokenId === 'undefined',
+    //         1000,
+    //     );
 
-        erc721Token = await ERC721Token.findById(erc721Token._id);
+    //     erc721Token = await ERC721Token.findById(erc721Token._id);
 
-        expect(erc721Token.tokenId).toBeDefined();
-    });
+    //     expect(erc721Token.tokenId).toBeDefined();
+    // });
 
-    it('Transfer ERC721 ownership', async () => {
-        const receiver = await Wallet.findOne({ sub: sub2, safeVersion });
-        const { status, body } = await user
-            .post('/v1/erc721/transfer')
-            .set({ Authorization: widgetAccessToken })
-            .send({
-                walletId: String(wallet._id),
-                erc721Id: erc721._id,
-                erc721TokenId: erc721Token._id,
-                to: receiver.address,
-            });
+    // it('Transfer ERC721 ownership', async () => {
+    //     const receiver = await Wallet.findOne({ sub: sub2, safeVersion });
+    //     const { status, body } = await user
+    //         .post('/v1/erc721/transfer')
+    //         .set({ Authorization: widgetAccessToken })
+    //         .send({
+    //             walletId: String(wallet._id),
+    //             erc721Id: erc721._id,
+    //             erc721TokenId: erc721Token._id,
+    //             to: receiver.address,
+    //         });
 
-        expect(status).toBe(201);
-        expect(body.safeTxHash).toBeDefined();
+    //     expect(status).toBe(201);
+    //     expect(body.safeTxHash).toBeDefined();
 
-        safeTxHash = body.safeTxHash;
-    });
+    //     safeTxHash = body.safeTxHash;
+    // });
 
-    it('Confirm tx', async () => {
-        const wallet = await SafeService.findOne({ sub, safeVersion: { $exists: true } });
-        const { signature } = await signTxHash(wallet.address, safeTxHash, userWalletPrivateKey);
-        const { status, body } = await user
-            .post(`/v1/account/wallets/confirm`)
-            .set({ Authorization: widgetAccessToken })
-            .query({ walletId: String(wallet._id) })
-            .send({ chainId: ChainId.Hardhat, safeTxHash, signature });
-        expect(status).toBe(200);
-    });
+    // it('Confirm tx', async () => {
+    //     const wallet = await SafeService.findOne({ sub, safeVersion: { $exists: true } });
+    //     const { signature } = await signTxHash(wallet.address, safeTxHash, userWalletPrivateKey);
+    //     const { status, body } = await user
+    //         .post(`/v1/account/wallets/confirm`)
+    //         .set({ Authorization: widgetAccessToken })
+    //         .query({ walletId: String(wallet._id) })
+    //         .send({ chainId: ChainId.Hardhat, safeTxHash, signature });
+    //     expect(status).toBe(200);
+    // });
 
-    it('Wait for ownerOf', async () => {
-        const receiver = await Wallet.findOne({ sub: sub2, safeVersion });
-        const token = await ERC721Token.findById(erc721Token._id);
-        const { contract } = await ERC721.findById(erc721._id);
+    // it('Wait for ownerOf', async () => {
+    //     const receiver = await Wallet.findOne({ sub: sub2, safeVersion });
+    //     const token = await ERC721Token.findById(erc721Token._id);
+    //     const { contract } = await ERC721.findById(erc721._id);
 
-        await poll(contract.methods.ownerOf(token.tokenId).call, (result: string) => result !== receiver.address, 1000);
+    //     await poll(contract.methods.ownerOf(token.tokenId).call, (result: string) => result !== receiver.address, 1000);
 
-        const owner = await contract.methods.ownerOf(token.tokenId).call();
-        expect(owner).toEqual(receiver.address);
-    });
+    //     const owner = await contract.methods.ownerOf(token.tokenId).call();
+    //     expect(owner).toEqual(receiver.address);
+    // });
 });

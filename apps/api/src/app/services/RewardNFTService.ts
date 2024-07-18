@@ -8,7 +8,7 @@ import {
     RewardNFTPayment,
     WalletDocument,
 } from '@thxnetwork/api/models';
-import { NFTVariant } from '@thxnetwork/common/enums';
+import { NFTVariant, WalletVariant } from '@thxnetwork/common/enums';
 import { IRewardService } from './interfaces/IRewardService';
 import ERC721Service from './ERC721Service';
 import ERC1155Service from './ERC1155Service';
@@ -76,7 +76,7 @@ export default class RewardNFTService implements IRewardService {
         }
 
         // Check receiving wallet for chain compatibility
-        if (wallet.chainId !== nft.chainId) {
+        if (wallet.variant === WalletVariant.Safe && wallet.chainId !== nft.chainId) {
             return { result: false, reason: 'Your wallet is not on the same chain as the NFT contract.' };
         }
 
@@ -89,6 +89,7 @@ export default class RewardNFTService implements IRewardService {
             const nft = await this.findNFT(data);
             const pool = await PoolService.getById(data.poolId);
             const safe = await SafeService.findOneByPool(pool, nft.chainId);
+            if (!safe) throw new Error('No campaign wallet found for this network');
 
             await this.addMinter(data, safe.address);
         }
@@ -105,7 +106,6 @@ export default class RewardNFTService implements IRewardService {
     }
 
     async createPayment({ reward, wallet }: { reward: RewardNFTDocument; wallet?: WalletDocument }) {
-        const erc1155Amount = reward.erc1155Amount && String(reward.erc1155Amount);
         const nft = await this.findNFT(reward);
         if (!nft) throw new Error('NFT not found');
 
@@ -115,6 +115,7 @@ export default class RewardNFTService implements IRewardService {
 
         // Get token and metadata for either ERC721 or ERC1155 based contracts
         // and mint if metadataId is present or transfer if tokenId is present
+        const erc1155Amount = reward.erc1155Amount && String(reward.erc1155Amount);
         let token: ERC721TokenDocument | ERC1155TokenDocument,
             metadata: ERC721MetadataDocument | ERC1155MetadataDocument;
         // Mint a token if metadataId is present
