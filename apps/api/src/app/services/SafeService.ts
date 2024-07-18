@@ -55,19 +55,15 @@ class SafeService {
                 contractNetworks,
             });
         } catch (error) {
-            await agenda.now(JobType.DeploySafe, { data: { safeAccountConfig, saltNonce, chainId: wallet.chainId } });
+            await agenda.now(JobType.DeploySafe, { safeAccountConfig, saltNonce, chainId: wallet.chainId });
             console.debug(`[${wallet.sub}] Deployed Safe: ${safeAddress}`, saltNonce);
         }
 
         return safeAddress;
     }
 
-    async deploySafeJob({ attrs: { data } }: Job) {
-        const { safeAccountConfig, saltNonce, chainId } = data as {
-            safeAccountConfig: SafeAccountConfig;
-            saltNonce: string;
-            chainId: ChainId;
-        };
+    async deploySafeJob({ attrs }: Job & TJobDeploySafe) {
+        const { safeAccountConfig, saltNonce, chainId } = attrs.data;
         const { ethAdapter } = NetworkService.getProvider(chainId);
         const safeFactory = await SafeFactory.create({
             ethAdapter,
