@@ -62,15 +62,15 @@ class SafeService {
         return safeAddress;
     }
 
-    async deploySafeJob({ attrs }: Job & TJobDeploySafe) {
-        const { safeAccountConfig, saltNonce, chainId } = attrs.data;
+    async deploySafeJob({ attrs }: Job) {
+        const { safeAccountConfig, saltNonce, chainId } = attrs.data as TJobDeploySafe;
         const { ethAdapter } = NetworkService.getProvider(chainId);
         const safeFactory = await SafeFactory.create({
             ethAdapter,
             safeVersion,
             contractNetworks,
         });
-
+        console.log({ safeAccountConfig, saltNonce, options: { gasLimit: '3000000' } });
         try {
             await safeFactory.deploySafe({ safeAccountConfig, saltNonce, options: { gasLimit: '3000000' } });
         } catch (error) {
