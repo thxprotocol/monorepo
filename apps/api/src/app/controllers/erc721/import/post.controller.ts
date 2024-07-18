@@ -70,6 +70,7 @@ const controller = async (req: Request, res: Response) => {
                         tokenUri,
                         tokenId,
                         state: ERC721TokenState.Minted,
+                        chainId: req.body.chainId,
                     },
                     { upsert: true, new: true },
                 );
