@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import { param } from 'express-validator';
 import { Participant, QuestInvite, QuestInviteCode } from '@thxnetwork/api/models';
+import { NotFoundError } from '@thxnetwork/api/util/errors';
 import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 import QuestService from '@thxnetwork/api/services/QuestService';
-import { NotFoundError } from '@thxnetwork/api/util/errors';
 import PoolService from '@thxnetwork/api/services/PoolService';
-import { id } from 'date-fns/locale';
 import BrandService from '@thxnetwork/api/services/BrandService';
 
 const validation = [param('code').isString()];

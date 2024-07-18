@@ -46,6 +46,7 @@
         <template #footer>
             <b-button
                 v-if="participant && !participant.isSubscribed"
+                :disabled="isDisabledSubscribe"
                 variant="primary"
                 class="w-100 rounded-pill"
                 @click="onClickSubscribe"
@@ -107,6 +108,9 @@ export default defineComponent({
             const { participants, poolId } = useAccountStore();
             return participants.find((p) => p.poolId === poolId);
         },
+        isDisabledSubscribe() {
+            return !this.isEmailValid || this.isSubmitting;
+        },
     },
     watch: {
         show(value) {
@@ -122,12 +126,14 @@ export default defineComponent({
         },
         async onClickSubscribe() {
             this.subscribeError = '';
-
+            this.isSubmitting = true;
             try {
                 await this.accountStore.updateParticipant({ email: this.email, isSubscribed: true });
             } catch (response) {
                 const { error } = response as any;
                 this.subscribeError = error.message;
+            } finally {
+                this.isSubmitting = false;
             }
         },
         async onClickContinue() {
