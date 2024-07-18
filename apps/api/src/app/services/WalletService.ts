@@ -1,7 +1,7 @@
 import { Wallet } from '@thxnetwork/api/models/Wallet';
 import { TransactionState, WalletVariant } from '@thxnetwork/common/enums';
 import { Transaction } from '@thxnetwork/api/models/Transaction';
-import ContractService, { safeVersion } from './ContractService';
+import { safeVersion } from './ContractService';
 import SafeService from './SafeService';
 
 export default class WalletService {
@@ -45,22 +45,23 @@ export default class WalletService {
             [WalletVariant.Safe]: WalletService.createSafe,
             [WalletVariant.WalletConnect]: WalletService.createWalletConnect,
         };
-        return map[variant]({ ...(data as TWallet) });
+        return map[variant](data);
     }
 
-    static async createSafe({ sub, address }) {
-        const safeWallet = await SafeService.findOne({ sub });
-        // An account can have max 1 Safe
+    static async createSafe({ sub, chainId, address }: Partial<TWallet>) {
+        // An account can have max 1 Safe per network
+        const safeWallet = await SafeService.findOne({ sub, chainId });
         if (safeWallet) throw new Error('Already has a Safe.');
 
         // Deploy a Safe with Web3Auth address and relayer as signers
-        await SafeService.create({ sub, safeVersion }, address);
+        await SafeService.create({ sub, chainId, safeVersion }, address);
     }
 
-    static async createWalletConnect({ sub, address }) {
-        const chainId = ContractService.getChainId();
-        const data: Partial<TWallet> = { variant: WalletVariant.WalletConnect, sub, address, chainId };
-
-        await Wallet.findOneAndUpdate({ sub, address, chainId }, data, { upsert: true });
+    static async createWalletConnect({ sub, address }: Partial<TWallet>) {
+        await Wallet.findOneAndUpdate(
+            { sub, address },
+            { variant: WalletVariant.WalletConnect, sub, address },
+            { upsert: true },
+        );
     }
 }

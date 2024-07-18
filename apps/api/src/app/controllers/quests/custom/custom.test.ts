@@ -3,7 +3,6 @@ import app from '@thxnetwork/api/';
 import { v4 } from 'uuid';
 import { QuestVariant } from '@thxnetwork/common/enums';
 import { dashboardAccessToken, userWalletAddress2, widgetAccessToken2 } from '@thxnetwork/api/util/jest/constants';
-import { isAddress } from 'web3-utils';
 import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
 import { PoolDocument, QuestCustom } from '@thxnetwork/api/models';
 
@@ -21,7 +20,6 @@ describe('Quests Custom ', () => {
             .set('Authorization', dashboardAccessToken)
             .send()
             .expect((res: request.Response) => {
-                expect(isAddress(res.body.safeAddress)).toBe(true);
                 pool = res.body;
             })
             .expect(201, done);

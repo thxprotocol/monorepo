@@ -5,12 +5,17 @@
         :created-at="token.createdAt"
     >
         <template #header>
-            <div class="text-success fw-bold me-auto">{{ token.walletBalance }}</div>
-            <span class="text-opaque">{{ token.erc20.symbol }}</span>
+            <div>
+                <div class="text-success fw-bold me-auto">
+                    {{ token.walletBalance }}
+                </div>
+                <span class="small text-opaque">{{ token.erc20.symbol }}</span>
+            </div>
         </template>
 
         <template #dropdown-items>
-            <b-dropdown-item @click="isModalTransferShown = true"> Transfer </b-dropdown-item>
+            <b-dropdown-item disabled @click="isModalTransferShown = true"> Transfer </b-dropdown-item>
+            <b-dropdown-item :href="blockExplorerURL"> Block Explorer </b-dropdown-item>
             <BaseModalERC20Transfer
                 :id="`modalERC20Transfer${token.erc20._id}`"
                 :show="isModalTransferShown"
@@ -32,6 +37,7 @@ import { useAccountStore } from '../../stores/Account';
 import { toast } from '../../utils/toast';
 import { fromWei } from 'web3-utils';
 import { RewardVariant } from '@thxnetwork/common/enums';
+import { chainList } from '@thxnetwork/app/utils/chains';
 
 export default defineComponent({
     name: 'BaseCardERC20',
@@ -56,6 +62,12 @@ export default defineComponent({
         ...mapStores(useAccountStore, useWalletStore),
         isMigrateAvailable() {
             return this.token.migrationBalance ? Number(fromWei(this.token.migrationBalance)) > 0 : false;
+        },
+        blockExplorerURL() {
+            const { wallet, chainId } = this.walletStore;
+            if (!wallet || !chainId) return;
+
+            return chainList[chainId].blockExplorer + '/token/' + this.token.erc20.address + '?a=' + wallet.address;
         },
     },
     methods: {

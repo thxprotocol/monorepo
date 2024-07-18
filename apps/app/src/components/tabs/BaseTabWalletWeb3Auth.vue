@@ -54,6 +54,7 @@ import { useAuthStore } from '../../stores/Auth';
 import { useWalletStore } from '../../stores/Wallet';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
+import { ChainId } from '@thxnetwork/common/enums';
 
 export default defineComponent({
     name: 'BaseTabWalletWeb3Auth',
@@ -71,6 +72,7 @@ export default defineComponent({
             message: 'This signature will be used to proof ownership of a web3 account.',
             signature: '',
             isLoading: false,
+            chainId: ChainId.Polygon,
         };
     },
     computed: {
@@ -106,7 +108,12 @@ export default defineComponent({
     methods: {
         async onClickCreate() {
             this.isLoading = true;
+
             try {
+                if (!this.chainId) {
+                    throw new Error('No chain ID configured.');
+                }
+
                 // Get recent access token
                 await this.authStore.requestOAuthShareRefresh();
 
@@ -130,6 +137,7 @@ export default defineComponent({
                     variant: WalletVariant.Safe,
                     message: this.message,
                     signature: this.signature,
+                    chainId: this.chainId,
                 });
 
                 this.$emit('close');

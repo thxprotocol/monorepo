@@ -24,7 +24,6 @@ import RouterWidgets from './widgets/widgets.router';
 import RouterIdentity from './identity/identity.router';
 import RouterEvents from './events/events.router';
 import RouterData from './data/data.router';
-import RouterLiquidity from './liquidity/liquidity.router';
 import RouterVoteEscrow from './ve/ve.router';
 import RouterJobs from './jobs/jobs.router';
 import RouterLotteries from './lotteries/lotteries.router';
@@ -62,7 +61,6 @@ router.use('/widgets', RouterWidgets);
 router.use('/clients', RouterClients);
 router.use('/webhooks', RouterWebhooks);
 router.use('/ve', RouterVoteEscrow);
-router.use('/liquidity', RouterLiquidity);
 
 router.use('/erc20', RouterERC20);
 router.use('/erc721', RouterERC721);

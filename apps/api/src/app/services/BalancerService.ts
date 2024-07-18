@@ -13,16 +13,14 @@ class BalancerService {
     apr = {
         [ChainId.Hardhat]: {
             balancer: {
-                min: 0,
-                max: 0,
+                apr: 0,
                 swapFees: 0,
             },
             thx: 0,
         },
         [ChainId.Polygon]: {
             balancer: {
-                min: 0,
-                max: 0,
+                apr: 0,
                 swapFees: 0,
             },
             thx: 0,
@@ -46,9 +44,9 @@ class BalancerService {
     });
 
     constructor() {
-        this.updatePricesJob().then(() => {
-            this.updateMetricsJob();
-        });
+        // this.updatePricesJob().then(() => {
+        //     this.updateMetricsJob();
+        // });
     }
 
     async buildJoin(
@@ -135,9 +133,10 @@ class BalancerService {
             const priceOfBAL = this.pricing['BAL'];
             const pricePerBPT = this.pricing['20USDC-80THX'];
 
-            // Amount of bpt-gauge locked in veTHX in wei
             for (const chainId of [ChainId.Hardhat, ChainId.Polygon]) {
-                if (NODE_ENV === 'production' && chainId === ChainId.Hardhat) continue;
+                // Skip hardhat on production
+                if (['production', 'test'].includes(NODE_ENV) && chainId === ChainId.Hardhat) continue;
+
                 const provider = new ethers.providers.JsonRpcProvider(rpcMap[chainId]);
                 const gaugeAddress = contractNetworks[chainId].BPTGauge;
                 const bptAddress = contractNetworks[chainId].BPT;
@@ -168,11 +167,7 @@ class BalancerService {
                 const rewardsInBPT = this.rewards[chainId].bpt;
                 const thx = await this.calculateTHXAPR(gauge, veTHX, rewardsInBPT, pricePerBPT);
                 this.apr[chainId] = { balancer, thx };
-                logger.debug(this.apr[chainId]);
             }
-
-            // Log pricing here because job interval creates less logging clutter
-            logger.debug(this.pricing);
         } catch (error) {
             console.log(error);
         }

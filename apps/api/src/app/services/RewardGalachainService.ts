@@ -97,8 +97,6 @@ export default class RewardGalachainService implements IRewardService {
         wallet,
     }: {
         reward: TRewardGalachain;
-        account: TAccount;
-        safe: WalletDocument;
         wallet?: WalletDocument;
     }): Promise<void | TValidationResult> {
         const token = this.getToken(reward);

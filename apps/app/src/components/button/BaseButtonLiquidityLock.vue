@@ -30,8 +30,8 @@ export default defineComponent({
     computed: {
         ...mapStores(useWalletStore, useVeStore, useAccountStore),
         address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
+            if (!this.walletStore.chainId) return contractNetworks[ChainId.Polygon];
+            return contractNetworks[this.walletStore.chainId];
         },
         amountInWei() {
             return BigNumber.from(this.amount);

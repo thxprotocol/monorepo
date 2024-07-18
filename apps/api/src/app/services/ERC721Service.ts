@@ -1,12 +1,11 @@
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
-import { TransactionReceipt } from 'web3-core';
 import { ERC721, ERC721Document } from '@thxnetwork/api/models/ERC721';
 import { ERC721Metadata, ERC721MetadataDocument } from '@thxnetwork/api/models/ERC721Metadata';
 import { ERC721Token, ERC721TokenDocument } from '@thxnetwork/api/models/ERC721Token';
 import { Transaction } from '@thxnetwork/api/models/Transaction';
 import { ERC721TokenState, TransactionState } from '@thxnetwork/common/enums';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { WalletDocument } from '../models/Wallet';
 import { RewardNFT } from '../models/RewardNFT';
@@ -15,11 +14,13 @@ import PoolService from './PoolService';
 import TransactionService from './TransactionService';
 import IPFSService from './IPFSService';
 import WalletService from './WalletService';
+import { TransactionReceipt } from 'web3-core';
+import { toChecksumAddress } from 'web3-utils';
 
 const contractName = 'THXERC721';
 
 async function deploy(data: TERC721, forceSync = true): Promise<ERC721Document> {
-    const { web3, defaultAccount } = getProvider(data.chainId);
+    const { web3, defaultAccount } = NetworkService.getProvider(data.chainId);
     const { abi, bytecode } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi);
     const erc721 = await ERC721.create(data);
@@ -43,7 +44,7 @@ async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: 
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
     }
 
-    await ERC721.findByIdAndUpdate(erc721Id, { address: receipt.contractAddress });
+    await ERC721.findByIdAndUpdate(erc721Id, { address: toChecksumAddress(receipt.contractAddress) });
 }
 
 export async function queryDeployTransaction(erc721: ERC721Document): Promise<ERC721Document> {
@@ -84,16 +85,24 @@ export async function mint(
     wallet: WalletDocument,
     metadata: ERC721MetadataDocument,
 ): Promise<ERC721TokenDocument> {
-    const tokenUri = await IPFSService.getTokenURI(erc721, String(metadata._id));
-    const erc721token = await ERC721Token.create({
+    const tokenUri = await IPFSService.getTokenURI(erc721, metadata.id);
+    const query = {
+        erc721Id: erc721.id,
         sub: wallet.sub,
         tokenUri: erc721.baseURL + tokenUri,
-        recipient: wallet.address,
-        state: ERC721TokenState.Pending,
-        erc721Id: String(erc721._id),
-        metadataId: String(metadata._id),
-        walletId: wallet._id,
-    });
+        metadataId: metadata.id,
+        walletId: wallet.id,
+        chainId: erc721.chainId,
+    };
+    const erc721token = await ERC721Token.findOneAndUpdate(
+        query,
+        {
+            ...query,
+            state: ERC721TokenState.Pending,
+            recipient: wallet.address,
+        },
+        { upsert: true, new: true },
+    );
 
     const tx = await TransactionService.sendSafeAsync(
         safe,
@@ -101,13 +110,13 @@ export async function mint(
         erc721.contract.methods.mint(wallet.address, tokenUri),
         {
             type: 'erc721TokenMintCallback',
-            args: { erc721tokenId: String(erc721token._id) },
+            args: { erc721tokenId: erc721token.id },
         },
     );
 
     return await ERC721Token.findByIdAndUpdate(
-        erc721token._id,
-        { transactions: [String(tx._id)], state: ERC721TokenState.Transferring },
+        erc721token.id,
+        { transactions: [tx.id], state: ERC721TokenState.Transferring },
         { new: true },
     );
 }
@@ -193,7 +202,7 @@ async function findMetadataByNFT(erc721Id: string, page = 1, limit = 10) {
 }
 
 export const getOnChainERC721Token = async (chainId: number, address: string) => {
-    const { web3 } = getProvider(chainId);
+    const { web3 } = NetworkService.getProvider(chainId);
     const { abi } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi, address);
     const [name, symbol, totalSupply] = await Promise.all([

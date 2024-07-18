@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import ERC20Service from '@thxnetwork/api/services/ERC20Service';
 import { param } from 'express-validator';
 import { fromWei } from 'web3-utils';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 
 const validation = [param('id').isMongoId()];
@@ -17,7 +17,7 @@ const controller = async (req: Request, res: Response) => {
     // Still no address.
     if (!erc20.address) return res.send(erc20);
 
-    const { defaultAccount } = getProvider(erc20.chainId);
+    const { defaultAccount } = NetworkService.getProvider(erc20.chainId);
     const [totalSupplyInWei, decimalsString, adminBalanceInWei] = await Promise.all([
         erc20.contract.methods.totalSupply().call(),
         erc20.contract.methods.decimals().call(),

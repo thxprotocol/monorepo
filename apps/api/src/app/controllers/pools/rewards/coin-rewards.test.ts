@@ -8,6 +8,8 @@ import { addMinutes } from '@thxnetwork/api/util/date';
 import { createImage } from '@thxnetwork/api/util/jest/images';
 import { ERC20Document } from '@thxnetwork/api/models/ERC20';
 import { RewardCoinDocument } from '@thxnetwork/api/models/RewardCoin';
+import { poll } from 'ethers/lib/utils';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 
 const user = request.agent(app);
 
@@ -37,14 +39,31 @@ describe('Coin Rewards', () => {
     it('POST /pools', (done) => {
         user.post('/v1/pools')
             .set('Authorization', dashboardAccessToken)
+            .expect((res: request.Response) => {
+                poolId = res.body._id;
+                expect(poolId).toBeDefined();
+            })
+            .expect(201, done);
+    });
+
+    it('POST /pools/:poolId/wallets', async () => {
+        let walletAddress;
+        await user
+            .post(`/v1/pools/${poolId}/wallets`)
+            .set('Authorization', dashboardAccessToken)
             .send({
                 chainId: ChainId.Hardhat,
             })
             .expect((res: request.Response) => {
-                expect(isAddress(res.body.safeAddress)).toBe(true);
-                poolId = res.body._id;
+                walletAddress = res.body.address;
             })
-            .expect(201, done);
+            .expect(201);
+        const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
+        await poll(async () => {
+            const code = await web3.eth.getCode(walletAddress);
+            return code !== '0x';
+        });
+        expect(walletAddress).toBeDefined();
     });
 
     it('POST /pools/:poolId/rewards/:variant', (done) => {
@@ -58,7 +77,7 @@ describe('Coin Rewards', () => {
             isPromoted = true,
             isPublished = true;
         user.post(`/v1/pools/${poolId}/rewards/${RewardVariant.Coin}`)
-            .set({ Authorization: dashboardAccessToken })
+            .set('Authorization', dashboardAccessToken)
             .attach('file', image, {
                 filename: 'test.jpg',
                 contentType: 'image/jpg',

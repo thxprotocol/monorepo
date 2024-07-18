@@ -23,9 +23,6 @@ const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(reward.poolId);
     if (!pool) throw new BadRequestError('Campaign not found.');
 
-    const safe = await SafeService.findOneByPool(pool);
-    if (!safe) throw new BadRequestError('Safe not found.');
-
     // Find wallet for the authenticated user
     const wallet = await WalletService.findById(req.query.walletId as string);
     if (!wallet) throw new NotFoundError('Wallet not found');
@@ -36,6 +33,10 @@ const controller = async (req: Request, res: Response) => {
 
     const erc721 = await ERC721Service.findById(metadata.erc721Id);
     if (!erc721) throw new NotFoundError('ERC721 not found');
+
+    // Get the pool Safe for the token network
+    const safe = await SafeService.findOneByPool(pool, erc721.chainId);
+    if (!safe) throw new BadRequestError('Safe not found.');
 
     // Mint the NFT
     const token = await ERC721Service.mint(safe, erc721, wallet, metadata);

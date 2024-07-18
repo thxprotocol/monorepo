@@ -1,6 +1,5 @@
 import puppeteer from 'puppeteer';
 import fs from 'fs';
-import db from '@thxnetwork/api/util/database';
 import { Brand, Widget } from '@thxnetwork/api/models';
 import { createCanvas, loadImage, registerFont } from 'canvas';
 import { assetsPath } from '@thxnetwork/api/util/path';
@@ -8,7 +7,7 @@ import path from 'path';
 import CanvasService from '@thxnetwork/api/services/CanvasService';
 
 // Provide before running
-const poolIds = ['668663438b8ba79a477ce0c3'];
+const poolIds = ['66966bf734225e3add9b3a99', '66966bfd34225e3add9b3ac4'];
 
 // Load on boot as registration on runtime results in font not being loaded in time
 const fontPath = path.resolve(assetsPath, 'fa-solid-900.ttf');
@@ -21,10 +20,6 @@ const defaultLogoImgPath = path.resolve(assetsPath, 'logo.png');
 const widgetBaseUrl = 'https://app.thx.network';
 
 registerFont(fontPath, { family, style: 'normal', weight: '900' });
-
-// db.connect(process.env.MONGODB_URI);
-// db.connect(process.env.MONGODB_URI_DEV);
-db.connect(process.env.MONGODB_URI_PROD);
 
 async function createCampaignWidgetPreviewImage({ poolId, logoImgUrl, backgroundImgUrl }: TBrand) {
     const widget = await Widget.findOne({ poolId });

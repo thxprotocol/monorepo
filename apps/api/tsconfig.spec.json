@@ -9,6 +9,7 @@
     },
     "exclude": ["../../libs/common/src/lib/scss/**/*"],
     "include": [
+        // "package.json",
         "jest.config.ts",
         "**/*.test.ts",
         "**/*.d.ts",

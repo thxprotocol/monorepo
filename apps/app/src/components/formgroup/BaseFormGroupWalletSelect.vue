@@ -6,7 +6,7 @@
                 <b-form-select-option
                     v-for="w in wallets"
                     :value="w"
-                    :disabled="chainId ? chainId !== w.chainId : false"
+                    :disabled="chainId ? w.variant === WalletVariant.Safe && chainId !== w.chainId : false"
                 >
                     {{ w.short }}
                     ({{ w.variant }})
@@ -43,7 +43,7 @@ export default defineComponent({
         },
     },
     data() {
-        return { chainList };
+        return { chainList, WalletVariant };
     },
     computed: {
         ...mapStores(useWalletStore),

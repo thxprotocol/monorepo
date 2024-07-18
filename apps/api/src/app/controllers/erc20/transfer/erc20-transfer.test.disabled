@@ -12,6 +12,7 @@ import {
 import { toWei } from 'web3-utils';
 import { poll } from '@thxnetwork/api/util/polling';
 import { signTxHash } from '@thxnetwork/api/util/jest/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 
 const user = request.agent(app);
 
@@ -64,6 +65,11 @@ describe('ERC20 Transfer', () => {
 
     describe('POST /erc20/transfer', () => {
         it('HTTP 201', async () => {
+            const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
+            const fn = () => web3.eth.getCode(wallet.address);
+            const fnCondition = (result: string) => result === '0x';
+            await poll(fn, fnCondition, 500);
+
             const res = await user
                 .post('/v1/erc20/transfer')
                 .set({ Authorization: widgetAccessToken })
@@ -72,7 +78,6 @@ describe('ERC20 Transfer', () => {
                     erc20Id: erc20._id,
                     to: userWalletAddress2,
                     amount: toWei('1', 'ether'),
-                    chainId: ChainId.Hardhat,
                 });
             expect(res.body.safeTxHash).toBeDefined();
             expect(res.status).toBe(201);

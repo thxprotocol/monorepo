@@ -8,6 +8,7 @@ export const ERC20Token = mongoose.model<ERC20TokenDocument>(
         {
             sub: String,
             erc20Id: String,
+            chainId: Number,
             walletId: { type: String, index: 'hashed' },
         },
         { timestamps: true },

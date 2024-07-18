@@ -2,8 +2,8 @@ import { toChecksumAddress } from 'web3-utils';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import { ChainId, ERC20Type, TransactionState } from '@thxnetwork/common/enums';
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
-import { getProvider } from '@thxnetwork/api/util/network';
 import { TransactionReceipt } from 'web3-core';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { contractNetworks, getArtifact } from '@thxnetwork/api/hardhat';
 import {
     ERC20,
@@ -20,6 +20,7 @@ import {
 import TransactionService from './TransactionService';
 import PoolService from './PoolService';
 import { fromWei } from 'web3-utils';
+import { NODE_ENV } from '../config/secrets';
 
 async function decorate(token: ERC20TokenDocument, wallet: WalletDocument) {
     const erc20 = await getById(token.erc20Id);
@@ -35,7 +36,7 @@ async function decorate(token: ERC20TokenDocument, wallet: WalletDocument) {
 }
 
 function getDeployArgs(erc20: ERC20Document, totalSupply?: string) {
-    const { defaultAccount } = getProvider(erc20.chainId);
+    const { defaultAccount } = NetworkService.getProvider(erc20.chainId);
 
     switch (erc20.type) {
         case ERC20Type.Limited: {
@@ -65,7 +66,7 @@ export const deploy = async (params: Partial<TERC20>, forceSync = true) => {
         sub: params.sub,
         logoImgUrl: params.logoImgUrl,
     });
-    const { web3 } = getProvider(erc20.chainId);
+    const { web3 } = NetworkService.getProvider(erc20.chainId);
     const { abi, bytecode } = getArtifact(erc20.contractName);
     const contract = new web3.eth.Contract(abi);
     const fn = contract.deploy({
@@ -92,7 +93,7 @@ export async function deployCallback({ erc20Id }: TERC20DeployCallbackArgs, rece
     }
 
     await ERC20.findByIdAndUpdate(erc20Id, {
-        address: receipt.contractAddress,
+        address: toChecksumAddress(receipt.contractAddress),
     });
 }
 
@@ -125,10 +126,16 @@ const addMinter = async (erc20: ERC20Document, address: string) => {
 };
 
 const addToken = async (wallet: WalletDocument, erc20: ERC20Document) => {
-    const query = { sub: wallet.sub, walletId: wallet.id, erc20Id: erc20._id };
-    if (!(await ERC20Token.exists(query))) {
-        await createERC20Token(erc20, wallet);
-    }
+    const query = { sub: wallet.sub, erc20Id: erc20.id };
+    await ERC20Token.findOneAndUpdate(
+        query,
+        {
+            ...query,
+            walletId: wallet.id,
+            chainId: erc20.chainId,
+        },
+        { upsert: true, new: true },
+    );
 };
 
 export const getAll = (sub: string) => {
@@ -139,22 +146,16 @@ export const getTokensForSub = (sub: string) => {
     return ERC20Token.find({ sub });
 };
 
-export const getTokensForWallet = async (wallet: WalletDocument) => {
-    const tokens = await ERC20Token.find({ walletId: wallet.id });
+export const getTokensForWallet = async (wallet: WalletDocument, chainId: ChainId) => {
+    const tokens = await ERC20Token.find({ sub: wallet.sub });
+    const result = await Promise.allSettled(tokens.map((token) => decorate(token, wallet)));
+    const erc20Tokens = result.filter((r) => r.status === 'fulfilled').map((r: any) => r.value);
 
-    const result = [];
-    for (const token of tokens) {
-        try {
-            const decorated = await decorate(token, wallet);
-            result.push(decorated);
-        } catch (error) {
-            console.log(error);
-        }
-    }
+    // We add additional veTHX related tokens for Polygon and Hardhat
+    const defaults = await findDefaultTokens(wallet, chainId);
+    const defaultTokens = defaults.filter(({ walletBalance }) => walletBalance > 0);
 
-    const defaultTokens = (await findDefaultTokens(wallet)).filter(({ walletBalance }) => walletBalance > 0);
-
-    return result.concat(defaultTokens);
+    return [...erc20Tokens, ...defaultTokens];
 };
 
 export const getById = async (id: string) => {
@@ -186,7 +187,7 @@ export const addTokenForWallet = async (erc20: ERC20Document, wallet: WalletDocu
 };
 
 export const importToken = async (chainId: number, address: string, sub: string, logoImgUrl: string) => {
-    const { web3 } = getProvider(chainId);
+    const { web3 } = NetworkService.getProvider(chainId);
     const { abi } = getArtifact('THXERC20_LimitedSupply');
     const contract = new web3.eth.Contract(abi);
     const [name, symbol] = await Promise.all([contract.methods.name().call(), contract.methods.symbol().call()]);
@@ -222,7 +223,7 @@ export const approve = async (erc20: ERC20Document, wallet: WalletDocument, amou
 
 export const transferFrom = async (erc20: ERC20Document, wallet: WalletDocument, to: string, amountInWei: string) => {
     const erc20Transfer = await ERC20Transfer.create({
-        erc20Id: erc20._id,
+        erc20Id: erc20.id,
         from: wallet.address,
         to,
         amount: amountInWei,
@@ -231,19 +232,19 @@ export const transferFrom = async (erc20: ERC20Document, wallet: WalletDocument,
     });
 
     // Check if an erc20Token exists for a known receiving wallet and create one if not
-    const toWallet = await Wallet.findOne({ chainId: wallet.chainId, address: toChecksumAddress(to) });
-    if (toWallet && !(await ERC20Token.exists({ walletId: toWallet._id, erc20Id: erc20._id }))) {
-        await createERC20Token(erc20, toWallet);
+    const receiver = await Wallet.findOne({ address: toChecksumAddress(to) });
+    if (receiver && !(await ERC20Token.exists({ walletId: receiver.id, erc20Id: erc20.id }))) {
+        await createERC20Token(erc20, receiver);
     }
 
     const tx = await TransactionService.sendSafeAsync(
         wallet,
         erc20.address,
         erc20.contract.methods.transfer(to, amountInWei),
-        { type: 'transferFromCallBack', args: { erc20Id: String(erc20._id) } },
+        { type: 'transferFromCallBack', args: { erc20Id: erc20.id } },
     );
 
-    await erc20Transfer.updateOne({ transactionId: String(tx._id) });
+    await erc20Transfer.updateOne({ transactionId: tx.id });
 
     return tx;
 };
@@ -264,18 +265,21 @@ async function createERC20Token(erc20: ERC20Document, wallet: WalletDocument) {
         sub: wallet.sub,
         walletId: wallet.id,
         erc20Id: erc20.id,
+        chainId: erc20.chainId,
     });
 }
 
-async function findDefaultTokens(wallet: WalletDocument) {
+async function findDefaultTokens(wallet: WalletDocument, chainId: ChainId) {
+    if (![ChainId.Polygon, ChainId.Hardhat].includes(chainId)) return [];
+
     const defaultContracts = [
         {
             type: ERC20Type.Unknown,
             name: '20USDC-80THX',
             symbol: '20USDC-80THX',
             decimals: 18,
-            chainId: wallet.chainId,
-            address: contractNetworks[wallet.chainId].BPT,
+            chainId,
+            address: contractNetworks[chainId].BPT,
             logoImgUrl: 'https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png',
         },
         {
@@ -283,8 +287,8 @@ async function findDefaultTokens(wallet: WalletDocument) {
             name: '20USDC-80THX (staked)',
             symbol: '20USDC-80THX-gauge',
             decimals: 18,
-            chainId: wallet.chainId,
-            address: contractNetworks[wallet.chainId].BPTGauge,
+            chainId,
+            address: contractNetworks[chainId].BPTGauge,
             logoImgUrl: 'https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png',
         },
         {
@@ -292,28 +296,29 @@ async function findDefaultTokens(wallet: WalletDocument) {
             name: 'Voting Escrow 20USDC-80THX-gauge',
             symbol: 'veTHX',
             decimals: 18,
-            chainId: wallet.chainId,
-            address: contractNetworks[wallet.chainId].VotingEscrow,
+            chainId,
+            address: contractNetworks[chainId].VotingEscrow,
             logoImgUrl: 'https://assets.coingecko.com/coins/images/21323/standard/logo-thx-resized-200-200.png',
         },
     ];
 
-    const promises = defaultContracts.map(async (erc20) => {
-        const { web3 } = getProvider(erc20.chainId);
-        const { abi } = getArtifact('THXERC20_LimitedSupply');
-        const contract = new web3.eth.Contract(abi, erc20.address);
-        const walletBalanceInWei = await contract.methods.balanceOf(wallet.address).call();
-        const walletBalance = Number(fromWei(walletBalanceInWei));
-        return {
-            sub: wallet.sub,
-            erc20Id: '',
-            walletId: wallet.id,
-            walletBalance,
-            erc20,
-        };
-    });
+    const promise = await Promise.allSettled(
+        defaultContracts.map(async (erc20) => {
+            const { web3 } = NetworkService.getProvider(erc20.chainId);
+            const contract = new web3.eth.Contract(getArtifact('THXERC20_LimitedSupply').abi, erc20.address);
+            const walletBalanceInWei = await contract.methods.balanceOf(wallet.address).call();
+            const walletBalance = Number(fromWei(walletBalanceInWei, 'ether'));
+            return {
+                sub: wallet.sub,
+                erc20Id: '',
+                walletId: wallet.id,
+                walletBalance,
+                erc20,
+            };
+        }),
+    );
 
-    return await Promise.all(promises);
+    return promise.filter((r) => r.status === 'fulfilled').map((r: any) => r.value);
 }
 
 export default {
@@ -321,6 +326,7 @@ export default {
     decorate,
     findBySub,
     createERC20Token,
+    deployCallback,
     deploy,
     getAll,
     findBy,

@@ -1,6 +1,17 @@
 <template>
     <b-form-group>
         <b-button
+            :variant="variant === WalletVariant.WalletConnect ? 'primary' : 'outline-primary'"
+            class="rounded mb-2 w-100 text-white"
+            @click="$emit('change', WalletVariant.WalletConnect)"
+        >
+            <div class="d-flex align-items-center">
+                <b-img :src="walletLogoMap[WalletVariant.WalletConnect]" width="17" class="me-2 rounded" />
+                Your Wallet
+            </div>
+            <p class="small text-start text-opaque mb-0">Connect one of your existing wallets using WalletConnect.</p>
+        </b-button>
+        <b-button
             :disabled="isDisabledSafeCreate"
             :variant="variant === WalletVariant.Safe ? 'primary' : 'outline-primary'"
             class="rounded mb-2 w-100 text-white justify-content-start"
@@ -13,17 +24,6 @@
             <p class="small text-start text-opaque mb-0">
                 Create a free Safe multisig. We sponsor your transaction costs!
             </p>
-        </b-button>
-        <b-button
-            :variant="variant === WalletVariant.WalletConnect ? 'primary' : 'outline-primary'"
-            class="rounded mb-2 w-100 text-white"
-            @click="$emit('change', WalletVariant.WalletConnect)"
-        >
-            <div class="d-flex align-items-center">
-                <b-img :src="walletLogoMap[WalletVariant.WalletConnect]" width="17" class="me-2 rounded" />
-                Your Wallet
-            </div>
-            <p class="small text-start text-opaque mb-0">Connect one of your existing wallets using WalletConnect.</p>
         </b-button>
     </b-form-group>
     <b-button :disabled="isDisabled" variant="primary" class="w-100" @click="$emit('next')"> Continue </b-button>

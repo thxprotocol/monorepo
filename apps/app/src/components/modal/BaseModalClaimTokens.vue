@@ -24,9 +24,9 @@
                     </span>
                     <b-link
                         v-if="walletStore.wallet"
-                        :href="`${chainList[walletStore.wallet.chainId].blockExplorer}/token/${
-                            rewardToken.tokenAddress
-                        }?a=${walletStore.wallet.address}`"
+                        :href="`${chainList[walletStore.chainId].blockExplorer}/token/${rewardToken.tokenAddress}?a=${
+                            walletStore.wallet.address
+                        }`"
                         target="_blank"
                     >
                         <i class="fas fa-external-link-alt text-white text-opaque ms-1 small" />

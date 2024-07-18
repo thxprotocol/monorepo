@@ -31,7 +31,6 @@ import {
 import AccountProxy from '../proxies/AccountProxy';
 import DiscordDataProxy from '../proxies/DiscordDataProxy';
 import MailService from './MailService';
-import SafeService from './SafeService';
 import ParticipantService from './ParticipantService';
 import DiscordService from './DiscordService';
 import ContractService from './ContractService';
@@ -44,20 +43,15 @@ async function isAudienceAllowed(aud: string, poolId: string) {
 }
 
 async function isSubjectAllowed(sub: string, poolId: string) {
-    const isOwner = await Pool.exists({
-        _id: poolId,
-        sub,
-    });
+    const pool = await Pool.findById(poolId);
+    const isOwner = pool && pool.sub === sub;
     const isCollaborator = await Collaborator.exists({ sub, poolId, state: CollaboratorInviteState.Accepted });
+
     return isOwner || isCollaborator;
 }
 
 async function getById(id: string) {
-    const pool = await Pool.findById(id);
-    const chainId = ContractService.getChainId();
-    const safe = await SafeService.findOneByPool(pool, chainId);
-    pool.safe = safe;
-    return pool;
+    return await Pool.findById(id);
 }
 
 function getByAddress(address: string) {
@@ -123,7 +117,7 @@ async function deploy(sub: string, title: string): Promise<PoolDocument> {
         theme: JSON.stringify({ elements: DEFAULT_ELEMENTS, colors: DEFAULT_COLORS }),
     });
 
-    return Pool.findByIdAndUpdate(pool._id, { 'settings.slug': String(pool._id) }, { new: true });
+    return await Pool.findByIdAndUpdate(pool.id, { 'settings.slug': pool.id }, { new: true });
 }
 
 async function getAllBySub(sub: string): Promise<PoolDocument[]> {
@@ -144,15 +138,17 @@ async function getAllBySub(sub: string): Promise<PoolDocument[]> {
     // Add Safes to pools
     return await Promise.all(
         pools.map(async (pool) => {
-            const brand = await Brand.findOne({ poolId: pool.id });
-            const safe = await SafeService.findOneByPool(pool);
-            const participantCount = await Participant.countDocuments({ poolId: pool.id });
-            const account = accounts.find((a) => a.sub === pool.sub);
-            const author = account && {
-                username: account.username,
-            };
-
-            return { ...pool.toJSON(), participantCount, author, brand, safe };
+            try {
+                const brand = await Brand.findOne({ poolId: pool.id });
+                const participantCount = await Participant.countDocuments({ poolId: pool.id });
+                const account = accounts.find((a) => a.sub === pool.sub);
+                const author = account && {
+                    username: account.username,
+                };
+                return { ...pool.toJSON(), participantCount, author, brand };
+            } catch (error) {
+                console.log(error);
+            }
         }),
     );
 }

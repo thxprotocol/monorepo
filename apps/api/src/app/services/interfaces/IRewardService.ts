@@ -21,12 +21,10 @@ export interface IRewardService {
     createPayment({
         reward,
         account,
-        safe,
         wallet,
     }: {
         reward: TReward;
         account: TAccount;
-        safe: WalletDocument;
         wallet?: WalletDocument;
     }): Promise<TValidationResult | void>;
 }

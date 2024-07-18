@@ -1,31 +1,15 @@
-import { safeVersion } from '@thxnetwork/api/services/ContractService';
-import { toChecksumAddress } from 'web3-utils';
-import { Wallet } from '@thxnetwork/api/models/Wallet';
-import { ChainId } from '@thxnetwork/common/enums';
-import { getProvider } from '@thxnetwork/api/util/network';
-import { SafeFactory } from '@safe-global/protocol-kit';
+import { RewardCoin, Wallet } from '@thxnetwork/api/models';
+import RewardCoinService from '@thxnetwork/api/services/RewardCoinService';
 
 export default async function main() {
-    const SAFE = toChecksumAddress(''); // Provide values
-    const RELAYER = toChecksumAddress(''); // Provide values
-    const ACCOUNT = toChecksumAddress(''); // Provide values
-    const wallet = await Wallet.findOne({
-        address: SAFE,
-        chainId: ChainId.Polygon,
-    });
-    if (SAFE !== wallet.address) throw new Error('Provided address does not equal Safe address.');
+    // const reward = await RewardCoin.findById('669126e1110e00291909e0e3'); // Polygon Reward
+    // const reward = await RewardCoin.findById('66952d939a90f7280b2d3164'); // Linea Reward
+    const reward = await RewardCoin.findById('6698033a03bf2db6c9a940f1'); // Linea Reward
+    const wallet = await Wallet.findById('669805738c683b6c4c506e97');
+    const service = new RewardCoinService();
 
-    const { ethAdapter } = getProvider(ChainId.Polygon);
-    const safeFactory = await SafeFactory.create({
-        safeVersion,
-        ethAdapter,
+    await service.createPayment({
+        reward,
+        wallet,
     });
-    const safeAccountConfig = {
-        owners: [RELAYER, ACCOUNT],
-        threshold: 2,
-    };
-    const safeAddress = await safeFactory.predictSafeAddress(safeAccountConfig);
-    console.log(safeAddress);
-
-    await safeFactory.deploySafe({ safeAccountConfig, options: { gasLimit: '3000000' } });
 }

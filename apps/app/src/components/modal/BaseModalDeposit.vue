@@ -85,8 +85,8 @@ export default defineComponent({
             return !!this.errors.length;
         },
         address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
+            if (!this.walletStore.chainId) return contractNetworks[ChainId.Polygon];
+            return contractNetworks[this.walletStore.chainId];
         },
         allowanceInWei() {
             if (!this.walletStore.allowances[this.address.BPTGauge]) return BigNumber.from(0);

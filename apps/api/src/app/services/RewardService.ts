@@ -193,16 +193,16 @@ export default class RewardService {
             const wallet = walletId && (await Wallet.findById(walletId));
 
             // Validate supply, expiry, locked and reward specific validation
-            const validationResult = await this.getValidationResult({ reward, account, wallet, safe: pool.safe });
+            const validationResult = await this.getValidationResult({ reward, account, wallet });
             if (!validationResult.result) return validationResult.reason;
 
-            // @TODO Should create payment and update after point subtraction and reward distribution etc
+            // @TODO Should create payment with state and update after point subtraction and reward distribution etc
 
             // Subtract points for account
             await PointBalanceService.subtract(pool, account, reward.pointPrice);
 
             // Create the payment
-            await serviceMap[variant].createPayment({ reward, account, safe: pool.safe, wallet });
+            await serviceMap[variant].createPayment({ reward, account, wallet });
 
             // Send email notification
             let html = `<p style="font-size: 18px">Congratulations!🚀</p>`;
@@ -256,12 +256,10 @@ export default class RewardService {
     static async getValidationResult({
         reward,
         account,
-        safe,
         wallet,
     }: {
         reward: TReward;
         account: TAccount;
-        safe?: WalletDocument;
         wallet?: WalletDocument;
     }) {
         const participant = await Participant.findOne({ sub: account.sub, poolId: reward.poolId });
@@ -281,7 +279,7 @@ export default class RewardService {
         const isLimitReached = await this.isLimitReached({ reward, account });
         if (isLimitReached) return { result: false, reason: 'This reward has reached your personal limit.' };
 
-        return serviceMap[reward.variant].getValidationResult({ reward, account, wallet, safe });
+        return serviceMap[reward.variant].getValidationResult({ reward, account, wallet });
     }
 
     // Checks if the account has reached the max amount of payments for this reward

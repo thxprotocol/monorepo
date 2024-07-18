@@ -6,14 +6,15 @@ import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/c
 import { dashboardAccessToken, sub } from '@thxnetwork/api/util/jest/constants';
 import { alchemy } from '@thxnetwork/api/util/alchemy';
 import { deployERC721, mockGetNftsForOwner } from '@thxnetwork/api/util/jest/erc721';
-import { ERC721Document, PoolDocument } from '@thxnetwork/api/models';
-import { getProvider } from '@thxnetwork/api/util/network';
+import { ERC721Document, WalletDocument } from '@thxnetwork/api/models';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import TransactionService from '@thxnetwork/api/services/TransactionService';
+import { poll } from 'ethers/lib/utils';
 
 const user = request.agent(app);
 
 describe('ERC721 import', () => {
-    let erc721: ERC721Document, pool: PoolDocument, nftContract: Contract;
+    let erc721: ERC721Document, poolId: string, wallet: WalletDocument, nftContract: Contract;
     const chainId = ChainId.Hardhat,
         nftName = 'Test Collection',
         nftSymbol = 'TST';
@@ -27,10 +28,27 @@ describe('ERC721 import', () => {
                 .set('Authorization', dashboardAccessToken)
                 .send({ chainId })
                 .expect((res: request.Response) => {
-                    pool = res.body;
+                    poolId = res.body._id;
                 })
                 .expect(201, done);
         });
+    });
+
+    it('POST /pools/:poolId/wallets', async () => {
+        await user
+            .post(`/v1/pools/${poolId}/wallets`)
+            .set('Authorization', dashboardAccessToken)
+            .send({ chainId })
+            .expect((res: request.Response) => {
+                wallet = res.body;
+            })
+            .expect(201);
+        const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
+        await poll(async () => {
+            const code = await web3.eth.getCode(wallet.address);
+            return code !== '0x';
+        });
+        expect(wallet.address).toBeDefined();
     });
 
     describe('POST /erc721/import', () => {
@@ -41,7 +59,7 @@ describe('ERC721 import', () => {
             // Mint 1 token in the collection
             await TransactionService.sendAsync(
                 nftContract.options.address,
-                nftContract.methods.mint(pool.safeAddress, 'tokenuri.json'),
+                nftContract.methods.mint(wallet.address, 'tokenuri.json'),
                 chainId,
             );
 
@@ -53,8 +71,8 @@ describe('ERC721 import', () => {
             // Run the import for the deployed contract address
             await user
                 .post('/v1/erc721/import')
-                .set({ 'Authorization': dashboardAccessToken, 'X-PoolId': pool._id })
-                .send({ chainId, contractAddress: nftContract.options.address })
+                .set({ Authorization: dashboardAccessToken })
+                .send({ walletId: wallet._id, chainId, contractAddress: nftContract.options.address })
                 .expect(({ body }: request.Response) => {
                     expect(body.erc721._id).toBeDefined();
                     expect(body.erc721.address).toBe(nftContract.options.address);
@@ -65,7 +83,7 @@ describe('ERC721 import', () => {
     });
 
     describe('GET /erc721/:id', () => {
-        const { defaultAccount } = getProvider(chainId);
+        const { defaultAccount } = NetworkService.getProvider(chainId);
 
         it('HTTP 200', (done) => {
             user.get(`/v1/erc721/${erc721._id}`)

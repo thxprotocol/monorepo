@@ -3,7 +3,7 @@ import { fromWei } from 'web3-utils';
 import { NODE_ENV } from '@thxnetwork/api/config/secrets';
 import { ChainId } from '@thxnetwork/common/enums';
 import { logger } from '@thxnetwork/api/util/logger';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { ethers } from 'ethers';
 import { getArtifact, contractNetworks } from '@thxnetwork/api/hardhat';
 import { BigNumber } from 'alchemy-sdk';
@@ -16,7 +16,7 @@ function handleError(error: Error) {
 
 async function getNetworkDetails(chainId: ChainId) {
     try {
-        const { defaultAccount, web3, signer } = getProvider(chainId);
+        const { defaultAccount, web3, signer } = NetworkService.getProvider(chainId);
         const rfthx = new ethers.Contract(
             contractNetworks[chainId].RewardFaucet,
             getArtifact('RewardFaucet').abi,
@@ -77,9 +77,9 @@ async function getNetworkDetails(chainId: ChainId) {
             locked: fromWei(amountLocked.toString(), 'ether'),
         };
         const getRewards = async (tokenAddress: string, now: string) => {
-            const currentWeek = fromWei(String(await rfthx.getTokenWeekAmounts(tokenAddress, now)));
+            const currentWeek = fromWei(String(await rfthx.getTokenWeekAmounts(tokenAddress, now)), 'ether');
             const upcomingWeeks = (await rfthx.getUpcomingRewardsForNWeeks(tokenAddress, 4)).map((amount: BigNumber) =>
-                fromWei(String(amount)),
+                fromWei(String(amount), 'ether'),
             );
             return [currentWeek, ...upcomingWeeks];
         };

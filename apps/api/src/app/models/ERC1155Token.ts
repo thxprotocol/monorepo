@@ -9,6 +9,7 @@ export const ERC1155Token = mongoose.model<ERC1155TokenDocument>(
             sub: String,
             state: Number,
             erc1155Id: String,
+            chainId: Number,
             metadataId: String,
             tokenId: Number,
             tokenUri: String,
