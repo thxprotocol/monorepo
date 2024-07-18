@@ -279,15 +279,19 @@ class SafeService {
         return await apiKit.getPendingTransactions(wallet.address);
     }
 
-    private async getSafe(wallet: WalletDocument) {
+    async getSafe(wallet: WalletDocument) {
         const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
-        const safe = await Safe.create({
-            ethAdapter,
-            safeAddress: wallet.address,
-            contractNetworks,
-        });
-        console.debug('Safe init:', wallet.address);
-        return safe;
+        try {
+            const safe = await Safe.create({
+                ethAdapter,
+                safeAddress: wallet.address,
+                contractNetworks,
+            });
+            console.debug('Safe init:', wallet.address);
+            return safe;
+        } catch (error) {
+            console.error(error.response ? error.response.data : error.message);
+        }
     }
 
     private getApiKit(wallet: WalletDocument) {

@@ -13,6 +13,8 @@ import { toWei } from 'web3-utils';
 import { poll } from '@thxnetwork/api/util/polling';
 import { signTxHash } from '@thxnetwork/api/util/jest/network';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
+import SafeService from '@thxnetwork/api/services/SafeService';
+import Safe from '@safe-global/protocol-kit';
 
 const user = request.agent(app);
 
@@ -65,9 +67,8 @@ describe('ERC20 Transfer', () => {
 
     describe('POST /erc20/transfer', () => {
         it('HTTP 201', async () => {
-            const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
-            const fn = () => web3.eth.getCode(wallet.address);
-            const fnCondition = (result: string) => result === '0x';
+            const fn = () => SafeService.getSafe(wallet);
+            const fnCondition = (result: Safe) => !result;
             await poll(fn, fnCondition, 500);
 
             const res = await user
