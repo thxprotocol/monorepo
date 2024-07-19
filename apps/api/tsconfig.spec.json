@@ -16,6 +16,7 @@
         "src/**/*.ts",
         "../../libs/common/src/**/*",
         "../../libs/sdk/src/**/*",
-        "src/app/hardhat/export/*.json"
+        "src/app/hardhat/export/*.json",
+        "src/app/controllers/erc20/transfer/erc20-transfer.test.disabled"
     ]
 }

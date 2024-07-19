@@ -2,6 +2,7 @@ import { TransactionState, TransactionType } from '@thxnetwork/common/enums';
 import { Transaction, TransactionDocument } from '@thxnetwork/api/models/Transaction';
 import SafeService from '../services/SafeService';
 import TransactionService from '../services/TransactionService';
+import { logger } from '../util/logger';
 
 export async function updatePendingTransactions() {
     const transactions: TransactionDocument[] = await Transaction.find({
@@ -20,14 +21,14 @@ export async function updatePendingTransactions() {
                 }
                 case TransactionState.Sent: {
                     if (tx.type == TransactionType.Relayed) {
-                        console.debug(`Update transaction: ${tx.transactionHash}`);
+                        logger.debug(`Update transaction: ${tx.transactionHash}`);
                         await TransactionService.queryTransactionStatusReceipt(tx);
                     }
                     break;
                 }
             }
         } catch (error) {
-            console.error(error);
+            logger.error(error.message);
         }
     }
 }
