@@ -50,7 +50,6 @@ type TPoolSettings = {
     leaderboardInWeeks: number;
     isPublished: boolean;
     isWeeklyDigestEnabled: boolean;
-    galachainPrivateKey: string;
     authenticationMethods: AccountVariant[];
 };
 

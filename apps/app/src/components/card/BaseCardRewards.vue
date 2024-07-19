@@ -30,7 +30,6 @@ import BaseCardERC20 from '../../components/card/BaseCardERC20.vue';
 import BaseCardERC721 from '../../components/card/BaseCardERC721.vue';
 import BaseCardCouponCode from '../../components/card/BaseCardCouponCode.vue';
 import BaseCardDiscordRole from '../../components/card/BaseCardDiscordRole.vue';
-import BaseCardGalachain from '../../components/card/BaseCardGalachain.vue';
 
 export default defineComponent({
     name: 'BaseViewWallet',
@@ -39,7 +38,6 @@ export default defineComponent({
         BaseCardERC721,
         BaseCardCouponCode,
         BaseCardDiscordRole,
-        BaseCardGalachain,
     },
     data() {
         return {
@@ -69,10 +67,6 @@ export default defineComponent({
                     label: 'Codes',
                     key: [RewardVariant.Coupon],
                 },
-                {
-                    label: 'Galachain',
-                    key: [RewardVariant.Galachain],
-                },
             ] as { label: string; key: number[] }[],
         };
     },
@@ -80,12 +74,11 @@ export default defineComponent({
         ...mapStores(useAuthStore, useAccountStore, useWalletStore),
         list() {
             return [
-                ...this.walletStore.erc20,
-                ...this.walletStore.erc721,
-                ...this.walletStore.erc1155,
+                ...this.walletStore.erc20.filter((item) => item.chainId === this.walletStore.chainId),
+                ...this.walletStore.erc721.filter((item) => item.chainId === this.walletStore.chainId),
+                ...this.walletStore.erc1155.filter((item) => item.chainId === this.walletStore.chainId),
                 ...this.walletStore.couponCodes,
                 ...this.walletStore.discordRoles,
-                ...this.walletStore.galachain,
             ]
                 .filter((item) => {
                     if (!this.activeFilter.key.length) return true;

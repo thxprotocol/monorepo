@@ -7,14 +7,12 @@ import {
     RewardCoin,
     RewardDiscordRole,
     RewardCustom,
-    RewardGalachain,
     ERC20,
     ERC721,
     ERC1155,
 } from '@thxnetwork/api/models';
-import { ChainId, RewardVariant } from '@thxnetwork/common/enums';
+import { RewardVariant } from '@thxnetwork/common/enums';
 import PoolService from '@thxnetwork/api/services/PoolService';
-import ERC20Service from '@thxnetwork/api/services/ERC20Service';
 import SafeService from '@thxnetwork/api/services/SafeService';
 
 const validation = [
@@ -39,7 +37,6 @@ const controller = async (req: Request, res: Response) => {
         { $unionWith: { coll: RewardCoupon.collection.name } },
         { $unionWith: { coll: RewardCustom.collection.name } },
         { $unionWith: { coll: RewardDiscordRole.collection.name } },
-        { $unionWith: { coll: RewardGalachain.collection.name } },
         { $match },
     ];
     const arr = await Promise.all(

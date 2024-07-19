@@ -23,7 +23,6 @@ export const useRewardStore = defineStore('reward', {
                 [RewardVariant.Coupon]: 'coupon reward redemption',
                 [RewardVariant.Custom]: 'custom reward redemption',
                 [RewardVariant.DiscordRole]: 'discord role reward redemption',
-                [RewardVariant.Galachain]: 'galachain reward redemption',
             };
             track('UserCreates', [account?.sub, eventMap[variant], { poolId }]);
         },
@@ -44,8 +43,8 @@ export const useRewardStore = defineStore('reward', {
             const { api } = useAccountStore();
             this.isLoading = true;
 
-            const { coin, nft, custom, coupon, discordRole, galachain } = await api.rewards.list(poolId);
-            this.rewards = [...coin, ...nft, ...custom, ...coupon, ...discordRole, ...galachain]
+            const { coin, nft, custom, coupon, discordRole } = await api.rewards.list(poolId);
+            this.rewards = [...coin, ...nft, ...custom, ...coupon, ...discordRole]
                 .sort((a: any, b: any) => toNumber(b.createdAt) - toNumber(a.createdAt))
                 .sort((a: any, b: any) => toNumber(b.isPromoted) - toNumber(a.isPromoted));
             this.isLoading = false;

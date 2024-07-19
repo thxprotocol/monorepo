@@ -19,6 +19,7 @@ import {
 import TransactionService from './TransactionService';
 import PoolService from './PoolService';
 import { fromWei } from 'web3-utils';
+import { PromiseParser } from '@thxnetwork/api/util';
 
 async function decorate(token: ERC20TokenDocument, wallet: WalletDocument) {
     const erc20 = await getById(token.erc20Id);
@@ -153,8 +154,7 @@ export const getTokensForSub = (sub: string) => {
 
 export const getTokensForWallet = async (wallet: WalletDocument, chainId: ChainId) => {
     const tokens = await ERC20Token.find({ sub: wallet.sub, walletId: wallet.id });
-    const result = await Promise.allSettled(tokens.map((token) => decorate(token, wallet)));
-    const erc20Tokens = result.filter((r) => r.status === 'fulfilled').map((r: any) => r.value);
+    const erc20Tokens = await PromiseParser.parse(tokens.map((token) => decorate(token, wallet)));
 
     // We add additional veTHX related tokens for Polygon and Hardhat
     const defaults = await findDefaultTokens(wallet, chainId);
@@ -291,7 +291,7 @@ async function findDefaultTokens(wallet: WalletDocument, chainId: ChainId) {
         },
     ];
 
-    const promise = await Promise.allSettled(
+    return await PromiseParser.parse(
         defaultContracts.map(async (erc20) => {
             const { web3 } = NetworkService.getProvider(erc20.chainId);
             const contract = new web3.eth.Contract(getArtifact('THXERC20_LimitedSupply').abi, erc20.address);
@@ -306,8 +306,6 @@ async function findDefaultTokens(wallet: WalletDocument, chainId: ChainId) {
             };
         }),
     );
-
-    return promise.filter((r) => r.status === 'fulfilled').map((r: any) => r.value);
 }
 
 export default {

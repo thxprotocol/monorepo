@@ -15,6 +15,7 @@ import ImageService from './ImageService';
 import AccountProxy from '../proxies/AccountProxy';
 import ParticipantService from './ParticipantService';
 import THXService from './THXService';
+import { PromiseParser } from '../util/promise';
 
 export default class QuestService {
     static async count({ poolId }) {
@@ -259,8 +260,9 @@ export default class QuestService {
         const subs = entries.map((entry) => entry.sub);
         const accounts = await AccountProxy.find({ subs });
         const participants = await Participant.find({ poolId: quest.poolId });
-        const promises = entries.map(async (entry) => ParticipantService.decorate(entry, { accounts, participants }));
-        const results = await Promise.allSettled(promises);
+        const results = await PromiseParser.parse(
+            entries.map(async (entry) => ParticipantService.decorate(entry, { accounts, participants })),
+        );
         const meta = await serviceMap[quest.variant].findEntryMetadata({ quest });
 
         return {
@@ -268,7 +270,7 @@ export default class QuestService {
             limit,
             page,
             meta,
-            results: results.filter((result) => result.status === 'fulfilled').map((result: any) => result.value),
+            results,
         };
     }
 }

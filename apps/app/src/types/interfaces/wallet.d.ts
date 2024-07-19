@@ -47,7 +47,6 @@ type TWalletState = {
     balances: { [tokenAddress: string]: string };
     couponCodes: any[];
     discordRoles: any[];
-    galachain: TRewardGalachainPayment[];
     pendingPoints: number;
     isLoading: boolean;
     isModalWalletCreateShown: boolean;

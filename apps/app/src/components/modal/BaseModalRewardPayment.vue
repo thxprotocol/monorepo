@@ -121,7 +121,7 @@ export default defineComponent({
             return !!this.error;
         },
         isWalletRequired() {
-            return [RewardVariant.Coin, RewardVariant.NFT, RewardVariant.Galachain].includes(this.reward.variant);
+            return [RewardVariant.Coin, RewardVariant.NFT].includes(this.reward.variant);
         },
     },
     watch: {
