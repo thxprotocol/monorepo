@@ -305,7 +305,7 @@ export const useWalletStore = defineStore('wallet', {
             const signature = await authStore.sign(safeTxHash);
 
             return await api.request.post(`/v1/account/wallets/confirm`, {
-                data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature: signature.data }),
+                data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature }),
                 params: { walletId: this.wallet._id },
             });
         },

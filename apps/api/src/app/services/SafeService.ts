@@ -38,7 +38,7 @@ class SafeService {
         const saltNonce = wallet.poolId && String(convertObjectIdToNumber(wallet.poolId));
         const safeAddress = await this.deploy(wallet, owners, saltNonce);
 
-        return await Wallet.findByIdAndUpdate(wallet.id, { address: safeAddress }, { new: true, upsert: true });
+        return await Wallet.findByIdAndUpdate(wallet.id, { address: safeAddress }, { new: true });
     }
 
     async deploy(wallet: WalletDocument, owners: string[], saltNonce?: string) {
