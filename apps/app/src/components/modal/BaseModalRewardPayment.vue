@@ -39,7 +39,7 @@
                     />
                 </strong>
             </b-alert>
-            <p :class="!reward.chainId && 'mb-0'">
+            <p :class="!isWalletRequired && 'mb-0'">
                 Do you want to use {{ reward.pointPrice }} points for <strong>{{ reward.title }} </strong>?
             </p>
             <BaseFormGroupWalletSelect

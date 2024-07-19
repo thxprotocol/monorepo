@@ -30,6 +30,7 @@
                     Increase
                 </b-link>
                 <BaseModalIncreaseAmount
+                    :chain-id="chainId"
                     :show="isModalIncreaseAmountShown"
                     @hidden="isModalIncreaseAmountShown = false"
                 />
@@ -52,6 +53,7 @@
                     Increase
                 </b-link>
                 <BaseModalIncreaseLockEnd
+                    :chain-id="chainId"
                     :show="isModalIncreaseLockEndShown"
                     @hidden="isModalIncreaseLockEndShown = false"
                 />
@@ -84,7 +86,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
 import { useWalletStore } from '../../stores/Wallet';
@@ -97,6 +99,9 @@ import { ChainId } from '@thxnetwork/common/enums';
 
 export default defineComponent({
     name: 'BaseTabWithdraw',
+    props: {
+        chainId: { type: Number as PropType<ChainId>, required: true },
+    },
     data() {
         return {
             fromWei,
@@ -149,6 +154,7 @@ export default defineComponent({
             try {
                 const wallet = this.walletStore.wallet;
                 if (!wallet) throw new Error('Please connect a wallet ');
+
                 await this.veStore.increasUnlockTime(wallet, { lockEndTimestamp: this.lockEnd });
             } catch (error) {
                 this.error = (error as any).toSTring();

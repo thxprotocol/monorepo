@@ -30,7 +30,7 @@
                     <slot name="dropdown-items"></slot>
                     <b-dropdown-divider />
                     <b-dropdown-text v-if="createdAt" class="text-end small text-opaque py-0">
-                        {{ format(new Date(createdAt), 'MM do hh:mm') }}
+                        {{ format(new Date(createdAt), 'MMM do hh:mm') }}
                     </b-dropdown-text>
                 </b-dropdown>
             </div>

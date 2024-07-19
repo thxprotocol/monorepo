@@ -19,6 +19,7 @@ import {
     getAccount,
     getChainId,
     watchConnections,
+    waitForTransactionReceipt,
 } from '@wagmi/core';
 import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
@@ -27,8 +28,9 @@ import { encodeFunctionData } from 'viem';
 import { contractNetworks } from '../config/constants';
 import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
-import Web3 from 'web3';
 import { ethers } from 'ethers';
+import { Hash } from 'crypto';
+import { abi } from '../utils/abi';
 
 type TRequestBodyApproval = {
     tokenAddress: string;
@@ -329,26 +331,33 @@ export const useWalletStore = defineStore('wallet', {
             const safeSignature = await safe.signTransactionHash(safeTxHash);
             return safeSignature.data;
         },
+        waitForTransactionReceipt(hash: `0x${string}`) {
+            return waitForTransactionReceipt(wagmiConfig, {
+                hash,
+                confirmations: 2,
+                pollingInterval: 1_000,
+            });
+        },
         async confirmTransactions(transactions: TTransaction[]) {
             for (const tx of transactions) {
                 await this.confirmTransaction(tx.safeTxHash);
             }
         },
-        async getBalance(tokenAddress: string) {
+        async getBalance(tokenAddress: string, chainId: ChainId) {
             if (!this.wallet || !tokenAddress) return;
 
             const { api } = useAccountStore();
             const { balanceInWei } = await api.request.get('/v1/erc20/balance', {
-                params: { tokenAddress, walletId: this.wallet._id, chainId: this.chainId },
+                params: { tokenAddress, walletId: this.wallet._id, chainId },
             });
             this.balances[tokenAddress] = balanceInWei;
         },
-        async getApproval(params: { tokenAddress: string; spender: string }) {
+        async getApproval(params: { tokenAddress: string; spender: string; chainId: ChainId }) {
             if (!this.wallet) return;
 
             const { api } = useAccountStore();
             const { allowanceInWei } = await api.request.get('/v1/erc20/allowance', {
-                params: { ...params, walletId: this.wallet._id, chainId: this.chainId },
+                params: { ...params, walletId: this.wallet._id },
             });
             if (!this.allowances[params.tokenAddress]) this.allowances[params.tokenAddress] = {};
             this.allowances[params.tokenAddress][params.spender] = allowanceInWei;
@@ -374,22 +383,14 @@ export const useWalletStore = defineStore('wallet', {
         },
         async approveWalletConnect(wallet: TWallet, data: TRequestBodyApproval) {
             // Prepare the contract call data
-            const abi = [
-                {
-                    inputs: [
-                        { name: 'spender', type: 'address' },
-                        { name: 'amount', type: 'uint256' },
-                    ],
-                    name: 'approve',
-                    outputs: [{ name: '', type: 'bool' }],
-                    stateMutability: 'public',
-                    type: 'function',
-                },
-            ];
-            const call = this.encodeContractCall(data.tokenAddress, abi, 'approve', [data.spender, data.amountInWei]);
+            const call = this.encodeContractCall(data.tokenAddress, abi.ERC20, 'approve', [
+                data.spender,
+                data.amountInWei,
+            ]);
 
             // Sign and execute the transaction data
-            await this.sendTransaction(wallet.address, call.to, call.data, this.chainId);
+            const hash = await this.sendTransaction(wallet.address, call.to, call.data, this.chainId);
+            await this.waitForTransactionReceipt(hash);
         },
         encodeContractCall(contractAddress: string, abi: any[], functionName: string, args: any[]) {
             return {

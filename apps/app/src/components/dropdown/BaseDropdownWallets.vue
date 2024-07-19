@@ -1,7 +1,7 @@
 <template>
     <div v-if="accountStore.isAuthenticated" class="d-flex">
         <b-dropdown
-            v-model="isOpenWallet"
+            v-model="isOpenChains"
             variant="link"
             class="w-100 rounded"
             :style="{
@@ -9,22 +9,44 @@
                 borderTopRightRadius: walletStore.wallets.length ? '0 !important' : null,
                 borderBottomRightRadius: walletStore.wallets.length ? '0 !important' : null,
             }"
-            :toggle-class="`d-flex align-items-center justify-content-end text-white text-decoration-none p-2  ${
+            toggle-class="d-flex align-items-center justify-content-end text-white text-decoration-none p-2 ps-3 pe-0"
+            auto-close="outside"
+            menu-class="bg-body"
+            no-caret
+            start
+        >
+            <template v-if="walletStore.wallet" #button-content>
+                <b-img :src="chainList[walletStore.chainId].logo" width="15" height="15" class="me-2" />
+            </template>
+            <b-dropdown-item
+                v-for="chain of chains"
+                link-class="d-flex align-items-center"
+                @click="onClickChainSwitch(chain)"
+            >
+                <b-img :src="chainList[chain.chainId].logo" width="15" height="15" class="me-3" />
+                {{ chain.name }}
+            </b-dropdown-item>
+        </b-dropdown>
+        <b-dropdown
+            v-model="isOpenWallet"
+            variant="link"
+            class="w-100 rounded"
+            :style="{
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                borderTopLeftRadius: '0 !important',
+                borderBottomLeftRadius: '0 !important',
+                borderTopRightRadius: walletStore.wallets.length ? '0 !important' : null,
+                borderBottomRightRadius: walletStore.wallets.length ? '0 !important' : null,
+            }"
+            :toggle-class="`d-flex align-items-center justify-content-end text-white text-decoration-none py-2 px-1 ${
                 !walletStore.wallets.length ? 'pe-3' : ''
             }`"
             auto-close="outside"
             menu-class="bg-body"
             no-caret
-            end
+            center
         >
             <template v-if="walletStore.wallet" #button-content>
-                <b-img
-                    v-if="isWalletConnect"
-                    :src="chainList[walletStore.chainId].logo"
-                    width="15"
-                    height="15"
-                    class="me-2"
-                />
                 {{ walletStore.wallet.short }}
             </template>
             <template v-else #button-content> Connect </template>
@@ -106,17 +128,6 @@
                         />
                     </div>
                 </b-form-group>
-                <b-form-group label="Network" label-class="text-opaque">
-                    <b-img
-                        v-if="isWalletConnect"
-                        :src="chainList[walletStore.chainId].logo"
-                        width="15"
-                        height="15"
-                        class="me-1"
-                    />
-                    {{ chainList[walletStore.chainId].name }}
-                    <span class="text-opaque">({{ walletStore.chainId }})</span>
-                </b-form-group>
             </b-dropdown-text>
             <b-dropdown-item
                 v-else
@@ -130,7 +141,7 @@
             v-if="walletStore.wallets.length"
             v-model="isOpen"
             variant="link"
-            menu-class="w-100"
+            menu-class="w-100 bg-body"
             no-caret
             end
             toggle-class="p-2"
@@ -178,6 +189,8 @@ import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { WalletVariant } from '../../types/enums/accountVariant';
 import { chainList } from '@thxnetwork/app/utils/chains';
+import { ChainId } from '@thxnetwork/common/enums';
+import { PROD } from '@thxnetwork/app/config/secrets';
 
 export default defineComponent({
     name: 'BaseDropdownWallets',
@@ -186,11 +199,13 @@ export default defineComponent({
     },
     data() {
         return {
+            ChainId,
             walletLogoMap,
             chainList,
             isCopied: false,
             isOpen: false,
             isOpenWallet: false,
+            isOpenChains: false,
             walletVariantMap: {
                 [WalletVariant.WalletConnect]: 'Wallet Connect',
                 [WalletVariant.Safe]: 'Safe Multisig',
@@ -214,6 +229,10 @@ export default defineComponent({
             url.searchParams.append('seed', this.walletStore.wallet.address);
             url.searchParams.append('backgroundType', 'gradientLinear');
             return url.toString();
+        },
+        chains() {
+            const allowedChains = [ChainId.Polygon, ChainId.Linea, ...(PROD ? [] : [ChainId.Hardhat])];
+            return Object.values(chainList).filter(({ chainId }) => allowedChains.includes(chainId));
         },
     },
     watch: {
@@ -260,6 +279,9 @@ export default defineComponent({
             this.walletStore.setWallet(wallet);
             this.accountStore.setGlobals({ activeWalletId: wallet._id });
             this.walletStore.list();
+        },
+        onClickChainSwitch(chain: { chainId: ChainId }) {
+            this.walletStore.switchChain(chain.chainId);
         },
     },
 });
