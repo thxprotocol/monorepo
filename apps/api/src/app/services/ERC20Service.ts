@@ -20,11 +20,16 @@ import {
 import TransactionService from './TransactionService';
 import PoolService from './PoolService';
 import { fromWei } from 'web3-utils';
-import { NODE_ENV } from '../config/secrets';
 
 async function decorate(token: ERC20TokenDocument, wallet: WalletDocument) {
     const erc20 = await getById(token.erc20Id);
-    if (!erc20 || erc20.chainId !== wallet.chainId) return;
+    if (!erc20) {
+        throw new Error(`ERC20 not found for ${token.erc20Id}`);
+    }
+
+    if (erc20.chainId !== wallet.chainId) {
+        throw new Error(`ERC20 chain ${erc20.chainId} not equal walllet chain ${wallet.chainId}`);
+    }
 
     const walletBalanceInWei = await erc20.contract.methods.balanceOf(wallet.address).call();
     const walletBalance = fromWei(walletBalanceInWei, 'ether');

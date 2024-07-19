@@ -14,7 +14,9 @@
         </template>
 
         <template #dropdown-items>
-            <b-dropdown-item disabled @click="isModalTransferShown = true"> Transfer </b-dropdown-item>
+            <b-dropdown-item :disabled="isDisabledTransfer" @click="isModalTransferShown = true">
+                Transfer
+            </b-dropdown-item>
             <b-dropdown-item :href="blockExplorerURL"> Block Explorer </b-dropdown-item>
             <BaseModalERC20Transfer
                 :id="`modalERC20Transfer${token.erc20._id}`"
@@ -36,7 +38,7 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { toast } from '../../utils/toast';
 import { fromWei } from 'web3-utils';
-import { RewardVariant } from '@thxnetwork/common/enums';
+import { RewardVariant, WalletVariant } from '@thxnetwork/common/enums';
 import { chainList } from '@thxnetwork/app/utils/chains';
 
 export default defineComponent({
@@ -68,6 +70,9 @@ export default defineComponent({
             if (!wallet || !chainId) return;
 
             return chainList[chainId].blockExplorer + '/token/' + this.token.erc20.address + '?a=' + wallet.address;
+        },
+        isDisabledTransfer() {
+            return this.walletStore.wallet?.variant !== WalletVariant.Safe;
         },
     },
     methods: {
