@@ -6,11 +6,5 @@
         "types": ["node"]
     },
     "exclude": ["jest.config.ts", "src/**/*.test.ts"],
-    "include": [
-        "package.json",
-        "scripts/**/*.ts",
-        "src/**/*.ts",
-        "../../libs/common/src/**/*",
-        "../../apps/api/src/hardhat/**/*"
-    ]
+    "include": ["package.json", "scripts/**/*.ts", "src/**/*.ts", "../../libs/common/src/**/*"]
 }

@@ -14,7 +14,6 @@
         "**/*.d.ts",
         "src/**/*.ts",
         "../../libs/common/src/**/*",
-        "../../libs/sdk/src/**/*",
-        "src/app/hardhat/export/*.json"
+        "../../libs/sdk/src/**/*"
     ]
 }

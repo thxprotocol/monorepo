@@ -132,7 +132,7 @@ class SafeService {
 
         const apiKit = this.getApiKit(wallet);
         try {
-            logger.debug('Transaction proposal start:', safeTxHash);
+            logger.debug('Transaction proposal start', { safeTxHash });
             await apiKit.proposeTransaction({
                 safeAddress: toChecksumAddress(wallet.address),
                 safeTxHash,
@@ -140,10 +140,10 @@ class SafeService {
                 senderAddress: toChecksumAddress(defaultAccount),
                 senderSignature: senderSignature.data,
             });
-            logger.debug('Transaction proposed:', safeTxHash);
+            logger.debug('Transaction proposed', { safeTxHash });
             return safeTxHash;
         } catch (error) {
-            logger.error('Error proposing transaction:', error.response ? error.response.data : error.message);
+            logger.error('Error proposing transaction', error.response ? error.response.data : error.message);
         }
     }
 
@@ -161,10 +161,10 @@ class SafeService {
                 },
                 options: { nonce },
             });
-            logger.debug('Transaction created:', safeTx);
+            logger.debug('Transaction created', { safeTx });
             return safeTx;
         } catch (error) {
-            logger.error('Error creating transaction:', error.response ? error.response.data : error.message);
+            logger.error('Error creating transaction', error.response ? error.response.data : error.message);
         }
     }
 
@@ -172,10 +172,10 @@ class SafeService {
         const safe = await this.getSafe(wallet);
         try {
             const signedTx = await safe.signTransaction(safeTx);
-            logger.debug('Transaction Signatures:', Array.from(safeTx.signatures).length);
+            logger.debug('Transaction Signatures', { count: Array.from(safeTx.signatures).length });
             return signedTx;
         } catch (error) {
-            logger.error('Error signing transaction:', error.response ? error.response.data : error.message);
+            logger.error('Error signing transaction', error.response ? error.response.data : error.message);
         }
     }
 
@@ -192,9 +192,9 @@ class SafeService {
         const apiKit = this.getApiKit(wallet);
         try {
             await apiKit.confirmTransaction(safeTxHash, signature);
-            logger.debug('Transaction confirmed:', safeTxHash);
+            logger.debug('Transaction confirmed', { safeTxHash });
         } catch (error) {
-            logger.error('Error confirming transaction:', error.response ? error.response.data : error.message);
+            logger.error('Error confirming transaction', error.response ? error.response.data : error.message);
         }
     }
 
@@ -226,11 +226,11 @@ class SafeService {
                     }
                 }
             } else {
-                logger.debug('Require more confirmations:', pendingTx.safeTxHash);
+                logger.debug('Require more confirmations', { safeTxHash: pendingTx.safeTxHash });
             }
         } catch (error) {
             await tx.updateOne({ state: TransactionState.Failed });
-            logger.error('Error executing transaction:', error.response ? error.response.data : error.message);
+            logger.error('Error executing transaction', error.response ? error.response.data : error.message);
         }
     }
 
@@ -243,12 +243,12 @@ class SafeService {
 
         if (isSent && safeTx.isExecuted && safeTx.isSuccessful) {
             await TransactionService.queryTransactionStatusReceipt(tx);
-            logger.debug('Transaction success:', safeTx);
+            logger.debug('Transaction success', { safeTx });
         }
 
         if (isSent && safeTx.isExecuted && !safeTx.isSuccessful) {
             await tx.updateOne({ state: TransactionState.Failed });
-            logger.debug('Transaction failed:', safeTx);
+            logger.debug('Transaction failed', { safeTx });
         }
     }
 
@@ -256,10 +256,10 @@ class SafeService {
         const apiKit = this.getApiKit(wallet);
         try {
             const safeTx = await apiKit.getTransaction(safeTxHash);
-            logger.debug('Transaction get:', safeTx);
+            logger.debug('Transaction get', { safeTx });
             return safeTx;
         } catch (error) {
-            logger.error('Error transaction get:', error.response ? error.response.data : error.message);
+            logger.error('Error transaction get', error.response ? error.response.data : error.message);
         }
     }
 
@@ -267,10 +267,10 @@ class SafeService {
         const safe = await this.getSafe(wallet);
         try {
             const safeTxHash = await safe.getTransactionHash(safeTx);
-            logger.debug('Transaction Hash created:', safeTxHash);
+            logger.debug('Transaction Hash created', { safeTxHash });
             return safeTxHash;
         } catch (error) {
-            logger.error('Error creating transaction hash:', error.response ? error.response.data : error.message);
+            logger.error('Error creating transaction hash', error.response ? error.response.data : error.message);
         }
     }
 
@@ -286,7 +286,7 @@ class SafeService {
             safeAddress: wallet.address,
             contractNetworks,
         });
-        logger.debug('Safe init:', wallet.address);
+        logger.debug('Safe init', { safeAddress: wallet.address });
         return safe;
     }
 
