@@ -36,12 +36,14 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
 import { parseUnits } from 'ethers/lib/utils';
-import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
 import { BigNumber } from 'ethers/lib/ethers';
 
 export default defineComponent({
     name: 'BaseModalIncreaseAmount',
+    props: {
+        show: Boolean,
+    },
     data() {
         return {
             WalletVariant,

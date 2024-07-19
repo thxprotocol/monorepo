@@ -65,7 +65,7 @@ export const useVeStore = defineStore('ve', {
                 contractNetworks[this.chainId].VotingEscrow,
                 abi.VotingEscrow,
                 'increase_amount',
-                [data.amountInWei],
+                [data.amountInWei.toString()],
             );
             const hash = await sendTransaction(wallet.address, call.to, call.data, this.chainId);
             await waitForTransactionReceipt(hash);

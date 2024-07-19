@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
@@ -30,14 +30,12 @@ import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
 import { format } from 'date-fns';
 import { getThursdaysUntilTimestamp, NinetyDaysInMs } from '@thxnetwork/app/utils/date';
-import { ChainId } from '@thxnetwork/common/enums';
 
 export default defineComponent({
     name: 'BaseModalIncreaseLockEnd',
     props: {
         show: Boolean,
         isEarly: Boolean,
-        chainId: { type: Number as PropType<ChainId>, required: true },
     },
     data() {
         return {

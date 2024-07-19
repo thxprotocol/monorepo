@@ -335,7 +335,7 @@ export const useWalletStore = defineStore('wallet', {
             return waitForTransactionReceipt(wagmiConfig, {
                 hash,
                 confirmations: 2,
-                pollingInterval: 1_000,
+                pollingInterval: 2_000,
             });
         },
         async confirmTransactions(transactions: TTransaction[]) {
