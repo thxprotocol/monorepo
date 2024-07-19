@@ -39,9 +39,6 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'BaseModalWalletCreate',
-    props: {
-        chainId: { type: Number, required: false },
-    },
     data() {
         return {
             tabIndex: 0,
