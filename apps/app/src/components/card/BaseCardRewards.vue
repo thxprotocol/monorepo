@@ -95,7 +95,7 @@ export default defineComponent({
                 .reverse();
         },
         isListShown() {
-            return !this.list.length;
+            return this.list.length;
         },
     },
     mounted() {
