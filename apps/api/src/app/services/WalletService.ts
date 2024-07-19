@@ -6,7 +6,6 @@ import SafeService from './SafeService';
 
 export default class WalletService {
     static findById(id: string) {
-        if (!id) return;
         return Wallet.findById(id);
     }
 

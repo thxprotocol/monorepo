@@ -12,7 +12,6 @@ export { ERC1155Metadata, ERC1155MetadataDocument } from './ERC1155Metadata';
 export { ERC1155Token, ERC1155TokenDocument } from './ERC1155Token';
 export { ERC20, ERC20Document } from './ERC20';
 export { ERC20Token, ERC20TokenDocument } from './ERC20Token';
-export { ERC20Transfer, ERC20TransferDocument } from './ERC20Transfer';
 export { ERC721, ERC721Document } from './ERC721';
 export { ERC721Metadata, ERC721MetadataDocument } from './ERC721Metadata';
 export { ERC721Token, ERC721TokenDocument } from './ERC721Token';

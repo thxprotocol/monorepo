@@ -1,6 +1,6 @@
 import { toChecksumAddress } from 'web3-utils';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
-import { ChainId, ERC20Type, TransactionState } from '@thxnetwork/common/enums';
+import { ChainId, ERC20Type, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { TransactionReceipt } from 'web3-core';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
@@ -10,7 +10,6 @@ import {
     ERC20Document,
     ERC20Token,
     ERC20TokenDocument,
-    ERC20Transfer,
     PoolDocument,
     RewardCoin,
     Transaction,
@@ -27,17 +26,18 @@ async function decorate(token: ERC20TokenDocument, wallet: WalletDocument) {
         throw new Error(`ERC20 not found for ${token.erc20Id}`);
     }
 
-    if (erc20.chainId !== wallet.chainId) {
+    if (wallet.variant === WalletVariant.Safe && erc20.chainId !== wallet.chainId) {
         throw new Error(`ERC20 chain ${erc20.chainId} not equal walllet chain ${wallet.chainId}`);
     }
 
     const walletBalanceInWei = await erc20.contract.methods.balanceOf(wallet.address).call();
     const walletBalance = fromWei(walletBalanceInWei, 'ether');
 
-    return Object.assign(token.toJSON() as TERC20Token, {
+    return {
+        ...(token.toJSON() as TERC20Token),
         walletBalance,
         erc20,
-    });
+    };
 }
 
 function getDeployArgs(erc20: ERC20Document, totalSupply?: string) {
@@ -179,18 +179,6 @@ export const findBy = (query: { address: string; chainId: ChainId; sub?: string 
     return ERC20.findOne(query);
 };
 
-export const addTokenForWallet = async (erc20: ERC20Document, wallet: WalletDocument) => {
-    const hasToken = await ERC20Token.exists({
-        sub: wallet.sub,
-        walletId: wallet.id,
-        erc20Id: erc20.id,
-    });
-
-    if (!hasToken) {
-        await createERC20Token(erc20, wallet);
-    }
-};
-
 export const importToken = async (chainId: number, address: string, sub: string, logoImgUrl: string) => {
     const { web3 } = NetworkService.getProvider(chainId);
     const { abi } = getArtifact('THXERC20_LimitedSupply');
@@ -208,7 +196,7 @@ export const importToken = async (chainId: number, address: string, sub: string,
 
     const wallets = await Wallet.find({ sub });
     for (const wallet of wallets) {
-        await addTokenForWallet(erc20, wallet);
+        await upsertToken(erc20, wallet);
     }
 
     return erc20;
@@ -227,19 +215,10 @@ export const approve = async (erc20: ERC20Document, wallet: WalletDocument, amou
 };
 
 export const transferFrom = async (erc20: ERC20Document, wallet: WalletDocument, to: string, amountInWei: string) => {
-    const erc20Transfer = await ERC20Transfer.create({
-        erc20Id: erc20.id,
-        from: wallet.address,
-        to,
-        amount: amountInWei,
-        chainId: wallet.chainId,
-        sub: wallet.sub,
-    });
-
-    // Check if an erc20Token exists for a known receiving wallet and create one if not
-    const receiver = await Wallet.findOne({ address: toChecksumAddress(to) });
+    // Check if the receiving wallet is known and register the token
+    const receiver = await Wallet.findOne({ address: to });
     if (receiver) {
-        await createERC20Token(erc20, receiver);
+        await upsertToken(erc20, receiver);
     }
 
     const tx = await TransactionService.sendSafeAsync(
@@ -248,8 +227,6 @@ export const transferFrom = async (erc20: ERC20Document, wallet: WalletDocument,
         erc20.contract.methods.transfer(to, amountInWei),
         { type: 'transferFromCallBack', args: { erc20Id: erc20.id } },
     );
-
-    await erc20Transfer.updateOne({ transactionId: tx.id });
 
     return tx;
 };
@@ -265,10 +242,10 @@ async function isMinter(erc20: ERC20Document, address: string) {
     return await erc20.contract.methods.hasRole(keccak256(toUtf8Bytes('MINTER_ROLE')), address).call();
 }
 
-async function createERC20Token(erc20: ERC20Document, wallet: WalletDocument) {
+async function upsertToken(erc20: ERC20Document, receiver: WalletDocument) {
     const query = {
-        sub: wallet.sub,
-        walletId: wallet.id,
+        sub: receiver.sub,
+        walletId: receiver.id,
         erc20Id: erc20.id,
     };
     await ERC20Token.findOneAndUpdate(
