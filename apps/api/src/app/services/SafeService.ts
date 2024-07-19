@@ -215,7 +215,6 @@ class SafeService {
                     const response = await safe.executeTransaction(safeTx);
                     const receipt = await response.transactionResponse.wait();
                     if (!receipt) throw new Error(`No receipt found for ${tx.safeTxHash}`);
-                    console.log(receipt);
 
                     await tx.updateOne({ transactionHash: receipt.transactionHash, state: TransactionState.Sent });
                 } catch (error) {

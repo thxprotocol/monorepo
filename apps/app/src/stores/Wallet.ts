@@ -1,10 +1,11 @@
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit';
 import { useAccountStore } from './Account';
 import { defineStore } from 'pinia';
 import { track } from '@thxnetwork/common/mixpanel';
 import { useAuthStore } from './Auth';
 import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '../types/enums/accountVariant';
-import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
+import { AUTH_URL, POLYGON_RPC, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 import {
     sendTransaction,
@@ -23,8 +24,11 @@ import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
 import { RewardVariant } from '../types/enums/rewards';
 import { encodeFunctionData } from 'viem';
+import { contractNetworks } from '../config/constants';
 import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
+import Web3 from 'web3';
+import { ethers } from 'ethers';
 
 type TRequestBodyApproval = {
     tokenAddress: string;
@@ -192,7 +196,12 @@ export const useWalletStore = defineStore('wallet', {
 
             const account = getAccount(wagmiConfig);
             const chainId = getChainId(wagmiConfig);
-            this.onChange({ account, chainId: wallet && wallet.chainId ? wallet.chainId : chainId });
+            const isSafe = wallet && wallet.variant === WalletVariant.Safe;
+
+            this.onChange({
+                account,
+                chainId: isSafe ? wallet.chainId : chainId,
+            });
         },
         async listWallets() {
             const { api, account } = useAccountStore();
@@ -302,12 +311,31 @@ export const useWalletStore = defineStore('wallet', {
                 await authStore.getPrivateKey();
             }
 
-            const signature = await authStore.sign(safeTxHash);
+            const signature = await this.signSafeTXHash(this.wallet, safeTxHash);
+            if (!signature) throw new Error('No signature');
 
             return await api.request.post(`/v1/account/wallets/confirm`, {
                 data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature }),
                 params: { walletId: this.wallet._id },
             });
+        },
+        async signSafeTXHash(wallet: TWallet, safeTxHash: string) {
+            const { privateKey } = useAuthStore();
+            if (!privateKey) throw new Error('No private key');
+
+            // Create Safe protocol kit
+            const provider = new ethers.providers.JsonRpcProvider(POLYGON_RPC);
+            const ethAdapter = new EthersAdapter({
+                ethers,
+                signerOrProvider: new ethers.Wallet(privateKey, provider),
+            });
+            const safe = await Safe.create({
+                safeAddress: wallet.address,
+                ethAdapter,
+                contractNetworks,
+            });
+            const safeSignature = await safe.signTransactionHash(safeTxHash);
+            return safeSignature.data;
         },
         async confirmTransactions(transactions: TTransaction[]) {
             for (const tx of transactions) {

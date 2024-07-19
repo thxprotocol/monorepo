@@ -17,7 +17,6 @@
                 "tsConfig": "apps/auth/tsconfig.app.json",
                 "assets": ["apps/auth/src/assets", "apps/auth/src/app/migrations"],
                 "webpackConfig": "apps/auth/webpack.config.js",
-                "generatePackageJson": true,
                 "additionalEntryPoints": [
                     {
                         "entryPath": "apps/auth/scripts/migrate-mongo.ts",
@@ -34,7 +33,8 @@
                 "production": {
                     "optimization": true,
                     "extractLicenses": true,
-                    "inspect": false
+                    "inspect": false,
+                    "generatePackageJson": true
                 }
             }
         },
