@@ -152,7 +152,7 @@ export const getTokensForSub = (sub: string) => {
 };
 
 export const getTokensForWallet = async (wallet: WalletDocument, chainId: ChainId) => {
-    const tokens = await ERC20Token.find({ sub: wallet.sub });
+    const tokens = await ERC20Token.find({ sub: wallet.sub, walletId: wallet.id });
     const result = await Promise.allSettled(tokens.map((token) => decorate(token, wallet)));
     const erc20Tokens = result.filter((r) => r.status === 'fulfilled').map((r: any) => r.value);
 
@@ -238,7 +238,7 @@ export const transferFrom = async (erc20: ERC20Document, wallet: WalletDocument,
 
     // Check if an erc20Token exists for a known receiving wallet and create one if not
     const receiver = await Wallet.findOne({ address: toChecksumAddress(to) });
-    if (receiver && !(await ERC20Token.exists({ walletId: receiver.id, erc20Id: erc20.id }))) {
+    if (receiver) {
         await createERC20Token(erc20, receiver);
     }
 
@@ -266,12 +266,19 @@ async function isMinter(erc20: ERC20Document, address: string) {
 }
 
 async function createERC20Token(erc20: ERC20Document, wallet: WalletDocument) {
-    await ERC20Token.create({
+    const query = {
         sub: wallet.sub,
         walletId: wallet.id,
         erc20Id: erc20.id,
-        chainId: erc20.chainId,
-    });
+    };
+    await ERC20Token.findOneAndUpdate(
+        query,
+        {
+            ...query,
+            chainId: erc20.chainId,
+        },
+        { upsert: true },
+    );
 }
 
 async function findDefaultTokens(wallet: WalletDocument, chainId: ChainId) {
@@ -330,7 +337,6 @@ export default {
     findDefaultTokens,
     decorate,
     findBySub,
-    createERC20Token,
     deployCallback,
     deploy,
     getAll,
