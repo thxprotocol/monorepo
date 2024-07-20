@@ -1,5 +1,5 @@
 <template>
-    <b-card header-class="d-flex align-items-center p-2" no-body class="mx-2">
+    <b-card :header-class="`d-flex align-items-center p-2 ${headerClass}`" no-body class="mx-2">
         <template #header>
             <div class="d-flex justify-content-between w-100 align-items-center" @click.stop="isVisible = !isVisible">
                 <div
@@ -7,31 +7,25 @@
                     class="d-flex align-items-center justify-content-center rounded position-relative me-3"
                 >
                     <b-img v-if="icon" :src="icon" width="30" height="30" class="rounded" />
-                    <div
-                        v-b-tooltip
-                        :title="RewardVariant[rewardVariant]"
-                        :class="
-                            icon
-                                ? 'small position-absolute bg-primary rounded-circle d-flex align-items-center justify-content-center'
-                                : ''
-                        "
-                        style="right: -5px; bottom: -5px; width: 20px; height: 20px"
-                    >
-                        <i class="text-opaque" :class="(icon ? 'small mt-1 ' : ' ') + iconMap[rewardVariant]" />
+                    <div v-else>
+                        <i class="text-opaque" :class="iconMap[rewardVariant]" />
                     </div>
                 </div>
                 <div class="d-flex flex-grow-1 justify-content-between pe-3">
                     <slot name="header" />
                 </div>
-                <b-dropdown variant="link" size="sm" no-caret end>
+                <b-dropdown variant="link" size="sm" no-caret end header-class="d-flex">
                     <template #button-content>
-                        <i class="fas fa-ellipsis-h ml-0 text-muted"></i>
+                        <i class="fas fa-ellipsis-v ml-0 text-muted"></i>
                     </template>
-                    <slot name="dropdown-items"></slot>
+                    <b-dropdown-header v-if="createdAt">
+                        <div class="text-opaque">
+                            {{ format(new Date(createdAt), 'MMM do hh:mm') }}
+                        </div>
+                        <i class="text-opaque" :class="`ms-auto ${iconMap[rewardVariant]}`" />
+                    </b-dropdown-header>
                     <b-dropdown-divider />
-                    <b-dropdown-text v-if="createdAt" class="text-end small text-opaque py-0">
-                        {{ format(new Date(createdAt), 'MMM do hh:mm') }}
-                    </b-dropdown-text>
+                    <slot name="dropdown-items"></slot>
                 </b-dropdown>
             </div>
         </template>
@@ -54,6 +48,7 @@ export default defineComponent({
     name: 'BaseCardPayment',
     props: {
         icon: String,
+        headerClass: String,
         rewardVariant: { type: Number, required: true },
         createdAt: Date,
     },
@@ -70,3 +65,12 @@ export default defineComponent({
     },
 });
 </script>
+
+<style>
+.dropdown-header {
+    display: flex !important;
+    font-size: 0.8rem !important;
+    opacity: 0.75 !important;
+    color: var(--bs-dropdown-header-color) !important;
+}
+</style>

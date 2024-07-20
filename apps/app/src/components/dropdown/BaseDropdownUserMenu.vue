@@ -13,7 +13,9 @@
             <b-dropdown-divider />
             <b-dropdown-item @click="$router.push(`/c/${accountStore.config.slug}/about`)"> About </b-dropdown-item>
         </template>
-        <b-dropdown-item href="https://discord.com/invite/uHHheeEJ" target="_blank"> Support </b-dropdown-item>
+        <b-dropdown-item href="https://discord.com/invite/thx-network-836147176270856243" target="_blank">
+            Support
+        </b-dropdown-item>
         <b-dropdown-divider />
         <b-dropdown-item
             size="sm"

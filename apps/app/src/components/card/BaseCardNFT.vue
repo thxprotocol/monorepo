@@ -3,22 +3,42 @@
         :reward-variant="RewardVariant.NFT"
         :icon="token.nft && token.nft.logoImgUrl"
         :created-at="token.createdAt"
+        header-class="cursor-pointer"
     >
         <template #header>
-            {{ token.metadata.name }}
             <div>
-                <b-spinner v-if="!token.tokenId" small variant="primary" />
-                <div v-else-if="token.nft.variant === NFTVariant.ERC721" class="text-accent fw-bold">
-                    #{{ token.tokenId }}
+                <div class="d-flex justify-content-start">
+                    <div class="me-1">
+                        <b-spinner v-if="!token.tokenId" small variant="primary" />
+                        <div v-else-if="token.nft.variant === NFTVariant.ERC721" class="text-accent fw-bold">
+                            #{{ token.tokenId }}
+                        </div>
+                        <div v-else-if="token.nft.variant === NFTVariant.ERC1155" class="text-accent fw-bold">
+                            {{ Number(balance) }}
+                        </div>
+                    </div>
+                    {{ token.metadata.name }}
                 </div>
-                <div v-else-if="token.nft.variant === NFTVariant.ERC1155" class="text-accent fw-bold">
-                    {{ Number(balance) }}
-                </div>
+                <div class="small text-opaque" v-html="token.nft.name" />
             </div>
         </template>
 
         <template #dropdown-items>
-            <b-dropdown-item @click.stop="isModalTransferShown = true"> Transfer </b-dropdown-item>
+            <b-dropdown-item
+                link-class="d-flex justify-content-between align-items-center"
+                :disabled="isDisabledTransfer"
+                @click.stop="isModalTransferShown = true"
+            >
+                Transfer
+                <i class="fas fa-caret-right text-opaque"></i>
+            </b-dropdown-item>
+            <b-dropdown-item
+                :href="blockExplorerURL"
+                target="_blank"
+                link-class="d-flex justify-content-between align-items-center"
+            >
+                Block Explorer <i class="fas fa-caret-right text-opaque"></i>
+            </b-dropdown-item>
             <BaseModalERC721Transfer
                 :id="`modalNFTTransfer${token.nft._id}`"
                 :show="isModalTransferShown"
@@ -103,6 +123,7 @@ import { useAccountStore } from '../../stores/Account';
 import { toast } from '../../utils/toast';
 import { WalletVariant } from '../../types/enums/accountVariant';
 import { RewardVariant } from '@thxnetwork/common/enums';
+import { chainList } from '@thxnetwork/app/utils/chains';
 
 export default defineComponent({
     name: 'BaseCardNFT',
@@ -128,14 +149,23 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useWalletStore),
+        blockExplorerURL() {
+            if (!this.walletStore.wallet) return;
+            return (
+                chainList[this.token.chainId].blockExplorer +
+                '/token/' +
+                this.token.nft.address +
+                '?a=' +
+                this.walletStore.wallet.address
+            );
+        },
         isNotOwner() {
             if (!this.walletStore.wallet) return false;
             const { address } = this.walletStore.wallet;
             return this.owner ? this.owner !== address : false;
         },
         isDisabledTransfer() {
-            if (!this.walletStore.wallet) return true;
-            return this.walletStore.wallet.variant !== WalletVariant.Safe;
+            return this.walletStore.wallet?.variant !== WalletVariant.Safe;
         },
     },
     watch: {

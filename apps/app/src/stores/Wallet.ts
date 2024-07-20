@@ -62,7 +62,7 @@ export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
         modal: null,
         account: null,
-        chainId: null,
+        chainId: ChainId.Polygon,
         allowances: {},
         balances: {},
         erc20: [],

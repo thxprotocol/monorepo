@@ -65,6 +65,7 @@ type TERC20 = {
 
 type TERC721Token = {
     _id: string;
+    chainId: ChainId;
     sub: string;
     nft: TERC721 | TERC1155;
     recipient: string;

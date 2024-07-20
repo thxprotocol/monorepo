@@ -15,7 +15,7 @@
             no-caret
             start
         >
-            <template v-if="walletStore.wallet" #button-content>
+            <template #button-content>
                 <b-img :src="chainList[walletStore.chainId].logo" width="15" height="15" class="me-2" />
             </template>
             <b-dropdown-item

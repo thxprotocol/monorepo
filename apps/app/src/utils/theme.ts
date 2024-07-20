@@ -135,6 +135,7 @@ export function getStyles(elements: any, colors: any) {
         },
         '.dropdown-menu': {
             '--bs-dropdown-bg': theme.elements.btnBg,
+            '--bs-dropdown-header-color': theme.elements.btnText,
             '--bs-dropdown-link-hover-bg': theme.elements.btnBgDarker,
             '--bs-dropdown-link-hover-color': theme.elements.btnText,
             '--bs-dropdown-link-active-bg': theme.elements.btnBgDarker,

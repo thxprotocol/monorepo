@@ -55,7 +55,7 @@
                     <i class="fas fa-external-link-alt ms-2" />
                 </b-button>
                 <b-button
-                    href="https://discord.com/invite/uHHheeEJ"
+                    href="https://discord.com/invite/thx-network-836147176270856243"
                     target="_blank"
                     variant="link"
                     class="text-white text-decoration-none"

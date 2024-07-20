@@ -9,15 +9,26 @@
                 <div class="text-success fw-bold me-auto">
                     {{ token.walletBalance }}
                 </div>
-                <span class="small text-opaque">{{ token.erc20.symbol }}</span>
+                <div class="small text-opaque">{{ token.erc20.symbol }}</div>
             </div>
         </template>
 
         <template #dropdown-items>
-            <b-dropdown-item :disabled="isDisabledTransfer" @click="isModalTransferShown = true">
+            <b-dropdown-item
+                :disabled="isDisabledTransfer"
+                link-class="d-flex justify-content-between align-items-center"
+                @click="isModalTransferShown = true"
+            >
                 Transfer
+                <i class="fas fa-caret-right text-opaque"></i>
             </b-dropdown-item>
-            <b-dropdown-item :href="blockExplorerURL" target="_blank"> Block Explorer </b-dropdown-item>
+            <b-dropdown-item
+                :href="blockExplorerURL"
+                target="_blank"
+                link-class="d-flex justify-content-between align-items-center"
+            >
+                Block Explorer <i class="fas fa-caret-right text-opaque"></i>
+            </b-dropdown-item>
             <BaseModalERC20Transfer
                 :id="`modalERC20Transfer${token.erc20._id}`"
                 :show="isModalTransferShown"
