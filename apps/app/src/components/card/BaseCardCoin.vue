@@ -17,7 +17,7 @@
             <b-dropdown-item :disabled="isDisabledTransfer" @click="isModalTransferShown = true">
                 Transfer
             </b-dropdown-item>
-            <b-dropdown-item :href="blockExplorerURL"> Block Explorer </b-dropdown-item>
+            <b-dropdown-item :href="blockExplorerURL" target="_blank"> Block Explorer </b-dropdown-item>
             <BaseModalERC20Transfer
                 :id="`modalERC20Transfer${token.erc20._id}`"
                 :show="isModalTransferShown"
@@ -66,10 +66,14 @@ export default defineComponent({
             return this.token.migrationBalance ? Number(fromWei(this.token.migrationBalance)) > 0 : false;
         },
         blockExplorerURL() {
-            const { wallet, chainId } = this.walletStore;
-            if (!wallet || !chainId) return;
-
-            return chainList[chainId].blockExplorer + '/token/' + this.token.erc20.address + '?a=' + wallet.address;
+            if (!this.walletStore.wallet) return;
+            return (
+                chainList[this.token.chainId].blockExplorer +
+                '/token/' +
+                this.token.erc20.address +
+                '?a=' +
+                this.walletStore.wallet.address
+            );
         },
         isDisabledTransfer() {
             return this.walletStore.wallet?.variant !== WalletVariant.Safe;
