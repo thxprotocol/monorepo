@@ -42,7 +42,7 @@ import { RewardVariant, WalletVariant } from '@thxnetwork/common/enums';
 import { chainList } from '@thxnetwork/app/utils/chains';
 
 export default defineComponent({
-    name: 'BaseCardERC20',
+    name: 'BaseCardCoin',
     props: {
         token: {
             type: Object as PropType<TERC20Token>,

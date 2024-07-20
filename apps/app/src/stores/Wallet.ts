@@ -212,7 +212,7 @@ export const useWalletStore = defineStore('wallet', {
             const token = await api.erc721.get(_id);
             const index = this.erc721.findIndex((t) => t._id === token._id);
 
-            this.erc721[index] = { ...token, component: 'BaseCardERC721' };
+            this.erc721[index] = { ...token, component: 'BaseCardNFT' };
         },
         async list() {
             const { api } = useAccountStore();
@@ -234,21 +234,21 @@ export const useWalletStore = defineStore('wallet', {
                 ? erc20.map((t: TERC20Token) => ({
                       ...t,
                       rewardVariant: RewardVariant.Coin,
-                      component: 'BaseCardERC20',
+                      component: 'BaseCardCoin',
                   }))
                 : [];
             this.erc721 = erc721
                 ? erc721.map((t: TERC721Token) => ({
                       ...t,
                       rewardVariant: RewardVariant.NFT,
-                      component: 'BaseCardERC721',
+                      component: 'BaseCardNFT',
                   }))
                 : [];
             this.erc1155 = erc1155
                 ? erc1155.map((t: TERC721Token) => ({
                       ...t,
                       rewardVariant: RewardVariant.NFT,
-                      component: 'BaseCardERC721',
+                      component: 'BaseCardNFT',
                   }))
                 : [];
             this.couponCodes = payments

@@ -105,7 +105,7 @@ import { WalletVariant } from '../../types/enums/accountVariant';
 import { RewardVariant } from '@thxnetwork/common/enums';
 
 export default defineComponent({
-    name: 'BaseCardERC721',
+    name: 'BaseCardNFT',
     props: {
         token: {
             type: Object as PropType<TERC721Token>,

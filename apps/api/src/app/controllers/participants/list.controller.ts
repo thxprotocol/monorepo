@@ -37,7 +37,8 @@ const controller = async (req: Request, res: Response) => {
 
         // If no participants were found, create a participant for the authenticated user
         if (!participants.length) {
-            const participant = await Participant.create({ poolId, sub: account.sub });
+            const query = { poolId, sub: account.sub };
+            const participant = await Participant.findOneAndUpdate(query, { ...query }, { new: true, upsert: true });
             participants.push(participant);
         }
     }

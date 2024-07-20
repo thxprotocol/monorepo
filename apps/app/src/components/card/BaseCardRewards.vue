@@ -26,16 +26,16 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useAuthStore } from '../../stores/Auth';
 import { RewardVariant } from '@thxnetwork/common/enums';
 import { useAccountStore } from '../../stores/Account';
-import BaseCardERC20 from '../../components/card/BaseCardERC20.vue';
-import BaseCardERC721 from '../../components/card/BaseCardERC721.vue';
+import BaseCardCoin from '../../components/card/BaseCardCoin.vue';
+import BaseCardNFT from '../../components/card/BaseCardNFT.vue';
 import BaseCardCouponCode from '../../components/card/BaseCardCouponCode.vue';
 import BaseCardDiscordRole from '../../components/card/BaseCardDiscordRole.vue';
 
 export default defineComponent({
     name: 'BaseViewWallet',
     components: {
-        BaseCardERC20,
-        BaseCardERC721,
+        BaseCardCoin,
+        BaseCardNFT,
         BaseCardCouponCode,
         BaseCardDiscordRole,
     },
