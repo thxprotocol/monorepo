@@ -25,12 +25,11 @@ import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
 import { RewardVariant } from '../types/enums/rewards';
 import { encodeFunctionData } from 'viem';
+import { ethers } from 'ethers';
+import { abi } from '../utils/abi';
 import { contractNetworks } from '../config/constants';
 import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
-import { ethers } from 'ethers';
-import { Hash } from 'crypto';
-import { abi } from '../utils/abi';
 
 type TRequestBodyApproval = {
     tokenAddress: string;

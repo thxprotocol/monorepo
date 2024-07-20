@@ -1,20 +1,30 @@
 import { Request, Response } from 'express';
-import { Participant } from '@thxnetwork/api/models/Participant';
+import { Pool, Participant } from '@thxnetwork/api/models';
 import { query } from 'express-validator';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
-import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
-import IdentityService from '@thxnetwork/api/services/IdentityService';
 import PoolService from '@thxnetwork/api/services/PoolService';
+import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
+import THXService from '@thxnetwork/api/services/THXService';
 
 const validation = [query('poolId').optional().isMongoId()];
 
 const controller = async (req: Request, res: Response) => {
     const poolId = req.query.poolId as string;
-    const query: { sub: string; poolId?: string } = { sub: req.auth.sub };
-    if (poolId) query.poolId = poolId;
+    const query = { sub: req.auth.sub };
+    if (poolId) query['poolId'] = poolId;
 
-    // Get all participants for the authenticated user and optionally filter by poolId
+    // Extend participant details with pool info
     const participants = await Participant.find(query);
+    const pools = await Pool.find({ _id: participants.map((p) => p.poolId) });
+    const result = participants.map(({ _id, poolId, balance, isSubscribed }) => {
+        const pool = pools.find((pool) => pool.id === poolId);
+        return {
+            _id,
+            balance,
+            isSubscribed,
+            campaign: { title: pool ? pool.settings.title : '' },
+        };
+    });
 
     // Run pool specific operations
     if (poolId) {
@@ -23,7 +33,7 @@ const controller = async (req: Request, res: Response) => {
         if (!account) throw new NotFoundError('Account not found.');
 
         // Force connect account address as identity might be available
-        await IdentityService.forceConnect(pool, account);
+        await THXService.forceConnect(pool, account);
 
         // If no participants were found, create a participant for the authenticated user
         if (!participants.length) {
@@ -32,7 +42,7 @@ const controller = async (req: Request, res: Response) => {
         }
     }
 
-    res.json(participants);
+    res.json(result);
 };
 
 export { controller, validation };

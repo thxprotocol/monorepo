@@ -84,6 +84,7 @@ declare module 'vue' {
     BaseFormGroupInputTokenAmount: typeof import('./src/components/formgroup/BaseFormGroupInputTokenAmount.vue')['default']
     BaseFormGroupLockAmount: typeof import('./src/components/formgroup/BaseFormGroupLockAmount.vue')['default']
     BaseFormGroupLockEnd: typeof import('./src/components/formgroup/BaseFormGroupLockEnd.vue')['default']
+    BaseFormGroupNotifications: typeof import('./src/components/formgroup/BaseFormGroupNotifications.vue')['default']
     BaseFormGroupUsername: typeof import('./src/components/formgroup/BaseFormGroupUsername.vue')['default']
     BaseFormGroupWalletAddress: typeof import('./src/components/formgroup/BaseFormGroupWalletAddress.vue')['default']
     BaseFormGroupWalletSelect: typeof import('./src/components/formgroup/BaseFormGroupWalletSelect.vue')['default']
@@ -167,6 +168,7 @@ declare module 'vue' {
     BSpinner: typeof import('bootstrap-vue-next')['BSpinner']
     BTab: typeof import('bootstrap-vue-next')['BTab']
     BTabs: typeof import('bootstrap-vue-next')['BTabs']
+    copy: typeof import('./src/components/formgroup/BaseFormGroupConnected copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
