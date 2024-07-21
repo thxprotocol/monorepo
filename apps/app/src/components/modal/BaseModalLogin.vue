@@ -92,12 +92,9 @@ export default defineComponent({
             imgWalletConnect,
             error: '',
             email: '',
-<<<<<<< HEAD
             otp: '',
             isEmailSubmitted: false,
             isShown: false,
-=======
->>>>>>> develop
             isLoading: false,
             shortenAddress,
         };
