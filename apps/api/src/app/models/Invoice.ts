@@ -6,7 +6,7 @@ export const Invoice = mongoose.model<InvoiceDocument>(
     'Invoice',
     new mongoose.Schema(
         {
-            poolId: String,
+            sub: String,
             additionalUnitCount: Number,
             costPerUnit: Number,
             costSubscription: Number,

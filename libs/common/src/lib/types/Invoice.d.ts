@@ -1,5 +1,5 @@
 type TInvoice = {
-    poolId: string;
+    sub: string;
     additionalUnitCount: number;
     costPerUnit: number;
     costSubscription: number;
