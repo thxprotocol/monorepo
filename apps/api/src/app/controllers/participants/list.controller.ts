@@ -4,7 +4,7 @@ import { query } from 'express-validator';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 import PoolService from '@thxnetwork/api/services/PoolService';
 import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
-import THXService from '@thxnetwork/api/services/THXService';
+import IdentityService from '@thxnetwork/api/services/IdentityService';
 
 const validation = [query('poolId').optional().isMongoId()];
 
@@ -24,7 +24,7 @@ const controller = async (req: Request, res: Response) => {
         if (!account) throw new NotFoundError('Account not found.');
 
         // Force connect account address as identity might be available
-        await THXService.forceConnect(pool, account);
+        await IdentityService.forceConnect(pool, account);
 
         // If no participants were found, create a participant for the authenticated user
         if (!participants.length) {
@@ -35,12 +35,10 @@ const controller = async (req: Request, res: Response) => {
     }
 
     // Decorate response
-    const result = participants.map(({ _id, poolId, balance, isSubscribed }) => {
-        const pool = pools.find((pool) => pool.id === poolId);
+    const result = participants.map((p) => {
+        const pool = pools.find((pool) => pool.id === p.poolId);
         return {
-            _id,
-            balance,
-            isSubscribed,
+            ...p.toJSON(),
             campaign: { title: pool ? pool.settings.title : '' },
         };
     });

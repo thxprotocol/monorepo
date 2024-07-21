@@ -6,8 +6,8 @@
             class="w-100 rounded"
             :style="{
                 backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                borderTopRightRadius: walletStore.wallets.length ? '0 !important' : null,
-                borderBottomRightRadius: walletStore.wallets.length ? '0 !important' : null,
+                borderTopRightRadius: '0 !important',
+                borderBottomRightRadius: '0 !important',
             }"
             toggle-class="d-flex align-items-center justify-content-end text-white text-decoration-none p-2 ps-3 pe-0"
             auto-close="outside"

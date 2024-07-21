@@ -34,6 +34,7 @@ export { QuestGitcoinEntry, QuestGitcoinEntryDocument } from './QuestGitcoinEntr
 export { QuestInvite, QuestInviteDocument } from './QuestInvite';
 export { QuestInviteEntry, QuestInviteEntryDocument } from './QuestInviteEntry';
 export { QuestInviteCode, QuestInviteCodeDocument } from './QuestInviteCode';
+export { QuestInviteInvitee, QuestInviteInviteeDocument } from './QuestInviteInvitee';
 export { QuestSocial, QuestSocialDocument } from './QuestSocial';
 export { QuestSocialEntry, QuestSocialEntryDocument } from './QuestSocialEntry';
 export { QuestWeb3, QuestWeb3Document } from './QuestWeb3';

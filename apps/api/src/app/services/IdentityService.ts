@@ -1,21 +1,22 @@
-import { Identity } from '@thxnetwork/api/models';
+import { Identity, PoolDocument, Wallet } from '@thxnetwork/api/models';
 import { uuidV1 } from '../util/uuid';
 import AccountProxy from '../proxies/AccountProxy';
+import { WalletVariant } from '@thxnetwork/common/enums';
 
-export default class IdentityService {
-    static getUUID(sub: string, salt: string) {
+class IdentityService {
+    getUUID(sub: string, salt: string) {
         return uuidV1(`${sub}${salt}`);
     }
 
     // Derive uuid v1 from pool.sub + salt. Using uuid v1 format so we can
     // validate the input using express-validator
-    static async getIdentityForSalt(sub: string, salt: string) {
+    async getIdentityForSalt(sub: string, salt: string) {
         const uuid = this.getUUID(sub, salt);
         const query = { sub, uuid };
         return await Identity.findOneAndUpdate(query, query, { new: true, upsert: true });
     }
 
-    static async list(sub: string, page: number, limit: number) {
+    async list(sub: string, page: number, limit: number) {
         const startIndex = (page - 1) * limit;
         const endIndex = page * limit;
         const total = await Identity.find({ sub }).countDocuments().exec();
@@ -47,4 +48,18 @@ export default class IdentityService {
 
         return identities;
     }
+
+    async forceConnect(pool: PoolDocument, account: TAccount) {
+        // Search for WalletConnect wallets for this sub
+        const wallets = await Wallet.find({ sub: account.sub, variant: WalletVariant.WalletConnect });
+        if (!wallets.length) return;
+
+        // Create a list of uuids for these wallets
+        const uuids = wallets.map((wallet) => this.getUUID(pool.sub, wallet.address));
+
+        // Find any identity for these uuids and update
+        await Identity.findOneAndUpdate({ uuid: { $in: uuids } }, { accountId: account.sub });
+    }
 }
+
+export default new IdentityService();
