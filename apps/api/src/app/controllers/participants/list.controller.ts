@@ -35,12 +35,10 @@ const controller = async (req: Request, res: Response) => {
     }
 
     // Decorate response
-    const result = participants.map(({ _id, poolId, balance, isSubscribed }) => {
-        const pool = pools.find((pool) => pool.id === poolId);
+    const result = participants.map((p) => {
+        const pool = pools.find((pool) => pool.id === p.poolId);
         return {
-            _id,
-            balance,
-            isSubscribed,
+            ...p.toJSON(),
             campaign: { title: pool ? pool.settings.title : '' },
         };
     });

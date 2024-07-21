@@ -219,10 +219,11 @@ export default class QuestInviteService implements IQuestService {
     private async getUses({ quest, account }: { quest: TQuestInvite; account?: TAccount }) {
         if (!account) return 0;
 
-        const codes = await QuestInviteCode.find({ questId: String(quest._id), sub: account.sub });
-        const uses = await Participant.countDocuments({
-            poolId: quest.poolId,
-            inviteCode: { $in: codes.map(({ code }) => code) },
+        const inviteCodes = await QuestInviteCode.find({ questId: String(quest._id), sub: account.sub });
+        const codes = inviteCodes.map(({ code }) => code);
+        const uses = await QuestInviteInvitee.countDocuments({
+            questId: String(quest._id),
+            code: { $in: codes },
         });
         return uses;
     }
@@ -238,13 +239,14 @@ export default class QuestInviteService implements IQuestService {
     private async getInvitees({ quest, account }: { quest: TQuestInvite; account?: TAccount }) {
         if (!account) return [];
 
-        const participants = await Participant.find({ poolId: quest.poolId, invitedBySub: account.sub });
-        const subs = participants.map((participant) => participant.sub);
-        const accounts = await AccountProxy.find({ subs });
+        const inviteCodes = await this.getCodes({ quest, account });
+        const codes = inviteCodes.map(({ code }) => code);
+        const invitees = await QuestInviteInvitee.find({ questId: String(quest._id), code: { $in: codes } });
+        const accounts = await AccountProxy.find({ subs: invitees.map((invitee) => invitee.sub) });
 
-        return accounts.map((account) => {
-            const participant = participants.find((participant) => participant.sub === account.sub);
-            return { username: account.username, createdAt: participant.createdAt };
+        return invitees.map(({ sub, createdAt }) => {
+            const account = accounts.find((account) => account.sub === sub);
+            return { username: account.username, createdAt };
         });
     }
 }

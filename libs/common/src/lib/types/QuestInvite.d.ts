@@ -18,4 +18,5 @@ type TQuestInviteInvitee = {
     questId: string;
     sub: string;
     code: string;
+    createdAt: Date;
 };
