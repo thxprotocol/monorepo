@@ -5,7 +5,7 @@ import { BadRequestError, NotFoundError } from '@thxnetwork/api/util/errors';
 import ERC20Service from '@thxnetwork/api/services/ERC20Service';
 import WalletService from '@thxnetwork/api/services/WalletService';
 
-const validation = [param('id').isMongoId(), query('walletId').isMongoId()];
+const validation = [param('id').isMongoId(), query('walletId').isMongoId(), query('chainId').isInt()];
 
 const controller = async (req: Request, res: Response) => {
     const token = await ERC20Service.getTokenById(req.params.id);

@@ -1,8 +1,7 @@
 import { BootstrapVueNext, vBTooltip } from 'bootstrap-vue-next';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import { Sentry } from '@thxnetwork/common/sentry';
-import { GCLOUD_RECAPTCHA_SITE_KEY, MODE, API_URL, MIXPANEL_TOKEN, AUTH_URL, WIDGET_URL } from './config/secrets';
+import { GCLOUD_RECAPTCHA_SITE_KEY, API_URL, MIXPANEL_TOKEN } from './config/secrets';
 import App from './App.vue';
 import VueClipboard from 'vue3-clipboard';
 import Vue3Toastify from 'vue3-toastify';
@@ -19,9 +18,6 @@ declare global {
 const pinia = createPinia();
 const app = createApp(App);
 
-if (MODE === 'production') {
-    Sentry.init(app, router, [WIDGET_URL, API_URL, AUTH_URL]);
-}
 // Create the Mixpanel instance
 Mixpanel.init(MIXPANEL_TOKEN, API_URL);
 

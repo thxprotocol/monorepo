@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { getArtifact } from '../hardhat';
 
 export type ERC721Document = mongoose.Document & TERC721;
@@ -23,7 +23,7 @@ const schema = new mongoose.Schema(
 
 schema.virtual('contract').get(function () {
     if (!this.address) return;
-    const { web3 } = getProvider(this.chainId);
+    const { web3 } = NetworkService.getProvider(this.chainId);
     const { abi } = getArtifact('THXERC721');
     return new web3.eth.Contract(abi, this.address);
 });

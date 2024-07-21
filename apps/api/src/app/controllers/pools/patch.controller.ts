@@ -20,7 +20,6 @@ const validation = [
 ];
 
 const controller = async (req: Request, res: Response) => {
-    // #swagger.tags = ['Pools']
     const pool = await PoolService.getById(req.params.id);
     if (!pool) throw new NotFoundError('Could not find the Asset Pool for this id');
 

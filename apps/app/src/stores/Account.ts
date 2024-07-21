@@ -130,8 +130,48 @@ export const useAccountStore = defineStore('account', {
             this.isMobile = window.innerWidth < BREAKPOINT_LG;
             this.windowHeight = window.innerHeight;
         },
+<<<<<<< HEAD
         isSubscribed(id: string) {
             return this.participants.find((p) => p.poolId === id)?.isSubscribed;
+=======
+        addEventListeners() {
+            const authStore = useAuthStore();
+
+            authStore.userManager.events.addUserLoaded(this.onUserLoaded);
+            authStore.userManager.events.addUserUnloaded(this.onUserUnloaded);
+            authStore.userManager.events.load(this.onLoad);
+            authStore
+                .getUser()
+                .then(() => {
+                    if (!authStore.user) {
+                        this.setStatus(null);
+                    }
+                })
+                .catch((error) => {
+                    this.setStatus(null);
+                    console.log(error);
+                });
+        },
+        async onUserLoaded(user: User) {
+            // Set user in API SDK
+            if (user.access_token) {
+                useAuthStore().onUserLoadedCallback(user);
+                this.api.request.setUser(user);
+                await this.getAccount();
+                track('UserSignsIn', [this.account, { poolId: this.poolId }]);
+
+                this.connectIdentity();
+            }
+
+            this.getUserData();
+        },
+        onUserUnloaded() {
+            return useAuthStore().onUserUnloadedCallback();
+        },
+        isSubscribed(campaignId: string) {
+            const participant = this.participants.find((p) => p.poolId === campaignId);
+            return participant ? participant.isSubscribed : false;
+>>>>>>> develop
         },
         async getAccount() {
             this.account = await this.api.request.get('/v1/account');
@@ -146,7 +186,6 @@ export const useAccountStore = defineStore('account', {
             const params: { poolId?: string } = {};
             if (poolId) params['poolId'] = poolId;
             if (this.poolId) params['poolId'] = this.poolId;
-
             this.participants = await this.api.request.get('/v1/participants', { params });
         },
         async updateParticipant({ email, isSubscribed }: Partial<TParticipant> & { email: string }) {

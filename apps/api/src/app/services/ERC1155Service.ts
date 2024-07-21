@@ -1,7 +1,6 @@
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
-import { TransactionReceipt } from 'web3-core';
 import { ChainId, TransactionState, ERC1155TokenState } from '@thxnetwork/common/enums';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import { API_URL, VERSION } from '../config/secrets';
@@ -22,11 +21,13 @@ import {
     ERC1155Token,
 } from '@thxnetwork/api/models';
 import { getArtifact } from '../hardhat';
+import { TransactionReceipt } from 'web3-core';
+import { toChecksumAddress } from 'web3-utils';
 
 const contractName = 'THXERC1155';
 
 async function deploy(data: TERC1155, forceSync = true): Promise<ERC1155Document> {
-    const { web3, defaultAccount } = getProvider(data.chainId);
+    const { web3, defaultAccount } = NetworkService.getProvider(data.chainId);
     const { abi, bytecode } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi);
     const erc1155 = await ERC1155.create(data);
@@ -52,7 +53,7 @@ async function deployCallback({ erc1155Id }: TERC1155DeployCallbackArgs, receipt
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
     }
 
-    await ERC1155.findByIdAndUpdate(erc1155Id, { address: receipt.contractAddress });
+    await ERC1155.findByIdAndUpdate(erc1155Id, { address: toChecksumAddress(receipt.contractAddress) });
 }
 
 export async function queryDeployTransaction(erc1155: ERC1155Document): Promise<ERC1155Document> {
@@ -111,22 +112,21 @@ export async function mint(
     amount: string,
 ): Promise<ERC1155TokenDocument> {
     const tokenUri = await IPFSService.getTokenURI(erc1155, String(metadata._id), String(metadata.tokenId));
+    const query = {
+        erc1155Id: erc1155.id,
+        tokenId: metadata.tokenId,
+        sub: wallet.sub,
+        walletId: wallet.id,
+        chainId: erc1155.chainId,
+    };
     const erc1155token = await ERC1155Token.findOneAndUpdate(
+        query,
         {
-            erc1155Id: String(erc1155._id),
-            tokenId: metadata.tokenId,
-            sub: wallet.sub,
-            walletId: String(wallet._id),
-        },
-        {
-            sub: wallet.sub,
+            ...query,
+            state: ERC1155TokenState.Pending,
             tokenUri: erc1155.baseURL.replace('{id}', tokenUri),
             recipient: wallet.address,
-            state: ERC1155TokenState.Pending,
-            erc1155Id: String(erc1155._id),
-            metadataId: String(metadata._id),
-            walletId: String(wallet._id),
-            tokenId: metadata.tokenId,
+            metadataId: metadata.id,
         },
         { upsert: true, new: true },
     );
@@ -309,7 +309,7 @@ export const update = (erc1155: ERC1155Document, updates: Partial<TERC1155>) => 
 };
 
 export const getOnChainERC1155Token = async (chainId: number, address: string) => {
-    const { web3 } = getProvider(chainId);
+    const { web3 } = NetworkService.getProvider(chainId);
     const { abi } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi, address);
     const uri = await contract.methods.uri(1).call();

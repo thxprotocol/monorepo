@@ -28,9 +28,9 @@ type TPool = {
     transactions: string[];
     version?: string;
     variant?: 'defaultDiamond' | 'registry' | 'factory' | 'sharedWallet';
-    events: string[];
+    eventNames: string[];
+    webhooks: TWebhook[];
     brand: TBrand;
-    // wallets: TWallet[];
     settings: TPoolSettings;
     widget: { domain: string; active: boolean };
     collaborators: TCollaborator[];
@@ -50,7 +50,6 @@ type TPoolSettings = {
     leaderboardInWeeks: number;
     isPublished: boolean;
     isWeeklyDigestEnabled: boolean;
-    galachainPrivateKey: string;
     authenticationMethods: AccountVariant[];
 };
 

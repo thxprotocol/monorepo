@@ -1,17 +1,10 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
-import { ChainId } from '@thxnetwork/common/enums';
-import { MODE } from '../config/secrets';
-import { WalletVariant } from '../types/enums/accountVariant';
 import { contractNetworks } from '../config/constants';
-import { BigNumber } from 'alchemy-sdk';
 import { track } from '@thxnetwork/common/mixpanel';
-import poll from 'promise-poller';
-
-export function getChainId() {
-    return MODE !== 'production' ? ChainId.Hardhat : ChainId.Polygon;
-}
+import { ChainId } from '@thxnetwork/common/enums';
+import { abi } from '../utils/abi';
 
 export const useVeStore = defineStore('ve', {
     state: (): TVeState => ({
@@ -22,6 +15,12 @@ export const useVeStore = defineStore('ve', {
         isAccepted: false,
         isModalClaimTokensShown: false,
     }),
+    getters: {
+        chainId() {
+            const { chainId } = useWalletStore();
+            return [ChainId.Polygon, ChainId.Hardhat].includes(chainId) ? chainId : ChainId.Polygon;
+        },
+    },
     actions: {
         reset() {
             this.lock = { end: 0, amount: '0' };
@@ -31,7 +30,7 @@ export const useVeStore = defineStore('ve', {
         },
         async getLocks(wallet: TWallet) {
             const { api } = useAccountStore();
-            const locks = await api.request.get('/v1/ve', { params: { walletId: wallet._id } });
+            const locks = await api.request.get('/v1/ve', { params: { walletId: wallet._id, chainId: this.chainId } });
             const { amount, end, now, balance, rewards } = locks[0];
             this.lock = { amount, end };
             this.now = now;
@@ -39,294 +38,93 @@ export const useVeStore = defineStore('ve', {
             this.balance = balance;
         },
         async deposit(wallet: TWallet, { lockEndTimestamp, amountInWei }: TRequestBodyDeposit) {
-            const map: { [variant: string]: (wallet: TWallet, data: TRequestBodyDeposit) => Promise<void> } = {
-                [WalletVariant.Safe]: this.depositSafe.bind(this),
-                [WalletVariant.WalletConnect]: this.depositWalletConnect.bind(this),
-            };
-
-            return await map[wallet.variant](wallet, { lockEndTimestamp, amountInWei });
-        },
-        async depositSafe(wallet: TWallet, data: TRequestBodyDeposit) {
-            const { confirmTransactions } = useWalletStore();
-            const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/deposit', {
-                data,
-                params: { walletId: wallet._id },
-            });
-
-            await confirmTransactions(txs);
-        },
-        async depositWalletConnect(wallet: TWallet, data: TRequestBodyDeposit) {
-            const { sendTransaction } = useWalletStore();
-            const abi = [
-                {
-                    stateMutability: 'nonpayable',
-                    type: 'function',
-                    name: 'create_lock',
-                    inputs: [
-                        {
-                            name: '_value',
-                            type: 'uint256',
-                        },
-                        {
-                            name: '_unlock_time',
-                            type: 'uint256',
-                        },
-                    ],
-                    outputs: [],
-                },
-            ];
+            const { sendTransaction, getBalance, waitForTransactionReceipt } = useWalletStore();
             const call = useWalletStore().encodeContractCall(
-                contractNetworks[wallet.chainId].VotingEscrow,
-                abi,
+                contractNetworks[this.chainId].VotingEscrow,
+                abi.VotingEscrow,
                 'create_lock',
-                [data.amountInWei, data.lockEndTimestamp],
+                [amountInWei, lockEndTimestamp],
             );
 
-            await sendTransaction(wallet.address, call.to, call.data);
+            const hash = await sendTransaction(wallet.address, call.to, call.data, this.chainId);
+            await waitForTransactionReceipt(hash);
+
+            track('UserCreates', [
+                useAccountStore().account?.sub,
+                'locked liquidity',
+                { address: wallet?.address, ...this.lock },
+            ]);
+
+            const { BPTGauge } = contractNetworks[this.chainId];
+            await getBalance(BPTGauge, this.chainId);
+            await this.getLocks(wallet);
         },
         async increaseAmount(wallet: TWallet, data: { amountInWei: string }) {
-            const map: { [variant: string]: (wallet: TWallet, data: { amountInWei: string }) => Promise<void> } = {
-                [WalletVariant.Safe]: this.increaseAmountSafe.bind(this),
-                [WalletVariant.WalletConnect]: this.increaseAmountWalletConnect.bind(this),
-            };
-            return await map[wallet.variant](wallet, data);
-        },
-        async increaseAmountSafe(wallet: TWallet, data: { amountInWei: string }) {
-            const { confirmTransactions } = useWalletStore();
-            const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/increase', {
-                data,
-                params: { walletId: wallet._id },
-            });
-
-            await confirmTransactions(txs);
-        },
-        async increaseAmountWalletConnect(wallet: TWallet, data: { amountInWei: string }) {
-            const { sendTransaction } = useWalletStore();
-            const abi = [
-                {
-                    stateMutability: 'nonpayable',
-                    type: 'function',
-                    name: 'increase_amount',
-                    inputs: [
-                        {
-                            name: '_value',
-                            type: 'uint256',
-                        },
-                    ],
-                    outputs: [],
-                },
-            ];
+            const { sendTransaction, waitForTransactionReceipt } = useWalletStore();
             const call = useWalletStore().encodeContractCall(
-                contractNetworks[wallet.chainId].VotingEscrow,
-                abi,
+                contractNetworks[this.chainId].VotingEscrow,
+                abi.VotingEscrow,
                 'increase_amount',
-                [data.amountInWei],
+                [data.amountInWei.toString()],
             );
-            await sendTransaction(wallet.address, call.to, call.data);
-        },
-        async waitForIncreaseAmount(wallet: TWallet, amountInWei: BigNumber) {
-            const expectedAmount = BigNumber.from(this.lock.amount).add(amountInWei);
-            const taskFn = async () => {
-                await this.getLocks(wallet);
-                const isDone = BigNumber.from(this.lock.amount).eq(expectedAmount);
+            const hash = await sendTransaction(wallet.address, call.to, call.data, this.chainId);
+            await waitForTransactionReceipt(hash);
 
-                if (isDone) {
-                    track('UserCreates', [
-                        useAccountStore().account?.sub,
-                        'increased lock amount',
-                        { address: wallet?.address, amountInWei: amountInWei.toString() },
-                    ]);
-                }
+            track('UserCreates', [
+                useAccountStore().account?.sub,
+                'increased lock amount',
+                { address: wallet?.address, amountInWei: data.amountInWei },
+            ]);
 
-                return isDone ? Promise.resolve() : Promise.reject('Increase amount');
-            };
-            return await poll({ taskFn, interval: 3000, retries: 20 });
+            await this.getLocks(wallet);
         },
         async increasUnlockTime(wallet: TWallet, data: { lockEndTimestamp: number }) {
-            const map: { [variant: string]: (wallet: TWallet, data: { lockEndTimestamp: number }) => Promise<void> } = {
-                [WalletVariant.Safe]: this.increaseUnlockTimeSafe.bind(this),
-                [WalletVariant.WalletConnect]: this.increaseUnlockTimeWalletConnect.bind(this),
-            };
-
-            return await map[wallet.variant](wallet, data);
-        },
-        async increaseUnlockTimeSafe(wallet: TWallet, data: { lockEndTimestamp: number }) {
-            const { confirmTransactions } = useWalletStore();
-            const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/increase', {
-                data,
-                params: { walletId: wallet._id },
-            });
-
-            await confirmTransactions(txs);
-        },
-        async increaseUnlockTimeWalletConnect(wallet: TWallet, data: { lockEndTimestamp: number }) {
-            const { sendTransaction } = useWalletStore();
-            const abi = [
-                {
-                    stateMutability: 'nonpayable',
-                    type: 'function',
-                    name: 'increase_unlock_time',
-                    inputs: [
-                        {
-                            name: '_unlock_time',
-                            type: 'uint256',
-                        },
-                    ],
-                    outputs: [],
-                },
-            ];
+            const { sendTransaction, waitForTransactionReceipt } = useWalletStore();
             const call = useWalletStore().encodeContractCall(
-                contractNetworks[wallet.chainId].VotingEscrow,
-                abi,
+                contractNetworks[this.chainId].VotingEscrow,
+                abi.VotingEscrow,
                 'increase_unlock_time',
                 [data.lockEndTimestamp],
             );
 
-            await sendTransaction(wallet.address, call.to, call.data);
-        },
-        async waitForIncreaseUnlockTime(wallet: TWallet, timestamp: number) {
-            const taskFn = async () => {
-                await this.getLocks(wallet);
-                const isDone = this.lock.end === timestamp * 1000;
+            const hash = await sendTransaction(wallet.address, call.to, call.data, this.chainId);
+            await waitForTransactionReceipt(hash);
 
-                if (isDone) {
-                    track('UserCreates', [
-                        useAccountStore().account?.sub,
-                        'increased lock duration',
-                        { address: wallet?.address, timestamp },
-                    ]);
-                }
-
-                return isDone ? Promise.resolve() : Promise.reject('Increase lock end');
-            };
-            return await poll({ taskFn, interval: 3000, retries: 20 });
+            await this.getLocks(wallet);
         },
         async claimTokens(wallet: TWallet) {
-            const map: { [variant: string]: (wallet: TWallet) => Promise<void> } = {
-                [WalletVariant.Safe]: this.claimTokenSafe.bind(this),
-                [WalletVariant.WalletConnect]: this.claimTokenWalletConnect.bind(this),
-            };
-
-            return await map[wallet.variant](wallet);
-        },
-        async claimTokenSafe(wallet: TWallet) {
-            const { confirmTransactions } = useWalletStore();
-            const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/claim', {
-                params: { walletId: wallet._id },
-            });
-
-            await confirmTransactions(txs);
-        },
-        async claimTokenWalletConnect(wallet: TWallet) {
-            const { sendTransaction } = useWalletStore();
-            const abi = [
-                {
-                    inputs: [
-                        {
-                            internalType: 'address',
-                            name: 'user',
-                            type: 'address',
-                        },
-                        {
-                            internalType: 'contract IERC20[]',
-                            name: 'tokens',
-                            type: 'address[]',
-                        },
-                    ],
-                    name: 'claimTokens',
-                    outputs: [
-                        {
-                            internalType: 'uint256[]',
-                            name: '',
-                            type: 'uint256[]',
-                        },
-                    ],
-                    stateMutability: 'nonpayable',
-                    type: 'function',
-                },
-            ];
-
-            const { RewardDistributor, BAL, BPT } = contractNetworks[wallet.chainId];
-            const call = useWalletStore().encodeContractCall(RewardDistributor, abi, 'claimTokens', [
+            const { getBalance, sendTransaction, waitForTransactionReceipt } = useWalletStore();
+            const { RewardDistributor, BAL, BPT } = contractNetworks[this.chainId];
+            const call = useWalletStore().encodeContractCall(RewardDistributor, abi.RewardDistributor, 'claimTokens', [
                 wallet.address,
                 [BAL, BPT],
             ]);
-            await sendTransaction(wallet.address, call.to, call.data);
+            const hash = await sendTransaction(wallet.address, call.to, call.data, this.chainId);
+            await waitForTransactionReceipt(hash);
+
+            await getBalance(BAL, this.chainId);
+            await getBalance(BPT, this.chainId);
         },
         async withdraw(wallet: TWallet, isEarlyAttempt: boolean) {
-            const map: { [variant: string]: (wallet: TWallet, isEarlyAttempt: boolean) => Promise<void> } = {
-                [WalletVariant.Safe]: this.withdrawSafe.bind(this),
-                [WalletVariant.WalletConnect]: this.withdrawWalletConnect.bind(this),
-            };
-
-            return await map[wallet.variant](wallet, isEarlyAttempt);
-        },
-        async withdrawSafe(wallet: TWallet, isEarlyAttempt: boolean) {
-            const { confirmTransactions } = useWalletStore();
-            const { api } = useAccountStore();
-            const txs = await api.request.post('/v1/ve/withdraw', {
-                data: { isEarlyAttempt: isEarlyAttempt },
-                params: { walletId: wallet._id },
-            });
-
-            await confirmTransactions(txs);
-        },
-        async withdrawWalletConnect(wallet: TWallet, isEarlyAttempt: boolean) {
-            const { sendTransaction } = useWalletStore();
+            const { sendTransaction, waitForTransactionReceipt } = useWalletStore();
             const method = isEarlyAttempt ? 'withdraw_early' : 'withdraw';
-            const abi = [
-                {
-                    stateMutability: 'nonpayable',
-                    type: 'function',
-                    name: method,
-                    inputs: [],
-                    outputs: [],
-                },
-            ];
+
             const call = useWalletStore().encodeContractCall(
-                contractNetworks[wallet.chainId].VotingEscrow,
-                abi,
+                contractNetworks[this.chainId].VotingEscrow,
+                abi.VotingEscrow,
                 method,
                 [],
             );
-            await sendTransaction(wallet.address, call.to, call.data);
-        },
-        async waitForWithdrawal(wallet: TWallet) {
-            const taskFn = async () => {
-                await this.getLocks(wallet);
-                const isDone = BigNumber.from(this.lock.amount).eq(0);
-                if (isDone) {
-                    track('UserCreates', [
-                        useAccountStore().account?.sub,
-                        'liquidity withdrawal',
-                        { address: wallet?.address },
-                    ]);
-                }
+            const hash = await sendTransaction(wallet.address, call.to, call.data, this.chainId);
+            await waitForTransactionReceipt(hash);
 
-                return isDone ? Promise.resolve() : Promise.reject('Withdraw');
-            };
-            return poll({ taskFn, interval: 3000, retries: 20 });
-        },
-        async waitForLock(wallet: TWallet, amountInWei: BigNumber, lockEndTimestamp: number) {
-            const taskFn = async () => {
-                await this.getLocks(wallet);
-                // We dont test for lockEndTimestamp here as an amount is the only requirement for creating a lock
-                const isDone = this.lock && this.lock.amount === amountInWei.toString();
-                if (isDone) {
-                    track('UserCreates', [
-                        useAccountStore().account?.sub,
-                        'locked liquidity',
-                        { address: wallet?.address, ...this.lock },
-                    ]);
-                }
+            track('UserCreates', [
+                useAccountStore().account?.sub,
+                'liquidity withdrawal',
+                { address: wallet?.address },
+            ]);
 
-                return isDone ? Promise.resolve() : Promise.reject('Ve amount');
-            };
-            return await poll({ taskFn, interval: 3000, retries: 20 });
+            await this.getLocks(wallet);
         },
     },
 });

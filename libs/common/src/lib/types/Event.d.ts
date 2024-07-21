@@ -1,8 +1,8 @@
 type TEvent = {
     _id: string;
-    identity: TIdentity;
-    identityId: string;
-    poolId: string;
+    sub: string;
     name: string;
+    identityId: string;
+    identity: TIdentity;
     createdAt: Date;
 };

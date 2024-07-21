@@ -23,7 +23,7 @@ class THXService {
             await AccountProxy.update(account.sub, { identity: account.identity });
         }
 
-        await Identity.updateOne({ uuid: account.identity }, { sub: account.sub });
+        await Identity.updateOne({ uuid: account.identity }, { accountId: account.sub });
     }
 
     async createEvent(account: TAccount, event: string) {
@@ -32,6 +32,4 @@ class THXService {
     }
 }
 
-const THXServiceInstance = new THXService();
-
-export default THXServiceInstance;
+export default new THXService();

@@ -1,13 +1,10 @@
-import { ethers } from 'ethers';
 import { VOTER_PK, DEPOSITOR_PK } from './constants';
-import { getProvider } from '@thxnetwork/api/util/network';
 import { ChainId } from '@thxnetwork/common/enums';
-import { contractNetworks } from '@thxnetwork/api/hardhat';
-import { HARDHAT_RPC, SAFE_TXS_SERVICE } from '@thxnetwork/api/config/secrets';
-import Safe, { EthersAdapter } from '@safe-global/protocol-kit';
-import SafeApiKit from '@safe-global/api-kit';
+import { Wallet } from '@thxnetwork/api/models';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
+import SafeService from '@thxnetwork/api/services/SafeService';
 
-const { web3 } = getProvider(ChainId.Hardhat);
+const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
 
 const voter = web3.eth.accounts.privateKeyToAccount(VOTER_PK) as any;
 const depositor = web3.eth.accounts.privateKeyToAccount(DEPOSITOR_PK) as any;
@@ -39,17 +36,10 @@ export const signMessage = (privateKey: string, message: string) => {
 };
 
 export async function signTxHash(safeAddress: string, safeTxHash: string, privateKey: string) {
-    const provider = new ethers.providers.JsonRpcProvider(HARDHAT_RPC);
-    const signer = new ethers.Wallet(privateKey, provider);
-    const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer as any }) as any;
-    const safe = await Safe.create({
-        ethAdapter,
-        safeAddress,
-        contractNetworks,
-    });
-    const signedTx = await safe.signTransactionHash(safeTxHash);
-    const apiKit = new SafeApiKit({ txServiceUrl: SAFE_TXS_SERVICE, ethAdapter });
-    const { signature } = await apiKit.confirmTransaction(safeTxHash, signedTx.data);
+    const wallet = await Wallet.findOne({ address: safeAddress });
+    const tx = await SafeService.getTransaction(wallet, safeTxHash);
+    const signature = await signMessage(privateKey, tx.data);
+    await SafeService.confirm(wallet, safeTxHash, signature);
 
     return { safeTxHash, signature };
 }

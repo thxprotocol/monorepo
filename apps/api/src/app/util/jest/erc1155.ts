@@ -1,10 +1,10 @@
 import { API_URL, MINIMUM_GAS_LIMIT, VERSION } from '@thxnetwork/api/config/secrets';
 import { ChainId } from '@thxnetwork/common/enums';
-import { getProvider } from '../network';
 import { getArtifact } from '@thxnetwork/api/hardhat';
+import NetworkService from '../../services/NetworkService';
 
 export async function deployERC1155(chainId = ChainId.Hardhat) {
-    const { web3, defaultAccount } = getProvider(chainId);
+    const { web3, defaultAccount } = NetworkService.getProvider(chainId);
     const contractName = 'THXERC1155';
     const { abi, bytecode } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi);

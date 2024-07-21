@@ -80,8 +80,8 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useVeStore } from '../../stores/VE';
 import { useWalletStore } from '../../stores/Wallet';
+import { useLiquidityStore } from '../../stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
-import { ChainId } from '@thxnetwork/common/enums';
 import { formatUnits } from 'ethers/lib/utils';
 
 export default defineComponent({
@@ -98,13 +98,12 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useVeStore, useWalletStore),
+        ...mapStores(useVeStore, useWalletStore, useLiquidityStore),
         isLocker() {
             return this.veStore.lock && !Number(this.veStore.lock.amount);
         },
         address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
+            return contractNetworks[this.liquidityStore.chainId];
         },
         balanceUSDC() {
             if (!this.walletStore.balances[this.address.USDC]) return 0;
@@ -155,10 +154,10 @@ export default defineComponent({
         },
         async getBalances() {
             await Promise.all([
-                this.walletStore.getBalance(this.address.USDC),
-                this.walletStore.getBalance(this.address.THX),
-                this.walletStore.getBalance(this.address.BPT),
-                this.walletStore.getBalance(this.address.BPTGauge),
+                this.walletStore.getBalance(this.address.USDC, this.liquidityStore.chainId),
+                this.walletStore.getBalance(this.address.THX, this.liquidityStore.chainId),
+                this.walletStore.getBalance(this.address.BPT, this.liquidityStore.chainId),
+                this.walletStore.getBalance(this.address.BPTGauge, this.liquidityStore.chainId),
             ]);
         },
     },

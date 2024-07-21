@@ -4,6 +4,7 @@ import { Participant, QRCodeEntry, Wallet, WalletDocument } from '@thxnetwork/ap
 import { v4 } from 'uuid';
 import { logger } from '../util/logger';
 import { Job } from '@hokify/agenda';
+import { PromiseParser } from '../util';
 import RewardCoinService from './RewardCoinService';
 import LockService from './LockService';
 import AccountProxy from '../proxies/AccountProxy';
@@ -15,7 +16,6 @@ import PointBalanceService from './PointBalanceService';
 import MailService from './MailService';
 import RewardDiscordRoleService from './RewardDiscordRoleService';
 import RewardCustomService from './RewardCustomService';
-import RewardGalachainService from './RewardGalachainService';
 import PoolService from './PoolService';
 
 const serviceMap = {
@@ -24,7 +24,6 @@ const serviceMap = {
     [RewardVariant.Custom]: new RewardCustomService(),
     [RewardVariant.Coupon]: new RewardCouponService(),
     [RewardVariant.DiscordRole]: new RewardDiscordRoleService(),
-    [RewardVariant.Galachain]: new RewardGalachainService(),
 };
 
 export default class RewardService {
@@ -152,22 +151,23 @@ export default class RewardService {
             query.length > 3
                 ? await this.findPaymentsBySub(reward, { skip, limit, query })
                 : await this.findPaymentsByReward(reward, { skip, limit, query });
-        const promises = payments.map(async (payment: Document & TRewardPayment) =>
-            ParticipantService.decorate(payment, { accounts, participants }),
+        const results = await PromiseParser.parse(
+            payments.map(async (payment: Document & TRewardPayment) =>
+                ParticipantService.decorate(payment, { accounts, participants }),
+            ),
         );
-        const results = await Promise.allSettled(promises);
 
         return {
             total,
             limit,
             page,
-            results: results.filter((result) => result.status === 'fulfilled').map((result: any) => result.value),
+            results,
         };
     }
 
     static async findPaymentsForSub(sub: string) {
         const rewardVariants: string[] = Object.keys(RewardVariant).filter((v) => !isNaN(Number(v)));
-        const payments = await Promise.allSettled(
+        const payments = await PromiseParser.parse(
             rewardVariants.map(async (variant: string) => {
                 const rewardVariant = Number(variant);
                 const payments = await serviceMap[rewardVariant].models.payment.find({ sub });
@@ -178,10 +178,7 @@ export default class RewardService {
                 return await Promise.all(callback);
             }),
         );
-        return payments
-            .filter((result) => result.status === 'fulfilled')
-            .map((result: any) => result.value)
-            .flat();
+        return payments.flat();
     }
 
     static async createPaymentJob(job: Job) {
@@ -193,16 +190,16 @@ export default class RewardService {
             const wallet = walletId && (await Wallet.findById(walletId));
 
             // Validate supply, expiry, locked and reward specific validation
-            const validationResult = await this.getValidationResult({ reward, account, wallet, safe: pool.safe });
+            const validationResult = await this.getValidationResult({ reward, account, wallet });
             if (!validationResult.result) return validationResult.reason;
 
-            // @TODO Should create payment and update after point subtraction and reward distribution etc
+            // @TODO Should create payment with state and update after point subtraction and reward distribution etc
 
             // Subtract points for account
             await PointBalanceService.subtract(pool, account, reward.pointPrice);
 
             // Create the payment
-            await serviceMap[variant].createPayment({ reward, account, safe: pool.safe, wallet });
+            await serviceMap[variant].createPayment({ reward, account, wallet });
 
             // Send email notification
             let html = `<p style="font-size: 18px">Congratulations!🚀</p>`;
@@ -256,12 +253,10 @@ export default class RewardService {
     static async getValidationResult({
         reward,
         account,
-        safe,
         wallet,
     }: {
         reward: TReward;
         account: TAccount;
-        safe?: WalletDocument;
         wallet?: WalletDocument;
     }) {
         const participant = await Participant.findOne({ sub: account.sub, poolId: reward.poolId });
@@ -281,7 +276,7 @@ export default class RewardService {
         const isLimitReached = await this.isLimitReached({ reward, account });
         if (isLimitReached) return { result: false, reason: 'This reward has reached your personal limit.' };
 
-        return serviceMap[reward.variant].getValidationResult({ reward, account, wallet, safe });
+        return serviceMap[reward.variant].getValidationResult({ reward, account, wallet });
     }
 
     // Checks if the account has reached the max amount of payments for this reward

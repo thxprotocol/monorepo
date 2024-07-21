@@ -17,7 +17,7 @@
                 "tsConfig": "apps/api/tsconfig.app.json",
                 "assets": ["apps/api/src/assets", "apps/api/src/app/migrations"],
                 "webpackConfig": "apps/api/webpack.config.js",
-                "generatePackageJson": true,
+                "generatePackageJson": false,
                 "additionalEntryPoints": [
                     {
                         "entryPath": "apps/api/scripts/migrate-mongo.ts",
@@ -38,7 +38,8 @@
                 "production": {
                     "optimization": true,
                     "extractLicenses": true,
-                    "inspect": false
+                    "inspect": false,
+                    "generatePackageJson": true
                 }
             }
         },

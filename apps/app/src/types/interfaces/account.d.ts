@@ -42,6 +42,7 @@ type TParticipant = {
     questEntriesCompleted: number;
     poolId: string;
     isSubscribed: boolean;
+    campaign: { title: string };
 };
 
 type TAccountGlobals = {

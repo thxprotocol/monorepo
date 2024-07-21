@@ -8,10 +8,11 @@ export const supabase = supabaseClient();
 
 export default class AccountProxy {
     static async request(config: AxiosRequestConfig) {
+        const header = await getAuthAccessToken();
         const { status, data } = await authClient({
             ...config,
             headers: {
-                Authorization: await getAuthAccessToken(),
+                Authorization: header,
             },
         });
 

@@ -55,7 +55,7 @@
                     <i class="fas fa-external-link-alt ms-2" />
                 </b-button>
                 <b-button
-                    href="https://discord.com/invite/uHHheeEJ"
+                    href="https://discord.com/invite/thx-network-836147176270856243"
                     target="_blank"
                     variant="link"
                     class="text-white text-decoration-none"
@@ -107,18 +107,11 @@ export default defineComponent({
         ...mapStores(useAccountStore, useAuthStore),
     },
     watch: {
-        async 'page'(page) {
+        async page(page) {
             this.page = page;
             this.isLoadingPage = true;
             await this.getCampaigns();
             this.isLoadingPage = false;
-        },
-        'accountStore.isAuthenticated': {
-            handler(isAuthenticated) {
-                if (!isAuthenticated) return;
-                this.getParticipants();
-            },
-            immediate: true,
         },
     },
     async mounted() {
@@ -127,11 +120,6 @@ export default defineComponent({
         this.isLoading = false;
     },
     methods: {
-        async getParticipants() {
-            if (this.accountStore.isAuthenticated) {
-                await this.accountStore.getParticipants();
-            }
-        },
         async getCampaigns() {
             const url = new URL(API_URL);
             url.pathname = '/v1/leaderboards';

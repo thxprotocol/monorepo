@@ -1,5 +1,5 @@
 <template>
-    <b-container class="py-5">
+    <b-container class="section-footer py-5">
         <b-row>
             <b-col md="4">
                 <div class="text-opaque my-3">THX Network</div>
@@ -104,3 +104,8 @@
         </b-row>
     </b-container>
 </template>
+<style>
+.section-footer a.nav-link:hover {
+    color: var(--bs-success) !important;
+}
+</style>

@@ -106,7 +106,6 @@ export default class DiscordDataProxy {
 
         // Check role for guild member
         const member = await guild.members.fetch(token.userId);
-        console.log(member.roles.cache.has(roleId), roleId);
         if (member.roles.cache.has(roleId)) return { result: true, reason: '' };
 
         return { result: false, reason: 'You do not have the required role.' };

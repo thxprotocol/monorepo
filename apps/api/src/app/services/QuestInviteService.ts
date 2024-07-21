@@ -1,6 +1,6 @@
 import { Participant, PoolDocument, QuestInvite, QuestInviteEntry } from '@thxnetwork/api/models';
 import { IQuestService } from './interfaces/IQuestService';
-import { QuestInviteCode, QuestInviteCodeDocument } from '../models/QuestInviteCode';
+import { QuestInviteCode, QuestInviteInvitee, QuestInviteCodeDocument } from '../models';
 import { serviceMap } from './interfaces/IQuestService';
 import { logger } from '../util/logger';
 import { WIDGET_URL } from '../config/secrets';
@@ -93,28 +93,31 @@ export default class QuestInviteService implements IQuestService {
         const inviteQuests = await QuestInvite.find({ poolId: quest.poolId });
         if (!inviteQuests.length) return;
 
-        // Return early if participant has not been invited
-        const participant = await Participant.findOne({ poolId: quest.poolId, sub: account.sub });
-        if (!participant.inviteCode) return;
-
-        // Transfer points to inviter
-        const code = await QuestInviteCode.findOne({ code: participant.inviteCode });
-        if (!code) {
-            logger.error('Invite code not found');
-            return;
-        }
-
         // Iterate over invite quests and assert if all quests for this invite quest have been completed
         for (const inviteQuest of inviteQuests) {
-            // Search for a single required quest entry by another user and continue if it does not exist
-            const Entry = serviceMap[inviteQuest.requiredQuest.variant].models.entry;
-            const requiredQuestEntry = await Entry.findOne({
+            // Continue if no invitee is found for this sub and this invite quest
+            const invitee = await QuestInviteInvitee.findOne({ sub: account.sub, questId: inviteQuest.id });
+            if (!invitee) {
+                logger.error('Invitee not found', { sub: account.sub, questId: inviteQuest.id });
+                continue;
+            }
+
+            // Continue if no code is found for this invitee and this invite quest
+            const code = await QuestInviteCode.findOne({ code: invitee.code, questId: inviteQuest.id });
+            if (!code) {
+                logger.error('Invite code not found', { code: invitee.code, questId: inviteQuest.id });
+                continue;
+            }
+
+            // Continue if the required quest entry for this invite quest is not found
+            const QuestRequiredEntry = serviceMap[inviteQuest.requiredQuest.variant].models.entry;
+            const requiredQuestEntry = await QuestRequiredEntry.findOne({
                 questId: inviteQuest.requiredQuest.questId,
                 sub: account.sub,
             });
             if (!requiredQuestEntry) continue;
 
-            // If the participant has received the invite quest bonus already continue
+            // Continue if an invite quest entry has already been created by this invitee
             const inviteQuestEntry = await QuestInviteEntry.findOne({
                 'sub': account.sub,
                 'questId': inviteQuest.id,
@@ -122,7 +125,7 @@ export default class QuestInviteService implements IQuestService {
             });
             if (inviteQuestEntry) continue;
 
-            // If the inviter had no account or equals invitee  continue
+            // Continue if the inviter has no account or is the same as the invitee
             const inviter = await AccountProxy.findById(code.sub);
             if (!inviter || inviter.sub === account.sub) continue;
 
@@ -181,6 +184,21 @@ export default class QuestInviteService implements IQuestService {
         });
     }
 
+    async createInvitee(sub: string, code: string) {
+        // Return early if no code is present
+        if (!code) return;
+
+        // Return early if invitee already exists for this code
+        const invitee = await QuestInviteInvitee.findOne({ code, sub });
+        if (invitee) return;
+
+        // Return early if invite code owner is equal to sub
+        const inviteCode = await QuestInviteCode.findOne({ code });
+        if (inviteCode && inviteCode.sub === sub) return;
+
+        return await QuestInviteInvitee.create({ code, sub, questId: inviteCode.questId });
+    }
+
     private async getEntries({ quest, account }: { quest: TQuestInvite; account: TAccount }) {
         return await QuestInviteEntry.find({
             sub: account.sub,
@@ -201,10 +219,11 @@ export default class QuestInviteService implements IQuestService {
     private async getUses({ quest, account }: { quest: TQuestInvite; account?: TAccount }) {
         if (!account) return 0;
 
-        const codes = await QuestInviteCode.find({ questId: String(quest._id), sub: account.sub });
-        const uses = await Participant.countDocuments({
-            poolId: quest.poolId,
-            inviteCode: { $in: codes.map(({ code }) => code) },
+        const inviteCodes = await QuestInviteCode.find({ questId: String(quest._id), sub: account.sub });
+        const codes = inviteCodes.map(({ code }) => code);
+        const uses = await QuestInviteInvitee.countDocuments({
+            questId: String(quest._id),
+            code: { $in: codes },
         });
         return uses;
     }
@@ -220,13 +239,14 @@ export default class QuestInviteService implements IQuestService {
     private async getInvitees({ quest, account }: { quest: TQuestInvite; account?: TAccount }) {
         if (!account) return [];
 
-        const participants = await Participant.find({ poolId: quest.poolId, invitedBySub: account.sub });
-        const subs = participants.map((participant) => participant.sub);
-        const accounts = await AccountProxy.find({ subs });
+        const inviteCodes = await this.getCodes({ quest, account });
+        const codes = inviteCodes.map(({ code }) => code);
+        const invitees = await QuestInviteInvitee.find({ questId: String(quest._id), code: { $in: codes } });
+        const accounts = await AccountProxy.find({ subs: invitees.map((invitee) => invitee.sub) });
 
-        return accounts.map((account) => {
-            const participant = participants.find((participant) => participant.sub === account.sub);
-            return { username: account.username, createdAt: participant.createdAt };
+        return invitees.map(({ sub, createdAt }) => {
+            const account = accounts.find((account) => account.sub === sub);
+            return { username: account.username, createdAt };
         });
     }
 }

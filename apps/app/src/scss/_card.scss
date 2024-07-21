@@ -91,3 +91,10 @@
     filter: none;
     -webhkit-filter: none;
 }
+
+@media (min-width: map-get($grid-breakpoints, 'md')) {
+    .list-group-overflow {
+        max-height: 210px;
+        overflow: auto;
+    }
+}

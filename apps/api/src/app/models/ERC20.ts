@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { ERC20Type } from '@thxnetwork/common/enums';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { getArtifact, TContractName } from '../hardhat';
 
 export type ERC20Document = mongoose.Document & TERC20;
@@ -26,7 +26,7 @@ schema.virtual('contractName').get(function () {
 
 schema.virtual('contract').get(function () {
     if (!this.address) return;
-    const { web3, defaultAccount } = getProvider(this.chainId);
+    const { web3, defaultAccount } = NetworkService.getProvider(this.chainId);
     const { abi } = getArtifact(getContractName(this.type));
     return new web3.eth.Contract(abi, this.address, { from: defaultAccount });
 });

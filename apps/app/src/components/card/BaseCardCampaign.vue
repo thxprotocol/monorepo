@@ -2,7 +2,8 @@
     <b-card
         no-body
         class="cursor-pointer gradient-shadow card-campaign"
-        :style="{ opacity: isLoading ? 0.5 : 1 }"
+        :class="isLoading ? 'cursor-disabled' : 'auto'"
+        :style="{ opacity: isLoading ? 0.5 : 1, pointerEvents: isLoading ? 'none' : 'auto' }"
         @click="goTo(`/c/${campaign.slug}`)"
     >
         <b-spinner
@@ -37,18 +38,6 @@
                     <div class="d-flex w-100 mb-2">
                         <div class="d-flex align-items-center">
                             <div class="text-white text-decoration-none lead">{{ campaign.title }}</div>
-                            <b-button
-                                :disabled="!accountStore.isAuthenticated"
-                                size="sm"
-                                variant="link"
-                                class="px-0 ms-1"
-                                @click.stop="onClickSubscribe"
-                            >
-                                <i
-                                    class="fa-star text-opaque text-white"
-                                    :class="{ fas: isSubscribed, far: !isSubscribed }"
-                                />
-                            </b-button>
                         </div>
                         <div class="ms-auto p-2 text-opaque me-md-3">
                             <i class="fas fa-hashtag me-1" />
@@ -151,33 +140,11 @@ export default defineComponent({
         campaignDomain() {
             return this.campaign.domain && new URL(this.campaign.domain).hostname;
         },
-        isSubscribed() {
-            return this.accountStore.isAuthenticated && this.accountStore.isSubscribed(this.campaign._id);
-        },
-        participant() {
-            return this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
-        },
     },
     methods: {
         goTo(path: string) {
             this.isLoading = true;
             this.$router.push(path);
-        },
-        async onClickSubscribe() {
-            try {
-                this.isLoading = true;
-                await this.accountStore.api.request.patch(`/v1/participants/${this.participant?._id}`, {
-                    data: {
-                        isSubscribed: !this.participant?.isSubscribed,
-                        email: this.accountStore.account ? this.accountStore.account.email : null,
-                    },
-                });
-                await this.accountStore.getParticipants(this.campaign._id);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                this.isLoading = false;
-            }
         },
     },
 });

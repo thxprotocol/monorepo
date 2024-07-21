@@ -11,12 +11,12 @@ const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(req.header('X-PoolId'));
     const account = sub && (await AccountProxy.findById(sub));
 
-    const [coin, nft, custom, coupon, discordRole, galachain] = await RewardService.list({
+    const [coin, nft, custom, coupon, discordRole] = await RewardService.list({
         pool,
         account,
     });
 
-    res.json({ coin, nft, custom, coupon, discordRole, galachain });
+    res.json({ coin, nft, custom, coupon, discordRole });
 };
 
 export { controller };

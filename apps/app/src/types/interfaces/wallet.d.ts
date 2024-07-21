@@ -47,7 +47,6 @@ type TWalletState = {
     balances: { [tokenAddress: string]: string };
     couponCodes: any[];
     discordRoles: any[];
-    galachain: TRewardGalachainPayment[];
     pendingPoints: number;
     isLoading: boolean;
     isModalWalletCreateShown: boolean;
@@ -56,14 +55,17 @@ type TWalletState = {
 
 type TERC20 = {
     _id: string;
+    address: string;
     balance: number;
     symbol: string;
     name: string;
     logoImgUrl: string;
+    chainId: ChainId;
 };
 
 type TERC721Token = {
     _id: string;
+    chainId: ChainId;
     sub: string;
     nft: TERC721 | TERC1155;
     recipient: string;
@@ -72,6 +74,7 @@ type TERC721Token = {
     tokenId: string;
     owner: string;
     balance: string;
+    createdAt: Date;
 };
 
 type TNFTMetadata = {
@@ -112,6 +115,7 @@ type TERC20Token = {
     migrationBalance: string;
     logoImg: string;
     erc20: TERC20;
+    chainId: ChainId;
     createdAt: Date;
 };
 

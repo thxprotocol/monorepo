@@ -7,9 +7,13 @@ import {
     RewardCoin,
     RewardDiscordRole,
     RewardCustom,
-    RewardGalachain,
+    ERC20,
+    ERC721,
+    ERC1155,
 } from '@thxnetwork/api/models';
 import { RewardVariant } from '@thxnetwork/common/enums';
+import PoolService from '@thxnetwork/api/services/PoolService';
+import SafeService from '@thxnetwork/api/services/SafeService';
 
 const validation = [
     param('id').isMongoId(),
@@ -33,7 +37,6 @@ const controller = async (req: Request, res: Response) => {
         { $unionWith: { coll: RewardCoupon.collection.name } },
         { $unionWith: { coll: RewardCustom.collection.name } },
         { $unionWith: { coll: RewardDiscordRole.collection.name } },
-        { $unionWith: { coll: RewardGalachain.collection.name } },
         { $match },
     ];
     const arr = await Promise.all(
@@ -48,6 +51,7 @@ const controller = async (req: Request, res: Response) => {
         { $skip: (page - 1) * limit },
         { $limit: limit },
     ]);
+    const pool = await PoolService.getById(poolId);
 
     res.json({
         total,
@@ -61,6 +65,21 @@ const controller = async (req: Request, res: Response) => {
                     return { ...reward, couponCodeCount };
                 }
 
+                if ([RewardVariant.Coin, RewardVariant.NFT].includes(reward.variant)) {
+                    const getToken = async (reward) => {
+                        return reward.erc20Id
+                            ? await ERC20.findById(reward.erc20Id)
+                            : reward
+                            ? await ERC721.findById(reward.erc721Id)
+                            : reward
+                            ? await ERC1155.findById(reward.erc1155Id)
+                            : null;
+                    };
+                    const token = await getToken(reward);
+                    const wallet = token ? await SafeService.findOneByPool(pool, token.chainId) : null;
+
+                    return { ...reward, wallet };
+                }
                 return reward;
             }),
         ),

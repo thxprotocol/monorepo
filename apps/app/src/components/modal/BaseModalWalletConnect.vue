@@ -13,18 +13,6 @@
             </b-link>
         </template>
         <div v-if="walletStore.wallet">
-            <b-card v-if="isAlertChainShown">
-                <b-alert v-model="isAlertChainShown" variant="primary" class="p-2">
-                    <i class="fas fa-exclamation-circle me-2" />
-                    <template v-if="currentChain">
-                        Connected to <strong>{{ currentChain.name }}</strong> ({{ currentChain.chainId }})
-                    </template>
-                    <template v-else>Network not connected</template>
-                </b-alert>
-                <b-button class="w-100" variant="success" @click="onClickSwitchChain(walletStore.wallet.chainId)">
-                    Connect <strong>{{ walletChain.name }}</strong>
-                </b-button>
-            </b-card>
             <b-card v-if="isAlertAccountShown">
                 <b-alert v-model="isAlertAccountShown" variant="primary" class="p-2">
                     <i class="fas fa-exclamation-circle me-2" />
@@ -63,21 +51,8 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useWalletStore, useAccountStore),
-        isAlertChainShown() {
-            return this.currentChain ? this.walletChain.chainId !== this.currentChain.chainId : false;
-        },
         isAlertAccountShown() {
             return this.walletAddress !== this.currentAddress;
-        },
-        currentChain() {
-            const { chainId } = this.walletStore;
-            const chain = chainList[chainId];
-            if (!chain) return;
-            return chain;
-        },
-        walletChain() {
-            if (!this.walletStore.wallet) return { name: 'Unknown', chainId: '' };
-            return chainList[this.walletStore.wallet.chainId];
         },
         currentAddress() {
             const { account } = this.walletStore;

@@ -3,12 +3,17 @@ import { InsufficientAllowanceError, InsufficientBalanceError, NotFoundError } f
 import { body, param } from 'express-validator';
 import { BigNumber } from 'alchemy-sdk';
 import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
-import { getProvider } from '@thxnetwork/api/util/network';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import PoolService from '@thxnetwork/api/services/PoolService';
 import SafeService from '@thxnetwork/api/services/SafeService';
 import PaymentService from '@thxnetwork/api/services/PaymentService';
 
-const validation = [param('id').isMongoId(), body('amountInWei').exists(), body('planType').isInt()];
+const validation = [
+    param('id').isMongoId(),
+    body('chainId').isInt(),
+    body('amountInWei').exists(),
+    body('planType').isInt(),
+];
 
 // TODO
 // 1. Customer approves USDC for Campaign Safe for x allowance
@@ -23,14 +28,14 @@ const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(req.params.id);
     if (!pool) throw new NotFoundError('Could not find campaign');
 
-    const safe = await SafeService.findOneByPool(pool, pool.chainId);
+    const safe = await SafeService.findOneByPool(pool, req.body.chainId);
     if (!safe) throw new NotFoundError('Could not find campaign Safe');
 
     const amountInWei = BigNumber.from(req.body.amountInWei);
     const addresses = contractNetworks[safe.chainId];
 
     // Assert USDC balance for Safe to ensure throughput
-    const { web3 } = getProvider(safe.chainId);
+    const { web3 } = NetworkService.getProvider(safe.chainId);
     const usdc = new web3.eth.Contract(contractArtifacts['USDC'].abi, addresses.USDC);
     const balance = await usdc.methods.balanceOf(safe.address).call();
     if (BigNumber.from(balance).lt(amountInWei)) {

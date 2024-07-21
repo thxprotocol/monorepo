@@ -5,8 +5,8 @@ export default async function main() {
     const thx = new THXAPIClient({
         authUrl: AUTH_URL,
         apiUrl: API_URL,
-        clientId: 'BitG_fGJI5k70kQgEeyID',
-        clientSecret: 'pniCrGc49hb_l18_MrpahhJC8SexAV1nHE9RR9CkZA2qA_YbRmJd1hSHl5fcpJA1ngmRwuoys47JfLtYJDlSgA',
+        clientId: 'ageY4VdoFq9pGQ_tTEm6K',
+        clientSecret: 'GbWJ6ymtGIG5F05opjY2B4i-iSKpAgndrW8Huqs4IzV0k62chxX-pPOvcVFnFyVTGxmu3bEGj2W2NvNzz7CRvg',
     });
-    await thx.events.create({ event: 'test', identity: '4de81b20-c71d-11ee-ac82-a970a9e4ebc4' });
+    await thx.events.create({ event: 'boss_kill', identity: 'd2844bb0-469d-11ef-8880-bfce5386ef6b' });
 }

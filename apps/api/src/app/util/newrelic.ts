@@ -1,4 +1,4 @@
-import newrelic from 'newrelic';
+import newrelic from 'node_modules/newrelic';
 
 export const wrapBackgroundTransaction = (name: string, group: string, promise: Promise<unknown>): Promise<unknown> => {
     return newrelic.startBackgroundTransaction(name, group, async () => {

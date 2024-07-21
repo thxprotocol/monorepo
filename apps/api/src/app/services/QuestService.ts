@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { agenda } from '../util/agenda';
 import { logger } from '../util/logger';
 import { Job } from '@hokify/agenda';
-import { IInviteService, serviceMap } from './interfaces/IQuestService';
+import { IQuestInviteService, serviceMap } from './interfaces/IQuestService';
 import { tokenInteractionMap } from './maps/quests';
 import { NODE_ENV } from '../config/secrets';
 import PoolService from './PoolService';
@@ -15,6 +15,7 @@ import ImageService from './ImageService';
 import AccountProxy from '../proxies/AccountProxy';
 import ParticipantService from './ParticipantService';
 import THXService from './THXService';
+import { PromiseParser } from '../util/promise';
 
 export default class QuestService {
     static async count({ poolId }) {
@@ -219,7 +220,7 @@ export default class QuestService {
             if (!entry) throw new Error('Entry creation failed.');
 
             // Assert if a required quest for invite quests has been completed
-            const InviteService = serviceMap[QuestVariant.Invite] as IInviteService;
+            const InviteService = serviceMap[QuestVariant.Invite] as IQuestInviteService;
             await InviteService.assertQuestEntry({ pool, quest, account });
 
             // Add points to participant balance
@@ -259,8 +260,9 @@ export default class QuestService {
         const subs = entries.map((entry) => entry.sub);
         const accounts = await AccountProxy.find({ subs });
         const participants = await Participant.find({ poolId: quest.poolId });
-        const promises = entries.map(async (entry) => ParticipantService.decorate(entry, { accounts, participants }));
-        const results = await Promise.allSettled(promises);
+        const results = await PromiseParser.parse(
+            entries.map(async (entry) => ParticipantService.decorate(entry, { accounts, participants })),
+        );
         const meta = await serviceMap[quest.variant].findEntryMetadata({ quest });
 
         return {
@@ -268,7 +270,7 @@ export default class QuestService {
             limit,
             page,
             meta,
-            results: results.filter((result) => result.status === 'fulfilled').map((result: any) => result.value),
+            results,
         };
     }
 }

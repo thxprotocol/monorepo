@@ -1,13 +1,11 @@
-import { defineStore } from 'pinia';
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit';
 import { useAccountStore } from './Account';
+import { defineStore } from 'pinia';
 import { track } from '@thxnetwork/common/mixpanel';
-import { HARDHAT_RPC, POLYGON_RPC } from '../config/secrets';
 import { useAuthStore } from './Auth';
-import { EthersAdapter, SafeConfig } from '@safe-global/protocol-kit';
-import { ethers } from 'ethers';
 import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '../types/enums/accountVariant';
-import { AUTH_URL, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
+import { AUTH_URL, POLYGON_RPC, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 import {
     sendTransaction,
@@ -21,13 +19,15 @@ import {
     getAccount,
     getChainId,
     watchConnections,
+    waitForTransactionReceipt,
 } from '@wagmi/core';
 import { mainnet } from 'viem/chains';
 import { chainList } from '../utils/chains';
 import { RewardVariant } from '../types/enums/rewards';
 import { encodeFunctionData } from 'viem';
+import { ethers } from 'ethers';
+import { abi } from '../utils/abi';
 import { contractNetworks } from '../config/constants';
-import Safe from '@safe-global/protocol-kit';
 import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
 
@@ -42,17 +42,17 @@ export const walletLogoMap: { [variant: string]: string } = {
     [WalletVariant.Safe]: imgSafeLogo,
 };
 
-const rpcMap: { [chainId: number]: string } = {
-    [ChainId.Hardhat]: HARDHAT_RPC,
-    [ChainId.Polygon]: POLYGON_RPC,
-};
-
 const wagmiConfig = defaultWagmiConfig({
-    chains: [mainnet, ...Object.values(chainList).map((item) => item.chain)],
+    chains: [
+        mainnet,
+        ...Object.values(chainList)
+            .map((item) => item.chain)
+            .filter((chain) => chain !== mainnet),
+    ],
     projectId: WALLET_CONNECT_PROJECT_ID,
     metadata: {
         name: 'THX Network',
-        description: 'THX Network Campaign Discovery',
+        description: 'THX Network',
         url: WIDGET_URL,
         icons: [AUTH_URL + '/img/logo.png'],
     },
@@ -62,7 +62,7 @@ export const useWalletStore = defineStore('wallet', {
     state: (): TWalletState => ({
         modal: null,
         account: null,
-        chainId: null,
+        chainId: ChainId.Polygon,
         allowances: {},
         balances: {},
         erc20: [],
@@ -70,7 +70,6 @@ export const useWalletStore = defineStore('wallet', {
         erc1155: [],
         couponCodes: [],
         discordRoles: [],
-        galachain: [],
         pendingPoints: 0,
         wallets: [],
         wallet: null,
@@ -90,7 +89,6 @@ export const useWalletStore = defineStore('wallet', {
             this.erc1155 = [];
             this.couponCodes = [];
             this.discordRoles = [];
-            this.galachain = [];
             this.pendingPoints = 0;
             this.wallets = [];
             this.wallet = null;
@@ -102,11 +100,11 @@ export const useWalletStore = defineStore('wallet', {
             await reconnect(wagmiConfig);
 
             watchAccount(wagmiConfig, {
-                onChange: (account) => this.onChange({ account, ignoreChainId: false }),
+                onChange: (account) => this.onChange({ account }),
             });
 
             watchChainId(wagmiConfig, {
-                onChange: (chainId) => this.onChange({ chainId, ignoreChainId: false }),
+                onChange: (chainId) => this.onChange({ chainId }),
             });
 
             watchConnections(wagmiConfig, {
@@ -121,15 +119,7 @@ export const useWalletStore = defineStore('wallet', {
                 themeMode: 'dark',
             });
         },
-        onChange({
-            account,
-            chainId,
-            ignoreChainId,
-        }: {
-            account?: GetAccountReturnType;
-            chainId?: ChainId;
-            ignoreChainId: boolean;
-        }) {
+        onChange({ account, chainId }: { account?: GetAccountReturnType; chainId?: ChainId }) {
             if (account) this.account = account;
             if (chainId) this.chainId = chainId;
 
@@ -140,12 +130,9 @@ export const useWalletStore = defineStore('wallet', {
             const isWalletConnect = this.wallet.variant === WalletVariant.WalletConnect;
             if (!isWalletConnect) return;
 
-            // Show chain modal if an account is connected but the desired chain is not the current chain
-            // or if the desired address is not the current address
-            const isWalletAddressCorrect = this.account ? this.wallet.address === this.account.address : false;
-            const isWalletChainCorrect = ignoreChainId ? true : this.wallet.chainId === this.chainId;
-
-            this.isModalChainSwitchShown = !isWalletAddressCorrect || !isWalletChainCorrect;
+            if (chainId) {
+                this.switchChain(chainId);
+            }
         },
         switchChain(chainId: ChainId) {
             return switchChain(wagmiConfig, { chainId });
@@ -158,9 +145,7 @@ export const useWalletStore = defineStore('wallet', {
         },
         async connect() {
             await this.createWeb3Modal();
-            this.modal.open({
-                view: 'account',
-            });
+            this.modal.open({ view: 'account' });
         },
         async disconnect() {
             if (this.account) {
@@ -174,7 +159,7 @@ export const useWalletStore = defineStore('wallet', {
                 this.modal = null;
             }
         },
-        async sendTransaction(from: string, to: `0x${string}`, data: `0x${string}`, gas?: any) {
+        async sendTransaction(from: string, to: `0x${string}`, data: `0x${string}`, chainId: ChainId, gas?: any) {
             await this.createWeb3Modal();
 
             if (
@@ -187,19 +172,19 @@ export const useWalletStore = defineStore('wallet', {
                 throw new Error(`Please connect address ${from}.`);
             }
 
-            if (this.chainId && this.wallet && this.wallet.chainId !== this.chainId) {
+            if (this.wallet && this.chainId !== chainId) {
                 this.isModalChainSwitchShown = true;
-                throw new Error(`Please set your network to ${this.wallet.chainId}.`);
+                throw new Error(`Please set your network to ${chainId}.`);
             }
 
             return sendTransaction(wagmiConfig, { to, data, gas });
         },
-        async create(data: { variant: WalletVariant; message?: string; signature?: string }) {
+        async create(data: { variant: WalletVariant; message?: string; signature?: string; chainId: ChainId }) {
             const { api } = useAccountStore();
             await api.request.post('/v1/account/wallets', { data });
             await this.listWallets();
         },
-        async setWallet(wallet: TWallet | null, ignoreChainId = false) {
+        async setWallet(wallet: TWallet | null) {
             this.wallet = wallet;
 
             // Check if there are pending transactions and confirm them
@@ -210,7 +195,12 @@ export const useWalletStore = defineStore('wallet', {
 
             const account = getAccount(wagmiConfig);
             const chainId = getChainId(wagmiConfig);
-            this.onChange({ account, chainId, ignoreChainId });
+            const isSafe = wallet && wallet.variant === WalletVariant.Safe;
+
+            this.onChange({
+                account,
+                chainId: isSafe ? wallet.chainId : chainId,
+            });
         },
         async listWallets() {
             const { api, account } = useAccountStore();
@@ -222,7 +212,7 @@ export const useWalletStore = defineStore('wallet', {
             const token = await api.erc721.get(_id);
             const index = this.erc721.findIndex((t) => t._id === token._id);
 
-            this.erc721[index] = { ...token, component: 'BaseCardERC721' };
+            this.erc721[index] = { ...token, component: 'BaseCardNFT' };
         },
         async list() {
             const { api } = useAccountStore();
@@ -232,9 +222,9 @@ export const useWalletStore = defineStore('wallet', {
                 api.request.get('/v1/rewards/payments'),
                 ...(this.wallet
                     ? [
-                          api.erc20.list({ walletId: this.wallet._id }),
-                          api.erc721.list({ walletId: this.wallet._id }),
-                          api.erc1155.list({ walletId: this.wallet._id }),
+                          api.erc20.list({ walletId: this.wallet._id, chainId: this.chainId }),
+                          api.erc721.list({ walletId: this.wallet._id, chainId: this.chainId }),
+                          api.erc1155.list({ walletId: this.wallet._id, chainId: this.chainId }),
                       ]
                     : []),
             ];
@@ -244,21 +234,21 @@ export const useWalletStore = defineStore('wallet', {
                 ? erc20.map((t: TERC20Token) => ({
                       ...t,
                       rewardVariant: RewardVariant.Coin,
-                      component: 'BaseCardERC20',
+                      component: 'BaseCardCoin',
                   }))
                 : [];
             this.erc721 = erc721
                 ? erc721.map((t: TERC721Token) => ({
                       ...t,
                       rewardVariant: RewardVariant.NFT,
-                      component: 'BaseCardERC721',
+                      component: 'BaseCardNFT',
                   }))
                 : [];
             this.erc1155 = erc1155
                 ? erc1155.map((t: TERC721Token) => ({
                       ...t,
                       rewardVariant: RewardVariant.NFT,
-                      component: 'BaseCardERC721',
+                      component: 'BaseCardNFT',
                   }))
                 : [];
             this.couponCodes = payments
@@ -272,12 +262,6 @@ export const useWalletStore = defineStore('wallet', {
                 .map((t: TRewardDiscordRolePayment[]) => ({
                     ...t,
                     component: 'BaseCardDiscordRole',
-                }));
-            this.galachain = payments
-                .filter((p: { rewardVariant: RewardVariant }) => p.rewardVariant === RewardVariant.Galachain)
-                .map((t: TRewardGalachainPayment[]) => ({
-                    ...t,
-                    component: 'BaseCardGalachain',
                 }));
 
             this.isLoading = false;
@@ -320,21 +304,37 @@ export const useWalletStore = defineStore('wallet', {
                 await authStore.getPrivateKey();
             }
 
-            const rpc = rpcMap[this.wallet.chainId];
-            const provider = new ethers.providers.JsonRpcProvider(rpc);
-            const signer = new ethers.Wallet(authStore.privateKey, provider);
-            const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer }) as any;
-            const config: SafeConfig = {
-                ethAdapter,
-                safeAddress: this.wallet.address,
-                contractNetworks,
-            };
-            const safe = await Safe.create(config);
-            const signature = await safe.signTransactionHash(safeTxHash);
+            const signature = await this.signSafeTXHash(this.wallet, safeTxHash);
+            if (!signature) throw new Error('No signature');
 
             return await api.request.post(`/v1/account/wallets/confirm`, {
-                data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature: signature.data }),
+                data: JSON.stringify({ chainId: this.wallet.chainId, safeTxHash, signature }),
                 params: { walletId: this.wallet._id },
+            });
+        },
+        async signSafeTXHash(wallet: TWallet, safeTxHash: string) {
+            const { privateKey } = useAuthStore();
+            if (!privateKey) throw new Error('No private key');
+
+            // Create Safe protocol kit
+            const provider = new ethers.providers.JsonRpcProvider(POLYGON_RPC);
+            const ethAdapter = new EthersAdapter({
+                ethers,
+                signerOrProvider: new ethers.Wallet(privateKey, provider),
+            });
+            const safe = await Safe.create({
+                safeAddress: wallet.address,
+                ethAdapter,
+                contractNetworks,
+            });
+            const safeSignature = await safe.signTransactionHash(safeTxHash);
+            return safeSignature.data;
+        },
+        waitForTransactionReceipt(hash: `0x${string}`) {
+            return waitForTransactionReceipt(wagmiConfig, {
+                hash,
+                confirmations: 2,
+                pollingInterval: 2_000,
             });
         },
         async confirmTransactions(transactions: TTransaction[]) {
@@ -342,16 +342,16 @@ export const useWalletStore = defineStore('wallet', {
                 await this.confirmTransaction(tx.safeTxHash);
             }
         },
-        async getBalance(tokenAddress: string) {
+        async getBalance(tokenAddress: string, chainId: ChainId) {
             if (!this.wallet || !tokenAddress) return;
 
             const { api } = useAccountStore();
             const { balanceInWei } = await api.request.get('/v1/erc20/balance', {
-                params: { tokenAddress, walletId: this.wallet._id },
+                params: { tokenAddress, walletId: this.wallet._id, chainId },
             });
             this.balances[tokenAddress] = balanceInWei;
         },
-        async getApproval(params: { tokenAddress: string; spender: string }) {
+        async getApproval(params: { tokenAddress: string; spender: string; chainId: ChainId }) {
             if (!this.wallet) return;
 
             const { api } = useAccountStore();
@@ -382,22 +382,14 @@ export const useWalletStore = defineStore('wallet', {
         },
         async approveWalletConnect(wallet: TWallet, data: TRequestBodyApproval) {
             // Prepare the contract call data
-            const abi = [
-                {
-                    inputs: [
-                        { name: 'spender', type: 'address' },
-                        { name: 'amount', type: 'uint256' },
-                    ],
-                    name: 'approve',
-                    outputs: [{ name: '', type: 'bool' }],
-                    stateMutability: 'public',
-                    type: 'function',
-                },
-            ];
-            const call = this.encodeContractCall(data.tokenAddress, abi, 'approve', [data.spender, data.amountInWei]);
+            const call = this.encodeContractCall(data.tokenAddress, abi.ERC20, 'approve', [
+                data.spender,
+                data.amountInWei,
+            ]);
 
             // Sign and execute the transaction data
-            await this.sendTransaction(wallet.address, call.to, call.data);
+            const hash = await this.sendTransaction(wallet.address, call.to, call.data, this.chainId);
+            await this.waitForTransactionReceipt(hash);
         },
         encodeContractCall(contractAddress: string, abi: any[], functionName: string, args: any[]) {
             return {

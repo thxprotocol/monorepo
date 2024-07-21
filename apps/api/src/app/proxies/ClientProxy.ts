@@ -34,7 +34,7 @@ export default class ClientProxy {
         return paginatedResults(Client, page, limit, query);
     }
 
-    static async create(sub: string, poolId: string, payload: TClientPayload, name?: string) {
+    static async create(sub: string, payload: TClientPayload, name?: string) {
         const { data } = await authClient({
             method: 'POST',
             url: '/reg',
@@ -47,7 +47,6 @@ export default class ClientProxy {
         const client = await Client.create({
             sub,
             name,
-            poolId,
             grantType: payload.grant_types[0],
             clientId: data.client_id,
             registrationAccessToken: data.registration_access_token,

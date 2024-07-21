@@ -11,17 +11,14 @@ import * as CreateDuplicate from './duplicate/post.controller';
 import RouterCollaborators from './collaborators/collaborators.router';
 import RouterParticipants from './participants/participants.router';
 import RouterAnalytics from './analytics/analytics.router';
-import RouterEvents from './events/events.router';
 import RouterQuests from './quests/quests.router';
 import RouterRewards from './rewards/rewards.router';
 import RouterGuilds from './guilds/guilds.router';
 import RouterPayments from './payments/payments.router';
-import RouterWallets from './wallets/wallets.router';
 import RouterERC20 from './erc20/erc20.router';
 import RouterER1155 from './erc1155/erc1155.router';
-import RouterIdentities from './identities/identities.router';
-import RouterInvoices from './invoices/invoices.router';
 import RouterIntegrations from './integrations/integrations.router';
+import RouterWallets from './wallets/wallets.router';
 
 const router: express.Router = express.Router({ mergeParams: true });
 
@@ -66,7 +63,6 @@ router.post(
 // Payment related routes that require access event if payment assertion fails
 router.use('/:id/erc20', RouterERC20); // Needed for payment processing
 router.use('/:id/payments', RouterPayments);
-router.use('/:id/invoices', RouterInvoices);
 
 // Everything below is asserted for payment
 router.use('/:id', assertPayment);
@@ -74,11 +70,9 @@ router.use('/:id/analytics', RouterAnalytics);
 router.use('/:id/quests', RouterQuests);
 router.use('/:id/rewards', RouterRewards);
 router.use('/:id/participants', RouterParticipants);
-router.use('/:id/wallets', RouterWallets);
-router.use('/:id/events', RouterEvents);
 router.use('/:id/guilds', RouterGuilds);
 router.use('/:id/erc1155', RouterER1155);
-router.use('/:id/identities', RouterIdentities);
 router.use('/:id/integrations', RouterIntegrations);
+router.use('/:id/wallets', RouterWallets);
 
 export default router;

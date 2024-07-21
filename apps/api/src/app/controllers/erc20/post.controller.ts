@@ -6,7 +6,7 @@ import ImageService from '@thxnetwork/api/services/ImageService';
 const validation = [
     body('name').exists().isString(),
     body('symbol').exists().isString(),
-    body('chainId').exists().isNumeric(),
+    body('chainId').exists().isInt(),
     body('type').exists().isNumeric(),
     body('totalSupply').optional().isNumeric(),
     check('file')

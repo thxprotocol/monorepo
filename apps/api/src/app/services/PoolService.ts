@@ -4,7 +4,6 @@ import { AccountVariant } from '@thxnetwork/common/enums';
 import { DASHBOARD_URL } from '../config/secrets';
 import { DEFAULT_COLORS, DEFAULT_ELEMENTS } from '@thxnetwork/common/constants';
 import { logger } from '../util/logger';
-import { getsigningSecret } from '../util/signingsecret';
 import {
     Pool,
     PoolDocument,
@@ -14,7 +13,6 @@ import {
     CollaboratorDocument,
     Client,
     DiscordGuild,
-    Identity,
     Participant,
     QuestInvite,
     QuestWeb3,
@@ -31,7 +29,6 @@ import {
 import AccountProxy from '../proxies/AccountProxy';
 import DiscordDataProxy from '../proxies/DiscordDataProxy';
 import MailService from './MailService';
-import SafeService from './SafeService';
 import ParticipantService from './ParticipantService';
 import DiscordService from './DiscordService';
 import ContractService from './ContractService';
@@ -44,20 +41,15 @@ async function isAudienceAllowed(aud: string, poolId: string) {
 }
 
 async function isSubjectAllowed(sub: string, poolId: string) {
-    const isOwner = await Pool.exists({
-        _id: poolId,
-        sub,
-    });
+    const pool = await Pool.findById(poolId);
+    const isOwner = pool && pool.sub === sub;
     const isCollaborator = await Collaborator.exists({ sub, poolId, state: CollaboratorInviteState.Accepted });
+
     return isOwner || isCollaborator;
 }
 
 async function getById(id: string) {
-    const pool = await Pool.findById(id);
-    const chainId = ContractService.getChainId();
-    const safe = await SafeService.findOneByPool(pool, chainId);
-    pool.safe = safe;
-    return pool;
+    return await Pool.findById(id);
 }
 
 function getByAddress(address: string) {
@@ -98,7 +90,6 @@ async function deploy(sub: string, title: string): Promise<PoolDocument> {
     const pool = await Pool.create({
         sub,
         token: v4(),
-        signingSecret: getsigningSecret(64),
         settings: {
             title,
             description: '',
@@ -123,7 +114,7 @@ async function deploy(sub: string, title: string): Promise<PoolDocument> {
         theme: JSON.stringify({ elements: DEFAULT_ELEMENTS, colors: DEFAULT_COLORS }),
     });
 
-    return Pool.findByIdAndUpdate(pool._id, { 'settings.slug': String(pool._id) }, { new: true });
+    return await Pool.findByIdAndUpdate(pool.id, { 'settings.slug': pool.id }, { new: true });
 }
 
 async function getAllBySub(sub: string): Promise<PoolDocument[]> {
@@ -144,15 +135,17 @@ async function getAllBySub(sub: string): Promise<PoolDocument[]> {
     // Add Safes to pools
     return await Promise.all(
         pools.map(async (pool) => {
-            const brand = await Brand.findOne({ poolId: pool.id });
-            const safe = await SafeService.findOneByPool(pool);
-            const participantCount = await Participant.countDocuments({ poolId: pool.id });
-            const account = accounts.find((a) => a.sub === pool.sub);
-            const author = account && {
-                username: account.username,
-            };
-
-            return { ...pool.toJSON(), participantCount, author, brand, safe };
+            try {
+                const brand = await Brand.findOne({ poolId: pool.id });
+                const participantCount = await Participant.countDocuments({ poolId: pool.id });
+                const account = accounts.find((a) => a.sub === pool.sub);
+                const author = account && {
+                    username: account.username,
+                };
+                return { ...pool.toJSON(), participantCount, author, brand };
+            } catch (error) {
+                console.log(error);
+            }
         }),
     );
 }
@@ -192,38 +185,6 @@ async function getRewardCount(pool: PoolDocument) {
         [RewardCoin, RewardNFT, RewardCustom].map(async (model) => await find(model, pool)),
     );
     return Array.from(new Set(result.flat(1)));
-}
-
-async function findIdentities(pool: PoolDocument, page: number, limit: number) {
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    const total = await Identity.find({ poolId: pool._id }).countDocuments().exec();
-
-    const identities = {
-        previous: startIndex > 0 && {
-            page: page - 1,
-        },
-        next: endIndex < total && {
-            page: page + 1,
-        },
-        limit,
-        total,
-        results: await Identity.aggregate([
-            { $match: { poolId: String(pool._id) } },
-            { $skip: startIndex },
-            { $limit: limit },
-        ]).exec(),
-    };
-
-    const subs = identities.results.filter(({ sub }) => !!sub).map(({ sub }) => sub);
-    const accounts = await AccountProxy.find({ subs });
-
-    identities.results = identities.results.map((identity: TIdentity) => ({
-        ...identity,
-        account: accounts.find(({ sub }) => sub === identity.sub),
-    }));
-
-    return identities;
 }
 
 async function findCouponCodes(
@@ -439,7 +400,6 @@ export default {
     getQuestCount,
     getRewardCount,
     findOwner,
-    findIdentities,
     findParticipants,
     findGuilds,
     findCollaborators,

@@ -5,7 +5,6 @@ import {
     RewardCustom,
     RewardCoupon,
     RewardDiscordRole,
-    RewardGalachain,
     QuestDaily,
     QuestInvite,
     QuestSocial,
@@ -19,7 +18,7 @@ import { logger } from '../util/logger';
 export async function updateCampaignRanks() {
     try {
         const questModels = [QuestDaily, QuestInvite, QuestSocial, QuestCustom, QuestWeb3, QuestGitcoin];
-        const rewardModels = [RewardCoin, RewardNFT, RewardCustom, RewardCoupon, RewardDiscordRole, RewardGalachain];
+        const rewardModels = [RewardCoin, RewardNFT, RewardCustom, RewardCoupon, RewardDiscordRole];
         const questLookupStages = questModels.map((model) => {
             return {
                 $lookup: {

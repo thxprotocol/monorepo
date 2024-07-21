@@ -2,7 +2,6 @@ import request from 'supertest';
 import app from '@thxnetwork/api/';
 import { QuestVariant } from '@thxnetwork/common/enums';
 import { account4, dashboardAccessToken, widgetAccessToken4 } from '@thxnetwork/api/util/jest/constants';
-import { isAddress } from 'web3-utils';
 import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
 import { QuestDailyDocument } from '@thxnetwork/api/models';
 import { poll } from '@thxnetwork/api/util/polling';
@@ -23,7 +22,6 @@ describe('Daily Rewards WebHooks', () => {
             .set('Authorization', dashboardAccessToken)
             .send()
             .expect((res: request.Response) => {
-                expect(isAddress(res.body.safeAddress)).toBe(true);
                 poolId = res.body._id;
             })
             .expect(201, done);
@@ -57,7 +55,7 @@ describe('Daily Rewards WebHooks', () => {
         expect(status).toBe(201);
     });
 
-    it('GET /participant to update identity', async () => {
+    it('GET /participant', async () => {
         const { status } = await user
             .get(`/v1/participants`)
             .query({ poolId })

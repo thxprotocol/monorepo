@@ -25,12 +25,12 @@
                         variant="success"
                         class="w-100"
                         :disabled="!!error || isWaitingForWalletAddress || isLoading || !isValidUUID"
-                        @click="onClickCollect"
+                        @click="onClickConnect"
                     >
                         <b-spinner v-if="isLoading" small variant="dark" />
                         Connect Identity
                     </b-button>
-                    <b-button v-else v-b-modal="'modalLogin'" variant="primary" class="w-100">
+                    <b-button v-else variant="primary" class="w-100" @click="authStore.isModalLoginShown = true">
                         Sign in &amp; Connect
                     </b-button>
                 </b-card>
@@ -82,11 +82,10 @@ export default defineComponent({
         this.uuid = this.$route.params.uuid as string;
     },
     methods: {
-        async onClickCollect() {
+        async onClickConnect() {
             this.isLoading = true;
             try {
                 await this.accountStore.api.request.patch(`/v1/identity/${this.uuid}`);
-                await this.questStore.list();
                 this.$router.push(`/c/${this.accountStore.config.slug}/quests`);
             } catch (res) {
                 this.error = (res as any).error.message || 'Something went wrong..';

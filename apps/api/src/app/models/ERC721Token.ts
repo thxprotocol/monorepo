@@ -8,6 +8,7 @@ export const ERC721Token = mongoose.model<ERC721TokenDocument>(
         {
             erc721Id: String,
             walletId: String,
+            chainId: Number,
             metadataId: String,
             tokenId: Number,
             sub: String,

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { Pool } from '@thxnetwork/api/models';
 import { Webhook, WebhookDocument } from '@thxnetwork/api/models/Webhook';
 import { Identity } from '@thxnetwork/api/models/Identity';
 import { WebhookRequest, WebhookRequestDocument } from '@thxnetwork/api/models/WebhookRequest';
@@ -7,10 +6,11 @@ import { Job } from '@hokify/agenda';
 import { agenda } from '@thxnetwork/api/util/agenda';
 import { signPayload } from '@thxnetwork/api/util/signingsecret';
 import { JobType, Event, WebhookRequestState } from '@thxnetwork/common/enums';
+import { logger } from '../util/logger';
 
 export default class WebhookService {
     static async request(webhook: WebhookDocument, account: TAccount, metadata?: string) {
-        const identities = (await Identity.find({ poolId: webhook.poolId, sub: account.sub })).map((i) => i.uuid);
+        const identities = (await Identity.find({ accountId: account.sub })).map((i) => i.uuid);
         const webhookRequest = await WebhookRequest.create({
             webhookId: webhook._id,
             payload: JSON.stringify({ type: 'quest_entry.create', identities, metadata }),
@@ -22,10 +22,10 @@ export default class WebhookService {
 
     static async requestAsync(
         webhook: WebhookDocument,
-        sub: string,
+        accountId: string,
         payload: { type: Event; data: any & { metadata: any } },
     ) {
-        const identities = (await Identity.find({ poolId: webhook.poolId, sub })).map((i) => i.uuid);
+        const identities = (await Identity.find({ accountId })).map((i) => i.uuid);
         const webhookRequest = await WebhookRequest.create({
             webhookId: webhook._id,
             payload: JSON.stringify({ ...payload, identities }),
@@ -34,7 +34,7 @@ export default class WebhookService {
 
         await agenda.now(JobType.RequestAttemp, {
             webhookRequestId: String(webhookRequest._id),
-            poolId: webhook.poolId,
+            sub: webhook.sub,
         });
     }
 
@@ -52,10 +52,7 @@ export default class WebhookService {
 
     static async executeRequest(webhook: WebhookDocument, webhookRequest: WebhookRequestDocument) {
         try {
-            const pool = await Pool.findById(webhook.poolId);
-            if (!pool.signingSecret) throw new Error('No signing secret found');
-
-            const signature = signPayload(webhookRequest.payload, pool.signingSecret);
+            const signature = signPayload(webhookRequest.payload, webhook.signingSecret);
             webhookRequest.state = WebhookRequestState.Sent;
 
             const response = await axios({
@@ -71,12 +68,10 @@ export default class WebhookService {
             webhookRequest.state = WebhookRequestState.Received;
             webhookRequest.httpStatus = response.status;
 
-            console.debug(`[${response.status}], ${JSON.stringify(response.data)}`);
+            logger.debug(`[${response.status}], ${JSON.stringify(response.data)}`);
 
             return response && response.data;
         } catch (error) {
-            console.log(error);
-
             webhookRequest.state = WebhookRequestState.Failed;
             webhookRequest.failReason = error && error.toString();
 
@@ -86,7 +81,7 @@ export default class WebhookService {
                 webhookRequest.failReason = JSON.stringify(error.response.data);
             }
 
-            console.error(error);
+            logger.error(error);
         } finally {
             webhookRequest.attempts = webhookRequest.attempts++;
             await webhookRequest.save();

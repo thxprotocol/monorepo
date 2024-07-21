@@ -25,7 +25,21 @@
                 <i class="fas fa-exclamation-circle me-2"></i>
                 You don't have enough points to purchase this reward.
             </b-alert>
-            <p :class="!reward.chainId && 'mb-0'">
+            <b-alert v-model="isAlertChainShown" show variant="primary" class="p-2">
+                <i class="fas fa-exclamation-circle mx-2"></i>
+                This reward will be sent to your wallet on
+                <strong class="d-inline-flex align-items-center">
+                    {{ chainList[reward.chainId].name }}
+                    <b-img
+                        :src="chainList[reward.chainId].logo"
+                        width="15"
+                        height="15"
+                        :alt="chainList[reward.chainId].name + ' logo'"
+                        class="ms-1"
+                    />
+                </strong>
+            </b-alert>
+            <p :class="!isWalletRequired && 'mb-0'">
                 Do you want to use {{ reward.pointPrice }} points for <strong>{{ reward.title }} </strong>?
             </p>
             <BaseFormGroupWalletSelect
@@ -61,6 +75,7 @@ import { useRewardStore } from '../../stores/Reward';
 import { useAccountStore } from '../../stores/Account';
 import { useWalletStore } from '../../stores/Wallet';
 import { RewardVariant } from '@thxnetwork/app/types/enums/rewards';
+import { chainList } from '@thxnetwork/app/utils/chains';
 
 export default defineComponent({
     name: 'BaseModalRewardPayment',
@@ -83,10 +98,14 @@ export default defineComponent({
             wallet: null,
             isModalShown: false,
             isLoading: false,
+            chainList,
         };
     },
     computed: {
         ...mapStores(useAccountStore, useRewardStore),
+        isAlertChainShown() {
+            return !!this.reward.chainId;
+        },
         participantBalance() {
             const participant = this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
             if (!participant) return 0;
@@ -102,7 +121,7 @@ export default defineComponent({
             return !!this.error;
         },
         isWalletRequired() {
-            return [RewardVariant.Coin, RewardVariant.NFT, RewardVariant.Galachain].includes(this.reward.variant);
+            return [RewardVariant.Coin, RewardVariant.NFT].includes(this.reward.variant);
         },
     },
     watch: {

@@ -1,6 +1,6 @@
 import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
 import { Pool, WalletDocument } from '../models';
-import { getProvider } from '../util/network';
+import NetworkService from './NetworkService';
 import { BigNumber } from 'alchemy-sdk';
 import { differenceInSeconds, isBefore, subWeeks } from 'date-fns';
 import { AccountPlanType, ChainId } from '@thxnetwork/common/enums';
@@ -16,7 +16,7 @@ const ONE_DAY = 60 * 60 * 24;
 
 export default class PaymentService {
     static async deposit(safe: WalletDocument, sub: string, amountInWei: BigNumber) {
-        const { web3 } = getProvider(safe.chainId);
+        const { web3 } = NetworkService.getProvider(safe.chainId);
         const addresses = contractNetworks[safe.chainId];
         const contract = new web3.eth.Contract(
             contractArtifacts['THXPaymentSplitter'].abi,
@@ -55,7 +55,7 @@ export default class PaymentService {
     }
 
     static async setRate(safe: WalletDocument, plan: AccountPlanType) {
-        const { web3 } = getProvider(safe.chainId);
+        const { web3 } = NetworkService.getProvider(safe.chainId);
         const addresses = contractNetworks[safe.chainId];
         const contract = new web3.eth.Contract(
             contractArtifacts['THXPaymentSplitter'].abi,
@@ -88,7 +88,7 @@ export default class PaymentService {
         const pools = await Pool.find({ trialEndsAt: { $exists: true, $lt: subWeeks(new Date(), 1) } });
         for (const pool of pools) {
             // Get campaing safe
-            const safe = await SafeService.findOneByPool(pool);
+            const safe = await SafeService.findOneByPool(pool, ChainId.Polygon);
             const timeLeftInSeconds = await this.getTimeLeftInSeconds(safe, pool);
 
             // Insufficient payments

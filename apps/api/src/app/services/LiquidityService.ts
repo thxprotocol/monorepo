@@ -1,6 +1,6 @@
 import { contractNetworks, getArtifact } from '@thxnetwork/api/hardhat';
 import { WalletDocument } from '../models/Wallet';
-import { getProvider } from '../util/network';
+import NetworkService from './NetworkService';
 import TransactionService from './TransactionService';
 import BalancerService from './BalancerService';
 
@@ -11,7 +11,7 @@ export default class LiquidityService {
     }
 
     static async stake(wallet: WalletDocument, amountInWei: string) {
-        const { web3 } = getProvider(wallet.chainId);
+        const { web3 } = NetworkService.getProvider(wallet.chainId);
 
         // Deposit the BPT into the gauge
         const bptGauge = new web3.eth.Contract(getArtifact('BPTGauge').abi, contractNetworks[wallet.chainId].BPTGauge);

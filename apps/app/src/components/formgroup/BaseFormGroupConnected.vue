@@ -1,39 +1,36 @@
 <template>
-    <b-form-group label="Connected accounts">
+    <b-form-group>
         <b-alert v-model="isErrorShown" show variant="danger" class="p-2">{{ error }}</b-alert>
-        <template v-for="provider of providers">
-            <div class="px-3 py-2 d-flex align-items-center">
-                <strong>
-                    <i :class="platformIconMap[provider.kind]" class="me-2" :style="{ color: provider.color }"></i>
-                </strong>
-                <div class="me-auto">
-                    <strong>{{ provider.label }}</strong>
-                    <div v-if="provider.user" class="small">
-                        <span class="text-opaque">{{ provider.user.userId }}</span>
-                        <i
-                            v-b-tooltip
-                            class="fas fa-question-circle ms-1 text-opaque"
-                            :title="`${provider.label} User ID`"
-                        />
-                    </div>
+        <div v-for="provider of providers" class="d-flex align-items-center py-2">
+            <strong>
+                <i :class="platformIconMap[provider.kind]" class="me-2" :style="{ color: provider.color }"></i>
+            </strong>
+            <div class="me-auto">
+                <strong>{{ provider.label }}</strong>
+                <div v-if="provider.user" class="small">
+                    <span class="text-opaque">{{ provider.user.userId }}</span>
+                    <i
+                        v-b-tooltip
+                        class="fas fa-question-circle ms-1 text-opaque"
+                        :title="`${provider.label} User ID`"
+                    />
                 </div>
-                <b-spinner v-if="provider.isSubmitting" small />
-                <template v-else>
-                    <b-button
-                        v-if="provider.user"
-                        :disabled="provider.isDisabled"
-                        variant="link"
-                        class="text-decoration-none text-primary"
-                        size="sm"
-                        @click="onClickDisconnect(provider.kind)"
-                    >
-                        Disconnect
-                    </b-button>
-                    <b-button v-else variant="primary" size="sm" @click="onClickConnect(provider)"> Connect </b-button>
-                </template>
             </div>
-            <hr class="my-1" />
-        </template>
+            <b-spinner v-if="provider.isSubmitting" small />
+            <template v-else>
+                <b-button
+                    v-if="provider.user"
+                    :disabled="provider.isDisabled"
+                    variant="link"
+                    class="text-decoration-none text-primary"
+                    size="sm"
+                    @click="onClickDisconnect(provider.kind)"
+                >
+                    Disconnect
+                </b-button>
+                <b-button v-else variant="primary" size="sm" @click="onClickConnect(provider)"> Connect </b-button>
+            </template>
+        </div>
     </b-form-group>
 </template>
 

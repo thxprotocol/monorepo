@@ -80,6 +80,7 @@
     </b-button>
     <BaseButtonApprove
         v-else-if="!isSufficientUSDCAllowance"
+        :chain-id="liquidityStore.chainId"
         :token="{ address: address.USDC, decimals: 6 }"
         :spender="address.BalancerVault"
         :amount="amountUSDC"
@@ -90,6 +91,7 @@
     </BaseButtonApprove>
     <BaseButtonApprove
         v-else-if="!isSufficientTHXAllowance"
+        :chain-id="liquidityStore.chainId"
         :token="{ address: address.THX, decimals: 18 }"
         :spender="address.BalancerVault"
         :amount="amountTHX"
@@ -118,7 +120,6 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '../../stores/Liquidity';
 import { useVeStore } from '../../stores/VE';
 import { contractNetworks } from '../../config/constants';
-import { ChainId } from '@thxnetwork/common/enums';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { useAuthStore } from '@thxnetwork/app/stores/Auth';
 import { chainList } from '@thxnetwork/app/utils/chains';
@@ -140,12 +141,10 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useWalletStore, useVeStore, useLiquidityStore),
         chainInfo() {
-            if (!this.walletStore.wallet) return chainList[ChainId.Polygon];
-            return chainList[this.walletStore.wallet.chainId];
+            return chainList[this.liquidityStore.chainId];
         },
         address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
+            return contractNetworks[this.liquidityStore.chainId];
         },
         isAlertInsufficientTokensShown() {
             return this.accountStore.isAuthenticated ? !this.balanceUSDC && !this.balanceTHX : false;
@@ -181,8 +180,16 @@ export default defineComponent({
                 const balanceUSDC = this.walletStore.balances[this.address.USDC];
                 this.amountUSDC = balanceUSDC ? formatUnits(balanceUSDC, 6) : '0';
                 this.amountTHX = balanceTHX ? formatUnits(balanceTHX, 18) : '0';
-                this.walletStore.getApproval({ tokenAddress: this.address.USDC, spender: this.address.BalancerVault });
-                this.walletStore.getApproval({ tokenAddress: this.address.THX, spender: this.address.BalancerVault });
+                this.walletStore.getApproval({
+                    tokenAddress: this.address.USDC,
+                    spender: this.address.BalancerVault,
+                    chainId: this.liquidityStore.chainId,
+                });
+                this.walletStore.getApproval({
+                    tokenAddress: this.address.THX,
+                    spender: this.address.BalancerVault,
+                    chainId: this.liquidityStore.chainId,
+                });
             },
             immediate: true,
         },
@@ -191,7 +198,7 @@ export default defineComponent({
         async onLiquidityCreate() {
             this.amountUSDC = '0';
             this.amountTHX = '0';
-            await this.walletStore.getBalance(this.address.BPT);
+            await this.walletStore.getBalance(this.address.BPT, this.liquidityStore.chainId);
             this.$emit('change-tab', 1);
         },
         onError(error: Error) {

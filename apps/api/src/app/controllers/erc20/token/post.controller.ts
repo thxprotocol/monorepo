@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { body } from 'express-validator';
+import { toChecksumAddress } from 'web3-utils';
 import ERC20Service from '@thxnetwork/api/services/ERC20Service';
 
 const validation = [
-    body('address').exists().isString(),
-    body('chainId').exists().isInt(),
+    body('address').isString().customSanitizer(toChecksumAddress),
+    body('chainId').isInt(),
     body('logoImgUrl').optional().isString(),
 ];
 

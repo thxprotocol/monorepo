@@ -21,7 +21,6 @@ describe('Widgets', () => {
     it('POST /pools', (done) => {
         user.post('/v1/pools')
             .set({ Authorization: dashboardAccessToken })
-            .send({ chainId: ChainId.Hardhat })
             .expect(({ body }: Response) => {
                 poolId = body._id;
             })

@@ -8,7 +8,14 @@
         <span>Store your secret answer safely!</span>
     </b-alert>
 
-    <b-form-group description="This question will be asked when you sign in on another device.">
+    <!-- <b-form-group label="Network">
+        <b-form-select v-model="chainId" :options="chainList" />
+    </b-form-group> -->
+
+    <b-form-group
+        label="Security Question"
+        description="This question will be asked when you sign in on another device."
+    >
         <b-form-input v-model="question" placeholder="Question" />
     </b-form-group>
 
@@ -54,6 +61,7 @@ import { useAuthStore } from '../../stores/Auth';
 import { useWalletStore } from '../../stores/Wallet';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
+import { ChainId } from '@thxnetwork/common/enums';
 
 export default defineComponent({
     name: 'BaseTabWalletWeb3Auth',
@@ -71,6 +79,11 @@ export default defineComponent({
             message: 'This signature will be used to proof ownership of a web3 account.',
             signature: '',
             isLoading: false,
+            chainId: ChainId.Polygon,
+            chainList: [
+                { value: ChainId.Polygon, text: 'Polygon' },
+                // { value: ChainId.Linea, text: 'Linea' },
+            ],
         };
     },
     computed: {
@@ -100,13 +113,18 @@ export default defineComponent({
             return this.isPasswordLengthValid && this.isPasswordCheckLengthValid && this.isPasswordCheckEqualValid;
         },
         isDisabled() {
-            return !!this.error || this.isLoading || !this.isPasswordValid;
+            return !this.chainId || !!this.error || this.isLoading || !this.isPasswordValid;
         },
     },
     methods: {
         async onClickCreate() {
             this.isLoading = true;
+
             try {
+                if (this.variant === WalletVariant.Safe && !this.chainId) {
+                    throw new Error('No chain ID configured.');
+                }
+
                 // Get recent access token
                 await this.authStore.requestOAuthShareRefresh();
 
@@ -130,6 +148,7 @@ export default defineComponent({
                     variant: WalletVariant.Safe,
                     message: this.message,
                     signature: this.signature,
+                    chainId: this.chainId,
                 });
 
                 this.$emit('close');

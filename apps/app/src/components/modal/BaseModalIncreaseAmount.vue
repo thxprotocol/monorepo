@@ -16,6 +16,7 @@
             :amount="lockAmount"
             :token="{ address: address.BPTGauge, decimals: 18 }"
             :spender="address.VotingEscrow"
+            :chain-id="liquidityStore.chainId"
             @success="onClickIncreaseAmount"
         >
             Approve Transfer
@@ -24,9 +25,6 @@
             <b-spinner v-if="isPolling" small />
             <template v-else>Increase Amount</template>
         </b-button>
-        <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
-            ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
-        </p>
     </b-modal>
 </template>
 
@@ -38,7 +36,6 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { contractNetworks } from '../../config/constants';
 import { parseUnits } from 'ethers/lib/utils';
-import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
 import { BigNumber } from 'ethers/lib/ethers';
 
@@ -69,8 +66,7 @@ export default defineComponent({
             return this.isPolling || this.balanceBPTGauge.lt(this.amountInWei) || this.balanceBPTGauge.eq(0);
         },
         address() {
-            if (!this.walletStore.wallet) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.wallet.chainId];
+            return contractNetworks[this.liquidityStore.chainId];
         },
         amountInWei() {
             return parseUnits(this.lockAmount, 18);
@@ -92,7 +88,11 @@ export default defineComponent({
     },
     methods: {
         onShow() {
-            this.walletStore.getApproval({ tokenAddress: this.address.BPTGauge, spender: this.address.VotingEscrow });
+            this.walletStore.getApproval({
+                tokenAddress: this.address.BPTGauge,
+                spender: this.address.VotingEscrow,
+                chainId: this.liquidityStore.chainId,
+            });
         },
         async onClickIncreaseAmount() {
             this.isPolling = true;
@@ -102,9 +102,7 @@ export default defineComponent({
                 if (!wallet) throw new Error('Please connect a wallet');
 
                 const amountInWei = parseUnits(String(this.lockAmount), 18);
-
                 await this.veStore.increaseAmount(wallet, { amountInWei: amountInWei.toString() });
-                await this.veStore.waitForIncreaseAmount(wallet, amountInWei);
 
                 this.$emit('hidden');
             } catch (response) {

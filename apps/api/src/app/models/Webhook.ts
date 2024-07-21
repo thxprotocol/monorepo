@@ -7,8 +7,8 @@ export const Webhook = mongoose.model<WebhookDocument>(
     new mongoose.Schema(
         {
             sub: String,
-            poolId: String,
             url: String,
+            signingSecret: String,
             active: { default: false, type: Boolean },
         },
         { timestamps: true },

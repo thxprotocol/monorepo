@@ -5,6 +5,8 @@ import {
     Identity,
     WalletDocument,
     Webhook,
+    PoolDocument,
+    Pool,
 } from '@thxnetwork/api/models';
 import { IQuestService } from './interfaces/IQuestService';
 import WebhookService from './WebhookService';
@@ -61,8 +63,9 @@ export default class QuestWebhookService implements IQuestService {
         account?: TAccount;
         data: Partial<TQuestWebhookEntry>;
     }) {
+        const pool = await Pool.findById(quest.poolId);
         const entries = await this.findAllEntries({ quest, account });
-        const identities = await this.findIdentities({ quest, account });
+        const identities = await this.findIdentities({ pool, account });
         const isAvailable = await this.isAvailable({ quest, account, data });
 
         return {
@@ -82,7 +85,8 @@ export default class QuestWebhookService implements IQuestService {
         data: Partial<TQuestWebhookEntry>;
     }): Promise<{ reason: string; result: boolean; data?: { result: boolean; amount?: number } }> {
         // See if there are identities
-        const identities = await this.findIdentities({ quest, account });
+        const pool = await Pool.findById(quest.poolId);
+        const identities = await this.findIdentities({ pool, account });
         if (!identities.length) {
             return {
                 result: false,
@@ -115,8 +119,8 @@ export default class QuestWebhookService implements IQuestService {
         });
     }
 
-    private async findIdentities({ quest, account }: { quest: QuestWebhookDocument; account: TAccount }) {
+    private async findIdentities({ pool, account }: { pool: PoolDocument; account: TAccount }) {
         if (!account || !account.sub) return [];
-        return await Identity.find({ poolId: quest.poolId, sub: account.sub });
+        return await Identity.find({ sub: pool.sub, accountId: account.sub });
     }
 }
