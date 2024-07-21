@@ -12,6 +12,7 @@
             <p class="small text-start text-opaque mb-0">Connect one of your existing wallets using WalletConnect.</p>
         </b-button>
         <b-button
+            v-if="accountStore.config.isQRCodeCampaign"
             :disabled="isDisabledSafeCreate"
             :variant="variant === WalletVariant.Safe ? 'primary' : 'outline-primary'"
             class="rounded mb-2 w-100 text-white justify-content-start"
@@ -53,6 +54,7 @@ export default defineComponent({
         isDisabled() {
             return !this.variant;
         },
+        // Can not create Safes if not for a QR code campaign and if a Safe for the required network already exists
         isDisabledSafeCreate() {
             return !!this.walletStore.wallets.find((wallet) => wallet.variant === WalletVariant.Safe);
         },

@@ -5,11 +5,12 @@ import { BN } from 'bn.js';
 import { ERC20 } from '@thxnetwork/api/models';
 import SafeService from '@thxnetwork/api/services/SafeService';
 import ERC20Service from '@thxnetwork/api/services/ERC20Service';
+import { toChecksumAddress } from 'web3-utils';
 
 const validation = [
     body('walletId').isMongoId(),
     body('erc20Id').isMongoId(),
-    body('to').isString(),
+    body('to').isEthereumAddress().customSanitizer(toChecksumAddress),
     body('amount').isString(),
 ];
 

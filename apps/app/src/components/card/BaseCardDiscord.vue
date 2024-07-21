@@ -19,10 +19,10 @@
             v-b-tooltip
             :title="member.username"
             variant="primary"
-            class="m-1"
+            class="m-2"
             :src="member.avatar_url"
             badge
-            size="2.1rem"
+            size="1.6rem"
             :badge-variant="member.isOnline ? 'success' : 'warning'"
         />
         <b-link :href="inviteURL">

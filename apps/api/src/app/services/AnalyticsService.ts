@@ -31,10 +31,7 @@ import {
     QuestDaily,
     QuestGitcoin,
     QuestGitcoinEntry,
-    RewardGalachainDocument,
-    RewardGalachain,
     QuestGitcoinDocument,
-    RewardGalachainPayment,
     QuestWebhookEntry,
     QuestWebhook,
     QuestWebhookDocument,
@@ -45,10 +42,6 @@ import { logger } from '../util/logger';
 
 class AnalyticsService {
     public leaderboards: { [poolId: string]: TLeaderboardEntry[] } = {};
-
-    constructor() {
-        //
-    }
 
     // Triggered when a quest entry is added
     async updateLeaderboardJob(job: TJob) {
@@ -152,7 +145,6 @@ class AnalyticsService {
             customRewardsQueryResult,
             couponRewardsQueryResult,
             discordRoleRewardsQueryResult,
-            galachainRewardsQueryResult,
         ] = await Promise.all([
             this.queryRewardRedemptions<RewardCoinDocument>({
                 collectionName: 'rewardcoinpayment',
@@ -190,14 +182,6 @@ class AnalyticsService {
                 collectionName: 'rewarddiscordrolepayment',
                 key: 'rewardId',
                 model: RewardDiscordRole,
-                poolId: String(pool._id),
-                startDate,
-                endDate,
-            }),
-            this.queryRewardRedemptions<RewardGalachainDocument>({
-                collectionName: 'rewargalachainpayment',
-                key: 'rewardId',
-                model: RewardGalachain,
                 poolId: String(pool._id),
                 startDate,
                 endDate,
@@ -306,12 +290,6 @@ class AnalyticsService {
                     totalAmount: x.total_amount,
                 };
             }),
-            galachainRewards: galachainRewardsQueryResult.map((x) => {
-                return {
-                    day: x._id,
-                    totalAmount: x.total_amount,
-                };
-            }),
             //
             dailyRewards: dailyRewardsQueryResult.map((x) => {
                 return {
@@ -373,7 +351,6 @@ class AnalyticsService {
             RewardCustomPayment,
             RewardCouponPayment,
             RewardDiscordRolePayment,
-            RewardGalachainPayment,
         ];
         const [
             dailyQuest,
@@ -388,7 +365,6 @@ class AnalyticsService {
             customReward,
             couponReward,
             discordRoleReward,
-            galachainReward,
         ] = await Promise.all(
             collections.map(async (Model) => {
                 const $match = { poolId: String(pool._id) };
@@ -444,7 +420,6 @@ class AnalyticsService {
             customReward,
             couponReward,
             discordRoleReward,
-            galachainReward,
         };
     }
 

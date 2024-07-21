@@ -255,7 +255,6 @@ export async function sendWeeklyDigestJob() {
                 customReward,
                 couponReward,
                 discordRoleReward,
-                galachainReward,
             } = await AnalyticsService.getPoolMetrics(pool, options);
 
             const leaderboardCache = await PoolService.getLeaderboardFromCache(pool, options);
@@ -266,14 +265,10 @@ export async function sendWeeklyDigestJob() {
                 0,
             );
 
-            const paymentCount = [
-                coinReward,
-                nftReward,
-                customReward,
-                couponReward,
-                discordRoleReward,
-                galachainReward,
-            ].reduce((acc, payment) => acc + payment.totalCreated, 0);
+            const paymentCount = [coinReward, nftReward, customReward, couponReward, discordRoleReward].reduce(
+                (acc, payment) => acc + payment.totalCreated,
+                0,
+            );
 
             // Skip if nothing happened.
             if (!entryCount && !paymentCount) continue;

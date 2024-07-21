@@ -18,9 +18,6 @@
             <b-spinner v-if="isPolling" small />
             <template v-else>Increase End Date</template>
         </b-button>
-        <p v-if="walletStore.wallet?.variant === WalletVariant.Safe" class="text-muted text-center mt-3 mb-0">
-            ❤️ We sponsor the transaction costs of your <b-link href="" class="text-white">Safe Multisig</b-link>!
-        </p>
     </b-modal>
 </template>
 
@@ -78,12 +75,11 @@ export default defineComponent({
                 if (!wallet) throw new Error('Please connect a wallet first');
 
                 const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
-
-                await this.veStore.increasUnlockTime(wallet, { lockEndTimestamp });
-                await this.veStore.waitForIncreaseUnlockTime(wallet, lockEndTimestamp);
+                await this.veStore.increasUnlockTime(wallet, { lockEndTimestamp, chainId: this.chainId });
 
                 this.$emit('hidden');
             } catch (response) {
+                console.error(response);
                 this.onError(response);
             } finally {
                 this.isPolling = false;

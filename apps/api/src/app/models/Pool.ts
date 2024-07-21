@@ -19,7 +19,6 @@ const schema = new mongoose.Schema(
             slug: String,
             description: String,
             leaderboardInWeeks: Number,
-            galachainPrivateKey: String,
             isPublished: { type: Boolean, default: false },
             isWeeklyDigestEnabled: { type: Boolean, default: true },
             authenticationMethods: [Number],

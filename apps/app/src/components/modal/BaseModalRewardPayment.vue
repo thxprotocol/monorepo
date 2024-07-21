@@ -39,7 +39,7 @@
                     />
                 </strong>
             </b-alert>
-            <p :class="!reward.chainId && 'mb-0'">
+            <p :class="!isWalletRequired && 'mb-0'">
                 Do you want to use {{ reward.pointPrice }} points for <strong>{{ reward.title }} </strong>?
             </p>
             <BaseFormGroupWalletSelect
@@ -121,7 +121,7 @@ export default defineComponent({
             return !!this.error;
         },
         isWalletRequired() {
-            return [RewardVariant.Coin, RewardVariant.NFT, RewardVariant.Galachain].includes(this.reward.variant);
+            return [RewardVariant.Coin, RewardVariant.NFT].includes(this.reward.variant);
         },
     },
     watch: {

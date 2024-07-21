@@ -108,7 +108,10 @@ export default defineComponent({
                 await this.veStore.withdraw(wallet, this.isEarlyAttempt);
                 await this.veStore.waitForWithdrawal(wallet);
 
-                this.walletStore.getBalance(contractNetworks[this.walletStore.chainId].BPTGauge);
+                this.walletStore.getBalance(
+                    contractNetworks[this.liquidityStore.chainId].BPTGauge,
+                    this.liquidityStore.chainId,
+                );
 
                 this.trackEvent({ isEarly: this.isEarly, isEarlyAttempt: this.isEarlyAttempt });
                 this.$emit('hidden');

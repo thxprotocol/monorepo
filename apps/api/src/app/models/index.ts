@@ -12,7 +12,6 @@ export { ERC1155Metadata, ERC1155MetadataDocument } from './ERC1155Metadata';
 export { ERC1155Token, ERC1155TokenDocument } from './ERC1155Token';
 export { ERC20, ERC20Document } from './ERC20';
 export { ERC20Token, ERC20TokenDocument } from './ERC20Token';
-export { ERC20Transfer, ERC20TransferDocument } from './ERC20Transfer';
 export { ERC721, ERC721Document } from './ERC721';
 export { ERC721Metadata, ERC721MetadataDocument } from './ERC721Metadata';
 export { ERC721Token, ERC721TokenDocument } from './ERC721Token';
@@ -49,8 +48,6 @@ export { RewardDiscordRole, RewardDiscordRoleDocument } from './RewardDiscordRol
 export { RewardDiscordRolePayment, RewardDiscordRolePaymentDocument } from './RewardDiscordRolePayment';
 export { RewardNFT, RewardNFTDocument } from './RewardNFT';
 export { RewardNFTPayment, RewardNFTPaymentDocument } from './RewardNFTPayment';
-export { RewardGalachain, RewardGalachainDocument } from './RewardGalachain';
-export { RewardGalachainPayment, RewardGalachainPaymentDocument } from './RewardGalachainPayment';
 export { Transaction, TransactionDocument } from './Transaction';
 export { TwitterFollower, TwitterFollowerDocument } from './TwitterFollower';
 export { TwitterLike, TwitterLikeDocument } from './TwitterLike';

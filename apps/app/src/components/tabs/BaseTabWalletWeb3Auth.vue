@@ -8,7 +8,14 @@
         <span>Store your secret answer safely!</span>
     </b-alert>
 
-    <b-form-group description="This question will be asked when you sign in on another device.">
+    <!-- <b-form-group label="Network">
+        <b-form-select v-model="chainId" :options="chainList" />
+    </b-form-group> -->
+
+    <b-form-group
+        label="Security Question"
+        description="This question will be asked when you sign in on another device."
+    >
         <b-form-input v-model="question" placeholder="Question" />
     </b-form-group>
 
@@ -73,6 +80,10 @@ export default defineComponent({
             signature: '',
             isLoading: false,
             chainId: ChainId.Polygon,
+            chainList: [
+                { value: ChainId.Polygon, text: 'Polygon' },
+                // { value: ChainId.Linea, text: 'Linea' },
+            ],
         };
     },
     computed: {
@@ -102,7 +113,7 @@ export default defineComponent({
             return this.isPasswordLengthValid && this.isPasswordCheckLengthValid && this.isPasswordCheckEqualValid;
         },
         isDisabled() {
-            return !!this.error || this.isLoading || !this.isPasswordValid;
+            return !this.chainId || !!this.error || this.isLoading || !this.isPasswordValid;
         },
     },
     methods: {
@@ -110,7 +121,7 @@ export default defineComponent({
             this.isLoading = true;
 
             try {
-                if (!this.chainId) {
+                if (this.variant === WalletVariant.Safe && !this.chainId) {
                     throw new Error('No chain ID configured.');
                 }
 

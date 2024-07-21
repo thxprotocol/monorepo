@@ -14,11 +14,13 @@ const validation = [
 
 const controller = async (req: Request, res: Response) => {
     const walletId = req.query.walletId as string;
+    const tokenAddress = req.query.tokenAddress as string;
     const chainId = Number(req.query.chainId) as ChainId;
+
     const wallet = await WalletService.findById(walletId);
     if (!wallet) throw new NotFoundError('Could not find wallet for account');
 
-    const contract = ContractService.getContract('THXERC20_LimitedSupply', chainId, req.query.tokenAddress as string);
+    const contract = ContractService.getContract('THXERC20_LimitedSupply', chainId, tokenAddress);
     const allowance = await contract.allowance(wallet.address, req.query.spender);
 
     res.json({ allowanceInWei: allowance.toString() });

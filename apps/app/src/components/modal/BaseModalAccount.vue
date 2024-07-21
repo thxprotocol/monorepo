@@ -11,50 +11,56 @@
                 <i class="fas fa-times" />
             </b-link>
         </template>
-
         <div v-if="!accountStore.account" class="d-flex justify-content-center">
             <b-spinner small />
         </div>
+        <b-tabs v-else justified content-class="py-3">
+            <b-tab title="Profile">
+                <b-alert v-model="isErrorShown" variant="danger" class="p-2">
+                    {{ error }}
+                </b-alert>
+                <b-alert v-model="isUsernameMissing" variant="danger" class="p-2">
+                    <i class="fas fa-exclamation-circle mx-2" />
+                    Please, set a username!
+                </b-alert>
+                <b-alert v-model="isProfileImgPlaceholder" variant="danger" class="p-2">
+                    <i class="fas fa-exclamation-circle mx-2" />
+                    Please, upload a profile picture!
+                </b-alert>
+                <b-row>
+                    <b-col cols="8">
+                        <BaseFormGroupUsername class="mb-3" />
+                        <BaseFormGroupEmail class="mb-3" />
+                    </b-col>
+                    <b-col cols="4" class="d-flex align-items-center justify-content-center">
+                        <BaseFormGroupAvatar />
+                    </b-col>
+                </b-row>
+                <b-form-group label="Account ID">
+                    <b-input-group>
+                        <b-form-input v-model="accountStore.account.sub" disabled />
+                        <b-input-group-append>
+                            <b-button
+                                v-clipboard:copy="accountStore.account.sub"
+                                v-clipboard:success="onCopySuccess"
+                                size="sm"
+                                variant="primary"
+                            >
+                                <i v-if="isCopied" class="fas fa-clipboard-check px-2" />
+                                <i v-else class="fas fa-clipboard px-2" />
+                            </b-button>
+                        </b-input-group-append>
+                    </b-input-group>
+                </b-form-group>
+            </b-tab>
+            <b-tab title="Connected">
+                <BaseFormGroupConnected class="mb-3" />
+            </b-tab>
+            <b-tab title="Subscriptions">
+                <BaseFormGroupNotifications class="mb-3" />
+            </b-tab>
+        </b-tabs>
 
-        <b-form v-else>
-            <b-alert v-model="isErrorShown" variant="danger" class="p-2">
-                {{ error }}
-            </b-alert>
-            <b-alert v-model="isUsernameMissing" variant="danger" class="p-2">
-                <i class="fas fa-exclamation-circle mx-2" />
-                Please, set a username!
-            </b-alert>
-            <b-alert v-model="isProfileImgPlaceholder" variant="danger" class="p-2">
-                <i class="fas fa-exclamation-circle mx-2" />
-                Please, upload a profile picture!
-            </b-alert>
-            <b-row>
-                <b-col cols="8">
-                    <BaseFormGroupUsername class="mb-3" />
-                    <BaseFormGroupEmail class="mb-3" />
-                </b-col>
-                <b-col cols="4" class="d-flex align-items-center justify-content-center">
-                    <BaseFormGroupAvatar />
-                </b-col>
-            </b-row>
-            <BaseFormGroupConnected class="mb-3" />
-            <b-form-group label="Account ID">
-                <b-input-group>
-                    <b-form-input v-model="accountStore.account.sub" disabled />
-                    <b-input-group-append>
-                        <b-button
-                            v-clipboard:copy="accountStore.account.sub"
-                            v-clipboard:success="onCopySuccess"
-                            size="sm"
-                            variant="primary"
-                        >
-                            <i v-if="isCopied" class="fas fa-clipboard-check px-2" />
-                            <i v-else class="fas fa-clipboard px-2" />
-                        </b-button>
-                    </b-input-group-append>
-                </b-input-group>
-            </b-form-group>
-        </b-form>
         <template #footer>
             <b-button
                 class="w-100"

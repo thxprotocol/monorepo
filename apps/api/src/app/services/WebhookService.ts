@@ -7,6 +7,7 @@ import { Job } from '@hokify/agenda';
 import { agenda } from '@thxnetwork/api/util/agenda';
 import { signPayload } from '@thxnetwork/api/util/signingsecret';
 import { JobType, Event, WebhookRequestState } from '@thxnetwork/common/enums';
+import { logger } from '../util/logger';
 
 export default class WebhookService {
     static async request(webhook: WebhookDocument, account: TAccount, metadata?: string) {
@@ -71,12 +72,10 @@ export default class WebhookService {
             webhookRequest.state = WebhookRequestState.Received;
             webhookRequest.httpStatus = response.status;
 
-            console.debug(`[${response.status}], ${JSON.stringify(response.data)}`);
+            logger.debug(`[${response.status}], ${JSON.stringify(response.data)}`);
 
             return response && response.data;
         } catch (error) {
-            console.log(error);
-
             webhookRequest.state = WebhookRequestState.Failed;
             webhookRequest.failReason = error && error.toString();
 
@@ -86,7 +85,7 @@ export default class WebhookService {
                 webhookRequest.failReason = JSON.stringify(error.response.data);
             }
 
-            console.error(error);
+            logger.error(error);
         } finally {
             webhookRequest.attempts = webhookRequest.attempts++;
             await webhookRequest.save();

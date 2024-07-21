@@ -9,8 +9,8 @@ import { getConnectedUser } from '../utils/social';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { User } from 'oidc-client-ts';
 import { decodeHTML } from '../utils/decode-html';
-import poll from 'promise-poller';
 import { useWalletStore } from './Wallet';
+import poll from 'promise-poller';
 
 // Feature only available on mobile devices
 const isMobileDevice = !!window.matchMedia('(pointer:coarse)').matches;
@@ -142,8 +142,9 @@ export const useAccountStore = defineStore('account', {
         onUserUnloaded() {
             return useAuthStore().onUserUnloadedCallback();
         },
-        isSubscribed(id: string) {
-            return this.participants.find((p) => p.poolId === id)?.isSubscribed;
+        isSubscribed(campaignId: string) {
+            const participant = this.participants.find((p) => p.poolId === campaignId);
+            return participant ? participant.isSubscribed : false;
         },
         async getAccount() {
             this.account = await this.api.request.get('/v1/account');
@@ -158,7 +159,6 @@ export const useAccountStore = defineStore('account', {
             const params: { poolId?: string } = {};
             if (poolId) params['poolId'] = poolId;
             if (this.poolId) params['poolId'] = this.poolId;
-
             this.participants = await this.api.request.get('/v1/participants', { params });
         },
         async updateParticipant({ email, isSubscribed }: Partial<TParticipant> & { email: string }) {

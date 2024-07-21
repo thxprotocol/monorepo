@@ -9,13 +9,26 @@
                 <div class="text-success fw-bold me-auto">
                     {{ token.walletBalance }}
                 </div>
-                <span class="small text-opaque">{{ token.erc20.symbol }}</span>
+                <div class="small text-opaque">{{ token.erc20.symbol }}</div>
             </div>
         </template>
 
         <template #dropdown-items>
-            <b-dropdown-item disabled @click="isModalTransferShown = true"> Transfer </b-dropdown-item>
-            <b-dropdown-item :href="blockExplorerURL"> Block Explorer </b-dropdown-item>
+            <b-dropdown-item
+                :disabled="isDisabledTransfer"
+                link-class="d-flex justify-content-between align-items-center"
+                @click="isModalTransferShown = true"
+            >
+                Transfer
+                <i class="fas fa-caret-right text-opaque"></i>
+            </b-dropdown-item>
+            <b-dropdown-item
+                :href="blockExplorerURL"
+                target="_blank"
+                link-class="d-flex justify-content-between align-items-center"
+            >
+                Block Explorer <i class="fas fa-caret-right text-opaque"></i>
+            </b-dropdown-item>
             <BaseModalERC20Transfer
                 :id="`modalERC20Transfer${token.erc20._id}`"
                 :show="isModalTransferShown"
@@ -36,11 +49,11 @@ import { useWalletStore } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { toast } from '../../utils/toast';
 import { fromWei } from 'web3-utils';
-import { RewardVariant } from '@thxnetwork/common/enums';
+import { RewardVariant, WalletVariant } from '@thxnetwork/common/enums';
 import { chainList } from '@thxnetwork/app/utils/chains';
 
 export default defineComponent({
-    name: 'BaseCardERC20',
+    name: 'BaseCardCoin',
     props: {
         token: {
             type: Object as PropType<TERC20Token>,
@@ -64,10 +77,17 @@ export default defineComponent({
             return this.token.migrationBalance ? Number(fromWei(this.token.migrationBalance)) > 0 : false;
         },
         blockExplorerURL() {
-            const { wallet, chainId } = this.walletStore;
-            if (!wallet || !chainId) return;
-
-            return chainList[chainId].blockExplorer + '/token/' + this.token.erc20.address + '?a=' + wallet.address;
+            if (!this.walletStore.wallet) return;
+            return (
+                chainList[this.token.chainId].blockExplorer +
+                '/token/' +
+                this.token.erc20.address +
+                '?a=' +
+                this.walletStore.wallet.address
+            );
+        },
+        isDisabledTransfer() {
+            return this.walletStore.wallet?.variant !== WalletVariant.Safe;
         },
     },
     methods: {

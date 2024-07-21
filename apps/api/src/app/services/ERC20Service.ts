@@ -1,6 +1,6 @@
 import { toChecksumAddress } from 'web3-utils';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
-import { ChainId, ERC20Type, TransactionState } from '@thxnetwork/common/enums';
+import { ChainId, ERC20Type, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { TransactionReceipt } from 'web3-core';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
@@ -10,7 +10,6 @@ import {
     ERC20Document,
     ERC20Token,
     ERC20TokenDocument,
-    ERC20Transfer,
     PoolDocument,
     RewardCoin,
     Transaction,
@@ -20,19 +19,26 @@ import {
 import TransactionService from './TransactionService';
 import PoolService from './PoolService';
 import { fromWei } from 'web3-utils';
-import { NODE_ENV } from '../config/secrets';
+import { PromiseParser } from '@thxnetwork/api/util';
 
 async function decorate(token: ERC20TokenDocument, wallet: WalletDocument) {
     const erc20 = await getById(token.erc20Id);
-    if (!erc20 || erc20.chainId !== wallet.chainId) return;
+    if (!erc20) {
+        throw new Error(`ERC20 not found for ${token.erc20Id}`);
+    }
+
+    if (wallet.variant === WalletVariant.Safe && erc20.chainId !== wallet.chainId) {
+        throw new Error(`ERC20 chain ${erc20.chainId} not equal walllet chain ${wallet.chainId}`);
+    }
 
     const walletBalanceInWei = await erc20.contract.methods.balanceOf(wallet.address).call();
     const walletBalance = fromWei(walletBalanceInWei, 'ether');
 
-    return Object.assign(token.toJSON() as TERC20Token, {
+    return {
+        ...(token.toJSON() as TERC20Token),
         walletBalance,
         erc20,
-    });
+    };
 }
 
 function getDeployArgs(erc20: ERC20Document, totalSupply?: string) {
@@ -147,9 +153,8 @@ export const getTokensForSub = (sub: string) => {
 };
 
 export const getTokensForWallet = async (wallet: WalletDocument, chainId: ChainId) => {
-    const tokens = await ERC20Token.find({ sub: wallet.sub });
-    const result = await Promise.allSettled(tokens.map((token) => decorate(token, wallet)));
-    const erc20Tokens = result.filter((r) => r.status === 'fulfilled').map((r: any) => r.value);
+    const tokens = await ERC20Token.find({ sub: wallet.sub, walletId: wallet.id });
+    const erc20Tokens = await PromiseParser.parse(tokens.map((token) => decorate(token, wallet)));
 
     // We add additional veTHX related tokens for Polygon and Hardhat
     const defaults = await findDefaultTokens(wallet, chainId);
@@ -174,36 +179,23 @@ export const findBy = (query: { address: string; chainId: ChainId; sub?: string 
     return ERC20.findOne(query);
 };
 
-export const addTokenForWallet = async (erc20: ERC20Document, wallet: WalletDocument) => {
-    const hasToken = await ERC20Token.exists({
-        sub: wallet.sub,
-        walletId: wallet.id,
-        erc20Id: erc20.id,
-    });
-
-    if (!hasToken) {
-        await createERC20Token(erc20, wallet);
-    }
-};
-
 export const importToken = async (chainId: number, address: string, sub: string, logoImgUrl: string) => {
     const { web3 } = NetworkService.getProvider(chainId);
-    const { abi } = getArtifact('THXERC20_LimitedSupply');
-    const contract = new web3.eth.Contract(abi);
+    const contract = new web3.eth.Contract(getArtifact('THXERC20_LimitedSupply').abi, address);
     const [name, symbol] = await Promise.all([contract.methods.name().call(), contract.methods.symbol().call()]);
     const erc20 = await ERC20.create({
+        sub,
         name,
         symbol,
-        address: toChecksumAddress(address),
+        address,
         chainId,
-        type: ERC20Type.Unknown,
-        sub,
         logoImgUrl,
+        type: ERC20Type.Unknown,
     });
 
     const wallets = await Wallet.find({ sub });
     for (const wallet of wallets) {
-        await addTokenForWallet(erc20, wallet);
+        await upsertToken(erc20, wallet);
     }
 
     return erc20;
@@ -222,19 +214,10 @@ export const approve = async (erc20: ERC20Document, wallet: WalletDocument, amou
 };
 
 export const transferFrom = async (erc20: ERC20Document, wallet: WalletDocument, to: string, amountInWei: string) => {
-    const erc20Transfer = await ERC20Transfer.create({
-        erc20Id: erc20.id,
-        from: wallet.address,
-        to,
-        amount: amountInWei,
-        chainId: wallet.chainId,
-        sub: wallet.sub,
-    });
-
-    // Check if an erc20Token exists for a known receiving wallet and create one if not
-    const receiver = await Wallet.findOne({ address: toChecksumAddress(to) });
-    if (receiver && !(await ERC20Token.exists({ walletId: receiver.id, erc20Id: erc20.id }))) {
-        await createERC20Token(erc20, receiver);
+    // Check if the receiving wallet is known and register the token
+    const receiver = await Wallet.findOne({ address: to });
+    if (receiver) {
+        await upsertToken(erc20, receiver);
     }
 
     const tx = await TransactionService.sendSafeAsync(
@@ -243,8 +226,6 @@ export const transferFrom = async (erc20: ERC20Document, wallet: WalletDocument,
         erc20.contract.methods.transfer(to, amountInWei),
         { type: 'transferFromCallBack', args: { erc20Id: erc20.id } },
     );
-
-    await erc20Transfer.updateOne({ transactionId: tx.id });
 
     return tx;
 };
@@ -260,13 +241,20 @@ async function isMinter(erc20: ERC20Document, address: string) {
     return await erc20.contract.methods.hasRole(keccak256(toUtf8Bytes('MINTER_ROLE')), address).call();
 }
 
-async function createERC20Token(erc20: ERC20Document, wallet: WalletDocument) {
-    await ERC20Token.create({
-        sub: wallet.sub,
-        walletId: wallet.id,
+async function upsertToken(erc20: ERC20Document, receiver: WalletDocument) {
+    const query = {
+        sub: receiver.sub,
+        walletId: receiver.id,
         erc20Id: erc20.id,
-        chainId: erc20.chainId,
-    });
+    };
+    await ERC20Token.findOneAndUpdate(
+        query,
+        {
+            ...query,
+            chainId: erc20.chainId,
+        },
+        { upsert: true },
+    );
 }
 
 async function findDefaultTokens(wallet: WalletDocument, chainId: ChainId) {
@@ -302,7 +290,7 @@ async function findDefaultTokens(wallet: WalletDocument, chainId: ChainId) {
         },
     ];
 
-    const promise = await Promise.allSettled(
+    return await PromiseParser.parse(
         defaultContracts.map(async (erc20) => {
             const { web3 } = NetworkService.getProvider(erc20.chainId);
             const contract = new web3.eth.Contract(getArtifact('THXERC20_LimitedSupply').abi, erc20.address);
@@ -317,15 +305,12 @@ async function findDefaultTokens(wallet: WalletDocument, chainId: ChainId) {
             };
         }),
     );
-
-    return promise.filter((r) => r.status === 'fulfilled').map((r: any) => r.value);
 }
 
 export default {
     findDefaultTokens,
     decorate,
     findBySub,
-    createERC20Token,
     deployCallback,
     deploy,
     getAll,

@@ -10,12 +10,11 @@ import { defineComponent, PropType } from 'vue';
 import { BigNumber } from 'ethers/lib/ethers';
 import { mapStores } from 'pinia';
 import { contractNetworks } from '@thxnetwork/app/config/constants';
-import { ChainId } from '@thxnetwork/common/enums';
 import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
 import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { useVeStore } from '@thxnetwork/app/stores/VE';
 import { useAccountStore } from '@thxnetwork/app/stores/Account';
-import { track } from '@thxnetwork/common/mixpanel';
+import { ChainId } from '@thxnetwork/common/enums';
 
 export default defineComponent({
     name: 'BaseButtonLiquidityStake',
@@ -31,8 +30,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useVeStore, useWalletStore, useLiquidityStore, useAccountStore),
         address() {
-            if (!this.walletStore.chainId) return contractNetworks[ChainId.Polygon];
-            return contractNetworks[this.walletStore.chainId];
+            return contractNetworks[this.liquidityStore.chainId];
         },
         amountInWei() {
             return BigNumber.from(this.amount);
@@ -57,9 +55,13 @@ export default defineComponent({
 
                 this.isPolling = true;
 
+                // Check current chainId to be Hardhat or Polygon
+                if (![ChainId.Hardhat, ChainId.Polygon].includes(this.walletStore.chainId)) {
+                    throw new Error('Please, change your network to Polygon');
+                }
+
                 const data = { amountInWei: this.amountInWei.toString() };
                 await this.liquidityStore.stake(wallet, data);
-                await this.liquidityStore.waitForStake(wallet, this.amountInWei);
 
                 this.$emit('success');
             } catch (error) {

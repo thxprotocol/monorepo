@@ -50,7 +50,7 @@ const chainList: { [chainId: number]: ChainInfo } = {
         chainId: ChainId.Linea,
         name: 'Linea',
         logo: ImgLogoLinea,
-        blockExplorer: 'https://zkevm.polygonscan.com',
+        blockExplorer: 'https://lineascan.build',
         chain: linea,
     },
     [ChainId.Metis]: {
