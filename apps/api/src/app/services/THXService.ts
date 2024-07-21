@@ -25,7 +25,7 @@ class THXService {
             await AccountProxy.update(account.sub, { identity: account.identity });
         }
 
-        await Identity.updateOne({ uuid: account.identity }, { sub: account.sub });
+        await Identity.updateOne({ uuid: account.identity }, { accountId: account.sub });
     }
 
     async forceConnect(pool: PoolDocument, account: TAccount) {
@@ -34,10 +34,10 @@ class THXService {
         if (!wallets.length) return;
 
         // Create a list of uuids for these wallets
-        const uuids = wallets.map((wallet) => IdentityService.getUUID(pool, wallet.address));
+        const uuids = wallets.map((wallet) => IdentityService.getUUID(pool.sub, wallet.address));
 
         // Find any identity for these uuids and update
-        await Identity.findOneAndUpdate({ uuid: { $in: uuids } }, { sub: account.sub });
+        await Identity.findOneAndUpdate({ uuid: { $in: uuids } }, { accountId: account.sub });
     }
 
     async createEvent(account: TAccount, event: string) {

@@ -1,4 +1,5 @@
 export * from './assertPoolAccess';
+export * from './assertModelAccess';
 export * from './assertRequestInput';
 export * from './errorOutput';
 export * from './errorLogger';

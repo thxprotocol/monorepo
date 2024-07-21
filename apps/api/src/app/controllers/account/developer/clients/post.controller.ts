@@ -3,8 +3,9 @@ import { GrantVariant } from '@thxnetwork/common/enums';
 import { widgetScopes } from '@thxnetwork/api/util/jest/constants';
 import ClientProxy from '@thxnetwork/api/proxies/ClientProxy';
 
+const validation = [];
+
 const controller = async (req: Request, res: Response) => {
-    const poolId = req.header('X-PoolId');
     const { grantType, redirectUri, requestUri, name } = req.body;
     const grantMap = {
         [GrantVariant.AuthorizationCode]: {
@@ -26,9 +27,9 @@ const controller = async (req: Request, res: Response) => {
         },
     };
     const payload = grantMap[grantType];
-    const client = await ClientProxy.create(req.auth.sub, poolId, payload, name);
+    const client = await ClientProxy.create(req.auth.sub, payload, name);
 
     res.json(client);
 };
 
-export { controller };
+export { controller, validation };

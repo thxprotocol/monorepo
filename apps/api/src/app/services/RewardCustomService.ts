@@ -1,4 +1,4 @@
-import { Identity, RewardCustom, RewardCustomPayment, RewardCustomPaymentDocument, Webhook } from '../models';
+import { Identity, Pool, RewardCustom, RewardCustomPayment, RewardCustomPaymentDocument, Webhook } from '../models';
 import { IRewardService } from './interfaces/IRewardService';
 import { Event } from '@thxnetwork/common/enums';
 import WebhookService from './WebhookService';
@@ -10,8 +10,9 @@ export default class RewardCustomService implements IRewardService {
     };
 
     async decorate({ reward, account }) {
-        const identities = account ? await Identity.find({ poolId: reward.poolId, sub: account.sub }) : [];
-        return { ...reward.toJSON(), isDisabled: !identities.length };
+        const pool = await Pool.findById(reward.poolId);
+        const identities = account ? await Identity.find({ sub: pool.sub, accountId: account.sub }) : [];
+        return { ...reward.toJSON(), isAvailable: true, isDisabled: !identities.length };
     }
 
     async decoratePayment(payment: RewardCustomPaymentDocument): Promise<TRewardPayment> {
@@ -19,7 +20,8 @@ export default class RewardCustomService implements IRewardService {
     }
 
     async getValidationResult({ reward, account }: { reward: TReward; account?: TAccount }) {
-        const identities = account ? await Identity.find({ poolId: reward.poolId, sub: account.sub }) : [];
+        const pool = await Pool.findById(reward.poolId);
+        const identities = account ? await Identity.find({ sub: pool.sub, accountId: account.sub }) : [];
         if (!identities.length) return { result: false, reason: 'No identity connected for this campaign.' };
 
         return { result: true, reason: '' };

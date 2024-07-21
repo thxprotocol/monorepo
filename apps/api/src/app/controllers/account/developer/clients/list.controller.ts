@@ -3,8 +3,7 @@ import { Client } from '@thxnetwork/api/models/Client';
 import ClientProxy from '@thxnetwork/api/proxies/ClientProxy';
 
 const controller = async (req: Request, res: Response) => {
-    const poolId = req.header('X-PoolId');
-    const clients = await Client.find({ poolId });
+    const clients = await Client.find({ sub: req.auth.sub });
     const promises = clients.map(async (client) => {
         return await ClientProxy.getCredentials(client.toJSON());
     });

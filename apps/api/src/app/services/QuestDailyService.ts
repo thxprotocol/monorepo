@@ -1,4 +1,4 @@
-import { Event, Identity, QuestDaily, QuestDailyEntry } from '@thxnetwork/api/models';
+import { Event, Identity, Pool, QuestDaily, QuestDailyEntry } from '@thxnetwork/api/models';
 import { IQuestService } from './interfaces/IQuestService';
 
 const ONE_DAY_MS = 86400 * 1000; // 24 hours in milliseconds
@@ -129,18 +129,18 @@ export default class QuestDailyService implements IQuestService {
         }
 
         // If an event is required we check if there is an event found within the time window
-        const identities = await this.findIdentities({ quest, account });
+        const pool = await Pool.findById(quest.poolId);
+        const identities = await this.findIdentities({ pool, account });
         if (!identities.length) {
             return {
                 result: false,
                 reason: 'No identity connected to this account. Please ask for this in your community!',
             };
         }
-
-        const identityIds = identities.map(({ _id }) => String(_id));
+        const identityIds = identities.map(({ id }) => id);
         const events = await Event.find({
             name: quest.eventName,
-            poolId: quest.poolId,
+            sub: pool.sub,
             identityId: { $in: identityIds },
             createdAt: { $gt: new Date(start), $lt: new Date(end) },
         });
@@ -156,8 +156,8 @@ export default class QuestDailyService implements IQuestService {
         }
     }
 
-    private async findIdentities({ quest, account }: { quest: TQuestDaily; account: TAccount }) {
-        return await Identity.find({ sub: account.sub, poolId: quest.poolId });
+    private async findIdentities({ pool, account }: { pool: TPool; account: TAccount }) {
+        return await Identity.find({ sub: pool.sub, accountId: account.sub });
     }
 
     private async findEntries({ account, quest }: { account: TAccount; quest: TQuestDaily }) {

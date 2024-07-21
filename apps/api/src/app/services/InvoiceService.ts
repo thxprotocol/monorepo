@@ -69,76 +69,81 @@ export default class InvoiceService {
         invoicePeriodEndDate: Date,
         accountsColl?: TAccount[],
     ) {
-        // Get all relevant pools
-        const questEntriesByCampaign = await Promise.all(
-            pools.map(async (pool) => {
-                const uniqueEntriesByVariant = await Promise.all(
-                    questEntryModels.map(async (model) => {
-                        return await model
-                            .countDocuments({
-                                poolId: pool.id,
-                                createdAt: { $gte: invoicePeriodstartDate, $lte: invoicePeriodEndDate },
-                            })
-                            .distinct('sub');
-                    }),
-                );
-                const flattenedArray = uniqueEntriesByVariant.flat();
+        try {
+            // Get all relevant pools
+            const questEntriesByCampaign = await Promise.all(
+                pools.map(async (pool) => {
+                    const uniqueEntriesByVariant = await Promise.all(
+                        questEntryModels.map(async (model) => {
+                            return await model
+                                .countDocuments({
+                                    poolId: pool.id,
+                                    createdAt: { $gte: invoicePeriodstartDate, $lte: invoicePeriodEndDate },
+                                })
+                                .distinct('sub');
+                        }),
+                    );
+                    const flattenedArray = uniqueEntriesByVariant.flat();
 
-                return { poolId: pool.id, poolSub: pool.sub, mapCount: new Set(flattenedArray).size };
-            }),
-        );
+                    return { poolId: pool.id, poolSub: pool.sub, mapCount: new Set(flattenedArray).size };
+                }),
+            );
 
-        // Get the pool owner accounts to send the invoices
-        const subs = questEntriesByCampaign.map(({ poolSub }) => poolSub);
-        const accounts =
-            accountsColl.map((a) => Object.assign(a, { sub: String(a._id) })) || (await AccountProxy.find({ subs }));
+            // Get the pool owner accounts to send the invoices
+            const subs = questEntriesByCampaign.map(({ poolSub }) => poolSub);
+            const accounts =
+                accountsColl.map((a) => Object.assign(a, { sub: String(a._id) })) ||
+                (await AccountProxy.find({ subs }));
 
-        // Build operations array for the current month metrics
-        const operations = questEntriesByCampaign.map(({ poolId, poolSub, mapCount }) => {
-            try {
-                const account = accounts.find((a) => a.sub === poolSub);
-                // If the account can not be found, has no email or plan then notify admin.
-                // Continue with invoice generation for future reference
-                // @todo: notify admin
-                if (!account) {
-                    logger.info(`Account ${account.sub} not found for invoicing.`);
-                }
-                if (!account.email) {
-                    logger.info(`Account ${account.sub} has no email for invoicing.`);
-                }
-                if (![AccountPlanType.Lite, AccountPlanType.Premium].includes(account.plan)) {
-                    logger.info(`Account ${account.sub} has no plan for invoicing.`);
-                }
+            // Build operations array for the current month metrics
+            const operations = questEntriesByCampaign.map(({ poolId, poolSub, mapCount }) => {
+                try {
+                    const account = accounts.find((a) => a.sub === poolSub);
+                    // If the account can not be found, has no email or plan then notify admin.
+                    // Continue with invoice generation for future reference
+                    // @todo: notify admin
+                    if (!account) {
+                        logger.info(`Account ${account.sub} not found for invoicing.`);
+                    }
+                    if (!account.email) {
+                        logger.info(`Account ${account.sub} has no email for invoicing.`);
+                    }
+                    if (![AccountPlanType.Lite, AccountPlanType.Premium].includes(account.plan)) {
+                        logger.info(`Account ${account.sub} has no plan for invoicing.`);
+                    }
 
-                const plan = account.plan || AccountPlanType.Lite;
+                    const plan = account.plan || AccountPlanType.Lite;
 
-                return {
-                    updateOne: {
-                        filter: {
-                            poolId,
-                            periodStartDate: invoicePeriodstartDate,
-                            periodEndDate: invoicePeriodEndDate,
-                        },
-                        update: {
-                            $set: {
+                    return {
+                        updateOne: {
+                            filter: {
                                 poolId,
                                 periodStartDate: invoicePeriodstartDate,
                                 periodEndDate: invoicePeriodEndDate,
-                                mapCount,
-                                mapLimit: planPricingMap[plan].subscriptionLimit,
-                                ...this.createInvoiceDetails(plan, mapCount),
                             },
+                            update: {
+                                $set: {
+                                    poolId,
+                                    periodStartDate: invoicePeriodstartDate,
+                                    periodEndDate: invoicePeriodEndDate,
+                                    mapCount,
+                                    mapLimit: planPricingMap[plan].subscriptionLimit,
+                                    ...this.createInvoiceDetails(plan, mapCount),
+                                },
+                            },
+                            upsert: true,
                         },
-                        upsert: true,
-                    },
-                };
-            } catch (error) {
-                logger.error(error);
-            }
-        });
+                    };
+                } catch (error) {
+                    logger.error('Invoice entry failed', error);
+                }
+            });
 
-        // Remove empty ops and bulk write the invoices
-        await Invoice.bulkWrite(operations.filter((op) => !!op));
+            // Remove empty ops and bulk write the invoices
+            await Invoice.bulkWrite(operations.filter((op) => !!op));
+        } catch (error) {
+            logger.error('Invoice chunk failed', { error });
+        }
     }
 
     /**

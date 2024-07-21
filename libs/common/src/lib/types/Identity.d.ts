@@ -4,5 +4,6 @@ type TIdentity = {
     uuid: string;
     sub: string;
     createdAt: Date;
+    accountId: string;
     account?: TAccount;
 };

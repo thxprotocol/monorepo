@@ -29,13 +29,13 @@ const controller = async (req: Request, res: Response) => {
         ? await getIdentityForCode(pool, req.body.code)
         : await getIdentityForAddress(pool, req.body.address);
 
-    await Event.create({ name: customQuest.eventName, identityId: identity._id, poolId: pool._id });
+    await Event.create({ name: customQuest.eventName, identityId: identity.id });
 
     res.status(201).end();
 };
 
 export function getIdentityForCode(pool: PoolDocument, code: string) {
-    return Identity.findOne({ poolId: pool._id, uuid: code });
+    return Identity.findOne({ sub: pool.sub, uuid: code });
 }
 
 // @peterpolman (FK still depends on this)
@@ -43,7 +43,7 @@ export function getIdentityForCode(pool: PoolDocument, code: string) {
 // Defaulting into identity derivation for the provided address. This will require FK to present derived
 // identity uuids in their client in order to connect the identity to their account.
 export function getIdentityForAddress(pool: PoolDocument, address: string) {
-    return IdentityService.getIdentityForSalt(pool, address);
+    return IdentityService.getIdentityForSalt(pool.sub, address);
 }
 
 export { validation, controller };

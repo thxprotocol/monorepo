@@ -1,8 +1,9 @@
 import express from 'express';
 import * as CreateController from './post.controller';
-import * as ListController from './get.controller';
+import * as ListController from './list.controller';
 import * as DeleteController from './delete.controller';
-import { assertRequestInput, guard } from '@thxnetwork/api/middlewares';
+import { assertModelAccess, assertRequestInput, guard } from '@thxnetwork/api/middlewares';
+import { Identity } from '@thxnetwork/api/models';
 
 const router: express.Router = express.Router({ mergeParams: true });
 
@@ -14,8 +15,9 @@ router.post(
     CreateController.controller,
 );
 router.delete(
-    '/:identityId',
+    '/:id',
     guard.check(['pools:read', 'pools:write']),
+    assertModelAccess(Identity),
     assertRequestInput(DeleteController.validation),
     DeleteController.controller,
 );

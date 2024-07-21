@@ -6,6 +6,8 @@ import {
     IdentityDocument,
     Event,
     WalletDocument,
+    Pool,
+    PoolDocument,
 } from '@thxnetwork/api/models';
 import { IQuestService } from './interfaces/IQuestService';
 
@@ -53,9 +55,10 @@ export default class QuestCustomService implements IQuestService {
         account?: TAccount;
         data: Partial<TQuestCustomEntry>;
     }) {
+        const pool = await Pool.findById(quest.poolId);
         const entries = await this.findAllEntries({ quest, account });
-        const identities = await this.findIdentities({ quest, account });
-        const events = await this.findEvents({ quest, identities });
+        const identities = await this.findIdentities({ pool, account });
+        const events = await this.findEvents({ pool, quest, identities });
         const isAvailable = await this.isAvailable({ quest, account, data });
         const pointsAvailable = quest.limit ? (quest.limit - entries.length) * quest.amount : quest.amount;
 
@@ -77,14 +80,16 @@ export default class QuestCustomService implements IQuestService {
         account: TAccount;
         data: Partial<TQuestCustomEntry>;
     }): Promise<{ reason: string; result: boolean }> {
+        const pool = await Pool.findById(quest.poolId);
         // See if there are identities
-        const identities = await this.findIdentities({ quest, account });
+        const identities = await this.findIdentities({ pool, account });
         if (!identities.length) {
             return {
                 result: false,
                 reason: 'No identity connected to this account. Please ask for this in your community!',
             };
         }
+        // Get pool for quest
 
         // Find existing entries for this quest and check optional limit
         const entries = await this.findAllEntries({ quest, account });
@@ -93,7 +98,7 @@ export default class QuestCustomService implements IQuestService {
         }
 
         // Find events for this quest and the identities connected to the account
-        const events = await this.findEvents({ quest, identities });
+        const events = await this.findEvents({ pool, quest, identities });
         if (entries.length >= events.length) {
             return { result: false, reason: 'Insufficient custom events found for this quest' };
         }
@@ -110,16 +115,24 @@ export default class QuestCustomService implements IQuestService {
         });
     }
 
-    private async findIdentities({ quest, account }: { quest: QuestCustomDocument; account: TAccount }) {
+    private async findIdentities({ pool, account }: { pool: PoolDocument; account: TAccount }) {
         if (!account || !account.sub) return [];
-        return await Identity.find({ poolId: quest.poolId, sub: account.sub });
+        return await Identity.find({ sub: pool.sub, accountId: account.sub });
     }
 
-    private async findEvents({ quest, identities }: { quest: QuestCustomDocument; identities: IdentityDocument[] }) {
+    private async findEvents({
+        pool,
+        quest,
+        identities,
+    }: {
+        pool: PoolDocument;
+        quest: QuestCustomDocument;
+        identities: IdentityDocument[];
+    }) {
         if (!identities.length) return [];
         return await Event.find({
             identityId: { $in: identities.map(({ _id }) => String(_id)) },
-            poolId: quest.poolId,
+            sub: pool.sub,
             name: quest.eventName,
         }).limit(quest.limit || null);
     }

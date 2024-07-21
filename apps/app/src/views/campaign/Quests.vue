@@ -154,12 +154,16 @@ export default defineComponent({
         'accountStore.isAuthenticated': {
             async handler(isAuthenticated: boolean) {
                 if (!isAuthenticated) return;
+
                 if (!this.accountStore.account) {
                     await this.accountStore.getAccount();
                 }
-                this.questStore.list();
-                this.rewardStore.list();
-                this.accountStore.getParticipants();
+
+                await Promise.all([
+                    this.questStore.list(),
+                    this.rewardStore.list(),
+                    this.accountStore.getParticipants(),
+                ]);
             },
             immediate: true,
         },

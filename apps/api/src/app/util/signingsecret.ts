@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-export function getsigningSecret(length: number) {
+export function getSigningSecret(length: number) {
     return crypto.randomBytes(length).toString('base64');
 }
 

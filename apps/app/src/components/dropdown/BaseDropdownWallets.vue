@@ -16,7 +16,14 @@
             start
         >
             <template #button-content>
-                <b-img :src="chainList[walletStore.chainId].logo" width="15" height="15" class="me-2" />
+                <b-img
+                    v-if="walletStore.chainId"
+                    :src="chainList[walletStore.chainId].logo"
+                    width="15"
+                    height="15"
+                    class="me-2"
+                />
+                <b-spinner v-else small />
             </template>
             <b-dropdown-item
                 v-for="chain of chains"

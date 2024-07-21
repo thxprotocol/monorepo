@@ -4,7 +4,6 @@ import { AccountVariant } from '@thxnetwork/common/enums';
 import { DASHBOARD_URL } from '../config/secrets';
 import { DEFAULT_COLORS, DEFAULT_ELEMENTS } from '@thxnetwork/common/constants';
 import { logger } from '../util/logger';
-import { getsigningSecret } from '../util/signingsecret';
 import {
     Pool,
     PoolDocument,
@@ -14,7 +13,6 @@ import {
     CollaboratorDocument,
     Client,
     DiscordGuild,
-    Identity,
     Participant,
     QuestInvite,
     QuestWeb3,
@@ -92,7 +90,6 @@ async function deploy(sub: string, title: string): Promise<PoolDocument> {
     const pool = await Pool.create({
         sub,
         token: v4(),
-        signingSecret: getsigningSecret(64),
         settings: {
             title,
             description: '',
@@ -188,38 +185,6 @@ async function getRewardCount(pool: PoolDocument) {
         [RewardCoin, RewardNFT, RewardCustom].map(async (model) => await find(model, pool)),
     );
     return Array.from(new Set(result.flat(1)));
-}
-
-async function findIdentities(pool: PoolDocument, page: number, limit: number) {
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    const total = await Identity.find({ poolId: pool._id }).countDocuments().exec();
-
-    const identities = {
-        previous: startIndex > 0 && {
-            page: page - 1,
-        },
-        next: endIndex < total && {
-            page: page + 1,
-        },
-        limit,
-        total,
-        results: await Identity.aggregate([
-            { $match: { poolId: String(pool._id) } },
-            { $skip: startIndex },
-            { $limit: limit },
-        ]).exec(),
-    };
-
-    const subs = identities.results.filter(({ sub }) => !!sub).map(({ sub }) => sub);
-    const accounts = await AccountProxy.find({ subs });
-
-    identities.results = identities.results.map((identity: TIdentity) => ({
-        ...identity,
-        account: accounts.find(({ sub }) => sub === identity.sub),
-    }));
-
-    return identities;
 }
 
 async function findCouponCodes(
@@ -435,7 +400,6 @@ export default {
     getQuestCount,
     getRewardCount,
     findOwner,
-    findIdentities,
     findParticipants,
     findGuilds,
     findCollaborators,
