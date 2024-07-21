@@ -26,7 +26,7 @@ const controller = async (req: Request, res: Response) => {
         ? await getIdentityForCode(pool, req.body.code)
         : await getIdentityForAddress(pool, req.body.address);
 
-    await Event.create({ name: quest.eventName, identityId: identity._id, poolId: pool._id });
+    await Event.create({ name: quest.eventName, identityId: identity._id, sub: pool.sub });
 
     res.status(201).end();
 };

@@ -137,8 +137,7 @@ export default class QuestDailyService implements IQuestService {
                 reason: 'No identity connected to this account. Please ask for this in your community!',
             };
         }
-
-        const identityIds = identities.map(({ _id }) => String(_id));
+        const identityIds = identities.map(({ id }) => id);
         const events = await Event.find({
             name: quest.eventName,
             sub: pool.sub,

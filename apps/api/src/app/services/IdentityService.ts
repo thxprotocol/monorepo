@@ -7,12 +7,12 @@ export default class IdentityService {
         return uuidV1(`${sub}${salt}`);
     }
 
-    // Derive uuid v1 from poolId + salt. Using uuid v1 format so we can
+    // Derive uuid v1 from pool.sub + salt. Using uuid v1 format so we can
     // validate the input using express-validator
-    static getIdentityForSalt(sub: string, salt: string) {
+    static async getIdentityForSalt(sub: string, salt: string) {
         const uuid = this.getUUID(sub, salt);
         const query = { sub, uuid };
-        return Identity.findOneAndUpdate(query, query, { new: true, upsert: true });
+        return await Identity.findOneAndUpdate(query, query, { new: true, upsert: true });
     }
 
     static async list(sub: string, page: number, limit: number) {

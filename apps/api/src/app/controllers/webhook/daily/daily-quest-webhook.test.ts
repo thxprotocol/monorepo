@@ -55,7 +55,7 @@ describe('Daily Rewards WebHooks', () => {
         expect(status).toBe(201);
     });
 
-    it('GET /participant to update identity', async () => {
+    it('GET /participant', async () => {
         const { status } = await user
             .get(`/v1/participants`)
             .query({ poolId })
@@ -68,7 +68,6 @@ describe('Daily Rewards WebHooks', () => {
             .post(`/v1/quests/daily/${dailyReward._id}/entries`)
             .set({ 'X-PoolId': poolId, 'Authorization': widgetAccessToken4 })
             .send({ recaptcha: 'test' });
-        console.log(body);
         expect(body.jobId).toBeDefined();
         expect(status).toBe(200);
 
