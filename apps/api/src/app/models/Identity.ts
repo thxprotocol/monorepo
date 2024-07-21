@@ -7,8 +7,9 @@ export const Identity = mongoose.model<IdentityDocument>(
     new mongoose.Schema(
         {
             poolId: String,
-            uuid: { unique: true, type: String },
             sub: String,
+            uuid: { unique: true, type: String },
+            accountId: String,
         },
         { timestamps: true },
     ),

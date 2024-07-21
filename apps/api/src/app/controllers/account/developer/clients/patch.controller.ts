@@ -3,10 +3,11 @@ import { Request, Response } from 'express';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { body, param } from 'express-validator';
 
-const validation = [param('id').exists(), body('name').exists()];
+const validation = [param('id').isMongoId(), body('name').exists()];
+
 const controller = async (req: Request, res: Response) => {
     let client = await ClientProxy.get(req.params.id);
-    if (!client) throw new NotFoundError('Cannot found Client ID in this request');
+    if (!client) throw new NotFoundError('Client not found');
 
     client = await ClientProxy.update(client.clientId, { name: req.body['name'] });
     res.status(200).json(client);

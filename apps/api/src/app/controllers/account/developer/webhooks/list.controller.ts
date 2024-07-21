@@ -5,9 +5,7 @@ import { WebhookRequest } from '@thxnetwork/api/models/WebhookRequest';
 const validation = [];
 
 const controller = async (req: Request, res: Response) => {
-    // #swagger.tags = ['Webhooks']
-    const poolId = req.header('x-poolid');
-    const webhooks = await Webhook.find({ poolId });
+    const webhooks = await Webhook.find({ sub: req.auth.sub });
     const response = await Promise.all(
         webhooks.map(async (webhook: WebhookDocument) => {
             const webhookRequests = await WebhookRequest.find({ webhookId: webhook.id })

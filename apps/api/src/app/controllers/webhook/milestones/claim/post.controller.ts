@@ -43,7 +43,7 @@ export function getIdentityForCode(pool: PoolDocument, code: string) {
 // Defaulting into identity derivation for the provided address. This will require FK to present derived
 // identity uuids in their client in order to connect the identity to their account.
 export function getIdentityForAddress(pool: PoolDocument, address: string) {
-    return IdentityService.getIdentityForSalt(pool, address);
+    return IdentityService.getIdentityForSalt(pool.sub, address);
 }
 
 export { validation, controller };

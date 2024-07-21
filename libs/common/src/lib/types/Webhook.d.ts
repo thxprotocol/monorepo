@@ -2,9 +2,9 @@ type TWebhook = {
     _id?: string;
     sub: string;
     url: string;
-    poolId: string;
     status: WebhookStatus;
     active: boolean;
+    signingSecret: string;
     webhookRequests: TWebhookRequest[];
     createdAt?: Date;
 };

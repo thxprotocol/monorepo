@@ -6,8 +6,8 @@ export const Event = mongoose.model<EventDocument>(
     'Event',
     new mongoose.Schema(
         {
+            sub: String,
             identityId: String,
-            poolId: String,
             name: String,
         },
         { timestamps: true },
