@@ -1,35 +1,18 @@
 import { planPricingMap } from '@thxnetwork/common/constants';
-import {
-    Pool,
-    Invoice,
-    QuestDailyEntry,
-    QuestInviteEntry,
-    QuestSocialEntry,
-    QuestCustomEntry,
-    QuestWeb3Entry,
-    QuestGitcoinEntry,
-    PoolDocument,
-} from '../models';
-import AccountProxy from '../proxies/AccountProxy';
+import { Pool, Invoice } from '../models';
 import { logger } from '../util/logger';
-import { AccountPlanType } from '@thxnetwork/common/enums';
+import { AccountPlanType, QuestVariant } from '@thxnetwork/common/enums';
 import { startOfMonth, endOfMonth } from 'date-fns';
+import { serviceMap } from './interfaces/IQuestService';
+import AccountProxy from '../proxies/AccountProxy';
 
-// Determine the lookup stages for the quest entries in the pools pipeline
-const questEntryModels = [
-    QuestDailyEntry,
-    QuestInviteEntry,
-    QuestSocialEntry,
-    QuestCustomEntry,
-    QuestWeb3Entry,
-    QuestGitcoinEntry,
-];
+class InvoiceService {
+    questEntryModels = [];
 
-export default class InvoiceService {
     /**
      * Upsert invoices for the current month. Periodically (daily) invoked by the agenda job scheduler.
      */
-    static async upsertJob() {
+    async upsertJob() {
         const currentDate = new Date();
         // Define the start and end dates for the month range
         const invoicePeriodstartDate = startOfMonth(currentDate);
@@ -43,71 +26,87 @@ export default class InvoiceService {
      * @param invoicePeriodstartDate
      * @param invoicePeriodEndDate
      */
-    static async upsertInvoices(invoicePeriodstartDate: Date, invoicePeriodEndDate: Date, accountsColl?: TAccount[]) {
+    async upsertInvoices(invoicePeriodstartDate: Date, invoicePeriodEndDate: Date, accountsColl?: TAccount[]) {
         // Iterate over all pools in chunks of 1000
-        const poolCount = await Pool.countDocuments({});
+        // const poolCount = await Pool.countDocuments({});
+        const poolSubs = await Pool.distinct('sub');
+        const accounts = accountsColl
+            ? accountsColl.filter((a) => poolSubs.includes(a.sub))
+            : await AccountProxy.find({ subs: poolSubs });
         const chunkSize = 1000;
-        const chunkCount = Math.ceil(poolCount / chunkSize);
+        const chunkCount = Math.ceil(accounts.length / chunkSize);
+
+        // Determine the lookup stages for the quest entries in the pools pipeline
+        this.questEntryModels = Object.keys(QuestVariant)
+            .filter((key) => isNaN(Number(key)))
+            .map((key: string) => {
+                return serviceMap[QuestVariant[key]].models.entry;
+            });
+
         for (let i = 0; i < chunkCount; i++) {
-            const pools = await Pool.find({})
-                .skip(i * chunkSize)
-                .limit(chunkSize);
-            await this.upsertInvoicesForPools(pools, invoicePeriodstartDate, invoicePeriodEndDate, accountsColl);
+            const startIndex = i * chunkSize;
+            const endIndex = Math.min((i + 1) * chunkSize, accounts.length);
+            const accountChunk = accounts.slice(startIndex, endIndex);
+
+            await this.upsertInvoicesForPools(accountChunk, invoicePeriodstartDate, invoicePeriodEndDate);
         }
     }
 
     /**
      * Upsert invoices for the given pools and period
+     * @param account
      * @param pools
-     * @param questEntryModels
      * @param invoicePeriodstartDate
      * @param invoicePeriodEndDate
+     * @param accountsColl optional accounts collection
      */
-    static async upsertInvoicesForPools(
-        pools: PoolDocument[],
-        invoicePeriodstartDate: Date,
-        invoicePeriodEndDate: Date,
-        accountsColl?: TAccount[],
-    ) {
+    async upsertInvoicesForPools(accounts: TAccount[], invoicePeriodstartDate: Date, invoicePeriodEndDate: Date) {
         try {
             // Get all relevant pools
-            const questEntriesByCampaign = await Promise.all(
-                pools.map(async (pool) => {
-                    const uniqueEntriesByVariant = await Promise.all(
-                        questEntryModels.map(async (model) => {
-                            return await model
-                                .countDocuments({
-                                    poolId: pool.id,
-                                    createdAt: { $gte: invoicePeriodstartDate, $lte: invoicePeriodEndDate },
-                                })
-                                .distinct('sub');
-                        }),
+            const pools = await Pool.find({ sub: { $in: accounts.map((a) => a.sub) } });
+            const questEntriesByAccount = await Promise.all(
+                accounts.map(async (account) => {
+                    const uniqueEntrySubsByPool = await Promise.all(
+                        pools
+                            // Get pools for the invoice account
+                            .filter((pool) => pool.sub === account.sub)
+                            // Create an array of unique subs for each pool
+                            .map(async (pool) => {
+                                // Get quest entries by sub for pool
+                                const uniqueQuestEntrySubsByVariant = await Promise.all(
+                                    this.questEntryModels.map(async (model) => {
+                                        return await model
+                                            .countDocuments({
+                                                poolId: pool.id,
+                                                createdAt: { $gte: invoicePeriodstartDate, $lte: invoicePeriodEndDate },
+                                            })
+                                            .distinct('sub');
+                                    }),
+                                );
+                                // Flatten to an array of subs
+                                return uniqueQuestEntrySubsByVariant.flat();
+                            }),
                     );
-                    const flattenedArray = uniqueEntriesByVariant.flat();
 
-                    return { poolId: pool.id, poolSub: pool.sub, mapCount: new Set(flattenedArray).size };
+                    const flattenedArray = uniqueEntrySubsByPool.flat();
+                    const mapCount = new Set(flattenedArray).size;
+
+                    return { account, mapCount };
                 }),
             );
 
-            // Get the pool owner accounts to send the invoices
-            const subs = questEntriesByCampaign.map(({ poolSub }) => poolSub);
-            const accounts =
-                accountsColl.map((a) => Object.assign(a, { sub: String(a._id) })) ||
-                (await AccountProxy.find({ subs }));
-
             // Build operations array for the current month metrics
-            const operations = questEntriesByCampaign.map(({ poolId, poolSub, mapCount }) => {
+            const operations = questEntriesByAccount.map(({ account, mapCount }) => {
                 try {
-                    const account = accounts.find((a) => a.sub === poolSub);
-                    // If the account can not be found, has no email or plan then notify admin.
-                    // Continue with invoice generation for future reference
-                    // @todo: notify admin
                     if (!account) {
-                        logger.info(`Account ${account.sub} not found for invoicing.`);
+                        logger.error('Account is missing for invoice entry');
+                        return;
                     }
+
                     if (!account.email) {
                         logger.info(`Account ${account.sub} has no email for invoicing.`);
                     }
+
                     if (![AccountPlanType.Lite, AccountPlanType.Premium].includes(account.plan)) {
                         logger.info(`Account ${account.sub} has no plan for invoicing.`);
                     }
@@ -117,13 +116,13 @@ export default class InvoiceService {
                     return {
                         updateOne: {
                             filter: {
-                                poolId,
+                                sub: account.sub,
                                 periodStartDate: invoicePeriodstartDate,
                                 periodEndDate: invoicePeriodEndDate,
                             },
                             update: {
                                 $set: {
-                                    poolId,
+                                    sub: account.sub,
                                     periodStartDate: invoicePeriodstartDate,
                                     periodEndDate: invoicePeriodEndDate,
                                     mapCount,
@@ -152,7 +151,7 @@ export default class InvoiceService {
      * @param mapCount
      * @returns invoice details used for upsert in db
      */
-    static createInvoiceDetails(plan: AccountPlanType, mapCount: number) {
+    createInvoiceDetails(plan: AccountPlanType, mapCount: number) {
         const countAdditionalUnits = (mapCount: number, limit: number) => {
             return Math.max(0, mapCount - limit);
         };
@@ -171,3 +170,5 @@ export default class InvoiceService {
         };
     }
 }
+
+export default new InvoiceService();
