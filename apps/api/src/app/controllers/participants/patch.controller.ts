@@ -2,9 +2,10 @@ import { Request, Response } from 'express';
 import { Participant } from '@thxnetwork/api/models/Participant';
 import { body, param } from 'express-validator';
 import { ForbiddenError, NotFoundError } from '@thxnetwork/api/util/errors';
-import { QuestInviteCode } from '@thxnetwork/api/models';
-import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 import { logger } from '@thxnetwork/api/util/logger';
+import { IQuestInviteService, serviceMap } from '@thxnetwork/api/services/interfaces/IQuestService';
+import { QuestVariant } from '@thxnetwork/common/enums';
+import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 
 const validation = [
     param('id').isMongoId(),
@@ -18,21 +19,12 @@ const controller = async (req: Request, res: Response) => {
     if (!participant) throw new NotFoundError('Participant not found.');
     if (participant.sub !== req.auth.sub) throw new ForbiddenError('You are not allowed to update this participant.');
 
-    // Add inviteCode to participant if it is not already set
-    if (req.body.inviteCode && !participant.inviteCode) {
-        // Fetch invite codes for logged in user
-        const codes = await QuestInviteCode.find({ sub: req.auth.sub });
-
-        // Skip if current code is owned by the logged in user
-        const code = codes.find((code) => code.code === req.body.inviteCode);
-        if (!code) {
-            await participant.updateOne({ inviteCode: req.body.inviteCode });
-        }
-    }
-
-    const account = await AccountProxy.findById(req.auth.sub);
+    // Create invite if code is present and unused by sub
+    const service = serviceMap[QuestVariant.Invite] as IQuestInviteService;
+    await service.createInvitee(req.auth.sub, req.body.inviteCode);
 
     // If subscribed is true and email we set the participant flag to true and patch the account
+    const account = await AccountProxy.findById(req.auth.sub);
     if ([true, false].includes(req.body.isSubscribed)) {
         if (account.email !== req.body.email) {
             try {

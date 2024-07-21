@@ -13,3 +13,9 @@ type TQuestInviteCode = {
     sub: string;
     code: string;
 };
+
+type TQuestInviteInvitee = {
+    questId: string;
+    sub: string;
+    code: string;
+};

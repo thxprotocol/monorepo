@@ -11,8 +11,9 @@ import QuestWebhookService from '../QuestWebhookService';
 import { QuestVariant } from '@thxnetwork/common/enums';
 import { PoolDocument } from '@thxnetwork/api/models';
 
-export interface IInviteService extends IQuestService {
+export interface IQuestInviteService extends IQuestService {
     assertQuestEntry(options: { pool: PoolDocument; quest: TQuest; account: TAccount }): Promise<void>;
+    createInvitee(sub: string, code: string): Promise<TInvitee>;
 }
 
 export interface IQuestService {

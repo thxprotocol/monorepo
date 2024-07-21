@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { agenda } from '../util/agenda';
 import { logger } from '../util/logger';
 import { Job } from '@hokify/agenda';
-import { IInviteService, serviceMap } from './interfaces/IQuestService';
+import { IQuestInviteService, serviceMap } from './interfaces/IQuestService';
 import { tokenInteractionMap } from './maps/quests';
 import { NODE_ENV } from '../config/secrets';
 import PoolService from './PoolService';
@@ -220,7 +220,7 @@ export default class QuestService {
             if (!entry) throw new Error('Entry creation failed.');
 
             // Assert if a required quest for invite quests has been completed
-            const InviteService = serviceMap[QuestVariant.Invite] as IInviteService;
+            const InviteService = serviceMap[QuestVariant.Invite] as IQuestInviteService;
             await InviteService.assertQuestEntry({ pool, quest, account });
 
             // Add points to participant balance
