@@ -16,15 +16,6 @@ const controller = async (req: Request, res: Response) => {
     // Extend participant details with pool info
     const participants = await Participant.find(query);
     const pools = await Pool.find({ _id: participants.map((p) => p.poolId) });
-    const result = participants.map(({ _id, poolId, balance, isSubscribed }) => {
-        const pool = pools.find((pool) => pool.id === poolId);
-        return {
-            _id,
-            balance,
-            isSubscribed,
-            campaign: { title: pool ? pool.settings.title : '' },
-        };
-    });
 
     // Run pool specific operations
     if (poolId) {
@@ -42,6 +33,17 @@ const controller = async (req: Request, res: Response) => {
             participants.push(participant);
         }
     }
+
+    // Decorate response
+    const result = participants.map(({ _id, poolId, balance, isSubscribed }) => {
+        const pool = pools.find((pool) => pool.id === poolId);
+        return {
+            _id,
+            balance,
+            isSubscribed,
+            campaign: { title: pool ? pool.settings.title : '' },
+        };
+    });
 
     res.json(result);
 };

@@ -37,7 +37,7 @@ class THXService {
         const uuids = wallets.map((wallet) => IdentityService.getUUID(pool.sub, wallet.address));
 
         // Find any identity for these uuids and update
-        await Identity.findOneAndUpdate({ uuid: { $in: uuids } }, { sub: account.sub });
+        await Identity.findOneAndUpdate({ uuid: { $in: uuids } }, { accountId: account.sub });
     }
 
     async createEvent(account: TAccount, event: string) {

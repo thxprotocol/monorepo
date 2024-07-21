@@ -2,7 +2,6 @@ import request from 'supertest';
 import app from '@thxnetwork/api/';
 import { QuestVariant } from '@thxnetwork/common/enums';
 import { account4, dashboardAccessToken, widgetAccessToken4 } from '@thxnetwork/api/util/jest/constants';
-import { isAddress } from 'web3-utils';
 import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
 import { QuestDailyDocument } from '@thxnetwork/api/models';
 import { poll } from '@thxnetwork/api/util/polling';
@@ -69,6 +68,7 @@ describe('Daily Rewards WebHooks', () => {
             .post(`/v1/quests/daily/${dailyReward._id}/entries`)
             .set({ 'X-PoolId': poolId, 'Authorization': widgetAccessToken4 })
             .send({ recaptcha: 'test' });
+        console.log(body);
         expect(body.jobId).toBeDefined();
         expect(status).toBe(200);
 
