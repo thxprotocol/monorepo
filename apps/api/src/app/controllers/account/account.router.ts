@@ -18,7 +18,6 @@ import * as CreateTwitterUserByUsername from './twitter/user/by/username/post.co
 
 // Dashboard routes
 import RouterInvoices from './invoices/invoices.router';
-import RouterSafes from './vaults/vaults.router';
 import RouterClients from './developer/clients/clients.router';
 import RouterEvents from './developer/events/events.router';
 import RouterIdentities from './developer/identities/identities.router';
@@ -27,7 +26,6 @@ import RouterWebhooks from './developer/webhooks/webhooks.router';
 const router: express.Router = express.Router();
 
 router.use('/invoices', RouterInvoices);
-router.use('/safes', RouterSafes);
 router.use('/developer/clients', RouterClients); // Done
 router.use('/developer/events', RouterEvents);
 router.use('/developer/identities', RouterIdentities);
