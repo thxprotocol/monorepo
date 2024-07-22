@@ -68,15 +68,15 @@ const routes: Array<RouteRecordRaw> = [
             },
         ],
     },
-    {
-        path: '/verify_email',
-        name: '',
-        beforeEnter: async (to) => {
-            const { verifyEmailToken, return_url } = to.query;
-            await useAccountStore().verifyEmail(verifyEmailToken as string, return_url as string);
-        },
-        component: () => import(/* webpackChunkName: "home" */ '../views/discovery/Home.vue'),
-    },
+    // {
+    //     path: '/verify_email',
+    //     name: '',
+    //     beforeEnter: async (to) => {
+    //         const { verifyEmailToken, return_url } = to.query;
+    //         await useAccountStore().verifyEmail(verifyEmailToken as string, return_url as string);
+    //     },
+    //     component: () => import(/* webpackChunkName: "home" */ '../views/discovery/Home.vue'),
+    // },
     {
         path: '/c/:slug',
         name: 'campaign',
