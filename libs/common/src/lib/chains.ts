@@ -45,6 +45,18 @@ const chainList: { [chainId: number]: ChainInfo } = {
         blockExplorer: 'https://explorer.metis.io',
         rpc: 'https://andromeda.metis.io',
     },
+    [ChainId.Base]: {
+        chainId: ChainId.Base,
+        name: 'Base',
+        blockExplorer: 'https://basescan.org',
+        rpc: 'https://rpc.ankr.com/base',
+    },
+    [ChainId.IOTA]: {
+        chainId: ChainId.IOTA,
+        name: 'IOTA',
+        blockExplorer: 'https://explorer.evm.iota.org',
+        rpc: 'https://json-rpc.evm.iotaledger.net',
+    },
 };
 
 if (process.env['NODE_ENV'] !== 'production') {
