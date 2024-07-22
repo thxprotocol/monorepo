@@ -14,9 +14,9 @@
             },
             {
                 label: 'THX Network APR',
-                url: 'https://docs.thx.network',
+                url: 'https://docs.thx.network/tokenomics/usdthx',
                 badge: '',
-                data: [{ label: 'VeTHX APR', value: `${aprMetric.thx}%` }],
+                data: [{ label: 'VeTHX APR (Max. Lock)', value: `${aprMetric.thx}%` }],
             },
         ]"
         class="me-4"

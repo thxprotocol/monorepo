@@ -6,9 +6,24 @@ import ImgLogoHardhat from '../assets/thx_logo_hardhat.svg';
 import ImgLogoLinea from '../assets/thx_logo_linea.svg';
 import ImgLogoMetis from '../assets/thx_logo_metis.svg';
 import ImgLogoBase from '../assets/thx_logo_base.svg';
+import ImgLogoIOTA from '../assets/thx_logo_iota.svg';
 import { arbitrum, mainnet, bsc, polygon, hardhat, polygonZkEvm, linea, metis, base } from '@wagmi/core/chains';
 import { ChainId } from '@thxnetwork/common/enums';
 import { PROD } from '../config/secrets';
+import { defineChain } from 'viem';
+
+const iota = defineChain({
+    id: ChainId.IOTA,
+    name: 'IOTA EVM',
+    nativeCurrency: { name: 'IOTA', symbol: 'IOTA', decimals: 18 },
+    rpcUrls: {
+        default: { http: ['https://json-rpc.evm.iotaledger.net'] },
+    },
+    blockExplorers: {
+        default: { name: 'Explorer', url: 'https://explorer.evm.iota.org' },
+    },
+    contracts: {},
+});
 
 const chainList: { [chainId: number]: ChainInfo } = {
     [ChainId.Ethereum]: {
@@ -67,12 +82,12 @@ const chainList: { [chainId: number]: ChainInfo } = {
         blockExplorer: 'https://basescan.org',
         chain: base,
     },
-    [ChainId.Hardhat]: {
-        chainId: ChainId.Hardhat,
-        name: 'Hardhat',
-        logo: ImgLogoHardhat,
-        blockExplorer: 'https://hardhatscan.org',
-        chain: hardhat,
+    [ChainId.IOTA]: {
+        chainId: ChainId.IOTA,
+        name: 'IOTA',
+        logo: ImgLogoIOTA,
+        blockExplorer: 'https://explorer.evm.iota.org',
+        chain: iota,
     },
 };
 
