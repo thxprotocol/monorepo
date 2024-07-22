@@ -34,8 +34,6 @@
         "@popperjs/core": "^2.11.6",
         "@safe-global/api-kit": "^1.1.0",
         "@safe-global/protocol-kit": "1.2.0",
-        "@safe-global/safe-core-sdk-types": "^1.9.2",
-        "@sentry/vue": "^7.71.0",
         "@supabase/supabase-js": "^2.44.2",
         "@tkey/default": "10.1.0",
         "@tkey/security-questions": "10.1.0",
