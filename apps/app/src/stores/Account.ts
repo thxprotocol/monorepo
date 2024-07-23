@@ -17,7 +17,7 @@ import poll from 'promise-poller';
 const isMobileDevice = !!window.matchMedia('(pointer:coarse)').matches;
 
 // Create Supabase client for authentication
-export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -107,13 +107,17 @@ export const useAccountStore = defineStore('account', {
             supabase.auth.onAuthStateChange(async (event, session) => {
                 console.log(event, session);
                 if (event === 'INITIAL_SESSION') {
-                    // handle initial session
-                    await this.setSession(session);
+                    if (session) {
+                        await this.setSession(session);
+                        this.setStatus(true);
+                    } else {
+                        this.setStatus(null);
+                    }
                 } else if (event === 'SIGNED_IN') {
-                    // handle sign in event
-                    await this.setSession(session);
+                    if (!this.isAuthenticated) await this.setSession(session);
+                    this.setStatus(true);
                 } else if (event === 'SIGNED_OUT') {
-                    // handle sign out event
+                    this.setStatus(null);
                 } else if (event === 'PASSWORD_RECOVERY') {
                     // handle password recovery event
                 } else if (event === 'TOKEN_REFRESHED') {
@@ -124,14 +128,16 @@ export const useAccountStore = defineStore('account', {
             });
         },
         async setSession(session: Session | null) {
+            this.api.request.setUser(session);
+
             if (session) {
-                this.setStatus(true);
-                this.api.request.setUser(session);
                 await this.getAccount();
                 useAuthStore().isModalLoginShown = false;
-            } else {
-                this.setStatus(null);
             }
+        },
+        async getUserData() {
+            const { user } = useAuthStore();
+            this.setStatus(!!user);
         },
         onResize() {
             this.isMobile = window.innerWidth < BREAKPOINT_LG;
@@ -237,10 +243,6 @@ export const useAccountStore = defineStore('account', {
             await supabase.auth.signOut();
             this.setStatus(null);
             this.account = null;
-        },
-        async getUserData() {
-            const { user } = useAuthStore();
-            this.setStatus(!!user);
         },
         setStatus(isAuthenticated: boolean | null) {
             this.isAuthenticated = isAuthenticated;

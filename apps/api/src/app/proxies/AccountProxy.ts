@@ -55,17 +55,14 @@ export default class AccountProxy {
         const { data, error } = await supabase.auth.getUser(token);
         if (error) throw error;
 
-        const {
-            user_metadata: { email, address },
-            app_metadata: { provider },
-            identities,
-        } = data.user;
+        const provider = data.user.app_metadata.provider;
+        const identities = data.user.identities;
 
         // Determine the provider used for the authentication request
         const isOAuthProvider = Object.values(accountVariantProviderMap).includes(provider as AccessTokenKind);
         const isEmailProvider = provider === 'email';
 
-        let account;
+        let account, email, address;
 
         // Find the account for the user login provider and provider user id
         if (isOAuthProvider) {
@@ -74,13 +71,15 @@ export default class AccountProxy {
 
         // Find the account for the email used in the OTP flow
         else if (isEmailProvider) {
+            email = data.user.user_metadata.email;
             account = await this.findByEmail(email);
         }
 
         // TODO Find the account for the recovered address from the signature
-        // else if (['walletconnect'].includes(provider)) {
-        //     account = await this.findByAddress(address);
-        // }
+        else if (['walletconnect'].includes(provider)) {
+            address = data.user.user_metadata.address;
+            account = await this.findByAddress(address);
+        }
 
         // If all of the above are skipped we create a new account
         if (!account) {
@@ -89,19 +88,19 @@ export default class AccountProxy {
 
             account = await this.create({
                 variant,
-                email: isEmailProvider ? email : '',
-                address,
+                email: email && email.toLowerCase(),
+                address: address && toChecksumAddress(address),
                 isEmailVerified,
             });
 
             // Store the tokens if any
             if (isOAuthProvider) {
                 await TokenService.set({
+                    sub: account.id,
                     kind: provider,
+                    userId: identities[0].id,
                     accessToken: '', // Can only store access token using /auth/connect flow
                     refreshToken: '', // Can only store refresh token using /auth/connect flow
-                    userId: identities[0].id,
-                    sub: account.id,
                 });
             }
         }
@@ -112,6 +111,7 @@ export default class AccountProxy {
     private static async decorate(account: AccountDocument): Promise<TAccount> {
         return {
             profileImg: `https://api.dicebear.com/7.x/identicon/svg?seed=${account.id}`,
+            username: '',
             ...account.toJSON(),
             sub: account.id,
             tokens: await this.findTokensBySub(account.id),
@@ -153,8 +153,6 @@ export default class AccountProxy {
             plan: AccountPlanType.Lite,
             username: '',
             ...data,
-            email: data.email && data.email.toLowerCase(),
-            address: data.address && toChecksumAddress(data.address),
         });
     }
 

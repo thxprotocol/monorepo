@@ -4,8 +4,8 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 async function beforeEnter(to: any, from: any, next: any) {
     // Redirect to last match
     if (to.hash && to.hash.startsWith('#access_token')) {
-        const route = to.matched[to.matched.length - 1];
-        return next(route || { name: 'home' });
+        const path = to.path.split('#')[0];
+        return next({ path });
     }
 
     // Init campaign if poolId is available
@@ -30,11 +30,6 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/',
                 name: 'home',
                 component: () => import(/* webpackChunkName: "home" */ '../views/discovery/Home.vue'),
-            },
-            {
-                path: '/auth/redirect',
-                name: 'auth-redirect',
-                component: () => import(/* webpackChunkName: "home" */ '../views/SigninRedirect.vue'),
             },
             {
                 path: '/i/:code',
@@ -79,6 +74,11 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import(/* webpackChunkName: "wallets" */ '../views/Wallets.vue'),
             },
         ],
+    },
+    {
+        path: '/auth/redirect',
+        name: 'auth-redirect',
+        component: () => import(/* webpackChunkName: "home" */ '../views/SigninRedirect.vue'),
     },
     // {
     //     path: '/verify_email',
