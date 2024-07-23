@@ -8,7 +8,6 @@ import { Account, AccountDocument } from '../models';
 import { Token } from '../models/Token';
 import { accountVariantProviderMap, providerAccountVariantMap } from '@thxnetwork/common/maps';
 import { toChecksumAddress } from 'web3-utils';
-import MailService from '../services/MailService';
 import TokenService from '../services/TokenService';
 
 export const supabase = supabaseClient();
@@ -56,47 +55,55 @@ export default class AccountProxy {
         const { data, error } = await supabase.auth.getUser(token);
         if (error) throw error;
 
-        const provider = data.user.app_metadata.provider;
-        const email = data.user.user_metadata.email;
-        const address = data.user.user_metadata.address;
+        const {
+            user_metadata: { email, address },
+            app_metadata: { provider },
+            identities,
+        } = data.user;
+
+        // Determine the provider used for the authentication request
+        const isOAuthProvider = Object.values(accountVariantProviderMap).includes(provider as AccessTokenKind);
+        const isEmailProvider = provider === 'email';
 
         let account;
+
         // Find the account for the user login provider and provider user id
-        if (Object.values(accountVariantProviderMap).includes(provider as AccessTokenKind)) {
-            account = await this.findByIdentityUserId(provider, data.user.identities[0].id);
-            await TokenService.set({
-                kind: provider,
-                accessToken: '',
-                refreshToken: '',
-                userId: data.user.identities[0].id,
-                sub: account.id,
-            });
+        if (isOAuthProvider) {
+            account = await this.findByIdentityUserId(provider, identities[0].id);
         }
+
         // Find the account for the email used in the OTP flow
-        else if (provider === 'email') {
+        else if (isEmailProvider) {
             account = await this.findByEmail(email);
         }
+
         // TODO Find the account for the recovered address from the signature
-        else if (['walletconnect'].includes(provider)) {
-            account = await this.findByAddress(address);
-        }
+        // else if (['walletconnect'].includes(provider)) {
+        //     account = await this.findByAddress(address);
+        // }
+
         // If all of the above are skipped we create a new account
-        else {
-            // Create the account
+        if (!account) {
             const variant = providerAccountVariantMap[provider];
             const isEmailVerified = variant === AccountVariant.EmailPassword;
-            account = await this.create({ variant, email, address, isEmailVerified });
+
+            account = await this.create({
+                variant,
+                email: isEmailProvider ? email : '',
+                address,
+                isEmailVerified,
+            });
 
             // Store the tokens if any
-
-            // TODO Change this into a welcome email
-            if (email) {
-                await MailService.send(email, 'Congratulations with your sign up!', 'Welcome to THX Network.');
+            if (isOAuthProvider) {
+                await TokenService.set({
+                    kind: provider,
+                    accessToken: '', // Can only store access token using /auth/connect flow
+                    refreshToken: '', // Can only store refresh token using /auth/connect flow
+                    userId: identities[0].id,
+                    sub: account.id,
+                });
             }
-        }
-
-        if (!account) {
-            throw new NotFoundError('Account not found during request');
         }
 
         return await this.decorate(account);
@@ -104,6 +111,7 @@ export default class AccountProxy {
 
     private static async decorate(account: AccountDocument): Promise<TAccount> {
         return {
+            profileImg: `https://api.dicebear.com/7.x/identicon/svg?seed=${account.id}`,
             ...account.toJSON(),
             sub: account.id,
             tokens: await this.findTokensBySub(account.id),

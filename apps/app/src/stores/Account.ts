@@ -17,7 +17,7 @@ import poll from 'promise-poller';
 const isMobileDevice = !!window.matchMedia('(pointer:coarse)').matches;
 
 // Create Supabase client for authentication
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -128,6 +128,7 @@ export const useAccountStore = defineStore('account', {
                 this.setStatus(true);
                 this.api.request.setUser(session);
                 await this.getAccount();
+                useAuthStore().isModalLoginShown = false;
             } else {
                 this.setStatus(null);
             }
@@ -205,8 +206,9 @@ export const useAccountStore = defineStore('account', {
             this.setStatus(false);
 
             const provider = accountVariantProviderKindMap[variant] as Provider;
-            if (!provider) throw new Error('Provider not available.');
+            if (!provider) throw new Error('Requested provider not available.');
 
+            const redirectTo = this.isIFrame ? WIDGET_URL + '/auth/redirect' : window.location.href;
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider,
                 options: {
@@ -215,15 +217,15 @@ export const useAccountStore = defineStore('account', {
                         access_type: 'offline',
                         prompt: 'consent',
                     },
-                    // When the app is loaded in an iframe we need to break out of the iframe
-                    // to continue the OAuth flow since social providers do not allow access from iframes
-                    redirectTo: this.isIFrame ? WIDGET_URL + '/auth/redirect' : window.location.href,
-                    skipBrowserRedirect: this.isIFrame ? true : false,
+                    redirectTo,
+                    skipBrowserRedirect: this.isIFrame,
                 },
             });
             if (error) throw new Error(error.message);
+
+            // When the app is loaded in an iframe we need to break out of the iframe
+            // to continue the OAuth flow since social providers do not allow access from iframes
             if (this.isIFrame) {
-                console.log('popup redirect', data.url);
                 window.open(data.url, '_blank');
             }
         },

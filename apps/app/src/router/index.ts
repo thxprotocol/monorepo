@@ -32,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import(/* webpackChunkName: "home" */ '../views/discovery/Home.vue'),
             },
             {
+                path: '/auth/redirect',
+                name: 'auth-redirect',
+                component: () => import(/* webpackChunkName: "home" */ '../views/SigninRedirect.vue'),
+            },
+            {
                 path: '/i/:code',
                 name: 'inviteRedirect',
                 beforeEnter: async (to, from, next) => {

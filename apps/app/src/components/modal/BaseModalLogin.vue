@@ -98,7 +98,6 @@ import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { AccountVariant } from '../../types/enums/accountVariant';
 import { shortenAddress } from '../../utils/address';
-import { accountVariantProviderKindMap } from '../../utils/social';
 import imgWalletConnect from '../../assets/walletconnect-logo.png';
 
 export default defineComponent({
@@ -174,9 +173,7 @@ export default defineComponent({
         async onClickSigninOAuth(variant: AccountVariant) {
             this.isLoading = true;
             try {
-                await this.accountStore.signInWithOAuth({
-                    variant,
-                });
+                await this.accountStore.signInWithOAuth({ variant });
             } catch (error) {
                 this.error = (error as any).message;
             } finally {

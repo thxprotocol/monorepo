@@ -41,4 +41,4 @@ tokenSchema.virtual('refreshToken').get(function () {
     return this.refreshTokenEncrypted && decryptString(this.refreshTokenEncrypted, SECURE_KEY);
 });
 
-export const Token = mongoose.model<TokenDocument>('Token', tokenSchema, 'tokens');
+export const Token = mongoose.model<TokenDocument>('Token', tokenSchema, 'token');
