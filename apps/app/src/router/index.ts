@@ -2,6 +2,13 @@ import { useAccountStore } from '../stores/Account';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 async function beforeEnter(to: any, from: any, next: any) {
+    // Redirect to last match
+    if (to.hash && to.hash.startsWith('#access_token')) {
+        const route = to.matched[to.matched.length - 1];
+        return next(route || { name: 'home' });
+    }
+
+    // Init campaign if poolId is available
     const { poolId, init } = useAccountStore();
     if (!poolId) {
         await init(to.params.slug, to.query.origin);

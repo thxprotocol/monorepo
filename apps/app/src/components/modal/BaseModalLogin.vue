@@ -11,22 +11,39 @@
             <i class="fas fa-exclamation-triangle me-2" />
             {{ error }}
         </b-alert>
+        {{ isEmailSent }}
         <template v-if="!isEmailSent">
             <b-form-group>
                 <b-form-input v-model="email" :state="isEmailValid" placeholder="E-mail" />
             </b-form-group>
-            <b-button variant="primary" :disabled="!isEmailValid" class="w-100" @click="onClickSigninOTP()">
-                Send one-time password
-                <i class="fas fa-chevron-right ms-2"></i>
+            <b-button
+                variant="primary"
+                :disabled="!isEmailValid || isLoading"
+                class="w-100"
+                @click="onClickSigninOTP()"
+            >
+                <b-spinner v-if="isLoading" small />
+                <template v-else>
+                    Send one-time password
+                    <i class="fas fa-chevron-right ms-2"></i>
+                </template>
             </b-button>
         </template>
         <template v-else>
             <b-form-group>
                 <b-form-input v-model="otp" placeholder="One-time password" />
             </b-form-group>
-            <b-button variant="primary" :disabled="!isOTPValid" class="w-100" @click="onClickVerifyOTP()">
-                Verify OTP
-                <i class="fas fa-chevron-right ms-2"></i>
+            <b-button
+                :variant="isOTPValid ? 'success' : 'primary'"
+                :disabled="!isOTPValid || isLoading"
+                class="w-100"
+                @click="onClickVerifyOTP()"
+            >
+                <b-spinner v-if="isLoading" small />
+                <template v-else>
+                    Verify one-time password
+                    <i class="fas fa-chevron-right ms-2"></i>
+                </template>
             </b-button>
         </template>
         <hr />
@@ -138,7 +155,7 @@ export default defineComponent({
                 await this.accountStore.signInWithOtp({ email: this.email });
                 this.isEmailSubmitted = true;
             } catch (error) {
-                this.error = (error as any).message;
+                this.error = error ? (error as Error).message : 'An issue occured. Please try again.';
             } finally {
                 this.isLoading = false;
             }
@@ -147,8 +164,9 @@ export default defineComponent({
             try {
                 this.isLoading = true;
                 await this.accountStore.verifyOtp({ email: this.email, token: this.otp });
+                this.authStore.isModalLoginShown = false;
             } catch (error) {
-                this.error = (error as any).message;
+                this.error = error ? (error as Error).message : 'An issue occured. Please try again.';
             } finally {
                 this.isLoading = false;
             }
@@ -157,7 +175,7 @@ export default defineComponent({
             this.isLoading = true;
             try {
                 await this.accountStore.signInWithOAuth({
-                    provider: accountVariantProviderKindMap[variant],
+                    variant,
                 });
             } catch (error) {
                 this.error = (error as any).message;

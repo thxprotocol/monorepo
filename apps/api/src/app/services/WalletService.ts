@@ -21,7 +21,7 @@ export default class WalletService {
         return await Promise.all(
             wallets.map(async (wallet) => {
                 const pendingTransactions = await Transaction.find({
-                    walletId: String(wallet._id),
+                    walletId: wallet.id,
                     state: TransactionState.Confirmed,
                 });
                 const short = wallet.address && WalletService.formatAddress(wallet.address);

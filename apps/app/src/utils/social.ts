@@ -1,6 +1,5 @@
 import { QuestSocialRequirement } from '../types/enums/rewards';
 import { AccountVariant } from '../types/enums/accountVariant';
-import { Provider } from '@supabase/supabase-js';
 
 function getConnectedUser(account: TAccount, kind: AccessTokenKind, requiredScopes: TOAuthScope[] = []) {
     return account.tokens.find((a) => a.kind === kind && requiredScopes.every((scope) => a.scopes.includes(scope)));

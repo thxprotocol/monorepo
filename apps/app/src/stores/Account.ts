@@ -1,11 +1,12 @@
-import { API_URL, AUTH_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from '../config/secrets';
+import { API_URL, AUTH_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL, WIDGET_URL } from '../config/secrets';
 import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
 import { defineStore } from 'pinia';
 import { track } from '@thxnetwork/common/mixpanel';
+import { AccountVariant } from '@thxnetwork/common/enums';
 import { THXBrowserClient } from '@thxnetwork/sdk/clients';
 import { BREAKPOINT_LG } from '../config/constants';
 import { useAuthStore } from './Auth';
-import { OAuthScopes } from '../utils/social';
+import { accountVariantProviderKindMap, OAuthScopes } from '../utils/social';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { decodeHTML } from '../utils/decode-html';
 import { useWalletStore } from './Wallet';
@@ -103,14 +104,14 @@ export const useAccountStore = defineStore('account', {
             this.setTheme(config);
         },
         setAuthListener() {
-            supabase.auth.onAuthStateChange((event, session) => {
+            supabase.auth.onAuthStateChange(async (event, session) => {
                 console.log(event, session);
                 if (event === 'INITIAL_SESSION') {
                     // handle initial session
-                    if (session) this.setSession(session);
+                    await this.setSession(session);
                 } else if (event === 'SIGNED_IN') {
                     // handle sign in event
-                    if (session) this.setSession(session);
+                    await this.setSession(session);
                 } else if (event === 'SIGNED_OUT') {
                     // handle sign out event
                 } else if (event === 'PASSWORD_RECOVERY') {
@@ -122,9 +123,14 @@ export const useAccountStore = defineStore('account', {
                 }
             });
         },
-        setSession(session: Session) {
-            this.isAuthenticated = true;
-            this.api.request.setUser(session);
+        async setSession(session: Session | null) {
+            if (session) {
+                this.setStatus(true);
+                this.api.request.setUser(session);
+                await this.getAccount();
+            } else {
+                this.setStatus(null);
+            }
         },
         onResize() {
             this.isMobile = window.innerWidth < BREAKPOINT_LG;
@@ -177,36 +183,49 @@ export const useAccountStore = defineStore('account', {
         disconnect(kind: AccessTokenKind) {
             return this.api.request.post('/v1/account/disconnect', { data: { kind } });
         },
+        async signInWithOtp({ email }: { email: string }) {
+            this.setStatus(false);
+            const { error } = await supabase.auth.signInWithOtp({
+                email,
+                options: {
+                    shouldCreateUser: true, // We create users in supabase if they don't exist
+                },
+            });
+            if (error) throw new Error(error.message);
+        },
         async verifyOtp({ email, token }: { email: string; token: string }) {
-            await supabase.auth.verifyOtp({
+            const { error } = await supabase.auth.verifyOtp({
                 email,
                 token,
                 type: 'email',
             });
+            if (error) throw new Error(error.message);
         },
-        async getSession() {
-            const { data, error } = await supabase.auth.getSession();
-        },
-        async signInWithOtp({ email }: { email: string }) {
+        async signInWithOAuth({ variant }: { variant: AccountVariant }) {
             this.setStatus(false);
-            await supabase.auth.signInWithOtp({
-                email,
-                options: {
-                    shouldCreateUser: false,
-                    // emailRedirectTo: window.location.href, // User for magic links
-                },
-            });
-        },
-        async signInWithOAuth({ provider }: { provider: string }) {
-            this.setStatus(false);
-            await supabase.auth.signInWithOAuth({
-                provider: provider as Provider,
+
+            const provider = accountVariantProviderKindMap[variant] as Provider;
+            if (!provider) throw new Error('Provider not available.');
+
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider,
                 options: {
                     scopes: OAuthScopes[provider].join(' '),
-                    redirectTo: window.location.href,
-                    // skipBrowserRedirect?: boolean; // Use this to create a popup for a URL from in case called from an iframe
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent',
+                    },
+                    // When the app is loaded in an iframe we need to break out of the iframe
+                    // to continue the OAuth flow since social providers do not allow access from iframes
+                    redirectTo: this.isIFrame ? WIDGET_URL + '/auth/redirect' : window.location.href,
+                    skipBrowserRedirect: this.isIFrame ? true : false,
                 },
             });
+            if (error) throw new Error(error.message);
+            if (this.isIFrame) {
+                console.log('popup redirect', data.url);
+                window.open(data.url, '_blank');
+            }
         },
         async signout() {
             const walletStore = useWalletStore();

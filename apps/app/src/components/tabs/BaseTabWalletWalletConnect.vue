@@ -12,8 +12,11 @@
         <span class="text-opaque">{{ address }}</span>
     </b-form-group>
     <b-button v-if="!address" variant="primary" class="w-100" @click="onClickConnect"> Connect Wallet </b-button>
-    <b-button v-else variant="success" class="w-100" @click="onClickAdd">
-        Add <strong>{{ walletStore.account.address && shortenAddress(walletStore.account.address) }}</strong>
+    <b-button v-else variant="success" :disabled="isLoading" class="w-100" @click="onClickAdd">
+        <b-spinner v-if="isLoading" small />
+        <template v-else>
+            Add <strong>{{ walletStore.account.address && shortenAddress(walletStore.account.address) }}</strong>
+        </template>
     </b-button>
 </template>
 
@@ -49,7 +52,7 @@ export default defineComponent({
         },
     },
     mounted() {
-        this.walletStore.setWallet(null, true);
+        this.walletStore.setWallet(null);
     },
     methods: {
         async getAddress() {
@@ -70,9 +73,11 @@ export default defineComponent({
             }
         },
         async onClickAdd() {
+            this.isLoading = true;
             try {
                 const signature = await this.walletStore.signMessage(this.message);
                 await this.walletStore.create({
+                    chainId: this.walletStore.chainId,
                     variant: this.variant,
                     message: this.message,
                     signature,

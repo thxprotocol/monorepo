@@ -1,5 +1,5 @@
 import express from 'express';
-import { assertRequestInput, assertPoolAccess, assertPayment, guard } from '@thxnetwork/api/middlewares';
+import { assertRequestInput, assertPoolAccess, assertPayment } from '@thxnetwork/api/middlewares';
 
 import * as ListController from './list.controller';
 import * as ReadController from './get.controller';
@@ -22,43 +22,18 @@ import RouterWallets from './wallets/wallets.router';
 
 const router: express.Router = express.Router({ mergeParams: true });
 
-router.get('/', guard.check(['pools:read']), assertRequestInput(ListController.validation), ListController.controller);
-router.post(
-    '/',
-    guard.check(['pools:read', 'pools:write']),
-    assertRequestInput(CreateController.validation),
-    CreateController.controller,
-);
+router.get('/', assertRequestInput(ListController.validation), ListController.controller);
+router.post('/', assertRequestInput(CreateController.validation), CreateController.controller);
 
 // This route is also asserted for payment but not for access
 router.use('/:id/collaborators', assertPayment, RouterCollaborators);
 
 // Everything below is asserted for campaign/pool access
 router.use('/:id', assertPoolAccess);
-router.get(
-    '/:id',
-    guard.check(['pools:read']),
-    assertRequestInput(ReadController.validation),
-    ReadController.controller,
-);
-router.patch(
-    '/:id',
-    guard.check(['pools:read', 'pools:write']),
-    assertRequestInput(UpdateController.validation),
-    UpdateController.controller,
-);
-router.delete(
-    '/:id',
-    guard.check(['pools:write']),
-    assertRequestInput(DeleteController.validation),
-    DeleteController.controller,
-);
-router.post(
-    '/:id/duplicate',
-    guard.check(['pools:read', 'pools:write']),
-    assertRequestInput(CreateDuplicate.validation),
-    CreateDuplicate.controller,
-);
+router.get('/:id', assertRequestInput(ReadController.validation), ReadController.controller);
+router.patch('/:id', assertRequestInput(UpdateController.validation), UpdateController.controller);
+router.delete('/:id', assertRequestInput(DeleteController.validation), DeleteController.controller);
+router.post('/:id/duplicate', assertRequestInput(CreateDuplicate.validation), CreateDuplicate.controller);
 
 // Payment related routes that require access event if payment assertion fails
 router.use('/:id/erc20', RouterERC20); // Needed for payment processing

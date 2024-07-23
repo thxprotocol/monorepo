@@ -133,3 +133,4 @@ export const THX_CLIENT_SECRET = process.env.THX_CLIENT_SECRET || '';
 export const WEBHOOK_SIGNING_SECRET = process.env.WEBHOOK_SIGNING_SECRET || '';
 export const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 export const SUPABASE_URL = process.env.SUPABASE_URL || '';
+export const SECURE_KEY = process.env.SECURE_KEY || '';

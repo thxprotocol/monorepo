@@ -1,0 +1,61 @@
+import { AccessTokenKind } from '@thxnetwork/common/enums';
+import { SECURE_KEY } from '../config/secrets';
+import { Token, TokenDocument } from '../models/Token';
+import { decryptString } from '../util/decrypt';
+import { logger } from '../util/logger';
+
+class TokenService {
+    async get({ sub, kind }: Partial<TToken>): Promise<TToken> {
+        const token = await Token.findOne({ sub, kind });
+        if (!token) return;
+
+        const { accessTokenEncrypted, refreshTokenEncrypted } = token;
+        const accessToken = accessTokenEncrypted && decryptString(accessTokenEncrypted, SECURE_KEY);
+        const refreshToken = refreshTokenEncrypted && decryptString(refreshTokenEncrypted, SECURE_KEY);
+        const refreshedToken = await this.refresh(token);
+
+        return { ...refreshedToken.toJSON(), accessToken, refreshToken };
+    }
+
+    // Store the token for the new account
+    set(token: Partial<TToken>) {
+        return Token.findOneAndUpdate({ sub: token.sub, kind: token.kind }, token, { upsert: true, new: true });
+    }
+
+    async unset({ sub, kind }: Partial<TToken>) {
+        const token = await this.get({ sub, kind });
+
+        // Revoke access at token provider if token has scopes
+        if (token.scopes.length) {
+            // await this.revoke(token);
+            logger.debug('Should revoke token', { sub, kind });
+        }
+
+        // Remove from storage
+        return this.remove({ sub, kind });
+    }
+
+    private async refresh(token: TokenDocument) {
+        // Return token if there is no expiry or no refreshtoken
+        if (!token || !token.expiry || !token.refreshToken) return token;
+
+        // Check if token is expired
+        const isExpired = Date.now() > token.expiry;
+        if (!isExpired) return token;
+
+        try {
+            // If so, refresh the token and return
+            // return await serviceMap[token.kind].refreshToken(token);
+            logger.debug('Should refresh token', { token });
+            return;
+        } catch (error) {
+            logger.error('Token refresh failed', { error });
+            return token;
+        }
+    }
+
+    private remove({ sub, kind }: { sub: string; kind: AccessTokenKind }) {
+        return Token.findOneAndDelete({ sub, kind });
+    }
+}
+export default new TokenService();
