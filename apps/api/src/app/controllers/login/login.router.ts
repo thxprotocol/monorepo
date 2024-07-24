@@ -5,6 +5,6 @@ import CreateJWT from './jwt/post.controller';
 
 const router: express.Router = express.Router();
 router.post('/pwd', corsHandler, assertRequestInput(CreatePassword.validation), CreatePassword.controller);
-router.post('/jwt', corsHandler, checkJwt, assertRequestInput(CreateJWT.validation), CreateJWT.controller);
+router.post('/jwt', checkJwt, corsHandler, assertRequestInput(CreateJWT.validation), CreateJWT.controller);
 
 export default router;

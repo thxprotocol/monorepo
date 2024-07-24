@@ -55,6 +55,8 @@ class AccountProxy {
         const token = header.split(' ')[1];
         if (!token) return;
 
+        console.log({ token });
+
         const { data, error } = await supabase.auth.getUser(token);
         if (error) throw error;
 

@@ -8,7 +8,7 @@ export function createPopupWindow(width: number, height: number) {
 export const popup = {
     open: (url: string) => {
         const width = 1024;
-        const height = 768;
+        const height = 640;
         const left = screen.width / 2 - width / 2;
         const top = screen.height / 2 - height / 2;
 

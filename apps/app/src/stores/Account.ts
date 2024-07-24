@@ -208,7 +208,7 @@ export const useAccountStore = defineStore('account', {
             return identity;
         },
         async signinWithWallet(address: string, { message, signature }: { message: string; signature: string }) {
-            const { password } = await this.api.request.post('/v1/login', { data: { message, signature } });
+            const { password } = await this.api.request.post('/v1/login/pwd', { data: { message, signature } });
             const { error } = await this._signinWithPassword({ address, password });
             if (error) throw error;
         },
