@@ -166,7 +166,6 @@ export default class RewardService {
     }
 
     static async findPaymentsForSub(sub: string) {
-        console.log({sub})
         const rewardVariants: string[] = Object.keys(RewardVariant).filter((v) => !isNaN(Number(v)));
         const payments = await PromiseParser.parse(
             rewardVariants.map(async (variant: string) => {

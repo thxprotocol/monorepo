@@ -18,6 +18,7 @@ type TAccount = {
     rank: number;
     isEmailVerified?: boolean;
     tokens: { kind: AccessTokenKind; userId: string; scopes: string[] }[];
+    providerUserId: string;
 };
 
 type TAuthState = {
@@ -73,6 +74,7 @@ type TAccountState = {
     isModalWalletShown: boolean;
     windowHeight: number;
     config: any;
+    identities: UserIdentity[];
     api: THXClient | null;
     poolId: string;
     balance: number;

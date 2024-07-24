@@ -6,7 +6,7 @@ import { AccountVariant } from '@thxnetwork/common/enums';
 import { THXBrowserClient } from '@thxnetwork/sdk/clients';
 import { BREAKPOINT_LG } from '../config/constants';
 import { useAuthStore } from './Auth';
-import { accountVariantProviderKindMap, OAuthScopes } from '../utils/social';
+import { accountVariantProviderKindMap, kindAccountVariantMap, OAuthScopes } from '../utils/social';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { decodeHTML } from '../utils/decode-html';
 import { useWalletStore } from './Wallet';
@@ -17,7 +17,7 @@ import poll from 'promise-poller';
 const isMobileDevice = !!window.matchMedia('(pointer:coarse)').matches;
 
 // Create Supabase client for authentication
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
@@ -33,6 +33,7 @@ export const useAccountStore = defineStore('account', {
         subscription: null,
         leaderboard: [],
         participants: [],
+        identities: [],
         windowHeight: 0,
         isSidebarShown: false,
         isAuthenticated: null,
@@ -114,10 +115,16 @@ export const useAccountStore = defineStore('account', {
                         this.setStatus(null);
                     }
                 } else if (event === 'SIGNED_IN') {
-                    if (!this.isAuthenticated) await this.setSession(session);
-                    this.setStatus(true);
+                    if (session) {
+                        await this.setSession(session);
+                        this.identities = session.user ? session.user.identities : [];
+                        this.setStatus(true);
+                    } else {
+                        this.identities = [];
+                    }
                 } else if (event === 'SIGNED_OUT') {
                     this.setStatus(null);
+                    this.identities = [];
                 } else if (event === 'PASSWORD_RECOVERY') {
                     // handle password recovery event
                 } else if (event === 'TOKEN_REFRESHED') {
@@ -129,7 +136,6 @@ export const useAccountStore = defineStore('account', {
         },
         async setSession(session: Session | null) {
             this.api.request.setUser(session);
-
             if (session) {
                 await this.getAccount();
                 useAuthStore().isModalLoginShown = false;
@@ -180,18 +186,79 @@ export const useAccountStore = defineStore('account', {
                 ]);
             }
         },
-        connect(kind: AccessTokenKind, scopes: TOAuthScope[]) {
-            return useAuthStore().signin({
-                prompt: 'connect',
-                access_token_kind: kind,
-                provider_scope: scopes.join(' '),
-            });
+        async connect(kind: AccessTokenKind, scopes: TOAuthScope[]) {
+            const variant = kindAccountVariantMap[kind];
+            const provider = accountVariantProviderKindMap[variant] as Provider;
+            if (!provider) throw new Error('Requested provider not available.');
+
+            const config = this._getOAuthConfig(provider, scopes);
+            const { data, error } = await supabase.auth.linkIdentity(config);
+            if (error) throw error;
+            if (config.options.skipBrowserRedirect) {
+                window.open(data.url, '_blank');
+            }
         },
-        disconnect(kind: AccessTokenKind) {
-            return this.api.request.post('/v1/account/disconnect', { data: { kind } });
+        async disconnect(kind: AccessTokenKind) {
+            const identity = await this._getSupabaseIdentity(kind);
+            await supabase.auth.unlinkIdentity(identity);
+            await this.getSupabaseIdentities();
+        },
+        async getSupabaseIdentities() {
+            const { data, error } = await supabase.auth.getUserIdentities();
+            if (error) throw error;
+            this.identities = data.identities;
+        },
+        async _getSupabaseIdentity(kind: AccessTokenKind) {
+            await this.getSupabaseIdentities();
+            const identity = this.identities.find((i) => i.provider === kind);
+            if (!identity) throw new Error('Identity not found');
+            return identity;
+        },
+        async signinWithWallet(address: string, { message, signature }: { message: string; signature: string }) {
+            const { password } = await this.api.request.post('/v1/login', { data: { message, signature } });
+            const { error } = await this._signinWithPassword({ address, password });
+            if (error) throw error;
+        },
+        async _signinWithPassword({ address, password }: { address: string; password: string }) {
+            try {
+                // Try to get the user with the address and password
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: `${address}@thx.network`,
+                    password,
+                });
+                // If we find a user for these credentials then login
+                if (data.user) return { data, error };
+                // If we are noticed that we login using the wrong credentials then we try to signup
+                if (error && error.message === 'Invalid login credentials') {
+                    return await this._signupWithPassword({ address, password });
+                }
+                // If it was a different error we rethrow
+                if (error) throw error;
+
+                // In all other cases we throw an unknown error
+                throw new Error('Unknown error');
+            } catch (error) {
+                return { data: null, error };
+            }
+        },
+        async _signupWithPassword({ address, password }: { address: string; password: string }) {
+            try {
+                // If no user is found for this address and password then create a new user
+                const { data, error } = await supabase.auth.signUp({
+                    email: `${address}@thx.network`,
+                    password,
+                    options: { data: { address } },
+                });
+                if (error && error.message === 'User already registered') {
+                    throw new Error('Unable to sign you in.');
+                }
+                if (error) throw error;
+                return { data, error };
+            } catch (error) {
+                return { data: null, error };
+            }
         },
         async signInWithOtp({ email }: { email: string }) {
-            this.setStatus(false);
             const { error } = await supabase.auth.signInWithOtp({
                 email,
                 options: {
@@ -209,24 +276,11 @@ export const useAccountStore = defineStore('account', {
             if (error) throw new Error(error.message);
         },
         async signInWithOAuth({ variant }: { variant: AccountVariant }) {
-            this.setStatus(false);
-
             const provider = accountVariantProviderKindMap[variant] as Provider;
             if (!provider) throw new Error('Requested provider not available.');
 
-            const redirectTo = this.isIFrame ? WIDGET_URL + '/auth/redirect' : window.location.href;
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider,
-                options: {
-                    scopes: OAuthScopes[provider].join(' '),
-                    queryParams: {
-                        access_type: 'offline',
-                        prompt: 'consent',
-                    },
-                    redirectTo,
-                    skipBrowserRedirect: this.isIFrame,
-                },
-            });
+            const config = this._getOAuthConfig(provider, OAuthScopes[provider]);
+            const { data, error } = await supabase.auth.signInWithOAuth(config);
             if (error) throw new Error(error.message);
 
             // When the app is loaded in an iframe we need to break out of the iframe
@@ -243,6 +297,21 @@ export const useAccountStore = defineStore('account', {
             await supabase.auth.signOut();
             this.setStatus(null);
             this.account = null;
+        },
+        _getOAuthConfig(provider: Provider, scopes: TOAuthScope[]) {
+            const redirectTo = this.isIFrame ? WIDGET_URL + '/auth/redirect' : window.location.href;
+            return {
+                provider,
+                options: {
+                    scopes: scopes.join(' '),
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent',
+                    },
+                    redirectTo,
+                    skipBrowserRedirect: this.isIFrame,
+                },
+            };
         },
         setStatus(isAuthenticated: boolean | null) {
             this.isAuthenticated = isAuthenticated;

@@ -24,6 +24,7 @@ const accountSchema = new mongoose.Schema(
         role: String,
         identity: String,
         goal: [String],
+        providerUserId: String,
     },
     { timestamps: true },
 );

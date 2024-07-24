@@ -24,8 +24,13 @@ const accountSchema = new mongoose.Schema(
         role: String,
         identity: String,
         goal: [String],
+        providerUserId: { type: String, unique: true, sparse: true },
     },
     { timestamps: true },
 );
+
+accountSchema.virtual('sub').get(function (this: TAccount) {
+    return String(this._id);
+});
 
 export const Account = mongoose.model<AccountDocument>('Account', accountSchema, 'account');

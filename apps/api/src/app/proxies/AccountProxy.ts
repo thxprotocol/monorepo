@@ -8,12 +8,15 @@ import { Account, AccountDocument } from '../models';
 import { Token } from '../models/Token';
 import { accountVariantProviderMap, providerAccountVariantMap } from '@thxnetwork/common/maps';
 import { toChecksumAddress } from 'web3-utils';
+import { SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
+import { encryptString } from '@thxnetwork/api/util/encrypt';
 import TokenService from '../services/TokenService';
+import { logger } from '../util/logger';
 
 export const supabase = supabaseClient();
 
-export default class AccountProxy {
-    static async request(config: AxiosRequestConfig) {
+class AccountProxy {
+    async request(config: AxiosRequestConfig) {
         const header = await getAuthAccessToken();
         const { status, data } = await authClient({
             ...config,
@@ -29,23 +32,23 @@ export default class AccountProxy {
         return data;
     }
 
-    static async getToken(account: TAccount, kind: AccessTokenKind, requiredScopes: OAuthScope[] = []) {
+    async getToken(account: TAccount, kind: AccessTokenKind, requiredScopes: OAuthScope[] = []) {
         const token = await TokenService.get({ sub: account.sub, kind });
         if (token && requiredScopes.every((scope) => token.scopes.includes(scope))) return token;
     }
 
-    static disconnect(account: TAccount, kind: AccessTokenKind) {
+    disconnect(account: TAccount, kind: AccessTokenKind) {
         return this.request({
             method: 'DELETE',
             url: `/accounts/${account.sub}/tokens/${kind}`,
         });
     }
 
-    static async findById(sub: string) {
+    async findById(sub: string) {
         return await Account.findById(sub);
     }
 
-    static async findByRequest(req: Request) {
+    async findByRequest(req: Request) {
         const header = req.header('authorization');
         if (!header) return;
 
@@ -62,53 +65,46 @@ export default class AccountProxy {
         const isOAuthProvider = Object.values(accountVariantProviderMap).includes(provider as AccessTokenKind);
         const isEmailProvider = provider === 'email';
 
-        let account, email, address;
+        let account, email, address, variant, providerUserId;
 
         // Find the account for the user login provider and provider user id
         if (isOAuthProvider) {
-            account = await this.findByIdentityUserId(provider, identities[0].id);
+            variant = providerAccountVariantMap[provider];
+            email = data.user.user_metadata.email;
+            account = await this.findByIdentityUserId(variant, provider, identities[0].id);
+            providerUserId = identities[0].id;
         }
 
         // Find the account for the email used in the OTP flow
-        else if (isEmailProvider) {
+        else if (isEmailProvider && !data.user.user_metadata.address) {
+            variant = AccountVariant.EmailPassword;
             email = data.user.user_metadata.email;
             account = await this.findByEmail(email);
         }
 
-        // TODO Find the account for the recovered address from the signature
-        else if (['walletconnect'].includes(provider)) {
+        // Find the account for the address stored in authenticated user metadata
+        else if (isEmailProvider && data.user.user_metadata.address) {
+            variant = AccountVariant.Metamask;
             address = data.user.user_metadata.address;
             account = await this.findByAddress(address);
         }
 
         // If all of the above are skipped we create a new account
         if (!account) {
-            const variant = providerAccountVariantMap[provider];
-            const isEmailVerified = variant === AccountVariant.EmailPassword;
-
             account = await this.create({
                 variant,
+                providerUserId,
                 email: email && email.toLowerCase(),
                 address: address && toChecksumAddress(address),
-                isEmailVerified,
+                // We can assume emails are verified in case of OTP flows
+                isEmailVerified: variant === AccountVariant.EmailPassword,
             });
-
-            // Store the tokens if any
-            if (isOAuthProvider) {
-                await TokenService.set({
-                    sub: account.id,
-                    kind: provider,
-                    userId: identities[0].id,
-                    accessToken: '', // Can only store access token using /auth/connect flow
-                    refreshToken: '', // Can only store refresh token using /auth/connect flow
-                });
-            }
         }
 
         return await this.decorate(account);
     }
 
-    private static async decorate(account: AccountDocument): Promise<TAccount> {
+    private async decorate(account: AccountDocument): Promise<TAccount> {
         return {
             profileImg: `https://api.dicebear.com/7.x/identicon/svg?seed=${account.id}`,
             username: '',
@@ -118,7 +114,7 @@ export default class AccountProxy {
         };
     }
 
-    private static async findTokensBySub(sub: string) {
+    private async findTokensBySub(sub: string) {
         const tokens = await Token.find({ sub });
         return (
             tokens
@@ -134,21 +130,28 @@ export default class AccountProxy {
         );
     }
 
-    private static async findByEmail(email: string) {
-        return await Account.findOne({ email });
-    }
-
-    private static async findByIdentityUserId(kind: string, userId: string) {
-        const token = await Token.findOne({ kind, userId });
-        if (!token) return;
-        return await Account.findById(token.sub);
-    }
-
-    private static async findByAddress(address: string) {
+    async findByAddress(address: string) {
         return await Account.findOne({ address });
     }
 
-    private static async create(data: Partial<TAccount>) {
+    private async findByEmail(email: string) {
+        return await Account.findOne({ email });
+    }
+
+    private async findByIdentityUserId(variant: AccountVariant, kind: string, userId: string) {
+        const accounts = await Account.find({ variant, providerUserId: userId });
+        if (!accounts.length) {
+            logger.error(`No accounts found for OAuth login request`, { kind, userId });
+            return;
+        }
+        if (accounts.length > 1) {
+            logger.error(`Multiple accounts found for OAuth login request`, { kind, userId });
+            return;
+        }
+        return accounts[0];
+    }
+
+    private async create(data: Partial<TAccount>) {
         return await Account.create({
             plan: AccountPlanType.Lite,
             username: '',
@@ -156,7 +159,7 @@ export default class AccountProxy {
         });
     }
 
-    static async find({ subs, query }: Partial<{ subs: string[]; query: string }>): Promise<TAccount[]> {
+    async find({ subs, query }: Partial<{ subs: string[]; query: string }>): Promise<TAccount[]> {
         if (subs && subs.length) {
             return await Account.find({ _id: { $in: subs } });
         } else if (query && query.length) {
@@ -168,7 +171,7 @@ export default class AccountProxy {
         }
     }
 
-    static async update(sub: string, data: Partial<TAccount>) {
+    async update(sub: string, data: Partial<TAccount>) {
         const account = await Account.findById(sub);
         if (!account) throw new NotFoundError('Account not found.');
 
@@ -197,16 +200,16 @@ export default class AccountProxy {
         return await this.decorate(await Account.findByIdAndUpdate(account.id, data, { new: true }));
     }
 
-    static async getByDiscordId(discordId: string): Promise<TAccount> {
+    async getByDiscordId(discordId: string): Promise<TAccount> {
         const token = await Token.findOne({ kind: AccessTokenKind.Discord, userId: discordId });
         return await Account.findById(token.sub);
     }
 
-    static getByIdentity(identity: string): Promise<TAccount> {
+    getByIdentity(identity: string): Promise<TAccount> {
         return Account.findById({ identity });
     }
 
-    static async isEmailDuplicate(email: string) {
+    async isEmailDuplicate(email: string) {
         try {
             const accountExists = await Account.exists({ email: email.toLowerCase() });
             return !!accountExists;
@@ -218,7 +221,15 @@ export default class AccountProxy {
         }
     }
 
-    static remove(sub: string) {
+    createPassword(address: string) {
+        const encryptedAddress = encryptString(address, SUPABASE_JWT_SECRET);
+        const passwordLength = 32;
+        return encryptedAddress.substring(0, passwordLength);
+    }
+
+    remove(sub: string) {
         return Account.findByIdAndDelete(sub);
     }
 }
+
+export default new AccountProxy();

@@ -7,7 +7,7 @@
         "start": "nx serve",
         "build": "nx build",
         "build:safe": "docker compose exec txs-web python manage.py insert_safe_master_copy --address \"0xd916a690676e925Ac9Faf2d01869c13Fd9757ef2\"",
-        "ngrok": "~/ngrok http --domain=local.auth.thx.network https://localhost:3030  > /dev/null &",
+        "ngrok": "~/ngrok http --domain=local.api.thx.network https://localhost:3000",
         "hardhat": "nx run api:hardhat",
         "hardhat-deploy": "nx run api:hardhat-deploy",
         "test": "NODE_OPTIONS='--max-old-space-size=8192' nx test",

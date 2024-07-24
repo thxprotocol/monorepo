@@ -76,10 +76,13 @@ async function getLeaderboardTop(leaderboard: TLeaderboardEntry[], limit: number
     const subs = topTen.map((p) => p.sub);
     const accounts = await AccountProxy.find({ subs });
     return topTen.map((p, index) => {
-        const { username, profileImg } = accounts.find((a) => a.sub === p.sub);
+        const account = accounts.find((a) => a.sub === p.sub);
+
         return {
             rank: Number(index) + 1,
-            account: { username, profileImg },
+            account: account
+                ? { username: account.username, profileImg: account.profileImg }
+                : { username: 'Removed account', profileImg: '' },
             score: p.score,
             questEntryCount: p.questEntryCount,
         };

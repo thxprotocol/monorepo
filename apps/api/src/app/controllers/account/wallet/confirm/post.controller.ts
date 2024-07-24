@@ -22,4 +22,4 @@ const controller = async (req: Request, res: Response) => {
     res.json(wallet);
 };
 
-export { controller, validation };
+export default { controller, validation };

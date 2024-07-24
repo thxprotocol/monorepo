@@ -139,15 +139,6 @@ export default defineComponent({
             this.accountStore.signout();
             this.accountStore.isModalAccountShown = false;
         },
-        async onSigned({ signature, message }: { signature: string; message: string }) {
-            this.isLoading = true;
-            await this.authStore.signin({
-                auth_variant: AccountVariant.Metamask,
-                auth_signature: signature,
-                auth_message: message,
-            });
-            this.isLoading = false;
-        },
         async onClickSigninOTP() {
             try {
                 this.isLoading = true;
@@ -168,6 +159,20 @@ export default defineComponent({
                 this.error = error ? (error as Error).message : 'An issue occured. Please try again.';
             } finally {
                 this.isLoading = false;
+            }
+        },
+        async onSigned({ signature, message }: { signature: string; message: string }) {
+            this.isLoading = true;
+            try {
+                const { account } = this.walletStore;
+                if (!account || !account.address) throw new Error('No account address found');
+
+                await this.accountStore.signinWithWallet(account.address, {
+                    signature,
+                    message,
+                });
+            } catch (error) {
+                this.error = (error as any).message;
             }
         },
         async onClickSigninOAuth(variant: AccountVariant) {

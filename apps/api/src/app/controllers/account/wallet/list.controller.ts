@@ -9,4 +9,4 @@ const controller = async (req: Request, res: Response) => {
     res.json(wallets);
 };
 
-export { controller, validation };
+export default { controller, validation };

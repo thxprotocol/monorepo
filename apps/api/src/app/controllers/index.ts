@@ -26,6 +26,7 @@ import RouterVoteEscrow from './ve/ve.router';
 import RouterJobs from './jobs/jobs.router';
 import RouterLotteries from './lotteries/lotteries.router';
 import RouterCoupons from './coupons/coupons.router';
+import RouterLogin from './login/login.router';
 import { checkJwt, corsHandler } from '@thxnetwork/api/middlewares';
 
 const router: express.Router = express.Router({ mergeParams: true });
@@ -46,6 +47,7 @@ router.use('/webhook', RouterWebhook);
 router.use('/earn', RouterPrices);
 router.use('/lotteries', RouterLotteries);
 router.use('/invites', RouterInvites);
+router.use('/login', RouterLogin);
 router.use(checkJwt, corsHandler);
 router.use('/jobs', RouterJobs);
 router.use('/upload', RouterUpload);
