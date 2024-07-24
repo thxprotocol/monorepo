@@ -1,37 +1,12 @@
 import { defineStore } from 'pinia';
-import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL, VERIFIER_ID, API_URL } from '../config/secrets';
-import { useQRCodeStore } from './QRCode';
+import { CLIENT_ID, AUTH_URL, VERIFIER_ID } from '../config/secrets';
 import { tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
-import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { Wallet } from '@ethersproject/wallet';
 import { track } from '@thxnetwork/common/mixpanel';
-import poll from 'promise-poller';
-import { useVeStore } from './VE';
-import { useWalletStore } from './Wallet';
-
-const userManager = new UserManager({
-    authority: AUTH_URL,
-    resource: API_URL,
-    response_type: 'code',
-    response_mode: 'query',
-    redirect_uri: WIDGET_URL + '/signin-popup.html',
-    silent_redirect_uri: WIDGET_URL + '/signin-silent.html',
-    post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-    popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-    client_id: CLIENT_ID,
-    client_secret: CLIENT_SECRET,
-    automaticSilentRenew: false,
-    loadUserInfo: false,
-    prompt: 'consent',
-    scope: 'openid offline_access account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
-    userStore: new WebStorageStateStore({ store: window.localStorage }),
-});
 
 export const useAuthStore = defineStore('auth', {
     state: (): TAuthState => ({
-        user: null,
-        userManager: userManager as UserManager,
         wallet: null,
         privateKey: '',
         oAuthShare: '',
@@ -42,122 +17,24 @@ export const useAuthStore = defineStore('auth', {
         isSecurityQuestionAvailable: null,
     }),
     actions: {
-        onUserUnloadedCallback() {
-            this.oAuthShare = '';
-            this.user = null;
-            useWalletStore().reset();
-            useVeStore().reset();
-        },
-        onUserLoadedCallback(user: Partial<User>) {
-            this.user = user;
-            this.isModalLoginShown = false;
-        },
-        signin(extraQueryParams: { [key: string]: any } = {}, state = {}) {
-            const { poolId, config, isMobileDevice } = useAccountStore();
-            const { entry } = useQRCodeStore();
-            const returnUrl = window.location.href;
-
-            return this.userManager[isMobileDevice ? 'signinRedirect' : 'signinPopup']({
-                state: {
-                    isMobile: isMobileDevice,
-                    returnUrl,
-                    client_id: CLIENT_ID,
-                    origin: config.origin,
-                    ...state,
-                },
-                extraQueryParams: {
-                    return_url: returnUrl,
-                    pool_id: poolId,
-                    claim_id: entry ? entry.uuid : '',
-                    ...extraQueryParams,
-                },
-            }).catch((error: Error) => {
-                console.log(error);
-
-                if (error.message === 'Popup closed by user') {
-                    // Should start polling in order to check if auth flow is completed
-                    // We should poll the signin silent request until a user becomes available (Twitter throws this after loosing window.top)
-                    // Its problematic that the user also could have closed it on purpose
-                    this.waitForUser();
-                }
-
-                // Should refresh because issue could be caused by base64 state string in redirect
-                if (error.message === 'No matching state found in storage') {
-                    this.requestOAuthShareRefresh();
-                }
-            });
-        },
-        waitForUser() {
-            const taskFn = async () => {
-                await this.requestOAuthShareRefresh();
-                return this.user ? Promise.resolve() : Promise.reject('Could not find an authenticated user...');
-            };
-            poll({ taskFn, interval: 5000, retries: 60 });
-        },
-        async signout() {
-            const { isMobileDevice } = useAccountStore();
-            await this.userManager[isMobileDevice ? 'signoutRedirect' : 'signoutPopup']({
-                state: { isMobile: isMobileDevice, origin: window.location.href },
-                id_token_hint: this.user?.id_token,
-            })
-                .then(() => {
-                    this.user = null;
-                })
-                .catch((error: Error) => {
-                    console.log(error);
-                    if (error.message === 'Popup closed by user') {
-                        this.user = null;
-                    }
-                });
-        },
-        async signoutSilent() {
-            await this.userManager
-                .signoutSilent()
-                .then(() => {
-                    this.user = null;
-                })
-                .catch((error: Error) => {
-                    console.log(error);
-                    this.user = null;
-                });
-        },
-        async requestOAuthShareRefresh() {
-            const { config } = useAccountStore();
-
-            if (this.user && this.user.expired) {
-                this.user = null;
-            }
-
-            this.user = await this.userManager
-                .signinSilent({
-                    state: {
-                        returnUrl: window.location.href,
-                        client_id: CLIENT_ID,
-                        origin: config.origin,
-                    },
-                })
-                .catch((error: Error) => {
-                    console.log(error);
-                    // Should signout because refresh token is no longer valid or auth is required
-                    if (['grant request is invalid', 'End-User authentication is required'].includes(error.message)) {
-                        this.signoutSilent();
-                    }
-                });
+        async getJWT() {
+            const { api } = useAccountStore();
+            const { jwt } = await api.request.post('/v1/login/jwt');
+            return jwt;
         },
         async triggerLogin() {
-            if (!this.user || !this.user.access_token || !this.user.id_token) return;
-
+            const jwt = await this.getJWT();
             const requestConfig = {
                 verifier: VERIFIER_ID,
                 clientId: CLIENT_ID,
                 typeOfLogin: 'jwt',
                 enableLogging: false,
-                hash: `#state=state&access_token=${this.user?.access_token}&id_token=${this.user?.id_token}`,
+                hash: `#state=state&access_token=${jwt}&id_token=${jwt}`,
                 queryParameters: new URLSearchParams({ code: '', iss: AUTH_URL, state: 'state' } as any).toString(),
                 jwtParams: {
                     domain: AUTH_URL,
-                    accessToken: this.user?.access_token,
-                    idToken: this.user?.id_token,
+                    accessToken: jwt,
+                    idToken: jwt,
                     user_info_route: 'me',
                 },
             };
@@ -171,19 +48,11 @@ export const useAuthStore = defineStore('auth', {
 
             await tKey.initialize();
         },
-        async getUser() {
-            // Validate user token expiry
-            this.user = await this.userManager.getUser();
-            if (!this.user) return;
-            if (this.oAuthShare) return;
-
-            await this.requestOAuthShareRefresh();
-        },
         async getPrivateKey() {
             // If the token is more than 60s old, we need to refresh
             // as web3auth will not accept it for deriving key shares
             if (this.user && 60 * 60 * 24 - this.user.expires_in > 60) {
-                await this.requestOAuthShareRefresh();
+                await this.triggerLogin();
             }
 
             // Get the oauth share (1/3)

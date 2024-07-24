@@ -1,8 +1,10 @@
 import express from 'express';
-import { assertRequestInput, corsHandler } from '@thxnetwork/api/middlewares';
-import CreateLogin from './post.controller';
+import { assertRequestInput, checkJwt, corsHandler } from '@thxnetwork/api/middlewares';
+import CreatePassword from './pwd/post.controller';
+import CreateJWT from './jwt/post.controller';
 
 const router: express.Router = express.Router();
-router.post('/', corsHandler, assertRequestInput(CreateLogin.validation), CreateLogin.controller);
+router.post('/pwd', corsHandler, assertRequestInput(CreatePassword.validation), CreatePassword.controller);
+router.post('/jwt', corsHandler, checkJwt, assertRequestInput(CreateJWT.validation), CreateJWT.controller);
 
 export default router;

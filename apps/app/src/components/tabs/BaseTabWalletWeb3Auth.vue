@@ -125,9 +125,6 @@ export default defineComponent({
                     throw new Error('No chain ID configured.');
                 }
 
-                // Get recent access token
-                await this.authStore.requestOAuthShareRefresh();
-
                 // Create OAuthshare
                 await this.authStore.triggerLogin();
                 if (!this.authStore.oAuthShare) throw new Error('Could not create the OAuthshare.');
@@ -157,6 +154,7 @@ export default defineComponent({
                 this.error = (error as Error).toString();
                 console.error(error);
             } finally {
+                this.error = '';
                 this.isLoading = false;
             }
         },

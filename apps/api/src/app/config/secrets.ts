@@ -135,3 +135,4 @@ export const SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET || '';
 export const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 export const SUPABASE_URL = process.env.SUPABASE_URL || '';
 export const SECURE_KEY = process.env.SECURE_KEY || '';
+export const JWKS_JSON = process.env.JWKS_JSON || '';
