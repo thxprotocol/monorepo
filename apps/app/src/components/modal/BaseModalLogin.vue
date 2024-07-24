@@ -11,7 +11,6 @@
             <i class="fas fa-exclamation-triangle me-2" />
             {{ error }}
         </b-alert>
-        {{ isEmailSent }}
         <template v-if="!isEmailSent">
             <b-form-group>
                 <b-form-input v-model="email" :state="isEmailValid" placeholder="E-mail" />

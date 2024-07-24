@@ -10,7 +10,8 @@ import { accountVariantProviderKindMap, kindAccountVariantMap, OAuthScopes } fro
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { decodeHTML } from '../utils/decode-html';
 import { useWalletStore } from './Wallet';
-import { createClient, Provider, Session } from '@supabase/supabase-js';
+import { createClient, Provider, Session, UserIdentity } from '@supabase/supabase-js';
+import { popup } from '../utils/popup';
 import poll from 'promise-poller';
 
 // Feature only available on mobile devices
@@ -90,9 +91,7 @@ export const useAccountStore = defineStore('account', {
                     apiUrl: API_URL,
                     authUrl: AUTH_URL,
                 } as any);
-                this.setAuthListener();
-                this.setStatus(false);
-                this.getUserData();
+                this.setSupabaseAuthListener();
             }
 
             if (!slug) return;
@@ -104,26 +103,20 @@ export const useAccountStore = defineStore('account', {
             this.setConfig(config.poolId, { ...config, origin });
             this.setTheme(config);
         },
-        setAuthListener() {
+        setSupabaseAuthListener() {
             supabase.auth.onAuthStateChange(async (event, session) => {
-                console.log(event, session);
                 if (event === 'INITIAL_SESSION') {
-                    if (session) {
-                        await this.setSession(session);
-                        this.setStatus(true);
-                    } else {
-                        this.setStatus(null);
-                    }
+                    if (session) await this.setSession(session);
+                    this.setStatus(!!session);
                 } else if (event === 'SIGNED_IN') {
                     if (session) {
                         await this.setSession(session);
                         this.identities = session.user ? session.user.identities : [];
-                        this.setStatus(true);
-                    } else {
-                        this.identities = [];
                     }
+                    this.setStatus(!!session);
                 } else if (event === 'SIGNED_OUT') {
-                    this.setStatus(null);
+                    this.setStatus(false);
+                    this.account = null;
                     this.identities = [];
                 } else if (event === 'PASSWORD_RECOVERY') {
                     // handle password recovery event
@@ -137,13 +130,9 @@ export const useAccountStore = defineStore('account', {
         async setSession(session: Session | null) {
             this.api.request.setUser(session);
             if (session) {
-                await this.getAccount();
+                if (!this.account) await this.getAccount();
                 useAuthStore().isModalLoginShown = false;
             }
-        },
-        async getUserData() {
-            const { user } = useAuthStore();
-            this.setStatus(!!user);
         },
         onResize() {
             this.isMobile = window.innerWidth < BREAKPOINT_LG;
@@ -191,11 +180,15 @@ export const useAccountStore = defineStore('account', {
             const provider = accountVariantProviderKindMap[variant] as Provider;
             if (!provider) throw new Error('Requested provider not available.');
 
-            const config = this._getOAuthConfig(provider, scopes);
+            const config = this._getOAuthConfig(provider, {
+                scopes,
+                skipBrowserRedirect: true,
+                redirectTo: WIDGET_URL + '/auth/redirect',
+            });
             const { data, error } = await supabase.auth.linkIdentity(config);
             if (error) throw error;
             if (config.options.skipBrowserRedirect) {
-                window.open(data.url, '_blank');
+                popup.open(data.url);
             }
         },
         async disconnect(kind: AccessTokenKind) {
@@ -210,7 +203,7 @@ export const useAccountStore = defineStore('account', {
         },
         async _getSupabaseIdentity(kind: AccessTokenKind) {
             await this.getSupabaseIdentities();
-            const identity = this.identities.find((i) => i.provider === kind);
+            const identity = this.identities.find((i: UserIdentity) => i.provider === kind);
             if (!identity) throw new Error('Identity not found');
             return identity;
         },
@@ -278,42 +271,44 @@ export const useAccountStore = defineStore('account', {
         async signInWithOAuth({ variant }: { variant: AccountVariant }) {
             const provider = accountVariantProviderKindMap[variant] as Provider;
             if (!provider) throw new Error('Requested provider not available.');
-
-            const config = this._getOAuthConfig(provider, OAuthScopes[provider]);
+            const redirectTo = this.isIFrame ? WIDGET_URL + '/auth/redirect' : window.location.href;
+            const config = this._getOAuthConfig(provider, {
+                scopes: OAuthScopes[provider],
+                redirectTo,
+                skipBrowserRedirect: this.isIFrame,
+            });
             const { data, error } = await supabase.auth.signInWithOAuth(config);
             if (error) throw new Error(error.message);
 
             // When the app is loaded in an iframe we need to break out of the iframe
             // to continue the OAuth flow since social providers do not allow access from iframes
             if (this.isIFrame) {
-                window.open(data.url, '_blank');
+                popup.open(data.url);
             }
         },
         async signout() {
             const walletStore = useWalletStore();
             walletStore.wallet = null;
             await walletStore.disconnect();
-
             await supabase.auth.signOut();
-            this.setStatus(null);
-            this.account = null;
         },
-        _getOAuthConfig(provider: Provider, scopes: TOAuthScope[]) {
-            const redirectTo = this.isIFrame ? WIDGET_URL + '/auth/redirect' : window.location.href;
+        _getOAuthConfig(
+            provider: Provider,
+            options: { scopes: TOAuthScope[]; skipBrowserRedirect: boolean; redirectTo: string },
+        ) {
             return {
                 provider,
                 options: {
-                    scopes: scopes.join(' '),
                     queryParams: {
                         access_type: 'offline',
                         prompt: 'consent',
                     },
-                    redirectTo,
-                    skipBrowserRedirect: this.isIFrame,
+                    ...options,
+                    scopes: options.scopes.join(' '),
                 },
             };
         },
-        setStatus(isAuthenticated: boolean | null) {
+        setStatus(isAuthenticated: boolean) {
             this.isAuthenticated = isAuthenticated;
             this.postMessage({ message: 'thx.auth.status', isAuthenticated });
 

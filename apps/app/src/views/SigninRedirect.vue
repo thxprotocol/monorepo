@@ -33,7 +33,7 @@ export default defineComponent({
             return !this.error;
         },
         isAlertDangerShown() {
-            return this.error !== null;
+            return this.error !== '';
         },
     },
     mounted() {

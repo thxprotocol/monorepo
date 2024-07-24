@@ -9,7 +9,7 @@ import { Token } from '../models/Token';
 import { accountVariantProviderMap, providerAccountVariantMap } from '@thxnetwork/common/maps';
 import { toChecksumAddress } from 'web3-utils';
 import { SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
-import { encryptString } from '@thxnetwork/api/util/encrypt';
+import crypto from 'crypto';
 import TokenService from '../services/TokenService';
 import { logger } from '../util/logger';
 
@@ -222,9 +222,9 @@ class AccountProxy {
     }
 
     createPassword(address: string) {
-        const encryptedAddress = encryptString(address, SUPABASE_JWT_SECRET);
-        const passwordLength = 32;
-        return encryptedAddress.substring(0, passwordLength);
+        const hmac = crypto.createHmac('sha256', SUPABASE_JWT_SECRET);
+        hmac.update(address);
+        return hmac.digest('hex');
     }
 
     remove(sub: string) {
