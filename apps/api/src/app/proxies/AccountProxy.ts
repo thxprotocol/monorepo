@@ -59,8 +59,6 @@ class AccountProxy {
         const { data, error } = await supabase.auth.getUser(token);
         if (error) throw error;
 
-        console.log(data.user.identities);
-
         const { app_metadata, user_metadata, identities } = data.user;
         const provider = app_metadata.provider;
         let variant = user_metadata.variant;
@@ -75,6 +73,8 @@ class AccountProxy {
                 user_metadata: { variant },
             });
         }
+        // At this point an account variant should be determined
+        if (!variant) throw new BadRequestError('Account variant not found.');
 
         // Prepare the account data
         let account: AccountDocument, email: string, address: string, providerUserId: string;
