@@ -22,7 +22,28 @@ export const useAuthStore = defineStore('auth', {
             const { jwt } = await api.request.post('/v1/login/jwt');
             return jwt;
         },
-        async triggerLogin() {
+        async getPrivateKey() {
+            // Get the oauth share (1/3)
+            await this._triggerLogin();
+            // Get the device share (2/3)
+            await this._getDeviceShare();
+            // Get the user controlled share (3/3)
+            await this._getSecurityQuestion();
+
+            // If no device share is available but there is a security question
+            // show the recovery modal to recover the device share
+            if (!this.isDeviceShareAvailable && this.isSecurityQuestionAvailable) {
+                this.isModalWalletRecoveryShown = true;
+                // Wait for the device share to become available
+                await this._waitForWalletRecovery();
+            }
+
+            // If both the device and security question are available, reconstruct the key
+            if (this.isDeviceShareAvailable && this.isSecurityQuestionAvailable) {
+                await this._reconstructKey();
+            }
+        },
+        async _triggerLogin() {
             const jwt = await this.getJWT();
             const requestConfig = {
                 verifier: VERIFIER_ID,
@@ -48,34 +69,7 @@ export const useAuthStore = defineStore('auth', {
 
             await tKey.initialize();
         },
-        async getPrivateKey() {
-            // If the token is more than 60s old, we need to refresh
-            // as web3auth will not accept it for deriving key shares
-            if (this.user && 60 * 60 * 24 - this.user.expires_in > 60) {
-                await this.triggerLogin();
-            }
-
-            // Get the oauth share (1/3)
-            await this.triggerLogin();
-            // Get the device share (2/3)
-            await this.getDeviceShare();
-            // Get the user controlled share (3/3)
-            await this.getSecurityQuestion();
-
-            // If no device share is available but there is a security question
-            // show the recovery modal to recover the device share
-            if (!this.isDeviceShareAvailable && this.isSecurityQuestionAvailable) {
-                this.isModalWalletRecoveryShown = true;
-                // Wait for the device share to become available
-                await this.waitForWalletRecovery();
-            }
-
-            // If both the device and security question are available, reconstruct the key
-            if (this.isDeviceShareAvailable && this.isSecurityQuestionAvailable) {
-                await this.reconstructKey();
-            }
-        },
-        waitForWalletRecovery() {
+        _waitForWalletRecovery() {
             return new Promise((resolve: any) => {
                 const interval = setInterval(() => {
                     if (this.isDeviceShareAvailable) {
@@ -100,7 +94,7 @@ export const useAuthStore = defineStore('auth', {
                 input: { message: 'KEY_NOT_FOUND' },
             });
         },
-        async reconstructKey() {
+        async _reconstructKey() {
             const { requiredShares } = tKey.getKeyDetails();
             if (requiredShares <= 0) {
                 const reconstructedKey = await tKey.reconstructKey();
@@ -109,7 +103,7 @@ export const useAuthStore = defineStore('auth', {
                 console.debug('Successfully reconstructed private key.');
             }
         },
-        async getDeviceShare() {
+        async _getDeviceShare() {
             try {
                 await tKey.modules.webStorage.inputShareFromWebStorage(); // 2/2 flow
                 this.isDeviceShareAvailable = true;
@@ -119,7 +113,7 @@ export const useAuthStore = defineStore('auth', {
                 console.log(error);
             }
         },
-        async getSecurityQuestion() {
+        async _getSecurityQuestion() {
             try {
                 this.securityQuestion = await tKey.modules.securityQuestions.getSecurityQuestions();
                 this.isSecurityQuestionAvailable = true;
@@ -129,12 +123,12 @@ export const useAuthStore = defineStore('auth', {
                 console.log(error);
             }
         },
-        async createDeviceShare(question: string, answer: string) {
+        async _createDeviceShare(question: string, answer: string) {
             const { account, poolId } = useAccountStore();
 
             try {
                 await tKey.modules.securityQuestions.generateNewShareWithSecurityQuestions(answer, question);
-                await this.getSecurityQuestion();
+                await this._getSecurityQuestion();
 
                 console.debug('Successfully generated new share with password.');
 
@@ -159,18 +153,18 @@ export const useAuthStore = defineStore('auth', {
         },
         async updateDeviceShare(answer: string, question: string) {
             await tKey.modules.securityQuestions.changeSecurityQuestionAndAnswer(answer, question);
-            await this.getSecurityQuestion();
+            await this._getSecurityQuestion();
             console.debug('Successfully changed new share with password.');
         },
         async recoverDeviceShare(value: string) {
             await tKey.modules.securityQuestions.inputShareFromSecurityQuestions(value); // 2/2 flow
-            await this.reconstructKey();
+            await this._reconstructKey();
 
             const newShare = await tKey.generateNewShare();
             const shareStore = tKey.outputShareStore(newShare.newShareIndex);
 
             await tKey.modules.webStorage.storeDeviceShare(shareStore);
-            await this.getDeviceShare();
+            await this._getDeviceShare();
 
             console.debug('Successfully logged you in with the recovery password.');
         },

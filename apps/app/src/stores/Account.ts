@@ -105,6 +105,7 @@ export const useAccountStore = defineStore('account', {
         },
         setSupabaseAuthListener() {
             supabase.auth.onAuthStateChange(async (event, session) => {
+                console.debug(event, !!session);
                 if (event === 'INITIAL_SESSION') {
                     if (session) await this.setSession(session);
                     this.setStatus(!!session);
