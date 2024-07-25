@@ -1,8 +1,9 @@
 import { AccessTokenKind } from '@thxnetwork/common/enums';
-import { SECURE_KEY } from '../config/secrets';
-import { Token, TokenDocument } from '../models/Token';
-import { decryptString } from '../util/decrypt';
-import { logger } from '../util/logger';
+import { SECURE_KEY } from '@thxnetwork/api/config/secrets';
+import { Token, TokenDocument } from '@thxnetwork/api/models/Token';
+import { decryptString } from '@thxnetwork/api/util/decrypt';
+import { logger } from '@thxnetwork/api/util/logger';
+import { serviceMap } from '@thxnetwork/api/services/interfaces/IOAuthService';
 
 class TokenService {
     async get({ sub, kind }: Partial<TToken>): Promise<TToken> {
@@ -45,9 +46,7 @@ class TokenService {
 
         try {
             // If so, refresh the token and return
-            // return await serviceMap[token.kind].refreshToken(token);
-            logger.debug('Should refresh token', { token });
-            return;
+            return await serviceMap[token.kind].refreshToken(token);
         } catch (error) {
             logger.error('Token refresh failed', { error });
             return token;
