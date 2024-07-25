@@ -12,6 +12,7 @@ import { SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
 import crypto from 'crypto';
 import TokenService from '../services/TokenService';
 import { logger } from '../util/logger';
+import { UserIdentity } from '@supabase/supabase-js';
 
 export const supabase = supabaseClient();
 
@@ -55,40 +56,53 @@ class AccountProxy {
         const token = header.split(' ')[1];
         if (!token) return;
 
-        console.log({ token });
-
         const { data, error } = await supabase.auth.getUser(token);
         if (error) throw error;
 
-        const provider = data.user.app_metadata.provider;
-        const identities = data.user.identities;
+        console.log(data.user.identities);
 
-        // Determine the provider used for the authentication request
-        const isOAuthProvider = Object.values(accountVariantProviderMap).includes(provider as AccessTokenKind);
-        const isEmailProvider = provider === 'email';
+        const { app_metadata, user_metadata, identities } = data.user;
+        const provider = app_metadata.provider;
+        let variant = user_metadata.variant;
 
-        let account, email, address, variant, providerUserId;
-
-        // Find the account for the user login provider and provider user id
-        if (isOAuthProvider) {
+        // user_metadata.variant can not be set through the client when using
+        // OAuth flows so we update the user_metadata based on the provider
+        // if no variant is found for the user. Should only occur once!
+        if (!variant && provider) {
             variant = providerAccountVariantMap[provider];
-            email = data.user.user_metadata.email;
-            account = await this.findByIdentityUserId(variant, provider, identities[0].id);
-            providerUserId = identities[0].id;
+
+            await supabase.auth.admin.updateUserById(data.user.id, {
+                user_metadata: { variant },
+            });
         }
 
-        // Find the account for the email used in the OTP flow
-        else if (isEmailProvider && !data.user.user_metadata.address) {
-            variant = AccountVariant.EmailPassword;
-            email = data.user.user_metadata.email;
-            account = await this.findByEmail(email);
-        }
-
-        // Find the account for the address stored in authenticated user metadata
-        else if (isEmailProvider && data.user.user_metadata.address) {
-            variant = AccountVariant.Metamask;
-            address = data.user.user_metadata.address;
-            account = await this.findByAddress(address);
+        // Prepare the account data
+        let account: AccountDocument, email: string, address: string, providerUserId: string;
+        switch (variant) {
+            // Find the account for the email used in the OTP flow
+            case AccountVariant.EmailPassword:
+                email = user_metadata.email;
+                account = await this.findByEmail(email);
+                break;
+            // Find the account for the address stored in authenticated user metadata
+            case AccountVariant.Metamask:
+                address = user_metadata.address;
+                account = await this.findByAddress(address);
+                break;
+            case AccountVariant.SSOGoogle:
+            case AccountVariant.SSOTwitter:
+            case AccountVariant.SSODiscord:
+            case AccountVariant.SSOTwitch:
+            case AccountVariant.SSOGithub: {
+                const provider = accountVariantProviderMap[variant];
+                const identity = identities.find((identity) => identity.provider === provider);
+                providerUserId = identity.id;
+                account = await this.findByIdentity(variant, provider, identity);
+                break;
+            }
+            default: {
+                break;
+            }
         }
 
         // If all of the above are skipped we create a new account
@@ -103,10 +117,10 @@ class AccountProxy {
             });
         }
 
-        return await this.decorate(account);
+        return await this.decorate(account as AccountDocument);
     }
 
-    private async decorate(account: AccountDocument): Promise<TAccount> {
+    async decorate(account: AccountDocument): Promise<TAccount> {
         return {
             profileImg: `https://api.dicebear.com/7.x/identicon/svg?seed=${account.id}`,
             username: '',
@@ -140,14 +154,14 @@ class AccountProxy {
         return await Account.findOne({ email });
     }
 
-    private async findByIdentityUserId(variant: AccountVariant, kind: string, userId: string) {
-        const accounts = await Account.find({ variant, providerUserId: userId });
+    private async findByIdentity(variant: AccountVariant, kind: string, identity: UserIdentity) {
+        const accounts = await Account.find({ variant, providerUserId: identity.id });
         if (!accounts.length) {
-            logger.error(`No accounts found for OAuth login request`, { kind, userId });
+            logger.error(`No accounts found for OAuth login request`, { kind, providerUserId: identity.id });
             return;
         }
         if (accounts.length > 1) {
-            logger.error(`Multiple accounts found for OAuth login request`, { kind, userId });
+            logger.error(`Multiple accounts found for OAuth login request`, { kind, providerUserId: identity.id });
             return;
         }
         return accounts[0];
@@ -166,7 +180,11 @@ class AccountProxy {
             return await Account.find({ _id: { $in: subs } });
         } else if (query && query.length) {
             return await Account.find({
-                $or: [{ username: new RegExp(query, 'i') }, { email: new RegExp(query, 'i') }],
+                $or: [
+                    { username: new RegExp(query, 'i') },
+                    { email: new RegExp(query, 'i') },
+                    { _id: new RegExp(query, 'i') },
+                ],
             });
         } else {
             return [];

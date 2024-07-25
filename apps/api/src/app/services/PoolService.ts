@@ -172,8 +172,8 @@ async function find(model: any, pool: PoolDocument) {
 
 async function findOwner(pool: PoolDocument) {
     const account = await AccountProxy.findById(pool.sub);
-    account.tokens = account.tokens.map(({ kind, expiry, scopes }) => ({ kind, expiry, scopes } as TToken));
-    return account;
+    if (!account) return;
+    return await AccountProxy.decorate(account);
 }
 
 async function getQuestCount(pool: PoolDocument) {

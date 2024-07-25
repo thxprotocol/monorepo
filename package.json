@@ -34,7 +34,7 @@
         "@popperjs/core": "^2.11.6",
         "@safe-global/api-kit": "^1.1.0",
         "@safe-global/protocol-kit": "1.2.0",
-        "@supabase/supabase-js": "^2.44.2",
+        "@supabase/supabase-js": "^2.44.4",
         "@tkey/default": "10.1.0",
         "@tkey/security-questions": "10.1.0",
         "@tkey/web-storage": "10.1.0",

@@ -9,7 +9,7 @@
                     </b-alert>
                     <b-alert v-model="isAlertSuccessShown" variant="success" class="p-2">
                         <i class="fas fa-check-circle mx-2" />
-                        You are now logged in!
+                        We have connected your account, you can continue!
                     </b-alert>
                     <div class="text-center">
                         <b-button class="px-5" variant="primary" @click="onClickClose"> Close this window </b-button>
@@ -38,13 +38,13 @@ export default defineComponent({
             return this.error !== '';
         },
     },
+    // User is only redirected here using auth on an _blank page or popup
     mounted() {
-        // User is only redirected here using auth on an _blank page or popup
-
         // Check query params for error
         if (this.$route.query.error) {
             this.error = this.$route.query.error_description;
         }
+
         // Start listening for signed_in event
         else {
             supabase.auth.onAuthStateChange(async (event) => {
