@@ -25,8 +25,7 @@ async function controller(req: Request, res: Response) {
         </head>
         <body style="background-color: #777">
             <script>
-                alert('Success!');
-                // window.close()
+                window.close()
             </script>
         </body>
         </html>
