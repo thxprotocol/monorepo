@@ -33,6 +33,7 @@ import ParticipantService from './ParticipantService';
 import DiscordService from './DiscordService';
 import ContractService from './ContractService';
 import AnalyticsService from './AnalyticsService';
+import { NotFoundError } from '../util/errors';
 
 export const ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -282,11 +283,13 @@ async function findParticipants(pool: PoolDocument, page: number, limit: number,
     const guild = await DiscordService.getGuild(poolId);
 
     participants.results = await Promise.all(
-        participants.results.map(async (participant, index) => {
+        participants.results.map(async (participant) => {
             let account: TAccount;
 
             try {
                 account = accounts.find((a) => a.sub === participant.sub);
+                if (!account) throw new Error('Account not found');
+
                 account.tokens = await Promise.all(
                     account.tokens.map(async (token: TToken) =>
                         ParticipantService.findUser(token, { userId: token.userId, guildId: guild && guild.id }),
@@ -298,13 +301,7 @@ async function findParticipants(pool: PoolDocument, page: number, limit: number,
 
             return {
                 ...participant,
-                account: account && {
-                    email: account.email,
-                    username: account.username,
-                    profileImg: account.profileImg,
-                    variant: account.variant,
-                    tokens: account.tokens,
-                },
+                account,
             };
         }),
     );
@@ -332,15 +329,15 @@ async function inviteCollaborator(pool: PoolDocument, email: string) {
     }
 
     const url = new URL(DASHBOARD_URL);
-    url.pathname = 'collaborator';
+    url.pathname = 'invite';
     url.searchParams.append('poolId', pool._id);
-    url.searchParams.append('collaboratorRequestToken', collaborator.uuid);
+    url.searchParams.append('uuid', collaborator.uuid);
 
     await MailService.send(
         email,
-        `👋 Collaboration Request: ${pool.settings.title}`,
-        `<p>Hi!👋</p><p>You have received a collaboration request for Quest &amp; Reward campaign: <strong>${pool.settings.title}</strong></p>`,
-        { src: url.href, text: 'Accept Request' },
+        `Invite: ${pool.settings.title}`,
+        `<p>Hi!👋</p><p>You have been invited to manage campaign <strong>${pool.settings.title}</strong></p>`,
+        { src: url.href, text: 'Accept Invite' },
     );
 
     return collaborator;
@@ -353,7 +350,7 @@ async function getAccountGuilds(account: TAccount) {
             OAuthDiscordScope.Identify,
             OAuthDiscordScope.Guilds,
         ]);
-        return DiscordDataProxy.getGuilds(token);
+        return token ? DiscordDataProxy.getGuilds(token) : [];
     } catch (error) {
         return [];
     }

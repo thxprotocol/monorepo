@@ -68,4 +68,4 @@ logger.info({
 
 server.listen(app.get('port'));
 
-// discordBot();
+discordBot();

@@ -1,11 +1,11 @@
-import { AUTH_URL, DISCORD_OAUTH_CLIENT_ID, DISCORD_OAUTH_CLIENT_SECRET } from '@thxnetwork/api/config/secrets';
+import { API_URL, DISCORD_OAUTH_CLIENT_ID, DISCORD_OAUTH_CLIENT_SECRET } from '@thxnetwork/api/config/secrets';
 import { Token, TokenDocument } from '../models/Token';
 import { IOAuthService } from './interfaces/IOAuthService';
 import { AccessTokenKind, OAuthDiscordScope } from '@thxnetwork/common/enums';
 import axios, { AxiosInstance } from 'axios';
 
 const DISCORD_API_ENDPOINT = 'https://discord.com/api/v10';
-const DISCORD_OAUTH_REDIRECT_URL = AUTH_URL + '/v1/oauht/callback/discord';
+const DISCORD_OAUTH_REDIRECT_URL = API_URL + '/v1/oauth/callback/discord';
 
 export default class DiscordService implements IOAuthService {
     client: AxiosInstance;

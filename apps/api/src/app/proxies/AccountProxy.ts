@@ -176,10 +176,11 @@ class AccountProxy {
     }
 
     async find({ subs, query }: Partial<{ subs: string[]; query: string }>): Promise<TAccount[]> {
+        let accounts = [];
         if (subs && subs.length) {
-            return await Account.find({ _id: { $in: subs } });
+            accounts = await Account.find({ _id: { $in: subs } });
         } else if (query && query.length) {
-            return await Account.find({
+            accounts = await Account.find({
                 $or: [
                     { username: new RegExp(query, 'i') },
                     { email: new RegExp(query, 'i') },
@@ -189,6 +190,8 @@ class AccountProxy {
         } else {
             return [];
         }
+
+        return await Promise.all(accounts.map(async (account) => await this.decorate(account)));
     }
 
     async update(sub: string, data: Partial<TAccount>) {
