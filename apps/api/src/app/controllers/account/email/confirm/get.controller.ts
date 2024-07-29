@@ -1,25 +1,33 @@
-import { SECURE_KEY } from '@thxnetwork/api/config/secrets';
+import { DASHBOARD_URL } from '@thxnetwork/api/config/secrets';
 import { Token } from '@thxnetwork/api/models/Token';
-import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
-import { decryptString } from '@thxnetwork/api/util/decrypt';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { AccessTokenKind } from '@thxnetwork/common/enums';
 import { Request, Response } from 'express';
-import { param } from 'express-validator';
+import { query } from 'express-validator';
+import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 
-const validation = [param('uuid').isString()];
+const validation = [query('token').isString()];
 
 const controller = async (req: Request, res: Response) => {
-    const accessToken = decryptString(req.query.uuid, SECURE_KEY);
-    const token = await Token.findOne({ accessToken, kind: AccessTokenKind.VerifyEmail });
-    if (!token) throw new NotFoundError('Token not found');
+    let message = 'Confirmation failed: ';
+    try {
+        const token = await Token.findOne({ accessTokenEncrypted: req.query.token, kind: AccessTokenKind.VerifyEmail });
+        if (!token) throw new NotFoundError('Token not found');
 
-    const account = await AccountProxy.findById(token.sub);
-    if (!account) throw new NotFoundError('Account not found');
+        const account = await AccountProxy.findById(token.sub);
+        if (!account) throw new NotFoundError('Account not found');
 
-    await AccountProxy.update(account.sub, { isEmailVerified: true });
+        await AccountProxy.update(account.sub, { isEmailVerified: true });
+        message = 'E-mail is confirmed!';
+    } catch (error) {
+        message += error.message;
+    }
 
-    res.redirect(301, req.query.redirect as string);
+    const url = new URL(DASHBOARD_URL);
+    url.pathname = '/confirm';
+    url.searchParams.append('message', message);
+
+    res.redirect(301, url.toString());
 };
 
 export default { controller, validation };

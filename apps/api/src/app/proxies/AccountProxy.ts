@@ -197,7 +197,7 @@ class AccountProxy {
         return await Promise.all(accounts.map(async (account) => await this.decorate(account)));
     }
 
-    async update(sub: string, data: Partial<TAccount>, redirectURL?: string) {
+    async update(sub: string, data: Partial<TAccount>) {
         const account = await Account.findById(sub);
         if (!account) throw new NotFoundError('Account not found.');
 
@@ -221,7 +221,7 @@ class AccountProxy {
                 if (isUsed) throw new BadRequestError('Email already in use.');
                 data.isEmailVerified = false;
                 // Send email confirmation
-                await MailService.sendEmailConfirmation(account, data.email, redirectURL);
+                await MailService.sendEmailConfirmation(account, data.email);
             }
         }
 

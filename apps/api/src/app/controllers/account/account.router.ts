@@ -1,5 +1,5 @@
 import express from 'express';
-import { assertRequestInput } from '@thxnetwork/api/middlewares';
+import { assertRequestInput, checkJwt, corsHandler } from '@thxnetwork/api/middlewares';
 
 // Account
 import RouterWallet from './wallet/wallets.router';
@@ -26,6 +26,9 @@ import RouterWebhooks from './developer/webhooks/webhooks.router';
 
 const router: express.Router = express.Router();
 
+router.get('/email/confirm', assertRequestInput(ReadEmailConfirm.validation), ReadEmailConfirm.controller);
+router.use(checkJwt, corsHandler);
+
 router.use('/invoices', RouterInvoices);
 router.use('/developer/clients', RouterClients); // Done
 router.use('/developer/events', RouterEvents);
@@ -39,8 +42,6 @@ router.patch('/', UpdateAccount.controller);
 router.delete('/', DeleteAccount.controller);
 
 router.post('/disconnect', assertRequestInput(CreateAccountDisconnect.validation), CreateAccountDisconnect.controller);
-router.get('/email/confirm', assertRequestInput(ReadEmailConfirm.validation), ReadEmailConfirm.controller);
-
 router.get('/discord', ReadAccountDiscord.controller);
 router.get(
     '/discord/:discordId',

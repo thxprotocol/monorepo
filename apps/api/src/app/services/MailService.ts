@@ -39,17 +39,21 @@ class MailService {
         return sendMail(to, subject, html);
     }
 
-    async sendEmailConfirmation(account: AccountDocument, email: string, redirectURL: string) {
+    async sendEmailConfirmation(account: AccountDocument, email: string) {
+        const accessToken = v4();
+        console.log(accessToken);
+
         const token = await TokenService.set({
             kind: AccessTokenKind.VerifyEmail,
-            accessToken: v4(),
+            accessToken,
             expiry: Date.now() + 1000 * 60 * 60 * 24, // 24 hours from now,
             sub: account.sub,
         });
+        console.log(token);
+
         const verifyURL = new URL(API_URL);
-        verifyURL.pathname = '/account/email/confirm';
-        verifyURL.searchParams.append('uuid', token.accessTokenEncrypted);
-        verifyURL.searchParams.append('redirect', redirectURL);
+        verifyURL.pathname = '/v1/account/email/confirm';
+        verifyURL.searchParams.append('token', token.accessTokenEncrypted);
 
         this.send(
             email,
