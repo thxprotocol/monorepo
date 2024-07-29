@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
 import { param } from 'express-validator';
-import { Wallet } from '@thxnetwork/api/models';
+import { Pool, Wallet } from '@thxnetwork/api/models';
+import { NotFoundError } from '@thxnetwork/api/util/errors';
 
 const validation = [param('id').isMongoId()];
 
 const controller = async (req: Request, res: Response) => {
-    const wallets = await Wallet.find({ poolId: req.params.id, sub: req.auth.sub });
+    const pool = await Pool.findById(req.params.id);
+    if (!pool) throw new NotFoundError('Pool not found');
+
+    const wallets = await Wallet.find({ poolId: req.params.id, sub: pool.sub });
     res.json(wallets);
 };
 
