@@ -8,11 +8,14 @@ import { Account, AccountDocument } from '../models';
 import { Token } from '../models/Token';
 import { accountVariantProviderMap, providerAccountVariantMap } from '@thxnetwork/common/maps';
 import { toChecksumAddress } from 'web3-utils';
-import { SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
+import { API_URL, DASHBOARD_URL, SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
 import crypto from 'crypto';
 import TokenService from '../services/TokenService';
 import { logger } from '../util/logger';
 import { UserIdentity } from '@supabase/supabase-js';
+import MailService from '../services/MailService';
+import { createRandomToken } from '../util/token';
+import ejs from 'ejs';
 
 export const supabase = supabaseClient();
 
@@ -194,7 +197,7 @@ class AccountProxy {
         return await Promise.all(accounts.map(async (account) => await this.decorate(account)));
     }
 
-    async update(sub: string, data: Partial<TAccount>) {
+    async update(sub: string, data: Partial<TAccount>, redirectURL?: string) {
         const account = await Account.findById(sub);
         if (!account) throw new NotFoundError('Account not found.');
 
@@ -217,6 +220,8 @@ class AccountProxy {
                 });
                 if (isUsed) throw new BadRequestError('Email already in use.');
                 data.isEmailVerified = false;
+                // Send email confirmation
+                await MailService.sendEmailConfirmation(account, data.email, redirectURL);
             }
         }
 
@@ -256,3 +261,6 @@ class AccountProxy {
 }
 
 export default new AccountProxy();
+function get24HoursExpiryTimestamp() {
+    throw new Error('Function not implemented.');
+}

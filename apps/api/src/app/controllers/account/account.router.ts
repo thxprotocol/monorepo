@@ -6,6 +6,7 @@ import RouterWallet from './wallet/wallets.router';
 import ReadAccount from './get.controller';
 import UpdateAccount from './patch.controller';
 import DeleteAccount from './delete.controller';
+import ReadEmailConfirm from './email/confirm/get.controller';
 
 // Social OAuth
 import * as CreateAccountDisconnect from './disconnect/post.controller';
@@ -38,6 +39,7 @@ router.patch('/', UpdateAccount.controller);
 router.delete('/', DeleteAccount.controller);
 
 router.post('/disconnect', assertRequestInput(CreateAccountDisconnect.validation), CreateAccountDisconnect.controller);
+router.get('/email/confirm', assertRequestInput(ReadEmailConfirm.validation), ReadEmailConfirm.controller);
 
 router.get('/discord', ReadAccountDiscord.controller);
 router.get(
