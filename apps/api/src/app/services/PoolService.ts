@@ -33,7 +33,6 @@ import ParticipantService from './ParticipantService';
 import DiscordService from './DiscordService';
 import ContractService from './ContractService';
 import AnalyticsService from './AnalyticsService';
-import { NotFoundError } from '../util/errors';
 
 export const ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';
 

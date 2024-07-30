@@ -64,7 +64,7 @@ class AccountProxy {
         // user_metadata.variant can not be set through the client when using
         // OAuth flows so we update the user_metadata based on the provider
         // if no variant is found for the user. Should only occur once!
-        if (!variant && provider) {
+        if (typeof variant === 'undefined' && provider) {
             variant = providerAccountVariantMap[provider];
 
             await supabase.auth.admin.updateUserById(data.user.id, {
@@ -72,7 +72,7 @@ class AccountProxy {
             });
         }
         // At this point an account variant should be determined
-        if (!variant) throw new BadRequestError('Account variant not found.');
+        if (typeof variant === 'undefined') throw new BadRequestError('Account variant not found.');
 
         // Prepare the account data
         let account: AccountDocument, email: string, address: string, providerUserId: string;
@@ -256,6 +256,3 @@ class AccountProxy {
 }
 
 export default new AccountProxy();
-function get24HoursExpiryTimestamp() {
-    throw new Error('Function not implemented.');
-}

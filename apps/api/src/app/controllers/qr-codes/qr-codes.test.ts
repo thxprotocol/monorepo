@@ -1,8 +1,7 @@
 import request from 'supertest';
 import app from '@thxnetwork/api/';
+import Mock from '@thxnetwork/api/util/jest/config';
 import { ChainId, NFTVariant, RewardVariant } from '@thxnetwork/common/enums';
-import { sub, dashboardAccessToken, widgetAccessToken, widgetAccessToken2 } from '@thxnetwork/api/util/jest/constants';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
 import {
     PoolDocument,
     ERC721Metadata,
@@ -12,10 +11,9 @@ import {
     RewardNFTDocument,
 } from '@thxnetwork/api/models';
 import { IPFS_BASE_URL } from '@thxnetwork/api/config/secrets';
-import { safeVersion } from '@thxnetwork/api/services/ContractService';
-import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { poll } from '@thxnetwork/api/util/polling';
 import { WalletDocument } from '@thxnetwork/api/models/Wallet';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
 import PoolService from '@thxnetwork/api/services/PoolService';
 import ERC721Service from '@thxnetwork/api/services/ERC721Service';
 import SafeService from '@thxnetwork/api/services/SafeService';
@@ -34,16 +32,16 @@ describe('QR Codes', () => {
     const chainId = ChainId.Hardhat;
 
     beforeAll(async () => {
-        await beforeAllCallback();
-        pool = await PoolService.deploy(sub, 'My Reward Campaign');
+        await Mock.beforeAll();
+        pool = await PoolService.deploy(Mock.accounts[0].sub, 'My Reward Campaign');
         poolId = pool.id;
     });
-    afterAll(afterAllCallback);
+    afterAll(() => Mock.afterAll());
 
     it('POST /pools/:poolId/wallets', async () => {
         const { status, body } = await user
             .post(`/v1/pools/${poolId}/wallets`)
-            .set({ Authorization: dashboardAccessToken })
+            .set({ Authorization: Mock.accounts[0].authHeader })
             .send({
                 chainId: ChainId.Hardhat,
             });
@@ -58,7 +56,7 @@ describe('QR Codes', () => {
     it('Deploy NFT', async () => {
         erc721 = await ERC721Service.deploy({
             variant: NFTVariant.ERC721,
-            sub,
+            sub: Mock.accounts[0].sub,
             chainId,
             name: 'Test Collection',
             symbol: 'TST',
@@ -75,12 +73,12 @@ describe('QR Codes', () => {
             description: 'Lorem ipsum dolor sit amet',
             externalUrl: 'https://example.com',
         });
-        wallet = await SafeService.findOne({ sub });
+        wallet = await SafeService.findOne({ sub: Mock.accounts[0].sub });
     });
 
     it('POST /pools/:poolId/rewards/:variant', (done) => {
         user.post(`/v1/pools/${poolId}/rewards/${RewardVariant.NFT}`)
-            .set({ Authorization: dashboardAccessToken })
+            .set({ Authorization: Mock.accounts[0].authHeader })
             .send({
                 title: '',
                 description: '',

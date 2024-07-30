@@ -1,9 +1,8 @@
 import request from 'supertest';
 import app from '@thxnetwork/api/';
+import Mock from '@thxnetwork/api/util/jest/config';
 import { ChainId } from '@thxnetwork/common/enums';
 import { isAddress } from 'web3-utils';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
-import { dashboardAccessToken } from '@thxnetwork/api/util/jest/constants';
 import { createImage } from '@thxnetwork/api/util/jest/images';
 
 const user = request.agent(app);
@@ -15,15 +14,15 @@ describe('ERC721', () => {
         description = 'Collection full of rarities.';
     let erc721ID: string;
 
-    beforeAll(beforeAllCallback);
-    afterAll(afterAllCallback);
+    beforeAll(() => Mock.beforeAll());
+    afterAll(() => Mock.afterAll());
 
     describe('POST /erc721', () => {
         it('should create and return contract details', async () => {
             const logoImg = createImage();
             await user
                 .post('/v1/erc721')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .attach('file', logoImg, { filename: 'logoImg.jpg', contentType: 'image/jpg' })
                 .field({
                     chainId,
@@ -48,7 +47,7 @@ describe('ERC721', () => {
     describe('GET /erc721/:id', () => {
         it('should return contract details', (done) => {
             user.get('/v1/erc721/' + erc721ID)
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send()
                 .expect(({ body }: request.Response) => {
                     expect(body.chainId).toBe(chainId);
@@ -62,7 +61,7 @@ describe('ERC721', () => {
         });
         it('should 400 for invalid ID', (done) => {
             user.get('/v1/erc721/' + 'invalid_id')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send()
                 .expect(({ body }: request.Response) => {
                     expect(body.errors[0].msg).toContain('Invalid value');
@@ -71,7 +70,7 @@ describe('ERC721', () => {
         });
         it('should 404 if not known', (done) => {
             user.get('/v1/erc721/' + '62397f69760ac5f9ab4454df')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send()
                 .expect(({ body }: request.Response) => {
                     expect(body.error.message).toContain('Not Found');
@@ -81,7 +80,7 @@ describe('ERC721', () => {
         describe('PATCH /erc721/:id', () => {
             it('should update a created token', (done) => {
                 user.patch('/v1/erc721/' + erc721ID)
-                    .set('Authorization', dashboardAccessToken)
+                    .set('Authorization', Mock.accounts[0].authHeader)
                     .send()
                     .expect(({ body }: request.Response) => {
                         expect(body).toBeDefined();
