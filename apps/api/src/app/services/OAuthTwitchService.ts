@@ -82,7 +82,7 @@ export default class TwitchService implements IOAuthService {
         );
     }
 
-    revokeToken(token: TokenDocument): Promise<void> {
+    revokeToken(token: TToken): Promise<void> {
         throw new Error('Method not implemented.');
     }
 

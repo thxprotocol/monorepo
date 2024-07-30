@@ -46,10 +46,6 @@ export default defineComponent({
             }>,
             required: true,
         },
-        identity: {
-            type: Object as PropType<UserIdentity>,
-            required: false,
-        },
     },
     data() {
         return {
@@ -63,6 +59,11 @@ export default defineComponent({
         isDisabled() {
             if (!this.accountStore.account || !this.identity) return true;
             return this.accountStore.account.variant === kindAccountVariantMap[this.identity.provider];
+        },
+        identity() {
+            return this.accountStore.identities.find(
+                (identity: UserIdentity) => identity.provider === this.provider.kind,
+            );
         },
     },
     methods: {

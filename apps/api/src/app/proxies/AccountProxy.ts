@@ -1,3 +1,6 @@
+import crypto from 'crypto';
+import TokenService from '../services/TokenService';
+import MailService from '../services/MailService';
 import { Request } from 'express';
 import { authClient, getAuthAccessToken } from '@thxnetwork/api/util/auth';
 import { BadRequestError, NotFoundError } from '../util/errors';
@@ -8,14 +11,9 @@ import { Account, AccountDocument } from '../models';
 import { Token } from '../models/Token';
 import { accountVariantProviderMap, providerAccountVariantMap } from '@thxnetwork/common/maps';
 import { toChecksumAddress } from 'web3-utils';
-import { API_URL, DASHBOARD_URL, SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
-import crypto from 'crypto';
-import TokenService from '../services/TokenService';
+import { SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
 import { logger } from '../util/logger';
 import { UserIdentity } from '@supabase/supabase-js';
-import MailService from '../services/MailService';
-import { createRandomToken } from '../util/token';
-import ejs from 'ejs';
 
 export const supabase = supabaseClient();
 
@@ -41,11 +39,8 @@ class AccountProxy {
         if (token && requiredScopes.every((scope) => token.scopes.includes(scope))) return token;
     }
 
-    disconnect(account: TAccount, kind: AccessTokenKind) {
-        return this.request({
-            method: 'DELETE',
-            url: `/accounts/${account.sub}/tokens/${kind}`,
-        });
+    async disconnect(account: TAccount, kind: AccessTokenKind) {
+        return await TokenService.unset({ sub: account.sub, kind });
     }
 
     async findById(sub: string) {

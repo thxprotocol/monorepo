@@ -94,12 +94,8 @@ export const useAccountStore = defineStore('account', {
                 } as any);
 
                 const authEventMap: { [event: string]: ((session: Session | null) => Promise<void>) | null } = {
-                    INITIAL_SESSION: null,
                     SIGNED_IN: this.onSignedIn,
                     SIGNED_OUT: this.onSignedOut,
-                    PASSWORD_RECOVERY: null,
-                    TOKEN_REFRESHED: null,
-                    USER_UPDATED: null,
                 };
 
                 // Listen for supabase auth events

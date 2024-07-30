@@ -1,11 +1,7 @@
 <template>
     <b-form-group>
         <b-alert v-model="isErrorShown" show variant="danger" class="p-2">{{ error }}</b-alert>
-        <BaseFormGroupConnectedProvider
-            v-for="provider of providers"
-            :provider="provider"
-            :identity="accountStore.identities.find((identity) => identity.provider === provider.kind)"
-        />
+        <BaseFormGroupConnectedProvider v-for="provider of providers" :provider="provider" />
     </b-form-group>
 </template>
 

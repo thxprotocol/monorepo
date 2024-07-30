@@ -96,7 +96,7 @@ export default class TwitterService implements IOAuthService {
         );
     }
 
-    async revokeToken(token: TokenDocument): Promise<void> {
+    async revokeToken(token: TToken): Promise<void> {
         const body = new URLSearchParams();
         body.append('token', token.accessToken);
         body.append('token_type_hint', 'access_token');

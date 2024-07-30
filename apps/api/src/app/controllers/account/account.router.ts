@@ -9,7 +9,7 @@ import DeleteAccount from './delete.controller';
 import ReadEmailConfirm from './email/confirm/get.controller';
 
 // Social OAuth
-import * as CreateAccountDisconnect from './disconnect/post.controller';
+import * as DeleteAccountToken from './disconnect/delete.controller';
 import * as ReadAccountDiscord from './discord/get.controller';
 import * as GetAccountByDiscordId from './discord/get.by-discord-id.controller';
 import * as CreateTwitterTweet from './twitter/tweet/post.controller';
@@ -41,7 +41,7 @@ router.get('/', ReadAccount.controller);
 router.patch('/', UpdateAccount.controller);
 router.delete('/', DeleteAccount.controller);
 
-router.post('/disconnect', assertRequestInput(CreateAccountDisconnect.validation), CreateAccountDisconnect.controller);
+router.delete('/disconnect/:kind', assertRequestInput(DeleteAccountToken.validation), DeleteAccountToken.controller);
 router.get('/discord', ReadAccountDiscord.controller);
 router.get(
     '/discord/:discordId',

@@ -1,14 +1,14 @@
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
-import { AUTH_URL, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET } from '../config/secrets';
+import { API_URL, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET } from '../config/secrets';
 import { Token, TokenDocument } from '../models/Token';
 import { IOAuthService } from './interfaces/IOAuthService';
 import { logger } from '../util/logger';
 import { AccessTokenKind, OAuthGoogleScope } from '@thxnetwork/common/enums';
-import jwt from 'jsonwebtoken';
 
-const GOOGLE_OAUTH_REDIRECT_URL = AUTH_URL + '/v1/oauth/callback/google';
+const GOOGLE_OAUTH_REDIRECT_URL = API_URL + '/v1/oauth/callback/google';
 
 export default class YouTubeService implements IOAuthService {
     private client: OAuth2Client;
@@ -27,7 +27,7 @@ export default class YouTubeService implements IOAuthService {
         return this.client.generateAuthUrl({
             state,
             access_type: 'offline',
-            scope: scopes,
+            scope: scopes.map((scope) => `${decodeURIComponent(scope)}`).join(' '),
         });
     }
 
@@ -70,7 +70,7 @@ export default class YouTubeService implements IOAuthService {
         );
     }
 
-    async revokeToken(token: TokenDocument): Promise<void> {
+    async revokeToken(token: TToken): Promise<void> {
         try {
             const url = new URL('https://oauth2.googleapis.com/revoke');
             if (token.accessToken) {

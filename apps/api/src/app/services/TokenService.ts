@@ -19,17 +19,16 @@ class TokenService {
     }
 
     // Store the token for the new account
-    set(token: Partial<TToken>) {
-        return Token.findOneAndUpdate({ sub: token.sub, kind: token.kind }, token, { upsert: true, new: true });
+    async set(token: Partial<TToken>) {
+        return await Token.findOneAndUpdate({ sub: token.sub, kind: token.kind }, token, { upsert: true, new: true });
     }
 
     async unset({ sub, kind }: Partial<TToken>) {
         const token = await this.get({ sub, kind });
 
         // Revoke access at token provider if token has scopes
-        if (token.scopes.length) {
-            // await this.revoke(token);
-            logger.debug('Should revoke token', { sub, kind });
+        if (token && token.scopes.length) {
+            await this.revoke(token);
         }
 
         // Remove from storage
@@ -55,6 +54,10 @@ class TokenService {
 
     private remove({ sub, kind }: { sub: string; kind: AccessTokenKind }) {
         return Token.findOneAndDelete({ sub, kind });
+    }
+
+    revoke(token: TToken) {
+        return serviceMap[token.kind].revokeToken(token);
     }
 }
 export default new TokenService();

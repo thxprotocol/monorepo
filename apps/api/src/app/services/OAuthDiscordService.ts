@@ -81,7 +81,7 @@ export default class DiscordService implements IOAuthService {
         );
     }
 
-    async revokeToken(token: TokenDocument): Promise<void> {
+    async revokeToken(token: TToken): Promise<void> {
         const body = new URLSearchParams();
         body.append('client_secret', DISCORD_OAUTH_CLIENT_SECRET);
         body.append('client_id', DISCORD_OAUTH_CLIENT_ID);
