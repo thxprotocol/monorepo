@@ -3,7 +3,7 @@ import { Token } from '@thxnetwork/auth/models/Token';
 import { AccountVariant } from '@thxnetwork/common/enums';
 import db from '@thxnetwork/auth/util/database';
 
-db.connect(process.env.MONGODB_URI);
+db.connect(process.env.MONGODB_URI_DEV);
 
 const accountVariantProviderKindMap: { [variant: number]: string } = {
     [AccountVariant.SSOGoogle]: 'google',
@@ -21,6 +21,7 @@ async function main() {
     const operations = accounts.map((a) => {
         const kind = accountVariantProviderKindMap[a.variant];
         const token = tokens.find((t) => t.sub === a.id && t.kind === kind);
+        // console.log('Account', a.id, 'Token', token && token.userId);
         return {
             updateOne: {
                 filter: { _id: a.id },
