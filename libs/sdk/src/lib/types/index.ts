@@ -58,9 +58,10 @@ type THXRequestConfig = {
 
 type THXOIDCConfig = {
     authUrl?: string;
-    clientId: string;
-    clientSecret: string;
+    clientId?: string;
+    clientSecret?: string;
     redirectUri?: string;
+    apiKey?: string;
 };
 
 type THXOIDCUser = {

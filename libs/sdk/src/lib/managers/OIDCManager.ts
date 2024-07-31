@@ -12,6 +12,7 @@ class OIDCManager extends BaseManager {
     user: THXOIDCUser | null;
     expiresAt: number;
     grantType: THXOIDCGrant;
+    apiKey?: string;
 
     constructor(client: THXClient, grantType: THXOIDCGrant) {
         super(client);
@@ -19,6 +20,7 @@ class OIDCManager extends BaseManager {
         this.grantType = grantType;
         this.expiresAt = Date.now();
         this.user = null;
+        this.apiKey = client.options.apiKey;
     }
 
     get isExpired() {
@@ -26,7 +28,7 @@ class OIDCManager extends BaseManager {
     }
 
     get isAuthenticated() {
-        return this.user && !this.isExpired;
+        return (this.user && !this.isExpired) || this.apiKey;
     }
 
     get authUrl() {
@@ -111,9 +113,9 @@ class OIDCManager extends BaseManager {
             'openid offline_access account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read';
         const authUrl = new URL(authorizationEndpoint);
 
-        authUrl.searchParams.append('client_id', clientId);
-        authUrl.searchParams.append('redirect_uri', redirectUri);
-        authUrl.searchParams.append('scope', scope);
+        authUrl.searchParams.append('client_id', clientId || '');
+        authUrl.searchParams.append('redirect_uri', redirectUri || '');
+        authUrl.searchParams.append('scope', scope || '');
         authUrl.searchParams.append('response_type', 'code');
 
         window.location.href = authUrl.toString();

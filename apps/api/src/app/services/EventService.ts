@@ -17,9 +17,9 @@ class EventService {
             total,
             results: await Event.aggregate([
                 { $match: { sub } },
+                { $sort: { createdAt: -1 } },
                 { $skip: startIndex },
                 { $limit: limit },
-                { $sort: { createdAt: -1 } },
             ]).exec(),
             metadata: {
                 eventTypes: await Event.find({ sub }).distinct('name'),

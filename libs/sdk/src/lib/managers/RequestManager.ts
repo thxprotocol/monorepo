@@ -57,6 +57,10 @@ class RequestManager extends OIDCManager {
             'Content-Type': 'application/json',
         };
 
+        if (this.apiKey) {
+            headers['X-API-Key'] = this.apiKey;
+        }
+
         if (this.user && this.user.access_token) {
             const token = this.validateToken(this.user.access_token);
             headers['Authorization'] = `Bearer ${token}`;
