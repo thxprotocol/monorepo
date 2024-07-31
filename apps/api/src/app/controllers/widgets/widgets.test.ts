@@ -1,8 +1,6 @@
 import request, { Response } from 'supertest';
 import app from '@thxnetwork/api/';
-import { ChainId } from '@thxnetwork/common/enums';
-import { dashboardAccessToken } from '@thxnetwork/api/util/jest/constants';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
+import Mock from '@thxnetwork/api/util/jest/config';
 import { WidgetDocument } from '@thxnetwork/api/models/Widget';
 
 const user = request.agent(app);
@@ -15,12 +13,12 @@ describe('Widgets', () => {
         message = 'New message',
         iconImg = 'https://image.icon';
 
-    beforeAll(beforeAllCallback);
-    afterAll(afterAllCallback);
+    beforeAll(() => Mock.beforeAll());
+    afterAll(() => Mock.afterAll());
 
     it('POST /pools', (done) => {
         user.post('/v1/pools')
-            .set({ Authorization: dashboardAccessToken })
+            .set({ Authorization: Mock.accounts[0].authHeader })
             .expect(({ body }: Response) => {
                 poolId = body._id;
             })
@@ -29,7 +27,7 @@ describe('Widgets', () => {
 
     it('GET /widgets', (done) => {
         user.get('/v1/widgets')
-            .set({ 'X-PoolId': poolId, 'Authorization': dashboardAccessToken })
+            .set({ 'X-PoolId': poolId, 'Authorization': Mock.accounts[0].authHeader })
             .expect(({ body }: Response) => {
                 expect(body[0].uuid).toBeDefined();
                 expect(body[0].theme).toBeDefined();
@@ -41,7 +39,7 @@ describe('Widgets', () => {
 
     it('PATCH /widgets/:uuid', (done) => {
         user.patch('/v1/widgets/' + widget.uuid)
-            .set({ 'X-PoolId': poolId, 'Authorization': dashboardAccessToken })
+            .set({ 'X-PoolId': poolId, 'Authorization': Mock.accounts[0].authHeader })
             .send({
                 iconImg,
                 align,
@@ -60,7 +58,7 @@ describe('Widgets', () => {
 
     it('GET /widgets/:uuid', (done) => {
         user.get('/v1/widgets/' + widget.uuid)
-            .set({ 'X-PoolId': poolId, 'Authorization': dashboardAccessToken })
+            .set({ 'X-PoolId': poolId, 'Authorization': Mock.accounts[0].authHeader })
             .expect(({ body }: Response) => {
                 expect(body.iconImg).toBe(iconImg);
                 expect(body.uuid).toBeDefined();

@@ -12,10 +12,9 @@ describe('Default Pool', () => {
 
     describe('POST /pools', () => {
         it('HTTP 201 (success)', async () => {
-            const [account] = Mock.getAccounts();
             const { body, status } = await user
                 .post('/v1/pools')
-                .set('Authorization', account.authHeader)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send({ title: 'My Pool' });
             expect(status).toBe(201);
             poolId = body._id;
@@ -25,10 +24,9 @@ describe('Default Pool', () => {
 
     describe('PATCH /pools/:id', () => {
         it('HTTP 200', async () => {
-            const [account] = Mock.getAccounts();
             await user
                 .patch('/v1/pools/' + poolId)
-                .set({ Authorization: account.authHeader })
+                .set({ Authorization: Mock.accounts[0].authHeader })
                 .send({ settings: { title: 'My Pool 2' } })
                 .expect(({ body }: request.Response) => {
                     expect(body.settings.title).toBe('My Pool 2');
@@ -39,9 +37,8 @@ describe('Default Pool', () => {
 
     describe('DELETE /pools/:id', () => {
         it('HTTP 204', async () => {
-            const [account] = await Mock.getAccounts();
             user.delete('/v1/pools/' + poolId)
-                .set({ 'X-PoolId': poolId, 'Authorization': account.authHeader })
+                .set({ 'X-PoolId': poolId, 'Authorization': Mock.accounts[0].authHeader })
                 .expect(204);
         });
     });
