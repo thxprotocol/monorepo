@@ -118,11 +118,11 @@ export const useAccountStore = defineStore('account', {
         async onSignedIn(session: Session | null) {
             if (session) {
                 await this.setSession(session);
-                this.identities = session.user ? session.user.identities : [];
+                this.identities = session.user ? session.user.identities || [] : [];
             }
             this.setStatus(!!session);
         },
-        async onSignedOut(_session: Session | null) {
+        async onSignedOut() {
             this.setStatus(false);
             this.account = null;
             this.identities = [];
