@@ -1,8 +1,7 @@
 import request from 'supertest';
 import app from '@thxnetwork/api/';
+import Mock from '@thxnetwork/api/util/jest/config';
 import { ChainId } from '@thxnetwork/common/enums';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
-import { dashboardAccessToken } from '@thxnetwork/api/util/jest/constants';
 import { createArchiver } from '@thxnetwork/api/util/zip';
 import { createImage } from '@thxnetwork/api/util/jest/images';
 
@@ -15,13 +14,13 @@ describe('ERC721 Metadata', () => {
         symbol = 'GLXY',
         description = 'Collection full of rarities.';
 
-    beforeAll(beforeAllCallback);
-    afterAll(afterAllCallback);
+    beforeAll(() => Mock.beforeAll());
+    afterAll(() => Mock.afterAll());
 
     describe('POST /erc721', () => {
         it('should create and return contract details', (done) => {
             user.post('/v1/erc721')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send({
                     chainId,
                     name,
@@ -45,7 +44,7 @@ describe('ERC721 Metadata', () => {
 
         it('HTTP 201', (done) => {
             user.post('/v1/erc721/' + erc721ID + '/metadata')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send({
                     name,
                     description,
@@ -73,7 +72,7 @@ describe('ERC721 Metadata', () => {
 
         it('should return modified metadata for metadataId', (done) => {
             user.patch('/v1/erc721/' + erc721ID + '/metadata/' + metadataId)
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send({
                     name: value1,
                     description: value2,
@@ -105,7 +104,7 @@ describe('ERC721 Metadata', () => {
             const zipFile = await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
             await user
                 .post('/v1/erc721/' + erc721ID + '/metadata/zip')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .attach('file', zipFile, { filename: 'images.zip', contentType: 'application/zip' })
                 .field({
                     description,
@@ -118,7 +117,7 @@ describe('ERC721 Metadata', () => {
     describe('GET /metadata', () => {
         it('HTTP 200', (done) => {
             user.get('/v1/erc721/' + erc721ID + '/metadata')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .expect(({ body }: request.Response) => {
                     expect(body.results.length).toBe(4);
                     expect(body.total).toBe(4);

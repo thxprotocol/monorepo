@@ -1,37 +1,12 @@
 import { defineStore } from 'pinia';
-import { CLIENT_ID, CLIENT_SECRET, WIDGET_URL, AUTH_URL, VERIFIER_ID, API_URL } from '../config/secrets';
-import { useQRCodeStore } from './QRCode';
+import { CLIENT_ID, AUTH_URL, VERIFIER_ID } from '../config/secrets';
 import { tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
-import { User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { Wallet } from '@ethersproject/wallet';
 import { track } from '@thxnetwork/common/mixpanel';
-import poll from 'promise-poller';
-import { useVeStore } from './VE';
-import { useWalletStore } from './Wallet';
-
-const userManager = new UserManager({
-    authority: AUTH_URL,
-    resource: API_URL,
-    response_type: 'code',
-    response_mode: 'query',
-    redirect_uri: WIDGET_URL + '/signin-popup.html',
-    silent_redirect_uri: WIDGET_URL + '/signin-silent.html',
-    post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-    popup_post_logout_redirect_uri: WIDGET_URL + '/signout-popup.html',
-    client_id: CLIENT_ID,
-    client_secret: CLIENT_SECRET,
-    automaticSilentRenew: false,
-    loadUserInfo: false,
-    prompt: 'consent',
-    scope: 'openid offline_access account:read account:write erc20:read erc721:read erc1155:read point_balances:read referral_rewards:read point_rewards:read wallets:read wallets:write pool_subscription:read pool_subscription:write claims:read',
-    userStore: new WebStorageStateStore({ store: window.localStorage }),
-});
 
 export const useAuthStore = defineStore('auth', {
     state: (): TAuthState => ({
-        user: null,
-        userManager: userManager as UserManager,
         wallet: null,
         privateKey: '',
         oAuthShare: '',
@@ -42,122 +17,45 @@ export const useAuthStore = defineStore('auth', {
         isSecurityQuestionAvailable: null,
     }),
     actions: {
-        onUserUnloadedCallback() {
-            this.oAuthShare = '';
-            this.user = null;
-            useWalletStore().reset();
-            useVeStore().reset();
+        async getJWT() {
+            const { api } = useAccountStore();
+            const { jwt } = await api.request.post('/v1/login/jwt');
+            return jwt;
         },
-        onUserLoadedCallback(user: Partial<User>) {
-            this.user = user;
-            this.isModalLoginShown = false;
-        },
-        signin(extraQueryParams: { [key: string]: any } = {}, state = {}) {
-            const { poolId, config, isMobileDevice } = useAccountStore();
-            const { entry } = useQRCodeStore();
-            const returnUrl = window.location.href;
+        async getPrivateKey() {
+            // Get the oauth share (1/3)
+            await this._triggerLogin();
+            // Get the device share (2/3)
+            await this._getDeviceShare();
+            // Get the user controlled share (3/3)
+            await this._getSecurityQuestion();
 
-            return this.userManager[isMobileDevice ? 'signinRedirect' : 'signinPopup']({
-                state: {
-                    isMobile: isMobileDevice,
-                    returnUrl,
-                    client_id: CLIENT_ID,
-                    origin: config.origin,
-                    ...state,
-                },
-                extraQueryParams: {
-                    return_url: returnUrl,
-                    pool_id: poolId,
-                    claim_id: entry ? entry.uuid : '',
-                    ...extraQueryParams,
-                },
-            }).catch((error: Error) => {
-                console.log(error);
-
-                if (error.message === 'Popup closed by user') {
-                    // Should start polling in order to check if auth flow is completed
-                    // We should poll the signin silent request until a user becomes available (Twitter throws this after loosing window.top)
-                    // Its problematic that the user also could have closed it on purpose
-                    this.waitForUser();
-                }
-
-                // Should refresh because issue could be caused by base64 state string in redirect
-                if (error.message === 'No matching state found in storage') {
-                    this.requestOAuthShareRefresh();
-                }
-            });
-        },
-        waitForUser() {
-            const taskFn = async () => {
-                await this.requestOAuthShareRefresh();
-                return this.user ? Promise.resolve() : Promise.reject('Could not find an authenticated user...');
-            };
-            poll({ taskFn, interval: 5000, retries: 60 });
-        },
-        async signout() {
-            const { isMobileDevice } = useAccountStore();
-            await this.userManager[isMobileDevice ? 'signoutRedirect' : 'signoutPopup']({
-                state: { isMobile: isMobileDevice, origin: window.location.href },
-                id_token_hint: this.user?.id_token,
-            })
-                .then(() => {
-                    this.user = null;
-                })
-                .catch((error: Error) => {
-                    console.log(error);
-                    if (error.message === 'Popup closed by user') {
-                        this.user = null;
-                    }
-                });
-        },
-        async signoutSilent() {
-            await this.userManager
-                .signoutSilent()
-                .then(() => {
-                    this.user = null;
-                })
-                .catch((error: Error) => {
-                    console.log(error);
-                    this.user = null;
-                });
-        },
-        async requestOAuthShareRefresh() {
-            const { config } = useAccountStore();
-
-            if (this.user && this.user.expired) {
-                this.user = null;
+            // If no device share is available but there is a security question
+            // show the recovery modal to recover the device share
+            if (!this.isDeviceShareAvailable && this.isSecurityQuestionAvailable) {
+                this.isModalWalletRecoveryShown = true;
+                // Wait for the device share to become available
+                await this._waitForWalletRecovery();
             }
 
-            this.user = await this.userManager
-                .signinSilent({
-                    state: {
-                        returnUrl: window.location.href,
-                        client_id: CLIENT_ID,
-                        origin: config.origin,
-                    },
-                })
-                .catch((error: Error) => {
-                    console.log(error);
-                    // Should signout because refresh token is no longer valid or auth is required
-                    if (['grant request is invalid', 'End-User authentication is required'].includes(error.message)) {
-                        this.signoutSilent();
-                    }
-                });
+            // If both the device and security question are available, reconstruct the key
+            if (this.isDeviceShareAvailable && this.isSecurityQuestionAvailable) {
+                await this._reconstructKey();
+            }
         },
-        async triggerLogin() {
-            if (!this.user || !this.user.access_token || !this.user.id_token) return;
-
+        async _triggerLogin() {
+            const jwt = await this.getJWT();
             const requestConfig = {
                 verifier: VERIFIER_ID,
                 clientId: CLIENT_ID,
                 typeOfLogin: 'jwt',
                 enableLogging: false,
-                hash: `#state=state&access_token=${this.user?.access_token}&id_token=${this.user?.id_token}`,
+                hash: `#state=state&access_token=${jwt}&id_token=${jwt}`,
                 queryParameters: new URLSearchParams({ code: '', iss: AUTH_URL, state: 'state' } as any).toString(),
                 jwtParams: {
                     domain: AUTH_URL,
-                    accessToken: this.user?.access_token,
-                    idToken: this.user?.id_token,
+                    accessToken: jwt,
+                    idToken: jwt,
                     user_info_route: 'me',
                 },
             };
@@ -171,42 +69,7 @@ export const useAuthStore = defineStore('auth', {
 
             await tKey.initialize();
         },
-        async getUser() {
-            // Validate user token expiry
-            this.user = await this.userManager.getUser();
-            if (!this.user) return;
-            if (this.oAuthShare) return;
-
-            await this.requestOAuthShareRefresh();
-        },
-        async getPrivateKey() {
-            // If the token is more than 60s old, we need to refresh
-            // as web3auth will not accept it for deriving key shares
-            if (this.user && 60 * 60 * 24 - this.user.expires_in > 60) {
-                await this.requestOAuthShareRefresh();
-            }
-
-            // Get the oauth share (1/3)
-            await this.triggerLogin();
-            // Get the device share (2/3)
-            await this.getDeviceShare();
-            // Get the user controlled share (3/3)
-            await this.getSecurityQuestion();
-
-            // If no device share is available but there is a security question
-            // show the recovery modal to recover the device share
-            if (!this.isDeviceShareAvailable && this.isSecurityQuestionAvailable) {
-                this.isModalWalletRecoveryShown = true;
-                // Wait for the device share to become available
-                await this.waitForWalletRecovery();
-            }
-
-            // If both the device and security question are available, reconstruct the key
-            if (this.isDeviceShareAvailable && this.isSecurityQuestionAvailable) {
-                await this.reconstructKey();
-            }
-        },
-        waitForWalletRecovery() {
+        _waitForWalletRecovery() {
             return new Promise((resolve: any) => {
                 const interval = setInterval(() => {
                     if (this.isDeviceShareAvailable) {
@@ -231,7 +94,7 @@ export const useAuthStore = defineStore('auth', {
                 input: { message: 'KEY_NOT_FOUND' },
             });
         },
-        async reconstructKey() {
+        async _reconstructKey() {
             const { requiredShares } = tKey.getKeyDetails();
             if (requiredShares <= 0) {
                 const reconstructedKey = await tKey.reconstructKey();
@@ -240,7 +103,7 @@ export const useAuthStore = defineStore('auth', {
                 console.debug('Successfully reconstructed private key.');
             }
         },
-        async getDeviceShare() {
+        async _getDeviceShare() {
             try {
                 await tKey.modules.webStorage.inputShareFromWebStorage(); // 2/2 flow
                 this.isDeviceShareAvailable = true;
@@ -250,7 +113,7 @@ export const useAuthStore = defineStore('auth', {
                 console.log(error);
             }
         },
-        async getSecurityQuestion() {
+        async _getSecurityQuestion() {
             try {
                 this.securityQuestion = await tKey.modules.securityQuestions.getSecurityQuestions();
                 this.isSecurityQuestionAvailable = true;
@@ -260,12 +123,12 @@ export const useAuthStore = defineStore('auth', {
                 console.log(error);
             }
         },
-        async createDeviceShare(question: string, answer: string) {
+        async _createDeviceShare(question: string, answer: string) {
             const { account, poolId } = useAccountStore();
 
             try {
                 await tKey.modules.securityQuestions.generateNewShareWithSecurityQuestions(answer, question);
-                await this.getSecurityQuestion();
+                await this._getSecurityQuestion();
 
                 console.debug('Successfully generated new share with password.');
 
@@ -290,18 +153,18 @@ export const useAuthStore = defineStore('auth', {
         },
         async updateDeviceShare(answer: string, question: string) {
             await tKey.modules.securityQuestions.changeSecurityQuestionAndAnswer(answer, question);
-            await this.getSecurityQuestion();
+            await this._getSecurityQuestion();
             console.debug('Successfully changed new share with password.');
         },
         async recoverDeviceShare(value: string) {
             await tKey.modules.securityQuestions.inputShareFromSecurityQuestions(value); // 2/2 flow
-            await this.reconstructKey();
+            await this._reconstructKey();
 
             const newShare = await tKey.generateNewShare();
             const shareStore = tKey.outputShareStore(newShare.newShareIndex);
 
             await tKey.modules.webStorage.storeDeviceShare(shareStore);
-            await this.getDeviceShare();
+            await this._getDeviceShare();
 
             console.debug('Successfully logged you in with the recovery password.');
         },

@@ -1,12 +1,13 @@
 import { Response, Request } from 'express';
-import { body } from 'express-validator';
+import { AccessTokenKind } from '@thxnetwork/common/enums';
+import { param } from 'express-validator';
 import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 
-const validation = [body('kind').isString()];
+const validation = [param('kind').isString()];
 
 const controller = async (req: Request, res: Response) => {
     const account = await AccountProxy.findById(req.auth.sub);
-    await AccountProxy.disconnect(account, req.body.kind);
+    await AccountProxy.disconnect(account, req.params.kind as AccessTokenKind);
 
     res.end();
 };

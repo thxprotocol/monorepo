@@ -1,20 +1,18 @@
-import jwksRsa from 'jwks-rsa';
-import expressJwtPermissions from 'express-jwt-permissions';
-import { expressjwt } from 'express-jwt';
-import { AUTH_URL } from '@thxnetwork/api/config/secrets';
+import { Request, Response, NextFunction } from 'express';
+import { logger } from '../util/logger';
+import AccountProxy from '../proxies/AccountProxy';
 
-export const checkJwt: any = expressjwt({
-    secret: jwksRsa.expressJwtSecret({
-        cache: true,
-        rateLimit: true,
-        jwksRequestsPerMinute: 10,
-        jwksUri: `${AUTH_URL}/jwks`,
-    }),
-    issuer: AUTH_URL,
-    algorithms: ['RS256'],
-});
+export const checkJwt = async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Missing or invalid authorization header' });
+    }
 
-export const guard: any = expressJwtPermissions({
-    requestProperty: 'auth',
-    permissionsProperty: 'scope',
-});
+    try {
+        req.auth = await AccountProxy.findByRequest(req);
+        next();
+    } catch (error) {
+        logger.error({ error });
+        res.status(401).json({ message: 'Unauthorized' });
+    }
+};

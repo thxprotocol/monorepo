@@ -183,11 +183,9 @@ export default defineComponent({
                 this.isSubmitting = true;
                 const { kind, scopes } = tokenInteractionMap[this.quest.interaction];
                 await this.accountStore.connect(kind, scopes);
-                await this.accountStore.waitForConnectionStatus(kind, scopes);
             } catch (error) {
                 this.error = 'Could not connect platform.';
                 console.error(error);
-                await this.accountStore.getAccount();
             } finally {
                 this.isSubmitting = false;
             }

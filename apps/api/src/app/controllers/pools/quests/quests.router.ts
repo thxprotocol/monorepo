@@ -1,5 +1,5 @@
 import express from 'express';
-import { assertRequestInput, assertPoolAccess, guard } from '@thxnetwork/api/middlewares';
+import { assertRequestInput, assertPoolAccess } from '@thxnetwork/api/middlewares';
 import { upload } from '@thxnetwork/api/util/multer';
 
 import * as ListController from './list.controller';
@@ -13,7 +13,6 @@ const router: express.Router = express.Router({ mergeParams: true });
 
 router.get(
     '/',
-    guard.check(['pools:read']),
     upload.single('file'),
     assertPoolAccess,
     assertRequestInput(ListController.validation),
@@ -21,7 +20,6 @@ router.get(
 );
 router.post(
     '/:variant',
-    guard.check(['pools:read', 'pools:write']),
     upload.single('file'),
     assertPoolAccess,
     assertRequestInput(CreateController.validation),
@@ -29,7 +27,6 @@ router.post(
 );
 router.patch(
     '/:variant/:questId',
-    guard.check(['pools:read', 'pools:write']),
     upload.single('file'),
     assertPoolAccess,
     assertRequestInput(UpdateController.validation),
@@ -37,7 +34,6 @@ router.patch(
 );
 router.delete(
     '/:variant/:questId',
-    guard.check(['pools:read', 'pools:write']),
     upload.single('file'),
     assertPoolAccess,
     assertRequestInput(RemoveController.validation),

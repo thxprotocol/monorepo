@@ -1,9 +1,9 @@
 import request from 'supertest';
 import app from '@thxnetwork/api/';
+import Mock from '@thxnetwork/api/util/jest/config';
 import { v4 } from 'uuid';
 import { QuestVariant } from '@thxnetwork/common/enums';
-import { dashboardAccessToken, userWalletAddress2, widgetAccessToken2 } from '@thxnetwork/api/util/jest/constants';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
+import { userWalletAddress2 } from '@thxnetwork/api/util/jest/constants';
 import { PoolDocument, QuestCustom } from '@thxnetwork/api/models';
 
 const user = request.agent(app);
@@ -12,12 +12,12 @@ describe('Quests Custom ', () => {
     let pool: PoolDocument, customQuest: TQuestCustom;
     const eventName = v4();
 
-    beforeAll(beforeAllCallback);
-    afterAll(afterAllCallback);
+    beforeAll(() => Mock.beforeAll());
+    afterAll(() => Mock.afterAll());
 
     it('POST /pools', (done) => {
         user.post('/v1/pools')
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send()
             .expect((res: request.Response) => {
                 pool = res.body;
@@ -27,7 +27,7 @@ describe('Quests Custom ', () => {
 
     it('POST /pools/:id/quests', (done) => {
         user.post(`/v1/pools/${pool._id}/quests/${QuestVariant.Custom}`)
-            .set({ Authorization: dashboardAccessToken })
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send({
                 variant: QuestVariant.Custom,
                 title: 'Expiration date is next 30 min',
@@ -67,14 +67,14 @@ describe('Quests Custom ', () => {
     describe('Collect', () => {
         it('GET /account to update identity', (done) => {
             user.get(`/v1/account`)
-                .set({ 'X-PoolId': pool._id, 'Authorization': widgetAccessToken2 })
+                .set({ 'X-PoolId': pool._id, 'Authorization': Mock.accounts[0].authHeader })
                 .expect(200, done);
         });
 
         it('POST /quests/custom/:id/entries', async () => {
             const { status } = await user
                 .post(`/v1/quests/custom/${customQuest._id}/entries`)
-                .set({ 'X-PoolId': pool._id, 'Authorization': widgetAccessToken2 })
+                .set({ 'X-PoolId': pool._id, 'Authorization': Mock.accounts[0].authHeader })
                 .send({ recaptcha: 'test' });
             expect(status).toBe(200);
         });

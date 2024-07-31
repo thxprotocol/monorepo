@@ -8,12 +8,11 @@ import { NotFoundError } from '@thxnetwork/api/util/errors';
 const validation = [param('id').isMongoId(), param('uuid').isUUID(4)];
 
 const controller = async (req: Request, res: Response) => {
-    // #swagger.tags = ['Pools']
     const pool = await PoolService.getById(req.params.id);
     const collaborator = await Collaborator.findOne({ poolId: req.params.id, uuid: req.params.uuid });
     if (!collaborator) throw new NotFoundError('Could not find collaboration invite');
 
-    if (pool.sub !== req.body.sub) {
+    if (pool.sub !== req.auth.sub) {
         await collaborator.updateOne({
             sub: req.auth.sub,
             state: CollaboratorInviteState.Accepted,

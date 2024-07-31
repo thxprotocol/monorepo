@@ -18,6 +18,7 @@ type TAccount = {
     rank: number;
     isEmailVerified?: boolean;
     tokens: { kind: AccessTokenKind; userId: string; scopes: string[] }[];
+    providerUserId: string;
 };
 
 type TAuthState = {
@@ -26,8 +27,6 @@ type TAuthState = {
     isModalWalletRecoveryShown: boolean;
     isDeviceShareAvailable: boolean | null;
     isSecurityQuestionAvailable: boolean | null;
-    userManager: UserManager;
-    user: Partial<User> | null;
     privateKey: string;
     oAuthShare: string;
     securityQuestion: string;
@@ -58,6 +57,7 @@ type TInvite = {
 } | null;
 
 type TAccountState = {
+    session: null | Session;
     css: HTMLStyleElement | null;
     invite: TInvite;
     isAuthenticated: boolean | null;
@@ -72,6 +72,7 @@ type TAccountState = {
     isModalWalletShown: boolean;
     windowHeight: number;
     config: any;
+    identities: UserIdentity[];
     api: THXClient | null;
     poolId: string;
     balance: number;

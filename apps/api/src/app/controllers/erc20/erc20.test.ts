@@ -1,8 +1,7 @@
 import request from 'supertest';
 import app from '@thxnetwork/api/';
+import Mock from '@thxnetwork/api/util/jest/config';
 import { ChainId, ERC20Type } from '@thxnetwork/common/enums';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
-import { dashboardAccessToken } from '@thxnetwork/api/util/jest/constants';
 import { createImage } from '@thxnetwork/api/util/jest/images';
 import { toWei } from 'web3-utils';
 import { isAddress } from 'ethers/lib/utils';
@@ -15,13 +14,13 @@ describe('ERC20', () => {
         symbol = 'TTK';
     let tokenAddress: string, tokenName: string, tokenSymbol: string, erc20Id: string;
 
-    beforeAll(beforeAllCallback);
-    afterAll(afterAllCallback);
+    beforeAll(() => Mock.beforeAll());
+    afterAll(() => Mock.afterAll());
 
     describe('POST /erc20', () => {
         it('Able to create unlimited token and return address', (done) => {
             http.post('/v1/erc20')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send({
                     name: 'Test Token',
                     symbol: 'TTK',
@@ -40,7 +39,7 @@ describe('ERC20', () => {
             const image = createImage();
             await http
                 .post('/v1/erc20')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .attach('file', image, {
                     filename: 'test.jpg',
                     contentType: 'image/jpg',
@@ -66,7 +65,7 @@ describe('ERC20', () => {
 
         it('Able to return list of created token', (done) => {
             http.get('/v1/erc20')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .expect(({ body }: request.Response) => {
                     expect(body.length).toEqual(2);
                 })
@@ -75,7 +74,7 @@ describe('ERC20', () => {
 
         it('Able to return a created token', (done) => {
             http.get('/v1/erc20/' + erc20Id)
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .expect(({ body }: request.Response) => {
                     expect(body).toBeDefined();
                     expect(isAddress(body.address)).toBe(true);
@@ -92,7 +91,7 @@ describe('ERC20', () => {
     describe('PATCH /erc20', () => {
         it('should to update a created token', (done) => {
             http.patch('/v1/erc20/' + erc20Id)
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send()
                 .expect(({ body }: request.Response) => {
                     expect(body).toBeDefined();
@@ -103,7 +102,7 @@ describe('ERC20', () => {
     describe('DELETE /erc20/:id', () => {
         it('Able to delete created token', (done) => {
             http.delete('/v1/erc20/' + erc20Id)
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .expect(204, done);
         });
     });
@@ -111,7 +110,7 @@ describe('ERC20', () => {
     describe('POST /erc20/preview', () => {
         it('should return name symbol and total supply of an oncChain ERC20Token', (done) => {
             http.get('/v1/erc20/preview')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .query({
                     chainId: ChainId.Hardhat,
                     address: tokenAddress,

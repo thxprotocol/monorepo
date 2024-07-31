@@ -6,17 +6,8 @@
         }"
     >
         <BaseNavbarSecondary v-if="accountStore.isMobile" />
-        <b-container
-            v-if="accountStore.isAuthenticated === false"
-            style="max-width: none"
-            class="d-flex align-items-center justify-content-center h-100 order-lg-1 mt-lg-5"
-        >
-            <b-spinner type="grow" variant="primary" small />
-        </b-container>
-        <template v-else>
-            <BaseCardCampaignJumbotron :height="100" />
-            <router-view class="order-lg-2 overflow-mobile flex-grow-1" />
-        </template>
+        <BaseCardCampaignJumbotron :height="100" />
+        <router-view class="order-lg-2 overflow-mobile flex-grow-1" />
         <BaseNavbarPrimary v-if="accountStore.isMobile" />
         <BaseModalInvite :show="isModalInviteShown" />
     </div>

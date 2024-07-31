@@ -123,11 +123,28 @@ export const GITCOIN_API_KEY = process.env.GITCOIN_API_KEY || '';
 export const BALANCER_POOL_ID = '0xb204bf10bc3a5435017d3db247f56da601dfe08a0002000000000000000000fe';
 export const PINATA_API_JWT = process.env.PINATA_API_JWT || '';
 export const ALLOWED_API_CLIENT_ID = process.env.ALLOWED_API_CLIENT_ID || '';
-export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
-export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+
+export const GOOGLE_OAUTH_CLIENT_ID = process.env.GOOGLE_OAUTH_CLIENT_ID || '';
+export const GOOGLE_OAUTH_CLIENT_SECRET = process.env.GOOGLE_OAUTH_CLIENT_SECRET || '';
+export const TWITTER_OAUTH_CLIENT_ID = process.env.TWITTER_OAUTH_CLIENT_ID || '';
+export const TWITTER_OAUTH_CLIENT_SECRET = process.env.TWITTER_OAUTH_CLIENT_SECRET || '';
+export const DISCORD_OAUTH_CLIENT_ID = process.env.DISCORD_OAUTH_CLIENT_ID || '';
+export const DISCORD_OAUTH_CLIENT_SECRET = process.env.DISCORD_OAUTH_CLIENT_SECRET || '';
+export const TWITCH_OAUTH_CLIENT_ID = process.env.TWITCH_OAUTH_CLIENT_ID || '';
+export const TWITCH_OAUTH_CLIENT_SECRET = process.env.TWITCH_OAUTH_CLIENT_SECRET || '';
+export const GITHUB_OAUTH_CLIENT_ID = process.env.GITHUB_OAUTH_CLIENT_ID || '';
+export const GITHUB_OAUTH_CLIENT_SECRET = process.env.GITHUB_OAUTH_CLIENT_SECRET || '';
+
 export const GCLOUD_PROJECT_ID = process.env.GCLOUD_PROJECT_ID || '';
 export const GCLOUD_RECAPTCHA_API_KEY = process.env.GCLOUD_RECAPTCHA_API_KEY || '';
 export const GCLOUD_RECAPTCHA_SITE_KEY = process.env.GCLOUD_RECAPTCHA_SITE_KEY || '';
+
 export const THX_CLIENT_ID = process.env.THX_CLIENT_ID || '';
 export const THX_CLIENT_SECRET = process.env.THX_CLIENT_SECRET || '';
+
 export const WEBHOOK_SIGNING_SECRET = process.env.WEBHOOK_SIGNING_SECRET || '';
+export const SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET || '';
+export const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
+export const SUPABASE_URL = process.env.SUPABASE_URL || '';
+export const SECURE_KEY = process.env.SECURE_KEY || '';
+export const JWKS_JSON = process.env.JWKS_JSON || '';

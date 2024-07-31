@@ -1,8 +1,7 @@
 import request from 'supertest';
 import app from '@thxnetwork/api/';
+import Mock from '@thxnetwork/api/util/jest/config';
 import { ChainId } from '@thxnetwork/common/enums';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
-import { dashboardAccessToken, sub } from '@thxnetwork/api/util/jest/constants';
 import { ERC1155Document } from '@thxnetwork/api/models/ERC1155';
 import { alchemy } from '@thxnetwork/api/util/alchemy';
 import { deployERC1155, mockGetNftsForOwner } from '@thxnetwork/api/util/jest/erc1155';
@@ -20,12 +19,12 @@ describe('ERC1155 import', () => {
     const chainId = ChainId.Hardhat,
         nftName = 'Test Collection';
 
-    beforeAll(beforeAllCallback);
-    afterAll(afterAllCallback);
+    beforeAll(() => Mock.beforeAll());
+    afterAll(() => Mock.afterAll());
 
     it('POST /pools', (done) => {
         user.post('/v1/pools')
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send({ chainId })
             .expect((res: request.Response) => {
                 poolId = res.body._id;
@@ -36,7 +35,7 @@ describe('ERC1155 import', () => {
     it('POST /pools/:poolId/wallets', async () => {
         await user
             .post(`/v1/pools/${poolId}/wallets`)
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send({ chainId })
             .expect((res: request.Response) => {
                 wallet = res.body;
@@ -71,7 +70,7 @@ describe('ERC1155 import', () => {
         // Run the import for the deployed contract address
         await user
             .post('/v1/erc1155/import')
-            .set({ Authorization: dashboardAccessToken })
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send({ walletId: wallet._id, chainId, contractAddress: nftContract.options.address, name: nftName })
             .expect(201)
             .expect(({ body }: request.Response) => {
@@ -84,12 +83,13 @@ describe('ERC1155 import', () => {
 
     it('GET /erc1155/:id', (done) => {
         const { defaultAccount } = NetworkService.getProvider(chainId);
+        const [account] = Mock.accounts;
         user.get(`/v1/erc1155/${erc1155._id}`)
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', account.authHeader)
             .send()
             .expect(({ body }: request.Response) => {
                 expect(body.chainId).toBe(chainId);
-                expect(body.sub).toBe(sub);
+                expect(body.sub).toBe(account.sub);
                 expect(body.name).toBe(nftName);
                 expect(body.address).toBe(nftContract.options.address);
                 expect(body.owner).toBe(defaultAccount);
@@ -99,7 +99,7 @@ describe('ERC1155 import', () => {
 
     it('GET /erc1155/:id/metadata', (done) => {
         user.get(`/v1/erc1155/${erc1155._id}/metadata`)
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send()
             .expect(({ body }: request.Response) => {
                 expect(body.total).toBe(1);

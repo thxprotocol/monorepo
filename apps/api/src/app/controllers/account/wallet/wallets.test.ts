@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '@thxnetwork/api/';
-import { widgetAccessToken, sub, userWalletPrivateKey4 } from '@thxnetwork/api/util/jest/constants';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
+import Mock from '@thxnetwork/api/util/jest/config';
+import { userWalletPrivateKey4 } from '@thxnetwork/api/util/jest/constants';
 import { ChainId, WalletVariant } from '@thxnetwork/common/enums';
 import { signMessage } from '@thxnetwork/api/util/jest/network';
 import { safeVersion } from '@thxnetwork/api/services/ContractService';
@@ -9,13 +9,13 @@ import { safeVersion } from '@thxnetwork/api/services/ContractService';
 const user = request.agent(app);
 
 describe('Account Wallets', () => {
-    beforeAll(() => beforeAllCallback({ skipWalletCreation: true }));
-    afterAll(afterAllCallback);
+    beforeAll(() => Mock.beforeAll({ skipWalletCreation: true }));
+    afterAll(() => Mock.afterAll());
 
     describe('GET /wallets', () => {
         it('HTTP 200 if OK', (done) => {
             user.get(`/v1/account/wallets`)
-                .set({ Authorization: widgetAccessToken })
+                .set({ Authorization: Mock.accounts[0].authHeader })
                 .expect((res: request.Response) => {
                     expect(res.body.length).toEqual(0);
                 })
@@ -29,7 +29,7 @@ describe('Account Wallets', () => {
             const message = 'test';
             const signature = signMessage(userWalletPrivateKey4, message);
             user.post(`/v1/account/wallets`)
-                .set({ Authorization: widgetAccessToken })
+                .set({ Authorization: Mock.accounts[0].authHeader })
                 .send({
                     variant: WalletVariant.Safe,
                     message,
@@ -45,7 +45,7 @@ describe('Account Wallets', () => {
             const message = 'test';
             const signature = signMessage(userWalletPrivateKey4, message);
             user.post(`/v1/account/wallets`)
-                .set({ Authorization: widgetAccessToken })
+                .set({ Authorization: Mock.accounts[0].authHeader })
                 .send({
                     variant: WalletVariant.WalletConnect,
                     message,
@@ -57,20 +57,21 @@ describe('Account Wallets', () => {
 
     describe('GET /wallets (connected)', () => {
         it('HTTP 200 if OK', (done) => {
+            const [account] = Mock.accounts;
             user.get('/v1/account/wallets')
-                .set({ Authorization: widgetAccessToken })
+                .set({ Authorization: account.authHeader })
                 .expect((res: request.Response) => {
                     expect(res.body.length).toEqual(2);
 
                     const safe = res.body.find((wallet: any) => wallet.variant === WalletVariant.Safe);
                     const wallet = res.body.find((wallet: any) => wallet.variant === WalletVariant.WalletConnect);
-                    expect(safe.sub).toEqual(sub);
+                    expect(safe.sub).toEqual(account.sub);
                     expect(safe.chainId).toEqual(ChainId.Hardhat);
                     expect(safe.variant).toBe(WalletVariant.Safe);
                     expect(safe.address).toBeDefined();
                     expect(safe.safeVersion).toBe(safeVersion);
 
-                    expect(wallet.sub).toEqual(sub);
+                    expect(wallet.sub).toEqual(account.sub);
                     expect(wallet.chainId).toBeUndefined();
                     expect(wallet.variant).toBe(WalletVariant.WalletConnect);
                     expect(wallet.address).toBeDefined();

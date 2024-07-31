@@ -36,22 +36,8 @@
                         <BaseFormGroupAvatar />
                     </b-col>
                 </b-row>
-                <b-form-group label="Account ID">
-                    <b-input-group>
-                        <b-form-input v-model="accountStore.account.sub" disabled />
-                        <b-input-group-append>
-                            <b-button
-                                v-clipboard:copy="accountStore.account.sub"
-                                v-clipboard:success="onCopySuccess"
-                                size="sm"
-                                variant="primary"
-                            >
-                                <i v-if="isCopied" class="fas fa-clipboard-check px-2" />
-                                <i v-else class="fas fa-clipboard px-2" />
-                            </b-button>
-                        </b-input-group-append>
-                    </b-input-group>
-                </b-form-group>
+                <BaseFormGroupAccountId :account="accountStore.account" />
+                <BaseFormGroupProviderUserId :account="accountStore.account" />
             </b-tab>
             <b-tab title="Connected">
                 <BaseFormGroupConnected class="mb-3" />

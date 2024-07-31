@@ -41,6 +41,14 @@ const kindAccountVariantMap: { [kind: string]: number } = {
     [AccessTokenKind.Twitch]: AccountVariant.SSOTwitch,
 };
 
+const accountVariantProviderKindMap: { [variant: number]: string } = {
+    [AccountVariant.SSOGoogle]: 'google',
+    [AccountVariant.SSOTwitter]: 'twitter',
+    [AccountVariant.SSODiscord]: 'discord',
+    [AccountVariant.SSOGithub]: 'github',
+    [AccountVariant.SSOTwitch]: 'twitch',
+};
+
 const interactionComponentMap: { [req: number]: string } = {
     [QuestSocialRequirement.YouTubeLike]: 'BaseBlockquoteVideo',
     [QuestSocialRequirement.YouTubeSubscribe]: 'BaseBlockquoteYoutubeChannelSubscription',
@@ -102,6 +110,14 @@ export const OAuthRequiredScopes = {
     GithubAuth: [OAuthGithubScope.PublicRepo],
 };
 
+export const OAuthScopes: { [provider: string]: string[] } = {
+    [AccessTokenKind.Google]: OAuthRequiredScopes.GoogleAuth,
+    [AccessTokenKind.Discord]: OAuthRequiredScopes.DiscordAuth,
+    [AccessTokenKind.Twitter]: OAuthRequiredScopes.TwitterAuth,
+    [AccessTokenKind.Github]: OAuthRequiredScopes.GithubAuth,
+    [AccessTokenKind.Twitch]: OAuthRequiredScopes.TwitchAuth,
+};
+
 const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; scopes: TOAuthScope[] } } = {
     [QuestSocialRequirement.YouTubeLike]: {
         kind: AccessTokenKind.Google,
@@ -146,4 +162,5 @@ export {
     platformIconMap,
     kindAccountVariantMap,
     tokenInteractionMap,
+    accountVariantProviderKindMap,
 };

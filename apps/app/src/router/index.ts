@@ -2,6 +2,13 @@ import { useAccountStore } from '../stores/Account';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 async function beforeEnter(to: any, from: any, next: any) {
+    // Redirect to last match
+    if (to.hash && to.hash.startsWith('#access_token')) {
+        const path = to.path.split('#')[0];
+        return next({ path });
+    }
+
+    // Init campaign if poolId is available
     const { poolId, init } = useAccountStore();
     if (!poolId) {
         await init(to.params.slug, to.query.origin);
@@ -69,14 +76,19 @@ const routes: Array<RouteRecordRaw> = [
         ],
     },
     {
-        path: '/verify_email',
-        name: '',
-        beforeEnter: async (to) => {
-            const { verifyEmailToken, return_url } = to.query;
-            await useAccountStore().verifyEmail(verifyEmailToken as string, return_url as string);
-        },
-        component: () => import(/* webpackChunkName: "home" */ '../views/discovery/Home.vue'),
+        path: '/auth/redirect',
+        name: 'auth-redirect',
+        component: () => import(/* webpackChunkName: "home" */ '../views/SigninRedirect.vue'),
     },
+    // {
+    //     path: '/verify_email',
+    //     name: '',
+    //     beforeEnter: async (to) => {
+    //         const { verifyEmailToken, return_url } = to.query;
+    //         await useAccountStore().verifyEmail(verifyEmailToken as string, return_url as string);
+    //     },
+    //     component: () => import(/* webpackChunkName: "home" */ '../views/discovery/Home.vue'),
+    // },
     {
         path: '/c/:slug',
         name: 'campaign',

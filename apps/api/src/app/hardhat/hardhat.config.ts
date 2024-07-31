@@ -5,7 +5,7 @@ import '@nomicfoundation/hardhat-toolbox';
 dotenv.config();
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || '';
-const POLYGON_PRIVATE_KEY = process.env.POLYGON_PRIVATE_KEY || '';
+const DEPLOYER_PRIVATE_KEY = process.env.POLYGON_PRIVATE_KEY || '';
 const ETHERSCAN_POLYGON_API_KEY = process.env.ETHERSCAN_POLYGON_API_KEY || '';
 const ETHERSCAN_BASE_API_KEY = process.env.ETHERSCAN_BASE_API_KEY || '';
 
@@ -103,6 +103,8 @@ const config: HardhatUserConfig = {
             },
         ],
     },
+    // IOTA EVM has no api for verification, link below is for reference
+    // https://wiki.iota.org/isc/getting-started/tools/#hardhat
     etherscan: {
         apiKey: {
             polygon: ETHERSCAN_POLYGON_API_KEY,
@@ -121,15 +123,20 @@ const config: HardhatUserConfig = {
     },
 };
 
-if (POLYGON_PRIVATE_KEY && ALCHEMY_API_KEY && config.networks) {
+if (DEPLOYER_PRIVATE_KEY && ALCHEMY_API_KEY && config.networks) {
     config.networks.matic = {
         url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-        accounts: [POLYGON_PRIVATE_KEY],
+        accounts: [DEPLOYER_PRIVATE_KEY],
         timeout: 2483647,
     };
     config.networks.base = {
         url: `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-        accounts: [POLYGON_PRIVATE_KEY],
+        accounts: [DEPLOYER_PRIVATE_KEY],
+        timeout: 2483647,
+    };
+    config.networks.iota = {
+        url: `https://json-rpc.evm.iotaledger.net`,
+        accounts: [DEPLOYER_PRIVATE_KEY],
         timeout: 2483647,
     };
 }

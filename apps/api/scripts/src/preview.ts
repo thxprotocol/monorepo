@@ -7,7 +7,7 @@ import path from 'path';
 import CanvasService from '@thxnetwork/api/services/CanvasService';
 
 // Provide before running
-const poolIds = ['66966bf734225e3add9b3a99', '66966bfd34225e3add9b3ac4'];
+const poolIds = ['669f5f9b5d7ba15f91f2fb81', '669f5fa15d7ba15f91f2fbac', '669f5fa55d7ba15f91f2fbd0'];
 
 // Load on boot as registration on runtime results in font not being loaded in time
 const fontPath = path.resolve(assetsPath, 'fa-solid-900.ttf');
@@ -155,6 +155,7 @@ export default async function main() {
     for (const index in brands) {
         try {
             const brand = brands[index];
+            console.log(brand);
             const previewFile = await createCampaignWidgetPreviewImage(brand);
             if (!previewFile) continue;
             // Write the image buffer data to the file

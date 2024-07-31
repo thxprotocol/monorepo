@@ -1,3 +1,4 @@
+export { Account, AccountDocument } from './Account';
 export { Brand } from './Brand';
 export { QRCodeEntry, QRCodeEntryDocument } from './QRCodeEntry';
 export { Client, ClientDocument } from './Client';

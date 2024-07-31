@@ -2,7 +2,7 @@
     <b-dropdown v-if="accountStore.account" variant="link" toggle-class="p-0" no-caret end>
         <template #button-content>
             <div :style="{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }" class="p-1 rounded-circle">
-                <b-avatar size="35" :src="accountStore.account.profileImg" variant="dark" />
+                <b-avatar :src="accountStore.account.profileImg" size="35" variant="dark" />
             </div>
         </template>
         <b-dropdown-item @click="accountStore.isModalAccountShown = true"> Account </b-dropdown-item>

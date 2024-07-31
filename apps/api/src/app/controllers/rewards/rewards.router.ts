@@ -1,5 +1,5 @@
 import { assertRequestInput, checkJwt, corsHandler } from '@thxnetwork/api/middlewares';
-import express, { Router } from 'express';
+import express from 'express';
 import * as ListRewards from './list.controller';
 import * as CreateRewardPayment from './payments/post.controller';
 import * as ListRewardPayment from './payments/list.controller';

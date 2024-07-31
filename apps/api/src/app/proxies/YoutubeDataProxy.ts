@@ -1,9 +1,13 @@
 import { google } from 'googleapis';
 import { AccessTokenKind, OAuthRequiredScopes, OAuthScope } from '@thxnetwork/common/enums';
-import { AUTH_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '../config/secrets';
+import { AUTH_URL, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET } from '../config/secrets';
 import AccountProxy from './AccountProxy';
 
-const client = new google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, AUTH_URL + '/oidc/callback/google');
+const client = new google.auth.OAuth2(
+    GOOGLE_OAUTH_CLIENT_ID,
+    GOOGLE_OAUTH_CLIENT_SECRET,
+    AUTH_URL + '/oidc/callback/google',
+);
 
 google.options({ auth: client });
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { assertRequestInput, guard } from '@thxnetwork/api/middlewares';
+import { assertRequestInput } from '@thxnetwork/api/middlewares';
 import { upload } from '@thxnetwork/api/util/multer';
 
 import RouterAllowance from './allowance/allowance.router';
@@ -25,48 +25,17 @@ router.use('/allowance', RouterAllowance);
 router.use('/preview', RouterPreview);
 
 // Token Resource should move into /wallet
-router.get(
-    '/token',
-    guard.check(['erc20:read']),
-    assertRequestInput(ListERC20Token.validation),
-    ListERC20Token.controller,
-);
-router.get('/token/:id', guard.check(['erc20:read']), ReadERC20Token.controller);
+router.get('/token', assertRequestInput(ListERC20Token.validation), ListERC20Token.controller);
+router.get('/token/:id', ReadERC20Token.controller);
 
 // Should be /import controller
-router.post(
-    '/token',
-    guard.check(['erc20:write', 'erc20:read']),
-    assertRequestInput(ImportERC20.validation),
-    ImportERC20.controller,
-);
+router.post('/token', assertRequestInput(ImportERC20.validation), ImportERC20.controller);
 // End
 
-router.post(
-    '/',
-    upload.single('file'),
-    guard.check(['erc20:write', 'erc20:read']),
-    assertRequestInput(CreateController.validation),
-    CreateController.controller,
-);
-router.get(
-    '/:id',
-    guard.check(['erc20:read']),
-    assertRequestInput(ReadController.validation),
-    ReadController.controller,
-);
-router.patch(
-    '/:id',
-    guard.check(['erc20:write', 'erc20:read']),
-    assertRequestInput(UpdateController.validation),
-    UpdateController.controller,
-);
-router.delete(
-    '/:id',
-    guard.check(['erc20:write']),
-    assertRequestInput(DeleteController.validation),
-    DeleteController.controller,
-);
-router.get('/', guard.check(['erc20:read']), assertRequestInput(ListController.validation), ListController.controller);
+router.post('/', upload.single('file'), assertRequestInput(CreateController.validation), CreateController.controller);
+router.get('/:id', assertRequestInput(ReadController.validation), ReadController.controller);
+router.patch('/:id', assertRequestInput(UpdateController.validation), UpdateController.controller);
+router.delete('/:id', assertRequestInput(DeleteController.validation), DeleteController.controller);
+router.get('/', assertRequestInput(ListController.validation), ListController.controller);
 
 export default router;
