@@ -2,8 +2,7 @@ import request from 'supertest';
 import app from '@thxnetwork/api/';
 import { Contract } from 'web3-eth-contract';
 import { ChainId } from '@thxnetwork/common/enums';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
-import { dashboardAccessToken, sub } from '@thxnetwork/api/util/jest/constants';
+import Mock from '@thxnetwork/api/util/jest/config';
 import { alchemy } from '@thxnetwork/api/util/alchemy';
 import { deployERC721, mockGetNftsForOwner } from '@thxnetwork/api/util/jest/erc721';
 import { ERC721Document, WalletDocument } from '@thxnetwork/api/models';
@@ -19,13 +18,13 @@ describe('ERC721 import', () => {
         nftName = 'Test Collection',
         nftSymbol = 'TST';
 
-    beforeAll(beforeAllCallback);
-    afterAll(afterAllCallback);
+    beforeAll(() => Mock.beforeAll());
+    afterAll(() => Mock.afterAll());
 
     describe('POST /pools', () => {
         it('HTTP 201', (done) => {
             user.post('/v1/pools')
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send({ chainId })
                 .expect((res: request.Response) => {
                     poolId = res.body._id;
@@ -37,7 +36,7 @@ describe('ERC721 import', () => {
     it('POST /pools/:poolId/wallets', async () => {
         await user
             .post(`/v1/pools/${poolId}/wallets`)
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send({ chainId })
             .expect((res: request.Response) => {
                 wallet = res.body;
@@ -71,7 +70,7 @@ describe('ERC721 import', () => {
             // Run the import for the deployed contract address
             await user
                 .post('/v1/erc721/import')
-                .set({ Authorization: dashboardAccessToken })
+                .set({ Authorization: Mock.accounts[0].authHeader })
                 .send({ walletId: wallet._id, chainId, contractAddress: nftContract.options.address })
                 .expect(({ body }: request.Response) => {
                     expect(body.erc721._id).toBeDefined();
@@ -86,12 +85,13 @@ describe('ERC721 import', () => {
         const { defaultAccount } = NetworkService.getProvider(chainId);
 
         it('HTTP 200', (done) => {
+            const [account] = Mock.accounts;
             user.get(`/v1/erc721/${erc721._id}`)
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', account.authHeader)
                 .send()
                 .expect(({ body }: request.Response) => {
                     expect(body.chainId).toBe(chainId);
-                    expect(body.sub).toBe(sub);
+                    expect(body.sub).toBe(account.sub);
                     expect(body.name).toBe(nftName);
                     expect(body.symbol).toBe(nftSymbol);
                     expect(body.address).toBe(nftContract.options.address);
@@ -105,7 +105,7 @@ describe('ERC721 import', () => {
     describe('GET /erc721/:id/metadata', () => {
         it('HTTP 200', (done) => {
             user.get(`/v1/erc721/${erc721._id}/metadata`)
-                .set('Authorization', dashboardAccessToken)
+                .set('Authorization', Mock.accounts[0].authHeader)
                 .send()
                 .expect(({ body }: request.Response) => {
                     expect(body.total).toBe(1);

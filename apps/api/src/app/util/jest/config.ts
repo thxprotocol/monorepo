@@ -11,7 +11,6 @@ import { User } from '@supabase/supabase-js';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import SafeService from '@thxnetwork/api/services/SafeService';
 import jwt from 'jsonwebtoken';
-import nock from 'nock';
 
 const user = {
     id: 'uuid_supabase',
@@ -44,16 +43,9 @@ class Mock {
         });
     }
 
-    url(method: string, baseUrl: string, path: string, status: number, callback: any = {}) {
-        const n = nock(baseUrl).persist() as any;
-        return n[method](path).reply(status, callback);
-    }
-
-    clear() {
-        nock.cleanAll();
-    }
-
     async beforeAll(options = { skipWalletCreation: false }) {
+        const chainId = ChainId.Hardhat;
+
         // Wait for this hardhat log:
         const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
         const lastDeployedContractAddress = '0x58C0e64cBB7E5C7D0201A3a5c2D899cC70B0dc4c';
@@ -100,16 +92,15 @@ class Mock {
 
         // Create wallets for accounts
         if (!options.skipWalletCreation) {
-            const chainId = ChainId.Hardhat;
-            for (const entry of this.accounts) {
-                switch (entry.variant) {
+            for (const a of this.accounts) {
+                switch (a.variant) {
                     case AccountVariant.EmailPassword:
-                        await SafeService.create({ sub: entry.id, chainId, safeVersion }, entry.userWalletAddress);
+                        await SafeService.create({ sub: a.sub, chainId, safeVersion }, a.userWalletAddress);
                         break;
                     case AccountVariant.Metamask:
                         await Wallet.create({
                             chainId,
-                            sub: entry.id,
+                            sub: a.sub,
                             address: userWalletAddress4,
                             variant: WalletVariant.WalletConnect,
                         });

@@ -1,9 +1,8 @@
 import request from 'supertest';
 import app from '@thxnetwork/api/';
+import Mock from '@thxnetwork/api/util/jest/config';
 import { ChainId } from '@thxnetwork/common/enums';
-import { dashboardAccessToken } from '@thxnetwork/api/util/jest/constants';
 import { isAddress } from 'web3-utils';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
 import { addMinutes } from '@thxnetwork/api/util/date';
 import { createImage } from '@thxnetwork/api/util/jest/images';
 import { RewardNFTDocument } from '@thxnetwork/api/models/RewardNFT';
@@ -17,16 +16,17 @@ const user = request.agent(app);
 
 describe('NFT Rewards', () => {
     let poolId: string, erc721metadata: ERC721MetadataDocument, erc721: ERC721Document, reward: RewardNFTDocument;
-    const name = 'Planets of the Galaxy',
-        symbol = 'GLXY',
-        description = 'description';
 
-    beforeAll(beforeAllCallback);
-    afterAll(afterAllCallback);
+    beforeAll(() => Mock.beforeAll());
+    afterAll(() => Mock.afterAll());
 
     it('POST /erc721', (done) => {
+        const name = 'Planets of the Galaxy',
+            symbol = 'GLXY',
+            description = 'description';
+
         user.post('/v1/erc721')
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send({
                 chainId: ChainId.Hardhat,
                 name,
@@ -50,7 +50,7 @@ describe('NFT Rewards', () => {
         };
 
         user.post('/v1/erc721/' + erc721._id + '/metadata')
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send(config)
             .expect(({ body }: request.Response) => {
                 expect(body._id).toBeDefined();
@@ -65,7 +65,7 @@ describe('NFT Rewards', () => {
 
     it('POST /pools', (done) => {
         user.post('/v1/pools')
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .expect(({ body }: request.Response) => {
                 poolId = body._id;
             })
@@ -76,7 +76,7 @@ describe('NFT Rewards', () => {
         let walletAddress;
         await user
             .post(`/v1/pools/${poolId}/wallets`)
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send({
                 chainId: ChainId.Hardhat,
             })
@@ -109,7 +109,7 @@ describe('NFT Rewards', () => {
             isPublished: true,
         };
         user.post(`/v1/pools/${poolId}/rewards/${RewardVariant.NFT}`)
-            .set({ Authorization: dashboardAccessToken })
+            .set('Authorization', Mock.accounts[0].authHeader)
             .attach('file', image, {
                 filename: 'test.jpg',
                 contentType: 'image/jpg',
@@ -134,7 +134,7 @@ describe('NFT Rewards', () => {
     it('GET /pools/:poolId/rewards?page=:page&limit=:limit', (done) => {
         user.get(`/v1/pools/${poolId}/rewards`)
             .query({ page: 1, limit: 10, isPublished: true })
-            .set({ Authorization: dashboardAccessToken })
+            .set('Authorization', Mock.accounts[0].authHeader)
             .expect((res: request.Response) => {
                 expect(res.body.results.length).toBe(1);
                 expect(res.body.limit).toBe(10);
@@ -146,7 +146,7 @@ describe('NFT Rewards', () => {
 
     it('DELETE /rewards/:id', (done) => {
         user.delete(`/v1/pools/${poolId}/rewards/${reward.variant}/${reward._id}`)
-            .set({ Authorization: dashboardAccessToken })
+            .set('Authorization', Mock.accounts[0].authHeader)
             .expect(204, done);
     });
 });

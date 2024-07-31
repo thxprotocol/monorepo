@@ -1,9 +1,8 @@
 import request from 'supertest';
 import app from '@thxnetwork/api/';
+import Mock from '@thxnetwork/api/util/jest/config';
 import { ChainId, ERC20Type, RewardVariant } from '@thxnetwork/common/enums';
-import { dashboardAccessToken, tokenName, tokenSymbol } from '@thxnetwork/api/util/jest/constants';
 import { isAddress } from 'web3-utils';
-import { afterAllCallback, beforeAllCallback } from '@thxnetwork/api/util/jest/config';
 import { addMinutes } from '@thxnetwork/api/util/date';
 import { createImage } from '@thxnetwork/api/util/jest/images';
 import { ERC20Document } from '@thxnetwork/api/models/ERC20';
@@ -16,16 +15,16 @@ const user = request.agent(app);
 describe('Coin Rewards', () => {
     let poolId: string, erc20: ERC20Document, reward: RewardCoinDocument;
 
-    beforeAll(beforeAllCallback);
-    afterAll(afterAllCallback);
+    beforeAll(() => Mock.beforeAll());
+    afterAll(() => Mock.afterAll());
 
     it('POST /erc20', (done) => {
         user.post('/v1/erc20')
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send({
                 chainId: ChainId.Hardhat,
-                name: tokenName,
-                symbol: tokenSymbol,
+                name: 'Token Name',
+                symbol: 'SMBL',
                 type: ERC20Type.Unlimited,
                 totalSupply: 0,
             })
@@ -38,7 +37,7 @@ describe('Coin Rewards', () => {
 
     it('POST /pools', (done) => {
         user.post('/v1/pools')
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .expect((res: request.Response) => {
                 poolId = res.body._id;
                 expect(poolId).toBeDefined();
@@ -50,7 +49,7 @@ describe('Coin Rewards', () => {
         let walletAddress;
         await user
             .post(`/v1/pools/${poolId}/wallets`)
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .send({
                 chainId: ChainId.Hardhat,
             })
@@ -77,7 +76,7 @@ describe('Coin Rewards', () => {
             isPromoted = true,
             isPublished = true;
         user.post(`/v1/pools/${poolId}/rewards/${RewardVariant.Coin}`)
-            .set('Authorization', dashboardAccessToken)
+            .set('Authorization', Mock.accounts[0].authHeader)
             .attach('file', image, {
                 filename: 'test.jpg',
                 contentType: 'image/jpg',
@@ -110,7 +109,7 @@ describe('Coin Rewards', () => {
 
     it('GET /pools/:poolId/rewards', (done) => {
         user.get(`/v1/pools/${poolId}/rewards`)
-            .set({ Authorization: dashboardAccessToken })
+            .set('Authorization', Mock.accounts[0].authHeader)
             .query({ page: 1, limit: 10, isPublished: true })
             .expect((res: request.Response) => {
                 expect(res.body.results.length).toBe(1);
@@ -123,7 +122,7 @@ describe('Coin Rewards', () => {
 
     it('DELETE /pools/:poolId/rewards/:variant', (done) => {
         user.delete(`/v1/pools/${poolId}/rewards/${reward.variant}/${reward._id}`)
-            .set({ Authorization: dashboardAccessToken })
+            .set('Authorization', Mock.accounts[0].authHeader)
             .expect(204, done);
     });
 });
