@@ -227,6 +227,7 @@ class AccountProxy {
         const token = await Token.findOne({ kind: AccessTokenKind.Discord, userId: discordId });
         if (!token) return;
         const account = await Account.findById(token.sub);
+        if (!account) return;
         return await this.decorate(account);
     }
 
