@@ -121,6 +121,7 @@ export const useAccountStore = defineStore('account', {
             this.setTheme(config);
         },
         async onChannelMessage(event: MessageEvent) {
+            console.log('onChannelMessage', event);
             switch (event.data.type) {
                 case 'signed_in':
                     await this.setSession(event.data.session);
