@@ -13,6 +13,7 @@ import { useWalletStore } from './Wallet';
 import { AuthChangeEvent, createClient, Provider, Session, UserIdentity } from '@supabase/supabase-js';
 import { popup } from '../utils/popup';
 import poll from 'promise-poller';
+import axios from 'axios';
 
 // Feature only available on mobile devices
 const isMobileDevice = !!window.matchMedia('(pointer:coarse)').matches;
@@ -176,35 +177,49 @@ export const useAccountStore = defineStore('account', {
             }
         },
         async connect(kind: AccessTokenKind, scopes: TOAuthScope[]) {
-            const variant = kindAccountVariantMap[kind];
-            const provider = accountVariantProviderKindMap[variant] as Provider;
-            if (!provider) throw new Error('Requested provider not available.');
-
-            const config = this._getOAuthConfig(provider, {
-                scopes,
-                redirectTo: WIDGET_URL + '/auth/redirect',
-            });
-            const { data, error } = await supabase.auth.linkIdentity(config);
-            if (error) throw error;
-            if (config.options.skipBrowserRedirect) {
+            try {
+                const data = await this.api.request.get('/v1/oauth/authorize/' + kind, {
+                    params: {
+                        scopes: scopes.map((scope) => encodeURIComponent(scope)).join(','),
+                        returnTo: WIDGET_URL + '/auth/redirect',
+                    },
+                });
+                if (!data.url) throw new Error('Could not get authorize URL');
                 popup.open(data.url);
+
+                await this.waitForToken({ kind, scopes });
+            } catch (error) {
+                console.error(error);
+                throw error;
             }
         },
         async disconnect(kind: AccessTokenKind) {
-            const identity = await this._getSupabaseIdentity(kind);
-            await supabase.auth.unlinkIdentity(identity);
-            await this.getSupabaseIdentities();
+            try {
+                await this.api.request.delete('/v1/account/disconnect/' + kind);
+                await this.waitForToken({ kind, scopes: [] });
+            } catch (error) {
+                console.error(error);
+            }
         },
-        async getSupabaseIdentities() {
-            const { data, error } = await supabase.auth.getUserIdentities();
-            if (error) throw error;
-            this.identities = data.identities;
-        },
-        async _getSupabaseIdentity(kind: AccessTokenKind) {
-            await this.getSupabaseIdentities();
-            const identity = this.identities.find((i: UserIdentity) => i.provider === kind);
-            if (!identity) throw new Error('Identity not found');
-            return identity;
+        async waitForToken({ kind, scopes }: { kind: AccessTokenKind; scopes: TOAuthScope[] }) {
+            return new Promise((resolve, reject) => {
+                const poll = async () => {
+                    await this.getAccount();
+
+                    if (!this.account) {
+                        setTimeout(poll, 1000);
+                        return reject('account_not_found');
+                    }
+
+                    const isAuthorized = this.account.tokens.find(
+                        (token) => token.kind === kind && scopes.every((scope) => token.scopes.includes(scope)),
+                    );
+                    if (!isAuthorized) setTimeout(poll, 1000);
+
+                    return isAuthorized ? resolve('') : reject('token_invalid');
+                };
+                poll();
+            });
         },
         async signinWithWallet(address: string, { message, signature }: { message: string; signature: string }) {
             const { password } = await this.api.request.post('/v1/login/pwd', { data: { message, signature } });

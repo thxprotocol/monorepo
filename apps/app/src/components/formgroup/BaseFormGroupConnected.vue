@@ -11,7 +11,6 @@ import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { OAuthRequiredScopes, platformIconMap } from '../../utils/social';
 import { AccessTokenKind } from '../../types/enums/accessTokenKind';
-import { UserIdentity } from '@supabase/supabase-js';
 
 export default defineComponent({
     name: 'BaseFormGroupUsername',
@@ -25,7 +24,6 @@ export default defineComponent({
             isAlertShown: true,
             platformIconMap,
             AccessTokenKind,
-            identities: [] as UserIdentity[],
         };
     },
     computed: {
@@ -55,9 +53,6 @@ export default defineComponent({
                 },
             };
         },
-    },
-    mounted() {
-        this.accountStore.getSupabaseIdentities();
     },
 });
 </script>

@@ -5,15 +5,15 @@
         </strong>
         <div class="me-auto">
             <strong>{{ provider.label }}</strong>
-            <div v-if="identity" class="small">
-                <span class="text-opaque">{{ identity.id }}</span>
+            <div v-if="token" class="small">
+                <span class="text-opaque">{{ token.userId }}</span>
                 <i v-b-tooltip class="fas fa-question-circle ms-1 text-opaque" :title="`${provider.label} User ID`" />
             </div>
         </div>
         <b-spinner v-if="isLoading" small />
         <template v-else>
             <b-button
-                v-if="identity"
+                v-if="token"
                 :disabled="isDisabled"
                 variant="link"
                 class="text-decoration-none text-primary"
@@ -22,17 +22,18 @@
             >
                 Disconnect
             </b-button>
-            <b-button v-else variant="primary" size="sm" @click="onClickConnect(provider)"> Connect </b-button>
+            <b-button v-else :disabled="isDisabled" variant="primary" size="sm" @click="onClickConnect(provider)">
+                Connect
+            </b-button>
         </template>
     </div>
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { kindAccountVariantMap, platformIconMap } from '../../utils/social';
+import { platformIconMap } from '../../utils/social';
 import { AccessTokenKind } from '../../types/enums/accessTokenKind';
 import { useAccountStore } from '../../stores/Account';
 import { mapStores } from 'pinia';
-import { UserIdentity } from '@supabase/supabase-js';
 
 export default defineComponent({
     name: 'BaseFormGroupUsername',
@@ -57,12 +58,12 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         isDisabled() {
-            if (!this.accountStore.account || !this.identity) return true;
-            return this.accountStore.account.variant === kindAccountVariantMap[this.identity.provider];
+            return this.isLoading;
         },
-        identity() {
-            return this.accountStore.identities.find(
-                (identity: UserIdentity) => identity.provider === this.provider.kind,
+        token() {
+            if (!this.accountStore.account) return;
+            return this.accountStore.account.tokens.find(
+                (token: { kind: string }) => token.kind === this.provider.kind,
             );
         },
     },
