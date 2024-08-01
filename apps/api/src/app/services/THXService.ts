@@ -1,5 +1,5 @@
 import { THXAPIClient } from '@thxnetwork/sdk/clients';
-import { THX_CLIENT_ID, THX_CLIENT_SECRET } from '../config/secrets';
+import { THX_CLIENT_SECRET } from '../config/secrets';
 import { Identity } from '../models';
 import AccountProxy from '../proxies/AccountProxy';
 
@@ -7,10 +7,9 @@ class THXService {
     thx!: THXAPIClient;
 
     constructor() {
-        if (THX_CLIENT_ID && THX_CLIENT_SECRET) {
+        if (THX_CLIENT_SECRET) {
             this.thx = new THXAPIClient({
-                clientId: THX_CLIENT_ID,
-                clientSecret: THX_CLIENT_SECRET,
+                apiKey: THX_CLIENT_SECRET,
             });
         }
     }
