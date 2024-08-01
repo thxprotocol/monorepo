@@ -80,6 +80,7 @@ type TAccountState = {
     subscription: TSubscription | null;
     participants: TParticipant[];
     leaderboard: { rank: number; score: number; questEntryCount: number; account: TAccount }[];
+    isNavbarOffcanvasShown: boolean;
 };
 
 type TWidgetTheme = {

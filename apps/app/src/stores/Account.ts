@@ -6,14 +6,13 @@ import { AccountVariant } from '@thxnetwork/common/enums';
 import { THXBrowserClient } from '@thxnetwork/sdk/clients';
 import { BREAKPOINT_LG } from '../config/constants';
 import { useAuthStore } from './Auth';
-import { accountVariantProviderKindMap, kindAccountVariantMap, OAuthScopes } from '../utils/social';
+import { accountVariantProviderKindMap, OAuthScopes } from '../utils/social';
 import { AccessTokenKind } from '../types/enums/accessTokenKind';
 import { decodeHTML } from '../utils/decode-html';
 import { useWalletStore } from './Wallet';
-import { AuthChangeEvent, createClient, Provider, Session, UserIdentity } from '@supabase/supabase-js';
+import { AuthChangeEvent, createClient, Provider, Session } from '@supabase/supabase-js';
 import { popup } from '../utils/popup';
 import poll from 'promise-poller';
-import axios from 'axios';
 
 // Feature only available on mobile devices
 const isMobileDevice = !!window.matchMedia('(pointer:coarse)').matches;
@@ -46,6 +45,7 @@ export const useAccountStore = defineStore('account', {
         isMobileDevice: isMobileDevice,
         isMobileIFrame: window.top !== window.self && isMobileDevice,
         isMobileEthereumBrowser: window.ethereum && isMobileDevice,
+        isNavbarOffcanvasShown: false,
     }),
     actions: {
         setGlobals(config: { activeWalletId: string }) {
@@ -127,12 +127,14 @@ export const useAccountStore = defineStore('account', {
             this.setStatus(false);
             this.account = null;
             this.identities = [];
+            this.isNavbarOffcanvasShown = false;
         },
         async setSession(session: Session | null) {
             this.api.request.setUser(session);
             if (session) {
                 if (!this.account) await this.getAccount();
                 useAuthStore().isModalLoginShown = false;
+                this.isNavbarOffcanvasShown = false;
             }
         },
         onResize() {

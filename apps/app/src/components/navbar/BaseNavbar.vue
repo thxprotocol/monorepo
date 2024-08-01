@@ -62,13 +62,13 @@
         <div class="d-flex align-items-center">
             <BaseDropdownWallets v-if="accountStore.isAuthenticated" class="me-3" />
             <BaseDropdownUserMenu class="ms-auto" />
-            <b-button variant="link" class="d-block d-lg-none" @click="isNavbarOffcanvasShown = true">
+            <b-button variant="link" class="d-block d-lg-none" @click="accountStore.isNavbarOffcanvasShown = true">
                 <i class="fas fa-bars text-white"></i>
             </b-button>
         </div>
     </b-navbar>
     <b-offcanvas
-        v-model="isNavbarOffcanvasShown"
+        v-model="accountStore.isNavbarOffcanvasShown"
         :no-header-close="true"
         placement="start"
         backdrop
@@ -147,7 +147,6 @@ export default defineComponent({
     data() {
         return {
             isAlertTopShown: true,
-            isNavbarOffcanvasShown: false,
             imgLogo,
             dashboardURL: DASHBOARD_URL,
         };
@@ -158,7 +157,7 @@ export default defineComponent({
     methods: {
         onClickRoute(path: string) {
             this.$router.push(path);
-            this.isNavbarOffcanvasShown = false;
+            this.accountStore.isNavbarOffcanvasShown = false;
         },
     },
 });

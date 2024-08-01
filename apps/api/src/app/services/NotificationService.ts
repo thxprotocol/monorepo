@@ -70,8 +70,8 @@ async function notify(variant: QuestVariant, quest: TQuest) {
 
 async function sendQuestPublishEmail(pool: PoolDocument, variant: QuestVariant, quest: TQuest, widget: TWidget) {
     const { amount, amounts } = quest as any;
-    const subject = `🎁 New ${QuestVariant[variant]} Quest: Earn ${amount || amounts[0]} pts!"`;
-    const message = `<p style="font-size: 18px">Earn ${amount || amounts[0]} points!🔔</p>
+    const subject = `🎁 New ${QuestVariant[variant]} Quest: Earn ${amounts ? amounts[0] : amount} pts!"`;
+    const message = `<p style="font-size: 18px">Earn ${amounts ? amounts[0] : amount} points!🔔</p>
     <p>Hi! <strong>${pool.settings.title}</strong> just published a new ${QuestVariant[variant]} Quest.
     <p><strong>${quest.title}</strong><br />${quest.description}.</p>`;
     const src = WIDGET_URL + `/c/${pool.settings.slug}`;
@@ -107,7 +107,7 @@ async function sendQuestPublishNotification(
         fields: [
             {
                 name: 'Points',
-                value: `${amount || amounts[0]}`,
+                value: `${amounts ? amounts[0] : amount}`,
                 inline: true,
             },
             {

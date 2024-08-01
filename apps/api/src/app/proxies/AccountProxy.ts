@@ -225,7 +225,7 @@ class AccountProxy {
 
     async getByDiscordId(discordId: string): Promise<TAccount> {
         const token = await Token.findOne({ kind: AccessTokenKind.Discord, userId: discordId });
-        return await Account.findById(token.sub);
+        return await this.decorate(await Account.findById(token.sub));
     }
 
     getByIdentity(identity: string): Promise<TAccount> {

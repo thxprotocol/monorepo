@@ -11,7 +11,7 @@ import { QuestSocialRequirement } from '@thxnetwork/common/enums';
 
 const validation = [param('id').isMongoId(), body('recaptcha').isString()];
 
-async function controller({ params, body, account }: Request, res: Response) {
+async function controller({ params, body, auth: account }: Request, res: Response) {
     // Get the quest document
     const quest = await QuestSocial.findById(params.id);
     if (!quest) throw new NotFoundError('Quest not found');

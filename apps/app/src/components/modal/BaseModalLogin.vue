@@ -154,7 +154,6 @@ export default defineComponent({
             try {
                 this.isLoading = true;
                 await this.accountStore.verifyOtp({ email: this.email, token: this.otp });
-                this.authStore.isModalLoginShown = false;
             } catch (error) {
                 this.error = error ? (error as Error).message : 'An issue occured. Please try again.';
             } finally {
