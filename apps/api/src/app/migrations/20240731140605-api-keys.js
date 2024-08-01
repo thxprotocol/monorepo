@@ -18,7 +18,7 @@ module.exports = {
             };
         });
 
-        clientColl.bulkWrite(operations);
+        await clientColl.bulkWrite(operations);
     },
     async down(db, client) {
         //
