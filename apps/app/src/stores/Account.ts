@@ -46,7 +46,7 @@ export const useAccountStore = defineStore('account', {
         isMobileIFrame: window.top !== window.self && isMobileDevice,
         isMobileEthereumBrowser: window.ethereum && isMobileDevice,
         isNavbarOffcanvasShown: false,
-        sw: null as ServiceWorkerRegistration | null,
+        channel: new BroadcastChannel('thx-auth-channel'),
     }),
     actions: {
         setGlobals(config: { activeWalletId: string }) {
@@ -107,9 +107,7 @@ export const useAccountStore = defineStore('account', {
                 });
 
                 // Listen for popup auth events
-                this.sw = await navigator.serviceWorker.register('/sw.js');
-                await navigator.serviceWorker.ready;
-                navigator.serviceWorker.addEventListener('message', this.onServiceWorkerMessage);
+                this.channel.onmessage = this.onChannelMessage;
             }
 
             // If no slug is provided we're not on a campaign page so we return early
@@ -122,11 +120,10 @@ export const useAccountStore = defineStore('account', {
             this.setConfig(config.poolId, { ...config, origin });
             this.setTheme(config);
         },
-        async onServiceWorkerMessage(event: MessageEvent) {
-            console.log('SW Message', event);
+        async onChannelMessage(event: MessageEvent) {
             switch (event.data.type) {
-                case 'setSession':
-                    await this.setSession(event.data.data.session);
+                case 'signed_in':
+                    await this.setSession(event.data.session);
                     break;
             }
         },

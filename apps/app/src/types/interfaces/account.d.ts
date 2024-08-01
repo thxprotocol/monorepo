@@ -81,7 +81,7 @@ type TAccountState = {
     participants: TParticipant[];
     leaderboard: { rank: number; score: number; questEntryCount: number; account: TAccount }[];
     isNavbarOffcanvasShown: boolean;
-    sw: ServiceWorkerRegistration | null;
+    channel: BroadcastChannel;
 };
 
 type TWidgetTheme = {

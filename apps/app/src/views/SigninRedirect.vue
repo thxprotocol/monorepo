@@ -21,7 +21,8 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { supabase } from '../stores/Account';
+import { supabase, useAccountStore } from '../stores/Account';
+import { mapStores } from 'pinia';
 
 export default defineComponent({
     name: 'ViewSigninRedirect',
@@ -31,6 +32,7 @@ export default defineComponent({
         };
     },
     computed: {
+        ...mapStores(useAccountStore),
         isAlertSuccessShown() {
             return !this.error;
         },
@@ -48,12 +50,9 @@ export default defineComponent({
         // Start listening for signed_in event
         else {
             const { data, error } = await supabase.auth.getSession();
-            console.log({ data });
             if (error) throw new Error(error.message);
-            navigator.serviceWorker.controller?.postMessage({
-                action: 'setSession',
-                session: data.session,
-            });
+
+            this.accountStore.channel.postMessage({ type: 'signed_in', session: data.session });
         }
     },
     methods: {
