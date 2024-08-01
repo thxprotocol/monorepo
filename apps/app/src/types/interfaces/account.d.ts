@@ -72,7 +72,6 @@ type TAccountState = {
     isModalWalletShown: boolean;
     windowHeight: number;
     config: any;
-    identities: UserIdentity[];
     api: THXClient | null;
     poolId: string;
     balance: number;
@@ -81,7 +80,6 @@ type TAccountState = {
     participants: TParticipant[];
     leaderboard: { rank: number; score: number; questEntryCount: number; account: TAccount }[];
     isNavbarOffcanvasShown: boolean;
-    channel: BroadcastChannel;
 };
 
 type TWidgetTheme = {

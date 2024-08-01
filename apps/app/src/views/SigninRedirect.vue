@@ -52,7 +52,7 @@ export default defineComponent({
             const { data, error } = await supabase.auth.getSession();
             if (error) throw new Error(error.message);
 
-            this.accountStore.channel.postMessage({ type: 'signed_in', session: data.session });
+            window.opener.postMessage({ message: 'thx.auth.callback', session: data.session });
         }
     },
     methods: {

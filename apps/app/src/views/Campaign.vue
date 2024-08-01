@@ -16,7 +16,7 @@
 import { mapStores } from 'pinia';
 import { track } from '@thxnetwork/common/mixpanel';
 import { defineComponent } from 'vue';
-import { GTM } from '../config/secrets';
+import { GTM, WIDGET_URL } from '../config/secrets';
 import { useAuthStore } from '../stores/Auth';
 import { useAccountStore } from '../stores/Account';
 import { useQuestStore } from '../stores/Quest';
@@ -81,11 +81,12 @@ export default defineComponent({
                 'thx.auth.identity': () => this.onSetIdentity(event.data.identity),
                 'thx.auth.signout': () => this.onSignout,
                 'thx.auth.signin': () => this.onSignin,
+                'thx.auth.callback': () => this.accountStore.onSignedIn(event.data.session),
             };
 
-            if (event.origin !== localOrigin || !event.data.message || !messageMap[event.data.message]) return;
-
-            messageMap[event.data.message]();
+            if ([localOrigin, WIDGET_URL].includes(event.origin) && messageMap[event.data.message]) {
+                messageMap[event.data.message]();
+            }
         },
         async onSetIdentity(identity: string) {
             // Store in localstorage and patch identity on auth success
@@ -97,7 +98,7 @@ export default defineComponent({
             }
         },
         onSignin() {
-            this.accountStore.signin();
+            // this.accountStore.signin();
         },
         onSignout() {
             this.accountStore.signout();

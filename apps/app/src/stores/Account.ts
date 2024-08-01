@@ -34,7 +34,6 @@ export const useAccountStore = defineStore('account', {
         subscription: null,
         leaderboard: [],
         participants: [],
-        identities: [],
         windowHeight: 0,
         isSidebarShown: false,
         isAuthenticated: null,
@@ -46,7 +45,6 @@ export const useAccountStore = defineStore('account', {
         isMobileIFrame: window.top !== window.self && isMobileDevice,
         isMobileEthereumBrowser: window.ethereum && isMobileDevice,
         isNavbarOffcanvasShown: false,
-        channel: new BroadcastChannel('thx-auth-channel'),
     }),
     actions: {
         setGlobals(config: { activeWalletId: string }) {
@@ -105,9 +103,6 @@ export const useAccountStore = defineStore('account', {
                     const fn = authEventMap[event];
                     if (fn) fn(session);
                 });
-
-                // Listen for popup auth events
-                this.channel.onmessage = this.onChannelMessage;
             }
 
             // If no slug is provided we're not on a campaign page so we return early
@@ -120,25 +115,13 @@ export const useAccountStore = defineStore('account', {
             this.setConfig(config.poolId, { ...config, origin });
             this.setTheme(config);
         },
-        async onChannelMessage(event: MessageEvent) {
-            console.log('onChannelMessage', event);
-            switch (event.data.type) {
-                case 'signed_in':
-                    await this.setSession(event.data.session);
-                    break;
-            }
-        },
         async onSignedIn(session: Session | null) {
-            if (session) {
-                await this.setSession(session);
-                this.identities = session.user ? session.user.identities || [] : [];
-            }
+            if (session) await this.setSession(session);
             this.setStatus(!!session);
         },
         async onSignedOut() {
             this.setStatus(false);
             this.account = null;
-            this.identities = [];
             this.isNavbarOffcanvasShown = false;
         },
         async setSession(session: Session | null) {
@@ -147,6 +130,7 @@ export const useAccountStore = defineStore('account', {
                 if (!this.account) await this.getAccount();
                 useAuthStore().isModalLoginShown = false;
                 this.isNavbarOffcanvasShown = false;
+                this.session = session;
             }
         },
         onResize() {
@@ -309,6 +293,7 @@ export const useAccountStore = defineStore('account', {
             });
             const { data, error } = await supabase.auth.signInWithOAuth(config);
             if (error) throw new Error(error.message);
+
             popup.open(data.url);
         },
         _getOAuthConfig(
