@@ -53,11 +53,14 @@
                 @signed="onSigned"
                 @error="error = $event"
             >
-                <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" />
-                <span>
-                    Continue with
-                    <strong>{{ walletStore.account && shortenAddress(walletStore.account.address) }}</strong>
-                </span>
+                <b-spinner v-if="isLoadingWalletConnect" small />
+                <template v-else>
+                    <b-img :src="imgWalletConnect" width="20" class="me-2 rounded" />
+                    <span>
+                        Continue with
+                        <strong>{{ walletStore.account && shortenAddress(walletStore.account.address) }}</strong>
+                    </span>
+                </template>
             </BaseButtonWalletConnect>
         </b-form-group>
         <hr class="or-separator" />
@@ -112,6 +115,7 @@ export default defineComponent({
             isEmailSubmitted: false,
             isShown: false,
             isLoading: false,
+            isLoadingWalletConnect: false,
             shortenAddress,
         };
     },
@@ -161,7 +165,7 @@ export default defineComponent({
             }
         },
         async onSigned({ signature, message }: { signature: string; message: string }) {
-            this.isLoading = true;
+            this.isLoadingWalletConnect = true;
             try {
                 const { account } = this.walletStore;
                 if (!account || !account.address) throw new Error('No account address found');
@@ -172,6 +176,8 @@ export default defineComponent({
                 });
             } catch (error) {
                 this.error = (error as any).message;
+            } finally {
+                this.isLoadingWalletConnect = false;
             }
         },
         async onClickSigninOAuth(variant: AccountVariant) {

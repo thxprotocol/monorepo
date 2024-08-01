@@ -11,7 +11,11 @@ const controller = async (req: Request, res: Response) => {
 
     // If account variant is metamask and no wallet is found then create it
     if (req.auth.variant === AccountVariant.Metamask) {
-        const wallet = await WalletService.findOne({ sub: req.auth.sub, variant: WalletVariant.WalletConnect });
+        const wallet = await WalletService.findOne({
+            sub: req.auth.sub,
+            variant: WalletVariant.WalletConnect,
+            address: req.auth.address,
+        });
         if (!wallet) {
             await WalletService.createWalletConnect({
                 sub: req.auth.sub,
