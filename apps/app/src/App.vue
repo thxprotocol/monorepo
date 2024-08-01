@@ -40,7 +40,9 @@ export default defineComponent({
         ...mapStores(useAccountStore, useAuthStore, useWalletStore),
         isOffline() {
             try {
-                return JSON.parse(MAINTENANCE);
+                return this.$route.query.maintenance
+                    ? !!JSON.parse(this.$route.query.maintenance)
+                    : !!JSON.parse(MAINTENANCE);
             } catch (error) {
                 return false;
             }
