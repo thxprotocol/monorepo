@@ -5,26 +5,14 @@ import { v4 } from 'uuid';
 import { logger } from '../util/logger';
 import { Job } from '@hokify/agenda';
 import { PromiseParser } from '../util';
-import RewardCoinService from './RewardCoinService';
+import { serviceMap } from './interfaces/IRewardService';
 import LockService from './LockService';
 import AccountProxy from '../proxies/AccountProxy';
 import ParticipantService from './ParticipantService';
-import RewardNFTService from './RewardNFTService';
-import RewardCouponService from './RewardCouponService';
 import ImageService from './ImageService';
 import PointBalanceService from './PointBalanceService';
 import MailService from './MailService';
-import RewardDiscordRoleService from './RewardDiscordRoleService';
-import RewardCustomService from './RewardCustomService';
 import PoolService from './PoolService';
-
-const serviceMap = {
-    [RewardVariant.Coin]: new RewardCoinService(),
-    [RewardVariant.NFT]: new RewardNFTService(),
-    [RewardVariant.Custom]: new RewardCustomService(),
-    [RewardVariant.Coupon]: new RewardCouponService(),
-    [RewardVariant.DiscordRole]: new RewardDiscordRoleService(),
-};
 
 export default class RewardService {
     static async count({ poolId }) {

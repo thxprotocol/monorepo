@@ -1,5 +1,11 @@
 import { Model } from 'mongoose';
 import { WalletDocument } from '@thxnetwork/api/models';
+import { RewardVariant } from '@thxnetwork/common/enums';
+import RewardNFTService from '../RewardNFTService';
+import RewardDiscordRoleService from '../RewardDiscordRoleService';
+import RewardCustomService from '../RewardCustomService';
+import RewardCouponService from '../RewardCouponService';
+import RewardCoinService from '../RewardCoinService';
 
 export interface IRewardService {
     models: {
@@ -28,3 +34,11 @@ export interface IRewardService {
         wallet?: WalletDocument;
     }): Promise<TValidationResult | void>;
 }
+
+export const serviceMap = {
+    [RewardVariant.Coin]: new RewardCoinService(),
+    [RewardVariant.NFT]: new RewardNFTService(),
+    [RewardVariant.Custom]: new RewardCustomService(),
+    [RewardVariant.Coupon]: new RewardCouponService(),
+    [RewardVariant.DiscordRole]: new RewardDiscordRoleService(),
+};
