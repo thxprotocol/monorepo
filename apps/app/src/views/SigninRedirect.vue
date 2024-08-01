@@ -21,6 +21,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { supabase } from '../stores/Account';
 
 export default defineComponent({
     name: 'ViewSigninRedirect',
@@ -38,10 +39,20 @@ export default defineComponent({
         },
     },
     // User is only redirected here using auth on an _blank page or popup
-    mounted() {
+    async mounted() {
         // Check query params for error
         if (this.$route.query.error) {
             this.error = this.$route.query.error_description;
+        }
+
+        // Start listening for signed_in event
+        else {
+            const { data, error } = await supabase.auth.getSession();
+            if (error) throw new Error(error.message);
+            navigator.serviceWorker.controller?.postMessage({
+                action: 'setSession',
+                session: data.session,
+            });
         }
     },
     methods: {
