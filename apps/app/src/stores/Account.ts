@@ -123,6 +123,7 @@ export const useAccountStore = defineStore('account', {
             this.setTheme(config);
         },
         async onServiceWorkerMessage(event: MessageEvent) {
+            console.log('SW Message', event);
             switch (event.data.type) {
                 case 'setSession':
                     await this.setSession(event.data.data.session);

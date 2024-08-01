@@ -48,6 +48,7 @@ export default defineComponent({
         // Start listening for signed_in event
         else {
             const { data, error } = await supabase.auth.getSession();
+            console.log({ data });
             if (error) throw new Error(error.message);
             navigator.serviceWorker.controller?.postMessage({
                 action: 'setSession',

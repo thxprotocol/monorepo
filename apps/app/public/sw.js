@@ -15,6 +15,7 @@ self.addEventListener('message', (event) => {
 function setSession(session) {
     self.clients.matchAll().then((clients) => {
         clients.forEach((client) => {
+            console.log('Session', client.id, session);
             client.postMessage({ type: 'setSession', data: { session } });
         });
     });
