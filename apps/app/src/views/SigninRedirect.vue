@@ -21,7 +21,6 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { supabase } from '../stores/Account';
 
 export default defineComponent({
     name: 'ViewSigninRedirect',
@@ -43,16 +42,6 @@ export default defineComponent({
         // Check query params for error
         if (this.$route.query.error) {
             this.error = this.$route.query.error_description;
-        }
-
-        // Start listening for signed_in event
-        else {
-            supabase.auth.onAuthStateChange(async (event) => {
-                // Wait until signed in and close the window
-                if (event === 'SIGNED_IN') {
-                    window.close();
-                }
-            });
         }
     },
     methods: {
