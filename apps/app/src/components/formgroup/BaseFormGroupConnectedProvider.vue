@@ -1,8 +1,11 @@
 <template>
     <div class="d-flex align-items-center py-2">
-        <strong>
-            <i :class="platformIconMap[provider.kind]" class="me-2" :style="{ color: provider.color }"></i>
-        </strong>
+        <div
+            class="d-flex align-items-center justify-content-center py-2 bg-light me-2 rounded"
+            style="width: 40px; height: 40px"
+        >
+            <i :class="platformIconMap[provider.kind]" :style="{ color: provider.color, fontSize: '1rem' }"></i>
+        </div>
         <div class="me-auto">
             <strong>{{ provider.label }}</strong>
             <div v-if="token" class="small">

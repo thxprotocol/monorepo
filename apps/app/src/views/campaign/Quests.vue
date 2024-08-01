@@ -131,10 +131,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore),
-        ...mapStores(useQuestStore),
-        ...mapStores(useRewardStore),
-        ...mapStores(useWalletStore),
+        ...mapStores(useAccountStore, useQuestStore, useRewardStore, useWalletStore),
         isSubscribed() {
             const { subscription } = useAccountStore();
             return !!subscription;

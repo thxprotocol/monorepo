@@ -11,6 +11,7 @@
             <i class="fas fa-exclamation-triangle me-2" />
             {{ error }}
         </b-alert>
+        <p class="text-opaque">If you don't have an account, we create one for you.</p>
         <template v-if="!isEmailSent">
             <b-form-group>
                 <b-form-input v-model="email" :state="isEmailValid" placeholder="E-mail" />
@@ -45,7 +46,7 @@
                 </template>
             </b-button>
         </template>
-        <hr />
+        <hr class="or-separator" />
         <b-form-group>
             <BaseButtonWalletConnect
                 message="This message is used for authentication purposes."

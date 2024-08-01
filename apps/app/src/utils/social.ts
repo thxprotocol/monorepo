@@ -28,7 +28,7 @@ const interactionLabelMap: { [i: number]: string } = {
 };
 
 const platformIconMap: { [kind: string]: string } = {
-    [AccessTokenKind.Google]: 'fab fa-youtube',
+    [AccessTokenKind.Google]: 'fab fa-google',
     [AccessTokenKind.Twitter]: 'fab fa-twitter',
     [AccessTokenKind.Discord]: 'fab fa-discord',
 };

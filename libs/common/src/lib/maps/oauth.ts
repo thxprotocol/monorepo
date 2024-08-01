@@ -1,13 +1,5 @@
 import { AccountVariant, AccessTokenKind, QuestSocialRequirement } from '../enums';
 
-export const providerIconMap = {
-    [AccessTokenKind.Google]: 'fab fa-youtube',
-    [AccessTokenKind.Twitter]: 'fab fa-twitter',
-    [AccessTokenKind.Discord]: 'fab fa-discord',
-    [AccessTokenKind.Twitch]: 'fab fa-twitch',
-    [AccessTokenKind.Github]: 'fab fa-github',
-};
-
 export const accountVariantProviderMap = {
     [AccountVariant.SSOGoogle]: AccessTokenKind.Google,
     [AccountVariant.SSODiscord]: AccessTokenKind.Discord,
