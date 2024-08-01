@@ -5,8 +5,9 @@ import { WebhookRequest, WebhookRequestDocument } from '@thxnetwork/api/models/W
 import { Job } from '@hokify/agenda';
 import { agenda } from '@thxnetwork/api/util/agenda';
 import { signPayload } from '@thxnetwork/api/util/signingsecret';
-import { JobType, Event, WebhookRequestState } from '@thxnetwork/common/enums';
+import { JobType, Event, WebhookRequestState, WalletVariant } from '@thxnetwork/common/enums';
 import { logger } from '../util/logger';
+import { Wallet } from '../models/Wallet';
 
 export default class WebhookService {
     static async request(webhook: WebhookDocument, account: TAccount, metadata?: string) {
@@ -26,9 +27,12 @@ export default class WebhookService {
         payload: { type: Event; data: any & { metadata: any } },
     ) {
         const identities = (await Identity.find({ accountId })).map((i) => i.uuid);
+        const wallets = (await Wallet.find({ sub: accountId, variant: WalletVariant.WalletConnect })).map(
+            (w) => w.address,
+        );
         const webhookRequest = await WebhookRequest.create({
             webhookId: webhook._id,
-            payload: JSON.stringify({ ...payload, identities }),
+            payload: JSON.stringify({ ...payload, identities, wallets }),
             state: WebhookRequestState.Pending,
         });
 

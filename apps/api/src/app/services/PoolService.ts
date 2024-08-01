@@ -1,4 +1,10 @@
-import { AccessTokenKind, ChainId, CollaboratorInviteState, OAuthDiscordScope } from '@thxnetwork/common/enums';
+import {
+    AccessTokenKind,
+    ChainId,
+    CollaboratorInviteState,
+    OAuthDiscordScope,
+    WalletVariant,
+} from '@thxnetwork/common/enums';
 import { v4 } from 'uuid';
 import { AccountVariant } from '@thxnetwork/common/enums';
 import { DASHBOARD_URL } from '../config/secrets';
@@ -24,6 +30,7 @@ import {
     CouponCode,
     WalletDocument,
     Brand,
+    Wallet,
 } from '@thxnetwork/api/models';
 
 import AccountProxy from '../proxies/AccountProxy';
@@ -298,9 +305,12 @@ async function findParticipants(pool: PoolDocument, page: number, limit: number,
                 logger.error(error);
             }
 
+            const wallets = await Wallet.find({ sub: participant.sub, variant: WalletVariant.WalletConnect });
+
             return {
                 ...participant,
                 account,
+                wallets,
             };
         }),
     );

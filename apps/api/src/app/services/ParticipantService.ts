@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 import { Participant, Pool, PoolDocument, TwitterUser } from '../models';
-import { AccessTokenKind } from '@thxnetwork/common/enums';
+import { AccessTokenKind, WalletVariant } from '@thxnetwork/common/enums';
 import { Wallet, DiscordUser } from '../models';
 import { logger } from '../util/logger';
 import ReCaptchaService from '@thxnetwork/api/services/ReCaptchaService';
@@ -12,7 +12,7 @@ export default class ParticipantService {
         const participants = await Participant.find({ poolId: pool.id });
         const subs = participants.map((p) => p.sub);
         const accounts = await AccountProxy.find({ subs });
-        const wallets = await Wallet.find({ sub: { $in: subs } });
+        const wallets = await Wallet.find({ sub: { $in: subs }, variant: WalletVariant.WalletConnect });
 
         return participants.map((p) => {
             const account = accounts.find((a) => a.sub === p.sub);
