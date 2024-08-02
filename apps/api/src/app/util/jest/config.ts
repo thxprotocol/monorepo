@@ -5,7 +5,7 @@ import { userWalletAddress, userWalletAddress2, userWalletAddress3, userWalletAd
 import { Account, Wallet } from '@thxnetwork/api/models';
 import { poll } from '../polling';
 import { agenda } from '../agenda';
-import { SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
+import { MONGODB_URI, SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
 import { supabase } from '@thxnetwork/api/proxies/AccountProxy';
 import { User } from '@supabase/supabase-js';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
@@ -44,6 +44,8 @@ class Mock {
     }
 
     async beforeAll(options = { skipWalletCreation: false }) {
+        await db.connect(MONGODB_URI);
+
         const chainId = ChainId.Hardhat;
 
         // Wait for this hardhat log:
