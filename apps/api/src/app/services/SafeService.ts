@@ -213,13 +213,19 @@ class SafeService {
 
                 try {
                     const response = await safe.executeTransaction(safeTx);
-                    const receipt = await response.transactionResponse.wait();
+                    const receipt = await response.transactionResponse.wait(2);
                     if (!receipt) throw new Error(`No receipt found for ${tx.safeTxHash}`);
+                    if (!receipt.transactionHash) throw new Error(`No transactionHash found for ${tx.safeTxHash}`);
 
                     await tx.updateOne({ transactionHash: receipt.transactionHash, state: TransactionState.Sent });
+
+                    logger.debug('Transaction executed', {
+                        safeTxHash: tx.safeTxHash,
+                        transactionHash: receipt.transactionHash,
+                    });
                 } catch (error) {
-                    // Suppress non breaking gas estimation error and start polling for state
-                    if (error.message.includes('GS026')) {
+                    // Suppress non breaking gas estimation error on Hardhat and start polling for state
+                    if (tx.chainId === ChainId.Hardhat && error.message.includes('GS026')) {
                         await tx.updateOne({ state: TransactionState.Sent });
                     } else {
                         throw error;
@@ -242,7 +248,9 @@ class SafeService {
         const isSent = tx.state === TransactionState.Sent;
 
         if (isSent && safeTx.isExecuted && safeTx.isSuccessful) {
-            await TransactionService.queryTransactionStatusReceipt(tx);
+            await TransactionService.queryTransactionStatusReceipt(
+                await tx.updateOne({ transactionHash: tx.transactionHash }, { new: true }),
+            );
             logger.debug('Transaction success', { safeTx });
         }
 
