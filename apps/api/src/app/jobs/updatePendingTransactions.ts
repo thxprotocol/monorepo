@@ -1,9 +1,8 @@
 import { TransactionState, TransactionType } from '@thxnetwork/common/enums';
 import { Transaction, TransactionDocument } from '@thxnetwork/api/models/Transaction';
-import SafeService from '../services/SafeService';
-import TransactionService from '../services/TransactionService';
 import { logger } from '../util/logger';
 import { Wallet } from '../models/Wallet';
+import SafeService from '../services/SafeService';
 
 export async function updatePendingTransactions() {
     const transactions: TransactionDocument[] = await Transaction.find({

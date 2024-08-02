@@ -3,7 +3,7 @@ import { ChainId, JobType, TransactionState, WalletVariant } from '@thxnetwork/c
 import { contractNetworks } from '@thxnetwork/api/hardhat';
 import { toChecksumAddress } from 'web3-utils';
 import { safeVersion } from '@thxnetwork/api/services/ContractService';
-import { SafeTransaction, MetaTransactionData } from '@safe-global/safe-core-sdk-types';
+import { SafeTransaction, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types';
 import { convertObjectIdToNumber } from '../util';
 import SafeApiKit from '@safe-global/api-kit';
 import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/protocol-kit';
@@ -122,7 +122,7 @@ class SafeService {
         });
     }
 
-    async proposeTransaction(wallet: WalletDocument, options: MetaTransactionData) {
+    async proposeTransaction(wallet: WalletDocument, options: SafeTransactionDataPartial) {
         const { defaultAccount } = NetworkService.getProvider(wallet.chainId);
         const safeTx = await this.createTransaction(wallet, options);
         const safeTxHash = await this.getTransactionHash(wallet, safeTx);
@@ -147,17 +147,25 @@ class SafeService {
         }
     }
 
-    async createTransaction(wallet: WalletDocument, { to, data }: Partial<MetaTransactionData>) {
+    async getNextNonce(wallet: WalletDocument) {
+        const apiKit = this.getApiKit(wallet);
+        try {
+            return await apiKit.getNextNonce(wallet.address);
+        } catch (error) {
+            logger.error('Error getting next nonce', error.response ? error.response.data : error.message);
+        }
+    }
+
+    async createTransaction(wallet: WalletDocument, { to, data, nonce }: SafeTransactionDataPartial) {
         const safe = await this.getSafe(wallet);
         try {
-            const apiKit = this.getApiKit(wallet);
-            const nonce = await apiKit.getNextNonce(wallet.address);
             const safeTx = await safe.createTransaction({
                 safeTransactionData: {
                     to,
                     data,
                     value: '0',
                     operation: 0,
+                    nonce,
                 },
                 options: { nonce },
             });
@@ -213,7 +221,7 @@ class SafeService {
 
                 try {
                     const response = await safe.executeTransaction(safeTx);
-                    const receipt = await response.transactionResponse.wait(2);
+                    const receipt = await response.transactionResponse.wait(3);
                     if (!receipt) throw new Error(`No receipt found for ${tx.safeTxHash}`);
                     if (!receipt.transactionHash) throw new Error(`No transactionHash found for ${tx.safeTxHash}`);
 
@@ -248,9 +256,7 @@ class SafeService {
         const isSent = tx.state === TransactionState.Sent;
 
         if (isSent && safeTx.isExecuted && safeTx.isSuccessful) {
-            await TransactionService.queryTransactionStatusReceipt(
-                await tx.updateOne({ transactionHash: tx.transactionHash }, { new: true }),
-            );
+            await TransactionService.queryTransactionStatusReceipt(tx);
             logger.debug('Transaction success', { safeTx });
         }
 

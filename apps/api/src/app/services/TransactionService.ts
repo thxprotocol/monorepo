@@ -195,10 +195,13 @@ class TransactionService {
 
     async proposeSafeAsync(wallet: WalletDocument, to: string | null, data: string, callback?: TTransactionCallback) {
         const { relayer, defaultAccount } = NetworkService.getProvider(wallet.chainId);
+        const nonce = await SafeService.getNextNonce(wallet);
         const safeTxHash = await SafeService.proposeTransaction(wallet, {
             to,
             data,
             value: '0',
+            operation: 0,
+            nonce,
         });
         if (!safeTxHash) throw new Error("Couldn't propose transaction.");
 
@@ -207,10 +210,11 @@ class TransactionService {
             state: TransactionState.Confirmed,
             safeTxHash,
             chainId: wallet.chainId,
-            walletId: String(wallet._id),
+            walletId: wallet.id,
             from: defaultAccount,
             to,
             callback,
+            nonce,
         });
     }
 

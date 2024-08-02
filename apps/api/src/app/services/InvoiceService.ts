@@ -26,13 +26,11 @@ class InvoiceService {
      * @param invoicePeriodstartDate
      * @param invoicePeriodEndDate
      */
-    async upsertInvoices(invoicePeriodstartDate: Date, invoicePeriodEndDate: Date, accountsColl?: TAccount[]) {
+    async upsertInvoices(invoicePeriodstartDate: Date, invoicePeriodEndDate: Date) {
         // Iterate over all pools in chunks of 1000
         // const poolCount = await Pool.countDocuments({});
         const poolSubs = await Pool.distinct('sub');
-        const accounts = accountsColl
-            ? accountsColl.filter((a) => poolSubs.includes(a.sub))
-            : await AccountProxy.find({ subs: poolSubs });
+        const accounts = await AccountProxy.find({ subs: poolSubs });
         const chunkSize = 1000;
         const chunkCount = Math.ceil(accounts.length / chunkSize);
 
@@ -48,7 +46,7 @@ class InvoiceService {
             const endIndex = Math.min((i + 1) * chunkSize, accounts.length);
             const accountChunk = accounts.slice(startIndex, endIndex);
 
-            await this.upsertInvoicesForPools(accountChunk, invoicePeriodstartDate, invoicePeriodEndDate);
+            await this.upsertInvoicesForAccounts(accountChunk, invoicePeriodstartDate, invoicePeriodEndDate);
         }
     }
 
@@ -60,7 +58,7 @@ class InvoiceService {
      * @param invoicePeriodEndDate
      * @param accountsColl optional accounts collection
      */
-    async upsertInvoicesForPools(accounts: TAccount[], invoicePeriodstartDate: Date, invoicePeriodEndDate: Date) {
+    async upsertInvoicesForAccounts(accounts: TAccount[], invoicePeriodstartDate: Date, invoicePeriodEndDate: Date) {
         try {
             // Get all relevant pools
             const pools = await Pool.find({ sub: { $in: accounts.map((a) => a.sub) } });
