@@ -15,7 +15,7 @@ import { useAccountStore } from '@thxnetwork/app/stores/Account';
 import { mapStores } from 'pinia';
 import { contractNetworks } from '@thxnetwork/app/config/constants';
 import { ChainId } from '@thxnetwork/common/enums';
-import { track } from '@thxnetwork/common/mixpanel';
+import { track } from '@thxnetwork/app/utils/mixpanel';
 import poll from 'promise-poller';
 
 export default defineComponent({

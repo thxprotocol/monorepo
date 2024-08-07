@@ -3,8 +3,7 @@ import { CLIENT_ID, AUTH_URL, VERIFIER_ID } from '../config/secrets';
 import { tKey } from '../utils/tkey';
 import { useAccountStore } from './Account';
 import { Wallet } from '@ethersproject/wallet';
-import { track } from '@thxnetwork/common/mixpanel';
-
+import { track } from '@thxnetwork/app/utils/mixpanel';
 export const useAuthStore = defineStore('auth', {
     state: (): TAuthState => ({
         wallet: null,

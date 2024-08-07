@@ -1,11 +1,11 @@
+import { Request } from 'express';
 import { JobType, QuestSocialRequirement, QuestVariant } from '@thxnetwork/common/enums';
-import { PoolDocument, Participant } from '@thxnetwork/api/models';
+import { PoolDocument, Participant, DiscordReaction, DiscordMessage, TwitterUser } from '@thxnetwork/api/models';
 import { v4 } from 'uuid';
 import { agenda } from '../util/agenda';
 import { logger } from '../util/logger';
 import { Job } from '@hokify/agenda';
 import { IQuestInviteService, serviceMap } from './interfaces/IQuestService';
-import { tokenInteractionMap } from './maps/quests';
 import { NODE_ENV } from '../config/secrets';
 import PoolService from './PoolService';
 import NotificationService from './NotificationService';
@@ -15,9 +15,18 @@ import ImageService from './ImageService';
 import AccountProxy from '../proxies/AccountProxy';
 import ParticipantService from './ParticipantService';
 import THXService from './THXService';
+import QuestSocialService from './QuestSocialService';
+import DiscordService from './DiscordService';
 import { PromiseParser } from '../util/promise';
+import { getIP } from '../util/ip';
 
 export default class QuestService {
+    static async getDataForRequest(variant: QuestVariant, req: Request, options) {
+        const data = await serviceMap[variant].getDataForRequest(req, options);
+        // Use IP address for valiation of quest entry
+        return { ...data, ip: getIP(req), recaptcha: req.body.recaptcha };
+    }
+
     static async count({ poolId }) {
         const variants = Object.keys(QuestVariant).filter((v) => !isNaN(Number(v)));
         const counts = await Promise.all(
@@ -150,8 +159,8 @@ export default class QuestService {
         variant: QuestVariant,
         options: { quest: TQuest; account: TAccount; data: Partial<TQuestEntry & { recaptcha: string }> },
     ) {
-        // Skip recaptcha check in test environment
-        if (NODE_ENV === 'test') return { result: true, reasons: '' };
+        // Skip recaptcha check non production environments
+        if (NODE_ENV !== 'production') return { result: true, reasons: '' };
 
         // Define the recaptcha action for this quest variant
         const recaptchaAction = `QUEST_${QuestVariant[variant].toUpperCase()}_ENTRY_CREATE`;
@@ -162,22 +171,38 @@ export default class QuestService {
             recaptchaAction,
         });
 
-        logger.info(
-            'ReCaptcha result' +
-                JSON.stringify({
-                    sub: options.account.sub,
-                    poolId: options.quest.poolId,
-                    riskAnalysis,
-                    recaptchaAction,
-                }),
-        );
-
         // Defaults: 0.1, 0.3, 0.7 and 0.9. Ranges from 0 (Bot) to 1 (User)
         if (riskAnalysis.score >= 0.7) {
-            return { result: true, reasons: '' };
+            return { result: true, reason: '' };
         }
 
         return { result: false, reason: 'This request has been indentified as potentially automated.' };
+    }
+
+    static async isIPCoolDown(
+        variant: QuestVariant,
+        options: { quest: TQuest; account: TAccount; data: Partial<TQuestEntry> },
+    ) {
+        if (options.data.ip) {
+            const ONE_DAY_MS = 86400 * 1000; // 24 hours in milliseconds
+            const now = Date.now(),
+                start = now - ONE_DAY_MS,
+                end = now;
+            const Entry = serviceMap[variant].models.entry;
+            const isCompletedForIP = !!(await Entry.exists({
+                questId: options.quest._id,
+                createdAt: { $gt: new Date(start), $lt: new Date(end) },
+                ip: options.data.ip,
+            }));
+            if (isCompletedForIP) {
+                return {
+                    result: false,
+                    reason: 'You have completed this quest from this IP within the last 24 hours.',
+                };
+            }
+        }
+
+        return { result: true, reason: '' };
     }
 
     static async getValidationResult(
@@ -188,10 +213,61 @@ export default class QuestService {
             data: Partial<TQuestEntry>;
         },
     ) {
+        // Test for risk score (@dev does not work with discord calls)
+        const isRealUser = await QuestService.isRealUser(variant, options);
+        if (!isRealUser.result) return isRealUser;
+
+        // Test for IP as we limit to 1 per IP per day (if an ip is passed)
+        const isIPCoolDown = await this.isIPCoolDown(variant, options);
+        if (!isIPCoolDown.result) return isIPCoolDown;
+
+        // Test for availability of the quest
         const isAvailable = await this.isAvailable(variant, options);
         if (!isAvailable.result) return isAvailable;
 
         return await serviceMap[variant].getValidationResult(options);
+    }
+
+    static async getEntryMetadata({ account, quest, data }) {
+        const platformUserId = QuestSocialService.findUserIdForInteraction(account, quest.interaction);
+
+        // For Discord Bot quests we store server user name in metadata
+        if (quest.variant === QuestVariant.Discord && quest.interaction !== QuestSocialRequirement.DiscordGuildJoined) {
+            const guild = await DiscordService.getGuild(quest.poolId);
+            const member = guild && (await DiscordService.getMember(guild.id, platformUserId));
+
+            return {
+                ...data,
+                platformUserId,
+                metadata: {
+                    discord: {
+                        guildId: guild && guild.id,
+                        username: member.user.username,
+                        joinedAt: new Date(member.joinedTimestamp).toISOString(),
+                        reactionCount: guild
+                            ? await DiscordReaction.countDocuments({ guildId: guild.id, userId: platformUserId })
+                            : 0,
+                        messageCount: guild
+                            ? await DiscordMessage.countDocuments({ guildId: guild.id, userId: platformUserId })
+                            : 0,
+                    },
+                },
+            };
+        }
+
+        // For Twitter quests we store public metrics in metadata
+        if (quest.variant === QuestVariant.Twitter) {
+            const user = await TwitterUser.findOne({ userId: platformUserId });
+            return {
+                ...data,
+                platformUserId,
+                metadata: {
+                    twitter: user.publicMetrics,
+                },
+            };
+        }
+
+        return data;
     }
 
     static async createEntryJob(job: Job) {
@@ -210,13 +286,14 @@ export default class QuestService {
 
             // Create the quest entry
             const entry = await Entry.create({
-                ...data,
+                ...(await this.getEntryMetadata({ quest, account, data })),
                 amount,
                 sub: account.sub,
                 questId: quest.id,
                 poolId: pool.id,
                 uuid: v4(),
             } as TQuestEntry);
+            console.log(entry);
             if (!entry) throw new Error('Entry creation failed.');
 
             // Assert if a required quest for invite quests has been completed
@@ -244,13 +321,13 @@ export default class QuestService {
         }
     }
 
-    static findUserIdForInteraction(account: TAccount, interaction: QuestSocialRequirement) {
-        if (typeof interaction === 'undefined') return;
-        const { kind } = tokenInteractionMap[interaction];
-        const token = account.tokens.find((token) => token.kind === kind);
+    // static findUserIdForInteraction(account: TAccount, interaction: QuestSocialRequirement) {
+    //     if (typeof interaction === 'undefined') return;
+    //     const { kind } = tokenInteractionMap[interaction];
+    //     const token = account.tokens.find((token) => token.kind === kind);
 
-        return token && token.userId;
-    }
+    //     return token && token.userId;
+    // }
 
     static async findEntries(quest: TQuest, { page = 1, limit = 25 }: { page: number; limit: number }) {
         const skip = (page - 1) * limit;

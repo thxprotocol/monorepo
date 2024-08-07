@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { track } from '@thxnetwork/common/mixpanel';
+import { track } from '@thxnetwork/app/utils/mixpanel';
 import { toNumber } from '../utils/quests';
 import { useAccountStore } from './Account';
 import { RewardVariant } from '../types/enums/rewards';

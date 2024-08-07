@@ -1,7 +1,4 @@
-type TQuestInviteEntry = {
-    questId: string;
-    sub: string;
-    amount: string;
+type TQuestInviteEntry = TBaseQuestEntry & {
     metadata: {
         code: string;
         inviter: string;

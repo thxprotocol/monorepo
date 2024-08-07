@@ -11,3 +11,11 @@ export const questSchema = {
     isPublished: { type: Boolean, default: false },
     locks: { type: [{ questId: String, variant: Number }], default: [] },
 };
+
+export const questEntrySchema = {
+    poolId: String,
+    questId: String,
+    sub: String,
+    amount: Number,
+    ip: String,
+};

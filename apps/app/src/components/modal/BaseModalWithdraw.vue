@@ -49,8 +49,7 @@ import { useLiquidityStore } from '@thxnetwork/app/stores/Liquidity';
 import { useAccountStore } from '@thxnetwork/app/stores/Account';
 import { calculatePenalty, toFiatPrice } from '@thxnetwork/app/utils/price';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
-import { track } from '@thxnetwork/common/mixpanel';
-
+import { track } from '@thxnetwork/app/utils/mixpanel';
 export default defineComponent({
     name: 'BaseModalWithdraw',
     props: {

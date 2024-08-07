@@ -178,9 +178,7 @@ async function find(model: any, pool: PoolDocument) {
 }
 
 async function findOwner(pool: PoolDocument) {
-    const account = await AccountProxy.findById(pool.sub);
-    if (!account) return;
-    return await AccountProxy.decorate(account);
+    return await AccountProxy.findById(pool.sub);
 }
 
 async function getQuestCount(pool: PoolDocument) {

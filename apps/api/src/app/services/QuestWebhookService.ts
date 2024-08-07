@@ -10,12 +10,17 @@ import {
 } from '@thxnetwork/api/models';
 import { IQuestService } from './interfaces/IQuestService';
 import WebhookService from './WebhookService';
+import { Request } from 'express';
 
 export default class QuestWebhookService implements IQuestService {
     models = {
         quest: QuestWebhook,
         entry: QuestWebhookEntry,
     };
+
+    async getDataForRequest(req: Request, options: { quest: TQuest; account: TAccount }) {
+        return {};
+    }
 
     async findEntryMetadata({ quest }: { quest: QuestWebhookDocument }) {
         const uniqueParticipantIds = await QuestWebhookEntry.countDocuments({

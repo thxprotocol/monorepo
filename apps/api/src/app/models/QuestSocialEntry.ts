@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { questEntrySchema } from './Quest';
 
 export type QuestSocialEntryDocument = mongoose.Document & TQuestSocialEntry;
 
@@ -6,10 +7,7 @@ export const QuestSocialEntry = mongoose.model<QuestSocialEntryDocument>(
     'QuestSocialEntry',
     new mongoose.Schema(
         {
-            questId: String,
-            sub: String,
-            amount: Number,
-            poolId: String,
+            ...questEntrySchema,
             metadata: {
                 platformUserId: String,
                 twitter: {

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
-import { track } from '@thxnetwork/common/mixpanel';
+import { track } from '@thxnetwork/app/utils/mixpanel';
 import { QuestVariant } from '@thxnetwork/common/enums';
 import { GCLOUD_RECAPTCHA_SITE_KEY } from '../config/secrets';
 

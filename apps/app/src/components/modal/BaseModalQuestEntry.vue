@@ -51,14 +51,17 @@
                 class="w-100 rounded-pill"
                 @click="onClickSubscribe"
             >
-                Subscribe
+                <b-spinner v-if="isSubmitting" small variant="light" />
+                <template v-else>Subscribe</template>
             </b-button>
             <b-button
                 :variant="participant && participant.isSubscribed ? 'primary' : 'link'"
                 class="w-100 rounded-pill"
+                :disabled="isDisabledContinue"
                 @click="onClickContinue"
             >
-                Continue
+                <b-spinner v-if="isSubmitting" small variant="light" />
+                <template v-else>Continue</template>
             </b-button>
         </template>
     </b-modal>
@@ -111,6 +114,9 @@ export default defineComponent({
         isDisabledSubscribe() {
             return !this.isEmailValid || this.isSubmitting;
         },
+        isDisabledContinue() {
+            return this.loading || this.isSubmitting;
+        },
     },
     watch: {
         show(value) {
@@ -137,8 +143,15 @@ export default defineComponent({
             }
         },
         async onClickContinue() {
-            await this.accountStore.getParticipants();
-            this.$emit('hidden');
+            try {
+                this.isSubmitting = true;
+                await this.accountStore.getParticipants();
+                this.$emit('hidden');
+            } catch (error) {
+                console.error(error);
+            } finally {
+                this.isSubmitting = false;
+            }
         },
     },
 });

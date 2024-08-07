@@ -10,6 +10,7 @@ import QuestWeb3Service from '../QuestWeb3Service';
 import QuestWebhookService from '../QuestWebhookService';
 import { QuestVariant } from '@thxnetwork/common/enums';
 import { PoolDocument } from '@thxnetwork/api/models';
+import { Request } from 'express';
 
 export interface IQuestInviteService extends IQuestService {
     assertQuestEntry(options: { pool: PoolDocument; quest: TQuest; account: TAccount }): Promise<void>;
@@ -20,6 +21,7 @@ export interface IQuestService {
     models: { quest: Model<TQuest>; entry: Model<TQuestEntry> };
     decorate(options: { quest: TQuest; account?: TAccount; data: Partial<TQuestEntry> }): Promise<TQuest>;
     isAvailable(options: { quest: TQuest; account?: TAccount; data: Partial<TQuestEntry> }): Promise<TValidationResult>;
+    getDataForRequest(req: Request, options: { quest: TQuest; account: TAccount }): Promise<Partial<TQuestEntry>>;
     getAmount(options: {
         quest: TQuest;
         account?: TAccount;

@@ -1,5 +1,7 @@
 import { Event, Identity, Pool, QuestDaily, QuestDailyEntry } from '@thxnetwork/api/models';
 import { IQuestService } from './interfaces/IQuestService';
+import { Request } from 'express';
+import { getIP } from '../util/ip';
 
 const ONE_DAY_MS = 86400 * 1000; // 24 hours in milliseconds
 
@@ -8,6 +10,14 @@ export default class QuestDailyService implements IQuestService {
         quest: QuestDaily,
         entry: QuestDailyEntry,
     };
+
+    async getDataForRequest(req: Request): Promise<Partial<TQuestEntry>> {
+        const now = Date.now(),
+            start = now - ONE_DAY_MS,
+            end = now;
+
+        return { metadata: { ip: getIP(req) }, now, start, end };
+    }
 
     async findEntryMetadata({ quest }: { quest: TQuestDaily }) {
         const uniqueParticipantIds = await this.models.entry
@@ -54,38 +64,22 @@ export default class QuestDailyService implements IQuestService {
     async isAvailable({
         quest,
         account,
-        data,
     }: {
         quest: TQuestDaily;
         account: TAccount;
         data: Partial<TQuestDailyEntry>;
     }): Promise<TValidationResult> {
         if (!account) return { result: true, reason: '' };
-
         const now = Date.now(),
             start = now - ONE_DAY_MS,
             end = now;
-
-        // Check for IP as we limit to 1 per IP per day (if an ip is passed)
-        if (data.metadata && data.metadata.ip) {
-            const isCompletedForIP = !!(await QuestDailyEntry.exists({
-                'questId': quest._id,
-                'createdAt': { $gt: new Date(start), $lt: new Date(end) },
-                'metadata.ip': data.metadata.ip,
-            }));
-            if (isCompletedForIP) {
-                return {
-                    result: false,
-                    reason: 'You have completed this quest from this IP within the last 24 hours.',
-                };
-            }
-        }
 
         const isCompleted = await QuestDailyEntry.findOne({
             questId: quest._id,
             sub: account.sub,
             createdAt: { $gt: new Date(start), $lt: new Date(end) },
         });
+
         if (!isCompleted) return { result: true, reason: '' };
 
         return { result: false, reason: 'You have completed this quest within the last 24 hours.' };
@@ -103,19 +97,17 @@ export default class QuestDailyService implements IQuestService {
     async getValidationResult({
         quest,
         account,
+        data,
     }: {
         quest: TQuestDaily;
         account: TAccount;
-        data: Partial<TQuestDailyEntry>;
+        data: Partial<TQuestDailyEntry> & { start: number; end: number };
     }): Promise<TValidationResult> {
-        const now = Date.now(),
-            start = now - ONE_DAY_MS,
-            end = now;
-
+        console.log({ data });
         const entry = await QuestDailyEntry.findOne({
             questId: quest._id,
             sub: account.sub,
-            createdAt: { $gt: new Date(start), $lt: new Date(end) },
+            createdAt: { $gt: new Date(data.start), $lt: new Date(data.end) },
         });
 
         // If an entry has been found the user needs to wait
@@ -142,7 +134,7 @@ export default class QuestDailyService implements IQuestService {
             name: quest.eventName,
             sub: pool.sub,
             identityId: { $in: identityIds },
-            createdAt: { $gt: new Date(start), $lt: new Date(end) },
+            createdAt: { $gt: new Date(data.start), $lt: new Date(data.end) },
         });
 
         // If no events are found we invalidate

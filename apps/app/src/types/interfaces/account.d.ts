@@ -5,22 +5,6 @@ type TSubscription = {
     poolId: string;
 };
 
-type TAccount = {
-    username: string;
-    sub: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    address: string;
-    plan: number;
-    variant: AccountVariant;
-    profileImg: string;
-    rank: number;
-    isEmailVerified?: boolean;
-    tokens: { kind: AccessTokenKind; userId: string; scopes: string[] }[];
-    providerUserId: string;
-};
-
 type TAuthState = {
     wallet: Wallet;
     isModalLoginShown: boolean;

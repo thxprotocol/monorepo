@@ -3,7 +3,7 @@ import { QuestSocialRequirement } from '@thxnetwork/common/enums';
 import { IQuestService } from './interfaces/IQuestService';
 import { requirementMap } from './maps/quests';
 import QuestSocialService from './QuestSocialService';
-import QuestService from './QuestService';
+import { Request } from 'express';
 
 type TRestartDates = { now: Date; start: Date; endDay: Date; end: Date };
 
@@ -12,6 +12,10 @@ export default class QuestDiscordService implements IQuestService {
         quest: QuestSocial,
         entry: QuestSocialEntry,
     };
+
+    async getDataForRequest(req: Request, options: { quest: TQuest; account: TAccount }) {
+        return {};
+    }
 
     findEntryMetadata(options: { quest: TQuestSocial }) {
         return {};
@@ -152,7 +156,7 @@ export default class QuestDiscordService implements IQuestService {
     private async getMessages({ quest, account, start }: { quest: TQuestSocial; account: TAccount; start: Date }) {
         if (!account) return [];
 
-        const userId = QuestService.findUserIdForInteraction(account, quest.interaction);
+        const userId = QuestSocialService.findUserIdForInteraction(account, quest.interaction);
         return await DiscordMessage.find({
             guildId: quest.content,
             memberId: userId,
@@ -168,7 +172,7 @@ export default class QuestDiscordService implements IQuestService {
         if (!account) return { pointsAvailable: 0, pointsClaimed: 0 };
 
         const { start, end } = this.getRestartDates(quest);
-        const platformUserId = QuestService.findUserIdForInteraction(account, quest.interaction);
+        const platformUserId = QuestSocialService.findUserIdForInteraction(account, quest.interaction);
         const claims = await QuestSocialEntry.find({
             'questId': String(quest._id),
             'metadata.platformUserId': platformUserId,

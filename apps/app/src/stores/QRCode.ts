@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
-import { track } from '@thxnetwork/common/mixpanel';
-
+import { track } from '@thxnetwork/app/utils/mixpanel';
 export const useQRCodeStore = defineStore('qrcode', {
     state: (): TQRCodeState => ({
         entry: null,

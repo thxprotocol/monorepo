@@ -1,7 +1,7 @@
 import { API_URL, AUTH_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL, WIDGET_URL } from '../config/secrets';
 import { DEFAULT_COLORS, DEFAULT_ELEMENTS, getStyles } from '../utils/theme';
 import { defineStore } from 'pinia';
-import { track } from '@thxnetwork/common/mixpanel';
+import { track } from '@thxnetwork/app/utils/mixpanel';
 import { AccountVariant } from '@thxnetwork/common/enums';
 import { THXBrowserClient } from '@thxnetwork/sdk/clients';
 import { BREAKPOINT_LG } from '../config/constants';

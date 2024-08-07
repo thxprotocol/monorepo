@@ -4,7 +4,7 @@ import { useWalletStore } from './Wallet';
 import { BALANCER_POOL_ID, contractNetworks } from '../config/constants';
 import { PoolWithMethods } from '@balancer-labs/sdk';
 import { ChainId } from '@thxnetwork/common/enums';
-import { track } from '@thxnetwork/common/mixpanel';
+import { track } from '@thxnetwork/app/utils/mixpanel';
 import { abi } from '../utils/abi';
 import { useVeStore } from './VE';
 

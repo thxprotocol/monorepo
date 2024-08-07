@@ -1,15 +1,24 @@
 import { QuestSocial, QuestSocialDocument, QuestSocialEntry } from '@thxnetwork/api/models';
 import { WalletDocument } from '@thxnetwork/api/models/Wallet';
 import { IQuestService } from './interfaces/IQuestService';
-import { requirementMap } from './maps/quests';
+import { requirementMap, tokenInteractionMap } from './maps/quests';
 import { logger } from '../util/logger';
-import { QuestVariant } from '@thxnetwork/common/enums';
+import { QuestSocialRequirement, QuestVariant } from '@thxnetwork/common/enums';
+import { Request } from 'express';
 
 export default class QuestSocialService implements IQuestService {
     models = {
         quest: QuestSocial,
         entry: QuestSocialEntry,
     };
+
+    async getDataForRequest(
+        req: Request,
+        { quest, account }: { quest: TQuestSocial; account: TAccount },
+    ): Promise<Partial<TQuestEntry>> {
+        const platformUserId = QuestSocialService.findUserIdForInteraction(account, quest.interaction);
+        return { metadata: { platformUserId } };
+    }
 
     async decorate({
         quest,
@@ -96,5 +105,12 @@ export default class QuestSocialService implements IQuestService {
         ]);
 
         return result ? result.totalFollowersCount : 0;
+    }
+
+    static findUserIdForInteraction(account: TAccount, interaction: QuestSocialRequirement) {
+        if (typeof interaction === 'undefined') return;
+        const { kind } = tokenInteractionMap[interaction];
+        const token = account.tokens.find((token) => token.kind === kind);
+        return token && token.userId;
     }
 }

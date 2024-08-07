@@ -10,12 +10,20 @@ import {
     PoolDocument,
 } from '@thxnetwork/api/models';
 import { IQuestService } from './interfaces/IQuestService';
+import { Request } from 'express';
 
 export default class QuestCustomService implements IQuestService {
     models = {
         quest: QuestCustom,
         entry: QuestCustomEntry,
     };
+
+    async getDataForRequest(
+        req: Request,
+        options: { quest: TQuest; account: TAccount },
+    ): Promise<Partial<TQuestEntry>> {
+        return {};
+    }
 
     async findEntryMetadata({ quest }: { quest: QuestCustomDocument }) {
         const uniqueParticipantIds = await QuestCustomEntry.countDocuments({
@@ -89,7 +97,6 @@ export default class QuestCustomService implements IQuestService {
                 reason: 'No identity connected to this account. Please ask for this in your community!',
             };
         }
-        // Get pool for quest
 
         // Find existing entries for this quest and check optional limit
         const entries = await this.findAllEntries({ quest, account });
@@ -111,7 +118,6 @@ export default class QuestCustomService implements IQuestService {
         return await this.models.entry.find({
             questId: quest._id,
             sub: account.sub,
-            isClaimed: true,
         });
     }
 

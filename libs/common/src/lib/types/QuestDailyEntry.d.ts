@@ -1,10 +1,4 @@
-type TQuestDailyEntry = {
-    questId: string;
-    poolId: string;
-    sub: string;
-    uuid: string;
-    amount: string;
-    createdAt: Date;
+type TQuestDailyEntry = TBaseQuestEntry & {
     metadata: TQuestDailyEntryMetadata;
 };
 

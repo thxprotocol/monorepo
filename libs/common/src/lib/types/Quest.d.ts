@@ -15,6 +15,16 @@ type TValidationResult = {
     result: boolean;
 };
 
+type TBaseQuestEntry = {
+    poolId: string;
+    questId: string;
+    sub: string;
+    amount: number;
+    recaptcha: string;
+    ip: string;
+    createdAt: Date;
+};
+
 type TBaseQuest = {
     _id: string;
     variant: QuestVariant;

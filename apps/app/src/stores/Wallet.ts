@@ -1,7 +1,7 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit';
 import { useAccountStore } from './Account';
 import { defineStore } from 'pinia';
-import { track } from '@thxnetwork/common/mixpanel';
+import { track } from '@thxnetwork/app/utils/mixpanel';
 import { useAuthStore } from './Auth';
 import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '../types/enums/accountVariant';

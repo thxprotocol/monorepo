@@ -3,6 +3,7 @@ import { param } from 'express-validator';
 import { Event, Participant, Widget, Wallet, Webhook } from '@thxnetwork/api/models';
 import PoolService from '@thxnetwork/api/services/PoolService';
 import BrandService from '@thxnetwork/api/services/BrandService';
+import QuestService from '@thxnetwork/api/services/QuestService';
 
 const validation = [param('id').isMongoId()];
 

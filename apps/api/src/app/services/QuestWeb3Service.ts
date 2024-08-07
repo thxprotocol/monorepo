@@ -3,12 +3,36 @@ import { QuestWeb3Entry, QuestWeb3 } from '@thxnetwork/api/models';
 import { logger } from '@thxnetwork/api/util/logger';
 import { IQuestService } from './interfaces/IQuestService';
 import { BigNumber } from 'alchemy-sdk';
+import { Request } from 'express';
+import NetworkService from './NetworkService';
+import { chainList } from '@thxnetwork/common/chains';
 
 export default class QuestWeb3Service implements IQuestService {
     models = {
         quest: QuestWeb3,
         entry: QuestWeb3Entry,
     };
+
+    async getDataForRequest(
+        req: Request,
+        options: { quest: TQuestWeb3; account: TAccount },
+    ): Promise<Partial<TQuestEntry>> {
+        const address = NetworkService.recoverSigner(req.body.message, req.body.signature);
+        const { rpc, chainId } = chainList[req.body.chainId];
+
+        const contract = options.quest.contracts.find((c) => c.chainId === chainId);
+        if (!contract) return { result: false, reason: 'Smart contract not found.' };
+
+        const instance = new ethers.Contract(
+            contract.address,
+            ['function ' + options.quest.methodName + '(address) view returns (uint256)'],
+            new ethers.providers.JsonRpcProvider(rpc),
+        );
+        const value = await instance[options.quest.methodName](address);
+        const callResult = value.toString();
+
+        return { metadata: { address, rpc, chainId: req.body.chainId, callResult } };
+    }
 
     findEntryMetadata(options: { quest: TQuestWeb3 }) {
         return {};
@@ -84,33 +108,5 @@ export default class QuestWeb3Service implements IQuestService {
         }
 
         return { result: true, reason: '' };
-    }
-
-    static async getCallResult({
-        quest,
-        data,
-    }: {
-        quest: TQuestWeb3;
-        account: TAccount;
-        data: Partial<TQuestWeb3Entry>;
-    }) {
-        const { rpc, chainId, address } = data.metadata;
-        const contract = quest.contracts.find((c) => c.chainId === chainId);
-        if (!contract) return { result: false, reason: 'Smart contract not found.' };
-
-        const contractInstance = new ethers.Contract(
-            contract.address,
-            ['function ' + quest.methodName + '(address) view returns (uint256)'],
-            new ethers.providers.JsonRpcProvider(rpc),
-        );
-
-        try {
-            const value = await contractInstance[quest.methodName](address);
-
-            return { result: true, reason: '', value };
-        } catch (error) {
-            logger.error(error);
-            return { result: false, reason: `Smart contract call on ${quest.methodName} failed` };
-        }
     }
 }

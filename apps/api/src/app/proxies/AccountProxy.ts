@@ -44,7 +44,8 @@ class AccountProxy {
     }
 
     async findById(sub: string) {
-        return await Account.findById(sub);
+        const account = await Account.findById(sub);
+        return await this.decorate(account);
     }
 
     async findByRequest(req: Request) {
@@ -119,6 +120,7 @@ class AccountProxy {
     }
 
     async decorate(account: AccountDocument): Promise<TAccount> {
+        if (!account) return;
         return {
             profileImg: `https://api.dicebear.com/7.x/identicon/svg?seed=${account.id}`,
             username: '',

@@ -1,12 +1,19 @@
+import { Request } from 'express';
 import { QuestGitcoin, QuestGitcoinEntry } from '@thxnetwork/api/models';
 import { IQuestService } from './interfaces/IQuestService';
 import GitcoinService from './GitcoinService';
+import NetworkService from './NetworkService';
 
 export default class QuestGitcoinService implements IQuestService {
     models = {
         quest: QuestGitcoin,
         entry: QuestGitcoinEntry,
     };
+
+    async getDataForRequest(req: Request, options: { quest: TQuest; account: TAccount }) {
+        const address = NetworkService.recoverSigner(req.body.message, req.body.signature);
+        return { metadata: { address } };
+    }
 
     findEntryMetadata(options: { quest: TQuestGitcoin }) {
         return {};
@@ -59,14 +66,14 @@ export default class QuestGitcoinService implements IQuestService {
         quest: TQuestGitcoin;
         account: TAccount;
         data: Partial<TQuestGitcoinEntry>;
-    }): Promise<TValidationResult> {
+    }): Promise<TValidationResult & { score?: number }> {
         if (!data.metadata.address) return { result: false, reason: 'Could not find an address during validation.' };
         if (data.metadata.score < quest.score) {
             const score = data.metadata.score.toString() || 0;
             const reason = `Your score ${score}/100 does not meet the minimum of ${quest.score}/100.`;
             return { result: false, reason };
         }
-        if (data.metadata.score >= quest.score) return { result: true, reason: '' };
+        if (data.metadata.score >= quest.score) return { result: true, reason: '', score: data.metadata.score };
     }
 
     async getScore(scorerId: number, address: string) {

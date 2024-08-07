@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { useAccountStore } from './Account';
 import { useWalletStore } from './Wallet';
 import { contractNetworks } from '../config/constants';
-import { track } from '@thxnetwork/common/mixpanel';
+import { track } from '@thxnetwork/app/utils/mixpanel';
 import { ChainId } from '@thxnetwork/common/enums';
 import { abi } from '../utils/abi';
 
