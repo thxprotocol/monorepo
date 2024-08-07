@@ -10,7 +10,7 @@
         "jochemvn <jochemvn@gmail.com>"
     ],
     "license": "AGPL-3.0",
-    "version": "1.53.6",
+    "version": "1.53.7",
     "scripts": {
         "migrate": "yarn run migrate:db && yarn run migrate:post-migrate",
         "migrate:post-migrate": "node post-migrate.js",
