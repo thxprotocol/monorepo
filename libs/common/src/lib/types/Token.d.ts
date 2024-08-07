@@ -1,4 +1,4 @@
-type TToken = {
+type TAccessToken = {
     sub: string;
     kind: AccessTokenKind;
     accessToken: string;

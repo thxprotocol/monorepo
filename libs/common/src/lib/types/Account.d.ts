@@ -18,7 +18,7 @@ type TAccount = {
     acceptUpdates: boolean;
     role: Role;
     goal: Goal[];
-    tokens: TToken[];
+    tokens: TAccessToken[];
     identity: string;
     createdAt: Date;
     updatedAt: Date;

@@ -142,7 +142,7 @@ class AccountProxy {
                     userId,
                     scopes,
                     metadata,
-                })) as TToken[]
+                })) as TAccessToken[]
         );
     }
 

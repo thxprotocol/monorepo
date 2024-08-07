@@ -6,7 +6,7 @@ import { logger } from '@thxnetwork/api/util/logger';
 import { serviceMap } from '@thxnetwork/api/services/interfaces/IOAuthService';
 
 class TokenService {
-    async get({ sub, kind }: Partial<TToken>): Promise<TToken> {
+    async get({ sub, kind }: Partial<TAccessToken>): Promise<TAccessToken> {
         const token = await Token.findOne({ sub, kind });
         if (!token) return;
 
@@ -19,11 +19,11 @@ class TokenService {
     }
 
     // Store the token for the new account
-    async set(token: Partial<TToken>) {
+    async set(token: Partial<TAccessToken>) {
         return await Token.findOneAndUpdate({ sub: token.sub, kind: token.kind }, token, { upsert: true, new: true });
     }
 
-    async unset({ sub, kind }: Partial<TToken>) {
+    async unset({ sub, kind }: Partial<TAccessToken>) {
         const token = await this.get({ sub, kind });
 
         // Revoke access at token provider if token has scopes
@@ -56,7 +56,7 @@ class TokenService {
         return Token.findOneAndDelete({ sub, kind });
     }
 
-    revoke(token: TToken) {
+    revoke(token: TAccessToken) {
         return serviceMap[token.kind].revokeToken(token);
     }
 }
