@@ -3,9 +3,10 @@ import { assertRequestInput, assertPoolAccess } from '@thxnetwork/api/middleware
 import { upload } from '@thxnetwork/api/util/multer';
 
 import * as ListController from './list.controller';
-import * as CreateController from './post.controller';
-import * as UpdateController from './patch.controller';
-import * as RemoveController from './delete.controller';
+import * as CreateListController from './post.controller';
+import * as CreateController from './variant/post.controller';
+import * as UpdateController from './variant/patch.controller';
+import * as RemoveController from './variant/delete.controller';
 
 import RouterQuestEntries from './entries/entries.router';
 
@@ -17,6 +18,12 @@ router.get(
     assertPoolAccess,
     assertRequestInput(ListController.validation),
     ListController.controller,
+);
+router.post(
+    '/',
+    assertPoolAccess,
+    assertRequestInput(CreateListController.validation),
+    CreateListController.controller,
 );
 router.post(
     '/:variant',
