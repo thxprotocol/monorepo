@@ -8,8 +8,9 @@ export const questSchema = {
     index: Number,
     expiryDate: Date,
     infoLinks: [{ label: String, url: String }],
-    isPublished: { type: Boolean, default: false },
     locks: { type: [{ questId: String, variant: Number }], default: [] },
+    isPublished: { type: Boolean, default: false },
+    isIPLimitEnabled: { type: Boolean, default: false },
 };
 
 export const questEntrySchema = {

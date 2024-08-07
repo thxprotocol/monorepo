@@ -183,7 +183,7 @@ export default class QuestService {
         variant: QuestVariant,
         options: { quest: TQuest; account: TAccount; data: Partial<TQuestEntry> },
     ) {
-        if (options.data.ip) {
+        if (options.quest.isIPLimitEnabled) {
             const ONE_DAY_MS = 86400 * 1000; // 24 hours in milliseconds
             const now = Date.now(),
                 start = now - ONE_DAY_MS,
