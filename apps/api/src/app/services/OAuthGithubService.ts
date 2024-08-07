@@ -68,7 +68,7 @@ export default class GithubService implements IOAuthService {
         return data;
     }
 
-    revokeToken(token: TToken): Promise<void> {
+    revokeToken(token: TAccessToken): Promise<void> {
         throw new Error('Method not implemented.');
     }
 

@@ -42,7 +42,7 @@ export default class ParticipantService {
         const account = accounts.find((a) => a.sub === data.sub);
         const pointBalance = participants.find((p) => account.sub === String(p.sub));
         const tokens = await Promise.all(
-            account.tokens.map(async (token: TToken) => {
+            account.tokens.map(async (token: TAccessToken) => {
                 if (token.kind !== 'twitter') return token;
                 const user = await TwitterUser.findOne({ userId: token.userId });
                 return { ...token, user };
@@ -71,7 +71,7 @@ export default class ParticipantService {
         return await Participant.findOneAndUpdate({ sub: account.sub, poolId }, { riskAnalysis }, { new: true });
     }
 
-    static async findUser(token: TToken, { userId, guildId }: { userId: string; guildId?: string }) {
+    static async findUser(token: TAccessToken, { userId, guildId }: { userId: string; guildId?: string }) {
         const userModelMap = {
             [AccessTokenKind.Twitter]: () => TwitterUser.findOne({ userId }),
             [AccessTokenKind.Discord]: () => DiscordUser.findOne({ userId, guildId }),
@@ -84,7 +84,7 @@ export default class ParticipantService {
             userId: token.userId,
             metadata: token.metadata,
             user,
-        } as unknown as TToken;
+        } as unknown as TAccessToken;
     }
 
     static async updateRanksJob(job: TJob) {

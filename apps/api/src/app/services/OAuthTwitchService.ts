@@ -27,7 +27,7 @@ export default class TwitchService implements IOAuthService {
         return url.toString();
     }
 
-    async requestToken(code: string): Promise<Partial<TToken>> {
+    async requestToken(code: string): Promise<Partial<TAccessToken>> {
         const body = new URLSearchParams();
         body.append('code', code);
         body.append('grant_type', 'authorization_code');
@@ -82,7 +82,7 @@ export default class TwitchService implements IOAuthService {
         );
     }
 
-    revokeToken(token: TToken): Promise<void> {
+    revokeToken(token: TAccessToken): Promise<void> {
         throw new Error('Method not implemented.');
     }
 

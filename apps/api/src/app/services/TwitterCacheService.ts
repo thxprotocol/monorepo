@@ -72,7 +72,7 @@ export default class TwitterCacheService {
     static async updatePostCache(
         account: TAccount,
         quest: TQuestSocial,
-        token: TToken,
+        token: TAccessToken,
         params: TTwitterRequestParams = { max_results: 100 },
     ) {
         try {
@@ -94,7 +94,7 @@ export default class TwitterCacheService {
     static async updateRepostCache(
         account: TAccount,
         quest: TQuestSocial,
-        token: TToken,
+        token: TAccessToken,
         params: TTwitterRequestParams = { max_results: 100 },
     ) {
         const postId = quest.content;
@@ -183,7 +183,7 @@ export default class TwitterCacheService {
         updateCacheCallback: (
             account: TAccount,
             quest: TQuestSocial,
-            token: TToken,
+            token: TAccessToken,
             params: TTwitterRequestParams,
         ) => Promise<void>,
     ) {

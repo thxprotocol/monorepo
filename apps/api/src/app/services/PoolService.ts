@@ -295,7 +295,7 @@ async function findParticipants(pool: PoolDocument, page: number, limit: number,
                 if (!account) throw new Error('Account not found');
 
                 account.tokens = await Promise.all(
-                    account.tokens.map(async (token: TToken) =>
+                    account.tokens.map(async (token: TAccessToken) =>
                         ParticipantService.findUser(token, { userId: token.userId, guildId: guild && guild.id }),
                     ),
                 );

@@ -31,7 +31,7 @@ export default class TwitterService implements IOAuthService {
         return authorizeURL.toString();
     }
 
-    async requestToken(code: string): Promise<Partial<TToken>> {
+    async requestToken(code: string): Promise<Partial<TAccessToken>> {
         const authHeader =
             'Basic ' + Buffer.from(`${TWITTER_OAUTH_CLIENT_ID}:${TWITTER_OAUTH_CLIENT_SECRET}`).toString('base64');
         const body = new URLSearchParams();
@@ -96,7 +96,7 @@ export default class TwitterService implements IOAuthService {
         );
     }
 
-    async revokeToken(token: TToken): Promise<void> {
+    async revokeToken(token: TAccessToken): Promise<void> {
         const body = new URLSearchParams();
         body.append('token', token.accessToken);
         body.append('token_type_hint', 'access_token');

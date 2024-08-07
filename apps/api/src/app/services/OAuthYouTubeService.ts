@@ -70,7 +70,7 @@ export default class YouTubeService implements IOAuthService {
         );
     }
 
-    async revokeToken(token: TToken): Promise<void> {
+    async revokeToken(token: TAccessToken): Promise<void> {
         try {
             const url = new URL('https://oauth2.googleapis.com/revoke');
             if (token.accessToken) {

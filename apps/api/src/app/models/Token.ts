@@ -3,7 +3,7 @@ import { encryptString } from '../util/encrypt';
 import { SECURE_KEY } from '../config/secrets';
 import { decryptString } from '../util/decrypt';
 
-export type TokenDocument = mongoose.Document & TToken;
+export type TokenDocument = mongoose.Document & TAccessToken;
 
 const tokenSchema = new mongoose.Schema(
     {

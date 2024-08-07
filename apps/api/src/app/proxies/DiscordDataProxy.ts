@@ -64,7 +64,7 @@ export default class DiscordDataProxy {
         return new ActionRowBuilder().addComponents(components);
     }
 
-    static async getGuilds(token: TToken) {
+    static async getGuilds(token: TAccessToken) {
         const r = await discordClient({
             method: 'GET',
             url: '/users/@me/guilds',

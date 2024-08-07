@@ -360,7 +360,7 @@ export default class TwitterDataProxy {
         return TwitterRepost.findOne({ userId, postId });
     }
 
-    static async request(token: TToken, config: AxiosRequestConfig) {
+    static async request(token: TAccessToken, config: AxiosRequestConfig) {
         try {
             const { data } = await twitterClient({
                 ...config,
@@ -377,7 +377,7 @@ export default class TwitterDataProxy {
         }
     }
 
-    static async handleError(account: TAccount, token: TToken, res: AxiosResponse) {
+    static async handleError(account: TAccount, token: TAccessToken, res: AxiosResponse) {
         if (res.status === 429) {
             logger.info(`[429] X-RateLimit is hit by account ${account.sub} with X UserId ${token.userId}.`);
             return this.handleRateLimitError(res);
