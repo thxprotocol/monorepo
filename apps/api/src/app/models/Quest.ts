@@ -6,7 +6,7 @@ export const questSchema = {
     description: String,
     image: String,
     index: Number,
-    expiryDate: Date,
+    expiryDate: { type: Date, default: '', nullable: false },
     infoLinks: [{ label: String, url: String }],
     locks: { type: [{ questId: String, variant: Number }], default: [] },
     isPublished: { type: Boolean, default: false },

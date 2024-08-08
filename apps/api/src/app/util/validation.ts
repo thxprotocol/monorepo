@@ -21,6 +21,14 @@ export const defaults = {
             .optional()
             .isBoolean()
             .customSanitizer((value) => JSON.parse(value)),
+        body('isReviewEnabled')
+            .optional()
+            .isBoolean()
+            .customSanitizer((value) => JSON.parse(value)),
+        body('isIPLimitEnabled')
+            .optional()
+            .isBoolean()
+            .customSanitizer((value) => JSON.parse(value)),
         check('file')
             .optional()
             .custom((value, { req }) => {

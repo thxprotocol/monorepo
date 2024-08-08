@@ -10,10 +10,10 @@ const controller = async (req: Request, res: Response) => {
     const variant = req.params.variant as unknown as QuestVariant;
     const questId = req.params.questId as string;
 
-    let quest = await QuestService.findById(variant, questId);
-    quest = await QuestService.update(quest, req.body, req.file);
+    const quest = await QuestService.findById(variant, questId);
+    const result = await QuestService.update(quest, req.body, req.file);
 
-    res.json(quest);
+    res.json(result);
 };
 
 export { controller, validation };
