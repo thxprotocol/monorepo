@@ -1,11 +1,4 @@
 import { RewardSortVariant, QuestVariant } from '../types/enums/rewards';
-import {
-    sortDailyRewards,
-    sortConditionalRewards,
-    sortMilestoneRewards,
-    sortWeb3Rewards,
-    sortGitcoinRewards,
-} from '../utils/sort';
 
 export function toNumber(value?: boolean) {
     return value === undefined ? 0 : Number(value);
@@ -26,24 +19,6 @@ export const questComponentMap: any = {
 export const sortMap: { [k: number]: any } = {
     [RewardSortVariant.Default]: (a: any, b: any): any => {
         return a.index - b.index;
-    },
-    [RewardSortVariant.Available]: (a: any, b: any): any => {
-        switch (a.component) {
-            case 'BaseCardQuestDaily':
-                return sortDailyRewards(a, b);
-            case 'BaseCardQuestInvite':
-                return -1;
-            case 'BaseCardQuestSocial':
-                return sortConditionalRewards(a, b);
-            case 'BaseCardQuestCustom':
-                return sortMilestoneRewards(a, b);
-            case 'BaseCardQuestWeb3':
-                return sortWeb3Rewards(a, b);
-            case 'BaseCardQuestGitcoin':
-                return sortGitcoinRewards(a, b);
-            default:
-                return 0;
-        }
     },
     [RewardSortVariant.Amount]: (a: any, b: any): any => {
         return a.amount > b.amount ? -1 : 1;

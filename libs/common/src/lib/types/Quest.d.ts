@@ -9,7 +9,7 @@ type TQuestEntry =
     | TQuestWebhookEntry;
 
 type TQuestEntryMetadata = TQuestSocialEntryMetadata | TQuestWeb3EntryMetadata;
-
+type TQuestLock = { variant: QuestVariant; questId: string };
 type TValidationResult = {
     reason: string;
     result: boolean;
@@ -39,8 +39,18 @@ type TBaseQuest = {
     locks: TQuestLock[];
     isPublished: boolean;
     isIPLimitEnabled: boolean;
+    isAvailable: boolean;
+    entries: TQuestEntry[];
     createdAt: string;
     updatedAt: string;
-    update: (payload: Partial<TQuest>) => Promise<void>;
-    delete: (payload: Partial<TQuest>) => Promise<void>;
+};
+
+type TJobState = {
+    [jobId: string]: TJob;
+};
+
+type TQuestState = {
+    jobs: TJobState;
+    quests: TAnyQuest[];
+    isLoading: boolean;
 };

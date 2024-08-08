@@ -5,7 +5,7 @@ import { track } from '@thxnetwork/app/utils/mixpanel';
 import { useAuthStore } from './Auth';
 import { ChainId } from '@thxnetwork/common/enums';
 import { WalletVariant } from '../types/enums/accountVariant';
-import { API_URL, AUTH_URL, POLYGON_RPC, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
+import { API_URL, POLYGON_RPC, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 import {
     sendTransaction,

@@ -25,7 +25,7 @@ export const useQuestStore = defineStore('quest', {
         unlock(quest: TBaseQuest) {
             for (const questIndex in this.quests) {
                 // If this quest is not found in other quests locks continue
-                const index = this.quests[questIndex].locks.findIndex((l) => l.questId === quest._id);
+                const index = this.quests[questIndex].locks.findIndex((l: TQuestLock) => l.questId === quest._id);
                 if (index === -1) continue;
 
                 // If there is a hit remove the lock and update flag
@@ -44,7 +44,7 @@ export const useQuestStore = defineStore('quest', {
                 });
             });
         },
-        async completeQuest(quest: TAnyQuest, payload = {}) {
+        async completeQuest(quest: TQuest, payload = {}) {
             const { api, account, poolId, waitForJob } = useAccountStore();
             if (!account) return;
 
@@ -65,13 +65,13 @@ export const useQuestStore = defineStore('quest', {
                     apiKey: 'custom',
                     eventKey: 'milestone reward claim',
                     callback: () => {
-                        const index = this.quests.findIndex((r) => r._id === quest._id);
+                        const index = this.quests.findIndex((q: TQuestCustom) => q._id === quest._id);
                         (this.quests[index] as TQuestCustom).entries.push({
                             questId: quest._id,
                             uuid: '',
                             sub: account.sub,
                             isClaimed: true,
-                            amount: quest.amount,
+                            amount: (quest as TQuestCustom).amount,
                         });
                     },
                 },

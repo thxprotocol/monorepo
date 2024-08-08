@@ -11,6 +11,7 @@ export const questSchema = {
     locks: { type: [{ questId: String, variant: Number }], default: [] },
     isPublished: { type: Boolean, default: false },
     isIPLimitEnabled: { type: Boolean, default: false },
+    isReviewEnabled: { type: Boolean, default: false },
 };
 
 export const questEntrySchema = {
