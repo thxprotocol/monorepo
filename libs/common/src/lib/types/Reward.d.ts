@@ -3,7 +3,6 @@ type TInfoLink = {
     url: string;
 };
 
-type TQuestLock = { variant: QuestVariant; questId: string };
 type TReward = TRewardCoin | TRewardNFT | TRewardCustom | TRewardCoupon | TRewardDiscordRole;
 type TBaseReward = {
     _id: string;

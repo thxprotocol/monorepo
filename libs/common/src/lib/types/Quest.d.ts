@@ -39,6 +39,7 @@ type TBaseQuest = {
     locks: TQuestLock[];
     isPublished: boolean;
     isIPLimitEnabled: boolean;
+    isReviewEnabled: boolean;
     isAvailable: boolean;
     entries: TQuestEntry[];
     createdAt: string;
