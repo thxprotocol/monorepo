@@ -67,8 +67,11 @@ export default class QuestService {
                             const isExpired = this.isExpired(quest);
                             const QuestEntry = serviceMap[variant].models.entry;
                             const distinctSubs = await QuestEntry.countDocuments({ questId: q.id }).distinct('sub');
+                            const entriesPendingReview = await this.getEntriesPendingReview(quest, account);
+
                             return {
                                 ...decorated,
+                                entriesPendingReview,
                                 entryCount: distinctSubs.length,
                                 author: { username: author.username },
                                 isLocked,
@@ -170,6 +173,13 @@ export default class QuestService {
 
     static getAmount(variant: QuestVariant, quest: TQuest, account: TAccount, data?: { metadata: any }) {
         return serviceMap[variant].getAmount({ quest, account, data });
+    }
+
+    static async getEntriesPendingReview(quest: TQuest, account?: TAccount) {
+        if (!quest.isReviewEnabled || !account) return [];
+
+        const Entry = serviceMap[quest.variant].models.entry;
+        return await Entry.find({ questId: quest._id, sub: account.sub, status: QuestEntryStatus.Pending });
     }
 
     static isExpired(quest: TQuest) {

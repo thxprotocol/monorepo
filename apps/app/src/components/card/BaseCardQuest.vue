@@ -31,9 +31,12 @@
                     <i class="fab fa-twitter me-1" />
                     A minimum of <strong>{{ quest.contentMetadata.minFollowersCount }} followers</strong> is required.
                 </b-alert>
-
                 <b-alert v-model="isAlertDangerShown" variant="primary" class="p-2">
                     <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+                </b-alert>
+                <b-alert v-model="isAlertEntriesPendingReviewShown" variant="primary" class="p-2">
+                    <i class="fas fa-info-circle me-1"></i> You have
+                    <strong>{{ quest.entriesPendingReview.length }}</strong> entries pending a review.
                 </b-alert>
 
                 <div class="d-flex align-items-start justify-content-between">
@@ -170,6 +173,9 @@ export default defineComponent({
         },
         isAlertDangerShown() {
             return !!this.error;
+        },
+        isAlertEntriesPendingReviewShown() {
+            return this.quest.entriesPendingReview.length > 0;
         },
     },
     watch: {
