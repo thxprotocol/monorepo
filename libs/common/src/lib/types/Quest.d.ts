@@ -22,6 +22,7 @@ type TBaseQuestEntry = {
     amount: number;
     recaptcha: string;
     ip: string;
+    status: QuestEntryStatus;
     createdAt: Date;
 };
 

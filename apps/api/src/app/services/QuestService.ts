@@ -19,6 +19,7 @@ import QuestSocialService from './QuestSocialService';
 import DiscordService from './DiscordService';
 import { PromiseParser } from '../util/promise';
 import { getIP } from '../util/ip';
+import { QuestEntryStatus } from '@thxnetwork/common/enums';
 
 export default class QuestService {
     static async getDataForRequest(variant: QuestVariant, req: Request, options) {
@@ -99,6 +100,47 @@ export default class QuestService {
         }
 
         return await this.updateById(quest.variant, quest._id, updates);
+    }
+
+    static async updateEntries(quest: TQuest, updates: { entryId: string; status: QuestEntryStatus }[]) {
+        const Entry = serviceMap[quest.variant].models.entry;
+        const entries = await Entry.find({ _id: { $in: updates.map(({ entryId }) => entryId) } });
+        const accounts = await AccountProxy.find({ subs: entries.map(({ sub }) => sub) });
+        const pool = await PoolService.getById(quest.poolId);
+
+        // Update entry status
+        const operations = updates
+            // Only process status changes
+            .filter(({ entryId, status }) => entries.find((e) => e.id === entryId).status !== status)
+            .map(({ entryId, status }) => ({
+                updateOne: {
+                    filter: { _id: entryId },
+                    update: { status },
+                },
+            }));
+        await Entry.bulkWrite(operations);
+
+        // Update point balances for entries
+        for (const { entryId, status } of updates) {
+            try {
+                const entry = entries.find((e) => e.id === entryId);
+                if (!entry) throw new Error('Entry not found');
+
+                const account = accounts.find((a) => a.sub === entry.sub);
+                if (!account) throw new Error('Account not found');
+
+                switch (status) {
+                    case QuestEntryStatus.Approved:
+                        await PointBalanceService.add(pool, account, entry.amount);
+                        break;
+                    case QuestEntryStatus.Rejected:
+                        await PointBalanceService.subtract(pool, account, entry.amount);
+                        break;
+                }
+            } catch (error) {
+                logger.error('UpdateEntry failed', { error });
+            }
+        }
     }
 
     static async create(variant: QuestVariant, poolId: string, data: Partial<TQuest>, file?: Express.Multer.File) {
@@ -285,23 +327,27 @@ export default class QuestService {
             if (!isAvailable.result) throw new Error(isAvailable.reason);
 
             // Create the quest entry
+            const status = quest.isReviewEnabled ? QuestEntryStatus.Pending : QuestEntryStatus.Approved;
+            const metadata = await this.getEntryMetadata({ quest, account, data });
             const entry = await Entry.create({
-                ...(await this.getEntryMetadata({ quest, account, data })),
+                ...metadata,
                 amount,
                 sub: account.sub,
                 questId: quest.id,
                 poolId: pool.id,
+                status,
                 uuid: v4(),
             } as TQuestEntry);
-            console.log(entry);
             if (!entry) throw new Error('Entry creation failed.');
 
             // Assert if a required quest for invite quests has been completed
             const InviteService = serviceMap[QuestVariant.Invite] as IQuestInviteService;
             await InviteService.assertQuestEntry({ pool, quest, account });
 
-            // Add points to participant balance
-            await PointBalanceService.add(pool, account, amount);
+            // Add points to participant balance if manual review is disabled
+            if (!quest.isReviewEnabled) {
+                await PointBalanceService.add(pool, account, amount);
+            }
 
             // Update participant ranks async
             await agenda.now(JobType.UpdateParticipantRanks, { poolId: pool.id });

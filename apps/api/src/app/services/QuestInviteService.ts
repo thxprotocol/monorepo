@@ -8,6 +8,7 @@ import PointBalanceService from './PointBalanceService';
 import AccountProxy from '../proxies/AccountProxy';
 import MailService from './MailService';
 import { Request } from 'express';
+import { QuestEntryStatus } from '@thxnetwork/common/enums/QuestEntryStatus';
 
 export default class QuestInviteService implements IQuestService {
     models = {
@@ -151,18 +152,22 @@ export default class QuestInviteService implements IQuestService {
             );
 
             // Create entry for invitee
+            const status = quest.isReviewEnabled ? QuestEntryStatus.Pending : QuestEntryStatus.Approved;
             await QuestInviteEntry.create({
                 questId: inviteQuest.id,
                 sub: account.sub,
                 amount: inviteQuest.amountInvitee,
+                status,
                 metadata: {
                     code: code.code,
                     inviter: inviter.username,
                 },
             });
 
-            // Transfer points to invitee
-            await PointBalanceService.add(pool, account, inviteQuest.amountInvitee);
+            // Add points to invitee balance if manual review is disabled
+            if (!quest.isReviewEnabled) {
+                await PointBalanceService.add(pool, account, inviteQuest.amountInvitee);
+            }
         }
     }
 
