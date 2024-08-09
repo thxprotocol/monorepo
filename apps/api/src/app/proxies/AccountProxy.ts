@@ -234,7 +234,7 @@ class AccountProxy {
     }
 
     getByIdentity(identity: string): Promise<TAccount> {
-        return Account.findById({ identity });
+        return Account.findOne({ identity });
     }
 
     async isEmailDuplicate(email: string) {
