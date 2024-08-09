@@ -20,9 +20,9 @@ const controller = async (req: Request, res: Response) => {
     const quest = await QuestService.findById(variant, questId);
     if (!quest) throw new NotFoundError('Quest not found');
 
-    await QuestService.updateEntries(quest, req.body.entries);
+    const entries = await QuestService.updateEntries(quest, req.body.entries);
 
-    res.status(204).end();
+    res.json(entries);
 };
 
 export { controller, validation };

@@ -107,7 +107,8 @@ export default class QuestService {
 
     static async updateEntries(quest: TQuest, updates: { entryId: string; status: QuestEntryStatus }[]) {
         const Entry = serviceMap[quest.variant].models.entry;
-        const entries = await Entry.find({ _id: { $in: updates.map(({ entryId }) => entryId) } });
+        const entryIds = updates.map(({ entryId }) => entryId);
+        const entries = await Entry.find({ _id: { $in: entryIds } });
         const accounts = await AccountProxy.find({ subs: entries.map(({ sub }) => sub) });
         const pool = await PoolService.getById(quest.poolId);
 
@@ -144,6 +145,8 @@ export default class QuestService {
                 logger.error('UpdateEntry failed', { error });
             }
         }
+
+        return await Entry.find({ _id: { $in: entryIds } });
     }
 
     static async create(variant: QuestVariant, poolId: string, data: Partial<TQuest>, file?: Express.Multer.File) {

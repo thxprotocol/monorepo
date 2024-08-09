@@ -8,7 +8,7 @@ import * as CreateController from './variant/post.controller';
 import * as UpdateController from './variant/patch.controller';
 import * as RemoveController from './variant/delete.controller';
 
-import RouterQuestEntries from './entries/entries.router';
+import RouterQuestEntries from './variant/entries/entries.router';
 
 const router: express.Router = express.Router({ mergeParams: true });
 

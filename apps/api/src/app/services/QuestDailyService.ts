@@ -103,7 +103,6 @@ export default class QuestDailyService implements IQuestService {
         account: TAccount;
         data: Partial<TQuestDailyEntry> & { start: number; end: number };
     }): Promise<TValidationResult> {
-        console.log({ data });
         const entry = await QuestDailyEntry.findOne({
             questId: quest._id,
             sub: account.sub,
