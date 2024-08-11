@@ -32,7 +32,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore, useRewardStore),
-        isModalInviteShown() {
+        isModalInviteShown(): boolean {
             return !!this.$route.params.code;
         },
     },

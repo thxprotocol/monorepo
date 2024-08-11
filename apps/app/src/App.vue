@@ -38,7 +38,7 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useWalletStore),
-        isOffline() {
+        isOffline(): boolean {
             try {
                 return this.$route.query.maintenance
                     ? !!JSON.parse(this.$route.query.maintenance)

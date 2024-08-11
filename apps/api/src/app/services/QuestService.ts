@@ -293,8 +293,8 @@ export default class QuestService {
 
             return {
                 ...data,
-                platformUserId,
                 metadata: {
+                    platformUserId,
                     discord: {
                         guildId: guild && guild.id,
                         username: member.user.username,
@@ -315,8 +315,8 @@ export default class QuestService {
             const user = await TwitterUser.findOne({ userId: platformUserId });
             return {
                 ...data,
-                platformUserId,
                 metadata: {
+                    platformUserId,
                     twitter: user.publicMetrics,
                 },
             };

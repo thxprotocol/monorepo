@@ -13,7 +13,7 @@ export default class QuestDiscordService implements IQuestService {
         entry: QuestSocialEntry,
     };
 
-    async getDataForRequest(req: Request, options: { quest: TQuest; account: TAccount }) {
+    async getDataForRequest(req: Request, options: { quest: TQuestSocial; account: TAccount }) {
         return {};
     }
 
@@ -173,22 +173,22 @@ export default class QuestDiscordService implements IQuestService {
 
         const { start, end } = this.getRestartDates(quest);
         const platformUserId = QuestSocialService.findUserIdForInteraction(account, quest.interaction);
-        const claims = await QuestSocialEntry.find({
-            'questId': String(quest._id),
+        const entries = await QuestSocialEntry.find({
+            'questId': quest.id,
             'metadata.platformUserId': platformUserId,
             'createdAt': {
                 $gte: start,
                 $lt: end,
             },
         }).sort({ createdAt: -1 });
-        const [claim] = claims;
-        const pointsClaimed = claims.reduce((total, claim) => total + Number(claim.amount), 0);
+        const [entry] = entries;
+        const pointsClaimed = entries.reduce((total, entry) => total + Number(entry.amount), 0);
 
         // Only find messages created after the last claim if one exists
         const messages = await DiscordMessage.find({
             guildId: quest.content,
             memberId: platformUserId,
-            createdAt: { $gte: claim ? claim.createdAt : start, $lt: end },
+            createdAt: { $gte: entry ? entry.createdAt : start, $lt: end },
         });
         const pointsAvailable = messages.length * quest.amount;
 

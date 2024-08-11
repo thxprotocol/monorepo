@@ -41,7 +41,6 @@ export default class QuestSocialService implements IQuestService {
     async isAvailable({
         quest,
         account,
-        data,
     }: {
         quest: TQuestSocial;
         account: TAccount;
@@ -49,16 +48,16 @@ export default class QuestSocialService implements IQuestService {
     }): Promise<TValidationResult> {
         if (!account) return { result: true, reason: '' };
 
+        const platformUserId = QuestSocialService.findUserIdForInteraction(account, quest.interaction);
         // We validate for both here since there are entries that only contain a sub
         // and should not be claimed again.
-        const ids: any[] = [{ sub: account.sub }];
-        if (data && data.metadata && data.metadata.platformUserId)
-            ids.push({ platformUserId: data.metadata.platformUserId });
+        const conditions: any[] = [{ sub: account.sub }];
+        if (platformUserId) conditions.push({ 'metadata.platformUserId': platformUserId });
 
         // If no entry exist the quest is available
         const isCompleted = await QuestSocialEntry.exists({
             questId: quest._id,
-            $or: ids,
+            $or: conditions,
         });
         if (!isCompleted) return { result: true, reason: '' };
 
@@ -90,7 +89,7 @@ export default class QuestSocialService implements IQuestService {
     async findEntryMetadata({ quest }: { quest: QuestSocialDocument }) {
         const reachTotal = await this.getTwitterFollowerCount(quest);
         const uniqueParticipantIds = await QuestSocialEntry.find({
-            questId: String(quest._id),
+            questId: quest.id,
         }).distinct('sub');
 
         return { reachTotal, participantCount: uniqueParticipantIds.length };

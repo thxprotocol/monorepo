@@ -33,7 +33,7 @@ export async function completeQuest(
             questInteraction && QuestSocialService.findUserIdForInteraction(account, questInteraction);
 
         const data = {
-            platformUserId,
+            metadata: { platformUserId },
         };
         const availabilityValidation = await QuestService.isAvailable(variant, {
             quest,
