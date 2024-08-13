@@ -15,7 +15,6 @@ export const ERC721Token = mongoose.model<ERC721TokenDocument>(
             state: Number,
             tokenUri: String,
             recipient: String,
-            failReason: String,
             transactions: [String],
         },
         { timestamps: true },

@@ -122,17 +122,18 @@ class SafeService {
         });
     }
 
-    async proposeTransaction(wallet: WalletDocument, options: SafeTransactionDataPartial) {
+    async proposeTransaction(wallet: WalletDocument, safeTransactionData: SafeTransactionDataPartial[]) {
         const { defaultAccount } = NetworkService.getProvider(wallet.chainId);
-        const safeTx = await this.createTransaction(wallet, options);
-        const safeTxHash = await this.getTransactionHash(wallet, safeTx);
-
+        const safeTx = await this.createTransaction(wallet, safeTransactionData);
         const signedTx = await this.signTransaction(wallet, safeTx);
-        const senderSignature = signedTx.signatures.get(defaultAccount.toLowerCase());
-
         const apiKit = this.getApiKit(wallet);
+
         try {
+            const safeTxHash = await this.getTransactionHash(wallet, safeTx);
+            const senderSignature = signedTx.signatures.get(defaultAccount.toLowerCase());
+
             logger.debug('Transaction proposal start', { safeTxHash });
+
             await apiKit.proposeTransaction({
                 safeAddress: toChecksumAddress(wallet.address),
                 safeTxHash,
@@ -156,18 +157,18 @@ class SafeService {
         }
     }
 
-    async createTransaction(wallet: WalletDocument, { to, data, nonce }: SafeTransactionDataPartial) {
+    async createTransaction(wallet: WalletDocument, safeTransactionData: SafeTransactionDataPartial[]) {
         const safe = await this.getSafe(wallet);
         try {
+            // const nonce = await this.getNextNonce(wallet);
             const safeTx = await safe.createTransaction({
-                safeTransactionData: {
+                safeTransactionData: safeTransactionData.map(({ to, data }) => ({
                     to,
                     data,
                     value: '0',
                     operation: 0,
-                    nonce,
-                },
-                options: { nonce },
+                })),
+                // options: { nonce },
             });
             logger.debug('Transaction created', { safeTx });
             return safeTx;
@@ -206,13 +207,10 @@ class SafeService {
         }
     }
 
-    async executeTransaction(tx: TransactionDocument) {
+    async executeTransaction(wallet: WalletDocument, safeTxHash: string) {
         try {
-            const wallet = await Wallet.findById(tx.walletId);
-            if (!wallet) throw new Error('Wallet not found');
-
-            const pendingTx = await this.getTransaction(wallet, tx.safeTxHash);
-            if (!wallet) throw new Error('Pending TX not found');
+            const pendingTx = await this.getTransaction(wallet, safeTxHash);
+            if (!pendingTx) throw new Error('Pending TX not found');
 
             const { confirmations, confirmationsRequired } = pendingTx;
             if (confirmations && confirmations.length >= confirmationsRequired) {
@@ -222,29 +220,50 @@ class SafeService {
                 try {
                     const response = await safe.executeTransaction(safeTx);
                     const receipt = await response.transactionResponse.wait(3);
-                    if (!receipt) throw new Error(`No receipt found for ${tx.safeTxHash}`);
-                    if (!receipt.transactionHash) throw new Error(`No transactionHash found for ${tx.safeTxHash}`);
+                    if (!receipt) throw new Error(`No receipt found for ${safeTxHash}`);
+                    if (!receipt.transactionHash) throw new Error(`No transactionHash found for ${safeTxHash}`);
 
-                    await tx.updateOne({ transactionHash: receipt.transactionHash, state: TransactionState.Sent });
+                    await Transaction.updateMany(
+                        { safeTxHash },
+                        { transactionHash: receipt.transactionHash, state: TransactionState.Sent },
+                    );
 
                     logger.debug('Transaction executed', {
-                        safeTxHash: tx.safeTxHash,
+                        safeTxHash,
                         transactionHash: receipt.transactionHash,
                     });
+
+                    return receipt.transactionHash;
                 } catch (error) {
                     // Suppress non breaking gas estimation error on Hardhat and start polling for state
+                    const [tx] = await Transaction.find({ safeTxHash });
                     if (tx.chainId === ChainId.Hardhat && error.message.includes('GS026')) {
-                        await tx.updateOne({ state: TransactionState.Sent });
-                    } else {
+                        await Transaction.updateMany({ safeTxHash }, { state: TransactionState.Sent });
+                    }
+                    // Try again if one of these error messages
+                    else if (
+                        !['service temporarily unavailable', 'service temporarily unavailable, retry in 10s'].includes(
+                            error.message,
+                        )
+                    ) {
                         throw error;
                     }
                 }
             } else {
+                const tx = await Transaction.findOne({ safeTxHash });
+                const timeout = 15 * 60 * 1000;
+                if (new Date(tx.createdAt).getTime() + timeout > Date.now()) {
+                    throw new Error('Transaction failed after 1 hour attempts');
+                }
+
+                // Update attempt count
+                await Transaction.updateMany({ safeTxHash }, { $inc: { attemptCount: 1 } });
                 logger.debug('Require more confirmations', { safeTxHash: pendingTx.safeTxHash });
             }
         } catch (error) {
-            await tx.updateOne({ state: TransactionState.Failed });
-            logger.error('Error executing transaction', error.response ? error.response.data : error.message);
+            const failReason = error.response ? error.response.data : error.message;
+            await Transaction.updateMany({ safeTxHash }, { state: TransactionState.Failed, failReason });
+            logger.error('Error executing transaction', failReason);
         }
     }
 
@@ -252,17 +271,16 @@ class SafeService {
         const safeTx = await this.getTransaction(wallet, safeTxHash);
         if (!safeTx) return;
 
-        const tx = await Transaction.findOne({ safeTxHash });
-        const isSent = tx.state === TransactionState.Sent;
-
-        if (isSent && safeTx.isExecuted && safeTx.isSuccessful) {
-            await TransactionService.queryTransactionStatusReceipt(tx);
-            logger.debug('Transaction success', { safeTx });
+        if (safeTx.isExecuted && safeTx.isSuccessful) {
+            for (const tx of await Transaction.find({ safeTxHash })) {
+                await TransactionService.queryTransactionStatusReceipt(tx);
+                logger.debug('Transaction success', { safeTxHash });
+            }
         }
 
-        if (isSent && safeTx.isExecuted && !safeTx.isSuccessful) {
-            await tx.updateOne({ state: TransactionState.Failed });
-            logger.debug('Transaction failed', { safeTx });
+        if (safeTx.isExecuted && !safeTx.isSuccessful) {
+            await Transaction.updateMany({ safeTxHash }, { state: TransactionState.Failed });
+            logger.debug('Transaction failed', { safeTx: safeTxHash });
         }
     }
 
@@ -270,7 +288,7 @@ class SafeService {
         const apiKit = this.getApiKit(wallet);
         try {
             const safeTx = await apiKit.getTransaction(safeTxHash);
-            logger.debug('Transaction get', { safeTx });
+            logger.debug('Transaction get', { safeTx: safeTxHash });
             return safeTx;
         } catch (error) {
             logger.error('Error transaction get', error.response ? error.response.data : error.message);

@@ -146,21 +146,16 @@ class BalancerService {
 
                 // veTHX contract on Polygon
                 const veTHXAddress = contractNetworks[chainId].VotingEscrow;
-                const veTHX = new ethers.Contract(veTHXAddress, contractArtifacts.VotingEscrow.abi, provider);
 
                 const { rewards, schedule } = await this.getRewards(chainId);
                 this.rewards[chainId] = rewards;
-                logger.debug(this.rewards[chainId]);
-
                 this.schedule[chainId] = schedule;
-                logger.debug(this.schedule[chainId]);
 
                 // TVL is measured as the total amount of BPT-gauge locked in veTHX
                 const liquidity = (await bpt.totalSupply()).toString();
                 const staked = (await bpt.balanceOf(gauge.address)).toString();
                 const tvl = (await gauge.balanceOf(veTHXAddress)).toString();
                 this.tvl[chainId] = { liquidity, staked, tvl };
-                logger.debug(this.tvl[chainId]);
 
                 // Calc APR
                 const apr = await this.calculateBalancerAPR(gauge, priceOfBAL, pricePerBPT);

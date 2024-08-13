@@ -2,12 +2,12 @@ import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { ERC721, ERC721Document } from '@thxnetwork/api/models/ERC721';
 import { ERC721Metadata, ERC721MetadataDocument } from '@thxnetwork/api/models/ERC721Metadata';
 import { ERC721Token, ERC721TokenDocument } from '@thxnetwork/api/models/ERC721Token';
-import { Transaction } from '@thxnetwork/api/models/Transaction';
+import { Transaction, TransactionDocument } from '@thxnetwork/api/models/Transaction';
 import { ERC721TokenState, TransactionState } from '@thxnetwork/common/enums';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
-import { WalletDocument } from '../models/Wallet';
+import { Wallet, WalletDocument } from '../models/Wallet';
 import { RewardNFT } from '../models/RewardNFT';
 import { getArtifact } from '../hardhat';
 import PoolService from './PoolService';
@@ -16,6 +16,7 @@ import IPFSService from './IPFSService';
 import WalletService from './WalletService';
 import { TransactionReceipt } from 'web3-core';
 import { toChecksumAddress } from 'web3-utils';
+import { ADDRESS_ZERO } from '../config/secrets';
 
 const contractName = 'THXERC721';
 
@@ -84,54 +85,56 @@ export async function mint(
     erc721: ERC721Document,
     wallet: WalletDocument,
     metadata: ERC721MetadataDocument,
-): Promise<ERC721TokenDocument> {
+): Promise<TransactionDocument> {
     const tokenUri = await IPFSService.getTokenURI(erc721, metadata.id);
-    const query = {
-        erc721Id: erc721.id,
-        sub: wallet.sub,
-        tokenUri: erc721.baseURL + tokenUri,
-        metadataId: metadata.id,
-        walletId: wallet.id,
-        chainId: erc721.chainId,
-    };
-    const erc721token = await ERC721Token.findOneAndUpdate(
-        query,
-        {
-            ...query,
-            state: ERC721TokenState.Pending,
-            recipient: wallet.address,
-        },
-        { upsert: true, new: true },
-    );
-
-    const tx = await TransactionService.sendSafeAsync(
+    return await TransactionService.sendSafeAsync(
         safe,
         erc721.address,
         erc721.contract.methods.mint(wallet.address, tokenUri),
         {
             type: 'erc721TokenMintCallback',
-            args: { erc721tokenId: erc721token.id },
+            args: {
+                erc721MetadataId: metadata.id,
+            },
         },
-    );
-
-    return await ERC721Token.findByIdAndUpdate(
-        erc721token.id,
-        { transactions: [tx.id], state: ERC721TokenState.Transferring },
-        { new: true },
     );
 }
 
 export async function mintCallback(args: TERC721TokenMintCallbackArgs, receipt: TransactionReceipt) {
-    const token = await ERC721Token.findById(args.erc721tokenId);
-    const { contract } = await ERC721.findById(token.erc721Id);
-    const events = parseLogs(contract.options.jsonInterface, receipt.logs);
-    const event = assertEvent('Transfer', events);
+    const metadata = await ERC721Metadata.findById(args.erc721MetadataId);
+    const erc721 = await ERC721.findById(metadata.erc721Id);
+    const tokenUri = await IPFSService.getTokenURI(erc721, metadata.id);
 
-    await token.updateOne({
-        state: ERC721TokenState.Minted,
-        tokenId: Number(event.args.tokenId),
-        recipient: event.args.to,
-    });
+    const logs = parseLogs(erc721.contract.options.jsonInterface, receipt.logs);
+    //  Get all the ERC721 mint events Transfer(from: 0x00, to: wallet address, tokenId: exists)
+    const events = logs.filter(
+        (ev: any) => ev && ev.name === 'Transfer' && ev.args.from === ADDRESS_ZERO && ev.args.tokenId,
+    );
+
+    // Add a token document with token ID for every wallet found in the db thats equal
+    // to the mint event to param
+    for (const event of events) {
+        const tokenExists = await ERC721Token.exists({
+            recipient: event.args.to,
+            tokenId: Number(event.args.tokenId),
+            erc721Id: erc721.id,
+        });
+        if (tokenExists) continue;
+
+        // Add tokent to account wallets
+        for (const wallet of await Wallet.find({ address: event.args.to })) {
+            await ERC721Token.create({
+                sub: wallet.sub,
+                walletId: wallet.id,
+                chainId: erc721.chainId,
+                erc721Id: erc721.id,
+                metadataId: metadata.id,
+                tokenUri: erc721.baseURL + tokenUri,
+                recipient: event.args.to,
+                tokenId: Number(event.args.tokenId),
+            });
+        }
+    }
 }
 
 export async function queryMintTransaction(erc721Token: ERC721TokenDocument): Promise<ERC721TokenDocument> {
@@ -220,7 +223,7 @@ export async function transferFrom(
     to: string,
     erc721Token: ERC721TokenDocument,
 ): Promise<ERC721TokenDocument> {
-    const toWallet = await WalletService.findOne({ address: to, chainId: erc721.chainId });
+    const toWallet = await WalletService.findOne({ address: to });
     const tx = await TransactionService.sendSafeAsync(
         wallet,
         erc721.address,
@@ -228,16 +231,17 @@ export async function transferFrom(
         {
             type: 'erc721nTransferFromCallback',
             args: {
-                erc721Id: String(erc721._id),
-                erc721TokenId: String(erc721Token._id),
-                walletId: toWallet && toWallet._id,
+                erc721Id: erc721.id,
+                erc721TokenId: erc721Token.id,
+                walletId: toWallet && toWallet.id,
             },
         },
     );
+
     return await ERC721Token.findByIdAndUpdate(
-        erc721Token._id,
+        erc721Token.id,
         {
-            transactions: [String(tx._id)],
+            transactions: [tx.id],
             state: ERC721TokenState.Transferring,
         },
         { new: true },
@@ -248,16 +252,17 @@ export async function transferFromCallback(args: TERC721TransferFromCallBackArgs
     const { erc721TokenId, walletId } = args;
     const erc721Token = await ERC721Token.findById(erc721TokenId);
     const erc721 = await ERC721.findById(erc721Token.erc721Id);
+    const wallet = await Wallet.findById(walletId);
+
     const events = parseLogs(erc721.contract.options.jsonInterface, receipt.logs);
     const event = assertEvent('Transfer', events);
-    const wallet = await WalletService.findById(walletId);
 
     await erc721Token.updateOne({
         state: ERC721TokenState.Transferred,
         tokenId: Number(event.args.tokenId),
         recipient: event.args.to,
         sub: wallet && wallet.sub,
-        walletId: wallet && String(wallet._id),
+        walletId: wallet && wallet.id,
     });
 }
 

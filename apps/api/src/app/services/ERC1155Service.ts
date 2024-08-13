@@ -179,7 +179,7 @@ export async function transferFrom(
     erc1155Token: ERC1155TokenDocument,
     amount: string,
 ): Promise<ERC1155TokenDocument> {
-    const toWallet = await SafeService.findOne({ address: to, chainId: erc1155.chainId });
+    const toWallet = await SafeService.findOne({ address: to });
     const tx = await TransactionService.sendSafeAsync(
         wallet,
         erc1155.address,
@@ -187,29 +187,30 @@ export async function transferFrom(
         {
             type: 'erc1155TransferFromCallback',
             args: {
-                erc1155Id: String(erc1155._id),
-                erc1155TokenId: String(erc1155Token._id),
+                erc1155Id: erc1155.id,
+                erc1155TokenId: erc1155Token.id,
                 walletId: toWallet && toWallet.id,
             },
         },
     );
     const metadata = await ERC1155Metadata.findById(erc1155Token.metadataId);
 
+    const query = {
+        erc1155Id: erc1155.id,
+        tokenId: metadata.tokenId,
+        sub: wallet.sub,
+        walletId: wallet.id,
+    };
     await ERC1155Token.findOneAndUpdate(
-        {
-            erc1155Id: String(erc1155._id),
-            tokenId: metadata.tokenId,
-            sub: wallet.sub,
-            walletId: String(wallet._id),
-        },
+        query,
         {
             sub: wallet.sub,
             tokenUri: erc1155.baseURL.replace('{id}', erc1155Token.tokenUri),
             recipient: wallet.address,
             state: ERC1155TokenState.Pending,
-            erc1155Id: String(erc1155._id),
-            metadataId: String(metadata._id),
-            walletId: String(wallet._id),
+            erc1155Id: erc1155.id,
+            metadataId: metadata.id,
+            walletId: wallet.id,
             tokenId: metadata.tokenId,
         },
         { upsert: true, new: true },
@@ -217,7 +218,7 @@ export async function transferFrom(
 
     return await ERC1155Token.findByIdAndUpdate(
         erc1155Token._id,
-        { transactions: [String(tx._id)], state: ERC1155TokenState.Transferring },
+        { transactions: [tx.id], state: ERC1155TokenState.Transferring },
         { new: true },
     );
 }

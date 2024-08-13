@@ -23,17 +23,6 @@ type TToken = {
     price: number;
 };
 
-type TTransaction = {
-    from: string;
-    to: string;
-    nonce: number;
-    gas: string;
-    chainId: ChainId;
-    walletId: string;
-    transactionHash: string;
-    safeTxHash: string;
-};
-
 type TWalletState = {
     modal: Web3Modal | null;
     account: any | null;
