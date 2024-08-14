@@ -9,7 +9,7 @@ const DEPLOYER_PRIVATE_KEY = process.env.POLYGON_PRIVATE_KEY || '';
 const ETHERSCAN_POLYGON_API_KEY = process.env.ETHERSCAN_POLYGON_API_KEY || '';
 const ETHERSCAN_BASE_API_KEY = process.env.ETHERSCAN_BASE_API_KEY || '';
 const ETHERSCAN_ARBITRUM_API_KEY = process.env.ETHERSCAN_ARBITRUM_API_KEY || '';
-
+console.log('ETHERSCAN_ARBITRUM_API_KEY', ETHERSCAN_ARBITRUM_API_KEY);
 const config: HardhatUserConfig = {
     defaultNetwork: 'hardhat',
     networks: {
@@ -109,8 +109,8 @@ const config: HardhatUserConfig = {
     etherscan: {
         apiKey: {
             polygon: ETHERSCAN_POLYGON_API_KEY,
+            arbitrumOne: ETHERSCAN_ARBITRUM_API_KEY,
             base: ETHERSCAN_BASE_API_KEY,
-            arbitrum: ETHERSCAN_ARBITRUM_API_KEY,
         },
         customChains: [
             {

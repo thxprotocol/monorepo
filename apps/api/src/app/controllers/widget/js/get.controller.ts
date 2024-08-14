@@ -387,6 +387,7 @@ if (typeof window.THXWidget !== 'undefined') {
             } else {
                 container = document.createElement('div');
                 container.id = 'thx-container';
+                container.style.userSelect = 'none';
                 container.appendChild(iframe);   
                 
                 if (!cssSelector) {
