@@ -7,7 +7,11 @@ const validation = [
     query('page').isInt(),
     query('limit').isInt(),
     query('page').optional().isString(),
-    query('query').optional().isString().isLength({ min: 3 }),
+    query('query')
+        .optional()
+        .isString()
+        .isLength({ min: 3 })
+        .customSanitizer((value) => value.trim()),
 ];
 
 const controller = async (req: Request, res: Response) => {

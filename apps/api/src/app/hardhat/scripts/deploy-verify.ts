@@ -5,14 +5,14 @@ import hre, { ethers } from 'hardhat';
  * @dev npx hardhat run --network arbitrum scripts/deploy-verify.ts
  */
 async function main() {
-    // const BondPurchaseCheckerFactory = await ethers.getContractFactory('BondPurchaseCheckerFactory');
-    // const factory = await BondPurchaseCheckerFactory.deploy();
-    // await factory.deployed();
-    // console.log('BondPurchaseCheckerFactory deployed:', factory.address);
+    const BondPurchaseCheckerFactory = await ethers.getContractFactory('BondPurchaseCheckerFactory');
+    const factory = await BondPurchaseCheckerFactory.deploy();
+    await factory.deployed();
+    console.log('BondPurchaseCheckerFactory deployed:', factory.address);
+
     try {
         await hre.run('verify:verify', {
-            // address: factory.address,
-            address: '0xe632ea2eF2CFD8Fc4a2731C76F99078Aef6a4B31',
+            address: factory.address,
             constructorArguments: [],
         });
         console.log('BondPurchaseCheckerFactory verification success!');
