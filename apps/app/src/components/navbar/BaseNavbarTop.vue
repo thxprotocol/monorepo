@@ -2,7 +2,7 @@
     <div
         v-if="accountStore.config.domain && !isIframe"
         style="height: 30px"
-        class="nav-top d-flex py-1 px-2 bg-dark text-white justify-content-between"
+        class="nav-top py-1 px-2 bg-dark text-white justify-content-between d-none d-lg-flex"
     >
         <b-link to="/" class="text-white text-opaque text-decoration-none">
             <i class="fas fa-caret-left me-1" />
