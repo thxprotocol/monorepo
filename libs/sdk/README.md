@@ -5,8 +5,8 @@ This SDK contains API wrappers and an OIDC OAuth manager to simplify access to T
 ## Prerequisites
 
 1. [Sign up for an account](https://dashboard.thx.network/)
-2. Create API keys (Developer -> API)
-3. Save your `clientId` and `clientSecret`
+2. Create an API key (Account -> Developer -> API)
+3. Store your API key in a secure location
 
 ## SDK Contents
 
@@ -20,18 +20,11 @@ This SDK contains API wrappers and an OIDC OAuth manager to simplify access to T
     -   [2.1 Identities](#21-identities)
     -   [2.2 Events](#22-events)
 
--   [3. THXBrowserClient](#3-thxbrowserclient)
-
-    -   [3.1 Account](#31-account)
-    -   [3.2 Quests](#32-quests)
-    -   [3.3 Rewards](#33-rewards)
-    -   [3.4 Wallet](#34-wallet)
-
 ## 1. THXWidget
 
 Meant for loading the HTML widget in a website using JavaScript.
 
-```javascript
+```typescript
 import { THXWidget, THXWidgetOptions } from '@thxnetwork/sdk';
 
 const options: THXWidgetOptions = {
@@ -56,7 +49,7 @@ No messagbox, launcher and notification elements will be injected if a container
 
 Providing an identity is optional and alternatively you can set an identity at a later moment, for example after successful authentication with your app.
 
-```javascript
+```typescript
 window.THXWidget.setIdentity('36d33a59-5398-463a-ac98-0f7d9b201648');
 ```
 
@@ -64,13 +57,11 @@ window.THXWidget.setIdentity('36d33a59-5398-463a-ac98-0f7d9b201648');
 
 Meant for JavaScript backend applications.
 
-```javascript
+```typescript
 import { THXAPIClient, THXAPIClientOptions } from '@thxnetwork/sdk';
 
 const options: THXAPIClientOptions = {
-    campaignId: '65b0e27845c63cd18e0ab4a6',
-    clientId: 'msuq4Znuv3q8hLf7ATnlP',
-    clientSecret: 'YP_k8_LnPG58LHqzWGxg3EMBBGVwwJUmqsuQZdoMtEAD-85hJwRt2vxfev23T92h727bDwCqh3cIkx6meT0xxg',
+    apiKey: 'WtMTSdvSuLaCL7YVYgn2OBT9Bp/WV6xxcosLiqj9CWo=',
 };
 const thx = new THXAPIClient(options);
 ```
@@ -79,7 +70,7 @@ const thx = new THXAPIClient(options);
 
 Identities are used to connect THX accounts to users in your database.
 
-```javascript
+```typescript
 const identity = await thx.identity.create();
 // 36d33a59-5398-463a-ac98-0f7d9b201648
 ```
@@ -88,7 +79,7 @@ const identity = await thx.identity.create();
 
 Events can be used to add requirements for Daily, Invite and Custom Quests.
 
-```javascript
+```typescript
 thx.events.create({ name: 'level_up', identity: '36d33a59-5398-463a-ac98-0f7d9b201648' });
 ```
 
@@ -100,7 +91,7 @@ Quests can be managed programatically. Specify `content` and `contentMetadata` a
 
 Use this `content` and `contentMetadata` for these `interaction` variants: `QuestRequirement.TwitterRetweet`.
 
-```javascript
+```typescript
 const interaction = QuestRequirement.TwitteRetweet;
 const content = '46927555';
 const contentMetadata = {
@@ -116,7 +107,7 @@ const contentMetadata = {
 
 Use this `content` and `contentMetadata` for these `interaction` variants: `QuestRequirement.TwitterFollow`.
 
-```javascript
+```typescript
 const interaction = QuestRequirement.TwitterFollow;
 const content = '13241234';
 const contentMetadata = {
@@ -132,7 +123,7 @@ const contentMetadata = {
 
 Use this `content` and `contentMetadata` for these `interaction` variants: ` QuestRequirement.TwitterMessage`,
 
-```javascript
+```typescript
 const interaction = QuestRequirement.TwitterMessage;
 const content = '✨ Loyalty Networks are here✨ #fintech meets #loyalty';
 const contentMetadata = {
@@ -142,7 +133,7 @@ const contentMetadata = {
 
 #### Create Twitter Quest
 
-```javascript
+```typescript
 thx.campaigns.quests.create({
     variant: QuestVariant.Twitter,
     title: 'Farm along!',
@@ -153,98 +144,4 @@ thx.campaigns.quests.create({
     content,
     contentMetadata,
 });
-```
-
-## 3. THXBrowserClient
-
-Meant for JavaScript browser applications.
-
-```javascript
-import { THXBrowserClient, THXBrowserClientOptions } from '@thxnetwork/sdk';
-
-const options: THXBrowserClientOptions = {
-    clientId: 'chyBeltL7rmOeTwVu',
-    clientSecret: 'q4ilZuGA4VPtrGhXug3i5taXrvDtidrzyv-gJN3yVo8T2stL6RwYQjqRoK-iUiAGGvhbG_F3TEFFuD_56Q065Q'
-    redirectUri: 'https://www.yourdomain.com/auth-callback'
-    campaignId: '6571c9c6b7d775decb45a8f0', // Optional
-};
-const thx = new THXBrowserClient(options);
-```
-
-Alternatively you can set the `campaignId` at a later moment, for example after obtaining it from a url or database. The campaign is used to scope API requests to a campaign that you own.
-
-```javascript
-thx.setCampaignId('6571c9c6b7d775decb45a8f0');
-```
-
-### 3.1 Account
-
-Get account info for the authenticated user and obtain it's current point balance in your campaign.
-
-```javascript
-// Get Account
-await client.account.get();
-
-// Update Account
-await client.account.patch({
-    username: '';
-    firstName: '';
-    lastName: '';
-    email: '';
-    profileImg: ''; // Absolute URL
-});
-
-// Get Point Balance
-await client.pointBalance.list();
-```
-
-### 3.2 Quests
-
-List and complete quests in your campaign.
-
-```javascript
-// List Quests
-await client.quests.list();
-
-// Complete Quests
-await client.quests.daily.complete(uuid, {
-    sub: '',
-});
-await client.quests.invite.complete(uuid, {
-    sub: '',
-});
-await client.quests.social.complete(id);
-await client.quests.custom.complete(id);
-await client.quests.web3.complete(id);
-```
-
-### 3.3 Rewards
-
-List and redeem rewards in your campaign.
-
-```javascript
-// List Rewards
-await thx.rewards.list();
-
-// Get Rewards
-await thx.rewards.coin.get(uuid);
-await thx.rewards.nft.get(uuid);
-await thx.rewards.custom.get(uuid);
-await thx.rewards.coupon.get(uuid);
-
-// Redeem Rewards
-await thx.rewards.coin.redemption.post(uuid);
-await thx.rewards.nft.redemption.post(uuid);
-await thx.rewards.custom.redemption.post(uuid);
-await thx.rewards.coupon.redemption.post(uuid);
-```
-
-### 3.4 Wallet
-
-List tokens held in your accounts wallet.
-
-```javascript
-await thx.erc20.list({ chainId: 137 });
-await thx.erc721.list({ chainId: 137 });
-await thx.erc1155.list({ chainId: 137 });
 ```
