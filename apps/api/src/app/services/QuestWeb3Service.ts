@@ -107,7 +107,7 @@ export default class QuestWeb3Service implements IQuestService {
         }
 
         if (!isCompleted && result.gte(threshold)) {
-            return { result: true, reason: '' };
+            return { result: true, reason: '', ...data };
         } else {
             return { result: false, reason: 'Validation did not succeed.' };
         }
