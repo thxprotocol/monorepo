@@ -8,6 +8,7 @@ const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || '';
 const DEPLOYER_PRIVATE_KEY = process.env.POLYGON_PRIVATE_KEY || '';
 const ETHERSCAN_POLYGON_API_KEY = process.env.ETHERSCAN_POLYGON_API_KEY || '';
 const ETHERSCAN_BASE_API_KEY = process.env.ETHERSCAN_BASE_API_KEY || '';
+const ETHERSCAN_ARBITRUM_API_KEY = process.env.ETHERSCAN_ARBITRUM_API_KEY || '';
 
 const config: HardhatUserConfig = {
     defaultNetwork: 'hardhat',
@@ -108,6 +109,7 @@ const config: HardhatUserConfig = {
     etherscan: {
         apiKey: {
             polygon: ETHERSCAN_POLYGON_API_KEY,
+            arbitrumOne: ETHERSCAN_ARBITRUM_API_KEY,
             base: ETHERSCAN_BASE_API_KEY,
         },
         customChains: [
@@ -131,6 +133,11 @@ if (DEPLOYER_PRIVATE_KEY && ALCHEMY_API_KEY && config.networks) {
     };
     config.networks.base = {
         url: `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+        accounts: [DEPLOYER_PRIVATE_KEY],
+        timeout: 2483647,
+    };
+    config.networks.arbitrum = {
+        url: `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
         accounts: [DEPLOYER_PRIVATE_KEY],
         timeout: 2483647,
     };

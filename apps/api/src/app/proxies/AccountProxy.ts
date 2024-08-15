@@ -7,13 +7,23 @@ import { BadRequestError, NotFoundError } from '../util/errors';
 import { AccessTokenKind, AccountPlanType, AccountVariant, OAuthScope } from '@thxnetwork/common/enums';
 import { AxiosRequestConfig } from 'axios';
 import { supabaseClient } from '../util/supabase';
-import { Account, AccountDocument } from '../models';
+import { Account, AccountDocument, Wallet } from '../models';
 import { Token } from '../models/Token';
 import { accountVariantProviderMap, providerAccountVariantMap } from '@thxnetwork/common/maps';
 import { toChecksumAddress } from 'web3-utils';
 import { SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
 import { logger } from '../util/logger';
 import { UserIdentity } from '@supabase/supabase-js';
+import { isObjectIdOrHexString } from 'mongoose';
+import { isAddress } from 'ethers/lib/utils';
+
+export function validateEmail(email: string) {
+    return !!String(email)
+        .toLowerCase()
+        .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        );
+}
 
 export const supabase = supabaseClient();
 
@@ -180,13 +190,15 @@ class AccountProxy {
         if (subs && subs.length) {
             accounts = await Account.find({ _id: { $in: subs } });
         } else if (query && query.length) {
-            accounts = await Account.find({
-                $or: [
-                    { username: new RegExp(query, 'i') },
-                    { email: new RegExp(query, 'i') },
-                    { _id: new RegExp(query, 'i') },
-                ],
-            });
+            const conditions: any[] = [{ email: new RegExp(query, 'i') }, { username: new RegExp(query, 'i') }];
+            if (isAddress(query)) {
+                const wallets = await Wallet.find({ address: new RegExp(query, 'i') });
+                const subs = wallets.map(({ sub }) => sub);
+                conditions.push({ _id: { $in: subs } });
+            } else if (isObjectIdOrHexString(query)) {
+                conditions.push({ _id: query });
+            }
+            accounts = await Account.find({ $or: conditions });
         } else {
             return [];
         }
