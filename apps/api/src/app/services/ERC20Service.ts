@@ -213,15 +213,15 @@ export const approve = async (erc20: ERC20Document, wallet: WalletDocument, amou
     );
 };
 
-export const transferFrom = async (erc20: ERC20Document, wallet: WalletDocument, to: string, amountInWei: string) => {
+export const transferFrom = async (erc20: ERC20Document, safe: WalletDocument, to: string, amountInWei: string) => {
     // Check if the receiving wallet is known and register the token
-    const receiver = await Wallet.findOne({ address: to });
-    if (receiver) {
-        await upsertToken(erc20, receiver);
+    const wallets = await Wallet.find({ address: to });
+    for (const wallet of wallets) {
+        await upsertToken(erc20, wallet);
     }
 
     const tx = await TransactionService.sendSafeAsync(
-        wallet,
+        safe,
         erc20.address,
         erc20.contract.methods.transfer(to, amountInWei),
         { type: 'transferFromCallBack', args: { erc20Id: erc20.id } },

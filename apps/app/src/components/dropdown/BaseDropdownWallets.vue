@@ -3,26 +3,16 @@
         <b-dropdown
             v-model="isOpenChains"
             variant="link"
-            class="w-100 rounded"
-            :style="{
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                borderTopRightRadius: '0 !important',
-                borderBottomRightRadius: '0 !important',
-            }"
-            toggle-class="d-flex align-items-center justify-content-end text-white text-decoration-none p-2 ps-3 pe-0"
+            class="me-2"
+            :style="{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }"
+            toggle-class="d-flex align-items-center"
             auto-close="outside"
             menu-class="bg-body"
             no-caret
             start
         >
             <template #button-content>
-                <b-img
-                    v-if="walletStore.chainId"
-                    :src="chainList[walletStore.chainId].logo"
-                    width="15"
-                    height="15"
-                    class="me-2"
-                />
+                <b-img v-if="walletStore.chainId" :src="chainList[walletStore.chainId].logo" width="15" height="15" />
                 <b-spinner v-else small />
             </template>
             <b-dropdown-item
@@ -40,12 +30,10 @@
             class="w-100 rounded"
             :style="{
                 backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                borderTopLeftRadius: '0 !important',
-                borderBottomLeftRadius: '0 !important',
                 borderTopRightRadius: walletStore.wallets.length ? '0 !important' : null,
                 borderBottomRightRadius: walletStore.wallets.length ? '0 !important' : null,
             }"
-            :toggle-class="`d-flex align-items-center justify-content-end text-white text-decoration-none py-2 px-1 ${
+            :toggle-class="`d-flex align-items-center justify-content-end text-white text-decoration-none py-2 ps-3 ${
                 !walletStore.wallets.length ? 'pe-3' : ''
             }`"
             auto-close="outside"
@@ -148,10 +136,10 @@
             v-if="walletStore.wallets.length"
             v-model="isOpen"
             variant="link"
+            toggle-class="p-2"
             menu-class="w-100 bg-body"
             no-caret
             end
-            toggle-class="p-2"
             :disabled="!accountStore.isAuthenticated"
             :style="{
                 backgroundColor: 'rgba(0, 0, 0, 0.3)',
@@ -185,6 +173,23 @@
             >
                 Add Wallet
             </b-dropdown-item>
+        </b-dropdown>
+        <b-dropdown
+            v-if="walletStore.wallet && walletStore.wallet.pendingTransactions.length"
+            variant="primary"
+            size="sm"
+            menu-class="bg-body"
+            toggle-class="ms-2 px-3"
+            no-caret
+        >
+            <template #button-content>
+                <i class="fas fa-circle text-danger position-absolute" style="top: -5px; right: -5px" />
+                <strong>{{ walletStore.wallet.pendingTransactions.length }}</strong>
+            </template>
+            <b-dropdown-text>
+                <span class="text-opaque">Transactions</span>
+                <BaseDropdownItemTransaction v-for="tx of walletStore.wallet.pendingTransactions" :tx="tx" />
+            </b-dropdown-text>
         </b-dropdown>
     </div>
 </template>
@@ -287,8 +292,9 @@ export default defineComponent({
             this.accountStore.setGlobals({ activeWalletId: wallet._id });
             this.walletStore.list();
         },
-        onClickChainSwitch(chain: { chainId: ChainId }) {
-            this.walletStore.switchChain(chain.chainId);
+        async onClickChainSwitch(chain: { chainId: ChainId }) {
+            await this.walletStore.switchChain(chain.chainId);
+            this.walletStore.list();
         },
     },
 });

@@ -1,6 +1,5 @@
 import db from './database';
 import { Agenda, Job } from '@hokify/agenda';
-import { updatePendingTransactions } from '@thxnetwork/api/jobs/updatePendingTransactions';
 import { updateCampaignRanks } from '@thxnetwork/api/jobs/updateCampaignRanks';
 import { logger } from './logger';
 import { MONGODB_URI } from '../config/secrets';
@@ -17,20 +16,22 @@ import VoteEscrowService from '../services/VoteEscrowService';
 import ParticipantService from '../services/ParticipantService';
 import NotificationService from '../services/NotificationService';
 import AnalyticsService from '../services/AnalyticsService';
+import TransactionService from '../services/TransactionService';
 
 const agenda = new Agenda({
     db: {
         address: MONGODB_URI,
         collection: 'jobs',
     },
-    maxConcurrency: 1,
-    lockLimit: 1,
     processEvery: '1 second',
 });
 
+agenda.define(JobType.Confirm, () => TransactionService.confirmJob());
+agenda.define(JobType.Execute, () => TransactionService.executeJob());
+agenda.define(JobType.Callback, () => TransactionService.callbackJob());
+
 agenda.define(JobType.UpdateCampaignRanks, updateCampaignRanks);
 agenda.define(JobType.UpdateParticipantRanks, (job: Job) => ParticipantService.updateRanksJob(job));
-agenda.define(JobType.UpdatePendingTransactions, updatePendingTransactions);
 agenda.define(JobType.CreateQuestEntry, (job: Job) => QuestService.createEntryJob(job));
 agenda.define(JobType.CreateRewardPayment, (job: Job) => RewardService.createPaymentJob(job));
 agenda.define(JobType.DeploySafe, (job: Job) => SafeService.deploySafeJob(job));
@@ -47,11 +48,15 @@ agenda.define(JobType.ClaimExternalRewards, () => VoteEscrowService.claimExterna
 db.connection.once('open', async () => {
     await agenda.start();
 
-    await agenda.every('10 seconds', JobType.UpdatePrices);
-    await agenda.every('10 seconds', JobType.UpdatePendingTransactions);
+    await agenda.every('5 seconds', JobType.Confirm);
+    await agenda.every('5 seconds', JobType.Execute);
+    await agenda.every('5 seconds', JobType.Callback);
+
+    await agenda.every('1 minutes', JobType.UpdatePrices);
     await agenda.every('5 minutes', JobType.UpdateCampaignRanks);
     await agenda.every('15 minutes', JobType.UpsertInvoices);
     await agenda.every('15 minutes', JobType.UpdateAPR);
+
     await agenda.every('0 9 * * *', JobType.AssertPayments);
     await agenda.every('0 9 * * *', JobType.ClaimExternalRewards);
     await agenda.every('0 9 * * MON', JobType.SendCampaignReport);

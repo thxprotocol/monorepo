@@ -1,21 +1,21 @@
 type TTransaction = {
+    _id: string;
     type: TransactionType;
     state: TransactionState;
     from: string;
     to: string;
+    data: string;
     nonce: number;
     gas: string;
     chainId: ChainId;
     walletId: string;
-    transactionId: string;
-    transactionHash?: string;
-    safeTxHash?: string;
-    call?: { fn: string; args: string };
-    baseFee?: string;
-    maxFeePerGas?: string;
-    maxPriorityFeePerGas?: string;
-    failReason?: string;
+    transactionHash: string;
+    safeTxHash: string;
     callback: TTransactionCallback;
+    failReason: string;
+    attemptCount: number;
+    createdAt: Date;
+    updatedAt: Date;
 };
 
 type SafeDeployCallback = {
@@ -102,7 +102,7 @@ type SwapCreateCallback = {
 };
 
 type TERC721TokenMintCallbackArgs = {
-    erc721tokenId: string;
+    erc721MetadataId: string;
 };
 
 type TERC1155TokenMintCallbackArgs = {

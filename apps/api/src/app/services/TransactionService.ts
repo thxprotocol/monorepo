@@ -5,14 +5,120 @@ import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { toChecksumAddress } from 'web3-utils';
 import { poll } from '@thxnetwork/api/util/polling';
 import { RelayerTransactionPayload } from '@openzeppelin/defender-relay-client';
-import { Transaction, TransactionDocument, WalletDocument } from '@thxnetwork/api/models';
+import { Transaction, TransactionDocument, Wallet, WalletDocument } from '@thxnetwork/api/models';
 import { TransactionReceipt } from 'web3-core';
+import { logger } from '../util/logger';
 import ERC20Service from './ERC20Service';
 import ERC721Service from './ERC721Service';
 import ERC1155Service from './ERC1155Service';
 import SafeService from './SafeService';
+import { PromiseParser } from '../util';
 
 class TransactionService {
+    /**
+     * Polls the transaction queue and confirms them.
+     * This is the main job of the service.
+     */
+    async confirmJob() {
+        // For every wallet we create a single Safe transaction potentially containing
+        // multiple transaction data partials and confirm the transaction
+        const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Queued);
+        const promises = Object.keys(transactionsByWalletId).map(async (walletId) => {
+            const now = Date.now();
+            try {
+                const wallet = await Wallet.findById(walletId);
+                const transactions = transactionsByWalletId[walletId];
+
+                await SafeService.proposeTransaction(wallet, transactions);
+            } catch (error) {
+                logger.error({ error });
+            }
+            logger.debug(`ConfirmJob Duration: ${Date.now() - now}ms`);
+        });
+        await PromiseParser.parse(promises);
+    }
+
+    /**
+     * Queries the transaction queue for confirmed transactions and executes them.
+     */
+    async executeJob() {
+        const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Confirmed);
+        for (const walletId in transactionsByWalletId) {
+            const now = Date.now();
+            try {
+                // Group by walletId
+                const wallet = await Wallet.findById(walletId);
+                const txs = transactionsByWalletId[walletId];
+
+                // Get unique tx.safeTxHash values
+                const safeTxHashes: string[] = Array.from(
+                    new Set(txs.sort((a, b) => a.nonce - b.nonce).map((tx: TransactionDocument) => tx.safeTxHash)),
+                );
+
+                // Iterate and execute
+                for (const safeTxHash of safeTxHashes) {
+                    // @dev should be processed serially due to nonce order
+                    const transactionHash = await SafeService.executeTransaction(wallet, safeTxHash);
+                    logger.debug(`Executed transaction: ${transactionHash}`);
+                }
+            } catch (error) {
+                logger.error({ error });
+            }
+            logger.debug(`ExecuteJob Duration: ${Date.now() - now}ms`);
+        }
+    }
+
+    /**
+     * Queries the transaction queue for confirmed transactions and executes them.
+     */
+    async callbackJob() {
+        const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Sent);
+        for (const walletId in transactionsByWalletId) {
+            const now = Date.now();
+            try {
+                // Group by walletId
+                const wallet = await Wallet.findById(walletId);
+                const txs = transactionsByWalletId[walletId];
+
+                // Get unique tx.safeTxHash values
+                const safeTxHashes: string[] = Array.from(new Set(txs.map((tx: TransactionDocument) => tx.safeTxHash)));
+
+                // Iterate and execute
+                for (const safeTxHash of safeTxHashes) {
+                    await SafeService.updateTransactionState(wallet, safeTxHash);
+                }
+            } catch (error) {
+                logger.error({ error });
+            }
+            logger.debug(`ExecuteJob Duration: ${Date.now() - now}ms`);
+        }
+    }
+
+    private async getTransactionsByStateGroupedBySafe(state: TransactionState) {
+        try {
+            const transactions: TransactionDocument[] = await Transaction.find({
+                state,
+            }).sort({ createdAt: 'asc' });
+
+            if (transactions.length) {
+                logger.debug(`Transaction Queue [${TransactionState[state]}]: ${transactions.length}`);
+            }
+
+            return transactions.reduce((txs, tx) => {
+                if (!tx.walletId) return txs;
+
+                const walletId = tx.walletId;
+                if (!txs[walletId]) txs[walletId] = [];
+                txs[walletId].push(tx);
+
+                return txs;
+            }, {});
+        } catch (error) {
+            logger.error('Transaction By State Grouped By Safe Failed', { error });
+            return [];
+        }
+    }
+
     /**
      * Creates a transaction in the db and either executes or schedules a web3 transaction.
      * When the chain has a relayer configured the transaction is scheduled through it instead of directly executed.
@@ -141,21 +247,10 @@ class TransactionService {
     }
 
     async queryTransactionStatusReceipt(tx: TransactionDocument) {
-        if ([TransactionState.Mined, TransactionState.Failed].includes(tx.state) || !tx.transactionHash) {
-            return tx;
-        }
         const { web3 } = NetworkService.getProvider(tx.chainId);
         try {
             const receipt = await web3.eth.getTransactionReceipt(tx.transactionHash);
-            if (receipt) {
-                // Wait 500 ms for transactions to be propagated to all nodes.
-                // Since we use multiple RPCs it happens we already have the receipt but the other RPC
-                // doesn't have the block available yet.
-                await new Promise((done) => setTimeout(done, 500));
-
-                await this.transactionMined(tx, receipt);
-            }
-
+            await this.transactionMined(tx, receipt);
             return tx.state;
         } catch (error) {
             console.error(error);
@@ -195,26 +290,15 @@ class TransactionService {
 
     async proposeSafeAsync(wallet: WalletDocument, to: string | null, data: string, callback?: TTransactionCallback) {
         const { relayer, defaultAccount } = NetworkService.getProvider(wallet.chainId);
-        const nonce = await SafeService.getNextNonce(wallet);
-        const safeTxHash = await SafeService.proposeTransaction(wallet, {
-            to,
-            data,
-            value: '0',
-            operation: 0,
-            nonce,
-        });
-        if (!safeTxHash) throw new Error("Couldn't propose transaction.");
-
         return await Transaction.create({
             type: relayer ? TransactionType.Relayed : TransactionType.Default,
-            state: TransactionState.Confirmed,
-            safeTxHash,
+            state: TransactionState.Queued,
+            from: defaultAccount,
             chainId: wallet.chainId,
             walletId: wallet.id,
-            from: defaultAccount,
             to,
+            data,
             callback,
-            nonce,
         });
     }
 

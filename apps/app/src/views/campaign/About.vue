@@ -8,7 +8,7 @@
                     </template>
                     <p style="white-space: pre-line" v-html="decodeHTML(accountStore.config.description)" />
                     <b-button
-                        v-if="!isQuestCampaign && accountStore.isAuthenticated"
+                        v-if="accountStore.isAuthenticated && accountStore.config.isQRCodeCampaign"
                         :to="`/c/${accountStore.config.slug}/wallets`"
                         variant="primary"
                         class="w-100"
@@ -17,7 +17,7 @@
                         <i class="fas fa-chevron-right ms-2" />
                     </b-button>
                     <b-button
-                        v-if="!isQuestCampaign && !accountStore.isAuthenticated"
+                        v-if="!accountStore.isAuthenticated && accountStore.config.isQRCodeCampaign"
                         variant="primary"
                         class="w-100"
                         @click="authStore.isModalLoginShown = true"
@@ -55,9 +55,6 @@ export default defineComponent({
         ...mapStores(useAuthStore),
         ...mapStores(useQuestStore),
         ...mapStores(useRewardStore),
-        isQuestCampaign() {
-            return this.questStore.quests.length || this.rewardStore.rewards.length;
-        },
     },
 });
 </script>

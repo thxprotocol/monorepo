@@ -11,6 +11,10 @@ import {
     PRIVATE_KEY,
     RELAYER_SPEED,
     SAFE_TXS_SERVICE,
+    METIS_RELAYER,
+    METIS_RPC,
+    METIS_RELAYER_API_KEY,
+    METIS_RELAYER_API_SECRET,
 } from '@thxnetwork/api/config/secrets';
 import Web3 from 'web3';
 import { ethers, Wallet } from 'ethers';
@@ -36,6 +40,13 @@ class NetworkService {
                 defaultAccount: POLYGON_RELAYER,
                 rpc: POLYGON_RPC,
                 relayer: { apiKey: POLYGON_RELAYER_API_KEY, apiSecret: POLYGON_RELAYER_API_SECRET },
+                txServiceUrl: 'https://safe-transaction-polygon.safe.global',
+            },
+            {
+                chainId: ChainId.Metis,
+                defaultAccount: METIS_RELAYER,
+                rpc: METIS_RPC,
+                relayer: { apiKey: METIS_RELAYER_API_KEY, apiSecret: METIS_RELAYER_API_SECRET },
                 txServiceUrl: 'https://safe-transaction-polygon.safe.global',
             },
         ],

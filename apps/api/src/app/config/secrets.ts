@@ -68,8 +68,12 @@ export const PUBLIC_URL = process.env.PUBLIC_URL || '';
 
 export const HARDHAT_RPC = process.env.HARDHAT_RPC || '';
 export const POLYGON_RPC = process.env.POLYGON_RPC || 'https://rpc.ankr.com/polygon';
-export const LINEA_RPC = `https://linea-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`;
-export const ETHEREUM_RPC = process.env.ETHEREUM_RPC || 'https://rpc.ankr.com/eth';
+export const LINEA_RPC =
+    `https://linea-mainnet.infura.io/v3/${INFURA_PROJECT_ID}` ||
+    `https://linea-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
+export const METIS_RPC = `https://metis-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
+export const ETHEREUM_RPC =
+    process.env.ETHEREUM_RPC || 'https://rpc.ankr.com/eth' || `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
 
 export const MONGODB_URI = String(process.env.MONGODB_URI) || '';
 export const PRIVATE_KEY = process.env.PRIVATE_KEY || '';
@@ -101,6 +105,10 @@ export const POLYGON_RELAYER_API_SECRET = process.env.POLYGON_RELAYER_API_SECRET
 export const LINEA_RELAYER = process.env.LINEA_RELAYER || '';
 export const LINEA_RELAYER_API_KEY = process.env.LINEA_RELAYER_API_KEY || '';
 export const LINEA_RELAYER_API_SECRET = process.env.LINEA_RELAYER_API_SECRET || '';
+
+export const METIS_RELAYER = process.env.METIS_RELAYER || '';
+export const METIS_RELAYER_API_KEY = process.env.METIS_RELAYER_API_KEY || '';
+export const METIS_RELAYER_API_SECRET = process.env.METIS_RELAYER_API_SECRET || '';
 
 export const RELAYER_SPEED = 'fast' as Speed;
 

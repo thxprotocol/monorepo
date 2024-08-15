@@ -1,7 +1,9 @@
 export enum JobType {
+    Confirm = 'confirmTransaction',
+    Execute = 'executeTransaction',
+    Callback = 'callbackTransaction',
     UpdateParticipantRanks = 'updateParticipantRanks',
     UpdateCampaignRanks = 'updateCampaignRanks',
-    UpdatePendingTransactions = 'updatePendingTransactions',
     CreateTwitterQuests = 'createTwitterQuests',
     SendCampaignReport = 'sendPoolAnalyticsReport',
     MigrateWallets = 'migrateWallets',

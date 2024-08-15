@@ -9,7 +9,6 @@ type TERC1155Token = {
     sub: string;
     state: ERC1155TokenState;
     recipient: string;
-    failReason: string;
     transactions: string[];
     tokenId: number;
     tokenUri: string;
