@@ -273,8 +273,8 @@ class SafeService {
         if (safeTx.isExecuted && safeTx.isSuccessful) {
             for (const tx of await Transaction.find({ safeTxHash })) {
                 await TransactionService.queryTransactionStatusReceipt(tx);
-                logger.debug('Transaction success', { safeTxHash });
             }
+            logger.debug('Transaction success', { safeTxHash });
         }
 
         if (safeTx.isExecuted && !safeTx.isSuccessful) {

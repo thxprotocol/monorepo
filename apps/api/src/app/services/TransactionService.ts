@@ -28,8 +28,7 @@ class TransactionService {
                 const wallet = await Wallet.findById(walletId);
                 const transactions = transactionsByWalletId[walletId];
 
-                // @dev Perhaps we can do this async on a per Safe basis
-                await SafeService.proposeTransaction(wallet, transactions);
+                SafeService.proposeTransaction(wallet, transactions);
             } catch (error) {
                 logger.error({ error });
             }
