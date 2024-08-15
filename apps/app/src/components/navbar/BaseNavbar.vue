@@ -24,19 +24,17 @@
             <b-button
                 class="me-lg-3 mb-3 mb-lg-0 py-2 px-3 rounded text-decoration-none text-white"
                 variant="link"
-                to="/governance"
+                to="/members"
             >
-                Governance
+                Earn
             </b-button>
             <b-button
                 class="me-lg-3 mb-3 mb-lg-0 py-2 px-3 rounded text-decoration-none text-white"
                 variant="link"
-                to="/members"
+                to="/governance"
             >
-                Members
-                <sup><i class="fas fa-circle text-danger" /></sup>
+                Governance
             </b-button>
-
             <b-button class="ps-4 pe-3 rounded py-2 ms-2" variant="primary" target="_blank" :href="dashboardURL">
                 Create Campaign
                 <i class="fas fa-plus ms-2 text-opaque" />
