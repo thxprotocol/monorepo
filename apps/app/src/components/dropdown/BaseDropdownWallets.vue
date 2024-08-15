@@ -292,8 +292,9 @@ export default defineComponent({
             this.accountStore.setGlobals({ activeWalletId: wallet._id });
             this.walletStore.list();
         },
-        onClickChainSwitch(chain: { chainId: ChainId }) {
-            this.walletStore.switchChain(chain.chainId);
+        async onClickChainSwitch(chain: { chainId: ChainId }) {
+            await this.walletStore.switchChain(chain.chainId);
+            this.walletStore.list();
         },
     },
 });

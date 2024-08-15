@@ -68,7 +68,9 @@ export const PUBLIC_URL = process.env.PUBLIC_URL || '';
 
 export const HARDHAT_RPC = process.env.HARDHAT_RPC || '';
 export const POLYGON_RPC = process.env.POLYGON_RPC || 'https://rpc.ankr.com/polygon';
-export const LINEA_RPC = `https://linea-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`; // `https://linea-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`;
+export const LINEA_RPC =
+    `https://linea-mainnet.infura.io/v3/${INFURA_PROJECT_ID}` ||
+    `https://linea-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
 export const METIS_RPC = `https://metis-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
 export const ETHEREUM_RPC =
     process.env.ETHEREUM_RPC || 'https://rpc.ankr.com/eth' || `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;

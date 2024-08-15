@@ -7,11 +7,11 @@ import { poll } from '@thxnetwork/api/util/polling';
 import { RelayerTransactionPayload } from '@openzeppelin/defender-relay-client';
 import { Transaction, TransactionDocument, Wallet, WalletDocument } from '@thxnetwork/api/models';
 import { TransactionReceipt } from 'web3-core';
+import { logger } from '../util/logger';
 import ERC20Service from './ERC20Service';
 import ERC721Service from './ERC721Service';
 import ERC1155Service from './ERC1155Service';
 import SafeService from './SafeService';
-import { logger } from '../util/logger';
 
 class TransactionService {
     /**
@@ -19,35 +19,21 @@ class TransactionService {
      * This is the main job of the service.
      */
     async confirmJob() {
-        try {
-            // For every wallet we create a single Safe transaction potentially containing
-            // multiple transaction data partials and confirm the transaction
-            const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Queued);
-            for (const walletId in transactionsByWalletId) {
+        // For every wallet we create a single Safe transaction potentially containing
+        // multiple transaction data partials and confirm the transaction
+        const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Queued);
+        for (const walletId in transactionsByWalletId) {
+            const now = Date.now();
+            try {
                 const wallet = await Wallet.findById(walletId);
-                const txs = transactionsByWalletId[walletId];
-                const safeTxHash = await SafeService.proposeTransaction(
-                    wallet,
-                    txs.map((tx: TransactionDocument) => {
-                        return {
-                            to: tx.to,
-                            data: tx.data,
-                        };
-                    }),
-                );
+                const transactions = transactionsByWalletId[walletId];
 
-                // Update the state of the transactions with the safeTxHash and confirmed state
-                await Promise.all(
-                    txs.map((tx: TransactionDocument) => {
-                        return tx.updateOne({
-                            safeTxHash: safeTxHash,
-                            state: TransactionState.Confirmed,
-                        });
-                    }),
-                );
+                // @dev Perhaps we can do this async on a per Safe basis
+                await SafeService.proposeTransaction(wallet, transactions);
+            } catch (error) {
+                logger.error({ error });
             }
-        } catch (error) {
-            logger.error({ error });
+            logger.debug(`ConfirmJob Duration: ${Date.now() - now}ms`);
         }
     }
 
@@ -55,24 +41,29 @@ class TransactionService {
      * Queries the transaction queue for confirmed transactions and executes them.
      */
     async executeJob() {
-        try {
-            const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Confirmed);
-            for (const walletId in transactionsByWalletId) {
+        const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Confirmed);
+        for (const walletId in transactionsByWalletId) {
+            const now = Date.now();
+            try {
                 // Group by walletId
                 const wallet = await Wallet.findById(walletId);
                 const txs = transactionsByWalletId[walletId];
 
                 // Get unique tx.safeTxHash values
-                const safeTxHashes: string[] = Array.from(new Set(txs.map((tx: TransactionDocument) => tx.safeTxHash)));
+                const safeTxHashes: string[] = Array.from(
+                    new Set(txs.sort((a, b) => a.nonce - b.nonce).map((tx: TransactionDocument) => tx.safeTxHash)),
+                );
 
                 // Iterate and execute
                 for (const safeTxHash of safeTxHashes) {
+                    // @dev should be processed serially due to nonce order
                     const transactionHash = await SafeService.executeTransaction(wallet, safeTxHash);
                     logger.debug(`Executed transaction: ${transactionHash}`);
                 }
+            } catch (error) {
+                logger.error({ error });
             }
-        } catch (error) {
-            logger.error({ error });
+            logger.debug(`ExecuteJob Duration: ${Date.now() - now}ms`);
         }
     }
 
@@ -80,9 +71,10 @@ class TransactionService {
      * Queries the transaction queue for confirmed transactions and executes them.
      */
     async callbackJob() {
-        try {
-            const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Sent);
-            for (const walletId in transactionsByWalletId) {
+        const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Sent);
+        for (const walletId in transactionsByWalletId) {
+            const now = Date.now();
+            try {
                 // Group by walletId
                 const wallet = await Wallet.findById(walletId);
                 const txs = transactionsByWalletId[walletId];
@@ -94,26 +86,36 @@ class TransactionService {
                 for (const safeTxHash of safeTxHashes) {
                     await SafeService.updateTransactionState(wallet, safeTxHash);
                 }
+            } catch (error) {
+                logger.error({ error });
             }
-        } catch (error) {
-            logger.error({ error });
+            logger.debug(`ExecuteJob Duration: ${Date.now() - now}ms`);
         }
     }
 
     private async getTransactionsByStateGroupedBySafe(state: TransactionState) {
-        const transactions: TransactionDocument[] = await Transaction.find({
-            state,
-        }).sort({ createdAt: 'asc' });
+        try {
+            const transactions: TransactionDocument[] = await Transaction.find({
+                state,
+            }).sort({ createdAt: 'asc' });
 
-        logger.debug(`Queue [${TransactionState[state]}]: ${transactions.length}`);
+            if (transactions.length) {
+                logger.debug(`Transaction Queue [${TransactionState[state]}]: ${transactions.length}`);
+            }
 
-        return transactions.reduce((acc, tx) => {
-            if (!tx.walletId) return acc;
-            const walletId = tx.walletId;
-            if (!acc[walletId]) acc[walletId] = [];
-            acc[walletId].push(tx);
-            return acc;
-        }, {});
+            return transactions.reduce((txs, tx) => {
+                if (!tx.walletId) return txs;
+
+                const walletId = tx.walletId;
+                if (!txs[walletId]) txs[walletId] = [];
+                txs[walletId].push(tx);
+
+                return txs;
+            }, {});
+        } catch (error) {
+            logger.error('Transaction By State Grouped By Safe Failed', { error });
+            return [];
+        }
     }
 
     /**

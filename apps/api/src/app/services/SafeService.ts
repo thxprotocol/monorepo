@@ -1,4 +1,4 @@
-import { Wallet, WalletDocument, PoolDocument, TransactionDocument, Transaction } from '@thxnetwork/api/models';
+import { Wallet, WalletDocument, PoolDocument, Transaction, TransactionDocument } from '@thxnetwork/api/models';
 import { ChainId, JobType, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
 import { contractNetworks } from '@thxnetwork/api/hardhat';
 import { toChecksumAddress } from 'web3-utils';
@@ -122,17 +122,22 @@ class SafeService {
         });
     }
 
-    async proposeTransaction(wallet: WalletDocument, safeTransactionData: SafeTransactionDataPartial[]) {
-        const { defaultAccount } = NetworkService.getProvider(wallet.chainId);
-        const safeTx = await this.createTransaction(wallet, safeTransactionData);
+    async proposeTransaction(wallet: WalletDocument, txs: TransactionDocument[]) {
+        const safeTransactionDataPartial = txs.map((tx: TransactionDocument) => {
+            return {
+                to: tx.to,
+                data: tx.data,
+            };
+        }) as SafeTransactionDataPartial[];
+        const safeTx = await this.createTransaction(wallet, safeTransactionDataPartial);
+        const nonce = safeTx.data.nonce;
         const signedTx = await this.signTransaction(wallet, safeTx);
         const apiKit = this.getApiKit(wallet);
 
         try {
             const safeTxHash = await this.getTransactionHash(wallet, safeTx);
+            const { defaultAccount } = NetworkService.getProvider(wallet.chainId);
             const senderSignature = signedTx.signatures.get(defaultAccount.toLowerCase());
-
-            logger.debug('Transaction proposal start', { safeTxHash });
 
             await apiKit.proposeTransaction({
                 safeAddress: toChecksumAddress(wallet.address),
@@ -142,25 +147,20 @@ class SafeService {
                 senderSignature: senderSignature.data,
             });
             logger.debug('Transaction proposed', { safeTxHash });
-            return safeTxHash;
+
+            await Transaction.updateMany(
+                { _id: txs.map((tx) => tx.id) },
+                { nonce, safeTxHash, state: TransactionState.Confirmed },
+            );
+            logger.debug('Updated transactions', { safeTxHash, nonce, count: txs.length });
         } catch (error) {
             logger.error('Error proposing transaction', error.response ? error.response.data : error.message);
-        }
-    }
-
-    async getNextNonce(wallet: WalletDocument) {
-        const apiKit = this.getApiKit(wallet);
-        try {
-            return await apiKit.getNextNonce(wallet.address);
-        } catch (error) {
-            logger.error('Error getting next nonce', error.response ? error.response.data : error.message);
         }
     }
 
     async createTransaction(wallet: WalletDocument, safeTransactionData: SafeTransactionDataPartial[]) {
         const safe = await this.getSafe(wallet);
         try {
-            // const nonce = await this.getNextNonce(wallet);
             const safeTx = await safe.createTransaction({
                 safeTransactionData: safeTransactionData.map(({ to, data }) => ({
                     to,
@@ -168,9 +168,8 @@ class SafeService {
                     value: '0',
                     operation: 0,
                 })),
-                // options: { nonce },
             });
-            logger.debug('Transaction created', { safeTx });
+            logger.debug('Transaction created', { to: safeTx.data.to, nonce: safeTx.data.nonce });
             return safeTx;
         } catch (error) {
             logger.error('Error creating transaction', error.response ? error.response.data : error.message);
@@ -188,7 +187,7 @@ class SafeService {
         }
     }
 
-    async confirmTransaction(wallet: WalletDocument, safeTx: SafeTransaction) {
+    private async confirmTransaction(wallet: WalletDocument, safeTx: SafeTransaction) {
         const { defaultAccount } = NetworkService.getProvider(wallet.chainId);
         const safeTxHash = await this.getTransactionHash(wallet, safeTx);
         const signedTx = await this.signTransaction(wallet, safeTx);
@@ -279,7 +278,7 @@ class SafeService {
         }
 
         if (safeTx.isExecuted && !safeTx.isSuccessful) {
-            await Transaction.updateMany({ safeTxHash }, { state: TransactionState.Failed });
+            await Transaction.updateMany({ safeTxHash }, { state: TransactionState.Failed, failReason: 'Reverted' });
             logger.debug('Transaction failed', { safeTx: safeTxHash });
         }
     }
@@ -295,7 +294,7 @@ class SafeService {
         }
     }
 
-    async getTransactionHash(wallet: WalletDocument, safeTx: any) {
+    private async getTransactionHash(wallet: WalletDocument, safeTx: any) {
         const safe = await this.getSafe(wallet);
         try {
             const safeTxHash = await safe.getTransactionHash(safeTx);

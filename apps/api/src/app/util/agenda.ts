@@ -23,8 +23,6 @@ const agenda = new Agenda({
         address: MONGODB_URI,
         collection: 'jobs',
     },
-    maxConcurrency: 1,
-    lockLimit: 1,
     processEvery: '1 second',
 });
 

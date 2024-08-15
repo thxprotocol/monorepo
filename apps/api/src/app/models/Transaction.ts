@@ -17,7 +17,6 @@ export const Transaction = mongoose.model<TransactionDocument>(
             state: { type: Number, index: { sparse: true } },
             chainId: Number,
             failReason: String,
-            attemptCount: { type: Number, default: 0 },
             callback: {},
         },
         { timestamps: true },
