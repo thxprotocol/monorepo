@@ -12,6 +12,7 @@ import ERC20Service from './ERC20Service';
 import ERC721Service from './ERC721Service';
 import ERC1155Service from './ERC1155Service';
 import SafeService from './SafeService';
+import { PromiseParser } from '../util';
 
 class TransactionService {
     /**
@@ -22,18 +23,19 @@ class TransactionService {
         // For every wallet we create a single Safe transaction potentially containing
         // multiple transaction data partials and confirm the transaction
         const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Queued);
-        for (const walletId in transactionsByWalletId) {
+        const promises = Object.keys(transactionsByWalletId).map(async (walletId) => {
             const now = Date.now();
             try {
                 const wallet = await Wallet.findById(walletId);
                 const transactions = transactionsByWalletId[walletId];
 
-                SafeService.proposeTransaction(wallet, transactions);
+                await SafeService.proposeTransaction(wallet, transactions);
             } catch (error) {
                 logger.error({ error });
             }
             logger.debug(`ConfirmJob Duration: ${Date.now() - now}ms`);
-        }
+        });
+        await PromiseParser.parse(promises);
     }
 
     /**
