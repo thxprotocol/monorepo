@@ -89,16 +89,6 @@ export default class QuestWebhookService implements IQuestService {
         account: TAccount;
         data: Partial<TQuestWebhookEntry>;
     }): Promise<{ reason: string; result: boolean; data?: { result: boolean; amount?: number } }> {
-        // See if there are identities
-        const pool = await Pool.findById(quest.poolId);
-        const identities = await this.findIdentities({ pool, account });
-        if (!identities.length) {
-            return {
-                result: false,
-                reason: 'No identity connected to this account. Please ask for this in your community!',
-            };
-        }
-
         const webhook = await Webhook.findById(quest.webhookId);
         if (!webhook) return { result: false, reason: 'Webhook no longer available.' };
 
