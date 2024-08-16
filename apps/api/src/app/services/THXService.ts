@@ -1,5 +1,5 @@
 import { THXAPIClient } from '@thxnetwork/sdk/clients';
-import { THX_CLIENT_SECRET } from '../config/secrets';
+import { NODE_ENV, THX_CLIENT_SECRET } from '../config/secrets';
 import { Identity } from '../models';
 import AccountProxy from '../proxies/AccountProxy';
 
@@ -15,7 +15,7 @@ class THXService {
     }
 
     async connect(account: TAccount) {
-        if (!this.thx) return;
+        if (!this.thx || NODE_ENV === 'development') return;
 
         if (!account.identity) {
             account.identity = await this.thx.identity.create();

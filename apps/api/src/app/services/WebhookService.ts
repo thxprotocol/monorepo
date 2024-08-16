@@ -12,9 +12,12 @@ import { Wallet } from '../models/Wallet';
 export default class WebhookService {
     static async request(webhook: WebhookDocument, account: TAccount, metadata?: string) {
         const identities = (await Identity.find({ accountId: account.sub })).map((i) => i.uuid);
+        const wallets = (await Wallet.find({ sub: account.sub, variant: WalletVariant.WalletConnect })).map(
+            (w) => w.address,
+        );
         const webhookRequest = await WebhookRequest.create({
             webhookId: webhook._id,
-            payload: JSON.stringify({ type: 'quest_entry.create', identities, metadata }),
+            payload: JSON.stringify({ type: 'quest_entry.create', identities, metadata, wallets }),
             state: WebhookRequestState.Pending,
         });
 
