@@ -112,7 +112,7 @@ const config: HardhatUserConfig = {
             polygon: ETHERSCAN_POLYGON_API_KEY,
             arbitrumOne: ETHERSCAN_ARBITRUM_API_KEY,
             base: ETHERSCAN_BASE_API_KEY,
-            binance: ETHERSCAN_BSC_API_KEY,
+            bsc: ETHERSCAN_BSC_API_KEY,
         },
         customChains: [
             {
@@ -149,7 +149,7 @@ if (DEPLOYER_PRIVATE_KEY && ALCHEMY_API_KEY && config.networks) {
         timeout: 2483647,
     };
     config.networks.bsc = {
-        url: `https://bnb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+        url: `https://rpc.ankr.com/bsc`,
         accounts: [DEPLOYER_PRIVATE_KEY],
         timeout: 2483647,
     };
