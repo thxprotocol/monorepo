@@ -1,13 +1,4 @@
-import {
-    QuestWebhook,
-    QuestWebhookDocument,
-    QuestWebhookEntry,
-    Identity,
-    WalletDocument,
-    Webhook,
-    PoolDocument,
-    Pool,
-} from '@thxnetwork/api/models';
+import { QuestWebhook, QuestWebhookDocument, QuestWebhookEntry, WalletDocument, Webhook } from '@thxnetwork/api/models';
 import { IQuestService } from './interfaces/IQuestService';
 import WebhookService from './WebhookService';
 import { Request } from 'express';
@@ -40,11 +31,11 @@ export default class QuestWebhookService implements IQuestService {
         data: Partial<TQuestWebhookEntry>;
     }): Promise<TValidationResult> {
         const entries = await this.findAllEntries({ quest, account });
-        if (entries.length) {
+        if (!entries.length) {
+            return { result: true, reason: '' };
+        } else {
             return { result: false, reason: 'Quest entry limit has been reached.' };
         }
-
-        return { result: true, reason: '' };
     }
 
     async getAmount({
@@ -68,14 +59,11 @@ export default class QuestWebhookService implements IQuestService {
         account?: TAccount;
         data: Partial<TQuestWebhookEntry>;
     }) {
-        const pool = await Pool.findById(quest.poolId);
         const entries = await this.findAllEntries({ quest, account });
-        const identities = await this.findIdentities({ pool, account });
         const isAvailable = await this.isAvailable({ quest, account, data });
 
         return {
             ...quest,
-            identities,
             isAvailable: isAvailable.result,
             entries,
         };
@@ -112,10 +100,5 @@ export default class QuestWebhookService implements IQuestService {
             questId: quest._id,
             sub: account.sub,
         });
-    }
-
-    private async findIdentities({ pool, account }: { pool: PoolDocument; account: TAccount }) {
-        if (!account || !account.sub) return [];
-        return await Identity.find({ sub: pool.sub, accountId: account.sub });
     }
 }
