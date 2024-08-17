@@ -57,11 +57,11 @@ export default class QuestWeb3Service implements IQuestService {
         };
     }
 
-    async isAvailable({ quest, account }: { quest: QuestWeb3Document; account: TAccount }): Promise<TValidationResult> {
+    async isAvailable({ quest, account }: { quest: TQuestWeb3; account: TAccount }): Promise<TValidationResult> {
         if (!account) return { result: true, reason: '' };
 
         const isCompleted = await QuestWeb3Entry.exists({
-            questId: quest.id,
+            questId: quest._id,
             sub: account.sub,
         });
         if (!isCompleted) return { result: true, reason: '' };

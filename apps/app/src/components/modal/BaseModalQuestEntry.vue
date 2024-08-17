@@ -129,7 +129,6 @@ export default defineComponent({
                 const { email } = this.accountStore.account;
                 this.email = email;
             }
-            this.questStore.list();
         },
         async onClickSubscribe() {
             this.subscribeError = '';
@@ -147,6 +146,7 @@ export default defineComponent({
             try {
                 this.isSubmitting = true;
                 await this.accountStore.getParticipants();
+                await this.questStore.list();
                 this.$emit('hidden');
             } catch (error) {
                 console.error(error);

@@ -59,9 +59,6 @@ export default defineComponent({
         },
     },
     methods: {
-        onClickSignin: function () {
-            this.accountStore.signin();
-        },
         onClickClaim: async function () {
             try {
                 this.error = '';
