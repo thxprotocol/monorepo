@@ -18,5 +18,4 @@ type TQuestWeb3EntryMetadata = {
     callResult: string;
     chainId: ChainId;
     address: string;
-    rpc?: string;
 };

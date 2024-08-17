@@ -20,13 +20,9 @@ export interface IQuestInviteService extends IQuestService {
 export interface IQuestService {
     models: { quest: Model<TQuest>; entry: Model<TQuestEntry> };
     decorate(options: { quest: TQuest; account?: TAccount; data: Partial<TQuestEntry> }): Promise<TQuest>;
-    isAvailable(options: { quest: TQuest; account?: TAccount; data: Partial<TQuestEntry> }): Promise<TValidationResult>;
+    isAvailable(options: { quest: TQuest; account?: TAccount }): Promise<TValidationResult>;
     getDataForRequest(req: Request, options: { quest: TQuest; account: TAccount }): Promise<Partial<TQuestEntry>>;
-    getAmount(options: {
-        quest: TQuest;
-        account?: TAccount;
-        data?: Partial<{ metadata: { data: { amount: number } } }>;
-    }): Promise<number>;
+    getAmount(options: { quest: TQuest; account?: TAccount }): Promise<number>;
     getValidationResult(options: {
         quest: TQuest;
         account: TAccount;

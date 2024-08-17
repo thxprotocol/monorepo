@@ -13,6 +13,7 @@ type TQuestLock = { variant: QuestVariant; questId: string };
 type TValidationResult = {
     reason: string;
     result: boolean;
+    metadata?: TQuestWeb3EntryMetadata | TQuestDailyEntryMetadata | TQuestGitcoinEntryMetadata;
 };
 
 type TBaseQuestEntry = {

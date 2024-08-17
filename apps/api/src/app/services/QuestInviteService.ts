@@ -30,7 +30,6 @@ export default class QuestInviteService implements IQuestService {
     async decorate({
         quest,
         account,
-        data,
     }: {
         quest: TQuestInvite;
         account?: TAccount;
@@ -38,7 +37,7 @@ export default class QuestInviteService implements IQuestService {
     }): Promise<
         TQuestInvite & { isAvailable: boolean; uses: number; codes: QuestInviteCodeDocument[]; invitees: TInvitee[] }
     > {
-        const { result: isAvailable } = await this.isAvailable({ quest, account, data });
+        const { result: isAvailable } = await this.isAvailable({ quest, account });
         const invitees = await this.getInvitees({ quest, account });
         const codes = await this.getCodes({ quest, account });
         const uses = await this.getUses({ quest, account });
@@ -54,11 +53,7 @@ export default class QuestInviteService implements IQuestService {
         };
     }
 
-    async isAvailable(options: {
-        quest: TQuestInvite;
-        account?: TAccount;
-        data: Partial<TQuestInviteEntry>;
-    }): Promise<TValidationResult> {
+    async isAvailable(options: { quest: TQuestInvite; account?: TAccount }): Promise<TValidationResult> {
         return { result: true, reason: '' };
     }
 

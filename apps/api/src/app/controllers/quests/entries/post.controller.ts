@@ -47,9 +47,10 @@ const controller = async (req: Request, res: Response) => {
         variant,
         questId: quest.id,
         sub: account.sub,
-        data: {
+        ip: data.ip,
+        metadata: {
             ...data,
-            metadata: validationResult,
+            ...validationResult.metadata,
         },
     });
 

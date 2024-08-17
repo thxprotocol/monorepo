@@ -32,7 +32,6 @@ export default class QuestDailyService implements IQuestService {
     async decorate({
         quest,
         account,
-        data,
     }: {
         quest: TQuestDaily;
         data: Partial<TQuestDailyEntry>;
@@ -49,7 +48,7 @@ export default class QuestDailyService implements IQuestService {
         const entries = account ? await this.findEntries({ quest, account }) : [];
         const claimAgainTime = entries.length ? new Date(entries[0].createdAt).getTime() + ONE_DAY_MS : null;
         const now = Date.now();
-        const isAvailable = await this.isAvailable({ quest, account, data });
+        const isAvailable = await this.isAvailable({ quest, account });
 
         return {
             ...quest,
@@ -61,14 +60,7 @@ export default class QuestDailyService implements IQuestService {
         };
     }
 
-    async isAvailable({
-        quest,
-        account,
-    }: {
-        quest: TQuestDaily;
-        account: TAccount;
-        data: Partial<TQuestDailyEntry>;
-    }): Promise<TValidationResult> {
+    async isAvailable({ quest, account }: { quest: TQuestDaily; account: TAccount }): Promise<TValidationResult> {
         if (!account) return { result: true, reason: '' };
         const now = Date.now(),
             start = now - ONE_DAY_MS,

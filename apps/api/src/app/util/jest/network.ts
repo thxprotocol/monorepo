@@ -1,13 +1,22 @@
 import { VOTER_PK, DEPOSITOR_PK } from './constants';
 import { ChainId } from '@thxnetwork/common/enums';
-import { Wallet } from '@thxnetwork/api/models';
+import { Job, Wallet } from '@thxnetwork/api/models';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import SafeService from '@thxnetwork/api/services/SafeService';
+import poll from 'promise-poller';
 
 const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
 
 const voter = web3.eth.accounts.privateKeyToAccount(VOTER_PK) as any;
 const depositor = web3.eth.accounts.privateKeyToAccount(DEPOSITOR_PK) as any;
+
+export async function waitForJob(jobId: string) {
+    const taskFn = async () => {
+        const job = await Job.findById(jobId);
+        return job.lastFinishedAt ? Promise.resolve() : Promise.reject('nothing');
+    };
+    return await poll({ taskFn, interval: 1000, retries: 60 });
+}
 
 function createWallet(privateKey: string): any {
     return web3.eth.accounts.privateKeyToAccount(privateKey);

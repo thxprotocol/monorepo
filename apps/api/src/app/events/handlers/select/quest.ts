@@ -38,7 +38,6 @@ export async function completeQuest(
         const availabilityValidation = await QuestService.isAvailable(variant, {
             quest,
             account,
-            data,
         });
         if (!availabilityValidation.result) throw new Error(availabilityValidation.reason);
 
@@ -80,8 +79,7 @@ export async function onSelectQuestComplete(interaction: StringSelectMenuInterac
         const pool = await PoolService.getById(quest.poolId);
         if (!pool) throw new Error('Could not find this campaign.');
 
-        const data = {};
-        const isAvailable = await QuestService.isAvailable(variant, { quest, account, data });
+        const isAvailable = await QuestService.isAvailable(variant, { quest, account });
         const brand = await Brand.findOne({ poolId: pool._id });
         const widget = await Widget.findOne({ poolId: pool._id });
         const theme = JSON.parse(widget.theme);

@@ -20,6 +20,7 @@ import DiscordService from './DiscordService';
 import { PromiseParser } from '../util/promise';
 import { getIP } from '../util/ip';
 import { QuestEntryStatus } from '@thxnetwork/common/enums';
+import { add } from 'date-fns';
 
 export default class QuestService {
     static async getDataForRequest(variant: QuestVariant, req: Request, options) {
@@ -174,8 +175,8 @@ export default class QuestService {
         return Quest.findByIdAndUpdate(questId, options, { new: true });
     }
 
-    static getAmount(variant: QuestVariant, quest: TQuest, account: TAccount, data?: { metadata: any }) {
-        return serviceMap[variant].getAmount({ quest, account, data });
+    static getAmount(variant: QuestVariant, quest: TQuest, account: TAccount) {
+        return serviceMap[variant].getAmount({ quest, account });
     }
 
     static async getEntriesPendingReview(quest: TQuest, account?: TAccount) {
@@ -194,7 +195,6 @@ export default class QuestService {
         options: {
             quest: TQuest;
             account?: TAccount;
-            data: Partial<TQuestEntry & { rpc: string }>;
         },
     ): Promise<TValidationResult> {
         if (!options.quest.isPublished) {
@@ -215,7 +215,7 @@ export default class QuestService {
         options: { quest: TQuest; account: TAccount; data: Partial<TQuestEntry & { recaptcha: string }> },
     ) {
         // Skip recaptcha check non production environments
-        if (NODE_ENV !== 'production') return { result: true, reasons: '' };
+        if (NODE_ENV !== 'production') return { result: true, reason: '' };
 
         // Define the recaptcha action for this quest variant
         const recaptchaAction = `QUEST_${QuestVariant[variant].toUpperCase()}_ENTRY_CREATE`;
@@ -267,7 +267,7 @@ export default class QuestService {
             account: TAccount;
             data: Partial<TQuestEntry>;
         },
-    ) {
+    ): Promise<TValidationResult> {
         // Test for risk score (@dev does not work with discord calls)
         const isRealUser = await QuestService.isRealUser(variant, options);
         if (!isRealUser.result) return isRealUser;
@@ -283,7 +283,7 @@ export default class QuestService {
         return await serviceMap[variant].getValidationResult(options);
     }
 
-    static async getEntryMetadata({ account, quest, data }) {
+    static async getEntryAdditionalMetadata({ account, quest }) {
         const platformUserId = QuestSocialService.findUserIdForInteraction(account, quest.interaction);
 
         // For Discord Bot quests we store server user name in metadata
@@ -292,20 +292,17 @@ export default class QuestService {
             const member = guild && (await DiscordService.getMember(guild.id, platformUserId));
 
             return {
-                ...data,
-                metadata: {
-                    platformUserId,
-                    discord: {
-                        guildId: guild && guild.id,
-                        username: member.user.username,
-                        joinedAt: new Date(member.joinedTimestamp).toISOString(),
-                        reactionCount: guild
-                            ? await DiscordReaction.countDocuments({ guildId: guild.id, userId: platformUserId })
-                            : 0,
-                        messageCount: guild
-                            ? await DiscordMessage.countDocuments({ guildId: guild.id, userId: platformUserId })
-                            : 0,
-                    },
+                platformUserId,
+                discord: {
+                    guildId: guild && guild.id,
+                    username: member.user.username,
+                    joinedAt: new Date(member.joinedTimestamp).toISOString(),
+                    reactionCount: guild
+                        ? await DiscordReaction.countDocuments({ guildId: guild.id, userId: platformUserId })
+                        : 0,
+                    messageCount: guild
+                        ? await DiscordMessage.countDocuments({ guildId: guild.id, userId: platformUserId })
+                        : 0,
                 },
             };
         }
@@ -314,36 +311,36 @@ export default class QuestService {
         if (quest.variant === QuestVariant.Twitter) {
             const user = await TwitterUser.findOne({ userId: platformUserId });
             return {
-                ...data,
-                metadata: {
-                    platformUserId,
-                    twitter: user.publicMetrics,
-                },
+                platformUserId,
+                twitter: user.publicMetrics,
             };
         }
-
-        return data;
     }
 
     static async createEntryJob(job: Job) {
         try {
-            const { variant, questId, sub, data } = job.attrs.data as any;
+            const { variant, questId, sub, ip, metadata } = job.attrs.data as any;
             const Entry = serviceMap[Number(variant)].models.entry;
             const account = await AccountProxy.findById(sub);
             const quest = await this.findById(variant, questId);
             const pool = await PoolService.getById(quest.poolId);
-            const amount = await this.getAmount(variant, quest, account, data);
+            const amount = await this.getAmount(variant, quest, account);
 
             // Test availabily of quest once more as it could be completed by a job that was scheduled already
             // if the jobs were created in parallel.
-            const isAvailable = await this.isAvailable(variant, { quest, account, data });
+            const isAvailable = await this.isAvailable(variant, { quest, account });
             if (!isAvailable.result) throw new Error(isAvailable.reason);
 
             // Create the quest entry
             const status = quest.isReviewEnabled ? QuestEntryStatus.Pending : QuestEntryStatus.Approved;
-            const metadata = await this.getEntryMetadata({ quest, account, data });
-            const entry = await Entry.create({
-                ...metadata,
+            const additionalMetadata = await this.getEntryAdditionalMetadata({ quest, account });
+
+            await Entry.create({
+                metadata: {
+                    ...metadata,
+                    ...additionalMetadata,
+                },
+                ip,
                 amount,
                 sub: account.sub,
                 questId: quest.id,
@@ -351,7 +348,6 @@ export default class QuestService {
                 status,
                 uuid: v4(),
             } as TQuestEntry);
-            if (!entry) throw new Error('Entry creation failed.');
 
             // Assert if a required quest for invite quests has been completed
             const InviteService = serviceMap[QuestVariant.Invite] as IQuestInviteService;
@@ -376,17 +372,9 @@ export default class QuestService {
                 await THXService.createEvent(account, 'quest_entry_created');
             }
         } catch (error) {
-            logger.error(error);
+            logger.error('CreateEntryJob failed', error);
         }
     }
-
-    // static findUserIdForInteraction(account: TAccount, interaction: QuestSocialRequirement) {
-    //     if (typeof interaction === 'undefined') return;
-    //     const { kind } = tokenInteractionMap[interaction];
-    //     const token = account.tokens.find((token) => token.kind === kind);
-
-    //     return token && token.userId;
-    // }
 
     static async findEntries(quest: TQuest, { page = 1, limit = 25 }: { page: number; limit: number }) {
         const skip = (page - 1) * limit;

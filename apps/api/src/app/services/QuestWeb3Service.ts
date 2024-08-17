@@ -40,13 +40,12 @@ export default class QuestWeb3Service implements IQuestService {
     async decorate({
         quest,
         account,
-        data,
     }: {
         quest: QuestWeb3Document;
-        data: Partial<TQuestWeb3Entry>;
         account?: TAccount;
+        data: Partial<TQuestWeb3Entry>;
     }): Promise<TQuestWeb3 & { isAvailable: boolean }> {
-        const isAvailable = await this.isAvailable({ quest, account, data });
+        const isAvailable = await this.isAvailable({ quest, account });
 
         return {
             ...quest,
@@ -58,23 +57,12 @@ export default class QuestWeb3Service implements IQuestService {
         };
     }
 
-    async isAvailable({
-        quest,
-        account,
-        data,
-    }: {
-        quest: QuestWeb3Document;
-        account: TAccount;
-        data: Partial<TQuestWeb3Entry>;
-    }): Promise<TValidationResult> {
+    async isAvailable({ quest, account }: { quest: QuestWeb3Document; account: TAccount }): Promise<TValidationResult> {
         if (!account) return { result: true, reason: '' };
-
-        const ids: any[] = [{ sub: account.sub }];
-        if (data.metadata && data.metadata.address) ids.push({ 'metadata.address': data.metadata.address });
 
         const isCompleted = await QuestWeb3Entry.exists({
             questId: quest.id,
-            $or: ids,
+            sub: account.sub,
         });
         if (!isCompleted) return { result: true, reason: '' };
 
@@ -107,7 +95,8 @@ export default class QuestWeb3Service implements IQuestService {
         }
 
         if (!isCompleted && result.gte(threshold)) {
-            return { result: true, reason: '', ...data };
+            const { address, chainId, callResult } = data.metadata;
+            return { result: true, reason: '', metadata: { address, chainId, callResult } };
         } else {
             return { result: false, reason: 'Validation did not succeed.' };
         }

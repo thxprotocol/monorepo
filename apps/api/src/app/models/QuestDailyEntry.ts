@@ -8,10 +8,7 @@ export const QuestDailyEntry = mongoose.model<QuestDailyEntryDocument>(
     new mongoose.Schema(
         {
             ...questEntrySchema,
-            metadata: {
-                state: Number,
-                ip: String,
-            },
+            metadata: {},
         },
         { timestamps: true },
     ),

@@ -11,6 +11,7 @@ export const Job = mongoose.model<JobDocument>(
             lastRunAt: Date,
             failedAt: Date,
             failReason: String,
+            lastFinishedAt: String,
         },
         { timestamps: true },
     ),

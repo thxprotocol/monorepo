@@ -24,7 +24,6 @@ export default class QuestDiscordService implements IQuestService {
     async decorate({
         quest,
         account,
-        data,
     }: {
         quest: TQuestSocial;
         account: TAccount;
@@ -38,7 +37,7 @@ export default class QuestDiscordService implements IQuestService {
         }
     > {
         const amount = await this.getAmount({ quest, account });
-        const isAvailable = await this.isAvailable({ quest, account, data });
+        const isAvailable = await this.isAvailable({ quest, account });
         const interactionMap = {
             [QuestSocialRequirement.DiscordMessage]: this.getDiscordMessageParams.bind(this),
             [QuestSocialRequirement.DiscordGuildJoined]: this.getDiscordParams.bind(this),
@@ -55,14 +54,7 @@ export default class QuestDiscordService implements IQuestService {
         };
     }
 
-    async isAvailable({
-        quest,
-        account,
-    }: {
-        quest: TQuestSocial;
-        account?: TAccount;
-        data: Partial<TQuestSocialEntry>;
-    }): Promise<TValidationResult> {
+    async isAvailable({ quest, account }: { quest: TQuestSocial; account?: TAccount }): Promise<TValidationResult> {
         const map = {
             [QuestSocialRequirement.DiscordMessage]: this.isAvailableMessage.bind(this),
             [QuestSocialRequirement.DiscordGuildJoined]: this.isAvailableDefault.bind(this),
@@ -74,7 +66,6 @@ export default class QuestDiscordService implements IQuestService {
     private async isAvailableDefault({
         quest,
         account,
-        data,
     }: {
         quest: TQuestSocial;
         account?: TAccount;
@@ -84,7 +75,7 @@ export default class QuestDiscordService implements IQuestService {
 
         // We use the default more generic QuestSocialService here since we want to
         // validate for platformUserIds as well
-        return await new QuestSocialService().isAvailable({ quest, account, data });
+        return await new QuestSocialService().isAvailable({ quest, account });
     }
 
     private async isAvailableMessage({ quest, account }: { quest: TQuestSocial; account?: TAccount }) {

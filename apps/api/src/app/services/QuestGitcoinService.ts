@@ -22,33 +22,21 @@ export default class QuestGitcoinService implements IQuestService {
     async decorate({
         quest,
         account,
-        data,
     }: {
         quest: TQuestGitcoin;
         account?: TAccount;
         data: Partial<TQuestGitcoinEntry>;
     }): Promise<TQuestGitcoin & { isAvailable: boolean }> {
-        const isAvailable = await this.isAvailable({ quest, account, data });
+        const isAvailable = await this.isAvailable({ quest, account });
         return { ...quest, isAvailable: isAvailable.result };
     }
 
-    async isAvailable({
-        quest,
-        account,
-        data,
-    }: {
-        quest: TQuestGitcoin;
-        account?: TAccount;
-        data: Partial<TQuestGitcoinEntry>;
-    }): Promise<TValidationResult> {
+    async isAvailable({ quest, account }: { quest: TQuestGitcoin; account?: TAccount }): Promise<TValidationResult> {
         if (!account) return { result: true, reason: '' };
-
-        const ids: { [key: string]: string }[] = [{ sub: account.sub }];
-        if (data.metadata && data.metadata.address) ids.push({ 'metadata.address': data.metadata.address });
 
         const isCompleted = await QuestGitcoinEntry.exists({
             questId: quest._id,
-            $or: ids,
+            sub: account.sub,
         });
         if (!isCompleted) return { result: true, reason: '' };
 
@@ -61,19 +49,37 @@ export default class QuestGitcoinService implements IQuestService {
 
     async getValidationResult({
         quest,
+        account,
         data,
     }: {
         quest: TQuestGitcoin;
         account: TAccount;
         data: Partial<TQuestGitcoinEntry>;
-    }): Promise<TValidationResult & { score?: number }> {
+    }) {
+        const ids: { [key: string]: string }[] = [{ sub: account.sub }];
+        if (data.metadata && data.metadata.address) ids.push({ 'metadata.address': data.metadata.address });
+
+        const isCompleted = await QuestGitcoinEntry.exists({
+            questId: quest._id,
+            $or: ids,
+        });
+        if (isCompleted) return { result: false, reason: 'Already completed using this wallet.' };
+
         if (!data.metadata.address) return { result: false, reason: 'Could not find an address during validation.' };
         if (data.metadata.score < quest.score) {
             const score = data.metadata.score.toString() || 0;
             const reason = `Your score ${score}/100 does not meet the minimum of ${quest.score}/100.`;
             return { result: false, reason };
         }
-        if (data.metadata.score >= quest.score) return { result: true, reason: '', score: data.metadata.score };
+        if (data.metadata.score >= quest.score) {
+            return {
+                result: true,
+                reason: '',
+                metadata: { address: data.metadata.address, score: data.metadata.score },
+            };
+        } else {
+            return { result: false, reason: '' };
+        }
     }
 
     async getScore(scorerId: number, address: string) {

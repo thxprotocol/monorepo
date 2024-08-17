@@ -87,7 +87,7 @@ export default class QuestCustomService implements IQuestService {
         quest: QuestCustomDocument;
         account: TAccount;
         data: Partial<TQuestCustomEntry>;
-    }): Promise<{ reason: string; result: boolean }> {
+    }) {
         const pool = await Pool.findById(quest.poolId);
         // See if there are identities
         const identities = await this.findIdentities({ pool, account });
@@ -110,7 +110,11 @@ export default class QuestCustomService implements IQuestService {
             return { result: false, reason: 'Insufficient custom events found for this quest' };
         }
 
-        if (entries.length < events.length) return { result: true, reason: '' };
+        if (entries.length < events.length) {
+            return { result: true, reason: '' };
+        } else {
+            return { result: false, reason: '' };
+        }
     }
 
     private async findAllEntries({ quest, account }: { quest: QuestCustomDocument; account: TAccount }) {

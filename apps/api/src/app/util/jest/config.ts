@@ -44,6 +44,7 @@ class Mock {
     }
 
     async beforeAll(options = { skipWalletCreation: false }) {
+        await db.truncate();
         await db.connect(MONGODB_URI);
 
         const chainId = ChainId.Hardhat;

@@ -23,13 +23,12 @@ export default class QuestSocialService implements IQuestService {
     async decorate({
         quest,
         account,
-        data,
     }: {
         quest: TQuestSocial;
         account?: TAccount;
         data: Partial<TQuestSocialEntry>;
     }): Promise<TQuestSocial & { isAvailable: boolean }> {
-        const isAvailable = await this.isAvailable({ quest, account, data });
+        const isAvailable = await this.isAvailable({ quest, account });
 
         return {
             ...quest,
@@ -38,14 +37,7 @@ export default class QuestSocialService implements IQuestService {
         };
     }
 
-    async isAvailable({
-        quest,
-        account,
-    }: {
-        quest: TQuestSocial;
-        account: TAccount;
-        data: Partial<TQuestSocialEntry>;
-    }): Promise<TValidationResult> {
+    async isAvailable({ quest, account }: { quest: TQuestSocial; account: TAccount }): Promise<TValidationResult> {
         if (!account) return { result: true, reason: '' };
 
         const platformUserId = QuestSocialService.findUserIdForInteraction(account, quest.interaction);
