@@ -2,7 +2,7 @@ import request from 'supertest';
 import app from '@thxnetwork/api/';
 import Mock from '@thxnetwork/api/util/jest/config';
 import QuestService from '@thxnetwork/api/services/QuestService';
-import { QuestVariant } from '@thxnetwork/common/enums';
+import { QuestSocialRequirement, QuestVariant } from '@thxnetwork/common/enums';
 import { ChainId } from '@thxnetwork/common/enums';
 import { contractNetworks } from '@thxnetwork/api/hardhat';
 import { signMessage, waitForJob } from '@thxnetwork/api/util/jest/network';
@@ -71,7 +71,7 @@ describe('Default Pool', () => {
             });
         });
 
-        it('Test entry', async () => {
+        it('Create an entry', async () => {
             const { body, status } = await user
                 .post(`/v1/quests/web3/${quest.id}/entries`)
                 .set('Authorization', account.authHeader)
