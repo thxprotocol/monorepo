@@ -123,7 +123,6 @@ class Mock {
         await agenda.stop();
         await agenda.cancel({});
         await agenda.purge();
-        await db.truncate();
     }
 }
 
