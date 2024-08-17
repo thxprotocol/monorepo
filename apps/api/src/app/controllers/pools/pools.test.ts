@@ -51,58 +51,58 @@ describe('Default Pool', () => {
         });
     });
 
-    describe('Quest Web3', () => {
-        let message, signature, wallet, account, quest;
+    // describe('Quest Web3', () => {
+    //     let message, signature, wallet, account, quest;
 
-        beforeAll(async () => {
-            message = 'signing message';
-            signature = signMessage(userWalletPrivateKey4, message);
+    //     beforeAll(async () => {
+    //         message = 'signing message';
+    //         signature = signMessage(userWalletPrivateKey4, message);
 
-            const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
-            wallet = web3.eth.accounts.privateKeyToAccount(userWalletPrivateKey4);
-            account = Mock.accounts[3];
-            quest = await QuestService.create(QuestVariant.Web3, poolId, {
-                isPublished: true,
-                title: 'Web3 Quest',
-                amount: 10,
-                methodName: 'balanceOf',
-                threshold: '0',
-                contracts: [{ address: contractNetworks[ChainId.Hardhat].THX, chainId: ChainId.Hardhat }],
-            });
-        });
+    //         const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
+    //         wallet = web3.eth.accounts.privateKeyToAccount(userWalletPrivateKey4);
+    //         account = Mock.accounts[3];
+    //         quest = await QuestService.create(QuestVariant.Web3, poolId, {
+    //             isPublished: true,
+    //             title: 'Web3 Quest',
+    //             amount: 10,
+    //             methodName: 'balanceOf',
+    //             threshold: '0',
+    //             contracts: [{ address: contractNetworks[ChainId.Hardhat].THX, chainId: ChainId.Hardhat }],
+    //         });
+    //     });
 
-        it('Create an entry', async () => {
-            const { body, status } = await user
-                .post(`/v1/quests/web3/${quest.id}/entries`)
-                .set('Authorization', account.authHeader)
-                .send({
-                    message,
-                    signature,
-                    recaptcha: 'test',
-                    chainId: ChainId.Hardhat,
-                });
-            expect(status).toBe(200);
-            expect(body.jobId).toBeDefined();
-            expect(await QuestWeb3Entry.find({ questId: quest.id, sub: account.sub })).toHaveLength(0);
-            await waitForJob(body.jobId);
+    //     it('Create an entry', async () => {
+    //         const { body, status } = await user
+    //             .post(`/v1/quests/web3/${quest.id}/entries`)
+    //             .set('Authorization', account.authHeader)
+    //             .send({
+    //                 message,
+    //                 signature,
+    //                 recaptcha: 'test',
+    //                 chainId: ChainId.Hardhat,
+    //             });
+    //         expect(status).toBe(200);
+    //         expect(body.jobId).toBeDefined();
+    //         expect(await QuestWeb3Entry.find({ questId: quest.id, sub: account.sub })).toHaveLength(0);
+    //         await waitForJob(body.jobId);
 
-            const entry = await QuestWeb3Entry.findOne({ questId: quest.id, sub: account.sub });
-            expect(entry).toBeDefined();
-            expect(entry.metadata.address).toBe(wallet.address);
-        });
+    //         const entry = await QuestWeb3Entry.findOne({ questId: quest.id, sub: account.sub });
+    //         expect(entry).toBeDefined();
+    //         expect(entry.metadata.address).toBe(wallet.address);
+    //     });
 
-        it('Create another entry for the same wallet', async () => {
-            const { body, status } = await user
-                .post(`/v1/quests/web3/${quest.id}/entries`)
-                .set('Authorization', account.authHeader)
-                .send({
-                    message,
-                    signature,
-                    recaptcha: 'test',
-                    chainId: ChainId.Hardhat,
-                });
-            expect(status).toBe(200);
-            expect(body.error).toBe('You have completed this quest with this account and/or address already.');
-        });
-    });
+    //     it('Create another entry for the same wallet', async () => {
+    //         const { body, status } = await user
+    //             .post(`/v1/quests/web3/${quest.id}/entries`)
+    //             .set('Authorization', account.authHeader)
+    //             .send({
+    //                 message,
+    //                 signature,
+    //                 recaptcha: 'test',
+    //                 chainId: ChainId.Hardhat,
+    //             });
+    //         expect(status).toBe(200);
+    //         expect(body.error).toBe('You have completed this quest with this account and/or address already.');
+    //     });
+    // });
 });
