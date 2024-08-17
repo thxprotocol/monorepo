@@ -86,19 +86,19 @@ export default class QuestWeb3Service implements IQuestService {
             questId: quest.id,
             $or: [{ sub: account.sub }, { 'metadata.address': data.metadata.address }],
         });
-        if (isCompleted) return { result: false, reason: 'You have claimed this quest already' };
+        if (isCompleted) return { result: false, reason: 'You have completed this quest already' };
 
         const threshold = BigNumber.from(quest.threshold);
         const result = BigNumber.from(data.metadata.callResult);
         if (result.lt(threshold)) {
-            return { result: false, reason: 'Result does not meet the threshold' };
+            return { result: false, reason: 'Result does not meet the requried threshold' };
         }
 
         if (!isCompleted && result.gte(threshold)) {
             const { address, chainId, callResult } = data.metadata;
             return { result: true, reason: '', metadata: { address, chainId, callResult } };
         } else {
-            return { result: false, reason: 'Validation did not succeed.' };
+            return { result: false, reason: 'Quest validation did not succeed.' };
         }
     }
 }
