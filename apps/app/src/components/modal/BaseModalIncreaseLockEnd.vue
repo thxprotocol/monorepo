@@ -75,7 +75,7 @@ export default defineComponent({
                 if (!wallet) throw new Error('Please connect a wallet first');
 
                 const lockEndTimestamp = Math.ceil(new Date(this.lockEnd).getTime() / 1000);
-                await this.veStore.increasUnlockTime(wallet, { lockEndTimestamp, chainId: this.chainId });
+                await this.veStore.increasUnlockTime(wallet, { lockEndTimestamp });
 
                 this.$emit('hidden');
             } catch (response) {
