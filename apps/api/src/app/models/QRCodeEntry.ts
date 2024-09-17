@@ -6,6 +6,7 @@ export const QRCodeEntry = mongoose.model<QRCodeEntryDocument>(
     'QRCodeEntry',
     new mongoose.Schema(
         {
+            accountId: String,
             sub: String,
             uuid: String,
             redirectURL: String,

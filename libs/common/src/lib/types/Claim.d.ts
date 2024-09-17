@@ -1,4 +1,6 @@
 type TQRCodeEntry = {
+    _id: string;
+    accountId: string;
     sub: string;
     uuid: string;
     redirectURL: string;

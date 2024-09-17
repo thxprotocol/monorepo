@@ -1,25 +1,15 @@
-import { QRCodeEntry, RewardNFT } from '@thxnetwork/api/models';
-import { ForbiddenError, NotFoundError } from '@thxnetwork/api/util/errors';
+import { QRCodeEntry } from '@thxnetwork/api/models';
 import { Request, Response } from 'express';
 import { query } from 'express-validator';
 import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
-import PoolService from '@thxnetwork/api/services/PoolService';
 
-const validation = [query('rewardId').isMongoId(), query('page').isInt(), query('limit').isInt()];
+const validation = [query('limit').optional().isInt({ gt: 0 }), query('page').optional().isInt({ gt: 0 })];
 
 const controller = async (req: Request, res: Response) => {
     const page = Number(req.query.page);
     const limit = Number(req.query.limit);
-    const rewardId = req.query.rewardId;
-
-    const reward = await RewardNFT.findById(rewardId);
-    if (!reward) throw new NotFoundError('Reward not found');
-
-    const isAllowed = await PoolService.isSubjectAllowed(req.auth.sub, reward.poolId);
-    if (!isAllowed) throw new ForbiddenError('Reward not accessible.');
-
-    const total = await QRCodeEntry.countDocuments({ rewardId });
-    const entries = await QRCodeEntry.find({ rewardId })
+    const total = await QRCodeEntry.countDocuments({ accountId: req.auth.sub });
+    const entries = await QRCodeEntry.find({ accountId: req.auth.sub })
         .limit(limit)
         .skip((page - 1) * limit);
     const subs = entries.map(({ sub }) => sub);
@@ -29,7 +19,7 @@ const controller = async (req: Request, res: Response) => {
         return Object.assign(entry.toJSON(), { account });
     });
     const meta = {
-        participantCount: await QRCodeEntry.countDocuments({ rewardId, sub: { $exists: true } }),
+        participantCount: await QRCodeEntry.countDocuments({ sub: { $exists: true } }),
     };
 
     res.json({

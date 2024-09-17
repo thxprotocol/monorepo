@@ -20,7 +20,7 @@ import { ADDRESS_ZERO } from '../config/secrets';
 
 const contractName = 'THXERC721';
 
-async function deploy(data: TERC721, forceSync = true): Promise<ERC721Document> {
+async function deploy(data: Partial<TERC721>, forceSync = true): Promise<ERC721Document> {
     const { web3, defaultAccount } = NetworkService.getProvider(data.chainId);
     const { abi, bytecode } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi);

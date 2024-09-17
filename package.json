@@ -14,6 +14,7 @@
         "test": "NODE_OPTIONS='--max-old-space-size=8192' nx test",
         "serve:docker": "docker-compose --env-file .env.example -f docker-compose.yml -f docker-compose.safe.yml up --build -d",
         "serve:app": "nx run app:serve",
+        "serve:studio": "nx run studio:serve",
         "serve:api": "NODE_TLS_REJECT_UNAUTHORIZED='0' nx serve api",
         "serve:auth": "NODE_TLS_REJECT_UNAUTHORIZED='0' nx serve auth"
     },
@@ -85,7 +86,8 @@
         "promise-poller": "^1.9.1",
         "protobufjs": "^7.2.4",
         "puppeteer": "21.3.4",
-        "sharp": "^0.33.4",
+        "qrcode-vue3": "^1.7.1",
+        "sharp": "^0.33.5",
         "short-uuid": "^5.2.0",
         "tslib": "^2.3.0",
         "viem": "^2.7.13",

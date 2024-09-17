@@ -15,7 +15,7 @@ type TERC721Token = {
 };
 
 type TERC721 = {
-    _id?: string;
+    _id: string;
     variant: NFTVariant;
     sub: string;
     chainId: ChainId;

@@ -1,5 +1,5 @@
 import cors from 'cors';
-import { AUTH_URL, API_URL, DASHBOARD_URL, WIDGET_URL, PUBLIC_URL } from '@thxnetwork/api/config/secrets';
+import { AUTH_URL, API_URL, DASHBOARD_URL, WIDGET_URL, PUBLIC_URL, STUDIO_URL } from '@thxnetwork/api/config/secrets';
 
 export const corsHandler = cors(async (req: any, callback: any) => {
     const origin = req.header('Origin');
@@ -7,6 +7,7 @@ export const corsHandler = cors(async (req: any, callback: any) => {
         AUTH_URL,
         API_URL,
         DASHBOARD_URL,
+        STUDIO_URL,
         WIDGET_URL,
         PUBLIC_URL,
         'https://thx.network',
