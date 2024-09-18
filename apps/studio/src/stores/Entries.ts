@@ -18,12 +18,15 @@ export const useEntryStore = defineStore('entry', {
             return useAuthStore().request(path, options);
         },
         async list(options: { page: number; limit: number; query: string }) {
-            const params = new URLSearchParams();
-            params.set('page', String(options.page));
-            params.set('limit', String(options.limit));
-            params.set('query', String(options.query));
-
-            this.entries = await this.request('/qr-codes');
+            this.entries = await this.request('/qr-codes', { params: options });
+        },
+        async create(body: { erc721Id: string; erc721MetadataId: string; amount: number; redirectURL: string }) {
+            const { request } = useAuthStore();
+            await request(`/qr-codes`, { method: 'POST', body });
+        },
+        async remove(id: string) {
+            await this.request(`/qr-codes/${id}`, { method: 'DELETE' });
+            this.entries.results = this.entries.results.filter((entry) => entry._id !== id);
         },
     },
 });

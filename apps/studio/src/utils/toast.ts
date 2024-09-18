@@ -1,6 +1,6 @@
 import { ToastTheme, toast as toastInstance } from 'vue3-toastify';
 
-export const toast = (message: string, theme = 'light', autoClose: number, onClose: () => void) => {
+export const toast = (message: string, theme: ToastTheme = 'light', autoClose: number, onClose: () => void) => {
     return toastInstance(`<i class="fas fa-exclamation-circle me-2"></i> ${message}`, {
         theme: theme as ToastTheme,
         dangerouslyHTMLString: true,

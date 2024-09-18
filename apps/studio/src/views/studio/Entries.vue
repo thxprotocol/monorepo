@@ -76,6 +76,8 @@ export default defineComponent({
                     value: entry.uuid,
                     url: `${entry.redirectURL}/${entry.uuid}`,
                 },
+                collection: entry.erc721.name,
+                metadata: entry.metadata.name,
                 account: entry.account && {
                     username: entry.account.username,
                     email: entry.account.email,
@@ -96,7 +98,9 @@ export default defineComponent({
                 this.isLoading = true;
                 await this.entryStore.list({ page: this.page, limit: this.limit, query: this.query });
             } catch (error: any) {
-                toast(error.message, 'danger', 3000, () => alert('bla'));
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
             } finally {
                 this.isLoading = false;
             }
@@ -116,8 +120,17 @@ export default defineComponent({
         onSubmitQuery() {
             debugger;
         },
-        onClickDelete(id: string) {
-            debugger;
+        async onClickDelete(id: string) {
+            try {
+                this.isLoading = true;
+                await this.entryStore.remove(id);
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
         },
     },
 });

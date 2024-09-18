@@ -5,7 +5,7 @@
             <slot v-else name="label" />
             <span v-if="required" class="text-danger ms-1">*</span>
             <b-link v-if="tooltip" v-b-tooltip class="ms-auto" :title="tooltip">
-                <i class="fas fa-info-circle text-secondary" />
+                <i class="fas fa-info-circle text-primary" />
             </b-link>
         </template>
         <slot />

@@ -1,13 +1,20 @@
 type TQRCodeEntry = {
+    // rewardId: string;
     _id: string;
-    accountId: string;
-    sub: string;
     uuid: string;
     redirectURL: string;
-    rewardId: string;
-    amount: number;
+    accountId: string;
+    erc721Id: string;
+    erc721MetadataId: string;
+
+    erc721: TERC721;
+    metadata: TERC721Metadata;
+
+    // amount: number;
+    sub: string;
+    claimedAt: Date;
+
     error: string;
     account: TAccount;
-    claimedAt: Date;
     createdAt: Date;
 };

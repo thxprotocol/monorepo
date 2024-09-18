@@ -26,6 +26,11 @@ export const useAuthStore = defineStore('auth', {
         async request(path: string, options?: TRequestOptions) {
             const url = new URL(API_URL);
             url.pathname = `/v1${path}`;
+            if (options?.params) {
+                for (const key in options.params) {
+                    url.searchParams.append(key, options.params[key]);
+                }
+            }
 
             const response = await fetch(url.toString(), {
                 method: 'GET',
@@ -38,7 +43,11 @@ export const useAuthStore = defineStore('auth', {
                 },
             });
 
-            return await response.json();
+            try {
+                return await response.json();
+            } catch (error) {
+                //
+            }
         },
         async getSession() {
             return await supabase.auth.getSession();

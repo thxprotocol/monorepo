@@ -86,7 +86,7 @@
         "promise-poller": "^1.9.1",
         "protobufjs": "^7.2.4",
         "puppeteer": "21.3.4",
-        "qrcode-vue3": "^1.7.1",
+        "qrcode": "^1.5.4",
         "sharp": "^0.33.5",
         "short-uuid": "^5.2.0",
         "tslib": "^2.3.0",

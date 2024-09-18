@@ -2,12 +2,12 @@
     <b-container class="py-5 text-white">
         <h1>{{ isCreating ? 'Create' : 'Configure' }} Collection</h1>
         <p class="lead">Design your personal NFT collections</p>
-        <b-button v-if="collection" variant="dark" target="_blank" :href="collection.blockExplorerURL">
+        <b-button variant="dark" target="_blank" :href="blockExplorerURL">
             Open Block Explorer URL
             <BaseIcon icon="external-link-alt ms-1" />
         </b-button>
     </b-container>
-    <div class="bg-dark text-white py-5">
+    <div class="bg-dark text-white py-5 flex-grow-1">
         <b-container>
             <b-row>
                 <b-col md="6">
@@ -45,7 +45,12 @@
                     <BaseFormCollectionMetadata :erc721="collection" />
                 </b-modal>
             </h2>
-            <b-row>
+            <b-row v-if="isLoading && !metadataList.length">
+                <b-col v-for="val in [1]" md="3">
+                    <b-placeholder-card :key="val" no-header :img-height="200" />
+                </b-col>
+            </b-row>
+            <b-row v-else>
                 <b-col v-for="metadata in metadataList" md="3">
                     <BaseCardCollectionMetadata :collection="collection" :metadata="metadata" />
                 </b-col>
@@ -58,6 +63,7 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAuthStore, useCollectionStore } from '@thxnetwork/studio/stores';
+import { toast } from '@thxnetwork/studio/utils/toast';
 
 export default defineComponent({
     name: 'NFT',
@@ -70,12 +76,16 @@ export default defineComponent({
             name: '',
             description: '',
             symbol: '',
+            address: '',
         };
     },
     computed: {
         ...mapStores(useAuthStore, useCollectionStore),
         isCreating(): boolean {
             return !this.$route.params.id;
+        },
+        blockExplorerURL() {
+            return '';
         },
         collection(): TERC721 {
             return this.collectionStore.collections.find(
@@ -89,16 +99,25 @@ export default defineComponent({
     },
     async mounted() {
         if (this.isCreating) return;
+
         const erc721Id = this.$route.params.id;
         await Promise.all([this.collectionStore.get(erc721Id), this.listMetadata(erc721Id)]);
+
         this.name = this.collection.name;
         this.description = this.collection.description as string;
-        this.symbol = this.collection.symbol;
-        this.address = this.collection.address;
+        this.symbol = this.collection.symbol as string;
+        this.address = this.collection.address as string;
     },
     methods: {
         async listMetadata(erc721Id: string) {
-            await this.collectionStore.listMetadata(erc721Id, { page: this.page, limit: this.limit });
+            try {
+                this.isLoading = true;
+                await this.collectionStore.listMetadata(erc721Id, { page: this.page, limit: this.limit });
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => alert('bla'));
+            } finally {
+                this.isLoading = true;
+            }
         },
         async onSubmit() {
             if (!this.isCreating) return;
