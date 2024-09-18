@@ -1,4 +1,4 @@
-name: App CI
+name: Studio CI
 
 on:
     push:
@@ -47,7 +47,7 @@ jobs:
                   path: ./node_modules
                   key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
 
-            - name: Build App
+            - name: Build Studio
               run: yarn nx run studio:build --prod --skip-nx-cache
 
     autodeploy:
@@ -95,7 +95,7 @@ jobs:
                     echo "BUILD_MODE=prod" >> $GITHUB_ENV
                   fi
 
-            - name: Build App
+            - name: Build Studio
               run: NODE_ENV='production' yarn nx run studio:build --configuration=production --mode $BUILD_MODE --skip-nx-cache
 
             - name: Deploy
