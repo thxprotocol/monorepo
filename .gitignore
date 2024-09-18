@@ -43,6 +43,8 @@ Thumbs.db
 !.env.example
 !apps/app/.env.prod
 !apps/app/.env.dev
+!apps/studio/.env.prod
+!apps/studio/.env.dev
 
 certs/*
 
