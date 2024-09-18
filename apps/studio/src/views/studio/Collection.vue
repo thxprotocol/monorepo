@@ -43,6 +43,7 @@
                     centered
                     hide-header
                     hide-footer
+                    body-class="gradient-shadow-xl"
                     @hidden="isModelCollectionMetadataShown = false"
                 >
                     <BaseFormCollectionMetadata :erc721="collection" @submit="isModelCollectionMetadataShown = false" />
@@ -67,6 +68,7 @@ import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAuthStore, useCollectionStore, useEntryStore } from '@thxnetwork/studio/stores';
 import { toast } from '@thxnetwork/studio/utils/toast';
+import { ChainId } from '@thxnetwork/common/enums';
 
 export default defineComponent({
     name: 'NFT',
@@ -80,6 +82,7 @@ export default defineComponent({
             description: '',
             symbol: '',
             address: '',
+            chainId: ChainId.Polygon,
         };
     },
     computed: {
@@ -88,7 +91,12 @@ export default defineComponent({
             return !this.$route.params.id;
         },
         blockExplorerURL() {
-            return '';
+            switch (this.chainId) {
+                case ChainId.Polygon:
+                    return 'https://polygonscan.com/token/' + this.address;
+                case ChainId.Linea:
+                    return 'https://lineascan.build/token/' + this.address;
+            }
         },
         collection(): TERC721 {
             return this.collectionStore.collections.find(
@@ -110,6 +118,7 @@ export default defineComponent({
         this.description = this.collection.description as string;
         this.symbol = this.collection.symbol as string;
         this.address = this.collection.address as string;
+        this.chainId = this.collection.chainId as ChainId;
     },
     methods: {
         async getCollection(erc721Id: string) {
@@ -139,12 +148,12 @@ export default defineComponent({
         async onSubmit() {
             if (!this.isCreating) return;
 
-            // await this.collectionStore.create({
-            //     name: this.name,
-            //     chainId: this.chainId,
-            //     symbol: this.symbol,
-            //     description: this.description,
-            // });
+            await this.collectionStore.create({
+                name: this.name,
+                chainId: this.chainId,
+                symbol: this.symbol,
+                description: this.description,
+            });
 
             // Redirect to edit page
             this.$router.push(

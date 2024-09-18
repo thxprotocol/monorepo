@@ -8,13 +8,13 @@
                 <b-navbar-toggle target="nav-collapse" />
                 <b-collapse id="nav-collapse" is-nav>
                     <b-navbar-nav>
-                        <b-nav-item to="/collections">Collections</b-nav-item>
+                        <b-nav-item to="/collections">My Collections</b-nav-item>
                         <b-nav-item to="/qr-codes">QR Codes</b-nav-item>
                     </b-navbar-nav>
                 </b-collapse>
                 <b-navbar-nav class="me-3">
-                    <b-nav-item href="https://www.twinstory.io" target="_blank">FAQ</b-nav-item>
-                    <b-nav-item href="https://www.twinstory.io" target="_blank">Support</b-nav-item>
+                    <b-nav-item href="https://www.twinstory.io/faq" target="_blank">FAQ</b-nav-item>
+                    <b-nav-item href="https://www.twinstory.io/support" target="_blank">Support</b-nav-item>
                 </b-navbar-nav>
                 <b-nav-item-dropdown right no-caret class="d-flex">
                     <template #button-content>

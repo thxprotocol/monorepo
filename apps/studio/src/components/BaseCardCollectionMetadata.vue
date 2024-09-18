@@ -27,6 +27,7 @@
                 centered
                 hide-header
                 hide-footer
+                body-class="gradient-shadow-xl"
                 @hidden="isModelGenerateQRCodeShown = false"
             >
                 <BaseFormCollectionMetadataQRCodes :collection="collection" :metadata="metadata" />

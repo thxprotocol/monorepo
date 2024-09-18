@@ -27,13 +27,12 @@ const routes: Array<RouteRecordRaw> = [
             {
                 name: 'collectioncreate',
                 path: '/collections/create',
-                component: () =>
-                    import(/* webpackChunkName: "collectioncreate" */ '../views/studio/CollectionCreate.vue'),
+                component: () => import(/* webpackChunkName: "collectioncreate" */ '../views/studio/Collection.vue'),
             },
             {
                 name: 'collection',
                 path: '/collections/:id',
-                component: () => import(/* webpackChunkName: "collection" */ '../views/studio/CollectionCreate.vue'),
+                component: () => import(/* webpackChunkName: "collection" */ '../views/studio/Collection.vue'),
             },
             {
                 name: 'qr',
