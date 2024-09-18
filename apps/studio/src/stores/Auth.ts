@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { createClient, Provider, Session } from '@supabase/supabase-js';
-import { API_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from '../config/secrets';
+import { API_URL, STUDIO_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from '../config/secrets';
 import { accountVariantProviderKindMap, OAuthScopes } from '../config/constants';
 import { AccountVariant } from '@thxnetwork/common/enums';
 import { popup } from '../utils/popup';
@@ -50,7 +50,9 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async getSession() {
-            return await supabase.auth.getSession();
+            const { data, error } = await supabase.auth.getSession();
+            if (error) throw new Error(error.message);
+            return data.session;
         },
         onSignedIn(session: Session) {
             const isExpired = session?.expires_at ? new Date(session.expires_at * 1000) < new Date() : false;
@@ -69,6 +71,7 @@ export const useAuthStore = defineStore('auth', {
         },
         onSignedOut(_session: Session) {
             this.session = null;
+            router.push({ name: 'login' });
         },
         async signInWithOtp({ email }: { email: string }) {
             const { error } = await supabase.auth.signInWithOtp({

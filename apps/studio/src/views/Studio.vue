@@ -3,7 +3,7 @@
         <b-row>
             <b-navbar>
                 <b-navbar-brand to="/">
-                    <b-img :src="imgLogo" width="50" class="rounded" />
+                    <b-img :src="imgLogo" width="50" />
                 </b-navbar-brand>
                 <b-navbar-toggle target="nav-collapse" />
                 <b-collapse id="nav-collapse" is-nav>

@@ -10,8 +10,8 @@
 .or-separator:after {
     display: block;
     content: 'OR';
-    background-color: #fff !important;
-    color: gray;
+    background-color: var(--bs-gray-800) !important;
+    color: var(--bs-gray-100);
     width: 40px;
     font-size: 0.8rem;
     margin-top: -0.7rem;

@@ -2,7 +2,7 @@
     <div class="h-100">
         <b-container class="m-auto h-100" fluid>
             <b-row class="h-100">
-                <b-col md="6" class="h-100 d-flex align-items-center justify-content-center flex-column bg-light">
+                <b-col md="6" class="h-100 d-flex align-items-center justify-content-center flex-column bg-dark">
                     <div>
                         <b-img width="60" :src="imgLogo" fluid />
                         <div>

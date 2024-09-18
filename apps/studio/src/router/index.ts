@@ -13,7 +13,7 @@ async function beforeEnter(to: any, from: any, next: any) {
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
-        name: '',
+        name: 'home',
         meta: { requiresAuth: true },
         beforeEnter,
         component: () => import(/* webpackChunkName: "studio" */ '../views/Studio.vue'),
@@ -44,7 +44,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/account',
         name: 'account',
-        component: () => import(/* webpackChunkName: "signinredirect" */ '../views/LoginRedirect.vue'),
+        component: () => import(/* webpackChunkName: "signinredirect" */ '../views/Account.vue'),
     },
     {
         path: '/auth/redirect',
@@ -60,10 +60,6 @@ const routes: Array<RouteRecordRaw> = [
         path: '/logout',
         name: 'logout',
         component: () => import(/* webpackChunkName: "logout" */ '../views/Logout.vue'),
-        beforeEnter: async (to, from, next) => {
-            await useAuthStore().logout();
-            next({ name: 'login' });
-        },
     },
 ];
 
@@ -77,7 +73,7 @@ router.beforeEach(async (to, from, next) => {
     if (to.matched.some((record) => record.meta.requiresAuth)) {
         // Not logged in, redirect to login page
         const session = await useAuthStore().getSession();
-        if (!session) {
+        if (!session || session.expires_in <= 0) {
             next({ name: 'login', query: { redirect: to.fullPath } });
         }
         // Logged in, proceed to route
@@ -89,4 +85,5 @@ router.beforeEach(async (to, from, next) => {
         next();
     }
 });
+
 export default router;
