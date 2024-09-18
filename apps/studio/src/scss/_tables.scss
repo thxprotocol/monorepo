@@ -1,6 +1,6 @@
 
 .table {
-    --bs-table-bg: var(--purple-darker);
+    --bs-table-bg: var(--purple);
     color: $table-color;
     
     .b-table-empty-slot td:last-of-type {
@@ -13,7 +13,7 @@
         padding-top: 1rem;
         padding-bottom: 1rem;
         vertical-align: middle;
-        border-color: $purple-dark;
+        border-color: $purple;
 
         &:last-of-type {
             text-align: right;

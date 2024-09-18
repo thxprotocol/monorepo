@@ -42,7 +42,7 @@
                     hide-footer
                     @hidden="isModelCollectionMetadataShown = false"
                 >
-                    <BaseFormCollectionMetadata :erc721="collection" />
+                    <BaseFormCollectionMetadata :erc721="collection" @submit="isModelCollectionMetadataShown = false" />
                 </b-modal>
             </h2>
             <b-row v-if="isLoading && !metadataList.length">
@@ -62,7 +62,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useAuthStore, useCollectionStore } from '@thxnetwork/studio/stores';
+import { useAuthStore, useCollectionStore, useEntryStore } from '@thxnetwork/studio/stores';
 import { toast } from '@thxnetwork/studio/utils/toast';
 
 export default defineComponent({
@@ -80,7 +80,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAuthStore, useCollectionStore),
+        ...mapStores(useAuthStore, useCollectionStore, useEntryStore),
         isCreating(): boolean {
             return !this.$route.params.id;
         },
@@ -101,7 +101,7 @@ export default defineComponent({
         if (this.isCreating) return;
 
         const erc721Id = this.$route.params.id;
-        await Promise.all([this.collectionStore.get(erc721Id), this.listMetadata(erc721Id)]);
+        await Promise.all([this.getCollection(erc721Id), this.listMetadata(erc721Id)]);
 
         this.name = this.collection.name;
         this.description = this.collection.description as string;
@@ -109,14 +109,28 @@ export default defineComponent({
         this.address = this.collection.address as string;
     },
     methods: {
+        async getCollection(erc721Id: string) {
+            try {
+                this.isLoading = true;
+                await this.collectionStore.get(erc721Id);
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
+        },
         async listMetadata(erc721Id: string) {
             try {
                 this.isLoading = true;
                 await this.collectionStore.listMetadata(erc721Id, { page: this.page, limit: this.limit });
             } catch (error: any) {
-                toast(error.message, 'light', 3000, () => alert('bla'));
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
             } finally {
-                this.isLoading = true;
+                this.isLoading = false;
             }
         },
         async onSubmit() {

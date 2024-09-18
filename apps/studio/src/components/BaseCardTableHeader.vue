@@ -4,7 +4,6 @@
             <b-form-input
                 :debounce="1000"
                 :value="query"
-                size="sm"
                 placeholder="Search..."
                 @input="$emit('query', $event)"
                 @change="$emit('query-submit', $event)"
@@ -15,19 +14,11 @@
             <b-form-select
                 v-model="limitModel"
                 :value="limit"
-                style="max-width: 75px"
-                size="sm"
+                style="max-width: 100px"
                 :options="[1, 10, 25, 50, 100]"
                 class="me-5"
             />
-            <b-pagination
-                v-model="pageModel"
-                size="sm"
-                class="mb-0"
-                :per-page="limit"
-                :total-rows="total"
-                align="center"
-            />
+            <b-pagination v-model="pageModel" class="mb-0" :per-page="limit" :total-rows="total" align="center" />
         </b-col>
     </b-row>
 </template>

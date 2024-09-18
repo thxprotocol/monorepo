@@ -33,13 +33,19 @@ export const useCollectionStore = defineStore('collection', {
             const data = await this.request(`/erc721`, { method: 'POST', body, params: {} });
             this.collections.push(data);
         },
-        async listMetadata(erc721Id: string, options: { page: number; limit: number }) {
-            const params = new URLSearchParams();
-            params.set('page', String(options.page));
-            params.set('limit', String(options.limit));
-
+        async listMetadata(erc721Id: string, params: { page: number; limit: number }) {
             const data = await this.request(`/erc721/${erc721Id}/metadata`, { params });
             this.metadata[erc721Id] = data;
+        },
+        async createMetadata(erc721Id: string, body: Partial<TERC721Metadata>) {
+            const data = await this.request(`/erc721/${erc721Id}/metadata`, { method: 'POST', body });
+            this.metadata[erc721Id].results.push(data);
+        },
+        async removeMetadata(erc721Id: string, erc721MetadataId: string) {
+            await this.request(`/erc721/${erc721Id}/metadata/${erc721MetadataId}`, { method: 'DELETE' });
+            this.metadata[erc721Id].results = this.metadata[erc721Id].results.filter(
+                (metadata) => metadata._id !== erc721MetadataId,
+            );
         },
     },
 });

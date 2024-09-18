@@ -5,7 +5,7 @@
     </b-container>
     <div class="bg-dark py-5 flex-grow-1">
         <b-container>
-            <b-card variant="light">
+            <b-card variant="darker">
                 <BaseCardTableHeader
                     :query="query"
                     :page="page"
@@ -17,11 +17,17 @@
                     @query-submit="onSubmitQuery"
                 />
                 <hr />
-                <b-table :items="entries" variant="light" show-empty responsive="lg" :busy="isLoading">
-                    <template #head(uuid) />
-                    <template #cell(uuid)="{ item }">
-                        <b-link :href="item.uuid.url" target="_blank">
-                            {{ item.uuid.value }}
+                <b-table :items="entries" variant="darker" show-empty hover responsive="lg" :busy="isLoading">
+                    <template #head(select)>
+                        <b-form-checkbox @change="selected = $event ? entries.map((item) => item.code.uuid) : []" />
+                    </template>
+                    <template #cell(select)="{ item }">
+                        <b-form-checkbox v-model="selected" :value="item.code.uuid" />
+                    </template>
+                    <template #head(code)>Code</template>
+                    <template #cell(code)="{ item }">
+                        <b-link :href="item.code.url" target="_blank" class="text-decoration-none">
+                            <code>{{ item.code.uuid }}</code>
                             <BaseIcon icon="external-link-alt" class="ms-1" />
                         </b-link>
                     </template>
@@ -37,12 +43,12 @@
                     <template #cell(id)="{ item }">
                         <b-dropdown no-caret size="sm" end variant="link">
                             <template #button-content>
-                                <BaseIcon icon="ellipsis-v" />
+                                <BaseIcon icon="ellipsis-v text-light" />
                             </template>
                             <b-dropdown-item v-b-modal="`modalQRCode${item.id}`"> QR Code </b-dropdown-item>
                             <b-dropdown-item @click="onClickDelete(item.id)"> Delete </b-dropdown-item>
                         </b-dropdown>
-                        <BaseModalQRCode :id="`modalQRCode${item.id}`" :url="item.uuid.url" />
+                        <BaseModalQRCode :id="`modalQRCode${item.id}`" :url="item.code.url" />
                     </template>
                 </b-table>
             </b-card>
@@ -61,19 +67,21 @@ export default defineComponent({
     name: 'QR',
     data() {
         return {
+            selected: [] as string[],
             isLoading: false,
             format,
             query: '',
             page: 1,
-            limit: 1,
+            limit: 10,
         };
     },
     computed: {
         ...mapStores(useEntryStore),
         entries() {
             return this.entryStore.entries.results.map((entry) => ({
-                uuid: {
-                    value: entry.uuid,
+                select: entry.uuid,
+                code: {
+                    uuid: entry.uuid,
                     url: `${entry.redirectURL}/${entry.uuid}`,
                 },
                 collection: entry.erc721.name,
@@ -96,7 +104,17 @@ export default defineComponent({
         async listEntries() {
             try {
                 this.isLoading = true;
-                await this.entryStore.list({ page: this.page, limit: this.limit, query: this.query });
+
+                const options: any = {
+                    page: this.page,
+                    limit: this.limit,
+                    query: this.query,
+                };
+                if (this.$route.query.metadataId) {
+                    options['erc721MetadataId'] = this.$route.query.metadataId;
+                }
+
+                await this.entryStore.list(options);
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;
@@ -110,15 +128,15 @@ export default defineComponent({
             await this.listEntries();
         },
         async onChangeLimit(limit: number) {
+            this.page = 1;
             this.limit = limit;
             await this.listEntries();
         },
         async onChangeQuery(query: string) {
             this.query = query;
-            await this.listEntries();
         },
-        onSubmitQuery() {
-            debugger;
+        async onSubmitQuery() {
+            await this.listEntries();
         },
         async onClickDelete(id: string) {
             try {
@@ -135,3 +153,8 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.table > :not(caption) > * > * {
+    border: 0;
+}
+</style>

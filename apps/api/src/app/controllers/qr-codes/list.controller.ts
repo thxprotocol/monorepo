@@ -6,6 +6,7 @@ import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 const validation = [
     query('limit').optional().isInt({ gt: 0 }),
     query('page').optional().isInt({ gt: 0 }),
+    query('query').optional().isString(), // username
     query('erc721Id').optional().isMongoId(),
     query('erc721MetadataId').optional().isMongoId(),
 ];

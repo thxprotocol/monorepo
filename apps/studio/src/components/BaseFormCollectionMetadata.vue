@@ -1,10 +1,10 @@
 <template>
-    <b-form>
+    <b-form @submit="onSubmit">
         <BaseFormGroup label="Name" tooltip="">
-            <b-form-input />
+            <b-form-input v-model="name" />
         </BaseFormGroup>
         <BaseFormGroup label="Description" tooltip="">
-            <b-form-input />
+            <b-form-textarea v-model="description" />
         </BaseFormGroup>
         <BaseFormGroup label="Image" tooltip="">
             <BaseFormInputFile
@@ -26,7 +26,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { useAuthStore } from '@thxnetwork/studio/stores';
+import { useCollectionStore } from '@thxnetwork/studio/stores';
+import { mapStores } from 'pinia';
+import { toast } from '@thxnetwork/studio/utils/toast';
 
 export default defineComponent({
     name: 'BaseFormCollectionMetadata',
@@ -45,19 +47,27 @@ export default defineComponent({
             externalURL: '',
         };
     },
+    computed: {
+        ...mapStores(useCollectionStore),
+    },
     methods: {
         async onSubmit() {
-            const { request } = useAuthStore();
-
-            await request(`/erc721/${this.erc721._id}/metadata`, {
-                method: 'POST',
-                body: {
+            try {
+                this.isLoading = true;
+                await this.collectionStore.createMetadata(this.erc721._id, {
                     name: this.name,
                     description: this.description,
-                    imageURL: this.imageURL,
-                    externalURL: this.externalURL,
-                },
-            });
+                    imageUrl: this.imageURL,
+                    externalUrl: this.externalURL,
+                });
+                this.$emit('submit');
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
         },
     },
 });

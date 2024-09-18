@@ -17,6 +17,7 @@ import WalletService from './WalletService';
 import { TransactionReceipt } from 'web3-core';
 import { toChecksumAddress } from 'web3-utils';
 import { ADDRESS_ZERO } from '../config/secrets';
+import { QRCodeEntry } from '../models';
 
 const contractName = 'THXERC721';
 
@@ -77,7 +78,11 @@ export async function findBySub(sub: string): Promise<ERC721Document[]> {
 }
 
 export async function deleteMetadata(id: string) {
-    return ERC721Metadata.findOneAndDelete({ _id: id });
+    // Delete QR codes for this bit of metadata
+    await QRCodeEntry.deleteMany({ erc721MetadataId: id });
+
+    // Delete metadata
+    await ERC721Metadata.findOneAndDelete({ _id: id });
 }
 
 export async function mint(

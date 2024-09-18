@@ -1,14 +1,26 @@
 <template>
     <b-card class="mb-3" :title="metadata.name" :img-src="metadata.imageUrl">
         <p>{{ metadata.description }}</p>
-        <b-link :href="metadata.externalUrl" target="_blank" class="d-block">
-            External URL
-            <BaseIcon icon="external-link-alt ms-1" />
-        </b-link>
+        <div class="d-flex">
+            <b-badge class="p-2 me-2" variant="dark">
+                <BaseIcon icon="qrcode" class="me-1" />
+                {{ entries.total }}
+            </b-badge>
+            <b-badge class="p-2" variant="dark">
+                <BaseIcon icon="users" class="me-1" />
+                {{ entries.meta.claimedCount }}
+            </b-badge>
+            <b-button variant="dark" size="sm" :href="metadata.externalUrl" target="_blank" class="ms-auto">
+                <BaseIcon icon="external-link-alt" />
+            </b-button>
+        </div>
         <template #footer>
             <b-button variant="primary" class="w-100" @click="isModelGenerateQRCodeShown = true">
-                Generate QR Codes
-                <BaseIcon icon="qrcode" class="ms-1" />
+                Create QR Codes
+                <BaseIcon icon="chevron-right" class="ms-1" />
+            </b-button>
+            <b-button variant="link" class="text-danger w-100 text-decoration-none" @click="onClickRemove">
+                Remove
             </b-button>
             <b-modal
                 v-model="isModelGenerateQRCodeShown"
@@ -25,6 +37,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import { mapStores } from 'pinia';
+import { useEntryStore, useCollectionStore } from '@thxnetwork/studio/stores';
+import { toast } from '@thxnetwork/studio/utils/toast';
 
 export default defineComponent({
     name: 'BaseCardTableHeader',
@@ -39,7 +54,49 @@ export default defineComponent({
         },
     },
     data() {
-        return { isModelGenerateQRCodeShown: false };
+        return { isLoading: false, page: 1, limit: 10, query: '', isModelGenerateQRCodeShown: false };
+    },
+    computed: {
+        ...mapStores(useEntryStore, useCollectionStore),
+        entries() {
+            if (!this.entryStore.entriesByMetadata[this.metadata._id])
+                return { total: 0, results: [], meta: { claimedCount: 0 } };
+            return this.entryStore.entriesByMetadata[this.metadata._id];
+        },
+    },
+    mounted() {
+        this.listEntries();
+    },
+    methods: {
+        async listEntries() {
+            try {
+                this.isLoading = true;
+                await this.entryStore.list({
+                    page: this.page,
+                    limit: this.limit,
+                    query: this.query,
+                    erc721MetadataId: this.metadata._id,
+                });
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async onClickRemove() {
+            try {
+                this.isLoading = true;
+                await this.collectionStore.removeMetadata(this.collection._id, this.metadata._id);
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
+        },
     },
 });
 </script>
