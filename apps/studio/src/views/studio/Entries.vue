@@ -17,7 +17,15 @@
                     @query-submit="onSubmitQuery"
                 />
                 <hr />
-                <b-table :items="entries" variant="darker" show-empty hover responsive="lg" :busy="isLoading">
+                <b-table
+                    :items="entries"
+                    align="middle"
+                    variant="darker"
+                    show-empty
+                    hover
+                    responsive="lg"
+                    :busy="isLoading"
+                >
                     <template #head(select)>
                         <b-form-checkbox @change="selected = $event ? entries.map((item) => item.code.uuid) : []" />
                     </template>
@@ -37,6 +45,14 @@
                             <b-avatar :src="item.account.profileImg" size="1.5rem" class="me-2" />
                             <b-link :href="`mailto: ${item.account.email}`">{{ item.account.username }}</b-link>
                         </template>
+                    </template>
+                    <template #head(collection)> Collection </template>
+                    <template #cell(collection)="{ item }">
+                        {{ item.collection }}
+                    </template>
+                    <template #head(metadata)> Metadata </template>
+                    <template #cell(metadata)="{ item }">
+                        {{ item.metadata }}
                     </template>
                     <template #head(claimedAt)> Claimed </template>
                     <template #head(id) />
@@ -64,7 +80,7 @@ import { format } from 'date-fns';
 import { toast } from '@thxnetwork/studio/utils/toast';
 
 export default defineComponent({
-    name: 'QR',
+    name: 'Entries',
     data() {
         return {
             selected: [] as string[],
@@ -153,8 +169,3 @@ export default defineComponent({
     },
 });
 </script>
-<style>
-.table > :not(caption) > * > * {
-    border: 0;
-}
-</style>

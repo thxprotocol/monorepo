@@ -9,26 +9,32 @@
     </b-container>
     <div class="bg-dark text-white py-5 flex-grow-1">
         <b-container>
-            <b-row v-if="isLoading && !collectionStore.collections.length">
-                <b-col v-for="val in [1, 2, 3]" md="4">
-                    <b-placeholder-card :key="val" no-img />
-                </b-col>
-            </b-row>
-            <b-row v-else>
-                <b-col v-for="collection of collectionStore.collections" md="4">
-                    <b-link class="text-decoration-none" :to="`/collections/${collection._id}`">
-                        <b-card class="mb-3" :header="collection.name">
-                            {{ collection.description }}
-                            <template #footer>
-                                <b-button class="w-100" variant="primary">
-                                    Configure
-                                    <BaseIcon icon="chevron-right" class="ms-2" />
-                                </b-button>
+            <b-card variant="darker">
+                <b-table :items="collections" responsive="lg" :tbody-tr-class="rowClass" @row-clicked="onClickRow">
+                    <template #head(name)>Name</template>
+                    <template #head(address)>Address</template>
+                    <template #head(actions)></template>
+
+                    <template #cell(name)="{ item }">
+                        <strong>{{ item.name }}</strong>
+                    </template>
+                    <template #cell(address)="{ item }">
+                        <b-link href="" target="_blank">
+                            <code>
+                                {{ item.address.value }}
+                            </code>
+                        </b-link>
+                    </template>
+                    <template #cell(actions)="{ item }">
+                        <b-dropdown no-caret size="sm" end variant="link">
+                            <template #button-content>
+                                <BaseIcon icon="ellipsis-v text-light" />
                             </template>
-                        </b-card>
-                    </b-link>
-                </b-col>
-            </b-row>
+                            <b-dropdown-item @click="onClickDelete(item.actions.id)"> Remove </b-dropdown-item>
+                        </b-dropdown>
+                    </template>
+                </b-table>
+            </b-card>
         </b-container>
     </div>
 </template>
@@ -48,17 +54,60 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAuthStore, useCollectionStore),
+        collections() {
+            return this.collectionStore.collections.map((collection) => {
+                return {
+                    name: collection.name,
+                    address: {
+                        value: collection.address,
+                        short: collection.address?.substring(0, 10),
+                    },
+                    actions: {
+                        id: collection._id,
+                    },
+                };
+            });
+        },
     },
     mounted() {
         this.listCollections();
     },
     methods: {
+        rowClass(_item, type: string) {
+            return type === 'row' ? 'cursor-pointer' : '';
+        },
         async listCollections() {
             try {
                 this.isLoading = true;
                 await this.collectionStore.list();
             } catch (error: any) {
-                toast(error.message, 'danger', 3000, () => alert('bla'));
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async onClickDelete(id: string) {
+            try {
+                this.isLoading = true;
+                await this.collectionStore.remove(id);
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = true;
+            }
+        },
+        async onClickRow(data: { actions: { id: string } }) {
+            try {
+                this.isLoading = true;
+                await this.$router.push(`/collections/${data.actions.id}`);
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
             } finally {
                 this.isLoading = false;
             }

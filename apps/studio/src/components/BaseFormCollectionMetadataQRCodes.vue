@@ -1,6 +1,6 @@
 <template>
     <b-tabs justified pills content-class="py-3">
-        <b-tab title="Entries">
+        <b-tab title="Codes">
             <b-form @submit.prevent="onSubmitEntries">
                 <BaseFormGroup
                     label="Amount"
@@ -13,12 +13,16 @@
                 </BaseFormGroup>
                 <b-button type="submit" variant="primary" class="w-100">
                     <b-spinner v-if="isLoading" small />
-                    <template v-else> Create QR Codes </template>
+                    <template v-else> Create Codes </template>
                 </b-button>
             </b-form>
         </b-tab>
         <b-tab title="Download">
             <b-form @submit="onSubmitDownload">
+                <b-alert v-model="isAlertShown" variant="primary" show class="py-2">
+                    <BaseIcon icon="info-circle" class="me-2" />
+                    You can download <strong>{{ codes.length }}</strong> entries as a zip with QR codes.
+                </b-alert>
                 <BaseFormGroup label="Logo Image" tooltip="Positioned in the center of the QR code">
                     <b-form-file
                         v-model="imageFile"
@@ -96,6 +100,7 @@ export default defineComponent({
     data() {
         return {
             isLoading: false,
+            isAlertShown: true,
             codes: [],
             index: 0,
             amount: 0,
@@ -108,6 +113,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useEntryStore),
+    },
+    async mounted() {
+        await this.listCodes();
     },
     methods: {
         async onSubmitEntries() {
@@ -135,6 +143,23 @@ export default defineComponent({
             url.pathname = `/v1/qr-codes/r/${uuid}`;
             return url.toString();
         },
+        async listCodes() {
+            try {
+                this.isLoading = true;
+                // Get the first 5000 (max) QR codes for this metadata. Increase if needed.
+                const { request } = useAuthStore();
+                const data = await request('/qr-codes', {
+                    params: { erc721MetadataId: this.metadata._id, page: 1, limit: 5000 },
+                });
+                this.codes = data.results.map((code: TQRCodeEntry) => code.uuid);
+            } catch (error) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
+        },
         async onSubmitDownload() {
             try {
                 if (!this.metadata) throw new Error('Metadata not found');
@@ -143,13 +168,6 @@ export default defineComponent({
                 const filename = `qr_codes_${new Date().getTime()}`;
                 const zip = new JSZip();
                 const archive = zip.folder(filename) as JSZip;
-
-                // Get the first 5000 (max) QR codes for this metadata. Increase if needed.
-                const { request } = useAuthStore();
-                const data = await request('/qr-codes', {
-                    params: { erc721MetadataId: this.metadata._id, page: 1, limit: 5000 },
-                });
-                this.codes = data.results.map((code: TQRCodeEntry) => code.uuid);
 
                 // Iterate over the uuids and create a QR code for each
                 for (const uuid of this.codes) {

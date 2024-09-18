@@ -33,6 +33,10 @@ export const useCollectionStore = defineStore('collection', {
             const data = await this.request(`/erc721`, { method: 'POST', body, params: {} });
             this.collections.push(data);
         },
+        async remove(id: string) {
+            await this.request(`/erc721/${id}`, { method: 'DELETE' });
+            this.collections = this.collections.filter((collection) => collection._id !== id);
+        },
         async listMetadata(erc721Id: string, params: { page: number; limit: number }) {
             const data = await this.request(`/erc721/${erc721Id}/metadata`, { params });
             this.metadata[erc721Id] = data;

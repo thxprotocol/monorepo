@@ -9,30 +9,33 @@
     </b-container>
     <div class="bg-dark text-white py-5 flex-grow-1">
         <b-container>
-            <b-row>
-                <b-col md="6">
-                    <BaseFormGroup label="Name" tooltip="This name is used to describe your collection">
-                        <b-form-input v-model="name" />
-                    </BaseFormGroup>
-                    <BaseFormGroup label="Symbol" tooltip="ERC721 collections require a symbol like ABC.">
-                        <b-form-input v-model="description" />
-                    </BaseFormGroup>
-                </b-col>
-                <b-col md="6">
-                    <BaseFormGroup label="Description" tooltip="Describe your collection in a couple of words">
-                        <b-form-textarea v-model="description" />
-                    </BaseFormGroup>
-                    <b-form @submit="onSubmit">
-                        <b-button variant="primary" type="submit" class="w-100">
-                            {{ isCreating ? 'Create' : 'Update' }} Collection
-                        </b-button>
-                    </b-form>
-                </b-col>
-            </b-row>
+            <h2>Details</h2>
+            <b-card class="mb-5">
+                <b-row>
+                    <b-col md="6">
+                        <BaseFormGroup label="Name" tooltip="This name is used to describe your collection">
+                            <b-form-input v-model="name" />
+                        </BaseFormGroup>
+                        <BaseFormGroup label="Symbol" tooltip="ERC721 collections require a symbol like ABC.">
+                            <b-form-input v-model="description" />
+                        </BaseFormGroup>
+                    </b-col>
+                    <b-col md="6">
+                        <BaseFormGroup label="Description" tooltip="Describe your collection in a couple of words">
+                            <b-form-textarea v-model="description" />
+                        </BaseFormGroup>
+                        <b-form @submit="onSubmit">
+                            <b-button variant="primary" type="submit" class="w-100">
+                                {{ isCreating ? 'Create' : 'Update' }} Collection
+                            </b-button>
+                        </b-form>
+                    </b-col>
+                </b-row>
+            </b-card>
             <h2 class="my-3 d-flex">
-                Metadata
-                <b-button variant="dark" class="ms-auto" @click="isModelCollectionMetadataShown = true">
-                    Create Metadata
+                Collectibles
+                <b-button variant="primary" class="ms-auto" @click="isModelCollectionMetadataShown = true">
+                    Create Collectible
                     <BaseIcon icon="plus" class="ms-1" />
                 </b-button>
                 <b-modal

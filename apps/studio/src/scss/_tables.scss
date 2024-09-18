@@ -32,3 +32,14 @@
         }
     }
 }
+
+.table > :not(caption) > * > * {
+    border: 0 !important;
+}
+.table > td {
+    vertical-align: middle !important;
+}
+
+.table .cursor-pointer {
+    cursor: pointer;
+}   
