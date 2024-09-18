@@ -86,7 +86,7 @@ jobs:
             - name: Set environment based on branch
               run: |
                   if [[ $GITHUB_REF == 'refs/heads/studio' ]]; then
-                    echo "S3_URL=s3://dev-stuidio.thx.network" >> $GITHUB_ENV
+                    echo "S3_URL=s3://dev-studio.thx.network" >> $GITHUB_ENV
                     echo "DISTRIBUTION=${{ secrets.CLOUDFRONT_DISTRIBUTION_APP_DEV }}" >> $GITHUB_ENV
                     echo "BUILD_MODE=dev" >> $GITHUB_ENV
                   elif [[ $GITHUB_REF == 'refs/heads/main' ]]; then
