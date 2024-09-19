@@ -3,6 +3,7 @@ export const BASE_URL = import.meta.env.BASE_URL;
 export const AUTH_URL = import.meta.env.VITE_AUTH_URL || '';
 export const API_URL = import.meta.env.VITE_API_URL || '';
 export const WIDGET_URL = import.meta.env.VITE_WIDGET_URL || '';
+export const WALLET_URL = import.meta.env.VITE_WALLET_URL || '';
 export const PUBLIC_URL = import.meta.env.VITE_PUBLIC_URL || 'https://thx.network';
 export const DASHBOARD_URL = import.meta.env.VITE_DASHBOARD_URL || 'https://dashboard.thx.network';
 export const STUDIO_URL = import.meta.env.VITE_STUDIO_URL || 'https://studio.thx.network';

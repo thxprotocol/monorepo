@@ -16,5 +16,11 @@ export const useAccountStore = defineStore('account', {
         async getProfiles() {
             this.profiles = await this.request('/widgets');
         },
+        async updateProfile(profileId: string, profile: Partial<TWidget>) {
+            await this.request(`/widgets/${profileId}`, {
+                method: 'PATCH',
+                body: profile,
+            });
+        },
     },
 });

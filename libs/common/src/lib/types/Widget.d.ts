@@ -1,4 +1,5 @@
 type TWidget = {
+    _id: string;
     sub: string;
     slug: string;
     name: string;

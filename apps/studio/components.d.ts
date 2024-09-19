@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     BAlert: typeof import('bootstrap-vue-next')['BAlert']
     BaseCardCollectionMetadata: typeof import('./src/components/BaseCardCollectionMetadata.vue')['default']
+    BaseCardProfile: typeof import('./src/components/BaseCardProfile.vue')['default']
     BaseCardTableHeader: typeof import('./src/components/BaseCardTableHeader.vue')['default']
     BaseFormCollectionMetadata: typeof import('./src/components/BaseFormCollectionMetadata.vue')['default']
     BaseFormCollectionMetadataQRCodes: typeof import('./src/components/BaseFormCollectionMetadataQRCodes.vue')['default']
