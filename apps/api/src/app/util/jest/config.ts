@@ -45,7 +45,6 @@ class Mock {
 
     async beforeAll(options = { skipWalletCreation: false }) {
         await db.connect(MONGODB_URI);
-        await db.truncate();
 
         const chainId = ChainId.Hardhat;
 
@@ -123,6 +122,7 @@ class Mock {
         await agenda.stop();
         await agenda.cancel({});
         await agenda.purge();
+        await db.truncate();
     }
 }
 
