@@ -26,6 +26,7 @@
                         />
                     </template>
                     <b-dropdown-item to="/account">Account</b-dropdown-item>
+                    <b-dropdown-item to="/settings">Settings</b-dropdown-item>
                     <b-dropdown-item to="/logout">Logout</b-dropdown-item>
                 </b-nav-item-dropdown>
             </b-navbar>

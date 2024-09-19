@@ -43,6 +43,11 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'account',
                 component: () => import(/* webpackChunkName: "signinredirect" */ '../views/studio/Account.vue'),
             },
+            {
+                path: '/settings',
+                name: 'settings',
+                component: () => import(/* webpackChunkName: "signinredirect" */ '../views/studio/Settings.vue'),
+            },
         ],
     },
     {

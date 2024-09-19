@@ -1,4 +1,5 @@
 type TWidget = {
+    sub: string;
     uuid: string;
     poolId: string;
     iconImg: string;

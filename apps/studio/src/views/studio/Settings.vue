@@ -1,18 +1,18 @@
 <template>
     <template v-if="accountStore.account">
         <b-container class="py-5 text-white">
-            <h1>{{ accountStore.account.username }}</h1>
-            <p class="lead">{{ accountStore.account.email }}</p>
+            <h1>Settings</h1>
+            <p class="lead">Personalize your collectible wallet.</p>
         </b-container>
         <div class="bg-dark py-5 flex-grow-1">
             <b-container>
-                <b-card variant="darker" class="mb-5">
-                    <BaseFormGroup label="Account ID">
-                        {{ accountStore.account.sub }}
+                <b-card v-for="profile of accountStore.profiles" variant="darker" class="mb-5">
+                    <h3>Domain</h3>
+                    <BaseFormGroup label="URL">
+                        <b-form-input v-model="profile.domain" />
                     </BaseFormGroup>
-                    <BaseFormGroup label="Created">
-                        {{ accountStore.account.createdAt }}
-                    </BaseFormGroup>
+                    <h3>Theme</h3>
+                    {{ profile.theme }}
                 </b-card>
             </b-container>
         </div>
@@ -26,11 +26,17 @@ import { useAccountStore } from '@thxnetwork/studio/stores';
 
 export default defineComponent({
     name: 'Account',
+    data() {
+        return {
+            domain: '',
+        };
+    },
     computed: {
         ...mapStores(useAccountStore),
     },
     async mounted() {
         await this.accountStore.get();
+        await this.accountStore.getSettings();
     },
 });
 </script>

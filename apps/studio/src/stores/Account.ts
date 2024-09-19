@@ -4,6 +4,7 @@ import { useAuthStore } from './Auth';
 export const useAccountStore = defineStore('account', {
     state: () => ({
         account: null as null | TAccount,
+        profiles: [] as TWidget[],
     }),
     actions: {
         request(path: string, options?: TRequestOptions) {
@@ -11,6 +12,9 @@ export const useAccountStore = defineStore('account', {
         },
         async get() {
             this.account = await this.request('/account');
+        },
+        async getSettings() {
+            this.profiles = await this.request('/widgets');
         },
     },
 });
