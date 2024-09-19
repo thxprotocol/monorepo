@@ -1,5 +1,10 @@
 type TWidget = {
     sub: string;
+    slug: string;
+    name: string;
+    description: string;
+    logoImgURL: string;
+    backgroundImgURL: string;
     uuid: string;
     poolId: string;
     iconImg: string;

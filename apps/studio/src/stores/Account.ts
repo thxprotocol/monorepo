@@ -13,7 +13,7 @@ export const useAccountStore = defineStore('account', {
         async get() {
             this.account = await this.request('/account');
         },
-        async getSettings() {
+        async getProfiles() {
             this.profiles = await this.request('/widgets');
         },
     },

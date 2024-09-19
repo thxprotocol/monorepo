@@ -7,6 +7,11 @@ export const Widget = mongoose.model<WidgetDocument>(
     new mongoose.Schema(
         {
             sub: String,
+            slug: String,
+            name: String,
+            description: String,
+            logoImgURL: String,
+            backgroundImgURL: String,
             uuid: String,
             poolId: String,
             iconImg: String,

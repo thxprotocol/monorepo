@@ -6,7 +6,7 @@ import * as ListWidgets from './list.controller';
 
 const router: express.Router = express.Router();
 
-router.get('/', assertPoolAccess, ListWidgets.controller);
+router.get('/', ListWidgets.controller);
 router.get('/:uuid', assertRequestInput(ReadWidget.validation), assertPoolAccess, ReadWidget.controller);
 router.patch('/:uuid', assertRequestInput(UpdateWidget.validation), assertPoolAccess, UpdateWidget.controller);
 
