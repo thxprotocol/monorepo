@@ -1,4 +1,4 @@
 export { useAuthStore } from './Auth';
 export { useAccountStore } from './Account';
-export { useCollectionStore } from './Collections';
-export { useEntryStore } from './Entries';
+export { useEntryStore } from './Entry';
+export { useCollectibleStore } from './Collectible';

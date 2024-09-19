@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex bg-primary h-100 overflow-auto flex-column">
+    <div class="d-flex h-100 overflow-auto flex-column">
         <router-view />
     </div>
 </template>

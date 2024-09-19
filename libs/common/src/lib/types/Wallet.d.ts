@@ -10,7 +10,7 @@ type TNetworkConfig = {
 };
 
 type TWallet = {
-    _id?: string;
+    _id: string;
     poolId: string;
     sub: string;
     chainId?: ChainId;

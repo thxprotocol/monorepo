@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
 import { createClient, Provider, Session } from '@supabase/supabase-js';
-import { API_URL, STUDIO_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from '../config/secrets';
+import { API_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from '../config/secrets';
 import { accountVariantProviderKindMap, OAuthScopes } from '../config/constants';
 import { AccountVariant } from '@thxnetwork/common/enums';
 import { popup } from '../utils/popup';
+import { useAccountStore } from './Account';
 import router from '../router';
+import { useCollectibleStore } from './Collectible';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
 
@@ -21,6 +23,8 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         session: null as null | Session,
+        isAuthenticated: false,
+        isModalLoginShown: false,
     }),
     actions: {
         async request(path: string, options?: TRequestOptions) {
@@ -42,11 +46,11 @@ export const useAuthStore = defineStore('auth', {
                     ...(options && options.headers),
                 },
             });
-
             try {
                 return await response.json();
             } catch (error) {
-                //
+                // If the response is not JSON, we return undefined
+                return;
             }
         },
         async getSession() {
@@ -54,24 +58,20 @@ export const useAuthStore = defineStore('auth', {
             if (error) throw new Error(error.message);
             return data.session;
         },
-        onSignedIn(session: Session) {
+        async onSignedIn(session: Session) {
             const isExpired = session?.expires_at ? new Date(session.expires_at * 1000) < new Date() : false;
             if (!session || isExpired) return;
             this.session = session;
 
-            // On login and signup page we redirect to redirect url or dashboard if an account is found
-            const route = router.currentRoute.value;
-            if (['login'].includes(route.name as string)) {
-                if (route.query.redirect) {
-                    router.push({ path: route.query.redirect as string });
-                } else {
-                    router.push({ name: 'collections' });
-                }
-            }
+            await useAccountStore().get();
+            await useAccountStore().getWallets();
+            this.isAuthenticated = true;
+            this.isModalLoginShown = false;
         },
         onSignedOut(_session: Session) {
             this.session = null;
-            router.push({ name: 'login' });
+            this.isAuthenticated = false;
+            router.push({ name: 'wallet' });
         },
         async signInWithOtp({ email }: { email: string }) {
             const { error } = await supabase.auth.signInWithOtp({

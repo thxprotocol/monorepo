@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BAlert: typeof import('bootstrap-vue-next')['BAlert']
+    BaseCardCollectible: typeof import('./src/components/BaseCardCollectible.vue')['default']
     BaseCardCollectionMetadata: typeof import('./src/components/BaseCardCollectionMetadata.vue')['default']
     BaseCardTableHeader: typeof import('./src/components/BaseCardTableHeader.vue')['default']
     BaseFormCollectionMetadata: typeof import('./src/components/BaseFormCollectionMetadata.vue')['default']
@@ -16,6 +17,7 @@ declare module 'vue' {
     BaseFormInputFile: typeof import('./src/components/BaseFormInputFile.vue')['default']
     BaseHrOrSeparator: typeof import('./src/components/BaseHrOrSeparator.vue')['default']
     BaseIcon: typeof import('./src/components/BaseIcon.vue')['default']
+    BaseModalLogin: typeof import('./src/components/BaseModalLogin.vue')['default']
     BaseModalQRCode: typeof import('./src/components/BaseModalQRCode.vue')['default']
     BAvatar: typeof import('bootstrap-vue-next')['BAvatar']
     BBadge: typeof import('bootstrap-vue-next')['BBadge']

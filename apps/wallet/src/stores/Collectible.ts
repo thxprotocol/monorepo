@@ -1,17 +1,17 @@
 import { defineStore } from 'pinia';
 import { useAuthStore } from './Auth';
 
-export const useEntryStore = defineStore('entry', {
+export const useCollectibleStore = defineStore('collectible', {
     state: () => ({
-        entry: null as null | TQRCodeEntry,
+        collectibles: [] as TERC721Token[],
     }),
     actions: {
         request(path: string, options?: TRequestOptions) {
             return useAuthStore().request(path, options);
         },
-        async get(uuid: string) {
-            const response = await this.request('/qr-codes/' + uuid);
-            this.entry = response;
+        async list(walletId: string) {
+            debugger;
+            this.collectibles = await this.request('/erc721/token', { params: { walletId } });
         },
     },
 });

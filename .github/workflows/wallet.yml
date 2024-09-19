@@ -1,0 +1,133 @@
+name: Wallet CI
+
+on:
+    push:
+
+jobs:
+    buildAndTest:
+        name: 'Build & Test'
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: ['18'] # Add other versions if needed
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: us-east-1
+
+            - name: Install Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Restore Node.js dependencies
+              uses: actions/cache@v3
+              with:
+                  path: ./node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - name: Install Node.js dependencies
+              run: yarn install --frozen-lockfile
+
+            - name: Cache Node.js dependencies
+              uses: actions/cache/save@v3
+              if: always()
+              with:
+                  path: ./node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+
+            - name: Build Wallet
+              run: yarn nx run wallet:build --prod --skip-nx-cache
+
+    autodeploy:
+        name: 'Auto deploy'
+        runs-on: ubuntu-latest
+        if: "(github.ref == 'refs/heads/wallet' || github.ref == 'refs/heads/main')"
+        needs: [buildAndTest]
+        outputs:
+            newTag: ${{ steps.version-bump.outputs.newTag }}
+        steps:
+            - name: 'Checkout source code'
+              uses: 'actions/checkout@v3'
+              with:
+                  ref: ${{ github.ref }}
+
+            - name: Install Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: eu-west-3
+
+            - name: Restore Node.js dependencies
+              uses: actions/cache@v3
+              with:
+                  path: ./node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - name: Set environment based on branch
+              run: |
+                  if [[ $GITHUB_REF == 'refs/heads/wallet' ]]; then
+                    echo "S3_URL=s3://dev-wallet.thx.network" >> $GITHUB_ENV
+                    echo "DISTRIBUTION=${{ secrets.CLOUDFRONT_DISTRIBUTION_STUDIO_DEV }}" >> $GITHUB_ENV
+                    echo "BUILD_MODE=dev" >> $GITHUB_ENV
+                  elif [[ $GITHUB_REF == 'refs/heads/main' ]]; then
+                    echo "S3_URL=s3://wallet.thx.network" >> $GITHUB_ENV
+                    echo "DISTRIBUTION=${{ secrets.CLOUDFRONT_DISTRIBUTION_STUDIO_PROD }}" >> $GITHUB_ENV
+                    echo "BUILD_MODE=prod" >> $GITHUB_ENV
+                  fi
+
+            - name: Build Wallet
+              run: NODE_ENV='production' yarn nx run wallet:build --configuration=production --mode $BUILD_MODE --skip-nx-cache
+
+            - name: Deploy
+              run: aws s3 sync ./dist/apps/wallet $S3_URL --delete
+
+            - name: Invalidate CloudFront cache
+              run: aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths "/*"
+
+    discord:
+        name: Update Discord
+        runs-on: ubuntu-latest
+        needs: [autodeploy]
+        steps:
+            - name: 'Checkout source code'
+              uses: 'actions/checkout@v3'
+              with:
+                  ref: ${{ github.ref }}
+
+            - name: Set DISCORD_WEBHOOK based on branch
+              run: |
+                  if [[ $GITHUB_REF == 'refs/heads/wallet' ]]; then
+                    echo "DISCORD_WEBHOOK=${{ secrets.DISCORD_WEBHOOK_DEV }}" >> $GITHUB_ENV
+                  elif [[ $GITHUB_REF == 'refs/heads/main' ]]; then
+                    echo "DISCORD_WEBHOOK=${{ secrets.DISCORD_WEBHOOK_PROD }}" >> $GITHUB_ENV
+                  fi
+
+            - name: Get version
+              run: echo "VERSION=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+            - name: Send message
+              env:
+                  DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
+              uses: Ilshidur/action-discord@master
+              with:
+                  args: "${{ needs.autodeploy.result == 'success' && '✅' || '⛔' }} Released Wallet `v${{ env.VERSION }}-app`"

@@ -1,9 +1,9 @@
-<template>ViewWalletAccount</template>
+<template>{{ accountStore.account }}</template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useAuthStore } from '@thxnetwork/wallet/stores';
+import { useAuthStore, useAccountStore } from '@thxnetwork/wallet/stores';
 
 export default defineComponent({
     name: 'ViewWalletOverview',
@@ -13,10 +13,10 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAuthStore),
+        ...mapStores(useAuthStore, useAccountStore),
     },
-    async mounted() {
-        //
+    mounted() {
+        this.accountStore.get();
     },
     methods: {
         //
