@@ -16,12 +16,12 @@
                     <b-nav-item href="https://www.twinstory.io/faq" target="_blank">FAQ</b-nav-item>
                     <b-nav-item href="https://www.twinstory.io/support" target="_blank">Support</b-nav-item>
                 </b-navbar-nav>
-                <b-nav-item-dropdown right no-caret class="d-flex">
+                <b-nav-item-dropdown end no-caret class="d-flex">
                     <template #button-content>
                         <b-avatar
                             size="40"
                             variant="dark"
-                            :src="accountStore.account ? accountStore.account.profileImg : undefined"
+                            :src="accountStore.account ? accountStore.account.profileImg : ''"
                             :text="accountStore.account ? accountStore.account.username.substring(0, 2) : '..'"
                         />
                     </template>

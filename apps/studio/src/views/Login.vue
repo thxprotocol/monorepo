@@ -4,36 +4,15 @@
             <b-row class="h-100">
                 <b-col md="6" class="h-100 d-flex align-items-center justify-content-center flex-column bg-dark">
                     <div>
-                        <b-img width="60" :src="imgLogo" fluid />
+                        <b-img width="60" :src="imgLogo" fluid class="rounded" />
                         <div>
                             <strong class="my-3 d-block font-weight-normal" :style="{ fontSize: '1.5rem' }">
                                 Sign in to studio
                             </strong>
                         </div>
-                        <b-card footer-class="text-right small" body-class="p-5">
-                            <b-alert show variant="primary">
-                                <i class="fas fa-info-circle ml-0 mr-2" />
-                                By continuing you accept TwinStory's
-                                <b-link
-                                    class="font-weight-bold"
-                                    href="https://thx.network/general-terms-and-conditions.pdf"
-                                    target="_blank"
-                                >
-                                    Terms &amp; Conditions
-                                </b-link>
-                                and
-                                <b-link
-                                    class="font-weight-bold"
-                                    href="https://thx.network/privacy-policy.pdf"
-                                    target="_blank"
-                                >
-                                    Privacy Policy
-                                </b-link>
-                                .
-                            </b-alert>
-
+                        <b-card footer-class="p-3 d-flex justify-content-end" body-class="p-5 pb-4">
                             <b-form v-if="!isEmailSent" @submit.prevent="onSubmitSigninWithOTP">
-                                <BaseFormGroup label="Use your e-mail">
+                                <BaseFormGroup label="Use your e-mail" label-class="text-opaque">
                                     <b-form-input v-model="email" placeholder="yourname@example.com" />
                                 </BaseFormGroup>
                                 <b-button :disabled="!isEmailValid" variant="primary" type="submit" class="w-100">
@@ -60,40 +39,39 @@
 
                             <BaseHrOrSeparator />
 
-                            <BaseFormGroup label="Use a trusted provider">
-                                <b-button
-                                    v-for="(provider, key) of providers"
-                                    :key="key"
-                                    variant="primary"
-                                    :title="provider.title"
-                                    class="me-2 p-2 px-3"
-                                    @click="onClickSigninWithOAuth(provider.variant)"
-                                >
-                                    <b-spinner v-if="provider.isLoading" small />
-                                    <BaseIcon
-                                        v-else
-                                        :icon="provider.kind"
-                                        type="fab"
-                                        class="m-0"
-                                        style="font-size: 1rem"
-                                    />
-                                </b-button>
+                            <BaseFormGroup label="Use a trusted provider" label-class="text-opaque">
+                                <div class="d-flex justify-content-between w-100 gap-2">
+                                    <b-button
+                                        v-for="provider of providers"
+                                        variant="dark"
+                                        :title="provider.title"
+                                        class="p-2 px-3 rounded"
+                                        @click="onClickSigninWithOAuth(provider.variant)"
+                                    >
+                                        <b-spinner v-if="isLoadingProvider == provider.kind" small />
+                                        <BaseIcon v-else :icon="provider.kind" type="fab" style="font-size: 1rem" />
+                                    </b-button>
+                                </div>
                             </BaseFormGroup>
 
                             <template #footer>
                                 <b-link
-                                    class="ms-1"
-                                    href="https://discord.com/invite/thx-network-836147176270856243"
+                                    class="ms-3 text-decoration-none text-opaque text-white"
+                                    href="https://twinstory.io/support"
                                     target="_blank"
                                 >
                                     Help
                                 </b-link>
-                                <b-link class="ms-1" href="https://thx.network/privacy-policy.pdf" target="_blank">
+                                <b-link
+                                    class="ms-3 text-decoration-none text-opaque text-white"
+                                    href="https://twinstory.io/privacy-policy.pdf"
+                                    target="_blank"
+                                >
                                     Privacy
                                 </b-link>
                                 <b-link
-                                    class="ms-1"
-                                    href="https://thx.network/general-terms-and-conditions.pdf"
+                                    class="ms-3 text-decoration-none text-opaque text-white"
+                                    href="https://twinstory.io/general-terms-and-conditions.pdf"
                                     target="_blank"
                                 >
                                     Terms
@@ -103,7 +81,6 @@
                     </div>
                 </b-col>
                 <b-col
-                    class="bg-primary"
                     :style="{
                         backgroundSize: 'cover',
                         backgroundPosition: 'center center',
@@ -162,6 +139,7 @@ export default defineComponent({
                     isLoading: false,
                 },
             } as any,
+            isLoadingProvider: null as null | AccountVariant,
             isLoadingOTP: false,
             isLoadingOTPVerify: false,
             isEmailSent: false,
@@ -200,16 +178,12 @@ export default defineComponent({
             }
         },
         async onClickSigninWithOAuth(variant: AccountVariant) {
-            this.providers[variant].isLoading = true;
+            this.isLoadingProvider = this.providers[variant].kind;
             try {
-                await this.authStore.signInWithOAuth({
-                    variant,
-                });
-                if (!this.authStore.session) throw new Error('An issue occured while logging in. Please try again.');
+                await this.authStore.signInWithOAuth({ variant });
             } catch (error) {
                 this.error = (error as Error).message;
-            } finally {
-                this.providers[variant].isLoading = false;
+                this.isLoadingProvider = null;
             }
         },
     },

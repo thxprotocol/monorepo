@@ -1,5 +1,5 @@
 <template>
-    <b-form-group label-class="d-flex" class="mb-3">
+    <b-form-group label-class="d-flex text-opaque" class="mb-3">
         <template #label>
             <span v-if="label">{{ label }}</span>
             <slot v-else name="label" />

@@ -97,34 +97,21 @@ export const useAuthStore = defineStore('auth', {
             const provider = accountVariantProviderKindMap[variant] as Provider;
             if (!provider) throw new Error('Requested provider not available.');
 
-            const config = this._getOAuthConfig(provider, {
-                redirectTo: window.location.origin + '/auth/redirect',
-                scopes: OAuthScopes[provider],
-            });
-            const { data, error } = await supabase.auth.signInWithOAuth(config);
-            if (error) throw new Error(error.message);
-
-            popup.open(data.url);
-        },
-        _getOAuthConfig(
-            provider: Provider,
-            options: {
-                redirectTo: string;
-                scopes: TOAuthScope[];
-            },
-        ) {
-            return {
+            const { data, error } = await supabase.auth.signInWithOAuth({
                 provider,
                 options: {
                     queryParams: {
                         access_type: 'offline',
                         prompt: 'consent',
                     },
-                    ...options,
+                    redirectTo: window.location.origin + '/auth/redirect',
+                    scopes: OAuthScopes[provider].join(' '),
                     skipBrowserRedirect: true,
-                    scopes: options.scopes.join(' '),
                 },
-            };
+            });
+            if (error) throw new Error(error.message);
+
+            popup.open(data.url);
         },
         async logout() {
             await supabase.auth.signOut();

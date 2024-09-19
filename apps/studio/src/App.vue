@@ -1,10 +1,6 @@
 <template>
     <div class="d-flex bg-primary h-100 overflow-auto flex-column gradient-bg-opacity">
-        <router-view v-slot="{ Component }">
-            <transition name="fade" mode="out-in">
-                <component :is="Component" />
-            </transition>
-        </router-view>
+        <router-view />
     </div>
 </template>
 

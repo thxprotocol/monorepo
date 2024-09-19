@@ -11,26 +11,27 @@
         <b-container>
             <h2>Details</h2>
             <b-card class="mb-5">
-                <b-row>
-                    <b-col md="6">
-                        <BaseFormGroup label="Name" tooltip="This name is used to describe your collection">
-                            <b-form-input v-model="name" />
-                        </BaseFormGroup>
-                        <BaseFormGroup label="Symbol" tooltip="ERC721 collections require a symbol like ABC.">
-                            <b-form-input v-model="description" />
-                        </BaseFormGroup>
-                    </b-col>
-                    <b-col md="6">
-                        <BaseFormGroup label="Description" tooltip="Describe your collection in a couple of words">
-                            <b-form-textarea v-model="description" />
-                        </BaseFormGroup>
-                        <b-form @submit="onSubmit">
+                <b-form @submit="onSubmit">
+                    <b-row>
+                        <b-col md="6">
+                            <BaseFormGroup label="Name" tooltip="This name is used to describe your collection">
+                                <b-form-input v-model="name" />
+                            </BaseFormGroup>
+                            <BaseFormGroup label="Symbol" tooltip="ERC721 collections require a symbol like ABC.">
+                                <b-form-input v-model="symbol" />
+                            </BaseFormGroup>
+                        </b-col>
+                        <b-col md="6">
+                            <BaseFormGroup label="Description" tooltip="Describe your collection in a couple of words">
+                                <b-form-textarea v-model="description" />
+                            </BaseFormGroup>
                             <b-button variant="primary" type="submit" class="w-100">
-                                {{ isCreating ? 'Create' : 'Update' }} Collection
+                                <b-spinner v-if="isLoading" small />
+                                <template v-else> {{ isCreating ? 'Create' : 'Update' }} Collection </template>
                             </b-button>
-                        </b-form>
-                    </b-col>
-                </b-row>
+                        </b-col>
+                    </b-row>
+                </b-form>
             </b-card>
             <h2 class="my-3 d-flex">
                 Collectibles
@@ -147,18 +148,24 @@ export default defineComponent({
         },
         async onSubmit() {
             if (!this.isCreating) return;
-
-            await this.collectionStore.create({
-                name: this.name,
-                chainId: this.chainId,
-                symbol: this.symbol,
-                description: this.description,
-            });
-
-            // Redirect to edit page
-            this.$router.push(
-                `/collections/${this.collectionStore.collections[this.collectionStore.collections.length - 1]._id}`,
-            );
+            try {
+                this.isLoading = true;
+                await this.collectionStore.create({
+                    name: this.name,
+                    chainId: this.chainId,
+                    symbol: this.symbol,
+                    description: this.description,
+                });
+                this.$router.push(
+                    `/collections/${this.collectionStore.collections[this.collectionStore.collections.length - 1]._id}`,
+                );
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
         },
     },
 });

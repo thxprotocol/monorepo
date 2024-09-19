@@ -2,7 +2,6 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { useAuthStore } from '../stores/Auth';
 
 async function beforeEnter(to: any, from: any, next: any) {
-    // Redirect to last match
     if (to.hash && to.hash.startsWith('#access_token')) {
         const path = to.path.split('#')[0];
         return next({ path });
@@ -39,12 +38,12 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/qr-codes',
                 component: () => import(/* webpackChunkName: "entries" */ '../views/studio/Entries.vue'),
             },
+            {
+                path: '/account',
+                name: 'account',
+                component: () => import(/* webpackChunkName: "signinredirect" */ '../views/studio/Account.vue'),
+            },
         ],
-    },
-    {
-        path: '/account',
-        name: 'account',
-        component: () => import(/* webpackChunkName: "signinredirect" */ '../views/Account.vue'),
     },
     {
         path: '/auth/redirect',
