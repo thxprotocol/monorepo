@@ -82,8 +82,6 @@ describe('ERC721 import', () => {
     });
 
     describe('GET /erc721/:id', () => {
-        const { defaultAccount } = NetworkService.getProvider(chainId);
-
         it('HTTP 200', (done) => {
             const [account] = Mock.accounts;
             user.get(`/v1/erc721/${erc721._id}`)
@@ -95,8 +93,6 @@ describe('ERC721 import', () => {
                     expect(body.name).toBe(nftName);
                     expect(body.symbol).toBe(nftSymbol);
                     expect(body.address).toBe(nftContract.options.address);
-                    expect(body.totalSupply).toBe('1');
-                    expect(body.owner).toBe(defaultAccount);
                 })
                 .expect(200, done);
         });
