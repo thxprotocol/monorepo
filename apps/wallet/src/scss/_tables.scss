@@ -1,0 +1,45 @@
+
+.table {
+    --bs-table-bg: var(--purple);
+    color: $table-color;
+    
+    .b-table-empty-slot td:last-of-type {
+        text-align: center;
+        border: 0;
+    }
+
+    th,
+    td {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        vertical-align: middle;
+        border-color: $purple;
+
+        &:last-of-type {
+            text-align: right;
+        }
+    }
+
+    tbody tr:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+
+    thead tr {
+
+        th {
+            opacity: .35;
+            vertical-align: middle;
+        }
+    }
+}
+
+.table > :not(caption) > * > * {
+    border: 0 !important;
+}
+.table > td {
+    vertical-align: middle !important;
+}
+
+.table .cursor-pointer {
+    cursor: pointer;
+}   

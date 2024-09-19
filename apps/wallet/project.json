@@ -1,0 +1,43 @@
+{
+    "name": "wallet",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/wallet/src",
+    "projectType": "application",
+    "tags": [],
+    "targets": {
+        "build": {
+            "executor": "@nx/vite:build",
+            "options": {
+                "outputPath": "dist/apps/wallet"
+            },
+            "configurations": {
+                "production": {
+                    "sourcemap": false,
+                    "minify": true
+                }
+            }
+        },
+        "serve": {
+            "executor": "@nx/vite:dev-server",
+            "defaultConfiguration": "development",
+            "options": {
+                "buildTarget": "app:build",
+                "port": 8086,
+                "fs": {
+                    "allow": [".."]
+                }
+            },
+            "configurations": {}
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+            "executor": "@nxext/vitest:vitest",
+            "options": {
+                "vitestConfig": "apps/app/vitest.config.ts"
+            }
+        }
+    }
+}

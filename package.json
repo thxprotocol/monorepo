@@ -15,6 +15,7 @@
         "serve:docker": "docker-compose --env-file .env.example -f docker-compose.yml -f docker-compose.safe.yml up --build -d",
         "serve:app": "nx run app:serve",
         "serve:studio": "nx run studio:serve",
+        "serve:wallet": "nx run wallet:serve",
         "serve:api": "NODE_TLS_REJECT_UNAUTHORIZED='0' nx serve api",
         "serve:auth": "NODE_TLS_REJECT_UNAUTHORIZED='0' nx serve auth"
     },
