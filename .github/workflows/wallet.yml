@@ -87,11 +87,11 @@ jobs:
               run: |
                   if [[ $GITHUB_REF == 'refs/heads/studio' ]]; then
                     echo "S3_URL=s3://dev-wallet.thx.network" >> $GITHUB_ENV
-                    echo "DISTRIBUTION=${{ secrets.CLOUDFRONT_DISTRIBUTION_STUDIO_DEV }}" >> $GITHUB_ENV
+                    echo "DISTRIBUTION=${{ secrets.CLOUDFRONT_DISTRIBUTION_WALLET_DEV }}" >> $GITHUB_ENV
                     echo "BUILD_MODE=dev" >> $GITHUB_ENV
                   elif [[ $GITHUB_REF == 'refs/heads/main' ]]; then
                     echo "S3_URL=s3://wallet.thx.network" >> $GITHUB_ENV
-                    echo "DISTRIBUTION=${{ secrets.CLOUDFRONT_DISTRIBUTION_STUDIO_PROD }}" >> $GITHUB_ENV
+                    echo "DISTRIBUTION=${{ secrets.CLOUDFRONT_DISTRIBUTION_WALLET_PROD }}" >> $GITHUB_ENV
                     echo "BUILD_MODE=prod" >> $GITHUB_ENV
                   fi
 
