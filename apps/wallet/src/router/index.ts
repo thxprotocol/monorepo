@@ -39,17 +39,17 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/:id/collect/:uuid',
                 component: () => import(/* webpackChunkName: "collect" */ '../views/wallet/Collect.vue'),
             },
+            {
+                path: '/:id/logout',
+                name: 'logout',
+                component: () => import(/* webpackChunkName: "logout" */ '../views/wallet/Logout.vue'),
+            },
         ],
     },
     {
         path: '/auth/redirect',
         name: 'auth-redirect',
         component: () => import(/* webpackChunkName: "authredirect" */ '../views/LoginRedirect.vue'),
-    },
-    {
-        path: '/logout',
-        name: 'logout',
-        component: () => import(/* webpackChunkName: "logout" */ '../views/Logout.vue'),
     },
 ];
 

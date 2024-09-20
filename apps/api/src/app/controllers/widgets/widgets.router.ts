@@ -8,6 +8,6 @@ const router: express.Router = express.Router();
 
 router.get('/', ListWidgets.controller);
 router.get('/:uuid', assertRequestInput(ReadWidget.validation), assertPoolAccess, ReadWidget.controller);
-router.patch('/:uuid', assertRequestInput(UpdateWidget.validation), assertPoolAccess, UpdateWidget.controller);
+router.patch('/:uuid', assertRequestInput(UpdateWidget.validation), UpdateWidget.controller);
 
 export default router;

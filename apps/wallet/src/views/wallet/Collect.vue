@@ -9,8 +9,15 @@
                     class="mb-3"
                 />
 
-                <b-button v-if="!authStore.isAuthenticated" variant="primary" class="w-100">Continue to login</b-button>
-                <b-button v-else variant="success" class="w-100">Collect!</b-button>
+                <b-button
+                    v-if="!authStore.isAuthenticated"
+                    variant="primary"
+                    class="w-100"
+                    @click="authStore.isModalLoginShown = true"
+                >
+                    Continue to login
+                </b-button>
+                <b-button v-else variant="success" class="w-100" @click="onClickCollect">Collect!</b-button>
             </template>
         </div>
     </div>
@@ -49,7 +56,9 @@ export default defineComponent({
         }
     },
     methods: {
-        //
+        onClickCollect() {
+            debugger;
+        },
     },
 });
 </script>

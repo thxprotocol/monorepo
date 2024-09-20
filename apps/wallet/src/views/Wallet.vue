@@ -2,7 +2,7 @@
     <b-container>
         <b-row>
             <b-navbar fluid class="mb-3">
-                <b-navbar-brand to="/">
+                <b-navbar-brand :to="`/${accountStore.settings?._id}`">
                     <b-img :src="imgLogo" width="40" />
                 </b-navbar-brand>
                 <b-navbar-toggle target="nav-collapse" />
@@ -25,7 +25,7 @@
                         />
                     </template>
                     <b-dropdown-item @click="accountStore.isModalAccountShown = true">Account</b-dropdown-item>
-                    <b-dropdown-item to="/logout">Logout</b-dropdown-item>
+                    <b-dropdown-item :to="`/${accountStore.settings?._id}/logout`">Logout</b-dropdown-item>
                 </b-nav-item-dropdown>
             </b-navbar>
         </b-row>

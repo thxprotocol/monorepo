@@ -2,7 +2,7 @@
     <div class="d-flex align-items-start flex-column">
         <div class="d-flex w-100">
             <div v-if="isLoading" class="d-flex align-items-center px-2">
-                <b-spinner variant="primary" size="sm" />
+                <b-spinner variant="primary" small />
             </div>
             <b-link v-else-if="imageSrc" :href="imageSrc">
                 <img
@@ -16,10 +16,13 @@
                 <b-form-file :disabled="isLoading" accept="image/*" width="50%" @change="onFileChange" />
             </b-input-group>
         </div>
-        <b-link v-if="imageSrc" target="_blank" :href="imageSrc" class="ms-auto">
-            Open file in new window
-            <BaseIcon icon="external-link-alt" class="ms-1" />
-        </b-link>
+        <div v-if="imageSrc" class="d-flex w-100">
+            <b-link target="_blank" :href="imageSrc" class="text-decoration-none">
+                Download file
+                <BaseIcon icon="external-link-alt" class="ms-1" />
+            </b-link>
+            <b-link class="text-decoration-none text-danger ms-auto" @click="$emit('remove')">Remove</b-link>
+        </div>
     </div>
 </template>
 
@@ -27,25 +30,22 @@
 import axios from 'axios';
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useAuthStore, useCollectionStore } from '@thxnetwork/studio/stores';
+import { useAuthStore } from '@thxnetwork/studio/stores';
 import { API_URL } from '@thxnetwork/studio/config/secrets';
 
 export default defineComponent({
-    name: 'NFT',
+    name: 'BaseFormInputFile',
     props: {
         isLoading: Boolean,
         imageSrc: String,
     },
     computed: {
-        ...mapStores(useAuthStore, useCollectionStore),
+        ...mapStores(useAuthStore),
     },
     watch: {
         file(file) {
             this.onFileChange(file);
         },
-    },
-    mounted() {
-        this.collectionStore.list();
     },
     methods: {
         async onFileChange(event: any) {
