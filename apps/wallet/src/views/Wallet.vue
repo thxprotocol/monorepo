@@ -3,9 +3,9 @@
         <b-row>
             <b-navbar fluid class="mb-3">
                 <b-navbar-brand :to="`/${accountStore.settings?._id}`">
-                    <b-img :src="imgLogo" width="40" />
+                    <b-img :src="accountStore.settings.logoImgURL || imgLogo" width="40" />
                 </b-navbar-brand>
-                <b-navbar-toggle target="nav-collapse" />
+                <BaseDropdownWallets />
                 <b-button
                     v-if="!authStore.isAuthenticated"
                     variant="primary"

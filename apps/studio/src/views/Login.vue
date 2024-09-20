@@ -4,7 +4,7 @@
             <b-row class="h-100">
                 <b-col md="6" class="h-100 d-flex align-items-center justify-content-center flex-column bg-dark">
                     <div>
-                        <b-img width="60" :src="imgLogo" fluid class="rounded" />
+                        <b-img width="60" :src="imgLogo" fluid />
                         <div>
                             <strong class="my-3 d-block font-weight-normal" :style="{ fontSize: '1.5rem' }">
                                 Sign in to studio

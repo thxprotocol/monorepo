@@ -101,6 +101,9 @@ export function getStyles(elements: any, colors: any) {
         },
     };
     const styles: any = {
+        '.or-separator:after': {
+            '--bs-gray-800': theme.elements.bodyBg,
+        },
         '.text-accent': {
             '--thx-accent': theme.colors.accent,
         },
@@ -132,6 +135,7 @@ export function getStyles(elements: any, colors: any) {
             '--bs-border-color': theme.elements.btnBg,
             '--bs-body-bg': theme.elements.bodyBg,
             '--bs-btn-bg': theme.elements.btnBg,
+            '--bs-gray-700': theme.elements.cardHeaderHoverBg,
         },
         '.dropdown-menu': {
             '--bs-dropdown-bg': theme.elements.btnBg,

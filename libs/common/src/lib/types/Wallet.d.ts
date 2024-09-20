@@ -21,4 +21,5 @@ type TWallet = {
     uuid: string;
     createdAt: Date;
     expiresAt: Date;
+    short: string;
 };

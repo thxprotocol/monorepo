@@ -806,15 +806,15 @@ $input-btn-focus-color:         $focus-ring-color !default;
 $input-btn-focus-blur:          $focus-ring-blur !default;
 $input-btn-focus-box-shadow:    $focus-ring-box-shadow !default;
 
-$input-btn-padding-y-sm:      .25rem !default;
-$input-btn-padding-x-sm:      .5rem !default;
+$input-btn-padding-y-sm:      .5rem !default;
+$input-btn-padding-x-sm:      1rem !default;
 $input-btn-font-size-sm:      $font-size-sm !default;
 
 $input-btn-padding-y-lg:      .5rem !default;
 $input-btn-padding-x-lg:      1.25rem !default;
 $input-btn-font-size-lg:      $font-size-lg !default;
 
-$input-btn-border-width:      var(--#{$prefix}border-width) !default;
+$input-btn-border-width:      0 !default;
 // scss-docs-end input-btn-variables
 
 
@@ -905,7 +905,7 @@ $input-padding-y-lg:                    $input-btn-padding-y-lg !default;
 $input-padding-x-lg:                    $input-btn-padding-x-lg !default;
 $input-font-size-lg:                    $input-btn-font-size-lg !default;
 
-$input-bg:                              $gray-700 !default;
+$input-bg:                              var(--bs-gray-700) !default;
 $input-disabled-color:                  null !default;
 $input-disabled-bg:                     var(--#{$prefix}secondary-bg) !default;
 $input-disabled-border-color:           null !default;

@@ -45,9 +45,9 @@
             <div class="d-flex justify-content-between w-100 gap-2">
                 <b-button
                     v-for="provider of providers"
-                    variant="dark"
-                    :title="provider.title"
+                    variant="primary"
                     class="p-2 px-3 rounded"
+                    :title="provider.title"
                     @click="onClickSigninWithOAuth(provider.variant)"
                 >
                     <b-spinner v-if="isLoadingProvider == provider.kind" small />

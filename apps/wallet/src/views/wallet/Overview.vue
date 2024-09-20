@@ -1,5 +1,5 @@
 <template>
-    <p v-if="!collectibleStore.collectibles.length" class="text-opaque">You have no collectibles yet!</p>
+    <p v-if="!collectibleStore.collectibles.length" class="text-opaque text-center">You have no collectibles yet!</p>
     <div v-for="collectible of collectibleStore.collectibles">
         {{ collectible }}
     </div>
@@ -21,23 +21,27 @@ export default defineComponent({
     computed: {
         ...mapStores(useAuthStore, useAccountStore, useCollectibleStore),
     },
-    mounted() {
-        debugger;
-        this.listCollectibles();
+    watch: {
+        'accountStore.wallet': {
+            handler(wallet) {
+                if (!wallet) return;
+
+                this.listCollectibles(wallet);
+            },
+            immediate: true,
+        },
     },
     methods: {
-        async listCollectibles() {
+        async listCollectibles(wallet: TWallet) {
             try {
-                if (!this.accountStore.wallet) {
-                    throw new Error('Wallet not found');
-                }
-
-                const walletId = this.accountStore.wallet._id;
-                await this.collectibleStore.list(walletId);
+                this.isLoading = true;
+                await this.collectibleStore.list(wallet._id);
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;
                 });
+            } finally {
+                this.isLoading = false;
             }
         },
     },

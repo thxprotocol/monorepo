@@ -17,6 +17,14 @@
                 >
                     Continue to login
                 </b-button>
+                <b-button
+                    v-else-if="!walletStore.wallets.length"
+                    variant="primary"
+                    class="w-100"
+                    @click="walletStore.isModalWalletShown = true"
+                >
+                    Connect Wallet
+                </b-button>
                 <b-button v-else variant="success" class="w-100" @click="onClickCollect">Collect!</b-button>
             </template>
         </div>
@@ -26,7 +34,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useAuthStore, useEntryStore } from '@thxnetwork/wallet/stores';
+import { useAuthStore, useEntryStore, useWalletStore } from '@thxnetwork/wallet/stores';
 import { toast } from '@thxnetwork/wallet/utils/toast';
 
 export default defineComponent({
@@ -37,7 +45,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAuthStore, useEntryStore),
+        ...mapStores(useAuthStore, useEntryStore, useWalletStore),
     },
     async mounted() {
         try {

@@ -19,7 +19,7 @@
   --toastify-font-family: $font-family-sans-serif;
   --toastify-z-index: $index-toast;
 
-  --toastify-text-color-light: var(--bs-white);
+  --toastify-text-color-light: var(--bs-dark);
   --toastify-text-color-dark: var(--bs-light);
 
   //Used only for colored theme
@@ -28,12 +28,12 @@
   --toastify-text-color-warning: #fff;
   --toastify-text-color-error: #fff;
 
-  --toastify-spinner-color: #616161;
-  --toastify-spinner-color-empty-area: #e0e0e0;
+  --toastify-spinner-color: var(--bs-gray-800);
+  --toastify-spinner-color-empty-area: var(--bs-gray-400);
 
   // Used when no type is provided
   // toast("**hello**")
-  --toastify-color-progress-light: var(--bs-white);
+  --toastify-color-progress-light: var(--bs-gray-400);
   // Used when no type is provided
   --toastify-color-progress-dark: var(--bs-white);
   --toastify-color-progress-info: var(--toastify-color-info);
@@ -45,8 +45,8 @@
 .Toastify__toast-container {
   max-width: 768px;
   width: auto;
-  bottom: 100px;
   right: .5rem;
+  bottom: .5rem;
   margin-left: .5rem;
 }
 

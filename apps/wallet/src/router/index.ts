@@ -3,7 +3,6 @@ import { useAccountStore } from '../stores';
 
 async function beforeEnter(to: any, from: any, next: any) {
     const { settings, getSettings } = useAccountStore();
-
     if (!settings) {
         if (to.params.id) {
             try {
@@ -12,6 +11,11 @@ async function beforeEnter(to: any, from: any, next: any) {
                 console.error('Could not get settings');
             }
         }
+    }
+
+    if (to.hash && to.hash.startsWith('#access_token')) {
+        const path = to.path.split('#')[0];
+        return next({ path });
     }
 
     next();
@@ -31,7 +35,7 @@ const routes: Array<RouteRecordRaw> = [
         children: [
             {
                 name: 'overview',
-                path: '/',
+                path: '/:id',
                 component: () => import(/* webpackChunkName: "overview" */ '../views/wallet/Overview.vue'),
             },
             {
@@ -49,6 +53,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/auth/redirect',
         name: 'auth-redirect',
+        beforeEnter,
         component: () => import(/* webpackChunkName: "authredirect" */ '../views/LoginRedirect.vue'),
     },
 ];

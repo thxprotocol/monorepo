@@ -10,7 +10,6 @@ export const useCollectibleStore = defineStore('collectible', {
             return useAuthStore().request(path, options);
         },
         async list(walletId: string) {
-            debugger;
             this.collectibles = await this.request('/erc721/token', { params: { walletId } });
         },
     },
