@@ -23,7 +23,7 @@ export const useAccountStore = defineStore('account', {
             this.settings = settings;
 
             const styles = getStyles(theme.elements, theme.colors);
-            document.title = decodeHTML(settings.title || 'no title') as string;
+            document.title = settings.name ? decodeHTML(settings.name) : document.title;
             document.head.appendChild(styles);
         },
     },

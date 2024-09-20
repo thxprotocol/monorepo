@@ -8,6 +8,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BAlert: typeof import('bootstrap-vue-next')['BAlert']
+    BaseCardBodyCollectible: typeof import('./src/components/BaseCardBodyCollectible.vue')['default']
+    BaseCardCollapseCollectible: typeof import('./src/components/BaseCardCollapseCollectible.vue')['default']
     BaseCardCollectible: typeof import('./src/components/BaseCardCollectible.vue')['default']
     BaseCardCollectionMetadata: typeof import('./src/components/BaseCardCollectionMetadata.vue')['default']
     BaseCardTableHeader: typeof import('./src/components/BaseCardTableHeader.vue')['default']
@@ -27,6 +29,7 @@ declare module 'vue' {
     BCard: typeof import('bootstrap-vue-next')['BCard']
     BCol: typeof import('bootstrap-vue-next')['BCol']
     BCollapse: typeof import('bootstrap-vue-next')['BCollapse']
+    BCollapsible: typeof import('bootstrap-vue-next')['BCollapsible']
     BContainer: typeof import('bootstrap-vue-next')['BContainer']
     BDropdown: typeof import('bootstrap-vue-next')['BDropdown']
     BDropdownDivider: typeof import('bootstrap-vue-next')['BDropdownDivider']

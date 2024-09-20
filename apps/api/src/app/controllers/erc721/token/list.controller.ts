@@ -26,7 +26,7 @@ const controller = async (req: Request, res: Response) => {
         }),
     );
 
-    res.json(results.reverse());
+    res.json(results.reverse().filter((x) => x));
 };
 
 export { controller, validation };

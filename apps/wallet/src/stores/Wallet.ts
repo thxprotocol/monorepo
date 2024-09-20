@@ -34,7 +34,7 @@ export const useWalletStore = defineStore('wallet', {
         wallets: [] as TWallet[],
         modal: null as null | Web3Modal,
         account: null as null | GetAccountReturnType,
-        chainId: null as null | ChainId,
+        chainId: ChainId.Polygon,
     }),
     actions: {
         request(path: string, options?: TRequestOptions) {
@@ -77,9 +77,7 @@ export const useWalletStore = defineStore('wallet', {
                 wagmiConfig,
                 projectId: WALLET_CONNECT_PROJECT_ID,
                 themeMode: 'dark',
-                themeVariables: {
-                    '--w3m-z-index': 9999,
-                },
+                themeVariables: { '--w3m-z-index': 9999 },
             });
         },
         onChange({ account, chainId }: { account?: GetAccountReturnType; chainId?: ChainId }) {

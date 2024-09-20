@@ -61,7 +61,6 @@
                             <template #button-content>
                                 <BaseIcon icon="ellipsis-v text-light" />
                             </template>
-                            <b-dropdown-item v-b-modal="`modalQRCode${item.id}`"> QR Code </b-dropdown-item>
                             <b-dropdown-item @click="onClickDelete(item.id)"> Delete </b-dropdown-item>
                         </b-dropdown>
                         <BaseModalQRCode :id="`modalQRCode${item.id}`" :url="item.code.url" />
@@ -75,9 +74,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useEntryStore } from '@thxnetwork/studio/stores';
+import { useEntryStore, useAccountStore } from '@thxnetwork/studio/stores';
 import { format } from 'date-fns';
 import { toast } from '@thxnetwork/studio/utils/toast';
+import { WALLET_URL } from '@thxnetwork/studio/config/secrets';
 
 export default defineComponent({
     name: 'Entries',
@@ -92,13 +92,15 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useEntryStore),
+        ...mapStores(useEntryStore, useAccountStore),
         entries() {
             return this.entryStore.entries.results.map((entry) => ({
-                select: entry.uuid,
+                // select: entry.uuid,
                 code: {
                     uuid: entry.uuid,
-                    url: `${entry.redirectURL}/${entry.uuid}`,
+                    url: this.accountStore.profiles.length
+                        ? `${WALLET_URL}/${this.accountStore.profiles[0]._id}/collect/${entry.uuid}`
+                        : '',
                 },
                 collection: entry.erc721.name,
                 metadata: entry.metadata.name,
@@ -106,14 +108,15 @@ export default defineComponent({
                     username: entry.account.username,
                     email: entry.account.email,
                     profileImg: entry.account.profileImg,
-                    createdAt: format(new Date(entry.account.createdAt), 'yyyy-MM-dd'),
+                    createdAt: format(new Date(entry.account.createdAt), 'yyyy-MM-dd HH:mm'),
                 },
-                claimedAt: entry.claimedAt ? format(new Date(entry.claimedAt), 'yyyy-MM-dd') : '',
+                claimedAt: entry.claimedAt ? format(new Date(entry.claimedAt), 'yyyy-MM-dd HH:mm') : '',
                 id: entry._id,
             }));
         },
     },
-    mounted() {
+    async mounted() {
+        this.accountStore.getProfiles();
         this.listEntries();
     },
     methods: {

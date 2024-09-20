@@ -1,14 +1,23 @@
 <template>
-    <p v-if="!collectibleStore.collectibles.length" class="text-opaque text-center">You have no collectibles yet!</p>
-    <div v-for="collectible of collectibleStore.collectibles">
-        {{ collectible }}
+    <div
+        v-if="!collectibleStore.collectibles.length"
+        class="text-opaque h-100 align-items-center d-flex w-100 justify-content-center"
+    >
+        You have no collectibles yet!
     </div>
+
+    <BaseCardCollapseCollectible
+        v-for="collectible of collectibleStore.collectibles"
+        :collection="collectible.nft as TERC721"
+        :metadata="collectible.metadata"
+        :collectible="collectible"
+    />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useAuthStore, useAccountStore, useCollectibleStore } from '@thxnetwork/wallet/stores';
+import { useAuthStore, useWalletStore, useCollectibleStore } from '@thxnetwork/wallet/stores';
 import { toast } from '@thxnetwork/wallet/utils/toast';
 
 export default defineComponent({
@@ -19,13 +28,12 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAuthStore, useAccountStore, useCollectibleStore),
+        ...mapStores(useAuthStore, useWalletStore, useCollectibleStore),
     },
     watch: {
-        'accountStore.wallet': {
+        'walletStore.wallet': {
             handler(wallet) {
                 if (!wallet) return;
-
                 this.listCollectibles(wallet);
             },
             immediate: true,

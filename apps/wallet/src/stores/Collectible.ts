@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAuthStore } from './Auth';
+import { useWalletStore } from '.';
 
 export const useCollectibleStore = defineStore('collectible', {
     state: () => ({
@@ -10,7 +11,8 @@ export const useCollectibleStore = defineStore('collectible', {
             return useAuthStore().request(path, options);
         },
         async list(walletId: string) {
-            this.collectibles = await this.request('/erc721/token', { params: { walletId } });
+            const { chainId } = useWalletStore();
+            this.collectibles = await this.request('/erc721/token', { params: { walletId, chainId } });
         },
     },
 });

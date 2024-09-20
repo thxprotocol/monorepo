@@ -13,14 +13,14 @@
             </b-link>
         </template>
 
-        <template v-if="!walletStore.account">
+        <template v-if="!walletStore.account || !walletStore.account.isConnected">
             <b-button
                 v-for="v in variants"
                 class="w-100 rounded d-flex align-items-center mb-3 text-start"
                 variant="primary"
                 @click="onClickVariant(v.variant)"
             >
-                <!-- <b-img :src="v.img" width="20" class="me-2 rounded" /> -->
+                <b-img :src="v.img" width="20" class="me-3 rounded" />
                 <div class="d-flex flex-column">
                     <div class="w-100">{{ v.name }}</div>
                     <p class="mb-0 text-opaque">{{ v.label }}</p>
@@ -43,6 +43,9 @@
                     <strong> {{ address?.substring(0, 10) }} </strong>...
                     <BaseIcon icon="chevron-right" class="ms-3" />
                 </template>
+            </b-button>
+            <b-button variant="link" class="text-white text-decoration-none w-100" @click="walletStore.disconnect">
+                Disconnect
             </b-button>
         </template>
     </b-modal>
@@ -68,13 +71,13 @@ export default defineComponent({
             WalletVariant,
             variants: [
                 {
-                    img: imgSafeLogo,
+                    img: imgWalletConnectLogo,
                     variant: WalletVariant.WalletConnect,
                     name: 'WalletConnect',
                     label: 'For Metamask and other providers',
                 },
                 {
-                    img: imgWalletConnectLogo,
+                    img: imgSafeLogo,
                     variant: WalletVariant.Safe,
                     name: 'Safe',
                     label: "If you don't own a wallet. Easy to use.",
