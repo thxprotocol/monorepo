@@ -13,6 +13,9 @@ const controller = async (req: Request, res: Response) => {
         res.json(widgets);
     } else {
         const widgets = await Widget.find({ sub: req.auth.sub });
+        if (!widgets.length) {
+            await Widget.create({ sub: req.auth.sub });
+        }
         res.json(widgets);
     }
 };

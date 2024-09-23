@@ -22,5 +22,10 @@ export const useAccountStore = defineStore('account', {
                 body: profile,
             });
         },
+        async removeProfile(profileId: string) {
+            await this.request(`/widgets/${profileId}`, {
+                method: 'DELETE',
+            });
+        },
     },
 });

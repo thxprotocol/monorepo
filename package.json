@@ -85,6 +85,7 @@
         "newrelic": "^11.17.0",
         "node-jose": "^2.2.0",
         "pinia": "^2.0.23",
+        "prismjs": "^1.29.0",
         "promise-poller": "^1.9.1",
         "protobufjs": "^7.2.4",
         "puppeteer": "21.3.4",

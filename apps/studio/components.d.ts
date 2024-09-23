@@ -21,6 +21,7 @@ declare module 'vue' {
     BAvatar: typeof import('bootstrap-vue-next')['BAvatar']
     BBadge: typeof import('bootstrap-vue-next')['BBadge']
     BButton: typeof import('bootstrap-vue-next')['BButton']
+    BButtonGroup: typeof import('bootstrap-vue-next')['BButtonGroup']
     BCard: typeof import('bootstrap-vue-next')['BCard']
     BCol: typeof import('bootstrap-vue-next')['BCol']
     BCollapse: typeof import('bootstrap-vue-next')['BCollapse']
@@ -68,6 +69,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
   }
   export interface ComponentCustomProperties {
+    vBClipboard: typeof import('bootstrap-vue-next')['vBClipboard']
     vBModal: typeof import('bootstrap-vue-next')['vBModal']
     vBTooltip: typeof import('bootstrap-vue-next')['vBTooltip']
   }

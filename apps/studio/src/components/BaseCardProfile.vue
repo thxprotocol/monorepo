@@ -1,25 +1,29 @@
 <template>
-    <b-card variant="darker" class="mb-5">
-        <h3 class="d-flex align-items-center">
-            Profile
-            <b-button variant="dark" target="_blank" s :href="url" class="ms-auto">
-                <BaseIcon icon="external-link-alt" />
+    <b-card
+        variant="darker"
+        class="mb-5"
+        header-class="d-flex align-items-center py-3"
+        footer-class="d-flex align-items-center"
+    >
+        <template #header>
+            <h3 class="m-0">
+                Profile
+                <code>{{ profile._id }}</code>
+            </h3>
+            <b-button variant="light" size="sm" target="_blank" s :href="url" class="ms-auto">
+                Open Wallet
+                <BaseIcon icon="external-link-alt ms-1" />
             </b-button>
-        </h3>
-
+        </template>
+        <b-alert v-model="isAlertDisabledShown" variant="warning" class="mb-3">
+            <BaseIcon icon="exclamation-circle" class="me-2" />
+            This profile is currently disabled and the wallet launcher is hidden on your domain.
+        </b-alert>
         <b-row>
             <b-col md="6">
                 <BaseFormGroup label="Name">
                     <b-form-input v-model="name" @change="update()" />
                 </BaseFormGroup>
-                <BaseFormGroup label="Slug">
-                    <b-form-input v-model="slug" @change="update()" />
-                </BaseFormGroup>
-                <BaseFormGroup label="URL">
-                    <b-form-input v-model="domain" @change="update()" />
-                </BaseFormGroup>
-            </b-col>
-            <b-col md="6">
                 <BaseFormGroup label="Logo">
                     <BaseFormInputFile
                         :image-src="logoImgURL"
@@ -39,8 +43,40 @@
                     />
                 </BaseFormGroup>
             </b-col>
+            <b-col md="6">
+                <BaseFormGroup label="Published">
+                    <b-button-group size="sm">
+                        <b-button :variant="isPublished ? 'success' : 'dark'" @click="onUpdate({ isPublished: true })">
+                            Enabled
+                        </b-button>
+                        <b-button :variant="!isPublished ? 'danger' : 'dark'" @click="onUpdate({ isPublished: false })">
+                            Disabled
+                        </b-button>
+                    </b-button-group>
+                </BaseFormGroup>
+                <BaseFormGroup label="URL">
+                    <b-form-input v-model="domain" @change="update()" />
+                </BaseFormGroup>
+                <BaseFormGroup label-class="d-flex align-items-center">
+                    <template #label>
+                        Embed Code
+                        <b-button
+                            v-clipboard:copy="decodeHTML(embedCode)"
+                            v-clipboard:success="onCopySuccess"
+                            class="ms-auto"
+                            variant="dark"
+                            size="sm"
+                        >
+                            Copy
+                            <BaseIcon v-if="isCopySuccess" icon="check" class="ms-2" />
+                        </b-button>
+                    </template>
+                    <pre
+                        class="bg-dark rounded p-3 overflow-auto"
+                    ><code class="language-javascript" v-html="embedCode" /></pre>
+                </BaseFormGroup>
+            </b-col>
         </b-row>
-
         <b-row>
             <b-col>
                 <h4 class="my-3">Elements</h4>
@@ -71,12 +107,7 @@
                     :style="{ backgroundColor: getElement('Background'), color: getElement('Text'), maxWidth: '380px' }"
                 >
                     <template #header>
-                        <b-navbar
-                            class="p-2 px-1"
-                            :style="{
-                                backgroundColor: getElement('Navigation'),
-                            }"
-                        >
+                        <b-navbar class="p-2 px-1" :style="{ backgroundColor: getElement('Navigation') }">
                             <b-navbar-brand href="#">
                                 <b-img :src="logoImgURL || Imglogo" width="40" height="40"></b-img>
                             </b-navbar-brand>
@@ -157,7 +188,7 @@
                 </div>
                 <div
                     class="rounded-circle d-flex my-3"
-                    :style="{ width: '60px', height: '60px', backgroundColor: getElement('Button') }"
+                    :style="{ width: '60px', height: '60px', backgroundColor: getElement('Launcher') }"
                 >
                     <b-img
                         v-if="iconImg"
@@ -169,21 +200,28 @@
                         v-else
                         icon="wallet"
                         class="m-auto"
-                        :style="{ color: getElement('Button Text'), fontSize: '1.2rem' }"
+                        :style="{ color: getElement('Launcher Icon'), fontSize: '1.2rem' }"
                     />
                 </div>
             </b-col>
         </b-row>
+        <template #footer>
+            <b-button variant="link" class="text-danger text-decoration-none ms-auto" @click="onClickRemove">
+                <b-spinner v-if="isLoading" small />
+                <template v-else> Remove </template>
+            </b-button>
+        </template>
     </b-card>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { WALLET_URL } from '@thxnetwork/studio/config/secrets';
+import { API_URL, WALLET_URL } from '@thxnetwork/studio/config/secrets';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '@thxnetwork/studio/stores';
 import { toast } from '@thxnetwork/studio/utils/toast';
 import Imglogo from '@thxnetwork/studio/assets/logo.jpg';
+import { decodeHTML } from '@thxnetwork/studio/utils/decode-html';
 
 export default defineComponent({
     name: 'BaseCardProfile',
@@ -195,6 +233,8 @@ export default defineComponent({
     },
     data() {
         return {
+            decodeHTML,
+            isCopySuccess: false,
             isLoading: false,
             isLoadingIcon: false,
             isLoadingLogo: false,
@@ -213,17 +253,18 @@ export default defineComponent({
             colors: [] as { color: string; label: string }[],
             color: '',
             bgColor: '',
+            url: '',
+            embedCode: '',
         };
     },
     computed: {
         ...mapStores(useAccountStore),
-        url() {
-            const url = new URL(WALLET_URL);
-            url.pathname = this.profile._id;
-            return url.toString();
+        isAlertDisabledShown() {
+            return !this.isPublished;
         },
     },
     mounted() {
+        this.isPublished = this.profile.isPublished;
         this.logoImgURL = this.profile.logoImgURL;
         this.backgroundImgURL = this.profile.backgroundImgURL;
         this.domain = this.profile.domain;
@@ -238,6 +279,14 @@ export default defineComponent({
         const { elements, colors } = JSON.parse(this.profile.theme);
         this.elements = elements;
         this.colors = colors;
+
+        const walletURL = new URL(WALLET_URL);
+        walletURL.pathname = this.profile._id;
+        this.url = walletURL.toString();
+
+        const apiURL = new URL(API_URL);
+        apiURL.pathname = `v1/wallet/${this.profile._id}.js`;
+        this.embedCode = `&lt;script src="${apiURL.toString()}"&gt;&lt;/script&gt;`;
     },
     methods: {
         getColor(label: string) {
@@ -245,6 +294,9 @@ export default defineComponent({
         },
         getElement(label: string) {
             return Object.values(this.elements).find((element) => element.label === label)?.color;
+        },
+        onCopySuccess() {
+            this.isCopySuccess = true;
         },
         async update() {
             try {
@@ -279,6 +331,18 @@ export default defineComponent({
             this.isLoadingIcon = false;
             this.isLoadingLogo = false;
             this.isLoadingBackground = false;
+        },
+        async onClickRemove() {
+            try {
+                this.isLoading = true;
+                await this.accountStore.removeProfile(this.profile._id);
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
         },
     },
 });
