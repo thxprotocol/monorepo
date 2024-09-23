@@ -8,6 +8,7 @@
             <b-card variant="darker">
                 <BaseCardTableHeader
                     :query="query"
+                    search-placeholder="Search on account ID..."
                     :page="page"
                     :limit="limit"
                     :total="entryStore.entries.total"
@@ -42,8 +43,7 @@
                     <template #head(account)> Account </template>
                     <template #cell(account)="{ item }">
                         <template v-if="item.account">
-                            <b-avatar :src="item.account.profileImg" size="1.5rem" class="me-2" />
-                            <b-link :href="`mailto: ${item.account.email}`">{{ item.account.username }}</b-link>
+                            <code>{{ item.account.id }}</code>
                         </template>
                     </template>
                     <template #head(collection)> Collection </template>
@@ -105,6 +105,7 @@ export default defineComponent({
                 collection: entry.erc721.name,
                 metadata: entry.metadata.name,
                 account: entry.account && {
+                    id: entry.account.sub,
                     username: entry.account.username,
                     email: entry.account.email,
                     profileImg: entry.account.profileImg,

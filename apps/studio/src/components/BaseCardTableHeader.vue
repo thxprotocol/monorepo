@@ -4,7 +4,7 @@
             <b-form-input
                 :debounce="1000"
                 :value="query"
-                placeholder="Search..."
+                :placeholder="searchPlaceholder"
                 @input="$emit('query', $event)"
                 @change="$emit('query-submit', $event)"
             />
@@ -30,6 +30,10 @@ import { format } from 'date-fns';
 export default defineComponent({
     name: 'BaseCardTableHeader',
     props: {
+        searchPlaceholder: {
+            type: String,
+            default: 'Search...',
+        },
         query: String,
         page: Number,
         limit: Number,
