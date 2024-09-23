@@ -155,13 +155,6 @@
                 <BaseFormGroup label="Message">
                     <b-form-input v-model="message" @change="update()" />
                 </BaseFormGroup>
-                <BaseFormGroup label="Alignment">
-                    <b-form-select v-model="align" @change="update()">
-                        <b-form-select-option v-for="label of ['Right', 'Left']" :value="label.toLowerCase()">
-                            {{ label }}
-                        </b-form-select-option>
-                    </b-form-select>
-                </BaseFormGroup>
                 <BaseFormGroup label="Icon">
                     <BaseFormInputFile
                         :image-src="iconImg"
@@ -206,10 +199,29 @@
             </b-col>
         </b-row>
         <template #footer>
-            <b-button variant="link" class="text-danger text-decoration-none ms-auto" @click="onClickRemove">
+            <b-button
+                variant="link"
+                class="text-danger text-decoration-none ms-auto"
+                @click="isModalRemoveShown = true"
+            >
                 <b-spinner v-if="isLoading" small />
                 <template v-else> Remove </template>
             </b-button>
+            <b-modal v-model="isModalRemoveShown" centered title="Remove Profile">
+                <template #header>
+                    <h3 class="m-0">Remove Profile</h3>
+                    <b-button variant="link" class="text-white ms-auto" size="sm">
+                        <BaseIcon icon="times" class="ms-1" />
+                    </b-button>
+                </template>
+                <p class="m-0">Are you sure you want to remove this profile? This action cannot be undone.</p>
+                <template #footer>
+                    <b-button class="w-100" variant="danger" @click="onClickRemove">
+                        <b-spinner v-if="isLoading" small />
+                        <template v-else> Remove </template>
+                    </b-button>
+                </template>
+            </b-modal>
         </template>
     </b-card>
 </template>
@@ -234,6 +246,7 @@ export default defineComponent({
     data() {
         return {
             decodeHTML,
+            isModalRemoveShown: false,
             isCopySuccess: false,
             isLoading: false,
             isLoadingIcon: false,
@@ -336,6 +349,9 @@ export default defineComponent({
             try {
                 this.isLoading = true;
                 await this.accountStore.removeProfile(this.profile._id);
+                await this.accountStore.getProfiles();
+
+                this.isModalRemoveShown = false;
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;

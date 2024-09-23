@@ -26,6 +26,7 @@ export const useAccountStore = defineStore('account', {
             await this.request(`/widgets/${profileId}`, {
                 method: 'DELETE',
             });
+            this.profiles = this.profiles.filter((profile) => profile._id !== profileId);
         },
     },
 });

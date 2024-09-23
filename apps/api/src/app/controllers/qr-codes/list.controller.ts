@@ -1,7 +1,8 @@
-import { ERC721, ERC721Metadata, QRCodeEntry } from '@thxnetwork/api/models';
+import { Account, Wallet, ERC721, ERC721Metadata, QRCodeEntry } from '@thxnetwork/api/models';
 import { Request, Response } from 'express';
 import { query } from 'express-validator';
 import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
+import { isValidObjectId } from 'mongoose';
 
 const validation = [
     query('limit').optional().isInt({ gt: 0 }),
@@ -18,6 +19,13 @@ const controller = async (req: Request, res: Response) => {
     if (req.query.erc721Id) query['erc721Id'] = req.query.erc721Id;
     if (req.query.erc721MetadataId) query['erc721MetadataId'] = req.query.erc721MetadataId;
 
+    // Assuming a mongoId in the query since UI hints at it
+    if (req.query.query && isValidObjectId(req.query.query)) {
+        const results = await Account.find({ _id: { $in: req.query.query } });
+        const subs = results.map((a) => a.id);
+        query['sub'] = { $in: subs };
+    }
+
     const total = await QRCodeEntry.countDocuments(query);
     const entries = await QRCodeEntry.find(query)
         .limit(limit)
@@ -29,13 +37,20 @@ const controller = async (req: Request, res: Response) => {
     const erc721MetadataIds = entries.map(({ erc721MetadataId }) => erc721MetadataId);
     const erc721s = await ERC721.find({ _id: { $in: erc721Ids } });
     const metadatas = await ERC721Metadata.find({ _id: { $in: erc721MetadataIds } });
+    const wallets = await Wallet.find({ sub: { $in: subs } });
 
     const results = entries.map((entry) => {
         const account = accounts.find((account) => account.sub === entry.sub);
         const metadata = metadatas.find((metadata) => metadata.id === entry.erc721MetadataId);
         const erc721 = erc721s.find((erc721) => erc721.id === entry.erc721Id);
-        return Object.assign(entry.toJSON(), { account, metadata, erc721 });
+        return Object.assign(entry.toJSON(), {
+            account,
+            metadata,
+            erc721,
+            wallets: wallets.filter((wallet) => wallet.sub === entry.sub),
+        });
     });
+
     const meta = {
         claimedCount: await QRCodeEntry.countDocuments({ sub: { $exists: true } }),
     };

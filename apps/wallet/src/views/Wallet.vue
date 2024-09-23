@@ -35,6 +35,7 @@
             <router-view />
         </div>
         <BaseModalLogin />
+        <BaseModalAccount />
     </b-container>
 </template>
 

@@ -36,6 +36,7 @@ const controller = async (req: Request, res: Response) => {
             font-size: 11px;
             padding: 10px;
         }
+            
         #wallet-widget-message:before {
             content: '\u00D7';
             position: absolute;
