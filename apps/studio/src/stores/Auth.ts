@@ -1,10 +1,10 @@
-import { defineStore } from 'pinia';
 import { createClient, Provider, Session } from '@supabase/supabase-js';
-import { API_URL, STUDIO_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from '../config/secrets';
-import { accountVariantProviderKindMap, OAuthScopes } from '../config/constants';
 import { AccountVariant } from '@thxnetwork/common/enums';
-import { popup } from '../utils/popup';
+import { defineStore } from 'pinia';
+import { accountVariantProviderKindMap, OAuthScopes } from '../config/constants';
+import { API_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from '../config/secrets';
 import router from '../router';
+import { popup } from '../utils/popup';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
 
@@ -69,9 +69,9 @@ export const useAuthStore = defineStore('auth', {
                 }
             }
         },
-        onSignedOut(_session: Session) {
+        async onSignedOut(_session: Session) {
             this.session = null;
-            router.push({ name: 'login' });
+            await router.push({ name: 'login' });
         },
         async signInWithOtp({ email }: { email: string }) {
             const { error } = await supabase.auth.signInWithOtp({

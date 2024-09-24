@@ -30,7 +30,33 @@
                             <template #button-content>
                                 <BaseIcon icon="ellipsis-v text-light" />
                             </template>
-                            <b-dropdown-item @click="onClickDelete(item.actions.id)"> Remove </b-dropdown-item>
+                            <b-dropdown-item v-b-modal="`modalRemove${item.actions.id}`"> Remove </b-dropdown-item>
+                            <b-modal :id="`modalRemove${item.actions.id}`" centered>
+                                <template #header>
+                                    <h3 class="m-0">Remove Collection</h3>
+                                    <b-button
+                                        variant="link"
+                                        class="text-white ms-auto"
+                                        size="sm"
+                                        @click="useModal(`modalRemove${item.actions.id}`).hide()"
+                                    >
+                                        <BaseIcon icon="times" class="ms-1" />
+                                    </b-button>
+                                </template>
+                                <p>
+                                    Are you sure you want to remove this collection, all it's collectibles and QR code
+                                    entries? This action cannot be undone.
+                                </p>
+                                <p class="m-0 fw-bold">
+                                    Note that minted collectibles can not be removed and will stay with the owners.
+                                </p>
+                                <template #footer>
+                                    <b-button class="w-100" variant="danger" @click="onClickDelete(item.actions.id)">
+                                        <b-spinner v-if="isLoading" small />
+                                        <template v-else> Remove </template>
+                                    </b-button>
+                                </template>
+                            </b-modal>
                         </b-dropdown>
                     </template>
                 </b-table>
@@ -40,15 +66,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { mapStores } from 'pinia';
 import { useAuthStore, useCollectionStore } from '@thxnetwork/studio/stores';
 import { toast } from '@thxnetwork/studio/utils/toast';
+import { useModal } from 'bootstrap-vue-next';
+import { mapStores } from 'pinia';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'Collection',
     data() {
         return {
+            useModal,
             isLoading: false,
         };
     },
@@ -92,6 +120,7 @@ export default defineComponent({
             try {
                 this.isLoading = true;
                 await this.collectionStore.remove(id);
+                this.useModal(`modalRemove${id}`).hide();
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;

@@ -15,10 +15,10 @@
                     <b-row>
                         <b-col md="6">
                             <BaseFormGroup label="Name" tooltip="This name is used to describe your collection">
-                                <b-form-input v-model="name" />
+                                <b-form-input v-model="name" :disabled="!isCreating" />
                             </BaseFormGroup>
                             <BaseFormGroup label="Symbol" tooltip="ERC721 collections require a symbol like ABC.">
-                                <b-form-input v-model="symbol" />
+                                <b-form-input v-model="symbol" :disabled="!isCreating" />
                             </BaseFormGroup>
                         </b-col>
                         <b-col md="6">
@@ -26,7 +26,7 @@
                                 <b-form-textarea v-model="description" />
                             </BaseFormGroup>
                             <b-button variant="primary" type="submit" class="w-100">
-                                <b-spinner v-if="isLoading" small />
+                                <b-spinner v-if="isLoadingCollection" small />
                                 <template v-else> {{ isCreating ? 'Create' : 'Update' }} Collection </template>
                             </b-button>
                         </b-col>
@@ -65,17 +65,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { mapStores } from 'pinia';
+import { ChainId } from '@thxnetwork/common/enums';
 import { useAuthStore, useCollectionStore, useEntryStore } from '@thxnetwork/studio/stores';
 import { toast } from '@thxnetwork/studio/utils/toast';
-import { ChainId } from '@thxnetwork/common/enums';
+import { mapStores } from 'pinia';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'NFT',
     data() {
         return {
             isLoading: false,
+            isLoadingCollection: false,
             isModelCollectionMetadataShown: false,
             page: 1,
             limit: 10,
@@ -147,10 +148,10 @@ export default defineComponent({
             }
         },
         async onSubmit() {
-            if (!this.isCreating) return;
             try {
-                this.isLoading = true;
-                await this.collectionStore.create({
+                this.isLoadingCollection = true;
+                await this.collectionStore[this.isCreating ? 'create' : 'update']({
+                    _id: this.collection && this.collection._id,
                     name: this.name,
                     chainId: this.chainId,
                     symbol: this.symbol,
@@ -164,7 +165,7 @@ export default defineComponent({
                     return;
                 });
             } finally {
-                this.isLoading = false;
+                this.isLoadingCollection = false;
             }
         },
     },

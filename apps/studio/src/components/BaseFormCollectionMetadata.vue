@@ -10,6 +10,7 @@
             <BaseFormInputFile
                 :image-src="imageURL"
                 :is-loading="isLoading"
+                @remove="imageURL = ''"
                 @done="imageURL = $event"
                 @loading="isLoading = $event"
             />
@@ -25,10 +26,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
 import { useCollectionStore } from '@thxnetwork/studio/stores';
-import { mapStores } from 'pinia';
 import { toast } from '@thxnetwork/studio/utils/toast';
+import { mapStores } from 'pinia';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
     name: 'BaseFormCollectionMetadata',

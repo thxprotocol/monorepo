@@ -115,8 +115,8 @@ export default defineComponent({
     computed: {
         ...mapStores(useEntryStore),
     },
-    async mounted() {
-        await this.listCodes();
+    mounted() {
+        this.listCodes();
     },
     methods: {
         async onSubmitEntries() {
@@ -131,6 +131,7 @@ export default defineComponent({
                     amount: this.amount,
                     redirectURL: this.redirectURL,
                 });
+                await this.listCodes();
                 this.tabIndex = 1;
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {

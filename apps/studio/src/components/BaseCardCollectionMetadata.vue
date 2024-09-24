@@ -19,9 +19,6 @@
                 Create QR Codes
                 <BaseIcon icon="chevron-right" class="ms-1" />
             </b-button>
-            <b-button variant="link" class="text-danger w-100 text-decoration-none" @click="onClickRemove">
-                Remove
-            </b-button>
             <b-modal
                 v-model="isModelGenerateQRCodeShown"
                 centered
@@ -32,15 +29,36 @@
             >
                 <BaseFormCollectionMetadataQRCodes :collection="collection" :metadata="metadata" />
             </b-modal>
+            <b-button variant="link" class="text-danger w-100 text-decoration-none" @click="isModalRemoveShown = true">
+                Remove
+            </b-button>
+            <b-modal v-model="isModalRemoveShown" centered title="Remove Profile">
+                <template #header>
+                    <h3 class="m-0">Remove Collectible</h3>
+                    <b-button variant="link" class="text-white ms-auto" size="sm" @click="isModalRemoveShown = false">
+                        <BaseIcon icon="times" class="ms-1" />
+                    </b-button>
+                </template>
+                <p class="m-0">
+                    Are you sure you want to remove this collectible and all it's QR code entries? This action cannot be
+                    undone. Note that minted collectibles can not be removed!
+                </p>
+                <template #footer>
+                    <b-button class="w-100" variant="danger" @click="onClickRemove">
+                        <b-spinner v-if="isLoading" small />
+                        <template v-else> Remove </template>
+                    </b-button>
+                </template>
+            </b-modal>
         </template>
     </b-card>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import { mapStores } from 'pinia';
-import { useEntryStore, useCollectionStore } from '@thxnetwork/studio/stores';
+import { useCollectionStore, useEntryStore } from '@thxnetwork/studio/stores';
 import { toast } from '@thxnetwork/studio/utils/toast';
+import { mapStores } from 'pinia';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
     name: 'BaseCardTableHeader',
@@ -55,7 +73,14 @@ export default defineComponent({
         },
     },
     data() {
-        return { isLoading: false, page: 1, limit: 10, query: '', isModelGenerateQRCodeShown: false };
+        return {
+            isModalRemoveShown: false,
+            isLoading: false,
+            page: 1,
+            limit: 10,
+            query: '',
+            isModelGenerateQRCodeShown: false,
+        };
     },
     computed: {
         ...mapStores(useEntryStore, useCollectionStore),
@@ -90,6 +115,7 @@ export default defineComponent({
             try {
                 this.isLoading = true;
                 await this.collectionStore.removeMetadata(this.collection._id, this.metadata._id);
+                this.isModalRemoveShown = false;
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;

@@ -58,7 +58,7 @@ const controller = async (req: Request, res: Response) => {
     });
 
     const meta = {
-        claimedCount: await QRCodeEntry.countDocuments({ sub: { $exists: true } }),
+        claimedCount: await QRCodeEntry.countDocuments({ ...query, sub: { $exists: true } }),
     };
 
     res.json({

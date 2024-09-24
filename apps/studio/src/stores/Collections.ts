@@ -33,6 +33,9 @@ export const useCollectionStore = defineStore('collection', {
             const data = await this.request(`/erc721`, { method: 'POST', body, params: {} });
             this.collections.push(data);
         },
+        async update(body: Partial<TERC721>) {
+            await this.request(`/erc721/${body._id}`, { method: 'PATCH', body, params: {} });
+        },
         async remove(id: string) {
             await this.request(`/erc721/${id}`, { method: 'DELETE' });
             this.collections = this.collections.filter((collection) => collection._id !== id);
