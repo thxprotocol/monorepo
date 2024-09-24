@@ -1,8 +1,9 @@
-import { Account, Wallet, ERC721, ERC721Metadata, QRCodeEntry } from '@thxnetwork/api/models';
+import { Account, ERC721, ERC721Metadata, QRCodeEntry, Wallet } from '@thxnetwork/api/models';
+import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 import { Request, Response } from 'express';
 import { query } from 'express-validator';
-import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 import { isValidObjectId } from 'mongoose';
+import { validate as isValidUUID } from 'uuid';
 
 const validation = [
     query('limit').optional().isInt({ gt: 0 }),
@@ -19,11 +20,16 @@ const controller = async (req: Request, res: Response) => {
     if (req.query.erc721Id) query['erc721Id'] = req.query.erc721Id;
     if (req.query.erc721MetadataId) query['erc721MetadataId'] = req.query.erc721MetadataId;
 
-    // Assuming a mongoId in the query since UI hints at it
+    // Extend query with sub filter if it is a mongoid
     if (req.query.query && isValidObjectId(req.query.query)) {
         const results = await Account.find({ _id: { $in: req.query.query } });
         const subs = results.map((a) => a.id);
         query['sub'] = { $in: subs };
+    }
+
+    // Extend query with uuid filter if it is a uuid
+    if (req.query.query && isValidUUID(req.query.query as string)) {
+        query['uuid'] = { $in: [req.query.query] };
     }
 
     const total = await QRCodeEntry.countDocuments(query);

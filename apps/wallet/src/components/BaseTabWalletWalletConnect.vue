@@ -11,8 +11,8 @@
     <b-form-group v-if="address" label="Address">
         <span class="text-opaque">{{ address }}</span>
     </b-form-group>
-    <b-button v-if="!address" variant="primary" class="w-100" @click="onClickConnect"> Connect Wallet </b-button>
-    <b-button v-else variant="success" :disabled="isLoading" class="w-100" @click="onClickAdd">
+    <b-button v-if="!address" variant="primary" class="w-100 mt-3" @click="onClickConnect"> Connect Wallet </b-button>
+    <b-button v-else variant="success" :disabled="isLoading" class="w-100 mt-3" @click="onClickAdd">
         <b-spinner v-if="isLoading" small />
         <template v-else>
             Add <strong>{{ walletStore.account?.address && shortenAddress(walletStore.account.address) }}</strong>

@@ -113,6 +113,50 @@ export const useAuthStore = defineStore('auth', {
 
             popup.open(data.url);
         },
+        async signinWithWallet(address: `0x${string}`, { message, signature }: { message: string; signature: string }) {
+            const { password } = await this.request('/login/pwd', { method: 'POST', body: { message, signature } });
+            const { error } = await this._signinWithPassword({ address, password });
+            if (error) throw error;
+        },
+        async _signinWithPassword({ address, password }: { address: string; password: string }) {
+            try {
+                // Try to get the user with the address and password
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: `${address}@thx.network`,
+                    password,
+                });
+                // If we find a user for these credentials then login
+                if (data.user) return { data, error };
+                // If we are noticed that we login using the wrong credentials then we try to signup
+                if (error && error.message === 'Invalid login credentials') {
+                    return await this._signupWithPassword({ address, password });
+                }
+                // If it was a different error we rethrow
+                if (error) throw error;
+
+                // In all other cases we throw an unknown error
+                throw new Error('Unknown error');
+            } catch (error) {
+                return { data: null, error };
+            }
+        },
+        async _signupWithPassword({ address, password }: { address: string; password: string }) {
+            try {
+                // If no user is found for this address and password then create a new user
+                const { data, error } = await supabase.auth.signUp({
+                    email: `${address}@thx.network`,
+                    password,
+                    options: { data: { variant: AccountVariant.Metamask, address } },
+                });
+                if (error && error.message === 'User already registered') {
+                    throw new Error('Unable to sign you in.');
+                }
+                if (error) throw error;
+                return { data, error };
+            } catch (error) {
+                return { data: null, error };
+            }
+        },
         async logout() {
             await supabase.auth.signOut();
         },

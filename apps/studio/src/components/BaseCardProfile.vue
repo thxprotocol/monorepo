@@ -227,13 +227,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import { API_URL, WALLET_URL } from '@thxnetwork/studio/config/secrets';
-import { mapStores } from 'pinia';
-import { useAccountStore } from '@thxnetwork/studio/stores';
-import { toast } from '@thxnetwork/studio/utils/toast';
 import Imglogo from '@thxnetwork/studio/assets/logo.jpg';
+import { API_URL, WALLET_URL } from '@thxnetwork/studio/config/secrets';
+import { useAccountStore } from '@thxnetwork/studio/stores';
 import { decodeHTML } from '@thxnetwork/studio/utils/decode-html';
+import { toast } from '@thxnetwork/studio/utils/toast';
+import { mapStores } from 'pinia';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
     name: 'BaseCardProfile',

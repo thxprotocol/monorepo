@@ -25,7 +25,7 @@
             </p>
         </b-button>
     </b-form-group>
-    <b-button :disabled="isDisabled" variant="primary" class="w-100" @click="$emit('next')"> Continue </b-button>
+    <b-button :disabled="isDisabled" variant="primary" class="w-100 mt-3" @click="$emit('next')"> Continue </b-button>
 </template>
 
 <script lang="ts">
