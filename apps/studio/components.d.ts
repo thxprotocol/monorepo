@@ -33,6 +33,7 @@ declare module 'vue' {
     BFormGroup: typeof import('bootstrap-vue-next')['BFormGroup']
     BFormInput: typeof import('bootstrap-vue-next')['BFormInput']
     BFormSelect: typeof import('bootstrap-vue-next')['BFormSelect']
+    BFormSelectOption: typeof import('bootstrap-vue-next')['BFormSelectOption']
     BFormTextarea: typeof import('bootstrap-vue-next')['BFormTextarea']
     BImg: typeof import('bootstrap-vue-next')['BImg']
     BInputGroup: typeof import('bootstrap-vue-next')['BInputGroup']
@@ -46,6 +47,7 @@ declare module 'vue' {
     BNavItem: typeof import('bootstrap-vue-next')['BNavItem']
     BNavItemDropdown: typeof import('bootstrap-vue-next')['BNavItemDropdown']
     BPagination: typeof import('bootstrap-vue-next')['BPagination']
+    BPlaceholder: typeof import('bootstrap-vue-next')['BPlaceholder']
     BPlaceholderCard: typeof import('bootstrap-vue-next')['BPlaceholderCard']
     BProgress: typeof import('bootstrap-vue-next')['BProgress']
     BRow: typeof import('bootstrap-vue-next')['BRow']
@@ -57,6 +59,8 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
   }
   export interface ComponentCustomProperties {
+    vBClipboard: typeof import('bootstrap-vue-next')['vBClipboard']
+    vBModal: typeof import('bootstrap-vue-next')['vBModal']
     vBTooltip: typeof import('bootstrap-vue-next')['vBTooltip']
   }
 }

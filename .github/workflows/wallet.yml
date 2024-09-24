@@ -53,7 +53,7 @@ jobs:
     autodeploy:
         name: 'Auto deploy'
         runs-on: ubuntu-latest
-        if: "(github.ref == 'refs/heads/studio' || github.ref == 'refs/heads/main')"
+        if: "(github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')"
         needs: [buildAndTest]
         outputs:
             newTag: ${{ steps.version-bump.outputs.newTag }}
@@ -85,7 +85,7 @@ jobs:
 
             - name: Set environment based on branch
               run: |
-                  if [[ $GITHUB_REF == 'refs/heads/studio' ]]; then
+                  if [[ $GITHUB_REF == 'refs/heads/develop' ]]; then
                     echo "S3_URL=s3://dev-wallet.thx.network" >> $GITHUB_ENV
                     echo "DISTRIBUTION=${{ secrets.CLOUDFRONT_DISTRIBUTION_WALLET_DEV }}" >> $GITHUB_ENV
                     echo "BUILD_MODE=dev" >> $GITHUB_ENV
@@ -116,7 +116,7 @@ jobs:
 
             - name: Set DISCORD_WEBHOOK based on branch
               run: |
-                  if [[ $GITHUB_REF == 'refs/heads/studio' ]]; then
+                  if [[ $GITHUB_REF == 'refs/heads/develop' ]]; then
                     echo "DISCORD_WEBHOOK=${{ secrets.DISCORD_WEBHOOK_DEV }}" >> $GITHUB_ENV
                   elif [[ $GITHUB_REF == 'refs/heads/main' ]]; then
                     echo "DISCORD_WEBHOOK=${{ secrets.DISCORD_WEBHOOK_PROD }}" >> $GITHUB_ENV
