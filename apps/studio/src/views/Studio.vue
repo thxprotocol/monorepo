@@ -36,10 +36,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { mapStores } from 'pinia';
-import { useAccountStore } from '@thxnetwork/studio/stores';
 import imgLogo from '@thxnetwork/studio/assets/logo.jpg';
+import { useAccountStore } from '@thxnetwork/studio/stores';
+import { mapStores } from 'pinia';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'Home',

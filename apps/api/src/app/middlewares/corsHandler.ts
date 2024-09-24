@@ -1,13 +1,13 @@
-import cors from 'cors';
 import {
-    WALLET_URL,
-    AUTH_URL,
     API_URL,
+    AUTH_URL,
     DASHBOARD_URL,
-    WIDGET_URL,
     PUBLIC_URL,
     STUDIO_URL,
+    WALLET_URL,
+    WIDGET_URL,
 } from '@thxnetwork/api/config/secrets';
+import cors from 'cors';
 
 export const corsHandler = cors(async (req: any, callback: any) => {
     const origin = req.header('Origin');
@@ -26,6 +26,10 @@ export const corsHandler = cors(async (req: any, callback: any) => {
         'https://dev-app.thx.network',
         'https://dashboard.thx.network',
         'https://dev-dashboard.thx.network',
+        'https://studio.thx.network',
+        'https://dev-studio.thx.network',
+        'https://wallet.thx.network',
+        'https://dev-wallet.thx.network',
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {
