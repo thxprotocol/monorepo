@@ -18,7 +18,7 @@ module.exports = {
                             filter: { _id: w._id },
                             update: {
                                 $set: {
-                                    sub: pool.sub,
+                                    accountId: pool.sub,
                                     slug: pool.settings.slug,
                                     name: pool.settings.title,
                                     description: pool.settings.description,
@@ -34,7 +34,10 @@ module.exports = {
             })
             .filter((o) => !!o);
 
-        await widgetColl.bulkWrite(operations);
+        // Iterate over operations in batches of 1000 and write
+        for (let i = 0; i < operations.length; i += 1000) {
+            await widgetColl.bulkWrite(operations.slice(i, i + 1000));
+        }
     },
     async down(db, client) {
         //

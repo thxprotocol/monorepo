@@ -1,5 +1,5 @@
 <template>
-    <b-tabs justified pills content-class="py-3">
+    <b-tabs v-model="tabIndex" justified pills content-class="py-3">
         <b-tab title="Codes">
             <b-form @submit.prevent="onSubmitEntries">
                 <BaseFormGroup
@@ -74,16 +74,16 @@
 </template>
 
 <script lang="ts">
-import QRCode from 'qrcode';
-import JSZip from 'jszip';
-import { defineComponent, PropType } from 'vue';
-import { useEntryStore, useAuthStore } from '@thxnetwork/studio/stores';
-import { mapStores } from 'pinia';
-import { toast } from '@thxnetwork/studio/utils/toast';
-import { loadImage } from '@thxnetwork/studio/utils/image';
-import { API_URL, STUDIO_URL } from '@thxnetwork/studio/config/secrets';
-import { saveAs } from 'file-saver';
 import ImgDefault from '@thxnetwork/studio/assets/logo.jpg';
+import { API_URL, STUDIO_URL } from '@thxnetwork/studio/config/secrets';
+import { useAuthStore, useEntryStore } from '@thxnetwork/studio/stores';
+import { loadImage } from '@thxnetwork/studio/utils/image';
+import { toast } from '@thxnetwork/studio/utils/toast';
+import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
+import { mapStores } from 'pinia';
+import QRCode from 'qrcode';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
     name: 'BaseFormCollectionMetadataQRCodes',
@@ -101,6 +101,7 @@ export default defineComponent({
         return {
             isLoading: false,
             isAlertShown: true,
+            tabIndex: 0,
             codes: [],
             index: 0,
             amount: 0,
@@ -130,6 +131,7 @@ export default defineComponent({
                     amount: this.amount,
                     redirectURL: this.redirectURL,
                 });
+                this.tabIndex = 1;
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;
