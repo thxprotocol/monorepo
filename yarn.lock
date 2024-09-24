@@ -7684,6 +7684,11 @@
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.7.3.tgz#3e51a17e291d01d17d3fc61422015a933af7a08f"
   integrity sha512-+68kP9yzs4LMp7VNh8gdzMSPZFL44MLGqiHWvttYJe+6qnuVr4Ek9wSBQoveqY/r+LwjCcU29kNVkidwim+kYA==
 
+"@types/promise-poller@^1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@types/promise-poller/-/promise-poller-1.7.4.tgz#d07851aede8221d5a129078e7b26c9cfc5286ee3"
+  integrity sha512-WIOiDAO4VBEbMr05/hckJSxS+aOXzT+5hocTVYmIdzvNKt+bgGu95FCR223/cTEC2kLgZ3EieMQU/AFEjhk6sQ==
+
 "@types/q@^1.5.1":
   version "1.5.8"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.8.tgz#95f6c6a08f2ad868ba230ead1d2d7f7be3db3837"

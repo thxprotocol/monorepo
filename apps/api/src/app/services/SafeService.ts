@@ -1,17 +1,17 @@
-import { Wallet, WalletDocument, PoolDocument, Transaction, TransactionDocument } from '@thxnetwork/api/models';
-import { ChainId, JobType, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
-import { contractNetworks } from '@thxnetwork/api/hardhat';
-import { toChecksumAddress } from 'web3-utils';
-import { safeVersion } from '@thxnetwork/api/services/ContractService';
-import { SafeTransaction, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types';
-import { convertObjectIdToNumber } from '../util';
-import SafeApiKit from '@safe-global/api-kit';
-import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/protocol-kit';
-import NetworkService from '@thxnetwork/api/services/NetworkService';
-import TransactionService from './TransactionService';
 import { Job } from '@hokify/agenda';
+import SafeApiKit from '@safe-global/api-kit';
+import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit';
+import { SafeTransaction, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types';
+import { contractNetworks } from '@thxnetwork/api/hardhat';
+import { PoolDocument, Transaction, TransactionDocument, Wallet, WalletDocument } from '@thxnetwork/api/models';
+import { safeVersion } from '@thxnetwork/api/services/ContractService';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
+import { ChainId, JobType, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
+import { toChecksumAddress } from 'web3-utils';
+import { convertObjectIdToNumber } from '../util';
 import { agenda } from '../util/agenda';
 import { logger } from '../util/logger';
+import TransactionService from './TransactionService';
 
 class SafeService {
     async create(
@@ -310,7 +310,7 @@ class SafeService {
         return await apiKit.getPendingTransactions(wallet.address);
     }
 
-    private async getSafe(wallet: WalletDocument) {
+    async getSafe(wallet: WalletDocument) {
         const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
         const safe = await Safe.create({
             ethAdapter,

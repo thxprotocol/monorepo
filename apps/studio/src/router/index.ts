@@ -34,7 +34,7 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import(/* webpackChunkName: "collection" */ '../views/studio/Collection.vue'),
             },
             {
-                name: 'qr',
+                name: 'entries',
                 path: '/qr-codes',
                 component: () => import(/* webpackChunkName: "entries" */ '../views/studio/Entries.vue'),
             },

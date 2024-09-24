@@ -11,17 +11,18 @@ const controller = async (req: Request, res: Response) => {
     if (!profile) throw new NotFoundError('Profile not found.');
     if (!profile.isPublished) return res.end();
 
-    const IFRAME_SRC = `${WALLET_URL}/${req.params.id}`;
-    const CSS_URL = `${API_URL}/v1/wallet/css/${req.params.id}.css`;
-    const ICON_IMG = profile.iconImg || '';
-    const MESSAGE = profile.message || '';
+    const iframeSrc = `${WALLET_URL}/${req.params.id}`;
+    const cssUrl = `${API_URL}/v1/wallet/css/${req.params.id}.css`;
+    const icon = profile.iconImg || '';
+    const message = profile.message || '';
 
     const body = `
         (function() {
-            const MESSAGE = '${MESSAGE}';
-            const ICON_IMG = '${ICON_IMG}';
-            const CSS_URL = '${CSS_URL}';
- 
+            const MESSAGE = '${message}';
+            const ICON_IMG = '${icon}';
+            const CSS_URL = '${cssUrl}';
+            const iframeSrc = new URL('${iframeSrc}');
+            
             // Link the stylesheet
             const stylesheet = document.createElement('link');
             stylesheet.rel = 'stylesheet';
@@ -30,15 +31,23 @@ const controller = async (req: Request, res: Response) => {
             stylesheet.media = 'all';
             document.head.appendChild(stylesheet);
 
+
+            // Check if there is a forced app path 
+            const parentUrl = new URL(window.location.href)
+            const path = parentUrl.searchParams.get('thx_widget_path');
+            if (path) {
+                iframeSrc.pathname += \`/c/\${path}\`;
+            }
+
             // Add the HTML template
             const template = document.createElement('div');
             template.id = 'wallet-widget-container';
             template.innerHTML = \`
-                <div id="wallet-widget-message">${MESSAGE}</div>
+                <div id="wallet-widget-message">\${MESSAGE}</div>
                 <div id="wallet-widget-launcher">
                     <svg id="wallet-widget-svg-icon" fill="white" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M461.2 128H80c-8.8 0-16-7.2-16-16s7.2-16 16-16h384c8.8 0 16-7.2 16-16 0-26.5-21.5-48-48-48H64C28.7 32 0 60.7 0 96v320c0 35.4 28.7 64 64 64h397.2c28 0 50.8-21.5 50.8-48V176c0-26.5-22.8-48-50.8-48zM416 336c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32z"/></svg>
                 </div>
-                <iframe id="wallet-widget-iframe" src="${IFRAME_SRC}"></iframe>
+                <iframe id="wallet-widget-iframe" src="\${iframeSrc.toString()}"></iframe>
             \`;
             document.body.appendChild(template)
              
@@ -65,7 +74,7 @@ const controller = async (req: Request, res: Response) => {
                 launcher.addEventListener('click', () => {
                     const isMobile = window.innerWidth < 1024;
                     if (isMobile) {
-                        window.open('${IFRAME_SRC}', '_blank');
+                        window.open(iframeSrc, '_blank');
                     } else {
                         const {opacity, transform} = iframe.style;
                         iframe.style.opacity = opacity === '1' ? '0' : '1'; 

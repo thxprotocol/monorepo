@@ -1,6 +1,6 @@
+import { Transaction } from '@thxnetwork/api/models/Transaction';
 import { Wallet } from '@thxnetwork/api/models/Wallet';
 import { TransactionState, WalletVariant } from '@thxnetwork/common/enums';
-import { Transaction } from '@thxnetwork/api/models/Transaction';
 import { safeVersion } from './ContractService';
 import SafeService from './SafeService';
 

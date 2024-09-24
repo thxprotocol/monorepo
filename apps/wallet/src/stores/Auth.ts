@@ -1,11 +1,11 @@
-import { useWalletStore, useAccountStore } from '.';
-import { defineStore } from 'pinia';
 import { createClient, Provider, Session } from '@supabase/supabase-js';
-import { API_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from '../config/secrets';
-import { accountVariantProviderKindMap, OAuthScopes } from '../config/constants';
 import { AccountVariant } from '@thxnetwork/common/enums';
-import { popup } from '../utils/popup';
+import { defineStore } from 'pinia';
+import { useAccountStore, useWalletStore } from '.';
+import { accountVariantProviderKindMap, OAuthScopes } from '../config/constants';
+import { API_URL, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from '../config/secrets';
 import router from '../router';
+import { popup } from '../utils/popup';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
 
@@ -62,7 +62,8 @@ export const useAuthStore = defineStore('auth', {
             if (!session || isExpired) return;
             this.session = session;
 
-            await Promise.all([useAccountStore().get(), useWalletStore().list()]);
+            await useAccountStore().get();
+            useWalletStore().list();
 
             this.isAuthenticated = true;
             this.isModalLoginShown = false;

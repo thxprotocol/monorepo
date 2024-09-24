@@ -116,7 +116,7 @@ export default defineComponent({
             }));
         },
     },
-    async mounted() {
+    mounted() {
         this.accountStore.getProfiles();
         this.listEntries();
     },

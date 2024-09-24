@@ -1,20 +1,20 @@
-import { defineStore } from 'pinia';
-import { useAuthStore } from './Auth';
-import { WALLET_URL, WALLET_CONNECT_PROJECT_ID } from '../config/secrets';
-import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
+import { ChainId, WalletVariant } from '@thxnetwork/common/enums';
 import {
     disconnect,
-    watchAccount,
-    signMessage,
-    switchChain,
-    watchChainId,
     GetAccountReturnType,
     reconnect,
+    signMessage,
+    switchChain,
+    watchAccount,
+    watchChainId,
     watchConnections,
 } from '@wagmi/core';
-import { mainnet } from 'viem/chains';
+import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 import { Web3Modal } from '@web3modal/wagmi/dist/types/src/client';
-import { ChainId, WalletVariant } from '@thxnetwork/common/enums';
+import { defineStore } from 'pinia';
+import { mainnet } from 'viem/chains';
+import { WALLET_CONNECT_PROJECT_ID, WALLET_URL } from '../config/secrets';
+import { useAuthStore } from './Auth';
 
 const wagmiConfig = defaultWagmiConfig({
     chains: [mainnet],
@@ -30,6 +30,7 @@ const wagmiConfig = defaultWagmiConfig({
 export const useWalletStore = defineStore('wallet', {
     state: () => ({
         isModalWalletShown: false,
+        isModalWalletCreateShown: false,
         wallet: null as null | TWallet,
         wallets: [] as TWallet[],
         modal: null as null | Web3Modal,
@@ -40,16 +41,18 @@ export const useWalletStore = defineStore('wallet', {
         request(path: string, options?: TRequestOptions) {
             return useAuthStore().request(path, options);
         },
-        set(wallet: TWallet) {
+        set(wallet: null | TWallet) {
             this.wallet = wallet;
         },
         async list() {
-            this.wallets = await this.request('/account/wallets');
+            const wallets = await this.request('/account/wallets');
+            this.wallets = wallets.filter((w: { poolId: string }) => !w.poolId);
+
             if (this.wallets.length) {
                 this.set(this.wallets[0]);
             }
         },
-        async create(body: { variant: WalletVariant; message: string; signature: string }) {
+        async create(body: Partial<{ variant: WalletVariant; message: string; signature: string; chainId: ChainId }>) {
             await this.request('/account/wallets', { method: 'POST', body });
             await this.list();
             this.set(this.wallets[this.wallets.length - 1]);

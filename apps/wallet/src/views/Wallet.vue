@@ -25,7 +25,6 @@
                                 :text="accountStore.account ? accountStore.account.username.substring(0, 2) : '..'"
                             />
                         </template>
-                        <b-dropdown-item @click="accountStore.isModalAccountShown = true">Account</b-dropdown-item>
                         <b-dropdown-item :to="`/${accountStore.settings?._id}/logout`">Logout</b-dropdown-item>
                     </b-nav-item-dropdown>
                 </template>
@@ -35,15 +34,16 @@
             <router-view />
         </div>
         <BaseModalLogin />
-        <BaseModalAccount />
+        <BaseModalWalletCreate size="lg" />
+        <BaseModalWalletRecovery size="lg" />
     </b-container>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { mapStores } from 'pinia';
-import { useAccountStore, useAuthStore } from '@thxnetwork/wallet/stores';
 import imgLogo from '@thxnetwork/wallet/assets/logo.jpg';
+import { useAccountStore, useAuthStore } from '@thxnetwork/wallet/stores';
+import { mapStores } from 'pinia';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'ViewWallet',

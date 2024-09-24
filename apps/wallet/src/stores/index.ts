@@ -1,5 +1,6 @@
-export { useAuthStore } from './Auth';
 export { useAccountStore } from './Account';
-export { useWalletStore } from './Wallet';
-export { useEntryStore } from './Entry';
+export { useAuthStore } from './Auth';
 export { useCollectibleStore } from './Collectible';
+export { useEntryStore } from './Entry';
+export { useWalletStore } from './Wallet';
+export { useWeb3AuthStore } from './Web3Auth';
