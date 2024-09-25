@@ -13,7 +13,12 @@
         :collectible="collectible"
     />
 
-    <b-button v-if="authStore.isAuthenticated" variant="dark" class="mt-3 w-100" @click="listCollectibles">
+    <b-button
+        v-if="authStore.isAuthenticated"
+        variant="link"
+        class="text-decoration-none text-white mt-3 w-100"
+        @click="listCollectibles"
+    >
         <b-spinner v-if="isLoading" small />
         <template v-else>
             Reload Collectibles
@@ -51,7 +56,7 @@ export default defineComponent({
         async listCollectibles(wallet: TWallet) {
             try {
                 this.isLoading = true;
-                await this.collectibleStore.list(wallet._id);
+                await this.collectibleStore.list();
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;

@@ -1,18 +1,18 @@
-import NetworkService from '@thxnetwork/api/services/NetworkService';
-import { ChainId, TransactionState, TransactionType } from '@thxnetwork/common/enums';
-import { MINIMUM_GAS_LIMIT, RELAYER_SPEED } from '@thxnetwork/api/config/secrets';
-import { paginatedResults } from '@thxnetwork/api/util/pagination';
-import { toChecksumAddress } from 'web3-utils';
-import { poll } from '@thxnetwork/api/util/polling';
 import { RelayerTransactionPayload } from '@openzeppelin/defender-relay-client';
+import { MINIMUM_GAS_LIMIT, RELAYER_SPEED } from '@thxnetwork/api/config/secrets';
 import { Transaction, TransactionDocument, Wallet, WalletDocument } from '@thxnetwork/api/models';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
+import { paginatedResults } from '@thxnetwork/api/util/pagination';
+import { poll } from '@thxnetwork/api/util/polling';
+import { ChainId, TransactionState, TransactionType } from '@thxnetwork/common/enums';
 import { TransactionReceipt } from 'web3-core';
+import { toChecksumAddress } from 'web3-utils';
+import { PromiseParser } from '../util';
 import { logger } from '../util/logger';
+import ERC1155Service from './ERC1155Service';
 import ERC20Service from './ERC20Service';
 import ERC721Service from './ERC721Service';
-import ERC1155Service from './ERC1155Service';
 import SafeService from './SafeService';
-import { PromiseParser } from '../util';
 
 class TransactionService {
     /**
@@ -304,6 +304,7 @@ class TransactionService {
 
     async sendSafeAsync(wallet: WalletDocument, to: string | null, fn: any, callback?: TTransactionCallback) {
         const data = fn.encodeABI();
+        console.log(wallet, to, fn, callback);
         return await this.proposeSafeAsync(wallet, to, data, callback);
     }
 }

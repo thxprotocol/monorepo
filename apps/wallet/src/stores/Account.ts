@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
-import { useAuthStore } from './Auth';
-import { getStyles } from '../utils/theme';
 import { decodeHTML } from '../utils/decode-html';
+import { getStyles } from '../utils/theme';
+import { useAuthStore } from './Auth';
 
 export const useAccountStore = defineStore('account', {
     state: () => ({
@@ -14,7 +14,7 @@ export const useAccountStore = defineStore('account', {
             return useAuthStore().request(path, options);
         },
         async get() {
-            this.account = await this.request('/account');
+            this.account = await this.request('/account', { isAuthenticated: true });
         },
         async getSettings(widgetId: string) {
             const settings = await this.request(`/widget/${widgetId}`);

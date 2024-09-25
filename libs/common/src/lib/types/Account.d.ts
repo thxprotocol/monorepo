@@ -28,6 +28,7 @@ type TAccount = {
 type TOAuthScope = OAuthGoogleScope | OAuthTwitterScope | OAuthDiscordScope | OAuthTwitchScope | OAuthGithubScope;
 
 type TRequestOptions = {
+    isAuthenticated?: boolean;
     body?: any;
     params?: any;
     headers?: any;

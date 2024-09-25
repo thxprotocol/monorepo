@@ -22,11 +22,19 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         session: null as null | Session,
-        isAuthenticated: false,
         isModalLoginShown: false,
     }),
+    getters: {
+        isAuthenticated(state) {
+            return !!state.session && state.session.expires_in > 0;
+        },
+    },
     actions: {
         async request(path: string, options?: TRequestOptions) {
+            // Return if not authenticated
+            if (!this.isAuthenticated && options?.isAuthenticated) return;
+
+            // Create URL and append params
             const url = new URL(API_URL);
             url.pathname = `/v1${path}`;
             if (options?.params) {
@@ -45,6 +53,7 @@ export const useAuthStore = defineStore('auth', {
                     ...(options && options.headers),
                 },
             });
+
             try {
                 return await response.json();
             } catch (error) {
@@ -65,12 +74,10 @@ export const useAuthStore = defineStore('auth', {
             await useAccountStore().get();
             useWalletStore().list();
 
-            this.isAuthenticated = true;
             this.isModalLoginShown = false;
         },
         onSignedOut(_session: Session) {
             this.session = null;
-            this.isAuthenticated = false;
             router.push({ name: 'wallet' });
         },
         async signInWithOtp({ email }: { email: string }) {

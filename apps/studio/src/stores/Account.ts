@@ -5,6 +5,7 @@ export const useAccountStore = defineStore('account', {
     state: () => ({
         account: null as null | TAccount,
         profiles: [] as TWidget[],
+        wallets: [] as TWallet[],
     }),
     actions: {
         request(path: string, options?: TRequestOptions) {
@@ -27,6 +28,19 @@ export const useAccountStore = defineStore('account', {
                 method: 'DELETE',
             });
             this.profiles = this.profiles.filter((profile) => profile._id !== profileId);
+        },
+        async listWallets() {
+            this.wallets = await this.request('/wallets');
+        },
+        async removeWallet(walletId: string) {
+            await this.request(`/wallets/${walletId}`, {
+                method: 'DELETE',
+            });
+        },
+        async removeTransaction(transactionId: string) {
+            await this.request(`/transactions/${transactionId}`, {
+                method: 'DELETE',
+            });
         },
     },
 });

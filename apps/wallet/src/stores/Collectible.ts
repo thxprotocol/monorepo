@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { useAuthStore } from './Auth';
 import { useWalletStore } from '.';
+import { useAuthStore } from './Auth';
 
 export const useCollectibleStore = defineStore('collectible', {
     state: () => ({
@@ -10,9 +10,13 @@ export const useCollectibleStore = defineStore('collectible', {
         request(path: string, options?: TRequestOptions) {
             return useAuthStore().request(path, options);
         },
-        async list(walletId: string) {
-            const { chainId } = useWalletStore();
-            this.collectibles = await this.request('/erc721/token', { params: { walletId, chainId } });
+        async list() {
+            const { wallet, chainId } = useWalletStore();
+            const collectibles = await this.request('/erc721/token', {
+                isAuthenticated: true,
+                params: { walletId: wallet?._id, chainId },
+            });
+            this.collectibles = collectibles.filter((c: TERC721Token) => c.nft && c.metadata);
         },
     },
 });

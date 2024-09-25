@@ -1,23 +1,23 @@
-import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { ERC721, ERC721Document } from '@thxnetwork/api/models/ERC721';
 import { ERC721Metadata, ERC721MetadataDocument } from '@thxnetwork/api/models/ERC721Metadata';
 import { ERC721Token, ERC721TokenDocument } from '@thxnetwork/api/models/ERC721Token';
 import { Transaction, TransactionDocument } from '@thxnetwork/api/models/Transaction';
-import { ERC721TokenState, TransactionState } from '@thxnetwork/common/enums';
-import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
+import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
-import { Wallet, WalletDocument } from '../models/Wallet';
-import { RewardNFT } from '../models/RewardNFT';
-import { getArtifact } from '../hardhat';
-import PoolService from './PoolService';
-import TransactionService from './TransactionService';
-import IPFSService from './IPFSService';
-import WalletService from './WalletService';
+import { ERC721TokenState, TransactionState } from '@thxnetwork/common/enums';
+import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { TransactionReceipt } from 'web3-core';
 import { toChecksumAddress } from 'web3-utils';
 import { ADDRESS_ZERO } from '../config/secrets';
+import { getArtifact } from '../hardhat';
 import { QRCodeEntry } from '../models';
+import { RewardNFT } from '../models/RewardNFT';
+import { Wallet, WalletDocument } from '../models/Wallet';
+import IPFSService from './IPFSService';
+import PoolService from './PoolService';
+import TransactionService from './TransactionService';
+import WalletService from './WalletService';
 
 const contractName = 'THXERC721';
 
@@ -92,6 +92,7 @@ export async function mint(
     metadata: ERC721MetadataDocument,
 ): Promise<TransactionDocument> {
     const tokenUri = await IPFSService.getTokenURI(erc721, metadata.id);
+    console.log(tokenUri);
     return await TransactionService.sendSafeAsync(
         safe,
         erc721.address,

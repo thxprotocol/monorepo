@@ -1,6 +1,11 @@
 <template>
-    <b-spinner v-if="!entryStore.entry" small />
+    <b-spinner v-if="isLoadingEntry" small />
     <template v-else>
+        <b-alert v-model="isRemoved" variant="danger" class="p-2 px-3">
+            <BaseIcon icon="exclamation-circle" class="me-2" />
+            This QR code could not be loaded properly
+        </b-alert>
+
         <b-alert v-model="isCollected" variant="danger" class="p-2 px-3">
             <BaseIcon icon="exclamation-circle" class="me-2" />
             This collectible has been collected already.
@@ -25,16 +30,23 @@
             Continue to login
         </b-button>
         <b-button
-            v-else-if="!walletStore.wallets.length"
+            v-else-if="!walletStore.wallet"
             variant="primary"
             class="w-100"
             @click="walletStore.isModalWalletShown = true"
         >
             Connect Wallet
         </b-button>
-        <b-button v-else variant="success" :disabled="isLoading || isCollected" class="w-100" @click="onClickCollect">
+        <b-button
+            v-else
+            variant="success"
+            :disabled="isLoading || isCollected || isRemoved"
+            class="w-100"
+            @click="onClickCollect"
+        >
             <b-spinner v-if="isLoading" small />
             <template v-else-if="isCollected">Already collected!</template>
+            <template v-else-if="isRemoved">Not found</template>
             <template v-else> Collect </template>
         </b-button>
 
@@ -87,16 +99,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { mapStores } from 'pinia';
-import { useAuthStore, useAccountStore, useEntryStore, useWalletStore } from '@thxnetwork/wallet/stores';
+import { useAccountStore, useAuthStore, useEntryStore, useWalletStore } from '@thxnetwork/wallet/stores';
 import { toast } from '@thxnetwork/wallet/utils/toast';
+import { mapStores } from 'pinia';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'ViewWalletOverview',
     data() {
         return {
             isLoading: false,
+            isLoadingEntry: false,
             isCopiedAccountID: false,
             isCopiedUUID: false,
             isSupportShown: false,
@@ -107,21 +120,25 @@ export default defineComponent({
         isCollected() {
             return this.entryStore.entry ? !!this.entryStore.entry.sub : false;
         },
+        isRemoved() {
+            return !this.entryStore.entry;
+        },
     },
     async mounted() {
         try {
             const uuid = this.$route.params.uuid;
             if (!uuid) throw new Error('Entry not found');
 
-            this.isLoading = true;
+            this.isLoadingEntry = true;
 
             await this.entryStore.get(uuid);
         } catch (error: any) {
+            console.dir(error);
             toast(error.message, 'light', 3000, () => {
                 return;
             });
         } finally {
-            this.isLoading = false;
+            this.isLoadingEntry = false;
         }
     },
 

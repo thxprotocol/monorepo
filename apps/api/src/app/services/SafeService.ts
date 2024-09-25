@@ -14,10 +14,7 @@ import { logger } from '../util/logger';
 import TransactionService from './TransactionService';
 
 class SafeService {
-    async create(
-        data: { sub: string; chainId: ChainId; safeVersion: '1.3.0'; address?: string; poolId?: string },
-        userWalletAddress?: string,
-    ) {
+    async create(data: { sub: string; chainId: ChainId; safeVersion: '1.3.0'; owners: string[]; address?: string }) {
         const wallet = await Wallet.create({
             variant: WalletVariant.Safe,
             ...data,
@@ -25,27 +22,18 @@ class SafeService {
         // Present address means Metamask account so do not deploy and return early
         if (!safeVersion && wallet.address) return wallet;
 
-        // Add relayer address and consider this a campaign safe
-        const { defaultAccount } = NetworkService.getProvider(wallet.chainId);
-        const owners = [toChecksumAddress(defaultAccount)];
-
-        // Add user address as a signer and consider this a participant safe
-        if (userWalletAddress) {
-            owners.push(toChecksumAddress(userWalletAddress));
-        }
-
-        // If campaign safe we provide a nonce based on the timestamp in the MongoID the pool (poolId value)
-        const saltNonce = wallet.poolId && String(convertObjectIdToNumber(wallet.poolId));
-        const safeAddress = await this.deploy(wallet, owners, saltNonce);
+        // If campaign safe we provide a nonce based on the timestamp in the account sub to make it unique
+        const saltNonce = wallet.owners.length === 1 && String(convertObjectIdToNumber(wallet.sub));
+        const safeAddress = await this.deploy(wallet, saltNonce);
 
         return await Wallet.findByIdAndUpdate(wallet.id, { address: safeAddress }, { new: true });
     }
 
-    async deploy(wallet: WalletDocument, owners: string[], saltNonce?: string) {
+    async deploy(wallet: WalletDocument, saltNonce?: string) {
         const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
         const safeAccountConfig: SafeAccountConfig = {
-            owners,
-            threshold: owners.length,
+            owners: wallet.owners,
+            threshold: wallet.owners.length,
         };
         const safeAddress = await this.predictAddress(wallet, safeAccountConfig, safeVersion, saltNonce);
 

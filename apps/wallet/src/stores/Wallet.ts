@@ -12,12 +12,12 @@ import {
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 import { Web3Modal } from '@web3modal/wagmi/dist/types/src/client';
 import { defineStore } from 'pinia';
-import { mainnet } from 'viem/chains';
+import { linea, mainnet, polygon } from 'viem/chains';
 import { WALLET_CONNECT_PROJECT_ID, WALLET_URL } from '../config/secrets';
 import { useAuthStore } from './Auth';
 
 const wagmiConfig = defaultWagmiConfig({
-    chains: [mainnet],
+    chains: [mainnet, polygon, linea],
     projectId: WALLET_CONNECT_PROJECT_ID,
     metadata: {
         name: 'TwinStory',
@@ -45,7 +45,7 @@ export const useWalletStore = defineStore('wallet', {
             this.wallet = wallet;
         },
         async list() {
-            const wallets = await this.request('/account/wallets');
+            const wallets = (await this.request('/account/wallets', { isAuthenticated: true })) || [];
             this.wallets = wallets.filter((w: { poolId: string }) => !w.poolId);
 
             if (this.wallets.length) {
@@ -53,7 +53,7 @@ export const useWalletStore = defineStore('wallet', {
             }
         },
         async create(body: Partial<{ variant: WalletVariant; message: string; signature: string; chainId: ChainId }>) {
-            await this.request('/account/wallets', { method: 'POST', body });
+            await this.request('/account/wallets', { method: 'POST', body, isAuthenticated: true });
             await this.list();
             this.set(this.wallets[this.wallets.length - 1]);
         },

@@ -1,15 +1,20 @@
-import { RewardCoin, Wallet } from '@thxnetwork/api/models';
-import RewardCoinService from '@thxnetwork/api/services/RewardCoinService';
+import { Wallet } from '@thxnetwork/api/models';
+import SafeService from '@thxnetwork/api/services/SafeService';
+import { PromiseParser } from '@thxnetwork/api/util';
+import { WalletVariant } from '@thxnetwork/common/enums';
 
 export default async function main() {
-    // const reward = await RewardCoin.findById('669126e1110e00291909e0e3'); // Polygon Reward
-    // const reward = await RewardCoin.findById('66952d939a90f7280b2d3164'); // Linea Reward
-    const reward = await RewardCoin.findById('6698033a03bf2db6c9a940f1'); // Linea Reward
-    const wallet = await Wallet.findById('669805738c683b6c4c506e97');
-    const service = new RewardCoinService();
+    const wallet = await Wallet.find({ variant: WalletVariant.Safe, poolId: { $exists: true } });
+    const chunkSize = 10;
 
-    await service.createPayment({
-        reward,
-        wallet,
-    });
+    for (let i = 0; i < wallet.length; i += chunkSize) {
+        await PromiseParser.parse(
+            wallet.slice(i, i + chunkSize).map(async (w) => {
+                const safe = await SafeService.getSafe(w);
+                const owners = await safe.getOwners();
+
+                await w.updateOne({ owners });
+            }),
+        );
+    }
 }

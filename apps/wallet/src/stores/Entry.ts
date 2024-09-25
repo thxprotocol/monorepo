@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { useAuthStore } from './Auth';
 import { useWalletStore } from '.';
+import { useAuthStore } from './Auth';
 
 export const useEntryStore = defineStore('entry', {
     state: () => ({
@@ -13,7 +13,8 @@ export const useEntryStore = defineStore('entry', {
             return useAuthStore().request(path, options);
         },
         async get(uuid: string) {
-            const { entry, metadata, erc721 } = await this.request('/qr-codes/' + uuid);
+            const { entry, metadata, erc721, error } = await this.request('/qr-codes/' + uuid);
+            if (error) throw new Error(error.message);
 
             this.entry = entry;
             this.erc721 = erc721;
@@ -23,7 +24,11 @@ export const useEntryStore = defineStore('entry', {
             const { wallet } = useWalletStore();
             if (!wallet) throw new Error('Wallet not found');
 
-            await this.request(`/qr-codes/${uuid}`, { method: 'PATCH', params: { walletId: wallet._id } });
+            await this.request(`/qr-codes/${uuid}`, {
+                isAuthenticated: true,
+                method: 'PATCH',
+                params: { walletId: wallet._id },
+            });
         },
     },
 });

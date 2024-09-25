@@ -17,6 +17,8 @@ declare module 'vue' {
     BaseFormInputFile: typeof import('./src/components/BaseFormInputFile.vue')['default']
     BaseHrOrSeparator: typeof import('./src/components/BaseHrOrSeparator.vue')['default']
     BaseIcon: typeof import('./src/components/BaseIcon.vue')['default']
+    BaseModalWalletCreate: typeof import('./src/components/BaseModalWalletCreate.vue')['default']
+    BaseModalWalletTransactions: typeof import('./src/components/BaseModalWalletTransactions.vue')['default']
     BAvatar: typeof import('bootstrap-vue-next')['BAvatar']
     BBadge: typeof import('bootstrap-vue-next')['BBadge']
     BButton: typeof import('bootstrap-vue-next')['BButton']
@@ -55,6 +57,7 @@ declare module 'vue' {
     BTab: typeof import('bootstrap-vue-next')['BTab']
     BTable: typeof import('bootstrap-vue-next')['BTable']
     BTabs: typeof import('bootstrap-vue-next')['BTabs']
+    copy: typeof import('./src/components/BaseModalWalletTransactions copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

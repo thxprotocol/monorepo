@@ -20,7 +20,7 @@ export const useWeb3AuthStore = defineStore('web3auth', {
             return useAuthStore().request(path, options);
         },
         async getJWT() {
-            const { jwt } = await this.request('/login/jwt', { method: 'POST' });
+            const { jwt } = await this.request('/login/jwt', { method: 'POST', isAuthenticated: true });
             return jwt;
         },
         async getPrivateKey() {

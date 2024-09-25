@@ -32,13 +32,7 @@
             <b-button variant="link" class="text-danger w-100 text-decoration-none" @click="isModalRemoveShown = true">
                 Remove
             </b-button>
-            <b-modal v-model="isModalRemoveShown" centered title="Remove Profile">
-                <template #header>
-                    <h3 class="m-0">Remove Collectible</h3>
-                    <b-button variant="link" class="text-white ms-auto" size="sm" @click="isModalRemoveShown = false">
-                        <BaseIcon icon="times" class="ms-1" />
-                    </b-button>
-                </template>
+            <b-modal v-model="isModalRemoveShown" centered title="Remove Collectible">
                 <p class="m-0">
                     Are you sure you want to remove this collectible and all it's QR code entries? This action cannot be
                     undone. Note that minted collectibles can not be removed!

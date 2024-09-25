@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
-import { param } from 'express-validator';
 import { Wallet } from '@thxnetwork/api/models';
 import { ForbiddenError, NotFoundError } from '@thxnetwork/api/util/errors';
+import { Request, Response } from 'express';
+import { param } from 'express-validator';
 
-const validation = [param('id').isMongoId(), param('walletId').isMongoId()];
+const validation = [param('walletId').isMongoId()];
 
 const controller = async (req: Request, res: Response) => {
     const wallet = await Wallet.findById(req.params.walletId);

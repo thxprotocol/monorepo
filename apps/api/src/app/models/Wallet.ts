@@ -15,6 +15,7 @@ export const Wallet = mongoose.model<WalletDocument>(
             version: String,
             safeVersion: String,
             variant: String,
+            owners: [String],
         },
         { timestamps: true },
     ),

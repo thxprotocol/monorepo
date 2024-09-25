@@ -22,4 +22,6 @@ type TWallet = {
     createdAt: Date;
     expiresAt: Date;
     short: string;
+    owners: string[];
+    transactions: TTransaction[];
 };

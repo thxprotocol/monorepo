@@ -1,7 +1,9 @@
 import { Transaction } from '@thxnetwork/api/models/Transaction';
 import { Wallet } from '@thxnetwork/api/models/Wallet';
 import { TransactionState, WalletVariant } from '@thxnetwork/common/enums';
+import { toChecksumAddress } from 'web3-utils';
 import { safeVersion } from './ContractService';
+import NetworkService from './NetworkService';
 import SafeService from './SafeService';
 
 export default class WalletService {
@@ -53,7 +55,10 @@ export default class WalletService {
         if (safeWallet) throw new Error('Already has a Safe.');
 
         // Deploy a Safe with Web3Auth address and relayer as signers
-        await SafeService.create({ sub, chainId, safeVersion }, address);
+        const { defaultAccount } = NetworkService.getProvider(chainId);
+        const owners = [toChecksumAddress(defaultAccount), toChecksumAddress(address)];
+
+        await SafeService.create({ sub, chainId, safeVersion, owners });
     }
 
     static async createWalletConnect({ sub, address }: Partial<TWallet>) {

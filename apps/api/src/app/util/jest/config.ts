@@ -1,16 +1,17 @@
-import db from '@thxnetwork/api/util/database';
-import { safeVersion } from '@thxnetwork/api/services/ContractService';
-import { AccountPlanType, AccountVariant, ChainId, WalletVariant } from '@thxnetwork/common/enums';
-import { userWalletAddress, userWalletAddress2, userWalletAddress3, userWalletAddress4 } from './constants';
-import { Account, Wallet } from '@thxnetwork/api/models';
-import { poll } from '../polling';
-import { agenda } from '../agenda';
-import { MONGODB_URI, SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
-import { supabase } from '@thxnetwork/api/proxies/AccountProxy';
 import { User } from '@supabase/supabase-js';
+import { MONGODB_URI, SUPABASE_JWT_SECRET } from '@thxnetwork/api/config/secrets';
+import { Account, Wallet } from '@thxnetwork/api/models';
+import { supabase } from '@thxnetwork/api/proxies/AccountProxy';
+import { safeVersion } from '@thxnetwork/api/services/ContractService';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import SafeService from '@thxnetwork/api/services/SafeService';
+import db from '@thxnetwork/api/util/database';
+import { AccountPlanType, AccountVariant, ChainId, WalletVariant } from '@thxnetwork/common/enums';
 import jwt from 'jsonwebtoken';
+import { toChecksumAddress } from 'web3-utils';
+import { agenda } from '../agenda';
+import { poll } from '../polling';
+import { userWalletAddress, userWalletAddress2, userWalletAddress3, userWalletAddress4 } from './constants';
 
 const user = {
     id: 'uuid_supabase',
@@ -96,9 +97,14 @@ class Mock {
         if (!options.skipWalletCreation) {
             for (const a of this.accounts) {
                 switch (a.variant) {
-                    case AccountVariant.EmailPassword:
-                        await SafeService.create({ sub: a.sub, chainId, safeVersion }, a.userWalletAddress);
+                    case AccountVariant.EmailPassword: {
+                        // Deploy a Safe with Web3Auth address and relayer as signers
+                        const { defaultAccount } = NetworkService.getProvider(chainId);
+                        const owners = [toChecksumAddress(defaultAccount), toChecksumAddress(a.userWalletAddress)];
+
+                        await SafeService.create({ sub: a.sub, chainId, safeVersion, owners });
                         break;
+                    }
                     case AccountVariant.Metamask:
                         await Wallet.create({
                             chainId,

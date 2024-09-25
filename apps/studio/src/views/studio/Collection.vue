@@ -42,9 +42,9 @@
                 <b-modal
                     v-model="isModelCollectionMetadataShown"
                     centered
-                    hide-header
                     hide-footer
                     body-class="gradient-shadow-xl"
+                    title="Create Collectible"
                     @hidden="isModelCollectionMetadataShown = false"
                 >
                     <BaseFormCollectionMetadata :erc721="collection" @submit="isModelCollectionMetadataShown = false" />

@@ -31,18 +31,7 @@
                                 <BaseIcon icon="ellipsis-v text-light" />
                             </template>
                             <b-dropdown-item v-b-modal="`modalRemove${item.actions.id}`"> Remove </b-dropdown-item>
-                            <b-modal :id="`modalRemove${item.actions.id}`" centered>
-                                <template #header>
-                                    <h3 class="m-0">Remove Collection</h3>
-                                    <b-button
-                                        variant="link"
-                                        class="text-white ms-auto"
-                                        size="sm"
-                                        @click="useModal(`modalRemove${item.actions.id}`).hide()"
-                                    >
-                                        <BaseIcon icon="times" class="ms-1" />
-                                    </b-button>
-                                </template>
+                            <b-modal :id="`modalRemove${item.actions.id}`" centered title="Remove Collection">
                                 <p>
                                     Are you sure you want to remove this collection, all it's collectibles and QR code
                                     entries? This action cannot be undone.

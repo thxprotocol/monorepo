@@ -4,12 +4,13 @@
             {{ walletStore.wallet.short }}
             <BaseIcon icon="caret-down" class="ms-2" />
         </template>
-        <b-dropdown-item v-for="w of walletStore.wallets">
+        <template v-else #button-content> No wallet selected </template>
+        <b-dropdown-item v-for="w of walletStore.wallets" @click="walletStore.set(w)">
             <code class="text-white">{{ w.short }}</code>
             <b-link
                 v-if="w.variant === WalletVariant.Safe"
                 v-b-modal="`modalWalletSafe${w._id}`"
-                class="text-white ms-2"
+                class="text-white text-opaque ms-3"
             >
                 <BaseIcon icon="cog" />
             </b-link>
