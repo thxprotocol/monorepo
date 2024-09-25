@@ -8,7 +8,7 @@
             <b-card variant="darker">
                 <BaseCardTableHeader
                     :query="query"
-                    search-placeholder="Search on account ID..."
+                    search-placeholder="Search on code or account ID..."
                     :page="page"
                     :limit="limit"
                     :total="entryStore.entries.total"
@@ -42,8 +42,11 @@
                     </template>
                     <template #head(account)> Account </template>
                     <template #cell(account)="{ item }">
-                        <template v-if="item.account">
+                        <template v-if="item.account.id">
                             <code>{{ item.account.id }}</code>
+                            <b-link v-b-tooltip class="text-white" :title="`Created: ${item.account.createdAt}`">
+                                <BaseIcon icon="question-circle" class="ms-1" />
+                            </b-link>
                         </template>
                     </template>
                     <template #head(collection)> Collection </template>
@@ -72,12 +75,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { mapStores } from 'pinia';
-import { useEntryStore, useAccountStore } from '@thxnetwork/studio/stores';
-import { format } from 'date-fns';
-import { toast } from '@thxnetwork/studio/utils/toast';
 import { WALLET_URL } from '@thxnetwork/studio/config/secrets';
+import { useAccountStore, useEntryStore } from '@thxnetwork/studio/stores';
+import { toast } from '@thxnetwork/studio/utils/toast';
+import { format } from 'date-fns';
+import { mapStores } from 'pinia';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'Entries',
@@ -102,15 +105,17 @@ export default defineComponent({
                         ? `${WALLET_URL}/${this.accountStore.profiles[0]._id}/collect/${entry.uuid}`
                         : '',
                 },
-                collection: entry.erc721.name,
-                metadata: entry.metadata.name,
-                account: entry.account && {
-                    id: entry.account.sub,
-                    username: entry.account.username,
-                    email: entry.account.email,
-                    profileImg: entry.account.profileImg,
-                    createdAt: format(new Date(entry.account.createdAt), 'yyyy-MM-dd HH:mm'),
-                },
+                collection: entry.erc721 ? entry.erc721.name : 'Removed',
+                metadata: entry.metadata ? entry.metadata.name : 'Removed',
+                account: entry.account
+                    ? {
+                          id: entry.account.sub,
+                          createdAt: format(new Date(entry.account.createdAt), 'yyyy-MM-dd HH:mm'),
+                      }
+                    : {
+                          id: '',
+                          createdAt: '',
+                      },
                 claimedAt: entry.claimedAt ? format(new Date(entry.claimedAt), 'yyyy-MM-dd HH:mm') : '',
                 id: entry._id,
             }));

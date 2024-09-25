@@ -2,7 +2,7 @@
     <b-container class="py-5 text-white">
         <h1>{{ isCreating ? 'Create' : 'Configure' }} Collection</h1>
         <p class="lead">Design your personal NFT collections</p>
-        <b-button variant="dark" target="_blank" :href="blockExplorerURL">
+        <b-button v-if="collection.address" variant="dark" target="_blank" :href="blockExplorerURL">
             Open Block Explorer URL
             <BaseIcon icon="external-link-alt ms-1" />
         </b-button>
@@ -25,7 +25,7 @@
                             <BaseFormGroup label="Description" tooltip="Describe your collection in a couple of words">
                                 <b-form-textarea v-model="description" />
                             </BaseFormGroup>
-                            <b-button variant="primary" type="submit" class="w-100">
+                            <b-button variant="primary" :disabled="isLoadingCollection" type="submit" class="w-100">
                                 <b-spinner v-if="isLoadingCollection" small />
                                 <template v-else> {{ isCreating ? 'Create' : 'Update' }} Collection </template>
                             </b-button>

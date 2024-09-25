@@ -3,7 +3,7 @@
         v-if="!collectibleStore.collectibles.length"
         class="text-opaque h-100 align-items-center d-flex w-100 justify-content-center"
     >
-        You have no collectibles yet!
+        {{ authStore.isAuthenticated ? 'You have no collectibles yet!' : 'Log in to view your collectibles' }}
     </div>
 
     <BaseCardCollapseCollectible
@@ -12,13 +12,21 @@
         :metadata="collectible.metadata"
         :collectible="collectible"
     />
+
+    <b-button v-if="authStore.isAuthenticated" variant="dark" class="mt-3 w-100" @click="listCollectibles">
+        <b-spinner v-if="isLoading" small />
+        <template v-else>
+            Reload Collectibles
+            <BaseIcon icon="sync-alt" class="ms-1" />
+        </template>
+    </b-button>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { mapStores } from 'pinia';
-import { useAuthStore, useWalletStore, useCollectibleStore } from '@thxnetwork/wallet/stores';
+import { useAuthStore, useCollectibleStore, useWalletStore } from '@thxnetwork/wallet/stores';
 import { toast } from '@thxnetwork/wallet/utils/toast';
+import { mapStores } from 'pinia';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'ViewWalletOverview',

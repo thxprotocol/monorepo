@@ -18,7 +18,7 @@
         <BaseFormGroup label="External URL" tooltip="">
             <b-form-input v-model="externalURL" />
         </BaseFormGroup>
-        <b-button type="submit" variant="primary" class="w-100">
+        <b-button type="submit" :disabled="isDisabled" variant="primary" class="w-100">
             <b-spinner v-if="isLoading" />
             <template v-else> Create Metadata </template>
         </b-button>
@@ -50,6 +50,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useCollectionStore),
+        isDisabled() {
+            return !this.name || !this.description || !this.externalURL || this.isLoading;
+        },
     },
     methods: {
         async onSubmit() {

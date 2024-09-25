@@ -32,6 +32,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'wallet',
         beforeEnter,
         component: () => import(/* webpackChunkName: "wallet" */ '../views/Wallet.vue'),
+        redirect: { name: 'overview' },
         children: [
             {
                 name: 'overview',

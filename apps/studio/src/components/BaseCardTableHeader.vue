@@ -5,6 +5,7 @@
                 :debounce="1000"
                 :value="query"
                 :placeholder="searchPlaceholder"
+                class="mb-3"
                 @input="$emit('query', $event)"
                 @change="$emit('query-submit', $event)"
             />
@@ -24,8 +25,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import { format } from 'date-fns';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'BaseCardTableHeader',

@@ -11,7 +11,7 @@
                 <BaseFormGroup label="Redirect URL" tooltip="Should be the domain on which your wallet is active.">
                     <b-form-input v-model="redirectURL" />
                 </BaseFormGroup>
-                <b-button type="submit" variant="primary" class="w-100">
+                <b-button type="submit" :disabled="isLoading" variant="primary" class="w-100">
                     <b-spinner v-if="isLoading" small />
                     <template v-else> Create Codes </template>
                 </b-button>
