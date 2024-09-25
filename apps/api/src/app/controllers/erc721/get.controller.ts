@@ -1,7 +1,10 @@
-import { param } from 'express-validator';
-import { Request, Response } from 'express';
+import { Wallet, WalletDocument } from '@thxnetwork/api/models';
 import ERC721Service from '@thxnetwork/api/services/ERC721Service';
+import { PromiseParser } from '@thxnetwork/api/util';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
+import { WalletVariant } from '@thxnetwork/common/enums';
+import { Request, Response } from 'express';
+import { param } from 'express-validator';
 
 const validation = [param('id').isMongoId()];
 
@@ -14,10 +17,22 @@ const controller = async (req: Request, res: Response) => {
         erc721 = await ERC721Service.queryDeployTransaction(erc721);
     }
 
-    // const totalSupply = await erc721.contract.methods.totalSupply().call();
-    // const owner = await erc721.contract.methods.owner().call();
+    const wallets = await Wallet.find({
+        sub: req.auth.sub,
+        chainId: erc721.chainId,
+        variant: WalletVariant.Safe,
+        owners: { $size: 1 },
+    });
+    const minters = (
+        await PromiseParser.parse(
+            wallets.map(async (wallet: WalletDocument) => {
+                const isMinter = await ERC721Service.isMinter(erc721, wallet.address);
+                return { ...wallet.toJSON(), isMinter };
+            }),
+        )
+    ).filter((wallet: any) => wallet.isMinter);
 
-    res.json(erc721);
+    res.json({ ...erc721.toJSON(), minters });
 };
 
 export { controller, validation };

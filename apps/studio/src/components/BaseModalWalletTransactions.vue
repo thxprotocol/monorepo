@@ -1,5 +1,9 @@
 <template>
-    <b-modal :id="id" centered hide-footer size="xl" title="Transactions">
+    <b-modal :id="id" centered hide-footer size="lg" title="Transactions">
+        <b-alert v-model="isModalTransactionsShown" variant="primary">
+            <BaseIcon icon="info-circle" class="me-2" />
+            This is an overview of your wallets last 50 transactions
+        </b-alert>
         <b-table show-empty hover :items="transactions" responsive="lg">
             <template #cell(created)="{ item }">
                 <span v-b-tooltip :title="`Updated: ${item.created.updated}`" class="text-muted">
@@ -69,6 +73,7 @@ export default defineComponent({
         return {
             TransactionState,
             isLoading: false,
+            isModalTransactionsShown: true,
         };
     },
     computed: {

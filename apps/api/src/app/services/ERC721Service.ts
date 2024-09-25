@@ -5,7 +5,7 @@ import { Transaction, TransactionDocument } from '@thxnetwork/api/models/Transac
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
-import { ERC721TokenState, TransactionState } from '@thxnetwork/common/enums';
+import { ERC721TokenState, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { TransactionReceipt } from 'web3-core';
 import { toChecksumAddress } from 'web3-utils';
@@ -16,6 +16,7 @@ import { RewardNFT } from '../models/RewardNFT';
 import { Wallet, WalletDocument } from '../models/Wallet';
 import IPFSService from './IPFSService';
 import PoolService from './PoolService';
+import SafeService from './SafeService';
 import TransactionService from './TransactionService';
 import WalletService from './WalletService';
 
@@ -46,7 +47,26 @@ async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: 
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
     }
 
-    await ERC721.findByIdAndUpdate(erc721Id, { address: toChecksumAddress(receipt.contractAddress) });
+    const erc721 = await ERC721.findById(erc721Id);
+    await erc721.updateOne({ address: toChecksumAddress(receipt.contractAddress) });
+
+    // Deploy a wallet and make it a minter if none exists for this account and chain
+    const wallets = await Wallet.find({
+        sub: erc721.sub,
+        chainId: erc721.chainId,
+        variant: WalletVariant.Safe,
+        owners: { $size: 1 },
+    });
+    if (!wallets.length) {
+        const { defaultAccount } = NetworkService.getProvider(erc721.chainId);
+        const safe = await SafeService.create({
+            sub: erc721.sub,
+            chainId: erc721.chainId,
+            safeVersion: '1.3.0',
+            owners: [toChecksumAddress(defaultAccount)],
+        });
+        await addMinter(erc721, safe.address);
+    }
 }
 
 export async function queryDeployTransaction(erc721: ERC721Document): Promise<ERC721Document> {

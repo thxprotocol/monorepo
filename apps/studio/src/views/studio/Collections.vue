@@ -14,16 +14,38 @@
                     <template #head(name)>Name</template>
                     <template #head(address)>Address</template>
                     <template #head(actions)></template>
-
+                    <template #cell(chain)="{ item }">
+                        <b-img :src="item.chain.logo" width="20" alt="" />
+                    </template>
                     <template #cell(name)="{ item }">
                         <strong>{{ item.name }}</strong>
                     </template>
                     <template #cell(address)="{ item }">
-                        <b-link href="" target="_blank">
+                        <b-link :href="item.address.url" target="_blank" class="text-decoration-none">
                             <code>
-                                {{ item.address.value }}
+                                {{ item.address.short }}
+                                <BaseIcon icon="external-link-alt" />
                             </code>
                         </b-link>
+                    </template>
+                    <template #cell(minter)="{ item }">
+                        <b-link
+                            v-if="item.minter.long"
+                            :href="item.minter.url"
+                            target="_blank"
+                            class="text-decoration-none"
+                        >
+                            <code>
+                                {{ item.minter.short }}
+                                <BaseIcon icon="external-link-alt" />
+                            </code>
+                        </b-link>
+                        <b-spinner
+                            v-else
+                            v-b-tooltip
+                            small
+                            title="Deploying your multisig and asigning it a minter role for this collection."
+                        />
                     </template>
                     <template #cell(actions)="{ item }">
                         <b-dropdown no-caret size="sm" end variant="link">
@@ -56,6 +78,8 @@
 
 <script lang="ts">
 import { useAuthStore, useCollectionStore } from '@thxnetwork/studio/stores';
+import { shortenAddress } from '@thxnetwork/studio/utils/address';
+import { chainInfo } from '@thxnetwork/studio/utils/chains';
 import { toast } from '@thxnetwork/studio/utils/toast';
 import { useModal } from 'bootstrap-vue-next';
 import { mapStores } from 'pinia';
@@ -72,12 +96,27 @@ export default defineComponent({
     computed: {
         ...mapStores(useAuthStore, useCollectionStore),
         collections() {
-            return this.collectionStore.collections.map((collection) => {
+            return this.collectionStore.collections.map((collection: TERC721 & { minters: TWallet[] }) => {
                 return {
+                    chain: {
+                        logo: chainInfo[collection.chainId].logo,
+                    },
                     name: collection.name,
                     address: {
-                        value: collection.address,
-                        short: collection.address?.substring(0, 10),
+                        url: collection.address
+                            ? chainInfo[collection.chainId].blockExplorer + '/address/' + collection.address
+                            : '',
+                        long: collection.address,
+                        short: collection.address ? shortenAddress(collection.address as `0x${string}`) : '',
+                    },
+                    minter: {
+                        url: collection.minters.length
+                            ? chainInfo[collection.chainId].blockExplorer + '/address/' + collection.minters[0]?.address
+                            : '',
+                        long: collection.minters.length ? collection.minters[0]?.address : '',
+                        short: collection.minters.length
+                            ? shortenAddress(collection.minters[0]?.address as `0x${string}`)
+                            : '',
                     },
                     actions: {
                         id: collection._id,
