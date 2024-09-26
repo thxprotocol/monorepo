@@ -1,14 +1,14 @@
-import request from 'supertest';
 import app from '@thxnetwork/api/';
-import { Contract } from 'web3-eth-contract';
-import { ChainId } from '@thxnetwork/common/enums';
-import Mock from '@thxnetwork/api/util/jest/config';
-import { alchemy } from '@thxnetwork/api/util/alchemy';
-import { deployERC721, mockGetNftsForOwner } from '@thxnetwork/api/util/jest/erc721';
 import { ERC721Document, WalletDocument } from '@thxnetwork/api/models';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import TransactionService from '@thxnetwork/api/services/TransactionService';
+import { alchemy } from '@thxnetwork/api/util/alchemy';
+import Mock from '@thxnetwork/api/util/jest/config';
+import { deployERC721, mockGetNftsForOwner } from '@thxnetwork/api/util/jest/erc721';
+import { ChainId } from '@thxnetwork/common/enums';
 import { poll } from 'ethers/lib/utils';
+import request from 'supertest';
+import { Contract } from 'web3-eth-contract';
 
 const user = request.agent(app);
 
@@ -33,9 +33,9 @@ describe('ERC721 import', () => {
         });
     });
 
-    it('POST /pools/:poolId/wallets', async () => {
+    it('POST /wallets', async () => {
         await user
-            .post(`/v1/pools/${poolId}/wallets`)
+            .post(`/v1/wallets`)
             .set('Authorization', Mock.accounts[0].authHeader)
             .send({ chainId })
             .expect((res: request.Response) => {

@@ -83,7 +83,9 @@ class SafeService {
             ethAdapter,
             contractNetworks,
         });
-        const safeAddress = await safeFactory.predictSafeAddress(safeAccountConfig, saltNonce);
+        const safeAddress = saltNonce
+            ? await safeFactory.predictSafeAddress(safeAccountConfig, saltNonce)
+            : await safeFactory.predictSafeAddress(safeAccountConfig);
 
         return toChecksumAddress(safeAddress);
     }

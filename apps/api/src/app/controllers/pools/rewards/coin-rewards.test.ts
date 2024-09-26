@@ -1,14 +1,14 @@
-import request from 'supertest';
 import app from '@thxnetwork/api/';
-import Mock from '@thxnetwork/api/util/jest/config';
-import { ChainId, ERC20Type, RewardVariant } from '@thxnetwork/common/enums';
-import { isAddress } from 'web3-utils';
-import { addMinutes } from '@thxnetwork/api/util/date';
-import { createImage } from '@thxnetwork/api/util/jest/images';
 import { ERC20Document } from '@thxnetwork/api/models/ERC20';
 import { RewardCoinDocument } from '@thxnetwork/api/models/RewardCoin';
-import { poll } from 'ethers/lib/utils';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
+import { addMinutes } from '@thxnetwork/api/util/date';
+import Mock from '@thxnetwork/api/util/jest/config';
+import { createImage } from '@thxnetwork/api/util/jest/images';
+import { ChainId, ERC20Type, RewardVariant } from '@thxnetwork/common/enums';
+import { poll } from 'ethers/lib/utils';
+import request from 'supertest';
+import { isAddress } from 'web3-utils';
 
 const user = request.agent(app);
 
@@ -45,10 +45,10 @@ describe('Coin Rewards', () => {
             .expect(201, done);
     });
 
-    it('POST /pools/:poolId/wallets', async () => {
+    it('POST /wallets', async () => {
         let walletAddress;
         await user
-            .post(`/v1/pools/${poolId}/wallets`)
+            .post(`/v1/wallets`)
             .set('Authorization', Mock.accounts[0].authHeader)
             .send({
                 chainId: ChainId.Hardhat,
