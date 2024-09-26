@@ -11,7 +11,12 @@ import { toChecksumAddress } from 'web3-utils';
 const validation = [body('chainId').isInt()];
 
 const controller = async (req: Request, res: Response) => {
-    const wallet = await Wallet.findOne({ variant: WalletVariant.Safe, chainId: req.body.chainId, sub: req.auth.sub });
+    const wallet = await Wallet.findOne({
+        variant: WalletVariant.Safe,
+        chainId: req.body.chainId,
+        sub: req.auth.sub,
+        owners: { $size: 1 },
+    });
     if (wallet) throw new ForbiddenError('Wallet for this chain already exists');
 
     const { defaultAccount } = NetworkService.getProvider(req.body.chainId);

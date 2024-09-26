@@ -105,7 +105,7 @@ class SafeService {
     async findOneByPool(pool: PoolDocument, chainId: ChainId) {
         if (!pool) return;
         return await Wallet.findOne({
-            poolId: pool.id,
+            owners: { $size: 1 },
             chainId,
             sub: pool.sub,
             safeVersion,
