@@ -193,7 +193,6 @@ export async function mintCallback(args: TERC721TokenMintCallbackArgs, receipt: 
                 {
                     tokenId: Number(event.args.tokenId),
                 },
-                { new: true, upsert: true },
             );
         }
     }
