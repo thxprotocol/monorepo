@@ -36,11 +36,13 @@ export const useAccountStore = defineStore('account', {
             await this.request(`/wallets/${walletId}`, {
                 method: 'DELETE',
             });
+            this.wallets = this.wallets.filter((wallet) => wallet._id !== walletId);
         },
         async removeTransaction(transactionId: string) {
             await this.request(`/transactions/${transactionId}`, {
                 method: 'DELETE',
             });
+            await this.listWallets();
         },
     },
 });

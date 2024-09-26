@@ -90,6 +90,7 @@ import { useAccountStore } from '@thxnetwork/studio/stores';
 import { shortenAddress } from '@thxnetwork/studio/utils/address';
 import { chainInfo } from '@thxnetwork/studio/utils/chains';
 import { toast } from '@thxnetwork/studio/utils/toast';
+import { useModal } from 'bootstrap-vue-next';
 import { format } from 'date-fns';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -138,6 +139,7 @@ export default defineComponent({
             try {
                 this.isLoading = true;
                 await this.accountStore.removeWallet(wallet._id);
+                useModal(`modalWalletRemove${wallet._id}`).hide();
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;

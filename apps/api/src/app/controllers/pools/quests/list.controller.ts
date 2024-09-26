@@ -1,14 +1,14 @@
-import { param, query } from 'express-validator';
-import { Request, Response } from 'express';
 import {
+    QuestCustom,
+    QuestDaily,
+    QuestGitcoin,
     QuestInvite,
     QuestSocial,
-    QuestCustom,
     QuestWeb3,
-    QuestGitcoin,
-    QuestDaily,
     QuestWebhook,
 } from '@thxnetwork/api/models';
+import { Request, Response } from 'express';
+import { param, query } from 'express-validator';
 import { PipelineStage } from 'mongoose';
 
 const validation = [
@@ -36,7 +36,7 @@ const controller = async (req: Request, res: Response) => {
         { $unionWith: { coll: QuestInvite.collection.name } },
         { $unionWith: { coll: QuestSocial.collection.name } },
         { $unionWith: { coll: QuestCustom.collection.name } },
-        { $unionWith: { coll: QuestWeb3.collection.name } },
+        // { $unionWith: { coll: QuestWeb3.collection.name } },
         { $unionWith: { coll: QuestGitcoin.collection.name } },
         { $unionWith: { coll: QuestWebhook.collection.name } },
         { $match },

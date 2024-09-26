@@ -57,16 +57,17 @@ async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: 
         variant: WalletVariant.Safe,
         owners: { $size: 1 },
     });
+    let safe = wallets.length && wallets[0];
     if (!wallets.length) {
         const { defaultAccount } = NetworkService.getProvider(erc721.chainId);
-        const safe = await SafeService.create({
+        safe = await SafeService.create({
             sub: erc721.sub,
             chainId: erc721.chainId,
             safeVersion: '1.3.0',
             owners: [toChecksumAddress(defaultAccount)],
         });
-        await addMinter(erc721, safe.address);
     }
+    await addMinter(erc721, safe.address);
 }
 
 export async function queryDeployTransaction(erc721: ERC721Document): Promise<ERC721Document> {
