@@ -59,7 +59,7 @@
                                     entries? This action cannot be undone.
                                 </p>
                                 <p class="m-0 fw-bold">
-                                    Note that minted collectibles can not be removed and will stay with the owners.
+                                    Already minted collectibles can not be removed and will stay with the owners.
                                 </p>
                                 <template #footer>
                                     <b-button class="w-100" variant="danger" @click="onClickDelete(item.actions.id)">
