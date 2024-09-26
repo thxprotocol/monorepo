@@ -9,6 +9,7 @@ type TTransaction = {
     gas: string;
     chainId: ChainId;
     walletId: string;
+    transactionId: string;
     transactionHash: string;
     safeTxHash: string;
     callback: TTransactionCallback;

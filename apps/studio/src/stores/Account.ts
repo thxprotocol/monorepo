@@ -1,3 +1,4 @@
+import { ChainId } from '@thxnetwork/common/enums';
 import { defineStore } from 'pinia';
 import { useAuthStore } from './Auth';
 
@@ -28,6 +29,13 @@ export const useAccountStore = defineStore('account', {
                 method: 'DELETE',
             });
             this.profiles = this.profiles.filter((profile) => profile._id !== profileId);
+        },
+        async createWallet({ chainId }: { chainId: ChainId }) {
+            const wallet = await this.request('/wallets', {
+                method: 'POST',
+                body: { chainId },
+            });
+            this.wallets.push(wallet);
         },
         async listWallets() {
             this.wallets = await this.request('/wallets');

@@ -304,7 +304,6 @@ class TransactionService {
 
     async sendSafeAsync(wallet: WalletDocument, to: string | null, fn: any, callback?: TTransactionCallback) {
         const data = fn.encodeABI();
-        console.log(wallet, to, fn, callback);
         return await this.proposeSafeAsync(wallet, to, data, callback);
     }
 }

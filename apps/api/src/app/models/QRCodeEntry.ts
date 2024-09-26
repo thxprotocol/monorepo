@@ -12,6 +12,7 @@ export const QRCodeEntry = mongoose.model<QRCodeEntryDocument>(
             redirectURL: String,
             // rewardId: String
             // amount: Number,
+            transactionId: String,
             erc721Id: String,
             erc721MetadataId: String,
             claimedAt: Date,

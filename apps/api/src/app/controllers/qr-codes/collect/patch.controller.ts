@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
-import { param, query } from 'express-validator';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@thxnetwork/api/util/errors';
-import { QRCodeEntry, ERC721Metadata, Wallet } from '@thxnetwork/api/models';
+import { ERC721Metadata, QRCodeEntry, Wallet } from '@thxnetwork/api/models';
 import ERC721Service from '@thxnetwork/api/services/ERC721Service';
 import WalletService from '@thxnetwork/api/services/WalletService';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@thxnetwork/api/util/errors';
+import { Request, Response } from 'express';
+import { param, query } from 'express-validator';
 
 const validation = [param('uuid').isUUID(4), query('walletId').isMongoId()];
 
@@ -28,15 +28,18 @@ const controller = async (req: Request, res: Response) => {
     if (!safe) throw new BadRequestError('Safe not found.');
 
     // Mint the NFT
-    const token = await ERC721Service.mint(safe, erc721, wallet, metadata);
+    const tx = await ERC721Service.mint(safe, erc721, wallet, metadata);
 
     // Mark claim as claimed by setting sub
-    entry = await QRCodeEntry.findByIdAndUpdate(entry._id, { sub: req.auth.sub, claimedAt: new Date() }, { new: true });
+    entry = await QRCodeEntry.findByIdAndUpdate(
+        entry.id,
+        { sub: req.auth.sub, transactionId: tx.id, claimedAt: new Date() },
+        { new: true },
+    );
 
     return res.json({
         erc721,
         entry,
-        token,
         metadata,
     });
 };

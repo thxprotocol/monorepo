@@ -9,6 +9,7 @@ type TQRCodeEntry = {
 
     erc721: TERC721;
     metadata: TERC721Metadata;
+    transactionId: string;
 
     // amount: number;
     sub: string;

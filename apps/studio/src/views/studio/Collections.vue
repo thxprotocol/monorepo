@@ -29,6 +29,43 @@
                         </b-link>
                     </template>
                     <template #cell(minter)="{ item }">
+                        <b-button
+                            v-if="!item.collection.wallets.length"
+                            size="sm"
+                            variant="danger"
+                            class="text-white"
+                            :disabled="item.collection.isLoading"
+                            @click.stop="onClickWalletCreate(item.collection)"
+                        >
+                            <b-spinner v-if="item.collection.isLoading" small />
+                            <template v-else>
+                                Add Wallet
+                                <BaseIcon
+                                    v-b-tooltip
+                                    icon="question-circle"
+                                    class="ms-1"
+                                    title="Your collection needs a Safe multisig on this network to enable lazy minting of collectibles."
+                                />
+                            </template>
+                        </b-button>
+                        <b-button
+                            v-if="item.collection.wallets.length && !item.collection.minters.length"
+                            size="sm"
+                            variant="danger"
+                            class="text-white"
+                            :disabled="item.collection.isLoading"
+                            @click.stop="onClickMinterCreate(item.collection, item.collection.wallets[0])"
+                        >
+                            <b-spinner v-if="item.collection.isLoading" small />
+                            <template v-else>
+                                Add Minter
+                                <BaseIcon
+                                    icon="question-circle"
+                                    class="ms-1"
+                                    title="Your Safe multisig requires the minter role for this collection."
+                                />
+                            </template>
+                        </b-button>
                         <b-link
                             v-if="item.minter.long"
                             :href="item.minter.url"
@@ -40,20 +77,14 @@
                                 <BaseIcon icon="external-link-alt" />
                             </code>
                         </b-link>
-                        <b-spinner
-                            v-else
-                            v-b-tooltip
-                            small
-                            title="Deploying your multisig and asigning it a minter role for this collection."
-                        />
                     </template>
-                    <template #cell(actions)="{ item }">
+                    <template #cell(collection)="{ item }">
                         <b-dropdown no-caret size="sm" end variant="link">
                             <template #button-content>
                                 <BaseIcon icon="ellipsis-v text-light" />
                             </template>
-                            <b-dropdown-item v-b-modal="`modalRemove${item.actions.id}`"> Remove </b-dropdown-item>
-                            <b-modal :id="`modalRemove${item.actions.id}`" centered title="Remove Collection">
+                            <b-dropdown-item v-b-modal="`modalRemove${item.collection._id}`"> Remove </b-dropdown-item>
+                            <b-modal :id="`modalRemove${item.collection._id}`" centered title="Remove Collection">
                                 <p>
                                     Are you sure you want to remove this collection, all it's collectibles and QR code
                                     entries? This action cannot be undone.
@@ -62,7 +93,11 @@
                                     Already minted collectibles can not be removed and will stay with the owners.
                                 </p>
                                 <template #footer>
-                                    <b-button class="w-100" variant="danger" @click="onClickDelete(item.actions.id)">
+                                    <b-button
+                                        class="w-100"
+                                        variant="danger"
+                                        @click="onClickDelete(item.collection._id)"
+                                    >
                                         <b-spinner v-if="isLoading" small />
                                         <template v-else> Remove </template>
                                     </b-button>
@@ -77,7 +112,7 @@
 </template>
 
 <script lang="ts">
-import { useAuthStore, useCollectionStore } from '@thxnetwork/studio/stores';
+import { useAccountStore, useAuthStore, useCollectionStore } from '@thxnetwork/studio/stores';
 import { shortenAddress } from '@thxnetwork/studio/utils/address';
 import { chainInfo } from '@thxnetwork/studio/utils/chains';
 import { toast } from '@thxnetwork/studio/utils/toast';
@@ -94,7 +129,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAuthStore, useCollectionStore),
+        ...mapStores(useAuthStore, useCollectionStore, useAccountStore),
         collections() {
             return this.collectionStore.collections.map((collection: TERC721 & { minters: TWallet[] }) => {
                 return {
@@ -118,9 +153,7 @@ export default defineComponent({
                             ? shortenAddress(collection.minters[0]?.address as `0x${string}`)
                             : '',
                     },
-                    actions: {
-                        id: collection._id,
-                    },
+                    collection,
                 };
             });
         },
@@ -129,8 +162,35 @@ export default defineComponent({
         this.listCollections();
     },
     methods: {
-        rowClass(_item, type: string) {
+        rowClass(_item: any, type: string) {
             return type === 'row' ? 'cursor-pointer' : '';
+        },
+        async onClickWalletCreate(collection: TERC721) {
+            const index = this.collectionStore.collections.findIndex((c) => c._id === collection._id);
+            try {
+                this.collectionStore.collections[index].isLoading = true;
+                await this.accountStore.createWallet({ chainId: collection.chainId });
+                await this.listCollections();
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.collectionStore.collections[index].isLoading = false;
+            }
+        },
+        async onClickMinterCreate(collection: TERC721, wallet: TWallet) {
+            const index = this.collectionStore.collections.findIndex((c) => c._id === collection._id);
+            try {
+                this.collectionStore.collections[index].isLoading = true;
+                await this.collectionStore.createMinter(collection._id, wallet._id);
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.collectionStore.collections[index].isLoading = false;
+            }
         },
         async listCollections() {
             try {
@@ -157,10 +217,10 @@ export default defineComponent({
                 this.isLoading = true;
             }
         },
-        async onClickRow(data: { actions: { id: string } }) {
+        async onClickRow(data: { collection: TERC721 }) {
             try {
                 this.isLoading = true;
-                await this.$router.push(`/collections/${data.actions.id}`);
+                await this.$router.push(`/collections/${data.collection._id}`);
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;

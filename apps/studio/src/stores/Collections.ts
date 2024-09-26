@@ -46,6 +46,9 @@ export const useCollectionStore = defineStore('collection', {
         },
         async createMetadata(erc721Id: string, body: Partial<TERC721Metadata>) {
             const data = await this.request(`/erc721/${erc721Id}/metadata`, { method: 'POST', body });
+            if (!this.metadata[erc721Id]) {
+                this.metadata[erc721Id] = { total: 1, results: [] };
+            }
             this.metadata[erc721Id].results.push(data);
         },
         async removeMetadata(erc721Id: string, erc721MetadataId: string) {
@@ -53,6 +56,9 @@ export const useCollectionStore = defineStore('collection', {
             this.metadata[erc721Id].results = this.metadata[erc721Id].results.filter(
                 (metadata) => metadata._id !== erc721MetadataId,
             );
+        },
+        async createMinter(erc721Id: string, walletId: string) {
+            await this.request(`/erc721/${erc721Id}/minter`, { method: 'POST', body: { walletId: walletId } });
         },
     },
 });

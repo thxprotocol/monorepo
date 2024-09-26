@@ -23,6 +23,7 @@ const controller = async (req: Request, res: Response) => {
         variant: WalletVariant.Safe,
         owners: { $size: 1 },
     });
+
     const minters = (
         await PromiseParser.parse(
             wallets.map(async (wallet: WalletDocument) => {
@@ -32,7 +33,7 @@ const controller = async (req: Request, res: Response) => {
         )
     ).filter((wallet: any) => wallet.isMinter);
 
-    res.json({ ...erc721.toJSON(), minters });
+    res.json({ ...erc721.toJSON(), wallets, minters });
 };
 
 export { controller, validation };

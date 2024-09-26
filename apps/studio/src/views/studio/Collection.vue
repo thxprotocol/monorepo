@@ -2,7 +2,7 @@
     <b-container class="py-5 text-white">
         <h1>{{ isCreating ? 'Create' : 'Configure' }} Collection</h1>
         <p class="lead">Design your personal NFT collections</p>
-        <b-button v-if="collection.address" variant="dark" target="_blank" :href="blockExplorerURL">
+        <b-button v-if="collection && collection.address" variant="dark" target="_blank" :href="blockExplorerURL">
             Open Block Explorer URL
             <BaseIcon icon="external-link-alt ms-1" />
         </b-button>
@@ -111,11 +111,12 @@ export default defineComponent({
         },
     },
     async mounted() {
-        if (this.isCreating) return;
-
         const erc721Id = this.$route.params.id;
+        if (!erc721Id) return;
+
         await Promise.all([this.getCollection(erc721Id), this.listMetadata(erc721Id)]);
 
+        console.log(this.collection);
         this.name = this.collection.name;
         this.description = this.collection.description as string;
         this.symbol = this.collection.symbol as string;

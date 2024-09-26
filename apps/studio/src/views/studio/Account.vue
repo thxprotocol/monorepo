@@ -18,14 +18,7 @@
                         {{ accountStore.account.createdAt }}
                     </BaseFormGroup>
                 </b-card>
-                <h3 class="d-flex align-items-center">
-                    Wallets
-                    <b-button v-b-modal="'modalWalletCreate'" variant="primary" class="ms-auto">
-                        Create Wallet
-                        <BaseIcon icon="plus" class="mx-2" />
-                    </b-button>
-                    <BaseModalWalletCreate />
-                </h3>
+                <h3>Wallets</h3>
                 <b-card variant="darker" class="mb-5">
                     <b-table
                         :items="wallets"
