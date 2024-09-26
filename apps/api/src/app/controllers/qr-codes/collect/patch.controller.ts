@@ -27,18 +27,23 @@ const controller = async (req: Request, res: Response) => {
     const safe = await Wallet.findOne({ chainId: erc721.chainId, sub: entry.accountId });
     if (!safe) throw new BadRequestError('Safe not found.');
 
+    // Prepare token for user
+    const token = await ERC721Service.createToken(erc721, metadata, wallet);
     // Mint the NFT
     const tx = await ERC721Service.mint(safe, erc721, wallet, metadata);
+
+    await token.updateOne({ transactions: [tx.id] });
 
     // Mark claim as claimed by setting sub
     entry = await QRCodeEntry.findByIdAndUpdate(
         entry.id,
-        { sub: req.auth.sub, transactionId: tx.id, claimedAt: new Date() },
+        { sub: req.auth.sub, transactionId: tx.id, erc721TokenId: token.id, claimedAt: new Date() },
         { new: true },
     );
 
     return res.json({
         erc721,
+        token,
         entry,
         metadata,
     });

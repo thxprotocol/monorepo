@@ -10,8 +10,7 @@ export const QRCodeEntry = mongoose.model<QRCodeEntryDocument>(
             sub: String,
             uuid: String,
             redirectURL: String,
-            // rewardId: String
-            // amount: Number,
+            erc721TokenId: String,
             transactionId: String,
             erc721Id: String,
             erc721MetadataId: String,

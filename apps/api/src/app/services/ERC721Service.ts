@@ -132,12 +132,29 @@ export async function mint(
     );
 }
 
+export async function getTokenURI(erc721: ERC721Document, metadata: ERC721MetadataDocument) {
+    const uri = await IPFSService.getTokenURI(erc721, metadata.id);
+    return erc721.baseURL + uri;
+}
+
+export async function createToken(erc721: ERC721Document, metadata: ERC721MetadataDocument, wallet: WalletDocument) {
+    const tokenUri = await getTokenURI(erc721, metadata);
+    return await ERC721Token.create({
+        sub: wallet.sub,
+        walletId: wallet.id,
+        recipient: wallet.address,
+        chainId: erc721.chainId,
+        erc721Id: erc721.id,
+        metadataId: metadata.id,
+        tokenUri: tokenUri,
+    });
+}
+
 export async function mintCallback(args: TERC721TokenMintCallbackArgs, receipt: TransactionReceipt) {
     const metadata = await ERC721Metadata.findById(args.erc721MetadataId);
     const erc721 = await ERC721.findById(metadata.erc721Id);
-    const tokenUri = await IPFSService.getTokenURI(erc721, metadata.id);
-
     const logs = parseLogs(erc721.contract.options.jsonInterface, receipt.logs);
+
     //  Get all the ERC721 mint events Transfer(from: 0x00, to: wallet address, tokenId: exists)
     const events = logs.filter(
         (ev: any) => ev && ev.name === 'Transfer' && ev.args.from === ADDRESS_ZERO && ev.args.tokenId,
@@ -153,18 +170,31 @@ export async function mintCallback(args: TERC721TokenMintCallbackArgs, receipt: 
         });
         if (tokenExists) continue;
 
-        // Add tokent to account wallets
-        for (const wallet of await Wallet.find({ address: event.args.to })) {
-            await ERC721Token.create({
+        // Add token to account wallets
+        for (const wallet of await Wallet.find({ address: toChecksumAddress(event.args.to) })) {
+            console.log(event.args.tokenId, {
                 sub: wallet.sub,
                 walletId: wallet.id,
+                recipient: wallet.address,
                 chainId: erc721.chainId,
                 erc721Id: erc721.id,
                 metadataId: metadata.id,
-                tokenUri: erc721.baseURL + tokenUri,
-                recipient: event.args.to,
-                tokenId: Number(event.args.tokenId),
             });
+            await ERC721Token.findOneAndUpdate(
+                {
+                    sub: wallet.sub,
+                    walletId: wallet.id,
+                    recipient: wallet.address,
+                    chainId: erc721.chainId,
+                    erc721Id: erc721.id,
+                    metadataId: metadata.id,
+                    tokenId: { $exists: false },
+                },
+                {
+                    tokenId: Number(event.args.tokenId),
+                },
+                { new: true, upsert: true },
+            );
         }
     }
 }
@@ -321,6 +351,7 @@ export default {
     deleteMetadata,
     mint,
     mintCallback,
+    createToken,
     queryMintTransaction,
     findBySub,
     findMetadataByNFT,

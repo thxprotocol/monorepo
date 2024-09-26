@@ -3,12 +3,13 @@
     <hr />
     <div v-for="{ key, value, url } of details" class="d-flex justify-content-between small mb-1">
         <span class="text-opaque me-auto">{{ key }}</span>
-        <b-link v-if="url" :href="url">{{ value }}</b-link>
+        <b-link v-if="url" target="_blank" :href="url">{{ value }}</b-link>
         <span v-else>{{ value }}</span>
     </div>
 </template>
 
 <script lang="ts">
+import { chainList } from '@thxnetwork/common/chains';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
@@ -26,12 +27,18 @@ export default defineComponent({
     computed: {
         details() {
             return [
-                { key: 'Collection', value: this.collection.name || '' },
-                { key: 'Symbol', value: this.collection.symbol || '' },
-                { key: 'Chain ID', value: this.collection.chainId || '' },
                 {
-                    key: 'Address',
-                    value: this.collection.address ? `${this.collection.address.substring(0, 10)}...` : '',
+                    key: 'Collection',
+                    value: this.collection.name || '',
+                    url: chainList[this.collection.chainId].blockExplorer + '/token/' + this.collection.address,
+                },
+                {
+                    key: 'Symbol',
+                    value: this.collection.symbol || '',
+                },
+                {
+                    key: 'Chain',
+                    value: `${chainList[this.collection.chainId].name} (${this.collection.chainId})` || '',
                 },
                 {
                     key: 'External URL',

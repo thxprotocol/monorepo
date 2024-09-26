@@ -17,7 +17,7 @@ export default class WalletService {
             sub: account.sub,
             variant: { $in: [WalletVariant.Safe, WalletVariant.WalletConnect] },
             address: { $exists: true, $ne: null },
-            poolId: { $exists: false },
+            $or: [{ owners: { $size: 2 } }, { owners: { $exists: false } }],
         });
 
         return await Promise.all(
@@ -51,7 +51,10 @@ export default class WalletService {
 
     static async createSafe({ sub, chainId, address }: Partial<TWallet>) {
         // An account can have max 1 Safe per network
-        const safeWallet = await SafeService.findOne({ sub, chainId });
+        const safeWallet = await SafeService.findOne({
+            sub,
+            chainId,
+        });
         if (safeWallet) throw new Error('Already has a Safe.');
 
         // Deploy a Safe with Web3Auth address and relayer as signers

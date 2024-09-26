@@ -6,6 +6,7 @@ type TQRCodeEntry = {
     accountId: string;
     erc721Id: string;
     erc721MetadataId: string;
+    erc721TokenId: string;
 
     erc721: TERC721;
     metadata: TERC721Metadata;

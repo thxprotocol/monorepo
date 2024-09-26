@@ -14,6 +14,7 @@ export const Wallet = mongoose.model<WalletDocument>(
             chainId: Number,
             version: String,
             safeVersion: String,
+            nonce: { default: 0, type: Number },
             variant: String,
             owners: [String],
         },

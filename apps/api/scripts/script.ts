@@ -15,7 +15,7 @@ import db from '@thxnetwork/api/util/database';
 // import main from './src/web3';
 import main from './src/safe';
 
-db.connect(process.env.MONGODB_URI_DEV);
+db.connect(process.env.MONGODB_URI_PROD);
 
 main()
     .then(() => process.exit(0))

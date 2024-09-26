@@ -33,7 +33,7 @@
             v-else-if="!walletStore.wallet"
             variant="primary"
             class="w-100"
-            @click="walletStore.isModalWalletShown = true"
+            @click="walletStore.isModalWalletCreateShown = true"
         >
             Connect Wallet
         </b-button>

@@ -44,7 +44,11 @@
                     <template #cell(account)="{ item }">
                         <template v-if="item.account.id">
                             <code>{{ item.account.id }}</code>
-                            <b-link v-b-tooltip class="text-white" :title="`Created: ${item.account.createdAt}`">
+                            <b-link
+                                v-b-tooltip
+                                class="text-white"
+                                :title="`Account created: ${item.account.createdAt}`"
+                            >
                                 <BaseIcon icon="question-circle" class="ms-1" />
                             </b-link>
                         </template>

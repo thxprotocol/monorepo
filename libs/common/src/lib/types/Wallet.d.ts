@@ -16,6 +16,7 @@ type TWallet = {
     chainId?: ChainId;
     address: string;
     version: string;
+    nonce: number;
     variant: WalletVariant;
     safeVersion: string;
     uuid: string;

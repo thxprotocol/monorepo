@@ -69,7 +69,7 @@ class TransactionService {
     }
 
     /**
-     * Queries the transaction queue for confirmed transactions and executes them.
+     * Queries the transaction queue for executed transactions and runs the callback
      */
     async callbackJob() {
         const transactionsByWalletId = await this.getTransactionsByStateGroupedBySafe(TransactionState.Sent);

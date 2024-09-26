@@ -19,14 +19,8 @@
                 <BaseTabWalletVariant :variant="variant" @change="variant = $event" @next="tabIndex = 1" />
             </b-tab>
             <b-tab title="2. Settings" :disabled="!variant">
-                <BaseTabWalletWalletConnect
-                    v-if="variant === WalletVariant.WalletConnect"
-                    @close="walletStore.isModalWalletCreateShown = false"
-                />
-                <BaseTabWalletWeb3Auth
-                    v-if="variant === WalletVariant.Safe"
-                    @close="walletStore.isModalWalletCreateShown = false"
-                />
+                <BaseTabWalletWalletConnect v-if="variant === WalletVariant.WalletConnect" />
+                <BaseTabWalletWeb3Auth v-if="variant === WalletVariant.Safe" />
             </b-tab>
         </b-tabs>
     </b-modal>

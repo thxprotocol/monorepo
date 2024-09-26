@@ -146,7 +146,7 @@ export default defineComponent({
                     chainId: this.chainId,
                 });
 
-                this.walletStore.isModalWalletShown = false;
+                this.walletStore.isModalWalletCreateShown = false;
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;

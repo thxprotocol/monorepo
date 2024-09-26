@@ -85,11 +85,7 @@ export default defineComponent({
                     message: this.message,
                     signature,
                 });
-                const wallet = this.walletStore.wallets.find((wallet: TWallet) => wallet.address === this.address);
-                if (!wallet) throw new Error('New wallet not found');
-
-                this.walletStore.set(wallet);
-                this.$emit('close');
+                this.walletStore.isModalWalletCreateShown = false;
             } catch (error) {
                 console.error(error);
                 this.error = 'An issue occured while creating your wallet. Please try again.';

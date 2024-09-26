@@ -95,7 +95,11 @@ class SafeService {
     }
 
     findOne(query) {
-        return Wallet.findOne({ ...query, variant: WalletVariant.Safe, poolId: { $exists: false } });
+        return Wallet.findOne({
+            ...query,
+            variant: WalletVariant.Safe,
+            $or: [{ owners: { $size: 2 } }],
+        });
     }
 
     findOneByAddress(address: string) {
@@ -113,14 +117,19 @@ class SafeService {
     }
 
     async proposeTransaction(wallet: WalletDocument, txs: TransactionDocument[]) {
-        const safeTransactionDataPartial = txs.map((tx: TransactionDocument) => {
+        const safeTransactionDataPartial = txs.map((tx: TransactionDocument, nonce: number) => {
             return {
                 to: tx.to,
                 data: tx.data,
+                nonce,
             };
         }) as SafeTransactionDataPartial[];
         const safeTx = await this.createTransaction(wallet, safeTransactionDataPartial);
-        const nonce = safeTx.data.nonce;
+
+        // Update nonce if needed
+        const nonce = safeTx.data.nonce > wallet.nonce ? safeTx.data.nonce : wallet.nonce + 1;
+        await wallet.updateOne({ nonce });
+
         const signedTx = await this.signTransaction(wallet, safeTx);
         const apiKit = this.getApiKit(wallet);
 

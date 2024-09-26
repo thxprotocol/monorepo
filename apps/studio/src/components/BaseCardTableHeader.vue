@@ -5,7 +5,7 @@
                 :debounce="1000"
                 :value="query"
                 :placeholder="searchPlaceholder"
-                class="mb-3"
+                class="mb-3 mb-md-0"
                 @input="$emit('query', $event)"
                 @change="$emit('query-submit', $event)"
             />
