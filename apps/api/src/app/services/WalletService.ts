@@ -13,11 +13,12 @@ export default class WalletService {
 
     static async list(account: TAccount): Promise<TWallet[]> {
         // List all wallets owned by the account but filter out wallets used for the campaign
+        // these wallets have an owners array with length 1
         const wallets = await Wallet.find({
             sub: account.sub,
             variant: { $in: [WalletVariant.Safe, WalletVariant.WalletConnect] },
             address: { $exists: true, $ne: null },
-            $or: [{ owners: { $size: 2 } }, { owners: { $exists: false } }],
+            $or: [{ owners: { $size: 2 } }, { owners: { $exists: false } }, { owners: { $size: 0 } }],
         });
 
         return await Promise.all(

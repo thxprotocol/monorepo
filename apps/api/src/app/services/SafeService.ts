@@ -98,12 +98,12 @@ class SafeService {
         return Wallet.findOne({
             ...query,
             variant: WalletVariant.Safe,
-            $or: [{ owners: { $size: 2 } }],
+            $or: [{ owners: { $size: 2 } }, { owners: { $exists: false } }, { owners: { $size: 0 } }],
         });
     }
 
     findOneByAddress(address: string) {
-        return Wallet.findOne({ address: toChecksumAddress(address) });
+        return Wallet.findOne({ variant: WalletVariant.Safe, address: toChecksumAddress(address) });
     }
 
     async findOneByPool(pool: PoolDocument, chainId: ChainId) {

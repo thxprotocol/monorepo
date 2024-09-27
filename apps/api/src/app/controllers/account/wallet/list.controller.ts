@@ -1,6 +1,6 @@
+import WalletService from '@thxnetwork/api/services/WalletService';
 import { Request, Response } from 'express';
 import { query } from 'express-validator';
-import WalletService from '@thxnetwork/api/services/WalletService';
 
 const validation = [query('chainId').optional().isNumeric()];
 

@@ -184,6 +184,7 @@ export default defineComponent({
             try {
                 this.collectionStore.collections[index].isLoading = true;
                 await this.collectionStore.createMinter(collection._id, wallet._id);
+                await this.listCollections();
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;
