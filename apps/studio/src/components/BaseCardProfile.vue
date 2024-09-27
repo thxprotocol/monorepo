@@ -298,7 +298,7 @@ export default defineComponent({
         this.url = walletURL.toString();
 
         const apiURL = new URL(API_URL);
-        apiURL.pathname = `v1/wallet/${this.profile._id}.js`;
+        apiURL.pathname = `v1/wallet/js/${this.profile._id}.js`;
         this.embedCode = `&lt;script src="${apiURL.toString()}"&gt;&lt;/script&gt;`;
     },
     methods: {
