@@ -12,6 +12,7 @@ export const chainInfo: Record<
         logo: string;
         blockExplorer: string;
         safeURL: string;
+        safeTxsURL?: string;
     }
 > = {
     [ChainId.Polygon]: {
@@ -20,6 +21,7 @@ export const chainInfo: Record<
         logo: imgLogoPolygon,
         blockExplorer: 'https://polygonscan.com',
         safeURL: 'https://app.safe.global',
+        safeTxsURL: 'https://safe-transaction-polygon.safe.global',
     },
     [ChainId.Linea]: {
         chainId: ChainId.Linea,
@@ -27,6 +29,7 @@ export const chainInfo: Record<
         logo: imgLogoLinea,
         blockExplorer: 'https://lineascan.build',
         safeURL: 'https://app.safe.global',
+        safeTxsURL: 'https://safe-transaction-linea.safe.global',
     },
     [ChainId.Metis]: {
         chainId: ChainId.Metis,
@@ -34,6 +37,7 @@ export const chainInfo: Record<
         logo: imgLogoMetis,
         blockExplorer: 'https://explorer.metis.io',
         safeURL: 'https://app.safe.global',
+        safeTxsURL: 'https://safe-transaction-metis.safe.global',
     },
     [ChainId.Hardhat]: {
         chainId: ChainId.Hardhat,

@@ -4,7 +4,7 @@
             <BaseIcon icon="info-circle" class="me-2" />
             This is an overview of your wallets last 50 transactions
         </b-alert>
-        <b-table show-empty hover :items="transactions" responsive="lg">
+        <b-table show-empty hover :items="transactions" responsive="lg" :busy="isLoading">
             <template #cell(created)="{ item }">
                 <span v-b-tooltip :title="`Updated: ${item.created.updated}`" class="text-muted">
                     {{ item.created.created }}
@@ -39,6 +39,13 @@
                     <template #button-content>
                         <i class="fas fa-ellipsis-h ml-0 text-muted" />
                     </template>
+                    <b-dropdown-item :disabled="isLoading" @click="onClickRefresh(item.tx)"> Refresh </b-dropdown-item>
+                    <b-dropdown-item
+                        :disabled="[TransactionState.Mined, TransactionState.Queued].includes(item.tx.state)"
+                        @click="onClickRetry(item.tx)"
+                    >
+                        Retry
+                    </b-dropdown-item>
                     <b-dropdown-item @click="onClickDelete(item.tx)">Delete</b-dropdown-item>
                 </b-dropdown>
             </template>
@@ -90,7 +97,7 @@ export default defineComponent({
                     label: tx.safeTxHash ? tx.safeTxHash.substring(0, 10) : 'Pending',
                     url:
                         tx.safeTxHash &&
-                        `${chainInfo[this.wallet?.chainId].safeURL}/transactions/history?safe=${this.wallet?.address}`,
+                        `${chainInfo[this.wallet?.chainId].safeTxsURL}/v1/multisig-transactions/${tx.safeTxHash}`,
                 },
                 transactionHash: {
                     label: tx.transactionHash ? tx.transactionHash.substring(0, 10) : 'Pending',
@@ -107,6 +114,32 @@ export default defineComponent({
         },
     },
     methods: {
+        async onClickRefresh(tx: TTransaction) {
+            try {
+                this.isLoading = true;
+                await this.accountStore.listWallets();
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async onClickRetry(tx: TTransaction) {
+            try {
+                this.isLoading = true;
+                await this.accountStore.updateTransaction(tx._id, {
+                    state: TransactionState.Queued,
+                });
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
+        },
         async onClickDelete(tx: TTransaction) {
             try {
                 this.isLoading = true;

@@ -46,6 +46,13 @@ export const useAccountStore = defineStore('account', {
             });
             this.wallets = this.wallets.filter((wallet) => wallet._id !== walletId);
         },
+        async updateTransaction(transactionId: string, body: Partial<TTransaction>) {
+            await this.request(`/transactions/${transactionId}`, {
+                method: 'PATCH',
+                body,
+            });
+            await this.listWallets();
+        },
         async removeTransaction(transactionId: string) {
             await this.request(`/transactions/${transactionId}`, {
                 method: 'DELETE',

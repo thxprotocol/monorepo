@@ -12,7 +12,9 @@ const controller = async (req: Request, res: Response) => {
     const wallet = await Wallet.findById(tx.walletId);
     if (wallet.sub !== req.auth.sub) throw new ForbiddenError('Transaction not owned by sub.');
 
-    res.json(tx);
+    await tx.deleteOne();
+
+    res.status(204).end();
 };
 
 export default { controller, validation };
