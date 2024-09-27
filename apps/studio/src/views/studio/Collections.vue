@@ -10,7 +10,14 @@
     <div class="bg-dark text-white py-5 flex-grow-1">
         <b-container>
             <b-card variant="darker">
-                <b-table :items="collections" responsive="lg" :tbody-tr-class="rowClass" @row-clicked="onClickRow">
+                <b-table
+                    responsive="lg"
+                    show-empty
+                    :items="collections"
+                    :tbody-tr-class="rowClass"
+                    :busy="isLoading"
+                    @row-clicked="onClickRow"
+                >
                     <template #head(name)>Name</template>
                     <template #head(address)>Address</template>
                     <template #head(actions)></template>
