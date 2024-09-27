@@ -30,6 +30,10 @@ export const corsHandler = cors(async (req: any, callback: any) => {
         'https://dev-studio.thx.network',
         'https://wallet.thx.network',
         'https://dev-wallet.thx.network',
+        'https://app.twinstory.io',
+        'https://dev-app.twinstory.io',
+        'https://admin.twinstory.io',
+        'https://dev-admin.twinstory.io',
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {
