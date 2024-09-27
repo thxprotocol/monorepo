@@ -2,6 +2,7 @@ import { ERC721Metadata, QRCodeEntry, Wallet } from '@thxnetwork/api/models';
 import ERC721Service from '@thxnetwork/api/services/ERC721Service';
 import WalletService from '@thxnetwork/api/services/WalletService';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@thxnetwork/api/util/errors';
+import { WalletVariant } from '@thxnetwork/common/enums';
 import { Request, Response } from 'express';
 import { param, query } from 'express-validator';
 
@@ -24,7 +25,12 @@ const controller = async (req: Request, res: Response) => {
     if (!erc721) throw new NotFoundError('ERC721 not found');
 
     // Get the pool Safe for the token network
-    const safe = await Wallet.findOne({ chainId: erc721.chainId, sub: entry.accountId });
+    const safe = await Wallet.findOne({
+        chainId: erc721.chainId,
+        sub: entry.accountId,
+        variant: WalletVariant.Safe,
+        owners: { $size: 1 },
+    });
     if (!safe) throw new BadRequestError('Safe not found.');
 
     // Prepare token for user
