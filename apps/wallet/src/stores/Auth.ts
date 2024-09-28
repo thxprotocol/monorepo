@@ -80,6 +80,14 @@ export const useAuthStore = defineStore('auth', {
             this.session = null;
             router.push({ name: 'wallet' });
         },
+        onMessage(event: MessageEvent) {
+            const { message, session } = event.data;
+            switch (message) {
+                case 'tws.auth.callback':
+                    this.onSignedIn(session);
+                    break;
+            }
+        },
         async signInWithOtp({ email }: { email: string }) {
             const { error } = await supabase.auth.signInWithOtp({
                 email,

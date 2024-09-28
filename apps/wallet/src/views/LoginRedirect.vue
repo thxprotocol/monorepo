@@ -20,9 +20,9 @@
     </div>
 </template>
 <script lang="ts">
+import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { supabase, useAuthStore } from '../stores/Auth';
-import { mapStores } from 'pinia';
 
 export default defineComponent({
     name: 'ViewSigninRedirect',
@@ -52,7 +52,7 @@ export default defineComponent({
             const { data, error } = await supabase.auth.getSession();
             if (error) throw new Error(error.message);
 
-            window.opener.postMessage({ message: 'thx.auth.callback', session: data.session });
+            window.opener.postMessage({ message: 'tws.auth.callback', session: data.session });
         }
     },
     methods: {

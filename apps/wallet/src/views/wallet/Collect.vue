@@ -132,6 +132,8 @@ export default defineComponent({
             this.isLoadingEntry = true;
 
             await this.entryStore.get(uuid);
+
+            this.accountStore.postMessage({ message: 'tws.iframe.toggle' });
         } catch (error: any) {
             console.dir(error);
             toast(error.message, 'light', 3000, () => {

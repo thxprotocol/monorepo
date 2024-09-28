@@ -11,6 +11,7 @@ const controller = async (req: Request, res: Response) => {
     if (!profile) throw new NotFoundError('Profile not found.');
     if (!profile.isPublished) return res.end();
 
+    const walletURL = WALLET_URL;
     const iframeSrc = `${WALLET_URL}/${req.params.id}`;
     const cssUrl = `${API_URL}/v1/wallet/css/${req.params.id}.css`;
     const icon = profile.iconImg || '';
@@ -19,10 +20,36 @@ const controller = async (req: Request, res: Response) => {
     const body = `
         (function() {
             const MESSAGE = '${message}';
+            const WALLET_URL = '${walletURL}';
             const ICON_IMG = '${icon}';
             const CSS_URL = '${cssUrl}';
             const iframeSrc = new URL('${iframeSrc}');
             
+            function onMessage(event) {
+                if (event.origin !== WALLET_URL) return;
+                const { message, url } = event.data;
+                switch (message) {
+                    case 'tws.iframe.login':
+                        window.open(url, '_blank');
+                        break;
+                    case 'tws.iframe.toggle':
+                        const iframe = document.getElementById('wallet-widget-iframe');
+                        toggle(iframe)
+                        break;
+                }
+            }
+
+            function toggle(iframe) {
+                const isMobile = window.innerWidth < 1024;
+                if (isMobile) {
+                    window.open(iframeSrc, '_blank');
+                } else {
+                    const {opacity, transform} = iframe.style;
+                    iframe.style.opacity = opacity === '1' ? '0' : '1'; 
+                    iframe.style.transform = transform === 'scale(1)' ? 'scale(0)' : 'scale(1)';
+                }
+            }
+    
             // Link the stylesheet
             const stylesheet = document.createElement('link');
             stylesheet.rel = 'stylesheet';
@@ -31,10 +58,10 @@ const controller = async (req: Request, res: Response) => {
             stylesheet.media = 'all';
             document.head.appendChild(stylesheet);
 
-
             // Check if there is a forced app path 
             const parentUrl = new URL(window.location.href)
             const path = parentUrl.searchParams.get('thx_widget_path');
+
             if (path) {
                 iframeSrc.pathname += \`/c/\${path}\`;
             }
@@ -58,6 +85,9 @@ const controller = async (req: Request, res: Response) => {
                 const launcher = document.getElementById('wallet-widget-launcher');
                 const iframe = document.getElementById('wallet-widget-iframe');
                 
+                // Add listener for message from iframe
+                window.onmessage = onMessage;    
+
                 // Set message content or remove if none
                 message.innerHTML = MESSAGE;
                 if (!MESSAGE) message.remove();
@@ -72,14 +102,8 @@ const controller = async (req: Request, res: Response) => {
 
                 // Add click event to launcher
                 launcher.addEventListener('click', () => {
-                    const isMobile = window.innerWidth < 1024;
-                    if (isMobile) {
-                        window.open(iframeSrc, '_blank');
-                    } else {
-                        const {opacity, transform} = iframe.style;
-                        iframe.style.opacity = opacity === '1' ? '0' : '1'; 
-                        iframe.style.transform = transform === 'scale(1)' ? 'scale(0)' : 'scale(1)';
-                    }
+                    message.remove();
+                    toggle(iframe);
                 });
 
                 // Add click event to launcher

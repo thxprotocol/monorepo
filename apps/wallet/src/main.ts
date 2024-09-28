@@ -1,11 +1,12 @@
 import { BootstrapVueNext, vBTooltip } from 'bootstrap-vue-next';
-import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import App from './App.vue';
-import Vue3Toastify from 'vue3-toastify';
+import { createApp } from 'vue';
 import VueClipboard from 'vue3-clipboard';
+import Vue3Toastify from 'vue3-toastify';
+import App from './App.vue';
 import router from './router';
 import './scss/main.scss';
+import { useAuthStore } from './stores';
 
 const pinia = createPinia();
 const app = createApp(App);
@@ -20,4 +21,5 @@ app.use(VueClipboard, { autoSetContainer: true, appendToBody: true });
 app.config.warnHandler = () => {
     //
 };
+window.onmessage = useAuthStore().onMessage;
 app.mount('#app');
