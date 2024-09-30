@@ -14,6 +14,7 @@ import { getArtifact } from '../hardhat';
 import { QRCodeEntry } from '../models';
 import { RewardNFT } from '../models/RewardNFT';
 import { Wallet, WalletDocument } from '../models/Wallet';
+import { PromiseParser } from '../util';
 import { logger } from '../util/logger';
 import IPFSService from './IPFSService';
 import PoolService from './PoolService';
@@ -93,6 +94,25 @@ export async function findById(id: string): Promise<ERC721Document> {
     if (!erc721) return;
     erc721.logoImgUrl = erc721.logoImgUrl || `https://api.dicebear.com/7.x/identicon/svg?seed=${erc721.address}`;
     return erc721;
+}
+
+export async function getMinters(erc721: ERC721Document, sub: string) {
+    const wallets = await Wallet.find({
+        sub,
+        chainId: erc721.chainId,
+        variant: WalletVariant.Safe,
+        owners: { $size: 1 },
+    });
+
+    const minters = (
+        await PromiseParser.parse(
+            wallets.map(async (wallet: WalletDocument) => {
+                return { ...wallet.toJSON(), isMinter: await isMinter(erc721, wallet.address) };
+            }),
+        )
+    ).filter((wallet: any) => wallet.isMinter);
+
+    return { wallets, minters };
 }
 
 export async function findBySub(sub: string): Promise<ERC721Document[]> {
@@ -356,6 +376,7 @@ export default {
     findMetadataByNFT,
     findTokensByRecipient,
     addMinter,
+    getMinters,
     isMinter,
     parseAttributes,
     queryDeployTransaction,

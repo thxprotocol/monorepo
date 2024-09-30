@@ -54,6 +54,7 @@ export default defineComponent({
         collection: {
             handler(collection) {
                 if (!collection) return;
+
                 this.name = collection.name;
                 this.description = collection.description as string;
                 this.symbol = collection.symbol as string;
@@ -67,16 +68,20 @@ export default defineComponent({
         async onSubmit() {
             try {
                 this.isLoadingCollection = true;
-                await this.collectionStore[this.isDisabled ? 'create' : 'update']({
+                await this.collectionStore[!this.isDisabled ? 'create' : 'update']({
                     _id: this.collection && this.collection._id,
                     name: this.name,
                     chainId: this.chainId,
                     symbol: this.symbol,
                     description: this.description,
                 });
-                this.$router.push(
-                    `/collections/${this.collectionStore.collections[this.collectionStore.collections.length - 1]._id}`,
-                );
+                if (!this.collection) {
+                    this.$router.push(
+                        `/collections/${
+                            this.collectionStore.collections[this.collectionStore.collections.length - 1]._id
+                        }`,
+                    );
+                }
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;

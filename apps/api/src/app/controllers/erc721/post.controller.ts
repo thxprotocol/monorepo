@@ -1,10 +1,10 @@
 import { API_URL, IPFS_BASE_URL, VERSION } from '@thxnetwork/api/config/secrets';
-import { Request, Response } from 'express';
-import { body, check, query } from 'express-validator';
+import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
 import ERC721Service from '@thxnetwork/api/services/ERC721Service';
 import ImageService from '@thxnetwork/api/services/ImageService';
 import { AccountPlanType, NFTVariant } from '@thxnetwork/common/enums';
-import AccountProxy from '@thxnetwork/api/proxies/AccountProxy';
+import { Request, Response } from 'express';
+import { body, check, query } from 'express-validator';
 
 const validation = [
     body('name').exists().isString(),
@@ -37,8 +37,9 @@ const controller = async (req: Request, res: Response) => {
         },
         forceSync,
     );
+    const { wallets, minters } = await ERC721Service.getMinters(erc721, req.auth.sub);
 
-    res.status(201).json(erc721);
+    res.status(201).json({ ...erc721.toJSON(), wallets, minters });
 };
 
 export { controller, validation };

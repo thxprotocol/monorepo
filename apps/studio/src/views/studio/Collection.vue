@@ -12,10 +12,16 @@
             <b-alert v-model="isAlertWalletCreateShown" variant="warning" class="mb-3">
                 <BaseIcon icon="exclamation-circle" class="me-2" />
                 Please create a Safe multisig on this network to enable lazy minting.
+                <b-link to="/" class="float-end text-decoration-none">
+                    Go to overview <BaseIcon icon="chevron-right" class="ms-1" />
+                </b-link>
             </b-alert>
             <b-alert v-model="isAlertMinterCreateShown" variant="warning" class="mb-3">
                 <BaseIcon icon="exclamation-circle" class="me-2" />
                 Please assign a Minter Role to the wallet to allow the wallet to mint collectibles.
+                <b-link to="/" class="float-end text-decoration-none">
+                    Go to overview <BaseIcon icon="chevron-right" class="ms-1" />
+                </b-link>
             </b-alert>
             <h2 class="my-3">Details</h2>
             <b-card class="mb-5">
@@ -23,20 +29,20 @@
             </b-card>
             <h2 v-if="collection" class="my-3 d-flex">
                 Collectibles
-                <b-button v-b-modal="`modalCollectibleCreate${collection._id}`" variant="primary" class="ms-auto">
+                <b-button v-b-modal="'modalCollectibleCreate'" variant="primary" class="ms-auto">
                     Create Collectible
                     <BaseIcon icon="plus" class="ms-1" />
                 </b-button>
-                <BaseModalColectibleCreate :id="`modalCollectibleCreate${collection._id}`" :collection="collection" />
+                <BaseModalCollectibleCreate
+                    :id="'modalCollectibleCreate'"
+                    :collection="collection"
+                    @hidden="listMetadata(collection._id)"
+                />
             </h2>
-            <b-row v-if="isLoading && !metadataList.length">
-                <b-col v-for="val in [1]" md="3">
-                    <b-placeholder-card :key="val" no-header :img-height="200" />
-                </b-col>
-            </b-row>
+            <b-spinner v-if="isLoading && !metadataList.length" small />
             <b-row v-else>
                 <b-col v-for="metadata in metadataList" md="3">
-                    <BaseCardCollectionMetadata :collection="collection" :metadata="metadata" />
+                    <BaseCardCollectible :collection="collection" :metadata="metadata" />
                 </b-col>
             </b-row>
         </b-container>
@@ -47,17 +53,13 @@
 import { ChainId } from '@thxnetwork/common/enums';
 import { useAuthStore, useCollectionStore, useEntryStore } from '@thxnetwork/studio/stores';
 import { toast } from '@thxnetwork/studio/utils/toast';
+import { useModal } from 'bootstrap-vue-next';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-
 export default defineComponent({
     name: 'NFT',
     data() {
-        return {
-            isLoading: false,
-            page: 1,
-            limit: 10,
-        };
+        return { useModal, isLoading: false, page: 1, limit: 10 };
     },
     computed: {
         ...mapStores(useAuthStore, useCollectionStore, useEntryStore),

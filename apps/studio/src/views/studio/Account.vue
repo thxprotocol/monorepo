@@ -8,14 +8,14 @@
             <b-container>
                 <h3>Personal</h3>
                 <b-card variant="darker" class="mb-5">
-                    <BaseFormGroup label="E-mail">
+                    <BaseFormGroup v-if="accountStore.account.email" label="E-mail">
                         {{ accountStore.account.email }}
                     </BaseFormGroup>
                     <BaseFormGroup label="Account ID">
                         {{ accountStore.account.sub }}
                     </BaseFormGroup>
                     <BaseFormGroup label="Created">
-                        {{ accountStore.account.createdAt }}
+                        {{ format(new Date(accountStore.account.createdAt), 'yyyy-MM-dd HH:mm') }}
                     </BaseFormGroup>
                 </b-card>
                 <h3>Wallets</h3>
@@ -29,11 +29,16 @@
 
 <script lang="ts">
 import { useAccountStore } from '@thxnetwork/studio/stores';
+import { format } from 'date-fns';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-
 export default defineComponent({
     name: 'Account',
+    data() {
+        return {
+            format,
+        };
+    },
     computed: {
         ...mapStores(useAccountStore),
     },

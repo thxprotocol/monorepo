@@ -1,9 +1,9 @@
 <template>
     <b-modal
         v-model="authStore.isModalLoginShown"
-        hide-footer
         centered
         title="Login to continue"
+        footer-class="justify-content-center text-opaque"
         hide-header-close
         title-class="d-flex align-items-center justify-content-between w-100"
     >
@@ -70,7 +70,7 @@
 
         <BaseHrOrSeparator />
         <BaseFormGroup label="Use a trusted provider" label-class="text-opaque">
-            <div class="d-flex justify-content-between w-100 gap-2">
+            <div class="d-flex w-100 gap-3">
                 <b-button
                     v-for="provider of providers"
                     variant="primary"
@@ -83,6 +83,30 @@
                 </b-button>
             </div>
         </BaseFormGroup>
+
+        <template #footer>
+            <b-link
+                class="ms-3 text-decoration-none text-opaque text-white"
+                href="https://twinstory.io/support"
+                target="_blank"
+            >
+                Help
+            </b-link>
+            <b-link
+                class="ms-3 text-decoration-none text-opaque text-white"
+                href="https://thx.network/privacy-policy.pdf"
+                target="_blank"
+            >
+                Privacy
+            </b-link>
+            <b-link
+                class="ms-3 text-decoration-none text-opaque text-white"
+                href="https://thx.network/general-terms-and-conditions.pdf"
+                target="_blank"
+            >
+                Terms
+            </b-link>
+        </template>
     </b-modal>
 </template>
 

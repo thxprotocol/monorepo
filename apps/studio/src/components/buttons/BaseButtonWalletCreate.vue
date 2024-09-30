@@ -1,13 +1,16 @@
 <template>
-    <b-button size="sm" variant="danger" class="text-white" :disabled="isLoading" @click.stop="onClickWalletCreate">
+    <b-button
+        v-b-tooltip
+        title="Your collection needs a Safe multisig on this network to enable lazy minting of collectibles."
+        size="sm"
+        variant="danger"
+        class="text-white"
+        :disabled="isLoading"
+        @click.stop="onClickWalletCreate"
+    >
         <b-spinner v-if="isLoading" small />
         <template v-else>
-            <BaseIcon
-                v-b-tooltip
-                icon="exclamation-circle"
-                class="me-1"
-                title="Your collection needs a Safe multisig on this network to enable lazy minting of collectibles."
-            />
+            <BaseIcon icon="exclamation-circle" class="me-1" />
             Add Wallet
         </template>
     </b-button>

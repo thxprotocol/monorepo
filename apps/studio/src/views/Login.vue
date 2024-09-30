@@ -64,14 +64,14 @@
                                 </b-link>
                                 <b-link
                                     class="ms-3 text-decoration-none text-opaque text-white"
-                                    href="https://twinstory.io/privacy-policy.pdf"
+                                    href="https://thx.network/privacy-policy.pdf"
                                     target="_blank"
                                 >
                                     Privacy
                                 </b-link>
                                 <b-link
                                     class="ms-3 text-decoration-none text-opaque text-white"
-                                    href="https://twinstory.io/general-terms-and-conditions.pdf"
+                                    href="https://thx.network/general-terms-and-conditions.pdf"
                                     target="_blank"
                                 >
                                     Terms
@@ -93,11 +93,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import imgLogo from '@thxnetwork/studio/assets/logo.jpg';
 import { AccessTokenKind, AccountVariant } from '@thxnetwork/common/enums';
+import imgLogo from '@thxnetwork/studio/assets/logo.jpg';
 import { useAuthStore } from '@thxnetwork/studio/stores/Auth';
 import { mapStores } from 'pinia';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'Login',

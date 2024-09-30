@@ -5,18 +5,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
 import { useModal } from 'bootstrap-vue-next';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
-    name: 'Collection',
+    name: 'BaseModalCollectibleCreate',
     props: {
-        collection: { type: Object as PropType<TERC721>, required: true },
         id: String,
+        collection: { type: Object as PropType<TERC721>, required: true },
     },
     methods: {
         onSubmit() {
             useModal(this.id).hide();
+            this.$emit('hidden');
         },
     },
 });

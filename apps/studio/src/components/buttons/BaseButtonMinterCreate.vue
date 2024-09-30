@@ -1,12 +1,16 @@
 <template>
-    <b-button size="sm" variant="danger" class="text-white" :disabled="isLoading" @click.stop="onClickMinterCreate">
+    <b-button
+        v-b-tooltip
+        title="Your Safe multisig requires the minter role for this collection."
+        size="sm"
+        variant="danger"
+        class="text-white"
+        :disabled="isLoading"
+        @click.stop="onClickMinterCreate"
+    >
         <b-spinner v-if="isLoading" small />
         <template v-else>
-            <BaseIcon
-                icon="exclamation-circle"
-                class="me-1"
-                title="Your Safe multisig requires the minter role for this collection."
-            />
+            <BaseIcon icon="exclamation-circle" class="me-1" />
             Assign Minter Role
         </template>
     </b-button>

@@ -146,7 +146,7 @@ export default defineComponent({
                     return;
                 });
             } finally {
-                this.isLoading = true;
+                this.isLoading = false;
             }
         },
         async onClickRow(item: any, _index: number, _event: MouseEvent) {

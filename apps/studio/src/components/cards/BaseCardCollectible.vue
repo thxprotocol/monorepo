@@ -29,10 +29,18 @@
             >
                 <BaseFormCollectionMetadataQRCodes :collection="collection" :metadata="metadata" />
             </b-modal>
-            <b-button variant="link" class="text-danger w-100 text-decoration-none" @click="isModalRemoveShown = true">
+            <b-button
+                v-b-modal="`modalRemoveCollectible${metadata._id}`"
+                variant="link"
+                class="text-danger w-100 text-decoration-none"
+            >
                 Remove
             </b-button>
-            <BaseModalDelete title="Remove Collectible" @delete="onClickRemove">
+            <BaseModalDelete
+                :id="`modalRemoveCollectible${metadata._id}`"
+                title="Remove Collectible"
+                @delete="onClickRemove"
+            >
                 <p class="m-0">
                     Are you sure you want to remove this collectible and all it's QR code entries? This action cannot be
                     undone. Note that minted collectibles can not be removed!
