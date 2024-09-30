@@ -22,8 +22,19 @@ export const useAuthStore = defineStore('auth', {
     state: () => ({
         session: null as null | Session,
     }),
+    getters: {
+        isAuthenticated(state) {
+            return !!state.session && state.session.expires_in > 0;
+        },
+    },
     actions: {
         async request(path: string, options?: TRequestOptions) {
+            // Return if not authenticated
+            if (!this.isAuthenticated) {
+                await router.push({ name: 'login' });
+                return;
+            }
+
             const url = new URL(API_URL);
             url.pathname = `/v1${path}`;
             if (options?.params) {

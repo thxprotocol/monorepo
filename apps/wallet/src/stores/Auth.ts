@@ -32,7 +32,9 @@ export const useAuthStore = defineStore('auth', {
     actions: {
         async request(path: string, options?: TRequestOptions) {
             // Return if not authenticated
-            if (!this.isAuthenticated && options?.isAuthenticated) return;
+            if (!this.isAuthenticated && options?.isAuthenticated) {
+                throw new Error('Login required!');
+            }
 
             // Create URL and append params
             const url = new URL(API_URL);

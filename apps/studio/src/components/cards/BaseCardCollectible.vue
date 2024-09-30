@@ -53,7 +53,7 @@ import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
-    name: 'BaseCardTableHeader',
+    name: 'BaseCardCollectible',
     props: {
         collection: {
             type: Object as PropType<TERC721>,

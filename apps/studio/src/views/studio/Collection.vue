@@ -1,7 +1,7 @@
 <template>
     <b-container class="py-5 text-white">
         <h1>{{ collection ? collection.name : 'New Collection' }}</h1>
-        <p class="lead">Design your personal NFT collections</p>
+        <p class="lead">{{ collection ? collection.description : 'Design your personal NFT collections' }}</p>
         <b-button v-if="collection && collection.address" variant="dark" target="_blank" :href="blockExplorerURL">
             Open Block Explorer URL
             <BaseIcon icon="external-link-alt ms-1" />
@@ -17,11 +17,11 @@
                 <BaseIcon icon="exclamation-circle" class="me-2" />
                 Please assign a Minter Role to the wallet to allow the wallet to mint collectibles.
             </b-alert>
-            <h2>Details</h2>
+            <h2 class="my-3">Details</h2>
             <b-card class="mb-5">
                 <BaseFormCollection :collection="collection" />
             </b-card>
-            <h2 class="my-3 d-flex">
+            <h2 v-if="collection" class="my-3 d-flex">
                 Collectibles
                 <b-button v-b-modal="`modalCollectibleCreate${collection._id}`" variant="primary" class="ms-auto">
                     Create Collectible
@@ -62,10 +62,10 @@ export default defineComponent({
     computed: {
         ...mapStores(useAuthStore, useCollectionStore, useEntryStore),
         isAlertWalletCreateShown() {
-            return !this.collection.wallets.length;
+            return this.collection && !this.collection.wallets.length;
         },
         isAlertMinterCreateShown() {
-            return this.collection.wallets.length && !this.collection.minters.length;
+            return this.collection && this.collection.wallets.length && !this.collection.minters.length;
         },
         blockExplorerURL() {
             if (!this.collection) return '';

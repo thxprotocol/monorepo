@@ -50,12 +50,18 @@ export default defineComponent({
             return !!this.collection;
         },
     },
-    async mounted() {
-        this.name = this.collection.name;
-        this.description = this.collection.description as string;
-        this.symbol = this.collection.symbol as string;
-        this.address = this.collection.address as string;
-        this.chainId = this.collection.chainId as ChainId;
+    watch: {
+        collection: {
+            handler(collection) {
+                if (!collection) return;
+                this.name = collection.name;
+                this.description = collection.description as string;
+                this.symbol = collection.symbol as string;
+                this.address = collection.address as string;
+                this.chainId = collection.chainId as ChainId;
+            },
+            immediate: true,
+        },
     },
     methods: {
         async onSubmit() {

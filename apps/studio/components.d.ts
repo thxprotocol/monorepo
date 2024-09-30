@@ -10,6 +10,7 @@ declare module 'vue' {
     BAlert: typeof import('bootstrap-vue-next')['BAlert']
     BaseButtonMinterCreate: typeof import('./src/components/buttons/BaseButtonMinterCreate.vue')['default']
     BaseButtonWalletCreate: typeof import('./src/components/buttons/BaseButtonWalletCreate.vue')['default']
+    BaseCardCollectible: typeof import('./src/components/cards/BaseCardCollectible.vue')['default']
     BaseCardCollectionMetadata: typeof import('./src/components/cards/BaseCardCollectionMetadata.vue')['default']
     BaseCardProfile: typeof import('./src/components/cards/BaseCardProfile.vue')['default']
     BaseCardTableHeader: typeof import('./src/components/cards/BaseCardTableHeader.vue')['default']

@@ -63,7 +63,7 @@ const controller = async (req: Request, res: Response) => {
             const path = parentUrl.searchParams.get('thx_widget_path');
 
             if (path) {
-                iframeSrc.pathname += \`/c/\${path}\`;
+                iframeSrc.pathname += path;
             }
 
             // Add the HTML template
