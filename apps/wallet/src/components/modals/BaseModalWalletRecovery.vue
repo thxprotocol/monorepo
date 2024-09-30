@@ -54,6 +54,7 @@
 
 <script lang="ts">
 import { useAccountStore, useWalletStore, useWeb3AuthStore } from '@thxnetwork/wallet/stores';
+import { toast } from '@thxnetwork/wallet/utils/toast';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 
@@ -89,8 +90,11 @@ export default defineComponent({
                 await this.web3authStore.recoverDeviceShare(this.passwordRecovery);
                 this.passwordRecovery = '';
                 this.web3authStore.isModalWalletRecoveryShown = false;
-            } catch (error) {
-                this.error = (error as Error).message;
+            } catch (error: any) {
+                console.error(error);
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
                 this.isFailedRecovery = true;
             } finally {
                 this.isLoadingPasswordRecovery = false;

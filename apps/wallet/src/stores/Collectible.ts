@@ -16,7 +16,10 @@ export const useCollectibleStore = defineStore('collectible', {
                 isAuthenticated: true,
                 params: { walletId: wallet?._id, chainId },
             });
-            this.collectibles = collectibles.filter((c: TERC721Token) => c.nft && c.metadata);
+            this.collectibles =
+                collectibles && collectibles.length
+                    ? collectibles.filter((c: TERC721Token) => c.nft && c.metadata)
+                    : [];
         },
     },
 });

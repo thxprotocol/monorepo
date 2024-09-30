@@ -47,7 +47,9 @@
             <b-spinner v-if="isLoading" small />
             <template v-else-if="isCollected">Already collected!</template>
             <template v-else-if="isRemoved">Not found</template>
-            <template v-else> Collect </template>
+            <template v-else>
+                Collect with <strong>{{ shortenAddress(walletStore.wallet.address) }}</strong>
+            </template>
         </b-button>
 
         <b-button
@@ -100,6 +102,7 @@
 
 <script lang="ts">
 import { useAccountStore, useAuthStore, useEntryStore, useWalletStore } from '@thxnetwork/wallet/stores';
+import { shortenAddress } from '@thxnetwork/wallet/utils/address';
 import { toast } from '@thxnetwork/wallet/utils/toast';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -113,6 +116,7 @@ export default defineComponent({
             isCopiedAccountID: false,
             isCopiedUUID: false,
             isSupportShown: false,
+            shortenAddress,
         };
     },
     computed: {

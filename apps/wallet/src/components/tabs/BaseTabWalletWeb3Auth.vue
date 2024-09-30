@@ -148,6 +148,7 @@ export default defineComponent({
 
                 this.walletStore.isModalWalletCreateShown = false;
             } catch (error: any) {
+                console.error(error);
                 toast(error.message, 'light', 3000, () => {
                     return;
                 });

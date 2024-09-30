@@ -17,12 +17,12 @@
 </template>
 
 <script lang="ts">
+import { useAccountStore } from '@thxnetwork/studio/stores';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-import { useAccountStore } from '@thxnetwork/studio/stores';
 
 export default defineComponent({
-    name: 'Account',
+    name: 'Settings',
     data() {
         return { domain: '', theme: '' };
     },
@@ -31,8 +31,7 @@ export default defineComponent({
     },
     async mounted() {
         await this.accountStore.get();
-        await this.accountStore.getProfiles();
+        this.accountStore.getProfiles();
     },
-    methods: {},
 });
 </script>

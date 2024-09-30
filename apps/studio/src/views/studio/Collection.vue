@@ -1,6 +1,6 @@
 <template>
     <b-container class="py-5 text-white">
-        <h1>{{ isCreating ? 'Create' : 'Configure' }} Collection</h1>
+        <h1>{{ collection ? collection.name : 'New Collection' }}</h1>
         <p class="lead">Design your personal NFT collections</p>
         <b-button v-if="collection && collection.address" variant="dark" target="_blank" :href="blockExplorerURL">
             Open Block Explorer URL
@@ -9,46 +9,25 @@
     </b-container>
     <div class="bg-dark text-white py-5 flex-grow-1">
         <b-container>
+            <b-alert v-model="isAlertWalletCreateShown" variant="warning" class="mb-3">
+                <BaseIcon icon="exclamation-circle" class="me-2" />
+                Please create a Safe multisig on this network to enable lazy minting.
+            </b-alert>
+            <b-alert v-model="isAlertMinterCreateShown" variant="warning" class="mb-3">
+                <BaseIcon icon="exclamation-circle" class="me-2" />
+                Please assign a Minter Role to the wallet to allow the wallet to mint collectibles.
+            </b-alert>
             <h2>Details</h2>
             <b-card class="mb-5">
-                <b-form @submit="onSubmit">
-                    <b-row>
-                        <b-col md="6">
-                            <BaseFormGroup label="Name" tooltip="This name is used to describe your collection">
-                                <b-form-input v-model="name" :disabled="!isCreating" />
-                            </BaseFormGroup>
-                            <BaseFormGroup label="Symbol" tooltip="ERC721 collections require a symbol like ABC.">
-                                <b-form-input v-model="symbol" :disabled="!isCreating" />
-                            </BaseFormGroup>
-                        </b-col>
-                        <b-col md="6">
-                            <BaseFormGroup label="Description" tooltip="Describe your collection in a couple of words">
-                                <b-form-textarea v-model="description" />
-                            </BaseFormGroup>
-                            <b-button variant="primary" :disabled="isLoadingCollection" type="submit" class="w-100">
-                                <b-spinner v-if="isLoadingCollection" small />
-                                <template v-else> {{ isCreating ? 'Create' : 'Update' }} Collection </template>
-                            </b-button>
-                        </b-col>
-                    </b-row>
-                </b-form>
+                <BaseFormCollection :collection="collection" />
             </b-card>
             <h2 class="my-3 d-flex">
                 Collectibles
-                <b-button variant="primary" class="ms-auto" @click="isModelCollectionMetadataShown = true">
+                <b-button v-b-modal="`modalCollectibleCreate${collection._id}`" variant="primary" class="ms-auto">
                     Create Collectible
                     <BaseIcon icon="plus" class="ms-1" />
                 </b-button>
-                <b-modal
-                    v-model="isModelCollectionMetadataShown"
-                    centered
-                    hide-footer
-                    body-class="gradient-shadow-xl"
-                    title="Create Collectible"
-                    @hidden="isModelCollectionMetadataShown = false"
-                >
-                    <BaseFormCollectionMetadata :erc721="collection" @submit="isModelCollectionMetadataShown = false" />
-                </b-modal>
+                <BaseModalColectibleCreate :id="`modalCollectibleCreate${collection._id}`" :collection="collection" />
             </h2>
             <b-row v-if="isLoading && !metadataList.length">
                 <b-col v-for="val in [1]" md="3">
@@ -76,28 +55,25 @@ export default defineComponent({
     data() {
         return {
             isLoading: false,
-            isLoadingCollection: false,
-            isModelCollectionMetadataShown: false,
             page: 1,
             limit: 10,
-            name: '',
-            description: '',
-            symbol: '',
-            address: '',
-            chainId: ChainId.Polygon,
         };
     },
     computed: {
         ...mapStores(useAuthStore, useCollectionStore, useEntryStore),
-        isCreating(): boolean {
-            return !this.$route.params.id;
+        isAlertWalletCreateShown() {
+            return !this.collection.wallets.length;
+        },
+        isAlertMinterCreateShown() {
+            return this.collection.wallets.length && !this.collection.minters.length;
         },
         blockExplorerURL() {
-            switch (this.chainId) {
+            if (!this.collection) return '';
+            switch (this.collection.chainId) {
                 case ChainId.Polygon:
-                    return 'https://polygonscan.com/token/' + this.address;
+                    return 'https://polygonscan.com/token/' + this.collection.address;
                 case ChainId.Linea:
-                    return 'https://lineascan.build/token/' + this.address;
+                    return 'https://lineascan.build/token/' + this.collection.address;
             }
         },
         collection(): TERC721 {
@@ -115,13 +91,6 @@ export default defineComponent({
         if (!erc721Id) return;
 
         await Promise.all([this.getCollection(erc721Id), this.listMetadata(erc721Id)]);
-
-        console.log(this.collection);
-        this.name = this.collection.name;
-        this.description = this.collection.description as string;
-        this.symbol = this.collection.symbol as string;
-        this.address = this.collection.address as string;
-        this.chainId = this.collection.chainId as ChainId;
     },
     methods: {
         async getCollection(erc721Id: string) {
@@ -146,27 +115,6 @@ export default defineComponent({
                 });
             } finally {
                 this.isLoading = false;
-            }
-        },
-        async onSubmit() {
-            try {
-                this.isLoadingCollection = true;
-                await this.collectionStore[this.isCreating ? 'create' : 'update']({
-                    _id: this.collection && this.collection._id,
-                    name: this.name,
-                    chainId: this.chainId,
-                    symbol: this.symbol,
-                    description: this.description,
-                });
-                this.$router.push(
-                    `/collections/${this.collectionStore.collections[this.collectionStore.collections.length - 1]._id}`,
-                );
-            } catch (error: any) {
-                toast(error.message, 'light', 3000, () => {
-                    return;
-                });
-            } finally {
-                this.isLoadingCollection = false;
             }
         },
     },

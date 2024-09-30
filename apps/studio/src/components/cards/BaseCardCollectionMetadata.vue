@@ -32,18 +32,16 @@
             <b-button variant="link" class="text-danger w-100 text-decoration-none" @click="isModalRemoveShown = true">
                 Remove
             </b-button>
-            <b-modal v-model="isModalRemoveShown" centered title="Remove Collectible">
+            <BaseModalDelete title="Remove Collectible" @delete="onClickRemove">
                 <p class="m-0">
                     Are you sure you want to remove this collectible and all it's QR code entries? This action cannot be
                     undone. Note that minted collectibles can not be removed!
                 </p>
-                <template #footer>
-                    <b-button class="w-100" variant="danger" @click="onClickRemove">
-                        <b-spinner v-if="isLoading" small />
-                        <template v-else> Remove </template>
-                    </b-button>
+                <template #btn-content>
+                    <b-spinner v-if="isLoading" small />
+                    <template v-else> Remove </template>
                 </template>
-            </b-modal>
+            </BaseModalDelete>
         </template>
     </b-card>
 </template>

@@ -47,13 +47,13 @@ export default defineComponent({
         'walletStore.wallet': {
             handler(wallet) {
                 if (!wallet) return;
-                this.listCollectibles(wallet);
+                this.listCollectibles();
             },
             immediate: true,
         },
     },
     methods: {
-        async listCollectibles(wallet: TWallet) {
+        async listCollectibles() {
             try {
                 this.isLoading = true;
                 await this.collectibleStore.list();

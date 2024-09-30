@@ -22,13 +22,14 @@
 
 <script lang="ts">
 import { WalletVariant } from '@thxnetwork/common/enums';
+import imgSafeLogo from '@thxnetwork/wallet/assets/safe-logo.jpg';
+import imgWalletConnectLogo from '@thxnetwork/wallet/assets/walletconnect-logo.png';
 import { useAccountStore, useAuthStore, useWalletStore } from '@thxnetwork/wallet/stores';
 import { shortenAddress } from '@thxnetwork/wallet/utils/address';
+import { toast } from '@thxnetwork/wallet/utils/toast';
 import { mapStores } from 'pinia';
 import poll from 'promise-poller';
 import { defineComponent } from 'vue';
-import imgSafeLogo from '../assets/safe-logo.jpg';
-import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
 
 export default defineComponent({
     name: 'BaseTabWalletWalletConnect',
@@ -54,9 +55,6 @@ export default defineComponent({
             return !!this.error;
         },
     },
-    mounted() {
-        this.walletStore.set(null);
-    },
     methods: {
         async getAddress() {
             const taskFn = async () => {
@@ -72,7 +70,9 @@ export default defineComponent({
                 this.address = await this.getAddress();
             } catch (error) {
                 console.error(error);
-                this.error = 'An issue occured while connecting your wallet. Please try again.';
+                toast('An issue occured while connecting your wallet. Please try again.', 'light', 3000, () => {
+                    return;
+                });
             }
         },
         async onClickAdd() {
@@ -88,7 +88,9 @@ export default defineComponent({
                 this.walletStore.isModalWalletCreateShown = false;
             } catch (error) {
                 console.error(error);
-                this.error = 'An issue occured while creating your wallet. Please try again.';
+                toast('An issue occured while creating your wallet. Please try again.', 'light', 3000, () => {
+                    return;
+                });
             } finally {
                 this.isLoading = false;
             }

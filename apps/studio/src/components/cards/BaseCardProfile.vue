@@ -94,66 +94,15 @@
                     </b-col>
                 </b-row>
             </b-col>
-            <b-col
-                class="d-flex flex-column"
-                :class="{
-                    'align-items-start': align === 'left',
-                    'align-items-end': align === 'right',
-                }"
-            >
-                <b-card
-                    header-class="p-0"
-                    class="mt-5"
-                    :style="{ backgroundColor: getElement('Background'), color: getElement('Text'), maxWidth: '380px' }"
-                >
-                    <template #header>
-                        <b-navbar class="p-2 px-1" :style="{ backgroundColor: getElement('Navigation') }">
-                            <b-navbar-brand href="#">
-                                <b-img :src="logoImgURL || Imglogo" width="40" height="40"></b-img>
-                            </b-navbar-brand>
-                            <b-button
-                                size="sm"
-                                variant="primary"
-                                class="border-0 p-2 px-3"
-                                :style="{
-                                    backgroundColor: getElement('Navigation Button'),
-                                    color: getElement('Navigation Button Text'),
-                                }"
-                            >
-                                Login
-                                <BaseIcon icon="sign-in-alt" class="ms-2" />
-                            </b-button>
-                        </b-navbar>
-                    </template>
-                    <div class="alert border-0 p-2" :style="{ backgroundColor: getColor('Success') }">
-                        <BaseIcon icon="info-circle" class="mx-2" />
-                        Lorem ipsum dolor sit amet
-                    </div>
-                    <div class="alert border-0 p-2" :style="{ backgroundColor: getColor('Danger') }">
-                        <BaseIcon icon="exclamation-circle" class="mx-2" />
-                        Lorem ipsum dolor sit amet
-                    </div>
-                    <p :style="{ color: getElement('Text') }">Lorem ipsum dolor sit amet.</p>
-                    <b-card
-                        :style="{ backgroundColor: getElement('Card') }"
-                        img-src="https://placehold.co/600x300?text=Collectible&font=Manrope"
-                    >
-                        <p :style="{ color: getElement('Card Text') }">Lorem ipsum dolor sit amet</p>
-                        <b-button
-                            class="border-0 w-100"
-                            :style="{ backgroundColor: getElement('Button'), color: getElement('Button Text') }"
-                        >
-                            Collect
-                        </b-button>
-                    </b-card>
-                </b-card>
+            <b-col class="d-flex flex-column align-items-end">
+                <BasePreviewWallet :logo-img="logoImgURL || Imglogo" :colors="colors" :elements="elements" />
             </b-col>
         </b-row>
         <b-row>
             <b-col md="6">
                 <h4 class="my-3">Launcher</h4>
                 <BaseFormGroup label="Message">
-                    <b-form-input v-model="message" @change="update()" />
+                    <b-form-textarea v-model="message" rows="2" @change="update()" />
                 </BaseFormGroup>
                 <BaseFormGroup label="Icon">
                     <BaseFormInputFile
@@ -165,63 +114,26 @@
                     />
                 </BaseFormGroup>
             </b-col>
-            <b-col
-                md="6"
-                class="d-flex justify-content-end flex-column"
-                :class="{
-                    'align-items-start': align === 'left',
-                    'align-items-end': align === 'right',
-                }"
-            >
-                <div
-                    style="max-width: 250px"
-                    class="rounded bg-white text-dark d-flex align-items-center justify-content-center p-2 small"
-                >
-                    <p class="m-0">{{ message }}</p>
-                </div>
-                <div
-                    class="rounded-circle d-flex my-3"
-                    :style="{ width: '60px', height: '60px', backgroundColor: getElement('Launcher') }"
-                >
-                    <b-img
-                        v-if="iconImg"
-                        :src="iconImg"
-                        class="m-auto"
-                        style="max-width: 30px; max-height: 30px; width: auto; height: auto"
-                    />
-                    <BaseIcon
-                        v-else
-                        icon="wallet"
-                        class="m-auto"
-                        :style="{ color: getElement('Launcher Icon'), fontSize: '1.2rem' }"
-                    />
-                </div>
+            <b-col md="6" class="d-flex justify-content-end flex-column align-items-end">
+                <BasePreviewLauncher :icon-img="iconImg" :message="message" :colors="colors" :elements="elements" />
             </b-col>
         </b-row>
         <template #footer>
             <b-button
+                v-b-modal="`modalDeleteProfile${profile._id}`"
                 variant="link"
                 class="text-danger text-decoration-none ms-auto"
-                @click="isModalRemoveShown = true"
             >
                 <b-spinner v-if="isLoading" small />
                 <template v-else> Remove </template>
             </b-button>
-            <b-modal v-model="isModalRemoveShown" centered title="Remove Profile">
-                <template #header>
-                    <h3 class="m-0">Remove Profile</h3>
-                    <b-button variant="link" class="text-white ms-auto" size="sm">
-                        <BaseIcon icon="times" class="ms-1" />
-                    </b-button>
-                </template>
+            <BaseModalDelete :id="`modalDeleteProfile${profile._id}`" title="Remove Profile" @delete="onClickRemove">
                 <p class="m-0">Are you sure you want to remove this profile? This action cannot be undone.</p>
-                <template #footer>
-                    <b-button class="w-100" variant="danger" @click="onClickRemove">
-                        <b-spinner v-if="isLoading" small />
-                        <template v-else> Remove </template>
-                    </b-button>
+                <template #btn-content>
+                    <b-spinner v-if="isLoading" small />
+                    <template v-else> Remove </template>
                 </template>
-            </b-modal>
+            </BaseModalDelete>
         </template>
     </b-card>
 </template>
@@ -232,6 +144,7 @@ import { API_URL, WALLET_URL } from '@thxnetwork/studio/config/secrets';
 import { useAccountStore } from '@thxnetwork/studio/stores';
 import { decodeHTML } from '@thxnetwork/studio/utils/decode-html';
 import { toast } from '@thxnetwork/studio/utils/toast';
+import { useModal } from 'bootstrap-vue-next';
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
 
@@ -246,7 +159,6 @@ export default defineComponent({
     data() {
         return {
             decodeHTML,
-            isModalRemoveShown: false,
             isCopySuccess: false,
             isLoading: false,
             isLoadingIcon: false,
@@ -302,12 +214,6 @@ export default defineComponent({
         this.embedCode = `&lt;script src="${apiURL.toString()}"&gt;&lt;/script&gt;`;
     },
     methods: {
-        getColor(label: string) {
-            return Object.values(this.colors).find((color) => color.label === label)?.color;
-        },
-        getElement(label: string) {
-            return Object.values(this.elements).find((element) => element.label === label)?.color;
-        },
         onCopySuccess() {
             this.isCopySuccess = true;
         },
@@ -351,7 +257,7 @@ export default defineComponent({
                 await this.accountStore.removeProfile(this.profile._id);
                 await this.accountStore.getProfiles();
 
-                this.isModalRemoveShown = false;
+                useModal(`modalDeleteProfile${this.profile._id}`).hide();
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;

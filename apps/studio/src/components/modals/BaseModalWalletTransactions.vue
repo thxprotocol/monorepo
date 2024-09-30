@@ -46,8 +46,16 @@
                     >
                         Retry
                     </b-dropdown-item>
-                    <b-dropdown-item @click="onClickDelete(item.tx)">Delete</b-dropdown-item>
+                    <b-dropdown-item v-b-modal="`modalTransactionDelete${item.tx._id}`">Delete</b-dropdown-item>
                 </b-dropdown>
+                <BaseModalDelete
+                    :id="`modalTransactionDelete${item.tx._id}`"
+                    title="Remove Transaction"
+                    @delete="onClickDelete(item.tx)"
+                >
+                    Are you sure you want to remove this transaction? This action cannot be undone.
+                    <template #btn-content> Remove Transaction </template>
+                </BaseModalDelete>
             </template>
         </b-table>
     </b-modal>
@@ -55,12 +63,12 @@
 
 <script lang="ts">
 import { TransactionState } from '@thxnetwork/common/enums';
+import { useAccountStore } from '@thxnetwork/studio/stores';
 import { chainInfo } from '@thxnetwork/studio/utils/chains';
 import { toast } from '@thxnetwork/studio/utils/toast';
 import { format } from 'date-fns';
 import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
-import { useAccountStore } from '../stores';
 
 const stateVariantMap: any = {
     [TransactionState.Queued]: 'light',

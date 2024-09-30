@@ -89,10 +89,10 @@
 <script lang="ts">
 import { AccessTokenKind, AccountVariant } from '@thxnetwork/common/enums';
 import { useAuthStore, useWalletStore } from '@thxnetwork/wallet/stores';
+import { shortenAddress } from '@thxnetwork/wallet/utils/address';
 import { toast } from '@thxnetwork/wallet/utils/toast';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-import { shortenAddress } from '../utils/address';
 
 export default defineComponent({
     name: 'BaseModalLogin',

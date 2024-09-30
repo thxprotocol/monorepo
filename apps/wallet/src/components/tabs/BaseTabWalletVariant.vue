@@ -30,11 +30,11 @@
 
 <script lang="ts">
 import { WalletVariant } from '@thxnetwork/common/enums';
+import imgSafeLogo from '@thxnetwork/wallet/assets/safe-logo.jpg';
+import imgWalletConnectLogo from '@thxnetwork/wallet/assets/walletconnect-logo.png';
 import { useAccountStore, useAuthStore, useWalletStore } from '@thxnetwork/wallet/stores';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
-import imgSafeLogo from '../assets/safe-logo.jpg';
-import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
 
 export default defineComponent({
     name: 'BaseTabWalletVariant',

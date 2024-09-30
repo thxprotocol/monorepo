@@ -43,14 +43,19 @@ export const useWalletStore = defineStore('wallet', {
         },
         set(wallet: null | TWallet) {
             this.wallet = wallet;
+            window.localStorage.setItem('wallet', wallet ? wallet._id : '');
         },
         async list() {
             const wallets = (await this.request('/account/wallets', { isAuthenticated: true })) || [];
             this.wallets = wallets.filter((w: { poolId: string }) => !w.poolId);
 
-            if (this.wallets.length) {
-                this.set(this.wallets[0]);
-            }
+            const walletId = window.localStorage.getItem('wallet');
+            const wallet = walletId
+                ? this.wallets.find((w) => w._id === walletId) || null
+                : this.wallets.length
+                ? this.wallets[0]
+                : null;
+            this.set(wallet);
         },
         async create(body: Partial<{ variant: WalletVariant; message: string; signature: string; chainId: ChainId }>) {
             await this.request('/account/wallets', { method: 'POST', body, isAuthenticated: true });
