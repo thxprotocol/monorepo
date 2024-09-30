@@ -15,6 +15,7 @@ declare module 'vue' {
     BaseHrOrSeparator: typeof import('./src/components/typography/BaseHrOrSeparator.vue')['default']
     BaseIcon: typeof import('./src/components/typography/BaseIcon.vue')['default']
     BaseModalLogin: typeof import('./src/components/modals/BaseModalLogin.vue')['default']
+    BaseModalTransfer: typeof import('./src/components/modals/BaseModalTransfer.vue')['default']
     BaseModalWalletCreate: typeof import('./src/components/modals/BaseModalWalletCreate.vue')['default']
     BaseModalWalletRecovery: typeof import('./src/components/modals/BaseModalWalletRecovery.vue')['default']
     BaseModalWalletSafe: typeof import('./src/components/modals/BaseModalWalletSafe.vue')['default']
@@ -51,6 +52,7 @@ declare module 'vue' {
   }
   export interface ComponentCustomProperties {
     vBModal: typeof import('bootstrap-vue-next')['vBModal']
+    vBModel: typeof import('bootstrap-vue-next')['vBModel']
     vBTooltip: typeof import('bootstrap-vue-next')['vBTooltip']
   }
 }

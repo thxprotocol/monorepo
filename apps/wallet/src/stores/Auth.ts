@@ -56,6 +56,12 @@ export const useAuthStore = defineStore('auth', {
                 },
             });
 
+            // Sometimes a session is removed in the backend which results in a 401
+            if (response.status === 401) {
+                this.isModalLoginShown = true;
+                throw new Error('Login required');
+            }
+
             try {
                 return await response.json();
             } catch (error) {

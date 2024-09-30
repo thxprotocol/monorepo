@@ -6,13 +6,13 @@
                 class="d-flex align-items-center rounded w-100 text-start"
                 @click="isCollapsed = !isCollapsed"
             >
-                <b-badge class="p-2 me-3" variant="light">
+                <div class="me-3 text-opaque">
                     <b-spinner v-if="!collectible.tokenId" small />
                     <template v-else>
                         <BaseIcon icon="hashtag" />
                         {{ collectible.tokenId }}
                     </template>
-                </b-badge>
+                </div>
                 {{ collection.name }}
                 <BaseIcon :icon="isCollapsed ? 'caret-up' : 'caret-down'" class="ms-auto me-1" />
             </b-button>
@@ -22,11 +22,15 @@
                 <b-img class="rounded mb-3" :src="metadata.imageUrl" fluid />
                 <h2>{{ metadata.name }}</h2>
                 <BaseCardBodyCollectible :metadata="metadata" :collection="collection" />
-
                 <div v-if="collectible.tokenId" class="d-flex justify-content-between small mb-1">
                     <span class="text-opaque me-auto">Token ID</span>
                     <b-link :href="url" target="_blank">{{ collectible.tokenId }}</b-link>
                 </div>
+                <!-- <b-button v-b-model="`modalTransfer${collectible._id}`" variant="primary" class="w-100 my-3">
+                    Transfer
+                    <BaseIcon icon="chevron-right" class="ms-1" />
+                </b-button>
+                <BaseModalTransfer :id="`modalTransfer${collectible._id}`" :collectible="collectible" /> -->
                 <hr />
                 <div class="small text-opaque text-center">
                     Collected at
