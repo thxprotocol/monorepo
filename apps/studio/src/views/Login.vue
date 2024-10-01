@@ -25,13 +25,13 @@
                             </b-form>
 
                             <b-form v-else @submit.prevent="onSubmitVerifyOTP">
-                                <BaseFormGroup label="Check your e-mail for the OTP">
+                                <BaseFormGroup label="Check your e-mail for password">
                                     <b-form-input v-model="otp" placeholder="******" />
                                 </BaseFormGroup>
                                 <b-button :disabled="!isOTPValid" variant="primary" type="submit" class="w-100">
                                     <b-spinner v-if="isLoadingOTPVerify" small />
                                     <template v-else>
-                                        Verify OTP
+                                        Verify one-time password
                                         <BaseIcon icon="chevron-right" class="ms-2" />
                                     </template>
                                 </b-button>
