@@ -1,11 +1,12 @@
 <template>
-    <b-form-group label-class="d-flex text-opaque" class="mb-3">
+    <b-form-group label-class="d-flex" class="mb-3">
         <template #label>
-            <span v-if="label">{{ label }}</span>
-            <slot v-else name="label" />
+            <span class="text-opaque">
+                <slot name="label"> {{ label }}</slot>
+            </span>
             <span v-if="required" class="text-danger ms-1">*</span>
             <b-link v-if="tooltip" v-b-tooltip class="ms-auto" :title="tooltip">
-                <i class="fas fa-info-circle text-primary" />
+                <i class="fas fa-info-circle" />
             </b-link>
         </template>
         <slot />

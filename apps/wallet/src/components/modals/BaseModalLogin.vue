@@ -70,7 +70,7 @@
 
         <BaseHrOrSeparator />
         <BaseFormGroup label="Use a trusted provider" label-class="text-opaque">
-            <div class="d-flex w-100 gap-3">
+            <div class="d-flex w-100 gap-2 gap-md-3">
                 <b-button
                     v-for="provider of providers"
                     variant="primary"
