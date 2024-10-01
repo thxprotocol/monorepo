@@ -22,7 +22,7 @@
                 </b-button>
             </b-form>
         </b-tab>
-        <b-tab title="Download">
+        <b-tab title="Design">
             <b-form @submit="onSubmitDownload">
                 <b-alert v-model="isAlertShown" variant="primary" show class="py-2">
                     <BaseIcon icon="info-circle" class="me-2" />
