@@ -41,7 +41,7 @@ export default defineComponent({
                     value: `${chainList[this.collection.chainId].name} (${this.collection.chainId})` || '',
                 },
                 {
-                    key: 'External URL',
+                    key: 'Website',
                     value: this.metadata.externalUrl
                         ? `${new URL(this.metadata.externalUrl).pathname.substring(0, 25)}`
                         : '',
