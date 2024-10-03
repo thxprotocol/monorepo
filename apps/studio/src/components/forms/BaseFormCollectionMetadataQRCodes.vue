@@ -79,7 +79,7 @@
 </template>
 
 <script lang="ts">
-import ImgDefault from '@thxnetwork/studio/assets/logo.jpg';
+import ImgDefault from '@thxnetwork/studio/assets/qr.png';
 import { API_URL, STUDIO_URL } from '@thxnetwork/studio/config/secrets';
 import { useAuthStore, useEntryStore } from '@thxnetwork/studio/stores';
 import { loadImage } from '@thxnetwork/studio/utils/image';

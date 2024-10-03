@@ -8,12 +8,18 @@
         <template #header>
             <h3 class="m-0">
                 Profile
-                <code>{{ profile._id }}</code>
+                <b-button variant="dark" class="ms-2 rounded py-1 px-2" target="_blank" :href="url">
+                    <BaseIcon icon="external-link-alt " />
+                </b-button>
             </h3>
-            <b-button variant="light" size="sm" target="_blank" s :href="url" class="ms-auto">
-                Open Wallet
-                <BaseIcon icon="external-link-alt ms-1" />
-            </b-button>
+            <b-button-group size="sm" class="ms-auto">
+                <b-button :variant="isPublished ? 'success' : 'dark'" @click="onUpdate({ isPublished: true })">
+                    Enabled
+                </b-button>
+                <b-button :variant="!isPublished ? 'danger' : 'dark'" @click="onUpdate({ isPublished: false })">
+                    Disabled
+                </b-button>
+            </b-button-group>
         </template>
         <b-alert v-model="isAlertDisabledShown" variant="warning" class="mb-3">
             <BaseIcon icon="exclamation-circle" class="me-2" />
@@ -24,6 +30,14 @@
                 <BaseFormGroup label="Name">
                     <b-form-input v-model="name" @change="update()" />
                 </BaseFormGroup>
+                <BaseFormGroup label="Description">
+                    <b-form-textarea v-model="description" @change="update()" />
+                </BaseFormGroup>
+                <BaseFormGroup label="URL">
+                    <b-form-input v-model="domain" @change="update()" />
+                </BaseFormGroup>
+            </b-col>
+            <b-col md="6">
                 <BaseFormGroup label="Logo">
                     <BaseFormInputFile
                         :image-src="logoImgURL"
@@ -42,24 +56,9 @@
                         @done="onUpdate({ backgroundImgURL: $event })"
                     />
                 </BaseFormGroup>
-            </b-col>
-            <b-col md="6">
-                <BaseFormGroup label="Published">
-                    <b-button-group size="sm">
-                        <b-button :variant="isPublished ? 'success' : 'dark'" @click="onUpdate({ isPublished: true })">
-                            Enabled
-                        </b-button>
-                        <b-button :variant="!isPublished ? 'danger' : 'dark'" @click="onUpdate({ isPublished: false })">
-                            Disabled
-                        </b-button>
-                    </b-button-group>
-                </BaseFormGroup>
-                <BaseFormGroup label="URL">
-                    <b-form-input v-model="domain" @change="update()" />
-                </BaseFormGroup>
                 <BaseFormGroup label-class="d-flex align-items-center">
                     <template #label>
-                        Embed Code
+                        <span class="text-opaque">Embed Code</span>
                         <b-button
                             v-clipboard:copy="decodeHTML(embedCode)"
                             v-clipboard:success="onCopySuccess"
@@ -95,7 +94,7 @@
                 </b-row>
             </b-col>
             <b-col class="d-flex flex-column align-items-end">
-                <BasePreviewWallet :logo-img="logoImgURL || Imglogo" :colors="colors" :elements="elements" />
+                <BasePreviewWallet :logo-img="logoImgURL || ImglogoLightSquare" :colors="colors" :elements="elements" />
             </b-col>
         </b-row>
         <b-row>
@@ -139,7 +138,7 @@
 </template>
 
 <script lang="ts">
-import Imglogo from '@thxnetwork/studio/assets/logo.jpg';
+import ImglogoLightSquare from '@thxnetwork/studio/assets/logo-light-square.png';
 import { API_URL, WALLET_URL } from '@thxnetwork/studio/config/secrets';
 import { useAccountStore } from '@thxnetwork/studio/stores';
 import { decodeHTML } from '@thxnetwork/studio/utils/decode-html';
@@ -164,12 +163,13 @@ export default defineComponent({
             isLoadingIcon: false,
             isLoadingLogo: false,
             isLoadingBackground: false,
-            Imglogo,
+            ImglogoLightSquare,
             iconImg: '',
             backgroundImgURL: '',
             logoImgURL: '',
             domain: '',
             name: '',
+            description: '',
             slug: '',
             isPublished: true,
             message: 'Hi👋 Click me to view your collectibles!',
@@ -194,6 +194,7 @@ export default defineComponent({
         this.backgroundImgURL = this.profile.backgroundImgURL;
         this.domain = this.profile.domain;
         this.name = this.profile.name;
+        this.description = this.profile.description;
         this.slug = this.profile.slug;
         this.color = this.profile.color;
         this.bgColor = this.profile.bgColor;
@@ -225,6 +226,7 @@ export default defineComponent({
                     logoImgURL: this.logoImgURL,
                     backgroundImgURL: this.backgroundImgURL,
                     name: this.name,
+                    description: this.description,
                     slug: this.slug,
                     domain: this.domain,
                     message: this.message,

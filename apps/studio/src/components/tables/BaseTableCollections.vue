@@ -118,7 +118,9 @@ export default defineComponent({
         },
     },
     mounted() {
-        this.listCollections();
+        if (!this.collectionStore.collections.length) {
+            this.listCollections();
+        }
     },
     methods: {
         rowClass(_item: any, type: string) {

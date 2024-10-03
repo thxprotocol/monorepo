@@ -4,7 +4,7 @@
             <b-row class="h-100">
                 <b-col md="6" class="h-100 d-flex align-items-center justify-content-center flex-column bg-dark">
                     <div>
-                        <b-img width="60" :src="imgLogo" fluid />
+                        <b-img height="40" :src="imgLogo" />
                         <div>
                             <strong class="my-3 d-block font-weight-normal" :style="{ fontSize: '1.5rem' }">
                                 Sign in to studio
@@ -94,7 +94,7 @@
 
 <script lang="ts">
 import { AccessTokenKind, AccountVariant } from '@thxnetwork/common/enums';
-import imgLogo from '@thxnetwork/studio/assets/logo.jpg';
+import imgLogo from '@thxnetwork/studio/assets/logo.png';
 import { useAuthStore } from '@thxnetwork/studio/stores/Auth';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';

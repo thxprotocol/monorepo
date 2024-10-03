@@ -11,7 +11,7 @@
         <template #header>
             <b-navbar class="p-2 px-1" :style="{ backgroundColor: getElement(elements, 'Navigation') }">
                 <b-navbar-brand href="#">
-                    <b-img :src="logoImg" width="40" height="40"></b-img>
+                    <b-img :src="logoImg" height="35"></b-img>
                 </b-navbar-brand>
                 <b-button
                     size="sm"

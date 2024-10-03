@@ -3,7 +3,7 @@
         <b-row>
             <b-navbar toggleable="lg">
                 <b-navbar-brand to="/">
-                    <b-img :src="imgLogo" width="50" />
+                    <b-img :src="imgLogoLight" height="40" />
                 </b-navbar-brand>
                 <b-collapse id="nav-collapse" is-nav class="order-1 order-md-0">
                     <b-navbar-nav>
@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import imgLogo from '@thxnetwork/studio/assets/logo.jpg';
+import imgLogoLight from '@thxnetwork/studio/assets/logo-light.png';
 import { useAccountStore } from '@thxnetwork/studio/stores';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -49,7 +49,7 @@ export default defineComponent({
     name: 'Home',
     data() {
         return {
-            imgLogo,
+            imgLogoLight,
         };
     },
     computed: {

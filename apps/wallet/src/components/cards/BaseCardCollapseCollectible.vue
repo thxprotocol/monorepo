@@ -19,7 +19,7 @@
         </template>
         <b-collapse v-model="isCollapsed">
             <div class="p-3">
-                <b-img class="rounded mb-3" :src="metadata.imageUrl" fluid />
+                <b-img class="rounded mb-3" style="width: 100%" :src="metadata.imageUrl" fluid />
                 <h2>{{ metadata.name }}</h2>
                 <BaseCardBodyCollectible :metadata="metadata" :collection="collection" />
                 <div v-if="collectible.tokenId" class="d-flex justify-content-between small mb-1">
@@ -75,9 +75,6 @@ export default defineComponent({
                 this.collectible.tokenId
             );
         },
-    },
-    mounted() {
-        //
     },
 });
 </script>

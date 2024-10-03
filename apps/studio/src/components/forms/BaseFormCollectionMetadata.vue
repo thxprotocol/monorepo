@@ -15,7 +15,7 @@
                 @loading="isLoading = $event"
             />
         </BaseFormGroup>
-        <BaseFormGroup label="External URL" tooltip="">
+        <BaseFormGroup label="Website" tooltip="">
             <b-form-input v-model="externalURL" />
         </BaseFormGroup>
         <b-button type="submit" :disabled="isDisabled" variant="primary" class="w-100">

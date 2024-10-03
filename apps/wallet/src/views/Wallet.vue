@@ -3,7 +3,7 @@
         <b-row>
             <b-navbar fluid class="mb-3">
                 <b-navbar-brand :to="`/${accountStore.settings?._id}`">
-                    <b-img :src="accountStore.settings?.logoImgURL || imgLogo" width="40" />
+                    <b-img :src="accountStore.settings?.logoImgURL || imgLogoLightSquare" width="40" />
                 </b-navbar-brand>
                 <b-button
                     v-if="!authStore.isAuthenticated"
@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import imgLogo from '@thxnetwork/wallet/assets/logo.jpg';
+import imgLogoLightSquare from '@thxnetwork/wallet/assets/logo-light-square.png';
 import { useAccountStore, useAuthStore } from '@thxnetwork/wallet/stores';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
@@ -49,7 +49,7 @@ export default defineComponent({
     name: 'ViewWallet',
     data() {
         return {
-            imgLogo,
+            imgLogoLightSquare,
         };
     },
     computed: {

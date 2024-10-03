@@ -18,7 +18,7 @@ export const useAccountStore = defineStore('account', {
             this.account = await this.request('/account', { isAuthenticated: true });
         },
         async getSettings(widgetId: string) {
-            const settings = await this.request(`/widget/${widgetId}`);
+            const settings = await this.request(`/wallet/${widgetId}`);
             const theme = JSON.parse(settings.theme);
 
             this.settings = settings;
