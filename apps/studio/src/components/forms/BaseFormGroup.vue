@@ -1,5 +1,5 @@
 <template>
-    <b-form-group class="mb-3">
+    <b-form-group class="mb-3" label-class="d-flex">
         <template #label>
             <slot name="label">
                 <span class="text-opaque">{{ label }} </span>

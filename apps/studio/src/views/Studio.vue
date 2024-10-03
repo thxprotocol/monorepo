@@ -8,7 +8,7 @@
                 <b-collapse id="nav-collapse" is-nav class="order-1 order-md-0">
                     <b-navbar-nav>
                         <b-nav-item class="mx-lg-3" to="/collections">My Collections</b-nav-item>
-                        <b-nav-item class="mx-lg-3" to="/qr-codes">QR Codes</b-nav-item>
+                        <b-nav-item class="mx-lg-3" to="/qr-codes">Usage</b-nav-item>
                     </b-navbar-nav>
                     <b-navbar-nav class="ms-auto me-3">
                         <b-nav-item class="mx-lg-3" href="https://www.twinstory.io/faq" target="_blank">FAQ</b-nav-item>
