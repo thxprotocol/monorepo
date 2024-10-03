@@ -27,13 +27,13 @@
         </b-form>
 
         <b-form v-else @submit.prevent="onSubmitVerifyOTP">
-            <BaseFormGroup label="Check your e-mail for the OTP">
+            <BaseFormGroup label="Check your e-mail for the one-time password">
                 <b-form-input v-model="otp" placeholder="******" />
             </BaseFormGroup>
             <b-button :disabled="!isOTPValid || isLoadingOTPVerify" variant="primary" type="submit" class="w-100">
                 <b-spinner v-if="isLoadingOTPVerify" small />
                 <template v-else>
-                    Verify OTP
+                    Verify one-time password
                     <BaseIcon icon="chevron-right" class="ms-2" />
                 </template>
             </b-button>
@@ -226,7 +226,8 @@ export default defineComponent({
             this.isLoadingOTPVerify = true;
             try {
                 await this.authStore.verifyOtp({ email: this.email, token: this.otp });
-                if (!this.authStore.session) throw new Error('An issue occured while verifying OTP. Please try again.');
+                if (!this.authStore.session)
+                    throw new Error('An issue occured while verifying one-time password. Please try again.');
             } catch (error: any) {
                 this.onError(error);
             } finally {

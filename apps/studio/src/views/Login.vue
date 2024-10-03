@@ -165,7 +165,8 @@ export default defineComponent({
             this.isLoadingOTPVerify = true;
             try {
                 await this.authStore.verifyOtp({ email: this.email, token: this.otp });
-                if (!this.authStore.session) throw new Error('An issue occured while verifying OTP. Please try again.');
+                if (!this.authStore.session)
+                    throw new Error('An issue occured while verifying one-time password. Please try again.');
             } catch (error) {
                 this.error = (error as Error).message;
             } finally {
