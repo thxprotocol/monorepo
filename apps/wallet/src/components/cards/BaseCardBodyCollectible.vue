@@ -43,7 +43,7 @@ export default defineComponent({
                 {
                     key: 'Website',
                     value: this.metadata.externalUrl
-                        ? `${new URL(this.metadata.externalUrl).pathname.substring(0, 25)}`
+                        ? `${new URL(this.metadata.externalUrl).origin.substring(0, 30)}`
                         : '',
                     url: this.metadata.externalUrl || '',
                 },
