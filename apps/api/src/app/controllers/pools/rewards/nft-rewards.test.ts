@@ -1,16 +1,12 @@
-import request from 'supertest';
 import app from '@thxnetwork/api/';
-import Mock from '@thxnetwork/api/util/jest/config';
-import { ChainId } from '@thxnetwork/common/enums';
-import { isAddress } from 'web3-utils';
-import { addMinutes } from '@thxnetwork/api/util/date';
-import { createImage } from '@thxnetwork/api/util/jest/images';
-import { RewardNFTDocument } from '@thxnetwork/api/models/RewardNFT';
 import { ERC721Document } from '@thxnetwork/api/models/ERC721';
 import { ERC721MetadataDocument } from '@thxnetwork/api/models/ERC721Metadata';
-import { RewardVariant } from '@thxnetwork/common/enums';
-import NetworkService from '@thxnetwork/api/services/NetworkService';
-import { poll } from 'ethers/lib/utils';
+import { RewardNFTDocument } from '@thxnetwork/api/models/RewardNFT';
+import { addMinutes } from '@thxnetwork/api/util/date';
+import Mock from '@thxnetwork/api/util/jest/config';
+import { createImage } from '@thxnetwork/api/util/jest/images';
+import { ChainId, RewardVariant } from '@thxnetwork/common/enums';
+import request from 'supertest';
 
 const user = request.agent(app);
 
@@ -72,25 +68,25 @@ describe('NFT Rewards', () => {
             .expect(201, done);
     });
 
-    it('POST /pools/:poolId/wallets', async () => {
-        let walletAddress;
-        await user
-            .post(`/v1/pools/${poolId}/wallets`)
-            .set('Authorization', Mock.accounts[0].authHeader)
-            .send({
-                chainId: ChainId.Hardhat,
-            })
-            .expect((res: request.Response) => {
-                walletAddress = res.body.address;
-            })
-            .expect(201);
-        const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
-        await poll(async () => {
-            const code = await web3.eth.getCode(walletAddress);
-            return code !== '0x';
-        });
-        expect(walletAddress).toBeDefined();
-    });
+    // it('POST /wallets', async () => {
+    //     let walletAddress;
+    //     await user
+    //         .post(`/v1/wallets`)
+    //         .set('Authorization', Mock.accounts[0].authHeader)
+    //         .send({
+    //             chainId: ChainId.Hardhat,
+    //         })
+    //         .expect((res: request.Response) => {
+    //             walletAddress = res.body.address;
+    //         })
+    //         .expect(201);
+    //     const { web3 } = NetworkService.getProvider(ChainId.Hardhat);
+    //     await poll(async () => {
+    //         const code = await web3.eth.getCode(walletAddress);
+    //         return code !== '0x';
+    //     });
+    //     expect(walletAddress).toBeDefined();
+    // });
 
     it('POST /pools/:poolId/rewards/:variant', (done) => {
         const expiryDate = addMinutes(new Date(), 30);

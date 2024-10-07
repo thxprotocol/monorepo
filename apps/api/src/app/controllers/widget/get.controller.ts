@@ -7,11 +7,12 @@ import { param } from 'express-validator';
 const validation = [param('id').isMongoId()];
 
 const controller = async (req: Request, res: Response) => {
-    const widget = await Widget.findOne({ poolId: req.params.id });
+    let widget = await Widget.findOne({ poolId: req.params.id });
+    if (!widget) widget = await Widget.findById(req.params.id);
     if (!widget) throw new NotFoundError('Widget not found');
 
     const pool = await Pool.findById(req.params.id);
-    if (!pool) throw new NotFoundError('Pool not found');
+    if (!pool) return res.json(widget);
 
     const brand = await Brand.findOne({ poolId: req.params.id });
     const nftRewards = await RewardNFT.find({ poolId: req.params.id }).distinct('_id');

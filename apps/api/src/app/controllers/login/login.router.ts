@@ -1,7 +1,7 @@
-import express from 'express';
 import { assertRequestInput, checkJwt, corsHandler } from '@thxnetwork/api/middlewares';
-import CreatePassword from './pwd/post.controller';
+import express from 'express';
 import CreateJWT from './jwt/post.controller';
+import CreatePassword from './pwd/post.controller';
 
 const router: express.Router = express.Router();
 

@@ -82,5 +82,3 @@ type TWidgetConfig = {
     backgroundUrl: string;
     ref?: string;
 };
-
-type TOAuthScope = OAuthGoogleScope | OAuthTwitterScope | OAuthDiscordScope | OAuthTwitchScope | OAuthGithubScope;

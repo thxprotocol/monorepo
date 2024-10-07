@@ -1,23 +1,20 @@
-import { Wallet, WalletDocument, PoolDocument, Transaction, TransactionDocument } from '@thxnetwork/api/models';
-import { ChainId, JobType, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
-import { contractNetworks } from '@thxnetwork/api/hardhat';
-import { toChecksumAddress } from 'web3-utils';
-import { safeVersion } from '@thxnetwork/api/services/ContractService';
-import { SafeTransaction, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types';
-import { convertObjectIdToNumber } from '../util';
-import SafeApiKit from '@safe-global/api-kit';
-import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/protocol-kit';
-import NetworkService from '@thxnetwork/api/services/NetworkService';
-import TransactionService from './TransactionService';
 import { Job } from '@hokify/agenda';
+import SafeApiKit from '@safe-global/api-kit';
+import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit';
+import { SafeTransaction, SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types';
+import { contractNetworks } from '@thxnetwork/api/hardhat';
+import { PoolDocument, Transaction, TransactionDocument, Wallet, WalletDocument } from '@thxnetwork/api/models';
+import { safeVersion } from '@thxnetwork/api/services/ContractService';
+import NetworkService from '@thxnetwork/api/services/NetworkService';
+import { ChainId, JobType, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
+import { toChecksumAddress } from 'web3-utils';
+import { convertObjectIdToNumber } from '../util';
 import { agenda } from '../util/agenda';
 import { logger } from '../util/logger';
+import TransactionService from './TransactionService';
 
 class SafeService {
-    async create(
-        data: { sub: string; chainId: ChainId; safeVersion: '1.3.0'; address?: string; poolId?: string },
-        userWalletAddress?: string,
-    ) {
+    async create(data: { sub: string; chainId: ChainId; safeVersion: '1.3.0'; owners: string[]; address?: string }) {
         const wallet = await Wallet.create({
             variant: WalletVariant.Safe,
             ...data,
@@ -25,27 +22,18 @@ class SafeService {
         // Present address means Metamask account so do not deploy and return early
         if (!safeVersion && wallet.address) return wallet;
 
-        // Add relayer address and consider this a campaign safe
-        const { defaultAccount } = NetworkService.getProvider(wallet.chainId);
-        const owners = [toChecksumAddress(defaultAccount)];
-
-        // Add user address as a signer and consider this a participant safe
-        if (userWalletAddress) {
-            owners.push(toChecksumAddress(userWalletAddress));
-        }
-
-        // If campaign safe we provide a nonce based on the timestamp in the MongoID the pool (poolId value)
-        const saltNonce = wallet.poolId && String(convertObjectIdToNumber(wallet.poolId));
-        const safeAddress = await this.deploy(wallet, owners, saltNonce);
+        // If campaign safe we provide a nonce based on the timestamp in the account sub to make it unique
+        const saltNonce = wallet.owners.length === 1 && String(convertObjectIdToNumber(wallet.sub));
+        const safeAddress = await this.deploy(wallet, saltNonce);
 
         return await Wallet.findByIdAndUpdate(wallet.id, { address: safeAddress }, { new: true });
     }
 
-    async deploy(wallet: WalletDocument, owners: string[], saltNonce?: string) {
+    async deploy(wallet: WalletDocument, saltNonce?: string) {
         const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
         const safeAccountConfig: SafeAccountConfig = {
-            owners,
-            threshold: owners.length,
+            owners: wallet.owners,
+            threshold: wallet.owners.length,
         };
         const safeAddress = await this.predictAddress(wallet, safeAccountConfig, safeVersion, saltNonce);
 
@@ -95,7 +83,9 @@ class SafeService {
             ethAdapter,
             contractNetworks,
         });
-        const safeAddress = await safeFactory.predictSafeAddress(safeAccountConfig, saltNonce);
+        const safeAddress = saltNonce
+            ? await safeFactory.predictSafeAddress(safeAccountConfig, saltNonce)
+            : await safeFactory.predictSafeAddress(safeAccountConfig);
 
         return toChecksumAddress(safeAddress);
     }
@@ -105,17 +95,21 @@ class SafeService {
     }
 
     findOne(query) {
-        return Wallet.findOne({ ...query, variant: WalletVariant.Safe, poolId: { $exists: false } });
+        return Wallet.findOne({
+            ...query,
+            variant: WalletVariant.Safe,
+            $or: [{ owners: { $size: 2 } }, { owners: { $exists: false } }, { owners: { $size: 0 } }],
+        });
     }
 
     findOneByAddress(address: string) {
-        return Wallet.findOne({ address: toChecksumAddress(address) });
+        return Wallet.findOne({ variant: WalletVariant.Safe, address: toChecksumAddress(address) });
     }
 
     async findOneByPool(pool: PoolDocument, chainId: ChainId) {
         if (!pool) return;
         return await Wallet.findOne({
-            poolId: pool.id,
+            owners: { $size: 1 },
             chainId,
             sub: pool.sub,
             safeVersion,
@@ -123,14 +117,19 @@ class SafeService {
     }
 
     async proposeTransaction(wallet: WalletDocument, txs: TransactionDocument[]) {
-        const safeTransactionDataPartial = txs.map((tx: TransactionDocument) => {
+        const safeTransactionDataPartial = txs.map((tx: TransactionDocument, nonce: number) => {
             return {
                 to: tx.to,
                 data: tx.data,
+                nonce,
             };
         }) as SafeTransactionDataPartial[];
         const safeTx = await this.createTransaction(wallet, safeTransactionDataPartial);
-        const nonce = safeTx.data.nonce;
+
+        // Update nonce if needed
+        const nonce = safeTx.data.nonce > wallet.nonce ? safeTx.data.nonce : wallet.nonce + 1;
+        await wallet.updateOne({ nonce });
+
         const signedTx = await this.signTransaction(wallet, safeTx);
         const apiKit = this.getApiKit(wallet);
 
@@ -310,7 +309,7 @@ class SafeService {
         return await apiKit.getPendingTransactions(wallet.address);
     }
 
-    private async getSafe(wallet: WalletDocument) {
+    async getSafe(wallet: WalletDocument) {
         const { ethAdapter } = NetworkService.getProvider(wallet.chainId);
         const safe = await Safe.create({
             ethAdapter,

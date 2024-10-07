@@ -1,26 +1,30 @@
-import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { ERC721, ERC721Document } from '@thxnetwork/api/models/ERC721';
 import { ERC721Metadata, ERC721MetadataDocument } from '@thxnetwork/api/models/ERC721Metadata';
 import { ERC721Token, ERC721TokenDocument } from '@thxnetwork/api/models/ERC721Token';
 import { Transaction, TransactionDocument } from '@thxnetwork/api/models/Transaction';
-import { ERC721TokenState, TransactionState } from '@thxnetwork/common/enums';
-import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
+import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
-import { Wallet, WalletDocument } from '../models/Wallet';
-import { RewardNFT } from '../models/RewardNFT';
-import { getArtifact } from '../hardhat';
-import PoolService from './PoolService';
-import TransactionService from './TransactionService';
-import IPFSService from './IPFSService';
-import WalletService from './WalletService';
+import { ERC721TokenState, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
+import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { TransactionReceipt } from 'web3-core';
 import { toChecksumAddress } from 'web3-utils';
 import { ADDRESS_ZERO } from '../config/secrets';
+import { getArtifact } from '../hardhat';
+import { QRCodeEntry } from '../models';
+import { RewardNFT } from '../models/RewardNFT';
+import { Wallet, WalletDocument } from '../models/Wallet';
+import { PromiseParser } from '../util';
+import { logger } from '../util/logger';
+import IPFSService from './IPFSService';
+import PoolService from './PoolService';
+import SafeService from './SafeService';
+import TransactionService from './TransactionService';
+import WalletService from './WalletService';
 
 const contractName = 'THXERC721';
 
-async function deploy(data: TERC721, forceSync = true): Promise<ERC721Document> {
+async function deploy(data: Partial<TERC721>, forceSync = true): Promise<ERC721Document> {
     const { web3, defaultAccount } = NetworkService.getProvider(data.chainId);
     const { abi, bytecode } = getArtifact(contractName);
     const contract = new web3.eth.Contract(abi);
@@ -45,7 +49,32 @@ async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: 
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
     }
 
-    await ERC721.findByIdAndUpdate(erc721Id, { address: toChecksumAddress(receipt.contractAddress) });
+    const erc721 = await ERC721.findById(erc721Id);
+    await erc721.updateOne({ address: toChecksumAddress(receipt.contractAddress) });
+
+    // Deploy a wallet and make it a minter
+    let safe = await Wallet.findOne({
+        sub: erc721.sub,
+        chainId: erc721.chainId,
+        variant: WalletVariant.Safe,
+        owners: { $size: 1 },
+    });
+
+    // If no safe exists then deploy one on the nft chain
+    if (!safe) {
+        const { defaultAccount } = NetworkService.getProvider(erc721.chainId);
+        safe = await SafeService.create({
+            sub: erc721.sub,
+            chainId: erc721.chainId,
+            safeVersion: '1.3.0',
+            owners: [toChecksumAddress(defaultAccount)],
+        });
+    }
+
+    // Add minter role for the address
+    if (!erc721.minters.includes(safe.address)) {
+        await addMinter(erc721, safe.address);
+    }
 }
 
 export async function queryDeployTransaction(erc721: ERC721Document): Promise<ERC721Document> {
@@ -67,6 +96,25 @@ export async function findById(id: string): Promise<ERC721Document> {
     return erc721;
 }
 
+export async function getMinters(erc721: ERC721Document, sub: string) {
+    const wallets = await Wallet.find({
+        sub,
+        chainId: erc721.chainId,
+        variant: WalletVariant.Safe,
+        owners: { $size: 1 },
+    });
+
+    const minters = (
+        await PromiseParser.parse(
+            wallets.map(async (wallet: WalletDocument) => {
+                return { ...wallet.toJSON(), isMinter: await isMinter(erc721, wallet.address) };
+            }),
+        )
+    ).filter((wallet: any) => wallet.isMinter);
+
+    return { wallets, minters };
+}
+
 export async function findBySub(sub: string): Promise<ERC721Document[]> {
     const pools = await PoolService.getAllBySub(sub);
     const nftRewards = await RewardNFT.find({ poolId: pools.map((p) => String(p._id)) });
@@ -77,7 +125,11 @@ export async function findBySub(sub: string): Promise<ERC721Document[]> {
 }
 
 export async function deleteMetadata(id: string) {
-    return ERC721Metadata.findOneAndDelete({ _id: id });
+    // Delete QR codes for this bit of metadata
+    await QRCodeEntry.deleteMany({ erc721MetadataId: id });
+
+    // Delete metadata
+    await ERC721Metadata.findOneAndDelete({ _id: id });
 }
 
 export async function mint(
@@ -100,12 +152,29 @@ export async function mint(
     );
 }
 
+export async function getTokenURI(erc721: ERC721Document, metadata: ERC721MetadataDocument) {
+    const uri = await IPFSService.getTokenURI(erc721, metadata.id);
+    return erc721.baseURL + uri;
+}
+
+export async function createToken(erc721: ERC721Document, metadata: ERC721MetadataDocument, wallet: WalletDocument) {
+    const tokenUri = await getTokenURI(erc721, metadata);
+    return await ERC721Token.create({
+        sub: wallet.sub,
+        walletId: wallet.id,
+        recipient: wallet.address,
+        chainId: erc721.chainId,
+        erc721Id: erc721.id,
+        metadataId: metadata.id,
+        tokenUri: tokenUri,
+    });
+}
+
 export async function mintCallback(args: TERC721TokenMintCallbackArgs, receipt: TransactionReceipt) {
     const metadata = await ERC721Metadata.findById(args.erc721MetadataId);
     const erc721 = await ERC721.findById(metadata.erc721Id);
-    const tokenUri = await IPFSService.getTokenURI(erc721, metadata.id);
-
     const logs = parseLogs(erc721.contract.options.jsonInterface, receipt.logs);
+
     //  Get all the ERC721 mint events Transfer(from: 0x00, to: wallet address, tokenId: exists)
     const events = logs.filter(
         (ev: any) => ev && ev.name === 'Transfer' && ev.args.from === ADDRESS_ZERO && ev.args.tokenId,
@@ -121,18 +190,30 @@ export async function mintCallback(args: TERC721TokenMintCallbackArgs, receipt: 
         });
         if (tokenExists) continue;
 
-        // Add tokent to account wallets
-        for (const wallet of await Wallet.find({ address: event.args.to })) {
-            await ERC721Token.create({
+        // Add token to account wallets
+        for (const wallet of await Wallet.find({ address: toChecksumAddress(event.args.to) })) {
+            console.log(event.args.tokenId, {
                 sub: wallet.sub,
                 walletId: wallet.id,
+                recipient: wallet.address,
                 chainId: erc721.chainId,
                 erc721Id: erc721.id,
                 metadataId: metadata.id,
-                tokenUri: erc721.baseURL + tokenUri,
-                recipient: event.args.to,
-                tokenId: Number(event.args.tokenId),
             });
+            await ERC721Token.findOneAndUpdate(
+                {
+                    sub: wallet.sub,
+                    walletId: wallet.id,
+                    recipient: wallet.address,
+                    chainId: erc721.chainId,
+                    erc721Id: erc721.id,
+                    metadataId: metadata.id,
+                    tokenId: { $exists: false },
+                },
+                {
+                    tokenId: Number(event.args.tokenId),
+                },
+            );
         }
     }
 }
@@ -163,13 +244,17 @@ async function isMinter(erc721: ERC721Document, address: string) {
 }
 
 async function addMinter(erc721: ERC721Document, address: string) {
-    const receipt = await TransactionService.send(
-        erc721.address,
-        erc721.contract.methods.grantRole(keccak256(toUtf8Bytes('MINTER_ROLE')), address),
-        erc721.chainId,
-    );
+    try {
+        const receipt = await TransactionService.send(
+            erc721.address,
+            erc721.contract.methods.grantRole(keccak256(toUtf8Bytes('MINTER_ROLE')), address),
+            erc721.chainId,
+        );
 
-    assertEvent('RoleGranted', parseLogs(erc721.contract.options.jsonInterface, receipt.logs));
+        assertEvent('RoleGranted', parseLogs(erc721.contract.options.jsonInterface, receipt.logs));
+    } catch (error) {
+        logger.error(error);
+    }
 }
 
 async function findTokensByRecipient(recipient: string, erc721Id: string): Promise<TERC721Token[]> {
@@ -285,11 +370,13 @@ export default {
     deleteMetadata,
     mint,
     mintCallback,
+    createToken,
     queryMintTransaction,
     findBySub,
     findMetadataByNFT,
     findTokensByRecipient,
     addMinter,
+    getMinters,
     isMinter,
     parseAttributes,
     queryDeployTransaction,

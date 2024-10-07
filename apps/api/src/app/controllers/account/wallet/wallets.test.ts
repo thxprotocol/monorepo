@@ -1,10 +1,10 @@
-import request from 'supertest';
 import app from '@thxnetwork/api/';
+import { safeVersion } from '@thxnetwork/api/services/ContractService';
 import Mock from '@thxnetwork/api/util/jest/config';
 import { userWalletPrivateKey4 } from '@thxnetwork/api/util/jest/constants';
-import { ChainId, WalletVariant } from '@thxnetwork/common/enums';
 import { signMessage } from '@thxnetwork/api/util/jest/network';
-import { safeVersion } from '@thxnetwork/api/services/ContractService';
+import { ChainId, WalletVariant } from '@thxnetwork/common/enums';
+import request from 'supertest';
 
 const user = request.agent(app);
 

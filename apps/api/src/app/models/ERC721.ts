@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
+import mongoose from 'mongoose';
 import { getArtifact } from '../hardhat';
 
 export type ERC721Document = mongoose.Document & TERC721;
@@ -12,6 +12,7 @@ const schema = new mongoose.Schema(
         symbol: String,
         description: String,
         transactions: [String],
+        minters: [String],
         address: String,
         baseURL: String,
         archived: Boolean,

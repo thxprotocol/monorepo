@@ -1,0 +1,14 @@
+html,
+body,
+#app,
+#main {
+    height: 100%;
+}
+
+.text-opaque {
+    opacity: .5 !important;
+}
+
+.grecaptcha-badge { 
+    visibility: hidden !important;
+}

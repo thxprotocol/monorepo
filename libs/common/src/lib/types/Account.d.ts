@@ -24,3 +24,13 @@ type TAccount = {
     updatedAt: Date;
     providerUserId: string;
 };
+
+type TOAuthScope = OAuthGoogleScope | OAuthTwitterScope | OAuthDiscordScope | OAuthTwitchScope | OAuthGithubScope;
+
+type TRequestOptions = {
+    isAuthenticated?: boolean;
+    body?: any;
+    params?: any;
+    headers?: any;
+    method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
+};

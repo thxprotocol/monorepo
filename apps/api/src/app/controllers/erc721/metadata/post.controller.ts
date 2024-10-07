@@ -15,9 +15,8 @@ const validation = [
 ];
 
 const controller = async (req: Request, res: Response) => {
-    // #swagger.tags = ['ERC721']
     const erc721 = await ERC721Service.findById(req.params.id);
-    if (!erc721) throw new NotFoundError('Could not find this NFT in the database');
+    if (!erc721) throw new NotFoundError('ERC721 not found');
 
     let image = req.body.imageUrl;
     if (req.body.imageUrl && NODE_ENV === 'production') {
@@ -26,7 +25,7 @@ const controller = async (req: Request, res: Response) => {
     }
 
     const metadata = await ERC721Metadata.create({
-        erc721Id: String(erc721._id),
+        erc721Id: erc721.id,
         name: req.body.name,
         image,
         imageUrl: req.body.imageUrl,

@@ -1,7 +1,7 @@
-import { param } from 'express-validator';
-import { Request, Response } from 'express';
 import ERC721Service from '@thxnetwork/api/services/ERC721Service';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
+import { Request, Response } from 'express';
+import { param } from 'express-validator';
 
 const validation = [param('id').isMongoId()];
 
@@ -14,15 +14,9 @@ const controller = async (req: Request, res: Response) => {
         erc721 = await ERC721Service.queryDeployTransaction(erc721);
     }
 
-    // Still no address.
-    if (!erc721.address) {
-        return res.send(erc721);
-    }
+    const { wallets, minters } = await ERC721Service.getMinters(erc721, req.auth.sub);
 
-    const totalSupply = await erc721.contract.methods.totalSupply().call();
-    const owner = await erc721.contract.methods.owner().call();
-
-    res.json({ ...erc721.toJSON(), totalSupply, owner });
+    res.json({ ...erc721.toJSON(), wallets, minters });
 };
 
 export { controller, validation };

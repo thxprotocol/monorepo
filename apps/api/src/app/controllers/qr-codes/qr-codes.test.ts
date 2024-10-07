@@ -1,22 +1,22 @@
-import request from 'supertest';
 import app from '@thxnetwork/api/';
-import Mock from '@thxnetwork/api/util/jest/config';
-import { ChainId, NFTVariant, RewardVariant } from '@thxnetwork/common/enums';
+import { IPFS_BASE_URL } from '@thxnetwork/api/config/secrets';
 import {
-    PoolDocument,
+    ERC721Document,
     ERC721Metadata,
     ERC721MetadataDocument,
+    PoolDocument,
     QRCodeEntryDocument,
-    ERC721Document,
     RewardNFTDocument,
 } from '@thxnetwork/api/models';
-import { IPFS_BASE_URL } from '@thxnetwork/api/config/secrets';
-import { poll } from '@thxnetwork/api/util/polling';
 import { WalletDocument } from '@thxnetwork/api/models/Wallet';
+import ERC721Service from '@thxnetwork/api/services/ERC721Service';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
 import PoolService from '@thxnetwork/api/services/PoolService';
-import ERC721Service from '@thxnetwork/api/services/ERC721Service';
 import SafeService from '@thxnetwork/api/services/SafeService';
+import Mock from '@thxnetwork/api/util/jest/config';
+import { poll } from '@thxnetwork/api/util/polling';
+import { ChainId, NFTVariant, RewardVariant } from '@thxnetwork/common/enums';
+import request from 'supertest';
 
 const user = request.agent(app);
 
@@ -38,9 +38,9 @@ describe('QR Codes', () => {
     });
     afterAll(() => Mock.afterAll());
 
-    it('POST /pools/:poolId/wallets', async () => {
+    it('POST /wallets', async () => {
         const { status, body } = await user
-            .post(`/v1/pools/${poolId}/wallets`)
+            .post(`/v1/wallets`)
             .set({ Authorization: Mock.accounts[0].authHeader })
             .send({
                 chainId: ChainId.Hardhat,

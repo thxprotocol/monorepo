@@ -1,4 +1,4 @@
-import { RewardSortVariant, QuestVariant } from '../types/enums/rewards';
+import { QuestVariant, RewardSortVariant } from '../types/enums/rewards';
 
 export function toNumber(value?: boolean) {
     return value === undefined ? 0 : Number(value);

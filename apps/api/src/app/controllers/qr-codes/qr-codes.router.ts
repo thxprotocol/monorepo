@@ -14,7 +14,7 @@ router.get('/r/:uuid', assertRequestInput(ReadRedirectEntry.validation), ReadRed
 router.use(checkJwt, corsHandler);
 router.get('/', assertRequestInput(ListEntry.validation), ListEntry.controller);
 router.post('/', assertRequestInput(CreateEntry.validation), CreateEntry.controller);
+router.delete('/:id', assertRequestInput(DeleteEntryController.validation), DeleteEntryController.controller);
 router.patch('/:uuid', assertRequestInput(UpdateEntryController.validation), UpdateEntryController.controller);
-router.delete('/:uuid', assertRequestInput(DeleteEntryController.validation), DeleteEntryController.controller);
 
 export default router;

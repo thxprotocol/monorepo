@@ -12,8 +12,8 @@ import db from '@thxnetwork/api/util/database';
 // import main from './src/preview';
 // import main from './src/metamask';
 // import main from './src/lottery';
-import main from './src/web3';
-// import main from './src/safe';
+// import main from './src/web3';
+import main from './src/safe';
 
 db.connect(process.env.MONGODB_URI_PROD);
 

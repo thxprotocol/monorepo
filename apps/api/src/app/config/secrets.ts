@@ -65,6 +65,7 @@ export const WALLET_URL = process.env.WALLET_URL || '';
 export const DASHBOARD_URL = process.env.DASHBOARD_URL || '';
 export const WIDGET_URL = process.env.WIDGET_URL || '';
 export const PUBLIC_URL = process.env.PUBLIC_URL || '';
+export const STUDIO_URL = process.env.STUDIO_URL || '';
 
 export const HARDHAT_RPC = process.env.HARDHAT_RPC || '';
 export const POLYGON_RPC = process.env.POLYGON_RPC || 'https://rpc.ankr.com/polygon';

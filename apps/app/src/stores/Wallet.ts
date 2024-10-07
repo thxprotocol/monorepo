@@ -1,35 +1,35 @@
 import Safe, { EthersAdapter } from '@safe-global/protocol-kit';
-import { useAccountStore } from './Account';
-import { defineStore } from 'pinia';
 import { track } from '@thxnetwork/app/utils/mixpanel';
-import { useAuthStore } from './Auth';
 import { ChainId } from '@thxnetwork/common/enums';
-import { WalletVariant } from '../types/enums/accountVariant';
-import { API_URL, POLYGON_RPC, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
-import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 import {
-    sendTransaction,
     disconnect,
-    watchAccount,
+    getAccount,
+    GetAccountReturnType,
+    getChainId,
+    reconnect,
+    sendTransaction,
     signMessage,
     switchChain,
-    watchChainId,
-    GetAccountReturnType,
-    reconnect,
-    getAccount,
-    getChainId,
-    watchConnections,
     waitForTransactionReceipt,
+    watchAccount,
+    watchChainId,
+    watchConnections,
 } from '@wagmi/core';
-import { mainnet } from 'viem/chains';
-import { chainList } from '../utils/chains';
-import { RewardVariant } from '../types/enums/rewards';
-import { encodeFunctionData } from 'viem';
+import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 import { ethers } from 'ethers';
-import { abi } from '../utils/abi';
-import { contractNetworks } from '../config/constants';
+import { defineStore } from 'pinia';
+import { encodeFunctionData } from 'viem';
+import { mainnet } from 'viem/chains';
 import imgSafeLogo from '../assets/safe-logo.jpg';
 import imgWalletConnectLogo from '../assets/walletconnect-logo.png';
+import { contractNetworks } from '../config/constants';
+import { API_URL, POLYGON_RPC, WALLET_CONNECT_PROJECT_ID, WIDGET_URL } from '../config/secrets';
+import { WalletVariant } from '../types/enums/accountVariant';
+import { RewardVariant } from '../types/enums/rewards';
+import { abi } from '../utils/abi';
+import { chainList } from '../utils/chains';
+import { useAccountStore } from './Account';
+import { useAuthStore } from './Auth';
 
 type TRequestBodyApproval = {
     tokenAddress: string;

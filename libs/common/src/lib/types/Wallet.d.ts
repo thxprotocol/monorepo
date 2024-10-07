@@ -10,15 +10,19 @@ type TNetworkConfig = {
 };
 
 type TWallet = {
-    _id?: string;
+    _id: string;
     poolId: string;
     sub: string;
     chainId?: ChainId;
     address: string;
     version: string;
+    nonce: number;
     variant: WalletVariant;
     safeVersion: string;
     uuid: string;
     createdAt: Date;
     expiresAt: Date;
+    short: string;
+    owners: string[];
+    transactions: TTransaction[];
 };

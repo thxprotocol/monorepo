@@ -9,17 +9,20 @@ type TERC721Token = {
     metadataId: string;
     erc721Id: string;
     metadata: TERC721Metadata;
+    nft: TERC721 | TERC1155;
     walletId: string;
     chainId: ChainId;
     balance?: string;
 };
 
 type TERC721 = {
-    _id?: string;
+    _id: string;
     variant: NFTVariant;
     sub: string;
     chainId: ChainId;
     name: string;
+    minters: string[];
+    wallets: string[];
     symbol: string;
     transactions?: string[];
     baseURL?: string;

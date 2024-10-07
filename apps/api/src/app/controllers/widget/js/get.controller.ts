@@ -1,10 +1,11 @@
 import { API_URL, AUTH_URL, DASHBOARD_URL, NODE_ENV, WIDGET_URL } from '@thxnetwork/api/config/secrets';
+import { QRCodeEntry } from '@thxnetwork/api/models';
+import { Widget } from '@thxnetwork/api/models/Widget';
 import BrandService from '@thxnetwork/api/services/BrandService';
 import PoolService from '@thxnetwork/api/services/PoolService';
-import { Widget } from '@thxnetwork/api/models/Widget';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { Request, Response } from 'express';
-import { query, param } from 'express-validator';
+import { param, query } from 'express-validator';
 import { minify } from 'terser';
 
 const validation = [
@@ -16,6 +17,16 @@ const validation = [
 const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(req.params.id);
     if (!pool) throw new NotFoundError('Pool not found.');
+
+    // If there are QR codes we redirect to it's wallet equivalent
+    const isQRCodeCampaign = await QRCodeEntry.exists({ poolId: req.params.id });
+    if (isQRCodeCampaign) {
+        const widget = await Widget.findOne({ poolId: req.params.id });
+        if (!widget) throw new NotFoundError('Widget not found.');
+
+        res.redirect(302, `${API_URL}/v1/wallet/js/${widget.id}.js`);
+        return;
+    }
 
     const brand = await BrandService.get(pool._id);
     const widget = await Widget.findOne({ poolId: req.params.id });
