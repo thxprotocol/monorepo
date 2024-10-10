@@ -36,7 +36,7 @@ export const useAuthStore = defineStore('auth', {
             }
 
             const url = new URL(API_URL);
-            url.pathname = `/v1${path}`;
+            url.pathname = path;
             if (options?.params) {
                 for (const key in options.params) {
                     url.searchParams.append(key, options.params[key]);

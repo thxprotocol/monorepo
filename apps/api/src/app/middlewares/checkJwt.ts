@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { logger } from '../util/logger';
+import { NextFunction, Request, Response } from 'express';
 import AccountProxy from '../proxies/AccountProxy';
+import { logger } from '../util/logger';
 
 export const checkJwt = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
