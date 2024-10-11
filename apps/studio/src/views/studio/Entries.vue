@@ -1,7 +1,7 @@
 <template>
     <b-container class="py-5 text-white">
-        <h1>QR Codes</h1>
-        <p class="lead">Dig deeper in QR Codes entry data.</p>
+        <h1>Usage</h1>
+        <p class="lead">Dig deeper in QR Code entry data.</p>
     </b-container>
     <div class="bg-dark py-5 flex-grow-1">
         <b-container>
