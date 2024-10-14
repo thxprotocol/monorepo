@@ -18,18 +18,12 @@ export const useCollectionStore = defineStore('collection', {
         },
         async list() {
             const data = await this.request('/erc721');
-            this.collections = await Promise.all(
-                data.map(async (id: string) => {
-                    return await this.request(`/erc721/${id}`);
-                }),
-            );
-
-            for (const key in this.collections) {
-                const erc721 = this.collections[key];
-                this.request(`/erc721/${erc721._id}/minter`).then(({ minters, wallets }) => {
-                    this.collections[key] = { ...erc721, minters, wallets };
-                });
-            }
+            this.collections = await Promise.all(data.map(async (id: string) => this.request(`/erc721/${id}`)));
+        },
+        async getMinter(id: string) {
+            const { minters, wallets } = await this.request(`/erc721/${id}/minter`);
+            const index = this.collections.findIndex((collection) => collection._id === id);
+            this.collections[index] = { ...this.collections[index], minters, wallets };
         },
         async get(id: string) {
             const data = await this.request(`/erc721/${id}`);

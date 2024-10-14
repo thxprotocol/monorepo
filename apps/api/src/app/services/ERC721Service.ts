@@ -72,7 +72,7 @@ async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: 
     }
 
     // Add minter role for the address
-    if (!erc721.minters.includes(safe.address)) {
+    if (!erc721.minters.map((m) => m.address).includes(safe.address)) {
         await addMinter(erc721, safe.address);
     }
 }

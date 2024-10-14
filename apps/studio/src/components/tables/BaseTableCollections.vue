@@ -25,23 +25,7 @@
             </b-link>
         </template>
         <template #cell(minter)="{ item }">
-            <BaseButtonWalletCreate
-                v-if="!item.collection.wallets.length"
-                :collection="item.collection"
-                @submit="listCollections"
-            />
-            <BaseButtonMinterCreate
-                v-if="!item.collection.minters.length"
-                :collection="item.collection"
-                :wallet="item.collection.wallets[0]"
-                @submit="listCollections"
-            />
-            <b-link v-if="item.minter.long" :href="item.minter.url" target="_blank" class="text-decoration-none">
-                <code>
-                    {{ item.minter.short }}
-                    <BaseIcon icon="external-link-alt" />
-                </code>
-            </b-link>
+            <BaseButtonGroupMinterWallet :collection="item.minter.collection" />
         </template>
         <template #cell(collection)="{ item }">
             <b-dropdown no-caret size="sm" end variant="link">
@@ -104,13 +88,7 @@ export default defineComponent({
                         short: collection.address ? shortenAddress(collection.address as `0x${string}`) : '',
                     },
                     minter: {
-                        url: collection.minters.length
-                            ? chainInfo[collection.chainId].blockExplorer + '/address/' + collection.minters[0]?.address
-                            : '',
-                        long: collection.minters.length ? collection.minters[0]?.address : '',
-                        short: collection.minters.length
-                            ? shortenAddress(collection.minters[0]?.address as `0x${string}`)
-                            : '',
+                        collection,
                     },
                     collection,
                 };
