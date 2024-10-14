@@ -18,6 +18,7 @@ import { PromiseParser } from '../util';
 import { logger } from '../util/logger';
 import IPFSService from './IPFSService';
 import PoolService from './PoolService';
+import SafeService from './SafeService';
 import TransactionService from './TransactionService';
 import WalletService from './WalletService';
 
