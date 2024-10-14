@@ -49,35 +49,7 @@ const controller = async (req: Request, res: Response) => {
                     iframe.style.transform = transform === 'scale(1)' ? 'scale(0)' : 'scale(1)';
                 }
             }
-
-            function fetchAndApplyStyles(cssUrl) {
-                fetch(cssUrl)
-                     .then(response => response.text())
-                     .then(css => {
-                         const styleSheet = new CSSStyleSheet();
-                         styleSheet.replaceSync(css);
-                         
-                         for (const rule of styleSheet.cssRules) {
-                             if (rule.style) {
-                                 const elements = document.querySelectorAll(rule.selectorText);
-                                 elements.forEach(element => {
-                                     for (let i = 0; i < rule.style.length; i++) {
-                                         const property = rule.style[i];
-                                         element.style.setProperty(
-                                             property,
-                                             rule.style.getPropertyValue(property),
-                                             rule.style.getPropertyPriority(property)
-                                         );
-                                     }
-                                 });
-                             }
-                         }
-                     })
-                     .catch(error => console.error('Error loading styles:', error));
-            }
-
-            fetchAndApplyStyles(CSS_URL);
-    
+                        
             // // Link the stylesheet
             // const stylesheet = document.createElement('link');
             // stylesheet.rel = 'stylesheet';
@@ -104,9 +76,8 @@ const controller = async (req: Request, res: Response) => {
                 </div>
                 <iframe id="wallet-widget-iframe" src="\${iframeSrc.toString()}"></iframe>
             \`;
-            document.body.appendChild(template)
-            
-            function onLoad() { 
+    
+            function init() { 
                 const container = document.getElementById('wallet-widget-container');
                 const message = document.getElementById('wallet-widget-message');
                 const launcher = document.getElementById('wallet-widget-launcher');
@@ -139,7 +110,18 @@ const controller = async (req: Request, res: Response) => {
                 })
             }
             
-            onLoad();
+            // Fetch and attach inline styles before appending the template to the body
+            fetch(CSS_URL).then(response => response.text()).then(css => {
+               // Create a new style element
+                const style = document.createElement('style');
+                style.textContent = css;
+                
+                // Append it to the head of the document
+                document.head.appendChild(style);
+                document.body.appendChild(template)
+                
+                init();
+            });
         })();
     `;
 
