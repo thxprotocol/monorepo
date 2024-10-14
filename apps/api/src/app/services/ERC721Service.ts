@@ -49,8 +49,11 @@ async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: 
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
     }
 
-    const erc721 = await ERC721.findById(erc721Id);
-    await erc721.updateOne({ address: toChecksumAddress(receipt.contractAddress) });
+    const erc721 = await ERC721.findByIdAndUpdate(
+        erc721Id,
+        { address: toChecksumAddress(receipt.contractAddress) },
+        { new: true },
+    );
 
     // Deploy a wallet and make it a minter
     let safe = await Wallet.findOne({
