@@ -8,9 +8,11 @@ import {
     WIDGET_URL,
 } from '@thxnetwork/api/config/secrets';
 import cors from 'cors';
+import { Widget } from '../models';
 
 export const corsHandler = cors(async (req: any, callback: any) => {
     const origin = req.header('Origin');
+    const domains = await Widget.find({ domain: { $exists: true, $ne: 'https://www.example.com' } }).distinct('domain');
     const allowedOrigins = [
         AUTH_URL,
         API_URL,
@@ -34,6 +36,7 @@ export const corsHandler = cors(async (req: any, callback: any) => {
         'https://dev-app.twinstory.io',
         'https://admin.twinstory.io',
         'https://dev-admin.twinstory.io',
+        ...domains,
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {
