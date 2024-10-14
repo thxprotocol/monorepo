@@ -17,7 +17,7 @@ export const useCollectionStore = defineStore('collection', {
             return useAuthStore().request(path, options);
         },
         async list() {
-            const data = await this.request('/erc721');
+            const data = await this.request('/collections');
             this.collections = await Promise.all(
                 data.map(async (id: string) => {
                     return await this.request(`/erc721/${id}`);
