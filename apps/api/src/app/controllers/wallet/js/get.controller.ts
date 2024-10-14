@@ -49,14 +49,42 @@ const controller = async (req: Request, res: Response) => {
                     iframe.style.transform = transform === 'scale(1)' ? 'scale(0)' : 'scale(1)';
                 }
             }
+
+            function fetchAndApplyStyles(cssUrl) {
+                fetch(cssUrl)
+                     .then(response => response.text())
+                     .then(css => {
+                         const styleSheet = new CSSStyleSheet();
+                         styleSheet.replaceSync(css);
+                         
+                         for (const rule of styleSheet.cssRules) {
+                             if (rule.style) {
+                                 const elements = document.querySelectorAll(rule.selectorText);
+                                 elements.forEach(element => {
+                                     for (let i = 0; i < rule.style.length; i++) {
+                                         const property = rule.style[i];
+                                         element.style.setProperty(
+                                             property,
+                                             rule.style.getPropertyValue(property),
+                                             rule.style.getPropertyPriority(property)
+                                         );
+                                     }
+                                 });
+                             }
+                         }
+                     })
+                     .catch(error => console.error('Error loading styles:', error));
+            }
+
+            fetchAndApplyStyles(CSS_URL);
     
-            // Link the stylesheet
-            const stylesheet = document.createElement('link');
-            stylesheet.rel = 'stylesheet';
-            stylesheet.href = CSS_URL; 
-            stylesheet.type = 'text/css';
-            stylesheet.media = 'all';
-            document.head.appendChild(stylesheet);
+            // // Link the stylesheet
+            // const stylesheet = document.createElement('link');
+            // stylesheet.rel = 'stylesheet';
+            // stylesheet.href = CSS_URL; 
+            // stylesheet.type = 'text/css';
+            // stylesheet.media = 'all';
+            // document.head.appendChild(stylesheet);
 
             // Check if there is a forced app path 
             const parentUrl = new URL(window.location.href)

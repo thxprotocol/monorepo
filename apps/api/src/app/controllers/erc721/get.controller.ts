@@ -9,14 +9,7 @@ const controller = async (req: Request, res: Response) => {
     const erc721 = await ERC721Service.findById(req.params.id);
     if (!erc721) throw new NotFoundError();
 
-    // Check if pending transaction is mined.
-    // if (!erc721.address) {
-    //     erc721 = await ERC721Service.queryDeployTransaction(erc721);
-    // }
-
-    const { wallets, minters } = await ERC721Service.getMinters(erc721, req.auth.sub);
-
-    res.json({ ...erc721.toJSON(), wallets, minters });
+    res.json(erc721);
 };
 
 export { controller, validation };
