@@ -180,7 +180,7 @@ export default defineComponent({
                 // Iterate over the uuids and create a QR code for each
                 for (const uuid of this.codes) {
                     const url = this.getUrl(uuid);
-                    const imageURL = this.imageFile ? URL.createObjectURL(this.imageFile) : STUDIO_URL + '/qr.jpg';
+                    const imageURL = this.imageFile ? URL.createObjectURL(this.imageFile) : STUDIO_URL + '/qr.png';
                     const data = await this.createQRCode(imageURL, this.size, this.color, url);
                     archive.file(`${uuid}.png`, data, { base64: true });
                     this.index++;
