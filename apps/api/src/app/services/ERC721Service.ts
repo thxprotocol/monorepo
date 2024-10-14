@@ -100,6 +100,7 @@ export async function findById(id: string): Promise<ERC721Document> {
 }
 
 export async function getMinters(erc721: ERC721Document, sub: string) {
+    // Fetch campaign safes
     const wallets = await Wallet.find({
         sub,
         chainId: erc721.chainId,
@@ -107,6 +108,15 @@ export async function getMinters(erc721: ERC721Document, sub: string) {
         owners: { $size: 1 },
     });
 
+    // Return early if cached already
+    if (erc721.minters && erc721.minters.length) {
+        return {
+            wallets,
+            minters: await Promise.all(erc721.minters.map((address) => Wallet.findOne({ address }))),
+        };
+    }
+
+    // Test wallet addresses for minter roles
     const minters = (
         await PromiseParser.parse(
             wallets.map(async (wallet: WalletDocument) => {
@@ -114,6 +124,9 @@ export async function getMinters(erc721: ERC721Document, sub: string) {
             }),
         )
     ).filter((wallet: any) => wallet.isMinter);
+
+    // Cache results in db (not likely to change as UI does not allow for it)
+    await erc721.updateOne({ minters: minters.map((m) => m.address) });
 
     return { wallets, minters };
 }
