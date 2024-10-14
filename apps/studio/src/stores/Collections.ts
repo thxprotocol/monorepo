@@ -20,7 +20,9 @@ export const useCollectionStore = defineStore('collection', {
             const data = await this.request('/erc721');
             this.collections = await Promise.all(
                 data.map(async (id: string) => {
-                    return await this.request(`/erc721/${id}`);
+                    const erc721 = await this.request(`/erc721/${id}`);
+                    const { minters, wallets } = await this.request(`/erc721/${id}/minters`);
+                    return { ...erc721, minters, wallets };
                 }),
             );
         },

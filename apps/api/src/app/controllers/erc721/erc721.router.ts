@@ -13,6 +13,7 @@ import * as CreateMultipleERC721Metadata from './metadata/images/post.controller
 import * as ListERC721Metadata from './metadata/list.controller';
 import * as PatchERC721Metadata from './metadata/patch.controller';
 import * as CreateERC721Metadata from './metadata/post.controller';
+import * as ListERC721Minter from './minter/get.controller';
 import * as CreateERC721Minter from './minter/post.controller';
 import * as UpdateERC721 from './patch.controller';
 import * as CreateERC721 from './post.controller';
@@ -26,6 +27,7 @@ router.get('/token', assertRequestInput(ListERC721Token.validation), ListERC721T
 router.get('/token/:id', ReadERC721Token.controller);
 router.get('/', assertRequestInput(ListERC721.validation), ListERC721.controller);
 router.get('/:id', assertRequestInput(ReadERC721.validation), ReadERC721.controller);
+router.get('/:id/minter', assertRequestInput(ListERC721Minter.validation), ListERC721Minter.controller);
 router.post('/:id/minter', assertRequestInput(CreateERC721Minter.validation), CreateERC721Minter.controller);
 
 router.post('/', upload.single('file'), assertRequestInput(CreateERC721.validation), CreateERC721.controller);
