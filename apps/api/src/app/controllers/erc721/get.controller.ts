@@ -6,8 +6,13 @@ import { param } from 'express-validator';
 const validation = [param('id').isMongoId()];
 
 const controller = async (req: Request, res: Response) => {
-    const erc721 = await ERC721Service.findById(req.params.id);
+    let erc721 = await ERC721Service.findById(req.params.id);
     if (!erc721) throw new NotFoundError();
+
+    // Check if pending transaction is mined.
+    if (!erc721.address) {
+        erc721 = await ERC721Service.queryDeployTransaction(erc721);
+    }
 
     res.json(erc721);
 };

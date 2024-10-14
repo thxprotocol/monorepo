@@ -18,7 +18,6 @@ import { PromiseParser } from '../util';
 import { logger } from '../util/logger';
 import IPFSService from './IPFSService';
 import PoolService from './PoolService';
-import SafeService from './SafeService';
 import TransactionService from './TransactionService';
 import WalletService from './WalletService';
 
@@ -52,29 +51,29 @@ async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: 
     const erc721 = await ERC721.findById(erc721Id);
     await erc721.updateOne({ address: toChecksumAddress(receipt.contractAddress) });
 
-    // Deploy a wallet and make it a minter
-    let safe = await Wallet.findOne({
-        sub: erc721.sub,
-        chainId: erc721.chainId,
-        variant: WalletVariant.Safe,
-        owners: { $size: 1 },
-    });
+    // // Deploy a wallet and make it a minter
+    // let safe = await Wallet.findOne({
+    //     sub: erc721.sub,
+    //     chainId: erc721.chainId,
+    //     variant: WalletVariant.Safe,
+    //     owners: { $size: 1 },
+    // });
 
-    // If no safe exists then deploy one on the nft chain
-    if (!safe) {
-        const { defaultAccount } = NetworkService.getProvider(erc721.chainId);
-        safe = await SafeService.create({
-            sub: erc721.sub,
-            chainId: erc721.chainId,
-            safeVersion: '1.3.0',
-            owners: [toChecksumAddress(defaultAccount)],
-        });
-    }
+    // // If no safe exists then deploy one on the nft chain
+    // if (!safe) {
+    //     const { defaultAccount } = NetworkService.getProvider(erc721.chainId);
+    //     safe = await SafeService.create({
+    //         sub: erc721.sub,
+    //         chainId: erc721.chainId,
+    //         safeVersion: '1.3.0',
+    //         owners: [toChecksumAddress(defaultAccount)],
+    //     });
+    // }
 
-    // Add minter role for the address
-    if (!erc721.minters.includes(safe.address)) {
-        await addMinter(erc721, safe.address);
-    }
+    // // Add minter role for the address
+    // if (!erc721.minters.includes(safe.address)) {
+    //     await addMinter(erc721, safe.address);
+    // }
 }
 
 export async function queryDeployTransaction(erc721: ERC721Document): Promise<ERC721Document> {
