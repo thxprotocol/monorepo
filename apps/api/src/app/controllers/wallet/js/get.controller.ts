@@ -77,9 +77,8 @@ const controller = async (req: Request, res: Response) => {
                 <iframe id="wallet-widget-iframe" src="\${iframeSrc.toString()}"></iframe>
             \`;
             document.body.appendChild(template)
-             
-            // Execute when DOM is ready
-            document.addEventListener('DOMContentLoaded', () => {
+            
+            function onLoad() { 
                 const container = document.getElementById('wallet-widget-container');
                 const message = document.getElementById('wallet-widget-message');
                 const launcher = document.getElementById('wallet-widget-launcher');
@@ -110,7 +109,9 @@ const controller = async (req: Request, res: Response) => {
                 message.addEventListener('click', () => {
                     message.remove();
                 })
-            });
+            }
+            
+            onLoad();
         })();
     `;
 
