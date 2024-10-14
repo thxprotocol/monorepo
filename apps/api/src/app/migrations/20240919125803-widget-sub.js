@@ -18,7 +18,7 @@ module.exports = {
                             filter: { _id: w._id },
                             update: {
                                 $set: {
-                                    accountId: pool.sub,
+                                    sub: pool.sub,
                                     slug: pool.settings.slug,
                                     name: pool.settings.title,
                                     description: pool.settings.description,
