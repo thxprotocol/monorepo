@@ -49,14 +49,14 @@ const controller = async (req: Request, res: Response) => {
                     iframe.style.transform = transform === 'scale(1)' ? 'scale(0)' : 'scale(1)';
                 }
             }
-    
-            // Link the stylesheet
-            const stylesheet = document.createElement('link');
-            stylesheet.rel = 'stylesheet';
-            stylesheet.href = CSS_URL; 
-            stylesheet.type = 'text/css';
-            stylesheet.media = 'all';
-            document.head.appendChild(stylesheet);
+                        
+            // // Link the stylesheet
+            // const stylesheet = document.createElement('link');
+            // stylesheet.rel = 'stylesheet';
+            // stylesheet.href = CSS_URL; 
+            // stylesheet.type = 'text/css';
+            // stylesheet.media = 'all';
+            // document.head.appendChild(stylesheet);
 
             // Check if there is a forced app path 
             const parentUrl = new URL(window.location.href)
@@ -76,10 +76,8 @@ const controller = async (req: Request, res: Response) => {
                 </div>
                 <iframe id="wallet-widget-iframe" src="\${iframeSrc.toString()}"></iframe>
             \`;
-            document.body.appendChild(template)
-             
-            // Execute when DOM is ready
-            document.addEventListener('DOMContentLoaded', () => {
+    
+            function init() { 
                 const container = document.getElementById('wallet-widget-container');
                 const message = document.getElementById('wallet-widget-message');
                 const launcher = document.getElementById('wallet-widget-launcher');
@@ -110,6 +108,19 @@ const controller = async (req: Request, res: Response) => {
                 message.addEventListener('click', () => {
                     message.remove();
                 })
+            }
+            
+            // Fetch and attach inline styles before appending the template to the body
+            fetch(CSS_URL).then(response => response.text()).then(css => {
+               // Create a new style element
+                const style = document.createElement('style');
+                style.textContent = css;
+                
+                // Append it to the head of the document
+                document.head.appendChild(style);
+                document.body.appendChild(template)
+                
+                init();
             });
         })();
     `;

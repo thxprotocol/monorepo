@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
-import { NotFoundError } from '@thxnetwork/api/util/errors';
 import { contractArtifacts, contractNetworks } from '@thxnetwork/api/hardhat';
-import { query } from 'express-validator';
 import NetworkService from '@thxnetwork/api/services/NetworkService';
-import WalletService from '@thxnetwork/api/services/WalletService';
 import VoteEscrowService from '@thxnetwork/api/services/VoteEscrowService';
+import WalletService from '@thxnetwork/api/services/WalletService';
+import { NotFoundError } from '@thxnetwork/api/util/errors';
+import { Request, Response } from 'express';
+import { query } from 'express-validator';
 
 const parseMs = (s) => Number(s) * 1000;
 

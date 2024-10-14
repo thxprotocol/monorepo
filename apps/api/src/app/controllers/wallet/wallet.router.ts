@@ -7,7 +7,7 @@ import ReadWalletScript from './js/get.controller';
 const router: express.Router = express.Router();
 
 router.get('/:id', assertRequestInput(ReadWallet.validation), ReadWallet.controller);
-router.get('/css/:id.:ext', assertRequestInput(ReadWalletCSS.validation), ReadWalletCSS.controller);
 router.get('/js/:id.:ext', assertRequestInput(ReadWalletScript.validation), ReadWalletScript.controller);
+router.get('/css/:id.:ext', assertRequestInput(ReadWalletCSS.validation), ReadWalletCSS.controller);
 
 export default router;

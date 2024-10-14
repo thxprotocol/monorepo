@@ -18,8 +18,8 @@ const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(req.params.id);
     if (!pool) throw new NotFoundError('Pool not found.');
 
-    // If there are QR codes we redirect to it's wallet equivalent
-    const isQRCodeCampaign = await QRCodeEntry.exists({ poolId: req.params.id });
+    // If there are QR codes for this campaign we redirect to it's wallet equivalent
+    const isQRCodeCampaign = await QRCodeEntry.exists({ accountId: pool.sub });
     if (isQRCodeCampaign) {
         const widget = await Widget.findOne({ poolId: req.params.id });
         if (!widget) throw new NotFoundError('Widget not found.');

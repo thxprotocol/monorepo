@@ -1,5 +1,5 @@
-import express, { Router } from 'express';
 import { upload } from '@thxnetwork/api/util/multer';
+import express from 'express';
 import * as PutUpload from './put.controller';
 
 const router: express.Router = express.Router();

@@ -23,6 +23,13 @@ export const useCollectionStore = defineStore('collection', {
                     return await this.request(`/erc721/${id}`);
                 }),
             );
+
+            for (const key in this.collections) {
+                const erc721 = this.collections[key];
+                this.request(`/erc721/${erc721._id}/minter`).then(({ minters, wallets }) => {
+                    this.collections[key] = { ...erc721, minters, wallets };
+                });
+            }
         },
         async get(id: string) {
             const data = await this.request(`/erc721/${id}`);
