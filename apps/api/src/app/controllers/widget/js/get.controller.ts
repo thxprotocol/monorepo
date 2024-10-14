@@ -1,5 +1,4 @@
 import { API_URL, AUTH_URL, DASHBOARD_URL, NODE_ENV, WIDGET_URL } from '@thxnetwork/api/config/secrets';
-import { QRCodeEntry } from '@thxnetwork/api/models';
 import { Widget } from '@thxnetwork/api/models/Widget';
 import BrandService from '@thxnetwork/api/services/BrandService';
 import PoolService from '@thxnetwork/api/services/PoolService';
@@ -18,9 +17,8 @@ const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(req.params.id);
     if (!pool) throw new NotFoundError('Pool not found.');
 
-    // If there are QR codes we redirect to it's wallet equivalent
-    const isQRCodeCampaign = await QRCodeEntry.exists({ poolId: req.params.id });
-    if (isQRCodeCampaign) {
+    // If there are QR codes for this campaign we redirect to it's wallet equivalent
+    if (pool.sub === '6315fb5a40286e9d0a219ce4') {
         const widget = await Widget.findOne({ poolId: req.params.id });
         if (!widget) throw new NotFoundError('Widget not found.');
 
