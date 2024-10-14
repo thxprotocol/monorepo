@@ -1,6 +1,6 @@
-import express from 'express';
 import { assertRequestInput } from '@thxnetwork/api/middlewares';
 import { assertWallet } from '@thxnetwork/api/middlewares/assertWallet';
+import express from 'express';
 
 import * as ListController from './list.controller';
 
