@@ -97,25 +97,14 @@ export default defineComponent({
         const erc721Id = this.$route.params.id;
         if (!erc721Id) return;
 
-        await Promise.all([this.getCollection(erc721Id), this.getMinter(erc721Id), this.listMetadata(erc721Id)]);
+        await Promise.all([this.getCollection(erc721Id), this.listMetadata(erc721Id)]);
     },
     methods: {
         async getCollection(erc721Id: string) {
             try {
                 this.isLoading = true;
                 await this.collectionStore.get(erc721Id);
-            } catch (error: any) {
-                toast(error.message, 'light', 3000, () => {
-                    return;
-                });
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        async getMinter(erc721Id: string) {
-            try {
-                this.isLoading = true;
-                await this.collectionStore.getMinter(erc721Id);
+                this.collectionStore.getMinter(erc721Id);
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;
