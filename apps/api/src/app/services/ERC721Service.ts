@@ -8,6 +8,7 @@ import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { ERC721TokenState, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
 import { Contract } from 'ethers';
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
+import { ObjectId } from 'mongodb';
 import { TransactionReceipt } from 'web3-core';
 import { toChecksumAddress } from 'web3-utils';
 import { ADDRESS_ZERO } from '../config/secrets';
@@ -144,7 +145,7 @@ export async function findBySub(sub: string): Promise<ERC721Document[]> {
     const pools = await PoolService.getAllBySub(sub);
     const nftRewards = await RewardNFT.find({ poolId: pools.map((p) => String(p._id)) });
     const erc721Ids = nftRewards.map((c) => c.erc721Id);
-    const erc721s = await ERC721.find({ sub });
+    const erc721s = await ERC721.find({ sub, _id: { $nin: erc721Ids.map((id) => new ObjectId(id)) } });
 
     return erc721s.concat(await ERC721.find({ _id: erc721Ids }));
 }
