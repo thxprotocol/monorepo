@@ -104,6 +104,7 @@ export default defineComponent({
             try {
                 this.isLoading = true;
                 await this.collectionStore.get(erc721Id);
+                this.collectionStore.getMinter(erc721Id);
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;
