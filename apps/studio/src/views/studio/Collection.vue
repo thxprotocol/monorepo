@@ -64,10 +64,14 @@ export default defineComponent({
     computed: {
         ...mapStores(useAuthStore, useCollectionStore, useEntryStore),
         isAlertWalletCreateShown() {
-            return this.collection && !this.collection.wallets.length;
+            return this.collection && (!this.collection.wallets || !this.collection.wallets.length);
         },
         isAlertMinterCreateShown() {
-            return this.collection && this.collection.wallets.length && !this.collection.minters.length;
+            return (
+                this.collection &&
+                this.collection.wallets.length &&
+                (!this.collection.minters || !this.collection.minters.length)
+            );
         },
         blockExplorerURL() {
             if (!this.collection) return '';
