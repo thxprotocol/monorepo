@@ -6,6 +6,7 @@ import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { ERC721TokenState, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
+import { Contract } from 'ethers';
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 import { TransactionReceipt } from 'web3-core';
 import { toChecksumAddress } from 'web3-utils';
@@ -101,18 +102,26 @@ export async function findById(id: string): Promise<ERC721Document> {
 
 export async function getMinters(erc721: ERC721Document, sub: string) {
     // Fetch campaign safes
-    const wallets = await Wallet.find({
+    const safeConfig = {
         sub,
         chainId: erc721.chainId,
         variant: WalletVariant.Safe,
         owners: { $size: 1 },
-    });
+    };
+    const wallets = await Wallet.find(safeConfig);
 
     // Return early if cached already
     if (erc721.minters && erc721.minters.length) {
         return {
             wallets,
-            minters: await PromiseParser.parse(erc721.minters.map((address) => Wallet.findOne({ address }))),
+            minters: await PromiseParser.parse(
+                erc721.minters.map((address) =>
+                    Wallet.findOne({
+                        ...safeConfig,
+                        address,
+                    }),
+                ),
+            ),
         };
     }
 
@@ -256,7 +265,9 @@ export function parseAttributes(entry: ERC721MetadataDocument) {
 }
 
 async function isMinter(erc721: ERC721Document, address: string) {
-    return await erc721.contract.methods.hasRole(keccak256(toUtf8Bytes('MINTER_ROLE')), address).call();
+    const provider = NetworkService.getProvider(erc721.chainId);
+    const contract = new Contract(erc721.address, erc721.contract.options.jsonInterface, provider.signer);
+    return await contract.hasRole(keccak256(toUtf8Bytes('MINTER_ROLE')), address);
 }
 
 async function addMinter(erc721: ERC721Document, address: string) {

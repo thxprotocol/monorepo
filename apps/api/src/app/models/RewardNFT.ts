@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 import { RewardVariant } from '@thxnetwork/common/enums';
+import mongoose from 'mongoose';
 import { rewardSchema } from './Reward';
 
 export type RewardNFTDocument = mongoose.Document & TRewardNFT;
