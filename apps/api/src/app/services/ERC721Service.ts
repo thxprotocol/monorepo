@@ -112,7 +112,7 @@ export async function getMinters(erc721: ERC721Document, sub: string) {
     if (erc721.minters && erc721.minters.length) {
         return {
             wallets,
-            minters: await Promise.all(erc721.minters.map((address) => Wallet.findOne({ address }))),
+            minters: await PromiseParser.parse(erc721.minters.map((address) => Wallet.findOne({ address }))),
         };
     }
 
