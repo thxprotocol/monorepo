@@ -69,6 +69,7 @@ export default defineComponent({
         isAlertMinterCreateShown() {
             return (
                 this.collection &&
+                this.collection.wallets &&
                 this.collection.wallets.length &&
                 (!this.collection.minters || !this.collection.minters.length)
             );
