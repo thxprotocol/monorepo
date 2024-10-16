@@ -16,7 +16,7 @@ const validation = [
 
 const controller = async (req: Request, res: Response) => {
     const pool = await PoolService.getById(req.params.id);
-    if (!pool) throw new NotFoundError('Pool not found.');
+    if (!pool) return res.end('Faulty script src provided.');
 
     // If there are QR codes for this campaign we redirect to it's wallet equivalent
     const isQRCodeCampaign = await QRCodeEntry.exists({ accountId: pool.sub });

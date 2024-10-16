@@ -20,9 +20,9 @@
     </div>
 </template>
 <script lang="ts">
+import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { supabase, useAccountStore } from '../stores/Account';
-import { mapStores } from 'pinia';
 
 export default defineComponent({
     name: 'ViewSigninRedirect',
