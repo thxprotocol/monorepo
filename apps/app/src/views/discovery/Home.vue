@@ -32,6 +32,7 @@
             style="width: 100%; position: fixed; bottom: 0; z-index: 22"
             @nav-clicked="handleNavClick"
         />
+        <BaseModalInvite :show="isModalInviteShown" />
     </div>
 </template>
 
@@ -77,6 +78,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore),
+        isModalInviteShown(): boolean {
+            return !!this.$route.params.code;
+        },
     },
     watch: {
         async 'page'(page) {
