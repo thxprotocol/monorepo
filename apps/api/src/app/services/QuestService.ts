@@ -40,11 +40,11 @@ export default class QuestService {
     }
 
     static async list({ pool, data, account }: { pool: PoolDocument; data: Partial<TQuestEntry>; account?: TAccount }) {
-        const questCacheKey = `quest-${pool.id}-${account?.sub || 'public'}`;
-        const cachedData = CacheService.get(questCacheKey);
-        if (cachedData) {
-            return cachedData;
-        }
+        // const questCacheKey = `quest-${pool.id}-${account?.sub || 'public'}`;
+        // const cachedData = CacheService.get(questCacheKey);
+        // if (cachedData) {
+        //     return cachedData;
+        // }
         const questVariants = Object.keys(QuestVariant).filter((v) => !isNaN(Number(v)));
         const author = await AccountProxy.findById(pool.sub);
         const callback: any = async (variant: QuestVariant) => {
@@ -90,9 +90,9 @@ export default class QuestService {
             ).filter((result) => !!result);
         };
 
-        const result = await Promise.all(questVariants.map(callback));
-        CacheService.set(questCacheKey, result);
-        return result;
+        // const result = await Promise.all(questVariants.map(callback));
+        // CacheService.set(questCacheKey, result);
+        return await Promise.all(questVariants.map(callback));
     }
 
     static async update(quest: TQuest, updates: Partial<TQuest>, file?: Express.Multer.File) {
