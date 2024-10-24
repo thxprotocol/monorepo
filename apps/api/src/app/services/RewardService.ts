@@ -28,11 +28,11 @@ export default class RewardService {
     }
 
     static async list({ pool, account }) {
-        const rewardCacheKey = `reward-${pool._id}-${account?.sub || 'public'}`;
-        const cachedData = CacheService.get(rewardCacheKey);
-        if (cachedData) {
-            return cachedData;
-        }
+        // const rewardCacheKey = `reward-${pool._id}-${account?.sub || 'public'}`;
+        // const cachedData = CacheService.get(rewardCacheKey);
+        // if (cachedData) {
+        //     return cachedData;
+        // }
         const owner = await AccountProxy.findById(pool.sub);
         const rewardVariants = Object.keys(RewardVariant).filter((v) => !isNaN(Number(v)));
         const callback: any = async (variant: RewardVariant) => {
@@ -99,9 +99,9 @@ export default class RewardService {
                 }),
             );
         };
-        const result = await Promise.all(rewardVariants.map(callback));
-        CacheService.set(rewardCacheKey, result);
-        return result;
+        // const result = await Promise.all(rewardVariants.map(callback));
+        // CacheService.set(rewardCacheKey, result);
+        return await Promise.all(rewardVariants.map(callback));
     }
 
     static async findPaymentsBySub(
