@@ -3,13 +3,15 @@
         <div class="d-flex flex-column h-100">
             <HeaderNav :is-visible="true" />
             <div class="d-flex h-100 overflow-hidden">
-                <Sidebar @nav-clicked="handleNavClick" />
-                <Quests :selected-part="selectedPart" />
-                <div v-if="selectedPart === 'leaderboard'" class="w-100">
-                    <BaseQuestLeaderboardSmall :selected-part="selectedPart" />
-                </div>
-                <div v-if="selectedPart === 'wallet'">
-                    <BaseCardRewards />
+                <Sidebar :selected-part="selectedPart" @nav-clicked="handleNavClick" />
+                <div class="main-content">
+                    <Quests :selected-part="selectedPart" />
+                    <div v-if="selectedPart === 'leaderboard'" class="w-100">
+                        <BaseQuestLeaderboardSmall :selected-part="selectedPart" />
+                    </div>
+                    <div v-if="selectedPart === 'wallet'">
+                        <BaseCardRewards />
+                    </div>
                 </div>
             </div>
         </div>
@@ -42,6 +44,7 @@
         <BaseNavbarPrimary
             v-if="accountStore.isMobile"
             style="width: 100%; position: fixed; bottom: 0; z-index: 22"
+            :selected-part="selectedPart"
             @nav-clicked="handleNavClick"
         />
     </div>
@@ -457,6 +460,13 @@ export default defineComponent({
     background-blend-mode: color-dodge;
     background-attachment: fixed;
     height: 100vh;
+}
+
+.main-content {
+    flex-grow: 1;
+    border: 1px solid #1a1a1a;
+    border-radius: 10px;
+    margin-top: 20px;
 }
 
 @media (max-width: 424px) {

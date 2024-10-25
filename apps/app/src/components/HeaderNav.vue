@@ -4,13 +4,13 @@
     <nav v-if="isVisible" class="header-nav d-flex w-100 justify-content-between">
         <!-- Your header content -->
         <!-- <h1>Header Navigation</h1> -->
-        <div class="d-flex gap-5">
-            <div class="d-flex align-items-center gap-2">
+        <div class="d-flex media-header">
+            <div class="d-flex align-items-center gap-2 media-header-first">
                 <img :src="rewardsIcon" alt="rewards" width="40" height="40" />
                 <h1 class="m-0 fs-3 fw-bold">Rewards</h1>
             </div>
 
-            <div class="d-flex gap-3 balance-wrap">
+            <div class="d-flex gap-3 balance-wrap media-header-third">
                 <div class="balance-box">
                     <h2>Santa <span class="d-block">Points</span></h2>
                     <div class="d-flex align-items-center">
@@ -25,14 +25,14 @@
             </div>
         </div>
 
-        <div v-if="!accountStore.isMobile" class="d-flex gap-2">
-            <BaseCardWalletInfo v-if="!accountStore.isMobile" />
-            <BaseDropdownWallets v-if="!accountStore.isMobile" />
+        <div class="d-flex gap-2 media-header-second">
+            <BaseCardWalletInfo />
+            <BaseDropdownWallets />
             <div
                 class="d-flex align-items-center justify-content-between name-avatar"
                 @click="accountStore.isModalAccountShown = true"
             >
-                <h2 v-if="!accountStore.isMobile" class="username">
+                <h2 class="username">
                     <template v-if="accountStore?.account?.username">
                         {{ accountStore.account.username }}
                     </template>
@@ -226,6 +226,10 @@ export default defineComponent({
     padding: 11px 10px;
 }
 
+.media-header {
+    gap: 3rem;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -259,15 +263,40 @@ export default defineComponent({
     }
 }
 
-@media (max-width: 490px) {
-    //.header-nav h2 {
-    //  display: none;
-    //}
-    //.balance-wrap {
-    //  width: auto !important;
-    //}
+@media (max-width: 450px) {
+    .media-header-first h1 {
+        display: none;
+    }
 }
 
+@media (max-width: 992px) {
+    .header-nav {
+        flex-direction: column;
+    }
+    .media-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .media-header-first {
+        order: 1;
+    }
+    .media-header-second {
+        order: 2;
+        position: absolute;
+        right: 0;
+        margin-right: 1rem;
+    }
+    .media-header-third {
+        order: 3;
+    }
+    .balance-box {
+        flex: 1 1 50%;
+        box-sizing: border-box;
+    }
+    .balance-wrap {
+        padding-right: 0;
+    }
+}
 .total-earnings p {
     font-size: 20px;
     text-align: right;

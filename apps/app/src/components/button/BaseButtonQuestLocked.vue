@@ -1,5 +1,5 @@
 <template>
-    <b-button variant="primary" block class="w-100" @click="isModalShown = true">
+    <b-button variant="primary" block class="w-100 locked-btn" @click="isModalShown = true">
         <i class="fas fa-lock me-1" />
         Locked
     </b-button>
@@ -56,5 +56,8 @@ export default defineComponent({
     border-radius: 20px;
     padding: 6px !important;
     height: auto;
+}
+.locked-btn {
+    opacity: 0.3;
 }
 </style>

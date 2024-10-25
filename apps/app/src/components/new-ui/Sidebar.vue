@@ -1,15 +1,15 @@
 <template>
-    <aside class="d-flex flex-column justify-content-between p-3 h-100">
+    <aside v-if="!accountStore.isMobile" class="d-flex flex-column justify-content-between p-3 h-100">
         <nav class="d-flex flex-column gap-3 fs-6 fw-normal">
             <a
                 v-for="item in navItems"
                 :key="item.name"
                 href="#"
                 class="text-decoration-none d-flex align-items-center gap-3 rounded-3 px-3 py-2 side-nav-item"
-                :class="{ active: activeNavItem === item.name }"
+                :class="{ active: selectedPart === item.name }"
                 @click.prevent="selectNavItem(item.name)"
             >
-                <img :src="item.icon" alt="" width="16" height="16" />
+                <img :src="item.icon" :alt="item.label" width="16" height="16" />
                 {{ item.label }}
             </a>
         </nav>
@@ -19,6 +19,8 @@
 
 <script>
 import { defineComponent } from 'vue';
+import { mapStores } from 'pinia';
+import { useAccountStore } from '../../stores/Account';
 import imgQuests from '../../assets/quest.png';
 import imgRewards from '../../assets/reward.png';
 import imgLeaderboard from '../../assets/leader.png';
@@ -27,9 +29,14 @@ import imgTransactions from '../../assets/transaction.png';
 
 export default defineComponent({
     name: 'Sidebar',
+    props: {
+        selectedPart: {
+            type: String,
+            required: true,
+        },
+    },
     data() {
         return {
-            activeNavItem: 'quests',
             navItems: [
                 { name: 'quests', label: 'Quests', icon: imgQuests },
                 { name: 'rewards', label: 'Rewards', icon: imgRewards },
@@ -39,9 +46,11 @@ export default defineComponent({
             ],
         };
     },
+    computed: {
+        ...mapStores(useAccountStore),
+    },
     methods: {
         selectNavItem(itemName) {
-            this.activeNavItem = itemName;
             this.$emit('nav-clicked', itemName);
         },
     },
@@ -55,6 +64,7 @@ export default defineComponent({
     background: rgba(27, 27, 27, 0.4);
     color: #cacaca;
     font-size: 12px;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 .active {
     background-color: #d44646;
