@@ -1,0 +1,24 @@
+name: API Webhook 
+
+on:
+  push:
+    paths:
+      - 'apps/api/**'
+    branches: [ "staging-branch", "production-branch" ]
+  pull_request:
+    paths:
+      - 'apps/api/**'
+    branches: [ "staging-branch", "production-branch" ]
+
+jobs:
+  redeploy:
+    name: Server redeploy webhook call
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to environment
+        uses: joelwmale/webhook-action@master
+        with: 
+          url: ${{ env.WEBHOOK_URL }}
+          data: "{ 'redeploy': true }"
+        env:
+          WEBHOOK_URL: ${{ github.ref == 'refs/heads/production-branch' && 'https://webhook.monorepo.aws.santabrowser.com/api-redeploy' || 'https://webhook.monorepo.santabrowser.com/api-redeploy' }}
