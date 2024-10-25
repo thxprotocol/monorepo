@@ -21,4 +21,4 @@ jobs:
           url: ${{ env.WEBHOOK_URL }}
           data: "{ 'redeploy': true }"
         env:
-          WEBHOOK_URL: ${{ github.ref == 'refs/heads/production' && 'https://webhook.monorepo.aws.santabrowser.com/app-redeploy' || 'https://webhook.monorepo.santabrowser.com/app-redeploy' }}
+          WEBHOOK_URL: ${{ github.ref == 'refs/heads/production-branch' && 'https://webhook.monorepo.aws.santabrowser.com/app-redeploy' || 'https://webhook.monorepo.santabrowser.com/app-redeploy' }}
