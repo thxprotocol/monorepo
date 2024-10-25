@@ -4,30 +4,21 @@ on:
   push:
     paths:
       - 'apps/api/**'
-    branches: [ "merge-branch-latest-sup" ]
+    branches: [ "stage", "production" ]
   pull_request:
     paths:
       - 'apps/api/**'
-    branches: [ "merge-branch-latest-sup" ]
+    branches: [ "stage", "production" ]
 
 jobs:
-  # You can remove the 'build' job if you no longer require it
-  # Or alternatively, you could leave the job but it wouldn't be triggered unless you also set the same branch condition
-
   redeploy:
     name: Server redeploy webhook call
     runs-on: ubuntu-latest
-    # Remove the 'needs' if you're not relying on the 'build' job anymore
-    # needs: [build]
     steps:
-      - name: Deploy stage 
+      - name: Deploy to environment
         uses: joelwmale/webhook-action@master
-        env:
-          WEBHOOK_URL: https://webhook.monorepo.santabrowser.com/api-redeploy # Use secrets as appropriate
+        with: 
+          url: ${{ env.WEBHOOK_URL }}
           data: "{ 'redeploy': true }"
-      - name: Deploy prod 
-        uses: joelwmale/webhook-action@master
         env:
-          WEBHOOK_URL: https://webhook.monorepo.aws.santabrowser.com/api-redeploy # Use secrets as appropriate
-          data: "{ 'redeploy': true }"
-
+          WEBHOOK_URL: ${{ github.ref == 'refs/heads/production' && 'https://webhook.monorepo.aws.santabrowser.com/api-redeploy' || 'https://webhook.monorepo.santabrowser.com/api-redeploy' }}
