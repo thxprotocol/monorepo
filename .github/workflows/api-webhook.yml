@@ -4,11 +4,11 @@ on:
   push:
     paths:
       - 'apps/api/**'
-    branches: [ "stage", "production" ]
+    branches: [ "staging-branch", "production-branch" ]
   pull_request:
     paths:
       - 'apps/api/**'
-    branches: [ "stage", "production" ]
+    branches: [ "staging-branch", "production-branch" ]
 
 jobs:
   redeploy:
