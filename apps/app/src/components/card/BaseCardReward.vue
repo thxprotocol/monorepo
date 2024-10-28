@@ -65,7 +65,7 @@
                             <span v-if="reward.poolId === SANTA_CAMPAIGN" class="coins-text">Points</span>
                         </div>
                         <div v-if="!reward.pointPrice" class="d-flex align-items-center justify-content-center">
-                            <span class="point me-1">Free!</span>
+                            Free!
                         </div>
                         <b-progress
                             v-if="reward.limitProgress.max"
