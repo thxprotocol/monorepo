@@ -13,6 +13,7 @@ type TQRCodeEntry = {
     transactionId: string;
 
     // amount: number;
+    rewardId: string;
     sub: string;
     claimedAt: Date;
 

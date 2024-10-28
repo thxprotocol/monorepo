@@ -64,10 +64,15 @@ export default defineComponent({
     computed: {
         ...mapStores(useAuthStore, useCollectionStore, useEntryStore),
         isAlertWalletCreateShown() {
-            return this.collection && !this.collection.wallets.length;
+            return this.collection && (!this.collection.wallets || !this.collection.wallets.length);
         },
         isAlertMinterCreateShown() {
-            return this.collection && this.collection.wallets.length && !this.collection.minters.length;
+            return (
+                this.collection &&
+                this.collection.wallets &&
+                this.collection.wallets.length &&
+                (!this.collection.minters || !this.collection.minters.length)
+            );
         },
         blockExplorerURL() {
             if (!this.collection) return '';
@@ -99,6 +104,7 @@ export default defineComponent({
             try {
                 this.isLoading = true;
                 await this.collectionStore.get(erc721Id);
+                this.collectionStore.getMinter(erc721Id);
             } catch (error: any) {
                 toast(error.message, 'light', 3000, () => {
                     return;

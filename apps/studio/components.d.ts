@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BAlert: typeof import('bootstrap-vue-next')['BAlert']
+    BaseButtonGroupMinterWallet: typeof import('./src/components/BaseButtonGroupMinterWallet.vue')['default']
     BaseButtonMinterCreate: typeof import('./src/components/buttons/BaseButtonMinterCreate.vue')['default']
     BaseButtonWalletCreate: typeof import('./src/components/buttons/BaseButtonWalletCreate.vue')['default']
     BaseCardCollectible: typeof import('./src/components/cards/BaseCardCollectible.vue')['default']

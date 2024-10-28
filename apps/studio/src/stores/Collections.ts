@@ -31,6 +31,11 @@ export const useCollectionStore = defineStore('collection', {
                 });
             }
         },
+        async getMinter(id: string) {
+            const { minters, wallets } = await this.request(`/erc721/${id}/minter`);
+            const index = this.collections.findIndex((collection) => collection._id === id);
+            this.collections[index] = { ...this.collections[index], minters, wallets };
+        },
         async get(id: string) {
             const data = await this.request(`/erc721/${id}`);
             const index = this.collections.findIndex((collection) => collection._id === id);

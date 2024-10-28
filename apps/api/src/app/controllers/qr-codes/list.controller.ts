@@ -53,7 +53,7 @@ const controller = async (req: Request, res: Response) => {
             account,
             metadata,
             erc721,
-            wallets: wallets.filter((wallet) => wallet.sub === entry.sub),
+            wallets: wallets.filter((wallet) => wallet.sub && wallet.sub === entry.sub),
         });
     });
 

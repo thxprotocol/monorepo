@@ -1,12 +1,12 @@
-import { UserConfigExport, defineConfig } from 'vite';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
-import { BootstrapVueNextResolver } from 'unplugin-vue-components/resolvers';
 import vue from '@vitejs/plugin-vue';
-import mkcert from 'vite-plugin-mkcert';
-import eslintPlugin from 'vite-plugin-eslint';
-import Components from 'unplugin-vue-components/vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import path from 'path';
+import { BootstrapVueNextResolver } from 'unplugin-vue-components/resolvers';
+import Components from 'unplugin-vue-components/vite';
+import { UserConfigExport, defineConfig } from 'vite';
+import eslintPlugin from 'vite-plugin-eslint';
+import mkcert from 'vite-plugin-mkcert';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 const isProd = process.env.NODE_ENV === 'production';
 

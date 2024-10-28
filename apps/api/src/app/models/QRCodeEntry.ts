@@ -14,6 +14,7 @@ export const QRCodeEntry = mongoose.model<QRCodeEntryDocument>(
             transactionId: String,
             erc721Id: String,
             erc721MetadataId: String,
+            rewardId: String,
             claimedAt: Date,
         },
         { timestamps: true },

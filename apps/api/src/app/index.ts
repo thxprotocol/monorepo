@@ -1,6 +1,6 @@
 import { MONGODB_URI, NODE_ENV, PORT, VERSION } from '@thxnetwork/api/config/secrets';
 import { router } from '@thxnetwork/api/controllers/index';
-import { errorLogger, errorNormalizer, errorOutput, notFoundHandler } from '@thxnetwork/api/middlewares';
+import { corsHandler, errorLogger, errorNormalizer, errorOutput, notFoundHandler } from '@thxnetwork/api/middlewares';
 import db from '@thxnetwork/api/util/database';
 import axios from 'axios';
 import axiosBetterStacktrace from 'axios-better-stacktrace';
@@ -21,6 +21,7 @@ db.connect(MONGODB_URI);
 
 app.set('trust proxy', true);
 app.set('port', PORT);
+app.use(corsHandler);
 app.use(lusca.xframe('SAMEORIGIN'));
 app.use(lusca.xssProtection(true));
 app.use(express.static(assetsPath));

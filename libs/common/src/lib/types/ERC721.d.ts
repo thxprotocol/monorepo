@@ -21,8 +21,8 @@ type TERC721 = {
     sub: string;
     chainId: ChainId;
     name: string;
-    minters: string[];
-    wallets: string[];
+    minters: TWallet[];
+    wallets: TWallet[];
     symbol: string;
     transactions?: string[];
     baseURL?: string;

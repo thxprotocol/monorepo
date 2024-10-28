@@ -1,29 +1,29 @@
+import { Relayer } from '@openzeppelin/defender-relay-client';
+import { DefenderRelaySigner } from '@openzeppelin/defender-relay-client/lib/ethers';
+import { DefenderRelayProvider } from '@openzeppelin/defender-relay-client/lib/web3';
+import { EthersAdapter } from '@safe-global/protocol-kit';
 import {
     HARDHAT_RPC,
-    POLYGON_RELAYER,
-    POLYGON_RELAYER_API_KEY,
-    POLYGON_RELAYER_API_SECRET,
-    POLYGON_RPC,
     LINEA_RELAYER,
     LINEA_RELAYER_API_KEY,
     LINEA_RELAYER_API_SECRET,
     LINEA_RPC,
+    METIS_RELAYER,
+    METIS_RELAYER_API_KEY,
+    METIS_RELAYER_API_SECRET,
+    METIS_RPC,
+    POLYGON_RELAYER,
+    POLYGON_RELAYER_API_KEY,
+    POLYGON_RELAYER_API_SECRET,
+    POLYGON_RPC,
     PRIVATE_KEY,
     RELAYER_SPEED,
     SAFE_TXS_SERVICE,
-    METIS_RELAYER,
-    METIS_RPC,
-    METIS_RELAYER_API_KEY,
-    METIS_RELAYER_API_SECRET,
 } from '@thxnetwork/api/config/secrets';
-import Web3 from 'web3';
-import { ethers, Wallet } from 'ethers';
-import { recoverAddress, hashMessage } from 'ethers/lib/utils';
-import { DefenderRelaySigner } from '@openzeppelin/defender-relay-client/lib/ethers';
-import { Relayer } from '@openzeppelin/defender-relay-client';
-import { DefenderRelayProvider } from '@openzeppelin/defender-relay-client/lib/web3';
 import { ChainId } from '@thxnetwork/common/enums';
-import { EthersAdapter } from '@safe-global/protocol-kit';
+import { ethers, Wallet } from 'ethers';
+import { hashMessage, recoverAddress } from 'ethers/lib/utils';
+import Web3 from 'web3';
 
 class NetworkService {
     config = {

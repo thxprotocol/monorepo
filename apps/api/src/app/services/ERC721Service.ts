@@ -6,7 +6,9 @@ import NetworkService from '@thxnetwork/api/services/NetworkService';
 import { assertEvent, ExpectedEventNotFound, findEvent, parseLogs } from '@thxnetwork/api/util/events';
 import { paginatedResults } from '@thxnetwork/api/util/pagination';
 import { ERC721TokenState, TransactionState, WalletVariant } from '@thxnetwork/common/enums';
+import { Contract } from 'ethers';
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
+import { ObjectId } from 'mongodb';
 import { TransactionReceipt } from 'web3-core';
 import { toChecksumAddress } from 'web3-utils';
 import { ADDRESS_ZERO } from '../config/secrets';
@@ -49,8 +51,11 @@ async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: 
         throw new ExpectedEventNotFound('Transfer or OwnershipTransferred');
     }
 
-    const erc721 = await ERC721.findById(erc721Id);
-    await erc721.updateOne({ address: toChecksumAddress(receipt.contractAddress) });
+    const erc721 = await ERC721.findByIdAndUpdate(
+        erc721Id,
+        { address: toChecksumAddress(receipt.contractAddress) },
+        { new: true },
+    );
 
     // Deploy a wallet and make it a minter
     let safe = await Wallet.findOne({
@@ -72,7 +77,7 @@ async function deployCallback({ erc721Id }: TERC721DeployCallbackArgs, receipt: 
     }
 
     // Add minter role for the address
-    if (!erc721.minters.includes(safe.address)) {
+    if (!erc721.minters.map((m) => m.address).includes(safe.address)) {
         await addMinter(erc721, safe.address);
     }
 }
@@ -97,13 +102,31 @@ export async function findById(id: string): Promise<ERC721Document> {
 }
 
 export async function getMinters(erc721: ERC721Document, sub: string) {
-    const wallets = await Wallet.find({
+    // Fetch campaign safes
+    const safeConfig = {
         sub,
         chainId: erc721.chainId,
         variant: WalletVariant.Safe,
         owners: { $size: 1 },
-    });
+    };
+    const wallets = await Wallet.find(safeConfig);
 
+    // Return early if cached already
+    if (erc721.minters && erc721.minters.length) {
+        return {
+            wallets,
+            minters: await PromiseParser.parse(
+                erc721.minters.map((address) =>
+                    Wallet.findOne({
+                        ...safeConfig,
+                        address,
+                    }),
+                ),
+            ),
+        };
+    }
+
+    // Test wallet addresses for minter roles
     const minters = (
         await PromiseParser.parse(
             wallets.map(async (wallet: WalletDocument) => {
@@ -112,6 +135,9 @@ export async function getMinters(erc721: ERC721Document, sub: string) {
         )
     ).filter((wallet: any) => wallet.isMinter);
 
+    // Cache results in db (not likely to change as UI does not allow for it)
+    await erc721.updateOne({ minters: minters.map((m) => m.address) });
+
     return { wallets, minters };
 }
 
@@ -119,7 +145,7 @@ export async function findBySub(sub: string): Promise<ERC721Document[]> {
     const pools = await PoolService.getAllBySub(sub);
     const nftRewards = await RewardNFT.find({ poolId: pools.map((p) => String(p._id)) });
     const erc721Ids = nftRewards.map((c) => c.erc721Id);
-    const erc721s = await ERC721.find({ sub });
+    const erc721s = await ERC721.find({ sub, _id: { $nin: erc721Ids.map((id) => new ObjectId(id)) } });
 
     return erc721s.concat(await ERC721.find({ _id: erc721Ids }));
 }
@@ -240,7 +266,9 @@ export function parseAttributes(entry: ERC721MetadataDocument) {
 }
 
 async function isMinter(erc721: ERC721Document, address: string) {
-    return await erc721.contract.methods.hasRole(keccak256(toUtf8Bytes('MINTER_ROLE')), address).call();
+    const provider = NetworkService.getProvider(erc721.chainId);
+    const contract = new Contract(erc721.address, erc721.contract.options.jsonInterface, provider.signer);
+    return await contract.hasRole(keccak256(toUtf8Bytes('MINTER_ROLE')), address);
 }
 
 async function addMinter(erc721: ERC721Document, address: string) {
