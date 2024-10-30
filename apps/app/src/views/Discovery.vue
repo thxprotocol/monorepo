@@ -1,5 +1,10 @@
 <template>
-    <div :style="{ minHeight: '100%' }" class="gradient-bg-opacity">
+    <div
+        :style="{
+            minHeight: '100%',
+            background: 'linear-gradient(178deg, #151415 -37.16%, #0E0D10 98.54%)',
+        }"
+    >
         <!-- <BaseNavbarTicker /> -->
         <!-- <BaseNavbar /> -->
         <router-view />

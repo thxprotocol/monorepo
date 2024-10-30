@@ -1,19 +1,23 @@
 <template>
     <div
-        v-if="!accountStore.isMobile || selectedPart === 'Leaderboard'"
+        v-if="selectedPart === 'leaderboard'"
         header-class="p-0"
         body-class="d-flex flex-column pt-0"
-        class="leaderboard-wrapper mt-3"
+        class="leaderboard-wrapper mt-4"
     >
-        <b-card-title class="d-flex m-0 align-items-center bg-leaderboard">
-            <div class="d-flex align-items-center justify-content-center" style="">
-                <!-- <i class="fa fa-trophy me-2 text-opaque" /> -->
-                <img :src="trophyImage" alt="trophy" loading="lazy" width="17" height="17" class="me-2" />
-            </div>
+        <b-card-title class="d-flex m-0 align-items-center">
+            <!-- <div class="d-flex align-items-center justify-content-center" style=""> -->
+            <!-- <i class="fa fa-trophy me-2 text-opaque" /> -->
+            <!-- <img :src="trophyImage" alt="trophy" loading="lazy" width="17" height="17" class="me-2" /> -->
+            <!-- </div> -->
             <div class="flex-grow-1 pe-2">
-                Leaderboard<span class="d-block flex-grow-1 pe-2 fa-xs mt-2" style="color: #fff; opacity: 0.7">
-                    (Monthly)</span
+                <h3 class="leaderboard-title">Leaderboard</h3>
+                <span
+                    class="d-block flex-grow-1 pe-2 fa-xs mt-2"
+                    style="color: #fff; opacity: 0.6; font-family: Poppins"
                 >
+                    (Monthly)
+                </span>
             </div>
             <!-- <b-button class="text-primary refresh-color" variant="link" @click="onClickRefresh">
                 <b-spinner v-if="isLoading" small />
@@ -21,7 +25,7 @@
             </b-button> -->
         </b-card-title>
         <b-list-group v-if="isLoading" class="skeleton-loader my-list">
-            <div v-for="n in 10" :key="n" class="skeleton-item d-flex p-2 align-items-center">
+            <div v-for="n in 10" :key="n" class="skeleton-item d-flex p-1 align-items-center">
                 <div class="skeleton-rank">{{ n }}</div>
                 <div class="skeleton-avatar"></div>
                 <div class="skeleton-username"></div>
@@ -36,7 +40,7 @@
                 <span class="list-item-field-rank">{{ entry.rank }}</span>
                 <span class="list-item-field-address flex-grow-1 ps-2 d-flex align-items-center">
                     <b-avatar
-                        size="sm"
+                        size="md"
                         variant="primary"
                         :src="entry.account.profileImg"
                         :alt="`Profile picture of ${entry.account.username}`"
@@ -44,10 +48,10 @@
                     />
                     <span class="username-text" :title="entry.account.username">{{ entry.account.username }}</span>
                 </span>
-                <span class="list-item-field-questcount flex-grow-1 text-opaque pe-3">
-                    {{ entry.questEntryCount }}
+                <div class="list-item-field-questcount flex-grow-1 text-opaque pe-3">
+                    <span>{{ entry.questEntryCount }}</span>
                     <i class="fas fa-tasks ms-1" />
-                </span>
+                </div>
                 <strong class="list-item-field-score">{{ formatScore(entry.score) }}</strong>
             </b-list-group-item>
         </b-list-group>
@@ -123,9 +127,6 @@ export default defineComponent({
 });
 </script>
 <style lang="scss" scoped>
-.bg-leaderboard {
-    background-image: url('/src/assets/bg_leaderboard.png');
-}
 .card-header {
     border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);
 }
@@ -143,6 +144,12 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #d4d4d4;
+    font-family: Poppins;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 .list-item-field-user {
     flex-grow: 1;
@@ -150,55 +157,74 @@ export default defineComponent({
     align-items: center;
 }
 .list-item-field-questcount {
-    width: 50px;
-    text-align: right;
+    display: flex;
+    align-items: center;
+    //text-align: right;
     white-space: nowrap;
+    color: #d4d4d4;
+    font-family: Poppins;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 21px;
+}
+.list-item-field-questcount span {
+    width: 20px;
+}
+.list-item-field-questcount i {
+    color: #888888;
 }
 .list-item-field-score {
     width: 50px;
     text-align: right;
+    color: #d4d4d4;
+    font-family: Poppins;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 175%;
+    letter-spacing: 0.48px;
 }
 .refresh-color {
     --bs-primary-rgb: #515151 !important;
 }
 .leaderboard-wrapper {
     background: transparent;
-    background-color: #06020d;
-    margin: 0 15px;
-    border-radius: 10px;
-    border: 0.5px solid rgba(76, 46, 115, 0.4);
-}
-.my-list {
-    //max-height: 320px;
-    gap: 0.5rem;
-    //overflow-y: scroll;
-    //overflow-x: hidden;
+    width: 800px;
 }
 
 .my-list .list-group-item {
-    border-radius: 5px;
-    border: 0.2px solid rgba(255, 255, 255, 0.1);
-    background: rgba($color: #000000, $alpha: 0.5);
-
-    box-shadow: 0px 4px 49px 0px rgba(0, 7, 72, 0.05);
+    border: none;
+    border-radius: 0;
+    &:nth-child(odd) {
+        background-color: #202020;
+    }
+    &:nth-child(even) {
+        background-color: transparent;
+    }
 }
 
 .username-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 110px;
+    width: 300px;
+    color: #d4d4d4;
+    font-family: Poppins;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    padding-left: 16px;
 }
 
 .leaderboard-wrapper .card-title {
-    border-radius: 10px 10px 0 0;
-    padding-top: 19px;
-    padding-left: 15px;
+    padding-left: 20px;
     padding-bottom: 18px;
 }
 
 .leaderboard-wrapper .list-group {
-    padding: 13.5px 7.5px;
+    padding: 13.5px 20px;
 }
 .skeleton-loader {
     display: flex;
@@ -207,10 +233,12 @@ export default defineComponent({
 }
 
 .skeleton-item {
-    border-radius: 5px;
-    border: 0.2px solid rgba(255, 255, 255, 0.1);
-    background: rgba($color: #000000, $alpha: 0.5);
-    box-shadow: 0px 4px 49px 0px rgba(0, 7, 72, 0.05);
+    &:nth-child(odd) {
+        background-color: #202020;
+    }
+    &:nth-child(even) {
+        background-color: transparent;
+    }
 }
 
 .skeleton-avatar,
@@ -221,12 +249,19 @@ export default defineComponent({
 }
 
 .skeleton-rank {
-    width: 10px;
+    width: 30px;
+    text-align: center;
+    color: #d4d4d4;
+    font-family: Poppins;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .skeleton-avatar {
-    width: 24px;
-    height: 24px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     margin: 0 10px;
 }
@@ -234,6 +269,17 @@ export default defineComponent({
 .skeleton-username {
     flex-grow: 1;
     height: 20px;
+}
+
+.leaderboard-title {
+    color: #d4d4d4;
+    font-feature-settings: 'liga' off, 'clig' off;
+    text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
+    font-family: Poppins;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
 }
 
 @keyframes pulse {
@@ -252,9 +298,13 @@ export default defineComponent({
     .leaderboard-wrapper {
         height: 100%;
         margin: 0;
+        width: 100%;
     }
     .my-list {
         max-height: calc(100vh - 220px);
+    }
+    .username-text {
+        width: 100px;
     }
 }
 //@media (max-height: 894px) {

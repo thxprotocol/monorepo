@@ -8,11 +8,8 @@
             <b-button v-if="reward.isPromoted" class="d-flex align-items-center promoted-title" variant="success">
                 Promoted
             </b-button>
-            <b-card-title v-if="!reward.isPromoted" class="d-flex align-items-center reward-title px-2 pt-2">
-                <i class="me-2 text-opaque small" :class="iconMap[reward.variant]" />
-                <slot name="title" />
-            </b-card-title>
-            <div class="d-flex justify-content-center">
+
+            <div :class="`d-flex justify-content-center ${reward.isPromoted ? 'mt-0' : 'mt-2'}`">
                 <div
                     v-if="!image"
                     :class="!reward.isPromoted ? 'reward-image-placeholder' : 'reward-img-promoted-ph'"
@@ -25,13 +22,17 @@
                     :class="!reward.isPromoted ? 'reward-image' : 'reward-img-promoted'"
                 />
             </div>
-            <b-card-title v-if="reward.isPromoted" class="d-flex align-items-center reward-title-promoted">
+            <b-card-title v-if="!reward.isPromoted" class="d-flex align-items-center reward-title px-2 flex-grow-1">
+                <!-- <i class="me-2 text-opaque small" :class="iconMap[reward.variant]" /> -->
                 <slot name="title" />
             </b-card-title>
-            <div>
+            <div class="d-flex justify-content-between">
+                <b-card-title v-if="reward.isPromoted" class="d-flex align-items-center reward-title-promoted">
+                    <slot name="title" />
+                </b-card-title>
                 <button
                     v-if="!accountStore.isAuthenticated"
-                    class="w-100 my-btn"
+                    class="w-100 my-reward-btn"
                     variant="primary"
                     @click="authStore.isModalLoginShown = !authStore.isModalLoginShown"
                 >
@@ -40,12 +41,19 @@
                     </template>
                     <strong v-else> Free! </strong>
                 </button>
-                <span v-else id="disabled-wrapper" class="d-block mx-3 mb-2" tabindex="0">
+                <span
+                    v-else
+                    id="disabled-wrapper"
+                    :class="`d-block mx-3 mb-2 ${reward.isPromoted ? '' : 'w-100'}`"
+                    tabindex="0"
+                >
                     <button
                         v-b-modal="`modalRewardPayment${reward._id}`"
                         variant="primary"
                         block
-                        :class="`w-100 position-relative mb-0 bg-red ${isInsufficientPoints ? 'locked' : 'my-btn'}`"
+                        :class="`position-relative mb-0 ${isInsufficientPoints ? 'locked' : 'my-reward-btn'} ${
+                            reward.isPromoted ? 'promoted-reward-btn' : ''
+                        }`"
                         :disabled="isDisabled"
                     >
                         <div v-if="isInsufficientPoints">Locked</div>
@@ -53,7 +61,8 @@
                             v-if="reward.pointPrice && !isInsufficientPoints"
                             class="d-flex align-items-center justify-content-center"
                         >
-                            <span class="point me-1">{{ formattedPrice }}</span>
+                            <span class="point me-1">Buy now</span>
+                            <!-- <span class="point me-1">{{ formattedPrice }}</span>
                             <img
                                 v-if="reward.poolId === SANTA_CAMPAIGN"
                                 :src="StarCoin"
@@ -62,7 +71,7 @@
                                 height="13"
                                 class="me-1"
                             />
-                            <span v-if="reward.poolId === SANTA_CAMPAIGN" class="coins-text">Points</span>
+                            <span v-if="reward.poolId === SANTA_CAMPAIGN" class="coins-text">Points</span> -->
                         </div>
                         <div v-if="!reward.pointPrice" class="d-flex align-items-center justify-content-center">
                             Free!
@@ -254,35 +263,36 @@ export default defineComponent({
     }
 }
 
-.my-btn,
+.my-reward-btn,
 .locked {
+    width: 100%;
     height: 32px;
     position: relative;
-    border-radius: 15px;
+    border-radius: 5px;
+    background: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
     border: 1px solid rgba(78, 78, 78, 0.2);
     //background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%);
     padding: 5px 0;
     transition: background 0.3s ease;
     z-index: 0;
 }
-.my-btn::before {
-    content: '';
-    position: absolute;
-    border-radius: 15px;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, #b14646 0%, #722121 100%);
-    opacity: 0;
-    transition: opacity 0.6s ease;
-    z-index: -1;
-}
-.h-200 {
-    height: 200px;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
+//.my-reward-btn::before {
+//    content: '';
+//    position: absolute;
+//    border-radius: 5px;
+//    top: 0;
+//    left: 0;
+//    right: 0;
+//    bottom: 0;
+//    opacity: 0;
+//    transition: opacity 0.6s ease;
+//    z-index: -1;
+//}
+//.h-200 {
+//    height: 200px;
+//    margin-top: 0 !important;
+//    margin-bottom: 0 !important;
+//}
 .pipe {
     border-left: 1px solid rgba(255, 255, 255, 0.1);
     height: 20px;
@@ -296,10 +306,10 @@ export default defineComponent({
     white-space: nowrap;
 }
 .point {
-    color: #f5f5f5;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 22px;
+    color: #fff;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: -0.14px;
 }
 .coins-text {
     color: #fff;
@@ -318,14 +328,14 @@ export default defineComponent({
 .card-wrapper {
     background: transparent !important;
 }
-.card-wrapper:hover .my-btn::before {
-    opacity: 1;
-}
+//.card-wrapper:hover .my-btn::before {
+//  opacity: 1;
+//}
 
-.card-wrapper:hover .my-btn:not(.locked) {
-    box-shadow: 0px 7px 12px 0px rgba(173, 40, 40, 0.14);
-    border-color: #722121;
-}
+//.card-wrapper:hover .my-btn:not(.locked) {
+//    box-shadow: 0px 7px 12px 0px rgba(173, 40, 40, 0.14);
+//    border-color: #722121;
+//}
 
 .card-wrapper:hover .reward-text {
     color: #fff;
@@ -372,17 +382,12 @@ export default defineComponent({
 }
 
 .locked {
-    background: #4444444f;
-    color: #ff6b6b;
+    opacity: 0.3;
 }
 
 .gr-2 {
     width: 100% !important;
     display: inline-block !important;
-}
-
-.bg-red {
-    background: linear-gradient(180deg, #c54949 0%, #ae3232 100%);
 }
 
 .gr-2 .card-body.cp-campaign-card {
@@ -416,18 +421,20 @@ export default defineComponent({
 }
 
 .reward-title div {
-    color: #fff;
+    color: #d4d4d4;
     font-feature-settings: 'liga' off, 'clig' off;
     font-family: 'Poppins';
-    font-size: 13px;
-    font-style: italic;
-    font-weight: 700;
-    line-height: 16px;
+    font-size: 14px;
+    font-weight: 500;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
+    font-style: normal;
+    line-height: 18px;
+    text-align: center;
 }
 
 .reward-title i {
@@ -455,5 +462,8 @@ export default defineComponent({
     width: 100%;
     height: 120px;
     object-fit: cover;
+}
+.promoted-reward-btn {
+    width: 112px;
 }
 </style>
