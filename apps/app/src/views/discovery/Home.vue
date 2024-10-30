@@ -47,6 +47,7 @@
             :selected-part="selectedPart"
             @nav-clicked="handleNavClick"
         />
+        <BaseModalInvite :show="isModalInviteShown" />
     </div>
 </template>
 
@@ -92,6 +93,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore),
+        isModalInviteShown(): boolean {
+            return !!this.$route.params.code;
+        },
     },
     watch: {
         async 'page'(page) {
