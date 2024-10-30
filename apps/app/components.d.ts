@@ -165,7 +165,6 @@ declare module 'vue' {
     CampaignCard: typeof import('./src/components/CampaignCard.vue')['default']
     HeaderNav: typeof import('./src/components/HeaderNav.vue')['default']
     OfferCard: typeof import('./src/components/OfferCard.vue')['default']
-    QuestDetailModal: typeof import('./src/components/new-ui/QuestDetailModal.vue')['default']
     Quests: typeof import('./src/components/Quests.vue')['default']
     QuestsCarousel: typeof import('./src/components/homepage/QuestsCarousel.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

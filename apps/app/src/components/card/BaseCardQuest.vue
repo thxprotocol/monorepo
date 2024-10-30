@@ -236,6 +236,6 @@ export default defineComponent({
     bottom: 0;
     border-radius: 5px;
     background: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
-    padding: 7px 32px;
+    padding: 7px 0px;
 }
 </style>

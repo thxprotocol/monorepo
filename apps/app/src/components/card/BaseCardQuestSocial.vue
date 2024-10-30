@@ -22,7 +22,7 @@
                     </template>
                 </b-button>
                 <BButton v-if="isSubmitting" variant="primary" style="max-width: 40px" @click="onClickCancel">
-                    <i class="fas fa-times text-opaque" />
+                    <i class="fas fa-times text-opaque m-0" />
                 </BButton>
             </BButtonGroup>
             <b-button
