@@ -1,24 +1,28 @@
 <template>
-    <b-card class="rounded-0 target-body disc-black" header-class="py-3 d-flex align-items-center " body-class="p-1">
+    <b-card
+        class="rounded-0 target-body disc-black w-100"
+        header-class="py-2 d-flex align-items-center "
+        body-class="p-1"
+    >
         <template #header>
-            <i class="fab fa-discord text-opaque mt-1 me-3" style="font-size: 1.3rem" />
+            <i class="fab fa-discord text-opaque mt-1 me-3 discord-icon" />
             <div>
                 <span>Got questions?</span>
                 <div>
-                    <strong class="me-1 text-accent">{{ presenceCount.toLocaleString() }}</strong>
+                    <strong class="me-1 discord-highlight-text">{{ presenceCount.toLocaleString() }}</strong>
                     <span class="text-opaque">Members</span>
                 </div>
+                <a
+                    v-if="inviteURL"
+                    target="_blank"
+                    :href="inviteURL"
+                    size="sm"
+                    class="ms-auto ml-1"
+                    style="color: #a9b8ff"
+                >
+                    Ask around!
+                </a>
             </div>
-            <b-button
-                v-if="inviteURL"
-                target="_blank"
-                :href="inviteURL"
-                size="sm"
-                class="ms-auto ml-1"
-                variant="success"
-            >
-                Ask around!
-            </b-button>
         </template>
 
         <!--        <b-avatar-->
@@ -131,7 +135,15 @@ export default defineComponent({
     background-color: transparent !important;
 }
 
-.disc-black {
-    margin: 0 15px 10px;
+.discord-icon {
+    font-size: 1rem;
+    color: #6c86ff;
+}
+.discord-highlight-text {
+    background: linear-gradient(180deg, #d2cc52 0%, #ccc300 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0px 1px 16px rgba(234, 211, 12, 0.76);
 }
 </style>

@@ -4,12 +4,7 @@
             v-model="dropdownModel"
             variant="link"
             class="w-100 rounded"
-            :style="{
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                borderTopRightRadius: '0 !important',
-                borderBottomRightRadius: '0 !important',
-            }"
-            toggle-class="d-flex align-items-center justify-content-end text-white text-decoration-none p-2"
+            toggle-class="d-flex align-items-center text-white text-decoration-none p-2"
             auto-close="outside"
             :menu-class="[{ 'd-none': !walletStore.wallet }, 'dropdown-move', 'fade-in']"
             no-caret
@@ -23,7 +18,7 @@
                     }"
                     class="fas fa-circle me-2"
                 />
-                <div>
+                <div class="fs-6 fw-normal">
                     {{ walletStore.wallet ? walletStore.wallet.short : 'Connect' }}
                 </div>
             </template>
@@ -139,11 +134,7 @@
             no-caret
             end
             :disabled="!accountStore.isAuthenticated"
-            :style="{
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                borderTopLeftRadius: '0 !important',
-                borderBottomLeftRadius: '0 !important',
-            }"
+            toggle-class="p-0"
         >
             <template #button-content>
                 <i class="fas fa-chevron-down text-white me-2" />
@@ -311,18 +302,16 @@ export default defineComponent({
 }
 
 .h-wallet {
-    border-radius: 22px;
-    border: 1px dotted #ffcd06;
+    width: 133px;
+    height: 32px;
+    border-radius: 5px;
+    border: 1px solid #292929;
     transition: all 0.3s ease-in-out;
-}
-
-.h-wallet:hover {
-    background: rgba(255, 205, 7, 0.3);
-    box-shadow: 0 0 10px rgba(255, 205, 7, 0.5);
+    background: #202020;
 }
 
 .dropdown {
-    background: #000;
+    background: #202020;
 }
 
 .h-wallet button div {
@@ -333,8 +322,12 @@ export default defineComponent({
     transform: translate(-95px, 43px) !important;
 }
 .dropdown-menu {
-    background-color: #000000 !important;
-    border: 1px dotted #ffcd06 !important;
+    border-radius: 5px;
+    border: 1px solid #292929;
+    background: #202020;
+}
+.dropdown-menu .dropdown-item:hover {
+    background: #292929;
 }
 @keyframes fadeIn {
     from {

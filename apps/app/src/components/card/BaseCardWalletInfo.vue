@@ -115,10 +115,10 @@ export default defineComponent({
     },
     mounted() {
         this.listRewards();
-        document.addEventListener('click', this.handleClickOutside);
+        // document.addEventListener('click', this.handleClickOutside);
     },
     beforeUnmount() {
-        document.removeEventListener('click', this.handleClickOutside);
+        // document.removeEventListener('click', this.handleClickOutside);
     },
     methods: {
         toggleDropdown() {
