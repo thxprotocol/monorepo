@@ -1,23 +1,25 @@
 <template>
-    <b-card
-        class="mb-1 w-100 my-offer-card"
-        header-class="p-0"
-        body-class="d-flex flex-column p-0"
-        style="background: transparent"
-    >
-        <template #header>
-            <b-card-title class="d-flex p-3 m-0 align-items-center" style="background-color: #0e0f19">
-                <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                    <i class="me-2 text-primary fas fa-gift"></i>
-                </div>
-                <div class="flex-grow-1 pe-2 offer-description">
-                    {{ decodeHTML(offer.title) }}
-                </div>
-                <!-- <div v-if="offer.payout" class="text-primary fw-bold" style="white-space: nowrap">
+    <b-card class="mb-1 w-100 my-offer-card" header-class="p-0" body-class="d-flex flex-column p-0">
+        <div
+            class="d-flex p-3 m-0 align-items-center"
+            style="
+                background: linear-gradient(
+                    155deg,
+                    rgba(255, 255, 255, 0.02) -2.13%,
+                    rgba(42, 42, 42, 0.11) 136.58%
+                ) !important;
+            "
+        >
+            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
+                <i class="me-2 text-primary fas fa-gift fs-5"></i>
+            </div>
+            <div class="flex-grow-1 pe-2 offer-description fs-5">
+                {{ decodeHTML(offer.title) }}
+            </div>
+            <!-- <div v-if="offer.payout" class="text-primary fw-bold" style="white-space: nowrap">
                     {{ offer.payout }} {{ offer.currency }}
                 </div> -->
-            </b-card-title>
-        </template>
+        </div>
 
         <b-collapse
             v-model="isVisible"
@@ -43,9 +45,9 @@
                     />
                 </div>
 
-                <b-button variant="primary" block class="w-100 mb-1" target="_blank" @click="openModal">
+                <button variant="primary" block class="w-100 mb-1 offer-btn" target="_blank" @click="openModal">
                     Claim <strong>${{ offer.payout }}</strong>
-                </b-button>
+                </button>
 
                 <!-- <div class="d-flex align-items-center justify-content-between mt-2 pb-2" style="opacity: 0.5">
                     <div class="d-flex align-items-center text-opaque small">
@@ -163,8 +165,9 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style>
 .offer-description {
+    font-family: 'Poppins', sans-serif;
     white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -280,6 +283,19 @@ export default defineComponent({
 }
 .offer-card-img {
     margin-top: 0.5rem;
+}
+.offer-btn {
+    outline: none;
+    border-radius: 5px;
+    background: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
+    border: none;
+    padding: 7px 0;
+}
+.my-offer-card {
+    background: linear-gradient(178deg, rgb(21, 20, 21) -37.16%, rgb(14, 13, 16) 98.54%);
+}
+.modal-content {
+    background-color: #15171a;
 }
 @media (max-width: 992px) {
     .modal-info-wrap {

@@ -40,26 +40,53 @@
                                 </div>
                             </div>
                             <div v-else class="d-flex flex-column gap-4">
-                                <div
-                                    v-for="group in mergedQuestsAndOffers"
-                                    :key="group.title"
-                                    :class="{
-                                    'd-none': group.quests.every((quest: TBaseQuest) => quest.isAvailable === false),
-                                }"
-                                >
-                                    <h3 class="quest-group-title">{{ group.title }}</h3>
-                                    <div class="quest-group">
-                                        <div
-                                            v-for="quest in group.quests"
-                                            :key="quest._id"
-                                            :class="{
-                                                'd-none': quest.isAvailable === false,
-                                                'quest-item': true,
-                                                'quest-item-daily': quest.variant === 0,
-                                            }"
-                                            class="quest-group-item"
-                                        >
-                                            <component :is="questComponentMap[quest.variant]" :quest="quest" />
+                                <div v-for="group in mergedQuestsAndOffers" :key="group.title">
+                                    <div
+                                        v-if="!group.isOfferRow"
+                                        :class="{
+                                        'd-none': group.quests.every((quest: TBaseQuest) => quest.isAvailable === false),
+                                    }"
+                                    >
+                                        <h3 class="quest-group-title">{{ group.title }}</h3>
+                                        <div class="quest-group">
+                                            <div
+                                                v-for="quest in group.quests"
+                                                :key="quest._id"
+                                                :class="{
+                                                    'd-none': quest.isAvailable === false,
+                                                    'quest-item': true,
+                                                    'quest-item-daily': quest.variant === 0,
+                                                }"
+                                                class="quest-group-item"
+                                            >
+                                                <component :is="questComponentMap[quest.variant]" :quest="quest" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-else class="offers-box">
+                                        <h3>{{ group.title }}</h3>
+                                        <div class="d-flex flex-wrap offer-row">
+                                            <div
+                                                v-for="offer in group.offers"
+                                                :key="offer.id"
+                                                class="offer-item"
+                                                :style="{
+                                                    width:
+                                                        group.offers.length === 1
+                                                            ? '100%'
+                                                            : offersPerRow === 3
+                                                            ? '30%'
+                                                            : '49%',
+                                                    maxWidth:
+                                                        group.offers.length === 1
+                                                            ? '100%'
+                                                            : offersPerRow === 3
+                                                            ? '30%'
+                                                            : '49%',
+                                                }"
+                                            >
+                                                <OfferCard :offer="offer" class="mb-2" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -418,13 +445,42 @@ export default defineComponent({
                 }
             });
 
-            return [
+            const groupedQuests = [
                 { title: 'Santa Quests', quests: santaQuests },
                 { title: 'X Quests', quests: xQuests },
                 { title: 'Discord Quests', quests: discordQuests },
                 { title: 'YouTube Quests', quests: youtubeQuests },
                 { title: 'Other Quests', quests: otherQuests },
             ];
+
+            const merged = [];
+            let offerIndex = 0;
+
+            groupedQuests.forEach((group) => {
+                if (group.quests.length) {
+                    merged.push(group);
+
+                    if (offerIndex < this.offers.length) {
+                        const offersForGroup = this.offers.slice(offerIndex, offerIndex + this.offersPerRow);
+                        merged.push({
+                            title: 'Top Performing Offers',
+                            isOfferRow: true,
+                            offers: offersForGroup,
+                        });
+                        offerIndex += this.offersPerRow;
+                    }
+                }
+            });
+
+            if (offerIndex < this.offers.length) {
+                const remainingOffers = this.offers.slice(offerIndex);
+                merged.push({
+                    title: '',
+                    isOfferRow: true,
+                    offers: remainingOffers,
+                });
+            }
+            return merged;
         },
     },
     watch: {
@@ -471,9 +527,12 @@ export default defineComponent({
                 const response = await axios.get(
                     `https://offers-api.santabrowser.com/offers/list?pageSize=10&pageNo=0&clid=${clid}`,
                 );
-                this.offers = response.data.trending.filter(
-                    (offer: any) => offer.imageUrl !== 'https://banners.hangmyads.com/files/uploads/Off_A_86634.png',
-                );
+                this.offers = response.data.trending
+                    .filter(
+                        (offer: any) =>
+                            offer.imageUrl !== 'https://banners.hangmyads.com/files/uploads/Off_A_86634.png',
+                    )
+                    .slice(0, 9);
             } catch (error) {
                 console.error('Failed to fetch offers', error);
             }
@@ -764,13 +823,19 @@ export default defineComponent({
 }
 
 .offers-box {
-    background: linear-gradient(129deg, #572985, #3a0202e6);
+    background: #202020;
     border-radius: 20px;
-    padding: 2%;
-    margin-bottom: 15px;
+    padding: 15px 20px;
+
     h3 {
-        font-family: 'Kode Mono', monospace;
-        font-size: 1rem;
+        font-family: 'Poppins', sans-serif;
+        color: #d4d4d4;
+        font-feature-settings: 'liga' off, 'clig' off;
+        text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 18px;
     }
 }
 .quest-skeleton-group {

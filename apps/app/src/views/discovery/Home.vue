@@ -12,6 +12,12 @@
                     <div v-if="selectedPart === 'wallet'">
                         <BaseCardRewards />
                     </div>
+                    <div
+                        v-if="selectedPart === 'transactions'"
+                        class="d-flex align-items-center justify-content-center h-100"
+                    >
+                        <Transactions />
+                    </div>
                 </div>
             </div>
         </div>
