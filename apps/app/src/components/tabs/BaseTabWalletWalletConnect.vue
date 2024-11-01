@@ -63,26 +63,33 @@ export default defineComponent({
             await poll({ taskFn, interval: 1000, retries: 60 });
             return this.walletStore.account.address;
         },
+        getAptosWallet() {
+            if ('aptos' in window) {
+                return window.aptos;
+            } else {
+                window.open('https://petra.app/', `_blank`);
+            }
+        },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
+                const wallet = this.getAptosWallet();
                 try {
-                    if (!window.martian) {
-                        window.open(
-                            'https://chromewebstore.google.com/detail/martian-aptos-sui-wallet/efbglgofoippbgcjepnhiblaibcnclgk',
-                            '_blank',
-                        );
-                        return;
-                    }
-                    if (window.martian._isConnected) await window.martian.disconnect();
-                    const accountInfo = await window.martian.connect();
+                    await wallet.disconnect();
+                } catch (error) {
+                    console.log(error);
+                    // { code: 4001, message: "User rejected the request."}
+                }
+                try {
+                    const response = await wallet.connect();
+
                     try {
                         await this.walletStore.create({
                             chainId: ChainId.Aptos,
                             variant: this.variant,
-                            rawAddress: accountInfo.address,
+                            rawAddress: response.address,
                         });
                         const wallet = this.walletStore.wallets.find(
-                            (wallet: TWallet) => wallet.address === accountInfo.address,
+                            (wallet: TWallet) => wallet.address === response.address,
                         );
                         if (!wallet) throw new Error('New wallet not found');
 
@@ -95,62 +102,98 @@ export default defineComponent({
                         this.isLoading = false;
                     }
                 } catch (error) {
-                    console.error(error);
+                    console.log(error);
+                    // { code: 4001, message: "User rejected the request."}
                 }
+                // try {
+                //     if (!window.martian) {
+                //         console.log('here');
+                //         window.open(
+                //             'https://chromewebstore.google.com/detail/martian-aptos-sui-wallet/efbglgofoippbgcjepnhiblaibcnclgk',
+                //             '_blank',
+                //         );
+                //         return;
+                //     }
+                //     if (window.martian._isConnected) await window.martian.disconnect();
+                //     const accountInfo = await window.martian.connect();
+                //     try {
+                //         await this.walletStore.create({
+                //             chainId: ChainId.Aptos,
+                //             variant: this.variant,
+                //             rawAddress: accountInfo.address,
+                //         });
+                //         const wallet = this.walletStore.wallets.find(
+                //             (wallet: TWallet) => wallet.address === accountInfo.address,
+                //         );
+                //         if (!wallet) throw new Error('New wallet not found');
+
+                //         this.walletStore.setWallet(wallet);
+                //         this.$emit('close');
+                //     } catch (error) {
+                //         console.error(error);
+                //         this.error = 'An issue occured while creating your wallet. Please try again.';
+                //     } finally {
+                //         this.isLoading = false;
+                //     }
+                // } catch (error) {
+                //     console.error(error);
+                // }
             } else if (this.walletStore.currentChainId == ChainId.Sui) {
-                try {
-                    if (window.martian.sui._isConnected) await window.martian.sui.disconnect();
-                    const accountInfo = await window.martian.sui.connect(['viewAccount', 'suggestTransactions']);
-                    try {
-                        await this.walletStore.create({
-                            chainId: ChainId.Sui,
-                            variant: this.variant,
-                            rawAddress: accountInfo.address,
-                        });
-                        const wallet = this.walletStore.wallets.find(
-                            (wallet: TWallet) => wallet.address === accountInfo.address,
-                        );
-                        if (!wallet) throw new Error('New wallet not found');
+                console.log('Not supporting Sui at the moment.');
+                // try {
+                //     if (window.martian.sui._isConnected) await window.martian.sui.disconnect();
+                //     const accountInfo = await window.martian.sui.connect(['viewAccount', 'suggestTransactions']);
+                //     try {
+                //         await this.walletStore.create({
+                //             chainId: ChainId.Sui,
+                //             variant: this.variant,
+                //             rawAddress: accountInfo.address,
+                //         });
+                //         const wallet = this.walletStore.wallets.find(
+                //             (wallet: TWallet) => wallet.address === accountInfo.address,
+                //         );
+                //         if (!wallet) throw new Error('New wallet not found');
 
-                        this.walletStore.setWallet(wallet);
-                        this.$emit('close');
-                    } catch (error) {
-                        console.error(error);
-                        this.error = 'An issue occured while creating your wallet. Please try again.';
-                    } finally {
-                        this.isLoading = false;
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
+                //         this.walletStore.setWallet(wallet);
+                //         this.$emit('close');
+                //     } catch (error) {
+                //         console.error(error);
+                //         this.error = 'An issue occured while creating your wallet. Please try again.';
+                //     } finally {
+                //         this.isLoading = false;
+                //     }
+                // } catch (error) {
+                //     console.error(error);
+                // }
             } else if (this.walletStore.currentChainId == ChainId.Solana) {
-                try {
-                    const provider = window.phantom?.solana;
-                    const resp = await provider.connect();
-                    const accountAddress = resp.publicKey.toString();
-                    console.log(accountAddress);
-                    try {
-                        await this.walletStore.create({
-                            chainId: ChainId.Solana,
-                            variant: this.variant,
-                            rawAddress: accountAddress,
-                        });
-                        const wallet = this.walletStore.wallets.find(
-                            (wallet: TWallet) => wallet.address === accountAddress,
-                        );
-                        if (!wallet) throw new Error('New wallet not found');
+                console.log('Not supporting Solana at the moment.');
+                // try {
+                //     const provider = window.phantom?.solana;
+                //     const resp = await provider.connect();
+                //     const accountAddress = resp.publicKey.toString();
+                //     console.log(accountAddress);
+                //     try {
+                //         await this.walletStore.create({
+                //             chainId: ChainId.Solana,
+                //             variant: this.variant,
+                //             rawAddress: accountAddress,
+                //         });
+                //         const wallet = this.walletStore.wallets.find(
+                //             (wallet: TWallet) => wallet.address === accountAddress,
+                //         );
+                //         if (!wallet) throw new Error('New wallet not found');
 
-                        this.walletStore.setWallet(wallet);
-                        this.$emit('close');
-                    } catch (error) {
-                        console.error(error);
-                        this.error = 'An issue occured while creating your wallet. Please try again.';
-                    } finally {
-                        this.isLoading = false;
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
+                //         this.walletStore.setWallet(wallet);
+                //         this.$emit('close');
+                //     } catch (error) {
+                //         console.error(error);
+                //         this.error = 'An issue occured while creating your wallet. Please try again.';
+                //     } finally {
+                //         this.isLoading = false;
+                //     }
+                // } catch (error) {
+                //     console.error(error);
+                // }
             } else {
                 try {
                     await this.walletStore.disconnect();
@@ -161,41 +204,6 @@ export default defineComponent({
                     this.error = 'An issue occured while connecting your wallet. Please try again.';
                 }
             }
-            // try {
-            //     await window.martian.sui.disconnect();
-            //     const accountInfo = await window.martian.sui.connect(['viewAccount', 'suggestTransactions']);
-            //     // const accountInfo = await window.martian.connect();
-            //     console.log(accountInfo);
-            //     try {
-            //         await this.walletStore.create({
-            //             chainId: ChainId.Sui,
-            //             variant: this.variant,
-            //             rawAddress: accountInfo.address,
-            //         });
-            //         console.log(this.walletStore.wallets);
-            //         const wallet = this.walletStore.wallets.find(
-            //             (wallet: TWallet) => wallet.address === accountInfo.address,
-            //         );
-            //         if (!wallet) throw new Error('New wallet not found');
-
-            //         this.walletStore.setWallet(wallet);
-            //         this.$emit('close');
-            //     } catch (error) {
-            //         console.error(error);
-            //         this.error = 'An issue occured while creating your wallet. Please try again.';
-            //     } finally {
-            //         this.isLoading = false;
-            //     }
-            // } catch (error) {
-            //     try {
-            //         await this.walletStore.disconnect();
-            //         await this.walletStore.connect();
-            //         this.address = await this.getAddress();
-            //     } catch (error) {
-            //         console.error(error);
-            //         this.error = 'An issue occured while connecting your wallet. Please try again.';
-            //     }
-            // }
         },
         async onClickAdd() {
             this.isLoading = true;
