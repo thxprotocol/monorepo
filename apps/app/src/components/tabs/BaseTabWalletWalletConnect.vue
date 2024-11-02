@@ -63,33 +63,24 @@ export default defineComponent({
             await poll({ taskFn, interval: 1000, retries: 60 });
             return this.walletStore.account.address;
         },
-        getAptosWallet() {
-            if ('aptos' in window) {
-                return window.aptos;
-            } else {
-                window.open('https://petra.app/', `_blank`);
-            }
-        },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
-                const wallet = this.getAptosWallet();
-                try {
-                    await wallet.disconnect();
-                } catch (error) {
-                    console.log(error);
-                    // { code: 4001, message: "User rejected the request."}
+                if (!('fewcha' in window)) {
+                    window.open('https://fewcha.app/', `_blank`);
                 }
+
                 try {
-                    const response = await wallet.connect();
+                    if (window.fewcha.isConnected()) await window.fewcha.disconnect();
+                    const fewcha = await window.fewcha.connect();
 
                     try {
                         await this.walletStore.create({
                             chainId: ChainId.Aptos,
                             variant: this.variant,
-                            rawAddress: response.address,
+                            rawAddress: fewcha.data.address,
                         });
                         const wallet = this.walletStore.wallets.find(
-                            (wallet: TWallet) => wallet.address === response.address,
+                            (wallet: TWallet) => wallet.address === fewcha.data.address,
                         );
                         if (!wallet) throw new Error('New wallet not found');
 
@@ -103,7 +94,6 @@ export default defineComponent({
                     }
                 } catch (error) {
                     console.log(error);
-                    // { code: 4001, message: "User rejected the request."}
                 }
                 // try {
                 //     if (!window.martian) {
