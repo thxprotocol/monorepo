@@ -65,9 +65,9 @@ export default defineComponent({
         },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
-                if (!('fewcha' in window)) {
-                    window.open('https://fewcha.app/', `_blank`);
-                }
+                // if (!('fewcha' in window)) {
+                //     window.open('https://fewcha.app/', `_blank`);
+                // }
 
                 try {
                     if (window.fewcha.isConnected()) await window.fewcha.disconnect();
