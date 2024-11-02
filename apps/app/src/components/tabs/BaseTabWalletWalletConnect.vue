@@ -63,24 +63,33 @@ export default defineComponent({
             await poll({ taskFn, interval: 1000, retries: 60 });
             return this.walletStore.account.address;
         },
+        getAptosWallet() {
+            if ('aptos' in window) {
+                return window.aptos;
+            } else {
+                window.open('https://petra.app/', `_blank`);
+            }
+        },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
-                // if (!('fewcha' in window)) {
-                //     window.open('https://fewcha.app/', `_blank`);
-                // }
-
+                const wallet = this.getAptosWallet();
                 try {
-                    if (window.fewcha.isConnected()) await window.fewcha.disconnect();
-                    const fewcha = await window.fewcha.connect();
+                    await wallet.disconnect();
+                } catch (error) {
+                    console.log(error);
+                    // { code: 4001, message: "User rejected the request."}
+                }
+                try {
+                    const response = await wallet.connect();
 
                     try {
                         await this.walletStore.create({
                             chainId: ChainId.Aptos,
                             variant: this.variant,
-                            rawAddress: fewcha.data.address,
+                            rawAddress: response.address,
                         });
                         const wallet = this.walletStore.wallets.find(
-                            (wallet: TWallet) => wallet.address === fewcha.data.address,
+                            (wallet: TWallet) => wallet.address === response.address,
                         );
                         if (!wallet) throw new Error('New wallet not found');
 
@@ -94,6 +103,7 @@ export default defineComponent({
                     }
                 } catch (error) {
                     console.log(error);
+                    // { code: 4001, message: "User rejected the request."}
                 }
                 // try {
                 //     if (!window.martian) {
