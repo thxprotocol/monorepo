@@ -1,11 +1,10 @@
 <template>
     <div
-        v-if="list.length"
         ref="dropdown"
         class="d-flex gap-2 dropdown-menu-wallet wal-dropdown align-items-center justify-content-between m-0 white-btn"
         @click="toggleDropdown"
     >
-        <div class="fst-italic">WALLET</div>
+        <div class="fst-italic fs-6">WALLET</div>
         <div class="flex-icons">
             <div v-for="(token, key) of list">
                 <img :key="key" :src="token.erc20.logoImgUrl" alt="ERC20" loading="lazy" class="img-circle" />
@@ -178,11 +177,13 @@ export default defineComponent({
     display: none;
     padding: 0;
     list-style-type: none;
-    background: #000;
-    border: 1px dotted #ffcd06;
-    border-radius: 20px;
+    border-radius: 5px;
+    border: 1px solid #292929;
+    background: #202020;
     margin-top: -4px;
     overflow: hidden;
+    height: 100px;
+    width: 200px;
 }
 
 .dropdown li {
@@ -197,20 +198,16 @@ export default defineComponent({
 }
 
 .dropdown-menu-wallet {
+    height: 32px;
     position: relative;
-    display: block;
-    height: auto;
     color: #fff;
     text-decoration: none;
     cursor: pointer;
-    background: #000;
-    border-radius: 22px;
-    border: 1px dotted #ffcd06;
     transition: all 0.3s ease-in-out;
-}
-.dropdown-menu-wallet:hover {
-    background: rgba(255, 205, 7, 0.3);
-    box-shadow: 0 0 10px rgba(255, 205, 7, 0.5);
+    border-radius: 5px;
+    border: 1px solid #292929;
+    background: #202020;
+    padding: 0 7px;
 }
 
 .dropdown-box {

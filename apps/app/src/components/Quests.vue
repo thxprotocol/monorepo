@@ -1004,6 +1004,13 @@ export default defineComponent({
         width: 100% !important;
     }
 }
+@media (max-width: 774px) {
+    .quest-group,
+    .reward-group {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+}
 
 @media (max-width: 1400px) {
     .my-col-xl-7 {
@@ -1027,6 +1034,17 @@ export default defineComponent({
     .regular-quest {
         width: 49%;
         flex: 1 1 49%;
+    }
+}
+@media (max-width: 576px) {
+    .quest-group,
+    .reward-group {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 10px;
+    }
+    .quests-column {
+        padding: 10px;
+        margin: 0;
     }
 }
 </style>

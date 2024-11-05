@@ -150,6 +150,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .header-nav {
+    position: relative;
     background: transparent;
 }
 
@@ -263,12 +264,6 @@ export default defineComponent({
     }
 }
 
-@media (max-width: 450px) {
-    .media-header-first h1 {
-        display: none;
-    }
-}
-
 @media (max-width: 992px) {
     .header-nav {
         flex-direction: column;
@@ -284,7 +279,7 @@ export default defineComponent({
         order: 2;
         position: absolute;
         right: 0;
-        margin-right: 1rem;
+        //margin-right: 1rem;
     }
     .media-header-third {
         order: 3;
@@ -295,6 +290,34 @@ export default defineComponent({
     }
     .balance-wrap {
         padding-right: 0;
+    }
+}
+@media (max-width: 527px) {
+    .media-header-first h1 {
+        display: none;
+    }
+}
+
+@media (max-width: 426px) {
+    .media-header-first img {
+        display: none;
+    }
+    .media-header-third {
+        margin-top: 40px;
+    }
+    .media-header-second > * {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+    .media-header-second {
+        width: 100%;
+    }
+    .username {
+        display: none;
+    }
+    .name-avatar {
+        padding-right: 0 !important;
+        justify-content: center !important;
     }
 }
 .total-earnings p {
