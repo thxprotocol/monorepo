@@ -1,5 +1,6 @@
 <template>
     <div
+        v-if="list.length"
         ref="dropdown"
         class="d-flex gap-2 dropdown-menu-wallet wal-dropdown align-items-center justify-content-between m-0 white-btn"
         @click="toggleDropdown"
@@ -182,8 +183,6 @@ export default defineComponent({
     background: #202020;
     margin-top: -4px;
     overflow: hidden;
-    height: 100px;
-    width: 200px;
 }
 
 .dropdown li {

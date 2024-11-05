@@ -1003,6 +1003,10 @@ export default defineComponent({
     .quests-column .nav-link {
         width: 100% !important;
     }
+    .quest-item-daily,
+    .reward-item-promoted {
+        grid-column: span 2;
+    }
 }
 @media (max-width: 774px) {
     .quest-group,
@@ -1045,6 +1049,10 @@ export default defineComponent({
     .quests-column {
         padding: 10px;
         margin: 0;
+    }
+    .quest-item-daily,
+    .reward-item-promoted {
+        grid-column: span 1;
     }
 }
 </style>
