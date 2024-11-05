@@ -99,4 +99,7 @@ export default defineComponent({
     top: 50%;
     transform: translateY(-50%);
 }
+.form-control:focus {
+    box-shadow: none;
+}
 </style>

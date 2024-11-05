@@ -643,25 +643,12 @@ export default defineComponent({
 
 .btn-primary {
     box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px, rgba(255, 255, 255, 0.12) 0px 4px 4px 0px inset;
-    border-radius: 20px;
+    border-radius: 5px;
     transition: all 0.3s ease;
     position: relative;
     z-index: 1;
     overflow: hidden;
-}
-
-.btn-primary::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 300%;
-    height: 300%;
-    background: rgba(255, 255, 255, 0.15);
-    transition: all 0.3s ease;
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    z-index: -1;
+    background: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
 }
 
 .my-leader {

@@ -1,7 +1,7 @@
 .form-control,
 .form-control:focus {
     background-color: var(--bs-body-bg);
-    border-color: var(--bs-btn-bg);
+    border-color: var(--bs-border-color);
     color: var(--bs-body-color);
 }
 .form-control:disabled {
