@@ -63,67 +63,25 @@ export default defineComponent({
             await poll({ taskFn, interval: 1000, retries: 60 });
             return this.walletStore.account.address;
         },
-        getAptosWallet() {
-            if ('aptos' in window) {
-                return window.aptos;
-            } else {
-                window.open('https://petra.app/', `_blank`);
-            }
-        },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
-                const wallet = this.getAptosWallet();
                 try {
-                    await wallet.disconnect();
+                    const walletAddress = await window.pontem.connect();
+                    console.log(walletAddress);
                 } catch (error) {
                     console.log(error);
-                    // { code: 4001, message: "User rejected the request."}
-                }
-                try {
-                    const response = await wallet.connect();
-
-                    try {
-                        await this.walletStore.create({
-                            chainId: ChainId.Aptos,
-                            variant: this.variant,
-                            rawAddress: response.address,
-                        });
-                        const wallet = this.walletStore.wallets.find(
-                            (wallet: TWallet) => wallet.address === response.address,
-                        );
-                        if (!wallet) throw new Error('New wallet not found');
-
-                        this.walletStore.setWallet(wallet);
-                        this.$emit('close');
-                    } catch (error) {
-                        console.error(error);
-                        this.error = 'An issue occured while creating your wallet. Please try again.';
-                    } finally {
-                        this.isLoading = false;
-                    }
-                } catch (error) {
-                    console.log(error);
-                    // { code: 4001, message: "User rejected the request."}
                 }
                 // try {
-                //     if (!window.martian) {
-                //         console.log('here');
-                //         window.open(
-                //             'https://chromewebstore.google.com/detail/martian-aptos-sui-wallet/efbglgofoippbgcjepnhiblaibcnclgk',
-                //             '_blank',
-                //         );
-                //         return;
-                //     }
-                //     if (window.martian._isConnected) await window.martian.disconnect();
-                //     const accountInfo = await window.martian.connect();
+                //     const response = await wallet.connect();
+
                 //     try {
                 //         await this.walletStore.create({
                 //             chainId: ChainId.Aptos,
                 //             variant: this.variant,
-                //             rawAddress: accountInfo.address,
+                //             rawAddress: response.address,
                 //         });
                 //         const wallet = this.walletStore.wallets.find(
-                //             (wallet: TWallet) => wallet.address === accountInfo.address,
+                //             (wallet: TWallet) => wallet.address === response.address,
                 //         );
                 //         if (!wallet) throw new Error('New wallet not found');
 
@@ -136,7 +94,8 @@ export default defineComponent({
                 //         this.isLoading = false;
                 //     }
                 // } catch (error) {
-                //     console.error(error);
+                //     console.log(error);
+                //     // { code: 4001, message: "User rejected the request."}
                 // }
             } else if (this.walletStore.currentChainId == ChainId.Sui) {
                 console.log('Not supporting Sui at the moment.');
