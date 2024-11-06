@@ -66,37 +66,31 @@ export default defineComponent({
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
                 try {
-                    const walletAddress = await window.pontem.connect();
-                    console.log(walletAddress);
+                    const response = await window.pontem.connect();
+
+                    try {
+                        await this.walletStore.create({
+                            chainId: ChainId.Aptos,
+                            variant: this.variant,
+                            rawAddress: response.address,
+                        });
+                        const wallet = this.walletStore.wallets.find(
+                            (wallet: TWallet) => wallet.address === response.address,
+                        );
+                        if (!wallet) throw new Error('New wallet not found');
+
+                        this.walletStore.setWallet(wallet);
+                        this.$emit('close');
+                    } catch (error) {
+                        console.error(error);
+                        this.error = 'An issue occured while creating your wallet. Please try again.';
+                    } finally {
+                        this.isLoading = false;
+                    }
                 } catch (error) {
                     console.log(error);
+                    // { code: 4001, message: "User rejected the request."}
                 }
-                // try {
-                //     const response = await wallet.connect();
-
-                //     try {
-                //         await this.walletStore.create({
-                //             chainId: ChainId.Aptos,
-                //             variant: this.variant,
-                //             rawAddress: response.address,
-                //         });
-                //         const wallet = this.walletStore.wallets.find(
-                //             (wallet: TWallet) => wallet.address === response.address,
-                //         );
-                //         if (!wallet) throw new Error('New wallet not found');
-
-                //         this.walletStore.setWallet(wallet);
-                //         this.$emit('close');
-                //     } catch (error) {
-                //         console.error(error);
-                //         this.error = 'An issue occured while creating your wallet. Please try again.';
-                //     } finally {
-                //         this.isLoading = false;
-                //     }
-                // } catch (error) {
-                //     console.log(error);
-                //     // { code: 4001, message: "User rejected the request."}
-                // }
             } else if (this.walletStore.currentChainId == ChainId.Sui) {
                 console.log('Not supporting Sui at the moment.');
                 // try {
