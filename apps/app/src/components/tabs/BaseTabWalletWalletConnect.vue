@@ -66,23 +66,32 @@ export default defineComponent({
             await poll({ taskFn, interval: 1000, retries: 60 });
             return this.walletStore.account.address;
         },
+        getAptosWallet() {
+            if ('aptos' in window) {
+                return window.aptos;
+            } else if (this.isMobile()) {
+                // Deep link to Petra wallet on mobile
+                window.location.href = `https://petra.app/explore?link=${encodeURIComponent(window.location.href)}`;
+                return null;
+            } else {
+                // Open Petra website in new tab for desktop
+                window.open('https://petra.app/', '_blank');
+                return null;
+            }
+        },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
+                const wallet = this.getAptosWallet();
+                if (!wallet) return; // Exit if redirecting to download
+
                 try {
-                    if (this.isMobile()) {
-                        window.location.href = `pontem://wallet/dapp/${encodeURIComponent(window.location.href)}`;
-                        return;
-                    }
+                    await wallet.disconnect();
+                } catch (error) {
+                    console.log(error);
+                }
 
-                    if (!window.pontem) {
-                        window.open(
-                            'https://chrome.google.com/webstore/detail/pontem-wallet/phkbamefinggmakgklpkljjmgibohnba',
-                            '_blank',
-                        );
-                        return;
-                    }
-
-                    const response = await window.pontem.connect();
+                try {
+                    const response = await wallet.connect();
 
                     try {
                         await this.walletStore.create({
@@ -99,15 +108,12 @@ export default defineComponent({
                         this.$emit('close');
                     } catch (error) {
                         console.error(error);
-                        this.error = 'An issue occured while creating your wallet. Please try again.';
+                        this.error = 'An issue occurred while creating your wallet. Please try again.';
                     } finally {
                         this.isLoading = false;
                     }
                 } catch (error) {
                     console.log(error);
-                    if (error.code === -32002) {
-                        window.open('chrome-extension://phkbamefinggmakgklpkljjmgibohnba/popup.html', '_blank');
-                    }
                 }
             } else if (this.walletStore.currentChainId == ChainId.Sui) {
                 console.log('Not supporting Sui at the moment.');
