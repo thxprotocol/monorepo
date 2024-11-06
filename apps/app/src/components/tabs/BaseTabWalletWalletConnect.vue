@@ -56,6 +56,9 @@ export default defineComponent({
         this.walletStore.setWallet(null);
     },
     methods: {
+        isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        },
         async getAddress() {
             const taskFn = async () => {
                 return this.walletStore.account.address ? Promise.resolve() : Promise.reject('Account address');
@@ -66,6 +69,19 @@ export default defineComponent({
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
                 try {
+                    if (this.isMobile()) {
+                        window.location.href = `pontem://wallet/dapp/${encodeURIComponent(window.location.href)}`;
+                        return;
+                    }
+
+                    if (!window.pontem) {
+                        window.open(
+                            'https://chrome.google.com/webstore/detail/pontem-wallet/phkbamefinggmakgklpkljjmgibohnba',
+                            '_blank',
+                        );
+                        return;
+                    }
+
                     const response = await window.pontem.connect();
 
                     try {
@@ -89,7 +105,9 @@ export default defineComponent({
                     }
                 } catch (error) {
                     console.log(error);
-                    // { code: 4001, message: "User rejected the request."}
+                    if (error.code === -32002) {
+                        window.open('chrome-extension://phkbamefinggmakgklpkljjmgibohnba/popup.html', '_blank');
+                    }
                 }
             } else if (this.walletStore.currentChainId == ChainId.Sui) {
                 console.log('Not supporting Sui at the moment.');
