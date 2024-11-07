@@ -1,15 +1,6 @@
 <template>
-    <b-card class="mb-1 w-100 my-offer-card" header-class="p-0" body-class="d-flex flex-column p-0">
-        <div
-            class="d-flex p-3 m-0 align-items-center"
-            style="
-                background: linear-gradient(
-                    155deg,
-                    rgba(255, 255, 255, 0.02) -2.13%,
-                    rgba(42, 42, 42, 0.11) 136.58%
-                ) !important;
-            "
-        >
+    <b-card class="w-100 my-offer-card m-0 p-3" header-class="p-0" body-class="d-flex flex-column p-0">
+        <div class="d-flex p-3 m-0 align-items-center pt-0">
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="me-2 text-primary fas fa-gift fs-5"></i>
             </div>
@@ -21,16 +12,7 @@
                 </div> -->
         </div>
 
-        <b-collapse
-            v-model="isVisible"
-            style="
-                background: linear-gradient(
-                    155deg,
-                    rgba(255, 255, 255, 0.02) -2.13%,
-                    rgba(42, 42, 42, 0.11) 136.58%
-                ) !important;
-            "
-        >
+        <b-collapse v-model="isVisible">
             <div class="d-flex justify-content-center w-100 offer-card-img">
                 <img v-if="offer.imageUrl" class="img-fluid" :src="offer.imageUrl" alt="header image" loading="lazy" />
                 <div v-else class="placeholder"></div>
@@ -45,7 +27,13 @@
                     />
                 </div>
 
-                <button variant="primary" block class="w-100 mb-1 offer-btn" target="_blank" @click="openModal">
+                <button
+                    variant="primary"
+                    block
+                    class="w-100 mb-1 offer-btn btn-primary"
+                    target="_blank"
+                    @click="openModal"
+                >
                     Claim <strong>${{ offer.payout }}</strong>
                 </button>
 

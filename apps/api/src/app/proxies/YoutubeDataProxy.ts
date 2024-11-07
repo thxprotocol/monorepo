@@ -1,12 +1,13 @@
 import { google } from 'googleapis';
 import { AccessTokenKind, OAuthRequiredScopes, OAuthScope } from '@thxnetwork/common/enums';
-import { AUTH_URL, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET } from '../config/secrets';
+import { API_URL, AUTH_URL, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET } from '../config/secrets';
 import AccountProxy from './AccountProxy';
 
 const client = new google.auth.OAuth2(
     GOOGLE_OAUTH_CLIENT_ID,
     GOOGLE_OAUTH_CLIENT_SECRET,
-    AUTH_URL + '/oidc/callback/google',
+    // AUTH_URL + '/oidc/callback/google',
+    API_URL + '/v1/oauth/callback/google',
 );
 
 google.options({ auth: client });
@@ -43,15 +44,21 @@ export default class YoutubeDataProxy {
     }
 
     static async validateSubscribe(account: TAccount, channelId: string) {
+        console.log('@@@@@@@@@@@@@@ validateSubscribe called with account:', account, 'and channelId:', channelId);
         const youtube = await getClient(account, OAuthRequiredScopes.GoogleYoutubeLike);
         const { data } = await youtube.subscriptions.list({
-            forChannelId: channelId,
             part: ['snippet'],
             mine: true,
+            maxResults: 10,
         });
+        console.log('@@@@@@@@@@@@@@ YouTube subscription list retrieved:', data);
         const isSubscribed = data.items.length > 0;
-        if (isSubscribed) return { result: true, reason: '' };
+        if (isSubscribed) {
+            console.log('@@@@@@@@@@@@@@ Subscription found, returning result as true');
+            return { result: true, reason: '' };
+        }
 
-        return { result: false, reason: 'Could not find your subscription for this channel.' };
+        console.log('@@@@@@@@@@@@@@ Subscription not found, returning result as false');
+        return { result: false, reason: '@@@@@@@@@@@@@@ Could not find your subscription for this channel.' };
     }
 }

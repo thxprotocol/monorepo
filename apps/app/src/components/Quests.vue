@@ -29,7 +29,10 @@
                             </sup> -->
                         </template>
                         <div class="quests-box">
-                            <div v-if="questStore.isLoading" class="d-flex justify-content-center p-3">
+                            <div
+                                v-if="questStore.isLoading || isLoadingOffers"
+                                class="d-flex justify-content-center p-3"
+                            >
                                 <div class="w-100 quest-skeleton-group">
                                     <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
                                         <div class="skeleton-image"></div>
@@ -85,7 +88,7 @@
                                                             : '49%',
                                                 }"
                                             >
-                                                <OfferCard :offer="offer" class="mb-2" />
+                                                <OfferCard :offer="offer" />
                                             </div>
                                         </div>
                                     </div>
@@ -334,6 +337,7 @@ export default defineComponent({
             entry: null,
             offers: [],
             offersPerRow: window.innerWidth > 1350 ? 3 : 2,
+            isLoadingOffers: false,
         };
     },
     computed: {
@@ -519,6 +523,7 @@ export default defineComponent({
     },
     methods: {
         async fetchOffers() {
+            this.isLoadingOffers = true;
             try {
                 while (!this.accountStore.account) {
                     await this.accountStore.getAccount();
@@ -535,6 +540,8 @@ export default defineComponent({
                     .slice(0, 9);
             } catch (error) {
                 console.error('Failed to fetch offers', error);
+            } finally {
+                this.isLoadingOffers = false;
             }
         },
         handleResize() {
@@ -774,7 +781,7 @@ export default defineComponent({
     //margin: 1%;
     max-width: 45%;
     box-sizing: border-box;
-    background: #130301 !important;
+    background: linear-gradient(178deg, rgb(21, 20, 21) -37.16%, rgb(14, 13, 16) 98.54%);
     border-radius: 20px;
 
     .card {
