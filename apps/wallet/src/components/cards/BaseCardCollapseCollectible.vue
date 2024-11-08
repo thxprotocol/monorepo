@@ -26,11 +26,22 @@
                     <span class="text-opaque me-auto">Token ID</span>
                     <b-link :href="url" target="_blank">{{ collectible.tokenId }}</b-link>
                 </div>
-                <!-- <b-button v-b-model="`modalTransfer${collectible._id}`" variant="primary" class="w-100 my-3">
+                <b-button variant="primary" class="w-100 my-3" @click="isModalTransferShown = true">
                     Transfer
                     <BaseIcon icon="chevron-right" class="ms-1" />
                 </b-button>
-                <BaseModalTransfer :id="`modalTransfer${collectible._id}`" :collectible="collectible" /> -->
+                <b-modal v-model="isModalTransferShown" centered hide-footer title="Transfer">
+                    <b-form @submit.prevent="onSubmitTransfer">
+                        <BaseFormGroup label="Receiver" tooltip="Provide the address of the recipient.">
+                            <b-form-input v-model="to" placeholder="0x0000..." />
+                        </BaseFormGroup>
+                        <b-button :disabled="isLoading" type="submit" variant="primary" class="w-100">
+                            <b-spinner v-if="isLoading" small variant="primary" />
+                            <template v-else>Transer</template>
+                        </b-button>
+                        <b-button variant="link" class="w-100" @click="isModalTransferShown = false">Cancel</b-button>
+                    </b-form>
+                </b-modal>
                 <hr />
                 <div class="small text-opaque text-center">
                     Collected at
@@ -43,8 +54,12 @@
 
 <script lang="ts">
 import { chainList } from '@thxnetwork/common/chains';
+import { useCollectibleStore } from '@thxnetwork/wallet/stores';
 import { format } from 'date-fns';
+import { isAddress } from 'ethers/lib/utils';
+import { mapStores } from 'pinia';
 import { defineComponent, PropType } from 'vue';
+import { toast } from '../../utils/toast';
 
 export default defineComponent({
     name: 'BaseCardCollapseCollectible',
@@ -63,9 +78,10 @@ export default defineComponent({
         },
     },
     data() {
-        return { format, isLoading: false, isCollapsed: false };
+        return { to: '', format, isModalTransferShown: false, isLoading: false, isCollapsed: false };
     },
     computed: {
+        ...mapStores(useCollectibleStore),
         url() {
             return (
                 chainList[this.collection.chainId].blockExplorer +
@@ -74,6 +90,29 @@ export default defineComponent({
                 '/' +
                 this.collectible.tokenId
             );
+        },
+    },
+
+    methods: {
+        async onSubmitTransfer() {
+            this.isLoading = true;
+            try {
+                if (!isAddress(this.to)) {
+                    throw new Error('Invalid receiver address');
+                }
+
+                await this.collectibleStore.transfer({
+                    to: this.to,
+                    erc721Id: this.collectible.erc721Id,
+                    erc721TokenId: this.collectible._id,
+                });
+            } catch (error: any) {
+                toast(error.message, 'light', 3000, () => {
+                    return;
+                });
+            } finally {
+                this.isLoading = false;
+            }
         },
     },
 });
