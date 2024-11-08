@@ -4,7 +4,7 @@
             <HeaderNav :is-visible="true" />
             <div class="d-flex h-100 overflow-hidden">
                 <Sidebar :selected-part="selectedPart" @nav-clicked="handleNavClick" />
-                <div class="main-content">
+                <div class="main-content position-relative">
                     <Quests :selected-part="selectedPart" />
                     <div v-if="selectedPart === 'leaderboard'" class="w-100">
                         <BaseQuestLeaderboardSmall :selected-part="selectedPart" />

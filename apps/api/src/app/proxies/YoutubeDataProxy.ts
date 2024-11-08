@@ -44,21 +44,17 @@ export default class YoutubeDataProxy {
     }
 
     static async validateSubscribe(account: TAccount, channelId: string) {
-        console.log('@@@@@@@@@@@@@@ validateSubscribe called with account:', account, 'and channelId:', channelId);
         const youtube = await getClient(account, OAuthRequiredScopes.GoogleYoutubeLike);
         const { data } = await youtube.subscriptions.list({
             part: ['snippet'],
             mine: true,
             maxResults: 10,
         });
-        console.log('@@@@@@@@@@@@@@ YouTube subscription list retrieved:', data);
         const isSubscribed = data.items.length > 0;
         if (isSubscribed) {
-            console.log('@@@@@@@@@@@@@@ Subscription found, returning result as true');
             return { result: true, reason: '' };
         }
 
-        console.log('@@@@@@@@@@@@@@ Subscription not found, returning result as false');
-        return { result: false, reason: '@@@@@@@@@@@@@@ Could not find your subscription for this channel.' };
+        return { result: false, reason: 'Could not find your subscription for this channel.' };
     }
 }

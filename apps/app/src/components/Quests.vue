@@ -164,10 +164,10 @@
                             </div>
                             <div v-else class="d-flex flex-column gap-4">
                                 <div
-                                    v-for="group in mergedQuestsAndOffers"
+                                    v-for="group in filteredCompletedQuests"
                                     :key="group.title"
                                     :class="{
-                                    'd-none': group.quests.every((quest: TBaseQuest) => quest.isAvailable === true),
+                                    'd-none': group.quests && group.quests.every((quest: TBaseQuest) => quest.isAvailable === true) && !group.isOfferRow,
                                 }"
                                 >
                                     <h3 class="quest-group-title">{{ group.title }}</h3>
@@ -187,6 +187,12 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </b-tab>
+
+                    <b-tab title="About">
+                        <div class="quests-box d-flex justify-content-center align-items-center">
+                            <p class="text-center text-muted mt-3">No information available.</p>
                         </div>
                     </b-tab>
                 </b-tabs>
@@ -485,6 +491,9 @@ export default defineComponent({
                 });
             }
             return merged;
+        },
+        filteredCompletedQuests() {
+            return this.mergedQuestsAndOffers.filter((group) => !group.isOfferRow);
         },
     },
     watch: {
@@ -991,7 +1000,7 @@ export default defineComponent({
         column-gap: 10px;
     }
     .quests-column .nav-item {
-        flex: 1 1 45%;
+        flex: 1 1 30%;
         box-sizing: border-box;
     }
     .quests-column .nav-link {

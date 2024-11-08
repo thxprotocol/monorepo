@@ -9,8 +9,8 @@
             <div>
                 <span>Got questions?</span>
                 <div>
-                    <strong class="me-1 discord-highlight-text">{{ presenceCount.toLocaleString() }}</strong>
-                    <span class="text-opaque">Members</span>
+                    <strong class="discord-highlight-text">{{ presenceCount.toLocaleString() }}</strong>
+                    <span class="text-opaque ms-1">Members</span>
                 </div>
                 <a
                     v-if="inviteURL"
