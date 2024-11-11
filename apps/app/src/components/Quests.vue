@@ -943,8 +943,8 @@ export default defineComponent({
 }
 
 .quest-item {
-    height: 280px;
-
+    height: 100%;
+    min-height: 280px;
     overflow: hidden;
     background-color: #202020;
     border-radius: 10px;

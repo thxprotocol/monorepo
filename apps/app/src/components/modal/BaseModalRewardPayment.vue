@@ -51,13 +51,7 @@
             />
         </template>
         <template #footer>
-            <b-button
-                v-if="!isAlertSuccessShown"
-                variant="success"
-                class="w-100 rounded-pill"
-                :disabled="isDisabled"
-                @click="onSubmit"
-            >
+            <b-button v-if="!isAlertSuccessShown" class="w-100 btn-primary" :disabled="isDisabled" @click="onSubmit">
                 <b-spinner v-if="isLoading" small variant="primary" />
                 <template v-else-if="reward.isLocked"> <i class="fas fa-lock"></i></template>
                 <template v-else> Pay {{ displayRewardAmount }} </template>
