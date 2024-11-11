@@ -57,6 +57,7 @@ export const useSafeStore = defineStore('safe', {
             if (!signature) throw new Error('Could not sign this transaction.');
 
             return await this.request(`/account/wallets/confirm`, {
+                method: 'POST',
                 body: { chainId: wallet.chainId, safeTxHash, signature },
                 params: { walletId: wallet._id },
             });
