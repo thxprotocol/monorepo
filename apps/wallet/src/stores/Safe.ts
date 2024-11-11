@@ -17,8 +17,11 @@ export const useSafeStore = defineStore('safe', {
             return useAuthStore().request(path, options);
         },
         async waitForTransaction(tx: TTransaction) {
+            const { safeTxHash } = await this.waitForTransactionProposal(tx);
+            if (!safeTxHash) throw new Error('Could not find transaction hash');
+
             const { confirmTransaction } = useSafeStore();
-            await confirmTransaction(tx.safeTxHash);
+            await confirmTransaction(safeTxHash);
 
             return new Promise((resolve, reject) => {
                 setTimeout(async () => {
@@ -30,6 +33,18 @@ export const useSafeStore = defineStore('safe', {
                     }
                 }, TX_POLLING_INTERVAL);
             });
+        },
+        async waitForTransactionProposal(tx: TTransaction) {
+            return new Promise((resolve, reject) => {
+                setTimeout(async () => {
+                    const newTx = await this.request(`/transactions/${tx._id}`);
+                    if (!tx.safeTxHash) {
+                        this.waitForTransactionProposal(newTx).then(resolve).catch(reject);
+                    } else {
+                        resolve(newTx);
+                    }
+                }, TX_POLLING_INTERVAL);
+            }) as unknown as TTransaction;
         },
         async confirmTransaction(safeTxHash: string) {
             const { privateKey, getPrivateKey } = useWeb3AuthStore();
