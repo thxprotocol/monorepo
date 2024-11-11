@@ -17,12 +17,6 @@ export const useSafeStore = defineStore('safe', {
             return useAuthStore().request(path, options);
         },
         async waitForTransaction(tx: TTransaction) {
-            const { safeTxHash } = await this.waitForTransactionProposal(tx);
-            if (!safeTxHash) throw new Error('Could not find transaction hash');
-
-            const { confirmTransaction } = useSafeStore();
-            await confirmTransaction(safeTxHash);
-
             return new Promise((resolve, reject) => {
                 setTimeout(async () => {
                     const newTx = await this.request(`/transactions/${tx._id}`);
@@ -46,19 +40,23 @@ export const useSafeStore = defineStore('safe', {
                 }, TX_POLLING_INTERVAL);
             }) as unknown as TTransaction;
         },
-        async confirmTransaction(safeTxHash: string) {
+        async confirmTransaction(tx: TTransaction) {
+            const { waitForTransactionProposal } = useSafeStore();
+            const { safeTxHash } = await waitForTransactionProposal(tx);
+            if (!safeTxHash) throw new Error('Could not find safeTxHash');
+
             const { privateKey, getPrivateKey } = useWeb3AuthStore();
             if (!privateKey) await getPrivateKey();
 
             const { wallet } = useWalletStore();
             if (!wallet) throw new Error('Please select a multisig wallet.');
 
-            const signature = await this.signSafeTXHash(wallet, safeTxHash);
+            const signature = await this.signSafeTXHash(wallet, tx.safeTxHash);
             if (!signature) throw new Error('Could not sign this transaction.');
 
             return await this.request(`/account/wallets/confirm`, {
                 method: 'POST',
-                body: { chainId: wallet.chainId, safeTxHash, signature },
+                body: { chainId: wallet.chainId, safeTxHash: tx.safeTxHash, signature },
                 params: { walletId: wallet._id },
             });
         },

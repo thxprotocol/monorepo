@@ -21,13 +21,16 @@ export const useCollectibleStore = defineStore('collectible', {
                     : [];
         },
         async transfer(options: { to: string; erc721Id: string; erc721TokenId: string }) {
+            const { confirmTransaction, waitForTransaction } = useSafeStore();
             const { wallet, chainId } = useWalletStore();
+
             const tx = await this.request('/erc721/transfer', {
                 method: 'POST',
                 isAuthenticated: true,
                 body: { walletId: wallet?._id, chainId, ...options },
             });
-            const { waitForTransaction } = useSafeStore();
+
+            await confirmTransaction(tx);
             await waitForTransaction(tx);
         },
     },
