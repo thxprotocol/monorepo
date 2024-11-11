@@ -1,9 +1,5 @@
-import { TransactionState } from '@thxnetwork/common/enums';
 import { defineStore } from 'pinia';
-import { useWalletStore } from '.';
-import { useAuthStore } from './Auth';
-
-const TX_POLLING_INTERVAL = 3000;
+import { useAuthStore, useSafeStore, useWalletStore } from '.';
 
 export const useCollectibleStore = defineStore('collectible', {
     state: () => ({
@@ -31,19 +27,8 @@ export const useCollectibleStore = defineStore('collectible', {
                 isAuthenticated: true,
                 body: { walletId: wallet?._id, chainId, ...options },
             });
-            await this.waitForTransaction(tx);
-        },
-        waitForTransaction(tx: TTransaction) {
-            return new Promise((resolve, reject) => {
-                setTimeout(async () => {
-                    const newTx = await this.request(`/transactions/${tx._id}`);
-                    if (![TransactionState.Mined, TransactionState.Failed].includes(tx.state)) {
-                        this.waitForTransaction(newTx).then(resolve).catch(reject);
-                    } else {
-                        resolve(newTx);
-                    }
-                }, TX_POLLING_INTERVAL);
-            });
+            const { waitForTransaction } = useSafeStore();
+            await waitForTransaction(tx);
         },
     },
 });
