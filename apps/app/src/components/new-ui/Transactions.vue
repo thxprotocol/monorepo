@@ -1,3 +1,3 @@
 <template>
-    <div class="m-auto">No Transactions Found</div>
+    <div class="m-auto text-opaque text-muted">No transactions found.</div>
 </template>

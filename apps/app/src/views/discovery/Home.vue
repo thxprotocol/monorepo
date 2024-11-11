@@ -470,6 +470,7 @@ export default defineComponent({
     background-blend-mode: color-dodge;
     background-attachment: fixed;
     height: 100vh;
+    overflow: hidden;
 }
 
 .main-content {

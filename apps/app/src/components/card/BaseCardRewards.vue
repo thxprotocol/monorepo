@@ -20,7 +20,7 @@
         <div v-for="(token, key) of list" :key="key" class="mb-1">
             <component :is="token.component" :token="token" />
         </div>
-        <div v-if="!list.length" class="text-center text-opaque empty-message">Nothing here...</div>
+        <div v-if="!list.length" class="text-center text-opaque empty-message text-muted">Nothing here...</div>
     </div>
 </template>
 

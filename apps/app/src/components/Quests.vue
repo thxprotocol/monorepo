@@ -186,13 +186,26 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div
+                                    v-if="
+                                        filteredCompletedQuests.length === 0 ||
+                                        filteredCompletedQuests.every((group) =>
+                                            group.quests.every((quest) => quest.isAvailable),
+                                        )
+                                    "
+                                    class="empty-message"
+                                >
+                                    <p class="text-center text-muted mt-3 text-opaque">
+                                        You haven't completed any quests yet.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </b-tab>
 
                     <b-tab title="About">
                         <div class="quests-box d-flex justify-content-center align-items-center">
-                            <p class="text-center text-muted mt-3">No information available.</p>
+                            <p class="text-center text-muted mt-3 text-opaque">No information available.</p>
                         </div>
                     </b-tab>
                 </b-tabs>
@@ -257,6 +270,11 @@
                                     class="reward-item"
                                 >
                                     <component :is="componentMap[reward.variant]" :reward="reward" />
+                                </div>
+                                <div v-if="!mergedRewards.some((reward) => !reward.isAvailable)" class="empty-message">
+                                    <p class="text-center text-muted mt-3 text-opaque">
+                                        You haven't completed any rewards yet.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -792,7 +810,7 @@ export default defineComponent({
     box-sizing: border-box;
     background: linear-gradient(178deg, rgb(21, 20, 21) -37.16%, rgb(14, 13, 16) 98.54%);
     border-radius: 20px;
-
+    margin-bottom: 15px;
     .card {
         border: 0 !important;
         border-radius: 20px !important;
@@ -829,6 +847,7 @@ export default defineComponent({
     background: #202020;
     border-radius: 20px;
     padding: 15px 20px;
+    padding-bottom: 0;
 
     h3 {
         font-family: 'Poppins', sans-serif;
@@ -1056,6 +1075,16 @@ export default defineComponent({
     .quest-item-daily,
     .reward-item-promoted {
         grid-column: span 1;
+    }
+    .offer-item {
+        flex: 1 0 100%;
+        max-width: 100% !important;
+    }
+}
+
+@media (min-width: 1400px) {
+    .quest-cont {
+        max-width: 100%;
     }
 }
 </style>

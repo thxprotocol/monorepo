@@ -13,7 +13,12 @@
                 {{ item.label }}
             </a>
         </nav>
-        <BaseCardDiscord />
+        <div class="d-flex flex-column gap-2">
+            <div class="cursor-pointer" @click.prevent="selectNavItem('rewards')">
+                <img :src="aptosBanner" alt="Aptos Banner" height="380" width="182" />
+            </div>
+            <BaseCardDiscord />
+        </div>
     </aside>
 </template>
 
@@ -26,7 +31,7 @@ import imgRewards from '../../assets/reward.png';
 import imgLeaderboard from '../../assets/leader.png';
 import imgWallet from '../../assets/wallet.png';
 import imgTransactions from '../../assets/transaction.png';
-
+import aptosBanner from '../../assets/aptos-banner.png';
 export default defineComponent({
     name: 'Sidebar',
     props: {
@@ -44,6 +49,7 @@ export default defineComponent({
                 { name: 'wallet', label: 'Wallet', icon: imgWallet },
                 { name: 'transactions', label: 'Transactions', icon: imgTransactions },
             ],
+            aptosBanner,
         };
     },
     computed: {

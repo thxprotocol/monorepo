@@ -152,6 +152,7 @@ export default defineComponent({
 .header-nav {
     position: relative;
     background: transparent;
+    padding-right: 50px;
 }
 
 .header-nav h2 {
