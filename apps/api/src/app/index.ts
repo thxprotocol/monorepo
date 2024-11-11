@@ -1,3 +1,5 @@
+import 'express-async-errors';
+
 import { MONGODB_URI, NODE_ENV, PORT, VERSION } from '@thxnetwork/api/config/secrets';
 import { router } from '@thxnetwork/api/controllers/index';
 import { corsHandler, errorLogger, errorNormalizer, errorOutput, notFoundHandler } from '@thxnetwork/api/middlewares';
@@ -6,7 +8,6 @@ import axios from 'axios';
 import axiosBetterStacktrace from 'axios-better-stacktrace';
 import compression from 'compression';
 import express, { Express } from 'express';
-import 'express-async-errors';
 import lusca from 'lusca';
 import morganBody from 'morgan-body';
 import RouterJWKS from './controllers/jwks/jwks.router';
