@@ -16,29 +16,24 @@ export const useSafeStore = defineStore('safe', {
         request(path: string, options?: TRequestOptions) {
             return useAuthStore().request(path, options);
         },
-        async waitForTransaction(tx: TTransaction) {
-            return new Promise((resolve, reject) => {
-                setTimeout(async () => {
-                    const newTx = await this.request(`/transactions/${tx._id}`);
-                    if (![TransactionState.Mined, TransactionState.Failed].includes(tx.state)) {
-                        this.waitForTransaction(newTx).then(resolve).catch(reject);
-                    } else {
-                        resolve(newTx);
-                    }
-                }, TX_POLLING_INTERVAL);
-            });
-        },
         async waitForTransactionProposal(tx: TTransaction) {
             return new Promise((resolve, reject) => {
                 setTimeout(async () => {
                     const newTx = await this.request(`/transactions/${tx._id}`);
-                    if (!tx.safeTxHash) {
-                        this.waitForTransactionProposal(newTx).then(resolve).catch(reject);
-                    } else {
-                        resolve(newTx);
-                    }
+                    if (tx.safeTxHash) resolve(newTx);
+                    this.waitForTransactionProposal(newTx).then(resolve).catch(reject);
                 }, TX_POLLING_INTERVAL);
             }) as unknown as TTransaction;
+        },
+        async waitForTransaction(tx: TTransaction) {
+            return new Promise((resolve, reject) => {
+                setTimeout(async () => {
+                    const newTx = await this.request(`/transactions/${tx._id}`);
+                    const isMinedOrFailed = [TransactionState.Mined, TransactionState.Failed].includes(tx.state);
+                    if (isMinedOrFailed) resolve(newTx);
+                    this.waitForTransaction(newTx).then(resolve).catch(reject);
+                }, TX_POLLING_INTERVAL);
+            });
         },
         async confirmTransaction(tx: TTransaction) {
             const { waitForTransactionProposal } = useSafeStore();
@@ -51,12 +46,12 @@ export const useSafeStore = defineStore('safe', {
             const { wallet } = useWalletStore();
             if (!wallet) throw new Error('Please select a multisig wallet.');
 
-            const signature = await this.signSafeTXHash(wallet, tx.safeTxHash);
+            const signature = await this.signSafeTXHash(wallet, safeTxHash);
             if (!signature) throw new Error('Could not sign this transaction.');
 
             return await this.request(`/account/wallets/confirm`, {
                 method: 'POST',
-                body: { chainId: wallet.chainId, safeTxHash: tx.safeTxHash, signature },
+                body: { chainId: wallet.chainId, safeTxHash, signature },
                 params: { walletId: wallet._id },
             });
         },

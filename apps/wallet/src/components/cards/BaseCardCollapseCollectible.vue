@@ -26,7 +26,12 @@
                     <span class="text-opaque me-auto">Token ID</span>
                     <b-link :href="url" target="_blank">{{ collectible.tokenId }}</b-link>
                 </div>
-                <b-button variant="primary" class="w-100 my-3" @click="isModalTransferShown = true">
+                <b-button
+                    variant="primary"
+                    class="w-100 my-3"
+                    :disabled="isLoading"
+                    @click="isModalTransferShown = true"
+                >
                     Transfer
                     <BaseIcon icon="chevron-right" class="ms-1" />
                 </b-button>

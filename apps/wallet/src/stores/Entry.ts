@@ -29,6 +29,7 @@ export const useEntryStore = defineStore('entry', {
                 method: 'PATCH',
                 params: { walletId: wallet._id },
             });
+            await this.get(uuid);
         },
     },
 });
