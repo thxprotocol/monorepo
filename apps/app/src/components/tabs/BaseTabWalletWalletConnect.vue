@@ -66,41 +66,26 @@ export default defineComponent({
             await poll({ taskFn, interval: 1000, retries: 60 });
             return this.walletStore.account.address;
         },
-        getAptosWallet() {
-            if ('aptos' in window) {
-                return window.aptos;
-            } else if (this.isMobile()) {
-                // Deep link to Petra wallet on mobile
-                window.location.href = `https://petra.app/explore?link=${encodeURIComponent(window.location.href)}`;
-                return null;
-            } else {
-                // Open Petra website in new tab for desktop
-                window.open('https://petra.app/', '_blank');
-                return null;
-            }
-        },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
-                const wallet = this.getAptosWallet();
-                if (!wallet) return; // Exit if redirecting to download
-
+                if (!window.santaAptos) return;
                 try {
-                    await wallet.disconnect();
+                    await window.santaAptos.disconnect();
                 } catch (error) {
                     console.log(error);
                 }
 
                 try {
-                    const response = await wallet.connect();
+                    const response = await window.santaAptos.connect();
 
                     try {
                         await this.walletStore.create({
                             chainId: ChainId.Aptos,
                             variant: this.variant,
-                            rawAddress: response.address,
+                            rawAddress: response.args.address,
                         });
                         const wallet = this.walletStore.wallets.find(
-                            (wallet: TWallet) => wallet.address === response.address,
+                            (wallet: TWallet) => wallet.address === response.args.address,
                         );
                         if (!wallet) throw new Error('New wallet not found');
 
