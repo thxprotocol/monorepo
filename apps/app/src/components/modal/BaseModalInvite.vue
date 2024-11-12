@@ -68,7 +68,7 @@ export default defineComponent({
             return this.show;
         },
         campaignPath() {
-            return this.invite ? `/c/${this.invite.campaign.slug}` : '';
+            return '/';
         },
         isAlertErrorShown() {
             return !!this.error;

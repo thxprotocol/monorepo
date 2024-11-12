@@ -16,7 +16,7 @@ export const DEFAULT_ELEMENTS = {
     },
     bodyBg: {
         label: 'Background',
-        color: '#000',
+        color: '#151415',
         // color: 'transparent',
     },
     cardBg: {
@@ -47,6 +47,10 @@ export const DEFAULT_ELEMENTS = {
     launcherIcon: {
         label: 'Launcher Icon',
         color: '#ffffff',
+    },
+    modalBorderColor: {
+        label: 'Border Color',
+        color: '#5b5b5b',
     },
 };
 
@@ -93,6 +97,7 @@ export function getStyles(elements: any, colors: any) {
             navbarBgDarker: Color(elements['navbarBg'].color).darken(0.4),
             navbarBtnBg: elements['navbarBtnBg'] ? elements['navbarBtnBg'].color : elements['btnBg'].color,
             navbarBtnText: elements['navbarBtnText'] ? elements['navbarBtnText'].color : elements['btnText'].color,
+            modalBorderColor: elements['modalBorderColor'].color,
         },
         colors: {
             accent: colors['accent'].color,
@@ -130,10 +135,10 @@ export function getStyles(elements: any, colors: any) {
         '.modal': {
             '--bs-modal-bg': theme.elements.bodyBg,
             '--bs-modal-color': theme.elements.text,
-            '--bs-modal-border-color': theme.elements.btnBg,
+            '--bs-modal-border-color': theme.elements.modalBorderColor,
         },
         '.form-control,.form-control:focus,.form-select': {
-            '--bs-border-color': theme.elements.btnBg,
+            '--bs-border-color': theme.elements.modalBorderColor,
             '--bs-body-bg': theme.elements.bodyBg,
             '--bs-btn-bg': theme.elements.btnBg,
         },
@@ -201,14 +206,14 @@ export function getStyles(elements: any, colors: any) {
             '--bs-nav-link-color': theme.elements.text,
         },
         '.nav-tabs': {
-            '--bs-nav-tabs-border-color': theme.elements.btnBg,
+            '--bs-nav-tabs-border-color': theme.elements.modalBorderColor,
             '--bs-nav-link-color': theme.elements.text,
             '--bs-nav-link-hover-color': theme.elements.text,
         },
         '.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-item .nav-link:hover': {
             '--bs-nav-tabs-link-active-color': theme.elements.text,
             '--bs-nav-tabs-link-active-bg': theme.elements.bodyBg,
-            '--bs-nav-tabs-link-active-border-color': theme.elements.btnBg,
+            '--bs-nav-tabs-link-active-border-color': theme.elements.modalBorderColor,
         },
         '.gradient-border-xl': {
             '--thx-linear-gradient-border': `linear-gradient(-45deg, ${theme.colors.accent}, ${theme.elements.btnBgDark}, ${theme.colors.glow})`,

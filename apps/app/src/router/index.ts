@@ -30,6 +30,14 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/',
                 name: 'home',
                 component: () => import(/* webpackChunkName: "home" */ '../views/discovery/Home.vue'),
+                children: [
+                    {
+                        path: '/:code',
+                        name: 'homeInvite',
+                        beforeEnter,
+                        component: () => import(/* webpackChunkName: "about" */ '../views/campaign/About.vue'),
+                    },
+                ],
             },
             {
                 path: '/i/:code',
@@ -41,9 +49,9 @@ const routes: Array<RouteRecordRaw> = [
                     const accountStore = useAccountStore();
                     await accountStore.getInvite(code as string);
 
-                    next({ name: 'questsInvite', params: { slug: accountStore.invite?.campaign.slug, code } });
+                    next({ name: 'homeInvite', params: { code } });
                 },
-                component: () => import(/* webpackChunkName: "invite" */ '../components/Quests.vue'),
+                component: () => null,
             },
             {
                 path: '/learn',

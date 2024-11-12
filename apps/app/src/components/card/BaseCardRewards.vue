@@ -1,5 +1,5 @@
 <template>
-    <div style="overflow: auto; min-height: 70%; padding: 10px">
+    <div style="min-height: 70%; padding: 10px">
         <BaseNavbarSecondary v-if="accountStore.isMobile" class="ms-auto" />
 
         <div class="d-flex p-2 m-0 align-items-center">
@@ -20,7 +20,7 @@
         <div v-for="(token, key) of list" :key="key" class="mb-1">
             <component :is="token.component" :token="token" />
         </div>
-        <div v-if="!list.length" class="text-center text-opaque">Nothing here...</div>
+        <div v-if="!list.length" class="text-center text-opaque empty-message text-muted">Nothing here...</div>
     </div>
 </template>
 
@@ -130,5 +130,12 @@ export default defineComponent({
 
 .refresh-color {
     --bs-primary-rgb: #515151 !important;
+}
+.empty-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
 }
 </style>

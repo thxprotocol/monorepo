@@ -1,17 +1,14 @@
 <template>
-    <b-container
-        v-if="!accountStore.isMobile || selectedPart === 'Quests' || selectedPart === 'Rewards'"
-        class="mt-2 quest-cont"
-    >
+    <b-container v-if="selectedPart === 'quests' || selectedPart === 'rewards'" class="quest-cont">
         <b-row>
             <b-col
-                v-if="!accountStore.isMobile || selectedPart === 'Quests'"
+                v-if="selectedPart === 'quests'"
                 lg="6"
                 xl="7"
                 offset-xl="0"
-                class="quests-column flex-grow-1 my-col-xl-7"
+                class="quests-column flex-grow-1 my-col-xl-7 p-3 pt-2"
             >
-                <div class="mb-2 align-items-center bg-quests rounded">
+                <!-- <div class="mb-2 align-items-center bg-quests rounded">
                     <div class="quests-title d-flex p-2">
                         <div>
                             <strong class="title-q">Quests</strong>
@@ -19,28 +16,84 @@
                         </div>
                         <i class="fas fa-tasks text-opaque ms-auto me-3" style="font-size: 1.2rem" />
                     </div>
-                </div>
-                <div v-if="questStore.isLoading" class="d-flex justify-content-center p-3">
-                    <div class="w-100">
-                        <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
-                            <div class="skeleton-title"></div>
-                            <div class="skeleton-description"></div>
-                            <div class="skeleton-button"></div>
-                        </div>
-                    </div>
-                </div>
-                <b-tabs v-else content-class="mt-3" justified class="mt-3">
+                </div> -->
+
+                <b-tabs content-class="mt-3" justified class="mt-3">
                     <b-tab active>
                         <template #title>
                             Available
-                            <sup v-if="availableQuestCount">
+                            <!-- <sup v-if="availableQuestCount">
                                 <b-badge class="px-1 py-1 text-white" variant="danger" style="font-size: 8px">
                                     {{ availableQuestCount }}
                                 </b-badge>
-                            </sup>
+                            </sup> -->
                         </template>
                         <div class="quests-box">
                             <div
+                                v-if="questStore.isLoading || isLoadingOffers"
+                                class="d-flex justify-content-center p-3"
+                            >
+                                <div class="w-100 quest-skeleton-group">
+                                    <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
+                                        <div class="skeleton-image"></div>
+                                        <div class="skeleton-title"></div>
+                                        <div class="skeleton-description"></div>
+                                        <div class="skeleton-button"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="d-flex flex-column gap-4">
+                                <div v-for="group in mergedQuestsAndOffers" :key="group.title">
+                                    <div
+                                        v-if="!group.isOfferRow"
+                                        :class="{
+                                        'd-none': group.quests.every((quest: TBaseQuest) => quest.isAvailable === false),
+                                    }"
+                                    >
+                                        <h3 class="quest-group-title">{{ group.title }}</h3>
+                                        <div class="quest-group">
+                                            <div
+                                                v-for="quest in group.quests"
+                                                :key="quest._id"
+                                                :class="{
+                                                    'd-none': quest.isAvailable === false,
+                                                    'quest-item': true,
+                                                    'quest-item-daily': quest.variant === 0,
+                                                }"
+                                                class="quest-group-item"
+                                            >
+                                                <component :is="questComponentMap[quest.variant]" :quest="quest" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-else class="offers-box">
+                                        <h3>{{ group.title }}</h3>
+                                        <div class="d-flex flex-wrap offer-row">
+                                            <div
+                                                v-for="offer in group.offers"
+                                                :key="offer.id"
+                                                class="offer-item"
+                                                :style="{
+                                                    width:
+                                                        group.offers.length === 1
+                                                            ? '100%'
+                                                            : offersPerRow === 3
+                                                            ? '30%'
+                                                            : '49%',
+                                                    maxWidth:
+                                                        group.offers.length === 1
+                                                            ? '100%'
+                                                            : offersPerRow === 3
+                                                            ? '30%'
+                                                            : '49%',
+                                                }"
+                                            >
+                                                <OfferCard :offer="offer" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- <div
                                 v-for="(item, index) in mergedQuestsAndOffers"
                                 :key="index"
                                 :class="{
@@ -74,19 +127,20 @@
                                             <OfferCard :offer="offer" class="mb-2" />
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                                 <!-- <div v-else :class="{ 'd-none': !item.quest?.isAvailable }"> -->
-                                <component :is="questComponentMap[item.quest.variant]" v-else :quest="item.quest" />
+                                <!-- <component :is="questComponentMap[item.quest.variant]" v-else :quest="item.quest" /> -->
                                 <!-- </div> -->
-                            </div>
-                            <div v-if="!availableQuestCount" class="text-center mt-5">
-                                <i class="h1 fas fa-trophy text-accent" />
-                                <p class="lead text-accent">Well done!</p>
-                                <p class="text-opaque">You have completed all available quests</p>
+                                <!-- </div> -->
+                                <div v-if="!availableQuestCount" class="text-center mt-5">
+                                    <i class="h1 fas fa-trophy text-accent" />
+                                    <p class="lead text-accent">Well done!</p>
+                                    <p class="text-opaque">You have completed all available quests</p>
+                                </div>
                             </div>
                         </div>
                     </b-tab>
-                    <b-tab title="Completed">
+                    <!-- <b-tab title="Completed">
                         <div v-for="(quest, key) of quests" :key="key" :class="{ 'd-none': quest.isAvailable }">
                             <component
                                 :is="questComponentMap[quest.variant]"
@@ -95,52 +149,137 @@
                                 :available-quest="!quest?.isAvailable"
                             />
                         </div>
+                    </b-tab> -->
+                    <b-tab title="Completed">
+                        <div class="quests-box">
+                            <div v-if="questStore.isLoading" class="d-flex justify-content-center p-3">
+                                <div class="w-100 quest-skeleton-group">
+                                    <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
+                                        <div class="skeleton-image"></div>
+                                        <div class="skeleton-title"></div>
+                                        <div class="skeleton-description"></div>
+                                        <div class="skeleton-button"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="d-flex flex-column gap-4">
+                                <div
+                                    v-for="group in filteredCompletedQuests"
+                                    :key="group.title"
+                                    :class="{
+                                    'd-none': group.quests && group.quests.every((quest: TBaseQuest) => quest.isAvailable === true) && !group.isOfferRow,
+                                }"
+                                >
+                                    <h3 class="quest-group-title">{{ group.title }}</h3>
+                                    <div class="quest-group">
+                                        <div
+                                            v-for="quest in group.quests"
+                                            :key="quest._id"
+                                            :class="{
+                                                'd-none': quest.isAvailable === true,
+                                                'quest-item': true,
+                                                'quest-item-daily': quest.variant === 0,
+                                            }"
+                                            class="quest-group-item"
+                                        >
+                                            <component :is="questComponentMap[quest.variant]" :quest="quest" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    v-if="
+                                        filteredCompletedQuests.length === 0 ||
+                                        filteredCompletedQuests.every((group) =>
+                                            group.quests.every((quest) => quest.isAvailable),
+                                        )
+                                    "
+                                    class="empty-message"
+                                >
+                                    <p class="text-center text-muted mt-3 text-opaque">
+                                        You haven't completed any quests yet.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </b-tab>
+
+                    <b-tab title="About">
+                        <div class="quests-box d-flex justify-content-center align-items-center">
+                            <p class="text-center text-muted mt-3 text-opaque">No information available.</p>
+                        </div>
                     </b-tab>
                 </b-tabs>
             </b-col>
             <b-col
-                v-if="!accountStore.isMobile || selectedPart === 'Rewards'"
+                v-if="selectedPart === 'rewards'"
                 lg="5"
                 xl="5"
                 xxl="4"
-                class="rewards-column flex-grow-1"
+                class="quests-column flex-grow-1 pt-2 px-3"
                 offset-xl="0"
             >
-                <div class="mb-2 bg-rewards rounded">
-                    <div class="align-items-center p-3 overflow-hidden d-flex" style="justify-content: space-between">
-                        <div>
-                            <strong class="title-q">Rewards</strong>
-                            <div class="text-opaque m-0 mt-1">Spend points to redeem</div>
+                <b-tabs content-class="mt-3" justified class="mt-3">
+                    <b-tab active>
+                        <template #title> Available </template>
+                        <div class="quests-box">
+                            <div
+                                v-if="rewardStore.isLoading || reward2Store.isLoading"
+                                class="d-flex justify-content-center p-3"
+                            >
+                                <div class="w-100 quest-skeleton-group">
+                                    <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
+                                        <div class="skeleton-image"></div>
+                                        <div class="skeleton-title"></div>
+                                        <div class="skeleton-description"></div>
+                                        <div class="skeleton-button"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="reward-group">
+                                <div
+                                    v-for="reward in mergedRewards.filter((reward) => reward.isAvailable)"
+                                    :key="reward._id"
+                                    :class="{ 'reward-item-promoted': reward.isPromoted }"
+                                    class="reward-item"
+                                >
+                                    <component :is="componentMap[reward.variant]" :reward="reward" />
+                                </div>
+                            </div>
                         </div>
-                        <div class="custom-select-wrapper">
-                            <select v-model="selectedValue" class="rewards-select">
-                                <option>All</option>
-                                <option>Santa</option>
-                                <option>Cash Rewards</option>
-                            </select>
-                            <i class="fas fa-chevron-down custom-select-icon"></i>
+                    </b-tab>
+                    <b-tab title="Completed">
+                        <div class="quests-box">
+                            <div
+                                v-if="rewardStore.isLoading || reward2Store.isLoading"
+                                class="d-flex justify-content-center p-3"
+                            >
+                                <div class="w-100 quest-skeleton-group">
+                                    <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
+                                        <div class="skeleton-image"></div>
+                                        <div class="skeleton-title"></div>
+                                        <div class="skeleton-description"></div>
+                                        <div class="skeleton-button"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="reward-group">
+                                <div
+                                    v-for="reward in mergedRewards.filter((reward) => !reward.isAvailable)"
+                                    :key="reward._id"
+                                    :class="{ 'reward-item-promoted': reward.isPromoted }"
+                                    class="reward-item"
+                                >
+                                    <component :is="componentMap[reward.variant]" :reward="reward" />
+                                </div>
+                                <div v-if="!mergedRewards.some((reward) => !reward.isAvailable)" class="empty-message">
+                                    <p class="text-center text-muted mt-3 text-opaque">
+                                        You haven't completed any rewards yet.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div v-if="rewardStore.isLoading || reward2Store.isLoading" class="d-flex justify-content-center p-3">
-                    <div class="w-100">
-                        <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
-                            <div class="skeleton-title"></div>
-                            <div class="skeleton-description"></div>
-                            <div class="skeleton-button"></div>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="mergedRewards.length > 0" class="rewards-container flex-1">
-                    <div
-                        v-for="(reward, index) in mergedRewards"
-                        :key="index"
-                        class="reward-item gr-2 mb-2"
-                        :style="reward?.isPromoted ? 'width: 100%' : 'width: 49% !important'"
-                    >
-                        <component :is="componentMap[reward?.variant]" :reward="reward" />
-                    </div>
-                </div>
+                    </b-tab>
+                </b-tabs>
             </b-col>
         </b-row>
     </b-container>
@@ -222,6 +361,7 @@ export default defineComponent({
             entry: null,
             offers: [],
             offersPerRow: window.innerWidth > 1350 ? 3 : 2,
+            isLoadingOffers: false,
         };
     },
     computed: {
@@ -247,6 +387,7 @@ export default defineComponent({
                 .map((quest: any, index: number) => ({ ...quest, index }));
         },
         mergedRewards() {
+            console.log('rewards: ', this.rewardStore.rewards, this.reward2Store.rewards);
             if (this.selectedValue === 'All') {
                 return [...this.rewardStore.rewards, ...this.reward2Store.rewards];
             } else if (this.selectedValue === 'Santa') {
@@ -259,47 +400,118 @@ export default defineComponent({
         userManager() {
             return useAuthStore().userManager;
         },
+        // mergedQuestsAndOffers() {
+        //     let merged = [];
+        //     let offerIndex = 0;
+        //     const questBatchSize = 4;
+        //     let rowQuests = [];
+
+        //     for (let i = 0; i < this.quests.length; i++) {
+        //         const quest = this.quests[i];
+        //         const isEndOfBatch = (i + 1) % questBatchSize === 0;
+
+        //         if (quest.variant === QuestVariant.Daily) {
+        //             merged.push({ quest, isDaily: true });
+        //             continue;
+        //         }
+
+        //         rowQuests.push(quest);
+
+        //         if (isEndOfBatch) {
+        //             merged.push(...this.formatQuests(rowQuests));
+        //             rowQuests = [];
+        //             merged.push({
+        //                 isOfferRow: true,
+        //                 offers: this.offers.slice(offerIndex, offerIndex + this.offersPerRow).filter(Boolean),
+        //             });
+        //             offerIndex += this.offersPerRow;
+        //         }
+        //     }
+
+        //     if (rowQuests.length > 0) {
+        //         merged.push(...this.formatQuests(rowQuests));
+        //     }
+
+        //     while (offerIndex < this.offers.length) {
+        //         merged.push({
+        //             isOfferRow: true,
+        //             offers: this.offers.slice(offerIndex, offerIndex + this.offersPerRow).filter(Boolean),
+        //         });
+        //         offerIndex += this.offersPerRow;
+        //     }
+
+        //     return merged;
+        // },
         mergedQuestsAndOffers() {
-            let merged = [];
+            const santaQuests: TBaseQuest[] = [];
+            const xQuests: TBaseQuest[] = [];
+            const discordQuests: TBaseQuest[] = [];
+            const youtubeQuests: TBaseQuest[] = [];
+            const otherQuests: TBaseQuest[] = [];
+
+            this.quests.forEach((quest: TBaseQuest) => {
+                switch (quest.variant) {
+                    case QuestVariant.Daily:
+                    case QuestVariant.Invite:
+                    case QuestVariant.Custom:
+                    case QuestVariant.Web3:
+                    case QuestVariant.Gitcoin:
+                    case QuestVariant.Webhook:
+                        santaQuests.push(quest);
+                        break;
+                    case QuestVariant.Twitter:
+                        xQuests.push(quest);
+                        break;
+                    case QuestVariant.Discord:
+                        discordQuests.push(quest);
+                        break;
+                    case QuestVariant.YouTube:
+                        youtubeQuests.push(quest);
+                        break;
+                    default:
+                        otherQuests.push(quest);
+                }
+            });
+
+            const groupedQuests = [
+                { title: 'Santa Quests', quests: santaQuests },
+                { title: 'X Quests', quests: xQuests },
+                { title: 'Discord Quests', quests: discordQuests },
+                { title: 'YouTube Quests', quests: youtubeQuests },
+                { title: 'Other Quests', quests: otherQuests },
+            ];
+
+            const merged = [];
             let offerIndex = 0;
-            const questBatchSize = 4;
-            let rowQuests = [];
 
-            for (let i = 0; i < this.quests.length; i++) {
-                const quest = this.quests[i];
-                const isEndOfBatch = (i + 1) % questBatchSize === 0;
+            groupedQuests.forEach((group) => {
+                if (group.quests.length) {
+                    merged.push(group);
 
-                if (quest.variant === QuestVariant.Daily) {
-                    merged.push({ quest, isDaily: true });
-                    continue;
+                    if (offerIndex < this.offers.length) {
+                        const offersForGroup = this.offers.slice(offerIndex, offerIndex + this.offersPerRow);
+                        merged.push({
+                            title: 'Top Performing Offers',
+                            isOfferRow: true,
+                            offers: offersForGroup,
+                        });
+                        offerIndex += this.offersPerRow;
+                    }
                 }
+            });
 
-                rowQuests.push(quest);
-
-                if (isEndOfBatch) {
-                    merged.push(...this.formatQuests(rowQuests));
-                    rowQuests = [];
-                    merged.push({
-                        isOfferRow: true,
-                        offers: this.offers.slice(offerIndex, offerIndex + this.offersPerRow).filter(Boolean),
-                    });
-                    offerIndex += this.offersPerRow;
-                }
-            }
-
-            if (rowQuests.length > 0) {
-                merged.push(...this.formatQuests(rowQuests));
-            }
-
-            while (offerIndex < this.offers.length) {
+            if (offerIndex < this.offers.length) {
+                const remainingOffers = this.offers.slice(offerIndex);
                 merged.push({
+                    title: '',
                     isOfferRow: true,
-                    offers: this.offers.slice(offerIndex, offerIndex + this.offersPerRow).filter(Boolean),
+                    offers: remainingOffers,
                 });
-                offerIndex += this.offersPerRow;
             }
-
             return merged;
+        },
+        filteredCompletedQuests() {
+            return this.mergedQuestsAndOffers.filter((group) => !group.isOfferRow);
         },
     },
     watch: {
@@ -338,6 +550,7 @@ export default defineComponent({
     },
     methods: {
         async fetchOffers() {
+            this.isLoadingOffers = true;
             try {
                 while (!this.accountStore.account) {
                     await this.accountStore.getAccount();
@@ -346,11 +559,16 @@ export default defineComponent({
                 const response = await axios.get(
                     `https://offers-api.santabrowser.com/offers/list?pageSize=10&pageNo=0&clid=${clid}`,
                 );
-                this.offers = response.data.trending.filter(
-                    (offer: any) => offer.imageUrl !== 'https://banners.hangmyads.com/files/uploads/Off_A_86634.png',
-                );
+                this.offers = response.data.trending
+                    .filter(
+                        (offer: any) =>
+                            offer.imageUrl !== 'https://banners.hangmyads.com/files/uploads/Off_A_86634.png',
+                    )
+                    .slice(0, 9);
             } catch (error) {
                 console.error('Failed to fetch offers', error);
+            } finally {
+                this.isLoadingOffers = false;
             }
         },
         handleResize() {
@@ -430,9 +648,6 @@ export default defineComponent({
     border: 1px dotted #f3d40760;
     margin: 6px;
 }
-.nav-tabs .nav-item {
-    margin-left: 10px;
-}
 
 .bg-rewards {
     //border: 1px dotted #f31a0760;
@@ -462,37 +677,12 @@ export default defineComponent({
 
 .btn-primary {
     box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px, rgba(255, 255, 255, 0.12) 0px 4px 4px 0px inset;
-    background: rgb(212, 70, 70) !important;
-    border-radius: 20px;
+    border-radius: 5px;
     transition: all 0.3s ease;
     position: relative;
     z-index: 1;
     overflow: hidden;
-}
-
-.btn-primary::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 300%;
-    height: 300%;
-    background: rgba(255, 255, 255, 0.15);
-    transition: all 0.3s ease;
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    z-index: -1;
-}
-
-.btn-primary:hover {
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 8px 16px 0px, rgba(255, 255, 255, 0.2) 0px 8px 16px 0px inset;
-    background: rgb(248, 69, 69) !important;
-    color: white;
-}
-
-.btn-primary:hover::before {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0;
+    background: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
 }
 
 .my-leader {
@@ -526,34 +716,18 @@ export default defineComponent({
 }
 
 .quests-column {
-    min-height: 100vh;
-    box-shadow: inset rgb(182 9 153 / 15%) 0px -7px 20px 8px;
+    height: calc(100vh - 70px);
     margin-right: 20px;
-    border-radius: 7px;
-    //background: #0e0f19;
-    border-radius: 15px;
-    border: 1px dotted #865c5c85;
-    padding: 0px !important;
     margin-left: 12px;
 }
 
-.quests-column .nav-item .nav-link.active {
-    background-color: #0e0f19 !important;
-}
-
-.quests-column .tab-content {
-    padding: 10px;
-}
-
 .quests-column .tab-content .card {
-    border-radius: 10px;
-    border: 1px dotted #f39696a1;
     overflow: hidden;
     margin-bottom: 15px;
+    border-radius: 0px;
 }
 
 .rewards-column {
-    max-width: 380px;
     height: calc(100vh - 70px);
     position: sticky;
     top: 70px;
@@ -634,9 +808,9 @@ export default defineComponent({
     //margin: 1%;
     max-width: 45%;
     box-sizing: border-box;
-    background: #130301 !important;
+    background: linear-gradient(178deg, rgb(21, 20, 21) -37.16%, rgb(14, 13, 16) 98.54%);
     border-radius: 20px;
-
+    margin-bottom: 15px;
     .card {
         border: 0 !important;
         border-radius: 20px !important;
@@ -662,21 +836,34 @@ export default defineComponent({
 }
 
 .quests-box {
+    height: calc(100vh - 180px);
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    column-gap: 2%;
+    flex-direction: column;
+    overflow-y: auto;
+    gap: 25px;
 }
 
 .offers-box {
-    background: linear-gradient(129deg, #572985, #3a0202e6);
+    background: #202020;
     border-radius: 20px;
-    padding: 2%;
-    margin-bottom: 15px;
+    padding: 15px 20px;
+    padding-bottom: 0;
+
     h3 {
-        font-family: 'Kode Mono', monospace;
-        font-size: 1rem;
+        font-family: 'Poppins', sans-serif;
+        color: #d4d4d4;
+        font-feature-settings: 'liga' off, 'clig' off;
+        text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 18px;
     }
+}
+.quest-skeleton-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
 }
 
 .quest-skeleton-loader {
@@ -711,6 +898,81 @@ export default defineComponent({
     border-radius: 4px;
 }
 
+.skeleton-image {
+    height: 130px;
+    background-color: #c0c0c0;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.quests-column .nav-item {
+    flex-grow: 0;
+}
+
+.quests-column .nav-link {
+    width: 158px !important;
+    display: flex;
+    justify-content: center;
+    background: #202020;
+    border-bottom-color: transparent;
+    border-bottom-width: 0px;
+    color: #8e8e8e;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+}
+
+.quests-column .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: #5b5b5b;
+    border-bottom-color: #1c1b1c;
+    border-bottom-width: 1px;
+    font-weight: 600;
+}
+
+.quests-column .nav {
+    border-bottom-color: #5b5b5b;
+    gap: 3px;
+}
+
+.quest-group,
+.reward-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.quest-item {
+    height: 100%;
+    min-height: 280px;
+    overflow: hidden;
+    background-color: #202020;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.quest-item-daily,
+.reward-item-promoted {
+    grid-column: span 3;
+}
+
+.quest-group-title {
+    color: #d4d4d4;
+    font-feature-settings: 'liga' off, 'clig' off;
+    text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
+    font-family: Poppins;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+    margin-bottom: 10px;
+}
+
+.reward-group {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+}
+
 @keyframes pulse {
     0% {
         opacity: 1;
@@ -729,6 +991,7 @@ export default defineComponent({
     }
     .quests-column {
         margin-right: 12px !important;
+        padding: 0 !important;
     }
     .quest-cont {
         max-width: 100%;
@@ -747,6 +1010,31 @@ export default defineComponent({
     }
     .rewards-container {
         height: calc(100vh - 205px);
+    }
+    .quests-box {
+        height: calc(100vh - 280px);
+    }
+    .reward-group {
+        gap: 0;
+        column-gap: 10px;
+    }
+    .quests-column .nav-item {
+        flex: 1 1 30%;
+        box-sizing: border-box;
+    }
+    .quests-column .nav-link {
+        width: 100% !important;
+    }
+    .quest-item-daily,
+    .reward-item-promoted {
+        grid-column: span 2;
+    }
+}
+@media (max-width: 774px) {
+    .quest-group,
+    .reward-group {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
 }
 
@@ -772,6 +1060,31 @@ export default defineComponent({
     .regular-quest {
         width: 49%;
         flex: 1 1 49%;
+    }
+}
+@media (max-width: 576px) {
+    .quest-group,
+    .reward-group {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 10px;
+    }
+    .quests-column {
+        padding: 10px;
+        margin: 0;
+    }
+    .quest-item-daily,
+    .reward-item-promoted {
+        grid-column: span 1;
+    }
+    .offer-item {
+        flex: 1 0 100%;
+        max-width: 100% !important;
+    }
+}
+
+@media (min-width: 1400px) {
+    .quest-cont {
+        max-width: 100%;
     }
 }
 </style>

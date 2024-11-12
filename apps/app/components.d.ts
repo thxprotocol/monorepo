@@ -169,8 +169,10 @@ declare module 'vue' {
     QuestsCarousel: typeof import('./src/components/homepage/QuestsCarousel.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Sidebar: typeof import('./src/components/new-ui/Sidebar.vue')['default']
     SocialQuests: typeof import('./src/components/homepage/SocialQuests.vue')['default']
     TopBrands: typeof import('./src/components/homepage/TopBrands.vue')['default']
+    Transactions: typeof import('./src/components/new-ui/Transactions.vue')['default']
   }
   export interface ComponentCustomProperties {
     vBModal: typeof import('bootstrap-vue-next')['vBModal']

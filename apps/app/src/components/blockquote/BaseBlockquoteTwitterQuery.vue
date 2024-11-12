@@ -97,4 +97,8 @@ export default defineComponent({
 a {
     text-decoration: none;
 }
+blockquote {
+    max-height: 150px;
+    overflow: auto;
+}
 </style>

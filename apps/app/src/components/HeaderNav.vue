@@ -1,72 +1,46 @@
 <template>
     <!-- <nav v-if="isVisible" class="header-nav"> -->
 
-    <nav v-if="isVisible" class="header-nav d-flex justify-content-between w-100">
+    <nav v-if="isVisible" class="header-nav d-flex w-100 justify-content-between">
         <!-- Your header content -->
         <!-- <h1>Header Navigation</h1> -->
-        <div class="d-flex gap-2 balance-wrap" style="width: 500px">
-            <div
-                ref="santaDiv"
-                class="d-flex align-items-center justify-content-between equal-divs"
-                @click="toggleSantaDropdown"
-            >
-                <h2>Santa <span style="display: block">Points</span></h2>
-                <div class="d-flex align-items-center">
-                    <p>{{ numberWithCommas(formattedBalance(participantSantaState, SANTA_CAMPAIGN)) }}</p>
-                    <img :src="imgStarCoin" alt="Star Coin" loading="lazy" width="24" />
-                </div>
-                <div v-if="showSantaDropdown" class="dropdown-content">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <p>Total Earnings:</p>
-                        <div class="d-flex align-items-center total-earnings">
-                            <p>{{ numberWithCommas(formattedScore(participantSantaState, SANTA_CAMPAIGN)) }}</p>
-                            <img :src="imgStarCoin" alt="Star Coin" loading="lazy" width="24" height="24" />
-                        </div>
-                    </div>
-                    <div>
-                        Latest Completed Quest:
-                        <p>{{ latestCompletedQuest?.title }}</p>
-                    </div>
-                </div>
+        <div class="d-flex media-header">
+            <div class="d-flex align-items-center gap-2 media-header-first">
+                <img :src="rewardsIcon" alt="rewards" width="40" height="40" />
+                <h1 class="m-0 fs-3 fw-bold">Rewards</h1>
             </div>
-            <div
-                ref="cpDiv"
-                class="d-flex align-items-center justify-content-between equal-divs"
-                @click="toggleCPDropdown"
-            >
-                <h2>Cash <span style="display: block">Rewards</span></h2>
-                <p>${{ numberWithCommas(formattedBalance(participantCPState, CP_CAMPAIGN)) }}</p>
-                <div v-if="showCPDropdown" class="dropdown-content">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <p>Total Earnings:</p>
-                        <div class="d-flex align-items-center total-earnings">
-                            <p>${{ numberWithCommas(formattedScore(participantCPState, CP_CAMPAIGN)) }}</p>
-                        </div>
+
+            <div class="d-flex gap-3 balance-wrap media-header-third">
+                <div class="balance-box">
+                    <h2>Santa <span class="d-block">Points</span></h2>
+                    <div class="d-flex align-items-center">
+                        <p>{{ numberWithCommas(formattedBalance(participantSantaState, SANTA_CAMPAIGN)) }}</p>
+                        <img :src="imgStarCoin" alt="Star Coin" loading="lazy" width="24" />
                     </div>
-                    <div>
-                        Latest Activity:
-                        <p>-</p>
-                    </div>
+                </div>
+                <div class="balance-box">
+                    <h2>Cash <span class="d-block">Rewards</span></h2>
+                    <p>${{ numberWithCommas(formattedBalance(participantCPState, CP_CAMPAIGN)) }}</p>
                 </div>
             </div>
         </div>
-        <div v-if="!accountStore.isMobile" class="d-flex gap-2"></div>
-        <div v-if="!accountStore.isMobile" class="d-flex gap-2">
-            <BaseCardWalletInfo v-if="!accountStore.isMobile" />
-            <BaseDropdownWallets v-if="!accountStore.isMobile" />
+
+        <div class="d-flex gap-2 media-header-second">
+            <BaseCardWalletInfo />
+            <BaseDropdownWallets />
             <div
-                class="d-flex align-items-center justify-content-between equal-divs name-avatar"
+                class="d-flex align-items-center justify-content-between name-avatar"
                 @click="accountStore.isModalAccountShown = true"
             >
-                <h2 v-if="!accountStore.isMobile" class="username">
+                <h2 class="username">
                     <template v-if="accountStore?.account?.username">
                         {{ accountStore.account.username }}
                     </template>
                     <template v-else>
-                        <span class="typing-placeholder">{{ typingDots }}</span>
+                        <!-- <span class="typing-placeholder">{{ typingDots }}</span> -->
                     </template>
                 </h2>
-                <b-avatar class="b-avatar-header" size="40" :src="accountStore?.account?.profileImg" variant="dark" />
+                <b-avatar class="b-avatar-header" size="24" :src="accountStore?.account?.profileImg" variant="dark" />
             </div>
         </div>
     </nav>
@@ -79,6 +53,7 @@ import { mapStores } from 'pinia';
 import { SANTA_CAMPAIGN, CP_CAMPAIGN } from '../config/secrets';
 import imgStarCoin from '../assets/star-coin.png';
 import { useQuestStore } from '../stores/Quest';
+import rewardsIcon from '../assets/rewards-icon.png';
 export default defineComponent({
     name: 'HeaderNav',
     props: {
@@ -98,13 +73,14 @@ export default defineComponent({
             participantCPState: null as any,
             dotCount: 0,
             typingInterval: undefined as ReturnType<typeof setInterval> | undefined,
+            rewardsIcon,
         };
     },
     computed: {
         ...mapStores(useAccountStore, useQuestStore),
         latestCompletedQuest() {
             const { quests } = this.questStore;
-            return quests.find((quest) => !quest.isAvailable);
+            return quests.find((quest: any) => !quest.isAvailable);
         },
         typingDots() {
             return '.'.repeat(this.dotCount);
@@ -122,11 +98,9 @@ export default defineComponent({
         // await this.accountStore.getParticipants();
     },
     mounted() {
-        document.addEventListener('click', this.handleClickOutside);
         this.startTypingAnimation();
     },
     beforeUnmount() {
-        document.removeEventListener('click', this.handleClickOutside);
         clearInterval(this.typingInterval);
     },
     methods: {
@@ -137,30 +111,6 @@ export default defineComponent({
             this.participantCPState = this.accountStore.participants.find(
                 (p) => p.sub === this.accountStore.account?.sub && p.poolId === this.CP_CAMPAIGN,
             );
-        },
-        toggleSantaDropdown() {
-            this.showSantaDropdown = !this.showSantaDropdown;
-            this.showCPDropdown = false;
-            event.stopPropagation();
-        },
-        toggleCPDropdown() {
-            this.showCPDropdown = !this.showCPDropdown;
-            this.showSantaDropdown = false;
-            event.stopPropagation();
-        },
-        handleClickOutside(event: Event) {
-            const santaDiv = this.$refs.santaDiv as HTMLElement;
-            const cpDiv = this.$refs.cpDiv as HTMLElement;
-
-            if (
-                santaDiv &&
-                !santaDiv.contains(event.target as Node) &&
-                cpDiv &&
-                !cpDiv.contains(event.target as Node)
-            ) {
-                this.showSantaDropdown = false;
-                this.showCPDropdown = false;
-            }
         },
         balance(participant: TParticipant) {
             if (!participant) return 0;
@@ -200,19 +150,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .header-nav {
-    position: fixed;
-    //top: 3px;
-    left: 0.5%;
-    width: 99% !important;
-    z-index: 1000;
-    padding: 6px;
-    /* border-bottom: 1px dotted #dd1e1e66; */
-    border-radius: 30px;
-    margin: 0.1% 0.5% 0.1% 0;
-    border: 1px dotted rgba(152, 122, 7, 0.968627451);
-    //padding-right: 60px;
-    background: rgba(0, 0, 0, 0.8);
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.7);
+    position: relative;
+    background: transparent;
     padding-right: 50px;
 }
 
@@ -221,7 +160,7 @@ export default defineComponent({
     font-feature-settings: 'clig' off, 'liga' off;
     font-size: 12px;
     font-style: italic;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     margin: 0;
     white-space: nowrap;
@@ -237,29 +176,18 @@ export default defineComponent({
     margin: 0;
 }
 
-.equal-divs {
-    background: rgb(179 2 2 / 14%);
-    flex: auto;
-    min-width: 0;
-    min-height: 0;
-    padding: 7px 10px;
-    border-radius: 22px;
-    border: 1px dotted #ffcd06;
-    position: relative;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-}
 .b-avatar-header {
     border: 2px dotted #064f17;
-    width: 40px;
-    height: 40px;
-    position: absolute;
-    right: 4px;
 }
 
-.name-avatar h2 {
-    margin-right: 50px;
+.name-avatar {
+    width: 133px;
+    height: 32px;
+    border-radius: 4px;
+    border: 0.5px solid #834bc4;
+    background: rgba(131, 75, 196, 0.5);
 }
+
 .name-avatar:hover h2 {
     text-decoration: underline;
     cursor: pointer;
@@ -268,7 +196,8 @@ export default defineComponent({
     padding-right: 2px !important;
 }
 .username {
-    max-width: 150px; /* Adjust this value as needed */
+    padding-left: 10px;
+    max-width: 100px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -288,6 +217,21 @@ export default defineComponent({
     animation: fadeIn 0.5s ease-in-out;
 }
 
+.balance-box {
+    width: 190px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
+    border-radius: 5px;
+    padding: 11px 10px;
+}
+
+.media-header {
+    gap: 3rem;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -302,10 +246,6 @@ export default defineComponent({
 }
 .dropdown-content p span {
     color: #c1c1c1;
-}
-.equal-divs:hover {
-    background: rgba(255, 205, 7, 0.3);
-    box-shadow: 0 0 10px rgba(255, 205, 7, 0.5);
 }
 @media (max-width: 992px) {
     .header-nav {
@@ -325,15 +265,62 @@ export default defineComponent({
     }
 }
 
-@media (max-width: 490px) {
-    //.header-nav h2 {
-    //  display: none;
-    //}
-    //.balance-wrap {
-    //  width: auto !important;
-    //}
+@media (max-width: 992px) {
+    .header-nav {
+        flex-direction: column;
+    }
+    .media-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .media-header-first {
+        order: 1;
+    }
+    .media-header-second {
+        order: 2;
+        position: absolute;
+        right: 0;
+        //margin-right: 1rem;
+    }
+    .media-header-third {
+        order: 3;
+    }
+    .balance-box {
+        flex: 1 1 50%;
+        box-sizing: border-box;
+    }
+    .balance-wrap {
+        padding-right: 0;
+    }
+}
+@media (max-width: 527px) {
+    .media-header-first h1 {
+        display: none;
+    }
 }
 
+@media (max-width: 426px) {
+    .media-header-first img {
+        display: none;
+    }
+    .media-header-third {
+        margin-top: 40px;
+    }
+    .media-header-second > * {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+    .media-header-second {
+        width: 100%;
+    }
+    .username {
+        display: none;
+    }
+    .name-avatar {
+        padding-right: 0 !important;
+        justify-content: center !important;
+    }
+}
 .total-earnings p {
     font-size: 20px;
     text-align: right;
