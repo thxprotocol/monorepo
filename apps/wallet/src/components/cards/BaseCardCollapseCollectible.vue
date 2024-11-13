@@ -27,6 +27,7 @@
                     <b-link :href="url" target="_blank">{{ collectible.tokenId }}</b-link>
                 </div>
                 <b-button
+                    v-if="walletStore.wallet && walletStore.wallet.variant === WalletVariant.Safe"
                     variant="primary"
                     class="w-100 my-3"
                     :disabled="isLoading"
@@ -59,7 +60,8 @@
 
 <script lang="ts">
 import { chainList } from '@thxnetwork/common/chains';
-import { useCollectibleStore } from '@thxnetwork/wallet/stores';
+import { WalletVariant } from '@thxnetwork/common/enums';
+import { useCollectibleStore, useWalletStore } from '@thxnetwork/wallet/stores';
 import { format } from 'date-fns';
 import { isAddress } from 'ethers/lib/utils';
 import { mapStores } from 'pinia';
@@ -83,10 +85,10 @@ export default defineComponent({
         },
     },
     data() {
-        return { to: '', format, isModalTransferShown: false, isLoading: false, isCollapsed: false };
+        return { WalletVariant, to: '', format, isModalTransferShown: false, isLoading: false, isCollapsed: false };
     },
     computed: {
-        ...mapStores(useCollectibleStore),
+        ...mapStores(useCollectibleStore, useWalletStore),
         url() {
             return (
                 chainList[this.collection.chainId].blockExplorer +
