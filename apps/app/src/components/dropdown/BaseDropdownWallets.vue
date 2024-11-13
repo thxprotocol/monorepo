@@ -158,7 +158,7 @@
             <b-dropdown-divider />
             <b-dropdown-item
                 link-class="d-flex align-items-center justify-content-center"
-                @click="walletStore.isModalWalletCreateShown = true"
+                @click="walletStore.isModalChainSelectShown = true"
             >
                 New Wallet
             </b-dropdown-item>

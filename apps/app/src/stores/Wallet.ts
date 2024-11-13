@@ -75,6 +75,7 @@ export const useWalletStore = defineStore('wallet', {
         wallet: null,
         isLoading: true,
         isModalWalletCreateShown: false,
+        isModalChainSelectShown: false,
         isModalChainSwitchShown: false,
         currentChainId: ChainId.Polygon,
     }),

@@ -18,6 +18,7 @@
         <BaseModalAccount size="lg" />
         <BaseModalWalletConnect />
         <BaseModalWalletCreate size="lg" />
+        <BaseModalChainSelect size="sm" />
         <BaseModalWalletRecovery size="lg" />
     </div>
 </template>

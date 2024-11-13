@@ -39,6 +39,7 @@ type TWalletState = {
     pendingPoints: number;
     isLoading: boolean;
     isModalWalletCreateShown: boolean;
+    isModalChainSelectShown: boolean;
     isModalChainSwitchShown: boolean;
     currentChainId: ChainId;
 };
