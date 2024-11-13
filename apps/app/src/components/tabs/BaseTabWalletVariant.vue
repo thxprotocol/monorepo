@@ -9,7 +9,7 @@
                 <b-img
                     :src="
                         walletStore.currentChainId == ChainId.Aptos
-                            ? 'src/assets/wallet.png'
+                            ? imgSantaWalletLogo
                             : walletLogoMap[WalletVariant.WalletConnect]
                     "
                     width="17"
@@ -49,6 +49,7 @@ import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { WalletVariant } from '../../types/enums/accountVariant';
 import { ChainId } from '@thxnetwork/common/enums';
+import imgSantaWalletLogo from '../../assets/wallet.png';
 
 export default defineComponent({
     name: 'BaseTabWalletVariant',
@@ -60,6 +61,7 @@ export default defineComponent({
             walletLogoMap,
             WalletVariant,
             ChainId,
+            imgSantaWalletLogo,
         };
     },
     computed: {
