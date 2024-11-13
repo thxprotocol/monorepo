@@ -38,6 +38,7 @@ export default defineComponent({
             error: '',
             variant: WalletVariant.WalletConnect,
             address: '',
+            publicKey: '',
             walletLogoMap,
             WalletVariant,
             message: 'This signature will be used to proof ownership of a web3 account.',
@@ -77,26 +78,9 @@ export default defineComponent({
 
                 try {
                     const response = await window.santaAptos.connect();
-
-                    try {
-                        await this.walletStore.create({
-                            chainId: ChainId.Aptos,
-                            variant: this.variant,
-                            rawAddress: response.args.address,
-                        });
-                        const wallet = this.walletStore.wallets.find(
-                            (wallet: TWallet) => wallet.address === response.args.address,
-                        );
-                        if (!wallet) throw new Error('New wallet not found');
-
-                        this.walletStore.setWallet(wallet);
-                        this.$emit('close');
-                    } catch (error) {
-                        console.error(error);
-                        this.error = 'An issue occurred while creating your wallet. Please try again.';
-                    } finally {
-                        this.isLoading = false;
-                    }
+                    this.address = response.args.address;
+                    this.publicKey = response.args.publicKey;
+                    this.walletStore.account = { address: response.args.address };
                 } catch (error) {
                     console.log(error);
                 }
@@ -168,25 +152,59 @@ export default defineComponent({
             }
         },
         async onClickAdd() {
-            this.isLoading = true;
-            try {
-                const signature = await this.walletStore.signMessage(this.message);
-                await this.walletStore.create({
-                    chainId: this.walletStore.chainId,
-                    variant: this.variant,
-                    message: this.message,
-                    signature,
-                });
-                const wallet = this.walletStore.wallets.find((wallet: TWallet) => wallet.address === this.address);
-                if (!wallet) throw new Error('New wallet not found');
+            if (this.walletStore.currentChainId == ChainId.Aptos) {
+                this.isLoading = true;
 
-                this.walletStore.setWallet(wallet);
-                this.$emit('close');
-            } catch (error) {
-                console.error(error);
-                this.error = 'An issue occured while creating your wallet. Please try again.';
-            } finally {
-                this.isLoading = false;
+                // const responsePetra = await window.aptos.signMessage({
+                //     message: this.message,
+                //     nonce: 'random',
+                // });
+
+                try {
+                    const response = await window.santaAptos.signMessage({
+                        message: this.message,
+                        nonce: 'random',
+                    });
+                    await this.walletStore.create({
+                        chainId: ChainId.Aptos,
+                        variant: this.variant,
+                        message: `APTOS\nmessage: ${this.message}\nnonce: random`,
+                        publicKey: this.publicKey,
+                        signature: response.args.signature,
+                        rawAddress: this.address,
+                    });
+                    const wallet = this.walletStore.wallets.find((wallet: TWallet) => wallet.address === this.address);
+                    if (!wallet) throw new Error('New wallet not found');
+
+                    this.walletStore.setWallet(wallet);
+                    this.$emit('close');
+                } catch (error) {
+                    console.error(error);
+                    this.error = 'An issue occurred while creating your wallet. Please try again.';
+                } finally {
+                    this.isLoading = false;
+                }
+            } else {
+                this.isLoading = true;
+                try {
+                    const signature = await this.walletStore.signMessage(this.message);
+                    await this.walletStore.create({
+                        chainId: this.walletStore.chainId,
+                        variant: this.variant,
+                        message: this.message,
+                        signature,
+                    });
+                    const wallet = this.walletStore.wallets.find((wallet: TWallet) => wallet.address === this.address);
+                    if (!wallet) throw new Error('New wallet not found');
+
+                    this.walletStore.setWallet(wallet);
+                    this.$emit('close');
+                } catch (error) {
+                    console.error(error);
+                    this.error = 'An issue occured while creating your wallet. Please try again.';
+                } finally {
+                    this.isLoading = false;
+                }
             }
         },
     },

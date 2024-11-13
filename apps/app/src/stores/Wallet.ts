@@ -184,6 +184,7 @@ export const useWalletStore = defineStore('wallet', {
         async create(data: {
             variant: WalletVariant;
             message?: string;
+            publicKey?: string;
             signature?: string;
             rawAddress?: string;
             chainId?: ChainId;
