@@ -20,17 +20,15 @@ import {
     QuestGitcoin,
     QuestSocial,
 } from '@thxnetwork/api/models';
+import { AccessTokenKind } from '@thxnetwork/common/enums';
 
 async function findQuests(campaigns: PoolDocument[]) {
-    const poolId = campaigns.map(({ _id }) => String(_id));
-    return await Promise.all([
-        QuestDaily.find({ poolId, isPublished: true }),
-        QuestInvite.find({ poolId, isPublished: true }),
-        QuestSocial.find({ poolId, isPublished: true }),
-        QuestCustom.find({ poolId, isPublished: true }),
-        QuestWeb3.find({ poolId, isPublished: true }),
-        QuestGitcoin.find({ poolId, isPublished: true }),
-    ]);
+    const poolIds = campaigns.map(({ _id }) => String(_id));
+    return await QuestSocial.find({
+        poolId: { $in: poolIds },
+        isPublished: true,
+        kind: AccessTokenKind.Discord,
+    });
 }
 
 async function createSelectMenuQuests(interaction: CommandInteraction | ButtonInteraction) {
