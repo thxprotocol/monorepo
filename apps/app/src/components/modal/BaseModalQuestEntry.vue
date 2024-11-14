@@ -13,7 +13,7 @@
             <h5 class="modal-title">
                 {{ loading ? 'Loading...' : error ? 'Quest validation' : 'Quest completed!' }}
             </h5>
-            <b-link class="btn-close" @click="isShown = false"><i class="fas fa-times"></i></b-link>
+            <!-- <b-link class="btn-close" @click="isShown = false"><i class="fas fa-times"></i></b-link> -->
         </template>
         <div v-if="loading" class="text-center">
             <b-spinner show small variant="primary" />
@@ -56,7 +56,7 @@
             </b-button>
             <b-button
                 :variant="participant && participant.isSubscribed ? 'primary' : 'link'"
-                class="w-100 rounded-pill"
+                class="w-100 btn-primary text-decoration-none"
                 :disabled="isDisabledContinue"
                 @click="onClickContinue"
             >
