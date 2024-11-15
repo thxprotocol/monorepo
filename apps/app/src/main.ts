@@ -19,7 +19,7 @@ const pinia = createPinia();
 const app = createApp(App);
 
 // Create the Mixpanel instance
-Mixpanel.init(MIXPANEL_TOKEN, API_URL);
+// Mixpanel.init(MIXPANEL_TOKEN, API_URL);
 
 // Create the ReCaptcha script tag for the environments site key and append it to the head
 const script = document.createElement('script');
