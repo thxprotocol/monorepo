@@ -13,8 +13,14 @@
         </template>
 
         <div class="select-group">
-            <b-button class="select-button" @click="onClickEVM"> EVM </b-button>
-            <b-button class="select-button" @click="onClickAptos"> Aptos </b-button>
+            <b-button class="select-button" @click="onClickEVM">
+                <img :src="ImgLogoSepolia" alt="Add Icon" style="width: 32px; height: 32px; border-radius: 8px" />
+                EVM
+            </b-button>
+            <b-button class="select-button" @click="onClickAptos">
+                <img :src="ImgLogoAptos" alt="Add Icon" style="width: 32px; height: 32px; border-radius: 8px" />
+                Aptos
+            </b-button>
         </div>
     </b-modal>
 </template>
@@ -23,9 +29,17 @@
 import { useWalletStore } from '../../stores/Wallet';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
+import ImgLogoSepolia from '../../assets/thx_logo_sepolia.svg';
+import ImgLogoAptos from '../../assets/thx_logo_aptos.svg';
 
 export default defineComponent({
     name: 'BaseModalChainSelect',
+    data() {
+        return {
+            ImgLogoSepolia,
+            ImgLogoAptos,
+        };
+    },
     computed: {
         ...mapStores(useWalletStore),
     },

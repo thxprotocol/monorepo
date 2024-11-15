@@ -53,7 +53,6 @@ export default {
         },
         setAsDefault() {
             this.chromeSendMessage({ message: 'setAsDefaultBrowser' }, () => {
-                console.log('Setting Santa as default...');
                 this.startCheckingDefault();
             });
         },

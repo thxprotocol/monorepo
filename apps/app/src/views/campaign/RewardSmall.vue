@@ -197,14 +197,12 @@ export default defineComponent({
         // },
     },
     async mounted() {
-        console.log('The props are also available in JS:', this.message);
         await this.getRewards(this.message);
     },
     methods: {
         async getRewards(poolId: string) {
             try {
                 this.rewardsList = await this.rewardStore.listReturn(poolId);
-                console.log(this.rewardsList);
             } catch (error) {
                 console.error('rewards fetch error:', error);
             }

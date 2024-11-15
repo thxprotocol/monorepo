@@ -12,7 +12,6 @@ export const useRewardStore = defineStore('reward', {
     actions: {
         updateSupply: function (id: string) {
             const index = this.rewards.findIndex((reward) => reward._id === id);
-            console.log(index);
             if (index == -1) return;
             this.rewards[index].limitSupplyProgress.count = this.rewards[index].limitSupplyProgress.count + 1;
             this.rewards[index].limitProgress.count = this.rewards[index].limitProgress.count + 1;

@@ -111,7 +111,7 @@ export const useWalletStore = defineStore('wallet', {
 
             watchConnections(wagmiConfig, {
                 onChange(data) {
-                    console.log('Connections changed!', data);
+                    // console.log('Connections changed!', data);
                 },
             });
 
