@@ -356,6 +356,14 @@ class SafeService {
                 const { defaultAccount } = NetworkService.getProvider(wallet.chainId);
                 const senderSignature = signedTx.signatures.get(defaultAccount.toLowerCase());
 
+                logger.debug({
+                    safeAddress: toChecksumAddress(wallet.address),
+                    safeTxHash: safeTxHash,
+                    safeTransactionData: signedTx.data,
+                    senderAddress: toChecksumAddress(defaultAccount),
+                    senderSignature: senderSignature.data,
+                });
+
                 await apiKit.proposeTransaction({
                     safeAddress: toChecksumAddress(wallet.address),
                     safeTxHash,
