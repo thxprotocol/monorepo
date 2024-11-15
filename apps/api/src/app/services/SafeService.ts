@@ -371,7 +371,9 @@ class SafeService {
                 );
                 logger.debug('Updated transactions', { safeTxHash, nonce, count: txs.length });
             } catch (error) {
-                logger.error('Error proposing transaction', error.response ? error.response.data : error.message);
+                logger.error('Error proposing transaction', {
+                    failReason: error.response ? error.response.data : error.message,
+                });
             }
         }
     }
@@ -484,7 +486,7 @@ class SafeService {
         } catch (error) {
             const failReason = error.response ? error.response.data : error.message;
             await Transaction.updateMany({ safeTxHash }, { state: TransactionState.Failed, failReason });
-            logger.error('Error executing transaction', failReason);
+            logger.error('Error executing transaction', { failReason: failReason });
         }
     }
 
