@@ -356,6 +356,14 @@ class SafeService {
                 const { defaultAccount } = NetworkService.getProvider(wallet.chainId);
                 const senderSignature = signedTx.signatures.get(defaultAccount.toLowerCase());
 
+                logger.debug({
+                    safeAddress: toChecksumAddress(wallet.address),
+                    safeTxHash: safeTxHash,
+                    safeTransactionData: signedTx.data,
+                    senderAddress: toChecksumAddress(defaultAccount),
+                    senderSignature: senderSignature.data,
+                });
+
                 await apiKit.proposeTransaction({
                     safeAddress: toChecksumAddress(wallet.address),
                     safeTxHash,
@@ -371,7 +379,9 @@ class SafeService {
                 );
                 logger.debug('Updated transactions', { safeTxHash, nonce, count: txs.length });
             } catch (error) {
-                logger.error('Error proposing transaction', error.response ? error.response.data : error.message);
+                logger.error('Error proposing transaction', {
+                    failReason: error.response ? error.response.data : error.message,
+                });
             }
         }
     }
@@ -484,7 +494,7 @@ class SafeService {
         } catch (error) {
             const failReason = error.response ? error.response.data : error.message;
             await Transaction.updateMany({ safeTxHash }, { state: TransactionState.Failed, failReason });
-            logger.error('Error executing transaction', failReason);
+            logger.error('Error executing transaction', { failReason: failReason });
         }
     }
 
