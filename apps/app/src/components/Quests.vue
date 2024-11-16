@@ -47,7 +47,13 @@
                                     <div
                                         v-if="!group.isOfferRow"
                                         :class="{
-                                        'd-none': group.quests.every((quest: TBaseQuest) => quest.isAvailable === false),
+                                        'd-none': group.quests.every((quest: TBaseQuest) => {
+                                            if (quest.variant === 0) {
+                                                return quest.isCompleted;
+                                            } else {
+                                                return !quest.isAvailable;
+                                            }
+                                        }), 
                                     }"
                                     >
                                         <h3 class="quest-group-title">{{ group.title }}</h3>
@@ -56,7 +62,8 @@
                                                 v-for="quest in group.quests"
                                                 :key="quest._id"
                                                 :class="{
-                                                    'd-none': quest.isAvailable === false,
+                                                    'd-none':
+                                                        quest.variant === 0 ? quest.isCompleted : !quest.isAvailable,
                                                     'quest-item': true,
                                                     'quest-item-daily': quest.variant === 0,
                                                 }"
@@ -167,7 +174,13 @@
                                     v-for="group in filteredCompletedQuests"
                                     :key="group.title"
                                     :class="{
-                                    'd-none': group.quests && group.quests.every((quest: TBaseQuest) => quest.isAvailable === true) && !group.isOfferRow,
+                                    'd-none': group.quests && group.quests.every((quest: TBaseQuest) => {
+                                        if (quest.variant === 0) {
+                                            return !quest.isCompleted;
+                                        } else {
+                                            return quest.isAvailable;
+                                        }
+                                    }) && !group.isOfferRow,
                                 }"
                                 >
                                     <h3 class="quest-group-title">{{ group.title }}</h3>
@@ -382,6 +395,7 @@ export default defineComponent({
         },
         quests() {
             const { quests } = this.questStore;
+            console.log('Quests: ', quests);
             return quests
                 .sort(sortMap[this.selectedSort.key])
                 .map((quest: any, index: number) => ({ ...quest, index }));

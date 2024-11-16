@@ -39,7 +39,6 @@
                 alt="header image"
                 loading="lazy"
                 style="border-radius: 4px"
-                height="167"
             />
 
             <div class="px-3 mt-2 d-flex flex-column flex-grow-1">

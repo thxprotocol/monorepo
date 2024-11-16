@@ -11,13 +11,7 @@
             end
         >
             <template #button-content>
-                <i
-                    :class="{
-                        'text-success': isConnected || !isWalletConnect,
-                        'text-danger': !isConnected && isWalletConnect,
-                    }"
-                    class="fas fa-circle me-2"
-                />
+                <i class="text-success fas fa-circle me-2" />
                 <div class="fs-6 fw-normal">
                     {{ walletStore.wallet ? walletStore.wallet.short : 'Connect' }}
                 </div>
@@ -25,7 +19,7 @@
 
             <b-dropdown-text v-if="walletStore.wallet" text-class="bg-dark">
                 <b-form-group label-class="d-flex align-items-center mb-1">
-                    <template #label>
+                    <!-- <template #label>
                         <span class="text-opaque">Account</span>
                         <template v-if="isWalletConnect">
                             <b-button
@@ -56,7 +50,7 @@
                                 size="lg"
                             />
                         </template>
-                    </template>
+                    </template> -->
                     <div class="d-flex align-items-center">
                         <!-- <b-avatar badge-variant="light" :src="walletImgURL" size="2.8rem" class="me-2">
                             <template #badge>
@@ -158,7 +152,7 @@
             <b-dropdown-divider />
             <b-dropdown-item
                 link-class="d-flex align-items-center justify-content-center"
-                @click="walletStore.isModalWalletCreateShown = true"
+                @click="walletStore.isModalChainSelectShown = true"
             >
                 New Wallet
             </b-dropdown-item>

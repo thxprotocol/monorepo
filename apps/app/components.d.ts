@@ -92,6 +92,7 @@ declare module 'vue' {
     BaseFormGroupWalletAddress: typeof import('./src/components/formgroup/BaseFormGroupWalletAddress.vue')['default']
     BaseFormGroupWalletSelect: typeof import('./src/components/formgroup/BaseFormGroupWalletSelect.vue')['default']
     BaseModalAccount: typeof import('./src/components/modal/BaseModalAccount.vue')['default']
+    BaseModalChainSelect: typeof import('./src/components/modal/BaseModalChainSelect.vue')['default']
     BaseModalClaimTokens: typeof import('./src/components/modal/BaseModalClaimTokens.vue')['default']
     BaseModalERC20Transfer: typeof import('./src/components/modal/BaseModalERC20Transfer.vue')['default']
     BaseModalERC721Transfer: typeof import('./src/components/modal/BaseModalERC721Transfer.vue')['default']

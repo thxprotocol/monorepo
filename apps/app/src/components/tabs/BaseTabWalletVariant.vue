@@ -6,10 +6,21 @@
             @click="$emit('change', WalletVariant.WalletConnect)"
         >
             <div class="d-flex align-items-center">
-                <b-img :src="walletLogoMap[WalletVariant.WalletConnect]" width="17" class="me-2 rounded" />
+                <b-img
+                    :src="
+                        walletStore.currentChainId == ChainId.Aptos
+                            ? imgSantaWalletLogo
+                            : walletLogoMap[WalletVariant.WalletConnect]
+                    "
+                    width="17"
+                    class="me-2 rounded"
+                />
                 Your Wallet
             </div>
-            <p class="small text-start text-opaque mb-0">Connect one of your existing wallets using WalletConnect.</p>
+            <p class="small text-start text-opaque mb-0">
+                Connect one of your existing wallets using
+                {{ walletStore.currentChainId == ChainId.Aptos ? 'SantaWallet' : 'WalletConnect' }}.
+            </p>
         </b-button>
         <b-button
             v-if="accountStore.config.isQRCodeCampaign"
@@ -37,6 +48,8 @@ import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { WalletVariant } from '../../types/enums/accountVariant';
+import { ChainId } from '@thxnetwork/common/enums';
+import imgSantaWalletLogo from '../../assets/wallet.png';
 
 export default defineComponent({
     name: 'BaseTabWalletVariant',
@@ -47,6 +60,8 @@ export default defineComponent({
         return {
             walletLogoMap,
             WalletVariant,
+            ChainId,
+            imgSantaWalletLogo,
         };
     },
     computed: {

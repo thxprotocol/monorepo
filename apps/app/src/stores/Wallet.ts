@@ -75,6 +75,7 @@ export const useWalletStore = defineStore('wallet', {
         wallet: null,
         isLoading: true,
         isModalWalletCreateShown: false,
+        isModalChainSelectShown: false,
         isModalChainSwitchShown: false,
         currentChainId: ChainId.Polygon,
     }),
@@ -110,7 +111,7 @@ export const useWalletStore = defineStore('wallet', {
 
             watchConnections(wagmiConfig, {
                 onChange(data) {
-                    console.log('Connections changed!', data);
+                    // console.log('Connections changed!', data);
                 },
             });
 
@@ -183,6 +184,7 @@ export const useWalletStore = defineStore('wallet', {
         async create(data: {
             variant: WalletVariant;
             message?: string;
+            publicKey?: string;
             signature?: string;
             rawAddress?: string;
             chainId?: ChainId;

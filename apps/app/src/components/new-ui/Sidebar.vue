@@ -1,5 +1,8 @@
 <template>
-    <aside v-if="!accountStore.isMobile" class="d-flex flex-column justify-content-between p-3 h-100">
+    <aside
+        v-if="!accountStore.isMobile"
+        class="d-flex flex-column justify-content-between p-3 h-100 overflow-auto gap-4 sidebar-wrap"
+    >
         <nav class="d-flex flex-column gap-3 fs-6 fw-normal">
             <a
                 v-for="item in navItems"
@@ -82,5 +85,11 @@ export default defineComponent({
     font-weight: 600;
     border-color: transparent;
     color: #ffffff;
+}
+.sidebar-wrap {
+    min-width: 220px;
+}
+.sidebar-wrap::-webkit-scrollbar {
+    display: none !important;
 }
 </style>

@@ -42,6 +42,7 @@ export default class QuestDailyService implements IQuestService {
             amount: number;
             entries: TQuestDailyEntry[];
             claimAgainDuration: number;
+            isCompleted: boolean;
         }
     > {
         const amount = await this.getAmount({ quest, account });
@@ -53,7 +54,7 @@ export default class QuestDailyService implements IQuestService {
         const now = Date.now();
         
         const isAvailable = await this.isAvailable({ quest, account });
-
+        const isCompleted = entries.length >= Object.keys(quest.amounts).length;
         return {
             ...quest,
             isAvailable: isAvailable.result,
@@ -61,6 +62,7 @@ export default class QuestDailyService implements IQuestService {
             entries,
             claimAgainDuration:
                 claimAgainTime && claimAgainTime - now > 0 ? Math.floor((claimAgainTime - now) / 1000) : null, // Convert to seconds
+            isCompleted,
         };
     }
 
