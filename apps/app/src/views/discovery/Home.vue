@@ -67,11 +67,12 @@ import imgLogo from '../../assets/logo.png';
 import earningsIcon from '../../assets/earnings-logo.png';
 import * as html from 'html-entities';
 import { defineComponent } from 'vue';
-
+import Quests from '@thxnetwork/app/components/Quests.vue';
 const CACHE_EXPIRY = 1000 * 60 * 60 * 24 * 7;
 
 export default defineComponent({
     name: 'Home',
+    components: { Quests },
     data(): any {
         return {
             decodeHTML,
