@@ -36,6 +36,8 @@ export default defineComponent({
     data() {
         return {
             test: false,
+            currentTheme: 'light',
+            colorSchemeMediaQuery: null as MediaQueryList | null,
         };
     },
     computed: {
@@ -56,6 +58,9 @@ export default defineComponent({
             const mobileOffset = 30;
             const height = windowHeight - mobileOffset;
             return { height: `${height}px` };
+        },
+        preferredTheme(): string {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         },
     },
     watch: {
@@ -87,6 +92,18 @@ export default defineComponent({
         if (clid && !user) {
             await this.authenticateUser(clid);
         }
+
+        this.applyTheme(this.preferredTheme);
+        this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        this.colorSchemeMediaQuery.addEventListener('change', this.handleColorSchemeChange);
+
+        console.log('Initial Preferred Theme Applied:', this.preferredTheme);
+    },
+    beforeUnmount() {
+        if (this.colorSchemeMediaQuery) {
+            this.colorSchemeMediaQuery.removeEventListener('change', this.handleColorSchemeChange);
+            console.log('Media query listener removed.');
+        }
     },
     methods: {
         getCookieReduce(name: string): string {
@@ -111,6 +128,19 @@ export default defineComponent({
             //         console.error('Authentication error:', error);
             //     }
         },
+        applyTheme(theme: string) {
+            this.currentTheme = theme;
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        },
+        handleColorSchemeChange(event: MediaQueryListEvent) {
+            const newPreferredTheme = event.matches ? 'dark' : 'light';
+            console.log(`System theme changed to: ${newPreferredTheme}`);
+            this.applyTheme(newPreferredTheme);
+        },
     },
 });
 </script>
@@ -119,6 +149,9 @@ export default defineComponent({
 #app {
     background-color: #000;
 }
+[data-theme='dark'] #app {
+    background-color: #ffffff;
+}
 .router-view-app {
     display: flex;
     flex-grow: 1;
@@ -126,44 +159,5 @@ export default defineComponent({
     // overflow-x: hidden;
     // overflow-y: auto;
     height: 100% !important;
-}
-.unwrap {
-    padding: 50px 0 0;
-    line-height: 35vh;
-    font-size: 21vw;
-    color: #3b3306;
-    font-weight: 800;
-    border-radius: 15px;
-    -webkit-text-fill-color: transparent;
-    -webkit-text-stroke-color: rgba(255, 205, 7, 0.9);
-    -webkit-text-stroke-width: 6px;
-    background-position: top;
-    top: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    transition: 1s all ease-in-out;
-    -moz-transition: 1s all ease-in-out;
-    -webkit-transition: 1s all ease-in-out;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-}
-
-.bg-santa {
-    background: url(/src/assets/top-bg.jpg);
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
-    //border: 1px dotted rgb(23 72 208);
-    overflow: hidden;
-    box-shadow: inset 1px 20px 20px 15px rgb(8 1 1 / 94%);
-    /* border-top-right-radius: 0; */
-    /* border-top-left-radius: 0; */
-    /* border-top: 0; */
-    background-position: center 20%;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
-
-.bg-blur {
-    backdrop-filter: blur(5px);
 }
 </style>

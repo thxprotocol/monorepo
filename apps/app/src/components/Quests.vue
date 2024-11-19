@@ -534,6 +534,7 @@ export default defineComponent({
                 if (!isAuthenticated) return;
                 if (!this.accountStore.account) {
                     await this.accountStore.getAccount();
+                    this.fetchOffers();
                 }
 
                 await Promise.all([
@@ -566,9 +567,6 @@ export default defineComponent({
         async fetchOffers() {
             this.isLoadingOffers = true;
             try {
-                while (!this.accountStore.account) {
-                    await this.accountStore.getAccount();
-                }
                 const clid = this.accountStore.account?.providerUserId;
                 const response = await axios.get(
                     `https://offers-api.santabrowser.com/offers/list?pageSize=10&pageNo=0&clid=${clid}`,
