@@ -196,6 +196,7 @@ export default defineComponent({
 .my-list .list-group-item {
     border: none;
     border-radius: 0;
+    padding: 4px 0;
     &:nth-child(odd) {
         background-color: #202020;
     }
@@ -282,6 +283,11 @@ export default defineComponent({
     line-height: 18px;
 }
 
+.list-item-field-address .b-avatar {
+    width: 32px;
+    height: 32px;
+}
+
 @keyframes pulse {
     0% {
         opacity: 1;
@@ -296,15 +302,24 @@ export default defineComponent({
 
 @media (max-width: 992px) {
     .leaderboard-wrapper {
-        height: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
         margin: 0;
         width: 100%;
     }
-    .my-list {
-        max-height: calc(100vh - 220px);
-    }
     .username-text {
         width: 100px;
+    }
+    .leaderboard-wrapper .list-group {
+        padding: 0 10px;
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .list-group-item {
+        padding-left: 30px !important;
     }
 }
 //@media (max-height: 894px) {
