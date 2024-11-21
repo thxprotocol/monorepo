@@ -2,11 +2,11 @@
     <div ref="mainComponent" class="mainComponent pt-3 px-3">
         <div class="d-flex flex-column h-100">
             <HeaderNav :is-visible="true" />
-            <div class="d-flex h-100 overflow-hidden">
+            <div class="d-flex h-100 overflow-hidden component-wrap">
                 <Sidebar :selected-part="selectedPart" @nav-clicked="handleNavClick" />
                 <div class="main-content position-relative">
                     <Quests :selected-part="selectedPart" />
-                    <div v-if="selectedPart === 'leaderboard'" class="w-100">
+                    <div v-if="selectedPart === 'leaderboard'" class="w-100 leaderboard-mobile">
                         <BaseQuestLeaderboardSmall :selected-part="selectedPart" />
                     </div>
                     <div v-if="selectedPart === 'wallet'">
@@ -503,6 +503,23 @@ export default defineComponent({
     .leaderboard-cont {
         height: 100%;
         padding: 12px 12px 0;
+    }
+    .component-wrap {
+        margin-bottom: 75px;
+        flex-direction: column;
+        flex: 1;
+    }
+    .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .leaderboard-mobile {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
 }
 </style>

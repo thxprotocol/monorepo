@@ -218,7 +218,9 @@
 
                     <b-tab title="About">
                         <div class="quests-box d-flex justify-content-center align-items-center">
-                            <p class="text-center text-muted mt-3 text-opaque">No information available.</p>
+                            <p class="text-center text-muted mt-3 text-opaque empty-message">
+                                No information available.
+                            </p>
                         </div>
                     </b-tab>
                 </b-tabs>
@@ -557,7 +559,6 @@ export default defineComponent({
         },
     },
     mounted() {
-        this.fetchOffers();
         window.addEventListener('resize', this.handleResize);
     },
     beforeUnmount() {
@@ -1000,13 +1001,23 @@ export default defineComponent({
 @media (max-width: 992px) {
     .quest-cont .row > * {
         flex-shrink: unset;
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+        flex-direction: column;
+        height: 100%;
+        padding-bottom: 10px !important;
     }
     .quests-column {
-        margin-right: 12px !important;
-        padding: 0 !important;
+        margin: 0 !important;
+        padding: 0 12px !important;
     }
     .quest-cont {
         max-width: 100%;
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+        flex-direction: column;
     }
     .rewards-column {
         width: 100% !important;
@@ -1015,6 +1026,10 @@ export default defineComponent({
     }
     .quest-cont .row {
         height: 100%;
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+        flex-wrap: nowrap;
     }
     .rewards-column {
         position: relative;
@@ -1024,7 +1039,8 @@ export default defineComponent({
         height: calc(100vh - 205px);
     }
     .quests-box {
-        height: calc(100vh - 280px);
+        height: 100%;
+        overflow: hidden;
     }
     .reward-group {
         gap: 0;
@@ -1040,6 +1056,17 @@ export default defineComponent({
     .quest-item-daily,
     .reward-item-promoted {
         grid-column: span 2;
+    }
+    .quests-column .tabs {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .quests-column .tabs .tab-content {
+        flex: 1;
+        overflow: auto;
     }
 }
 @media (max-width: 774px) {
@@ -1081,7 +1108,7 @@ export default defineComponent({
         gap: 10px;
     }
     .quests-column {
-        padding: 10px;
+        padding: 0 10px !important;
         margin: 0;
     }
     .quest-item-daily,
