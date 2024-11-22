@@ -91,7 +91,7 @@
             <img :src="imgTransactions" alt="transactions" width="24" height="24" />
             <div class="navbar-item-label">Transactions</div>
         </a>
-        <BaseNavbarSecondary v-if="!accountStore.isMobile" class="ms-auto" />
+        <!-- <BaseNavbarSecondary v-if="!accountStore.isMobile" class="ms-auto" /> -->
     </b-navbar>
 </template>
 
