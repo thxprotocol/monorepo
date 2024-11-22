@@ -181,7 +181,7 @@ export default defineComponent({
 }
 
 .name-avatar {
-    width: 133px;
+    width: 100%;
     height: 32px;
     border-radius: 4px;
     border: 0.5px solid #834bc4;
@@ -197,7 +197,7 @@ export default defineComponent({
 }
 .username {
     padding-left: 10px;
-    max-width: 100px;
+    max-width: 160px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -42,7 +42,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         isInvalidInput() {
-            return !this.value || !this.value.length || this.value.length < 3 || this.value.length > 50;
+            return !this.value || !this.value.length || this.value.length < 3 || this.value.length > 20;
         },
         isValidUsername() {
             if (this.isInvalidInput || this.error.length) return false;
@@ -60,8 +60,9 @@ export default defineComponent({
                 this.error = 'Username is required.';
             } else if (this.value.length < 3) {
                 this.error = 'Username must be at least 3 characters long.';
-            } else if (this.value.length > 50) {
-                this.error = 'Username must not exceed 50 characters.';
+            } else if (this.value.length > 20) {
+                console.log(this.value.length);
+                this.error = 'Username must not exceed 20 characters.';
             } else {
                 this.error = '';
             }

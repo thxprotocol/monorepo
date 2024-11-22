@@ -383,6 +383,7 @@ export default defineComponent({
 
 .locked {
     opacity: 0.3;
+    pointer-events: none;
 }
 
 .gr-2 {

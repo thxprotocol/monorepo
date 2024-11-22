@@ -209,7 +209,7 @@ export default defineComponent({
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 300px;
+    width: 160px;
     color: #d4d4d4;
     font-family: Poppins;
     font-size: 14px;
@@ -310,7 +310,7 @@ export default defineComponent({
         width: 100%;
     }
     .username-text {
-        width: 100px;
+        padding-left: 5px;
     }
     .leaderboard-wrapper .list-group {
         padding: 0 10px;
@@ -320,6 +320,17 @@ export default defineComponent({
     }
     .list-group-item {
         padding-left: 30px !important;
+    }
+}
+@media (max-width: 420px) {
+    .list-item-field-questcount {
+        display: none;
+    }
+}
+
+@media (max-width: 360px) {
+    .username-text {
+        width: 110px;
     }
 }
 //@media (max-height: 894px) {
