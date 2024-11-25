@@ -51,9 +51,9 @@
                         v-b-modal="`modalRewardPayment${reward._id}`"
                         variant="primary"
                         block
-                        :class="`position-relative mb-0 ${isInsufficientPoints ? 'locked' : 'my-reward-btn'} ${
+                        :class="`position-relative mb-0 ${isInsufficientPoints ? 'locked' : 'my-reward-btn '} ${
                             reward.isPromoted ? 'promoted-reward-btn' : ''
-                        }`"
+                        } btn-primary`"
                         :disabled="isDisabled"
                     >
                         <div v-if="isInsufficientPoints">Locked</div>
@@ -208,15 +208,15 @@ export default defineComponent({
         backgroundColor() {
             const lowerTitle = this.reward.title.toLowerCase();
 
-            if (lowerTitle.includes('polygon')) {
-                return 'linear-gradient(182deg, rgba(211, 30, 172, 0.16) 2.31%, rgba(42, 42, 42, 0.12) 81.91%)';
-            } else if (lowerTitle.includes('sepolia')) {
-                return 'linear-gradient(186deg, rgba(77, 162, 255, 0.20) -5.91%, rgba(42, 42, 42, 0.12) 71.01%)';
-            } else if (lowerTitle.includes('optimism')) {
-                return 'linear-gradient(186deg, rgba(255, 81, 81, 0.2) -5.91%, rgba(42, 42, 42, 0.12) 71.01%)';
-            } else if (lowerTitle.includes('base')) {
-                return 'linear-gradient(182deg, rgba(30, 81, 211, 0.16) 2.31%, rgba(42, 42, 42, 0.12) 81.91%)';
-            }
+            // if (lowerTitle.includes('polygon')) {
+            //     return 'linear-gradient(182deg, rgba(211, 30, 172, 0.16) 2.31%, rgba(42, 42, 42, 0.12) 81.91%)';
+            // } else if (lowerTitle.includes('sepolia')) {
+            //     return 'linear-gradient(186deg, rgba(77, 162, 255, 0.20) -5.91%, rgba(42, 42, 42, 0.12) 71.01%)';
+            // } else if (lowerTitle.includes('optimism')) {
+            //     return 'linear-gradient(186deg, rgba(255, 81, 81, 0.2) -5.91%, rgba(42, 42, 42, 0.12) 71.01%)';
+            // } else if (lowerTitle.includes('base')) {
+            //     return 'linear-gradient(182deg, rgba(30, 81, 211, 0.16) 2.31%, rgba(42, 42, 42, 0.12) 81.91%)';
+            // }
         },
     },
 });
@@ -349,12 +349,7 @@ export default defineComponent({
 .card-wrapper .card-body {
     border-radius: 8px;
     border: 1px solid rgba(63, 63, 63, 0.2);
-    background: linear-gradient(
-        182deg,
-        rgba(189, 189, 189, 0.2) -17.86%,
-        rgba(81, 81, 81, 0.15) 36.23%,
-        rgba(42, 42, 42, 0.18) 98.68%
-    );
+    background: var(--reward-item-bg);
     //backdrop-filter: blur(12.5px);
     //box-shadow: inset rgb(115 59 74 / 42%) 0px -7px 20px 8px;
 }
@@ -411,7 +406,7 @@ export default defineComponent({
 }
 
 .reward-title-promoted div {
-    color: #e7e7e7;
+    color: var(--reward-title-color);
     font-feature-settings: 'liga' off, 'clig' off;
     font-family: Poppins;
     font-size: 12px;
@@ -422,7 +417,7 @@ export default defineComponent({
 }
 
 .reward-title div {
-    color: #d4d4d4;
+    color: var(--reward-title-color);
     font-feature-settings: 'liga' off, 'clig' off;
     font-family: 'Poppins';
     font-size: 14px;
@@ -443,8 +438,8 @@ export default defineComponent({
     font-size: 16px;
 }
 .reward-image-placeholder {
-    height: 92px;
-    width: 92px;
+    height: 75px;
+    width: 75px;
     background-color: #000;
     border-radius: 50%;
 }
@@ -454,9 +449,8 @@ export default defineComponent({
     height: 120px;
 }
 .reward-image {
-    height: 92px;
-    width: 92px;
-    border-radius: 50%;
+    height: 75px;
+    width: 75px;
     object-fit: cover;
 }
 .reward-img-promoted {

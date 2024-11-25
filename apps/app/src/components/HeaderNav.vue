@@ -149,6 +149,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.media-header-first h1 {
+    color: var(--title-color);
+}
 .header-nav {
     position: relative;
     background: transparent;
@@ -185,7 +188,7 @@ export default defineComponent({
     height: 32px;
     border-radius: 4px;
     border: 0.5px solid #834bc4;
-    background: rgba(131, 75, 196, 0.5);
+    background: var(--avatar-background);
 }
 
 .name-avatar:hover h2 {

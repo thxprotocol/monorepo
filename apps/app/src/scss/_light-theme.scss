@@ -1,4 +1,30 @@
 :root {
-    --home-background: linear-gradient(178deg, #151415 -37.16%, #0E0D10 98.54%);
+    --body-rewards-bg: #ffffff;
+    --home-background: linear-gradient(180deg, #FFF 0%, #FFF 100%);
+    --body-text: #494949;
+    --title-color: #090A0C;
+    --dropdown-background: #FAFAFA;
+    --dropdown-border-color: #E0E0E0;
+    --avatar-background: #834BC4;
+    --modal-bg: #F4F4F4;
+    --nav-link-bg: #E7E7E7;
+    --nav-link-active-bg: linear-gradient(180deg, #FFF 0%, rgba(255, 255, 255, 0.00) 100%);
+    --nav-border-color: #CACACA;
+    --border-as-nav-color: #f6f6f6;
+    --btn-primary-santa: #29B6F6;
+    --btn-sidebar-bg: #FBFBFB;
+    --btn-sidebar-active-bg: #1ABCFE;
+    --btn-sidebar-color: #61656B;
+    --btn-sidebar-border-color: #E5E5E5;
+    --discord-bg: #fff;
+    --discord-border-color: #EAEAEA;
+    --discord-highlight-color: #FF9D00;
+    --main-content-border: transparent;
+    --main-content-bg: #f6f6f6;
+    --quest-item-bg: #ffffff;
+    --scroll-track-bg: #B3B3B3;
+    --scroll-thumb-bg: #D4D4D4;
+    --reward-item-bg: #ffffff;
+    --reward-title-color: #494949;
     // Add other light theme variables as needed
 }

@@ -2,7 +2,7 @@
     <b-form-group>
         <b-button
             :variant="variant === WalletVariant.WalletConnect ? 'primary' : 'outline-primary'"
-            class="rounded mb-2 w-100 text-white"
+            class="rounded mb-2 w-100 wallet-hover-btn"
             @click="$emit('change', WalletVariant.WalletConnect)"
         >
             <div class="d-flex align-items-center">
@@ -17,7 +17,7 @@
                 />
                 Your Wallet
             </div>
-            <p class="small text-start text-opaque mb-0">
+            <p class="small text-start mb-0">
                 Connect one of your existing wallets using
                 {{ walletStore.currentChainId == ChainId.Aptos ? 'SantaWallet' : 'WalletConnect' }}.
             </p>
@@ -77,3 +77,9 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.wallet-hover-btn:hover {
+    background: var(--btn-primary-santa) !important;
+    border-color: transparent !important;
+}
+</style>

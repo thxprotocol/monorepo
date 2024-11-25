@@ -1,7 +1,7 @@
 <template>
     <b-form-group :description="description">
         <b-input-group>
-            <b-form-select v-model="walletModel" placeholder="Choose a wallet">
+            <b-form-select v-model="walletModel" placeholder="Choose a wallet" class="select-bg">
                 <b-form-select-option :value="null" disabled>Choose a wallet...</b-form-select-option>
                 <b-form-select-option
                     v-for="w in wallets"
@@ -76,3 +76,10 @@ export default defineComponent({
     },
 });
 </script>
+<style scoped>
+.select-bg {
+    background: var(--border-as-nav-color);
+    border-right: none;
+    border-color: var(--nav-border-color);
+}
+</style>

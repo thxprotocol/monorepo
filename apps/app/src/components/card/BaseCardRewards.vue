@@ -1,9 +1,9 @@
 <template>
     <div style="min-height: 70%; padding: 10px">
-        <BaseNavbarSecondary v-if="accountStore.isMobile" class="ms-auto" />
+        <!-- <BaseNavbarSecondary v-if="accountStore.isMobile" class="ms-auto" /> -->
 
         <div class="d-flex p-2 m-0 align-items-center">
-            <div class="flex-grow-1 pe-2 d-flex">
+            <div class="flex-grow-1 pe-2 d-flex quest-group-title">
                 Your Wallet
                 <b-spinner v-if="walletStore.isLoading" class="ms-2" variant="primary" small />
             </div>

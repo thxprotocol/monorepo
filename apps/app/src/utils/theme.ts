@@ -12,7 +12,7 @@ export const DEFAULT_ELEMENTS = {
     },
     text: {
         label: 'Text',
-        color: '#FFFFFF',
+        color: 'var(--body-text)',
     },
     bodyBg: {
         label: 'Background',
@@ -118,12 +118,12 @@ export function getStyles(elements: any, colors: any) {
         },
         'body,.bg-splash,.card-header-bg': {
             '--bs-secondary-bg': theme.elements.bodyBg,
-            '--bs-body-bg': theme.elements.bodyBg,
+            '--bs-body-bg': 'var(--body-rewards-bg)',
             '--bs-body-color': theme.elements.text,
             '--bs-btn-bg': theme.elements.btnBg,
         },
         'blockquote': {
-            '--thx-blockquote-bg': theme.elements.bodyBg,
+            '--thx-blockquote-bg': 'var(--border-as-nav-color)',
             '--thx-blockquote-border-color': theme.elements.btnBg,
             '--thx-blockquote-link': theme.elements.text,
             '--thx-blockquote-link-hover': theme.elements.text,
@@ -159,8 +159,8 @@ export function getStyles(elements: any, colors: any) {
             '--thx-card-header-hover-bg': theme.elements.cardHeaderHoverBg,
         },
         '.btn-outline-primary,.btn-primary': {
-            '--bs-btn-color': theme.elements.btnText,
-            '--bs-btn-border-color': theme.elements.btnBg,
+            '--bs-btn-color': 'var(--body-color)',
+            '--bs-btn-border-color': 'var(--nav-border-color)',
         },
         '.tooltip-inner,.tooltip-arrow': {
             '--bs-primary': theme.elements.btnBg,

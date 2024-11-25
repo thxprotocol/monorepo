@@ -8,11 +8,11 @@
                 v-for="item in navItems"
                 :key="item.name"
                 href="#"
-                class="text-decoration-none d-flex align-items-center gap-3 rounded-3 px-3 py-2 side-nav-item"
+                class="text-decoration-none d-flex align-items-center gap-3 px-3 py-2 side-nav-item"
                 :class="{ active: selectedPart === item.name }"
                 @click.prevent="selectNavItem(item.name)"
             >
-                <img :src="item.icon" :alt="item.label" width="16" height="16" />
+                <span :class="['sidebar-icon', `sidebar-icon-${item.name}`]" />
                 {{ item.label }}
             </a>
         </nav>
@@ -29,12 +29,6 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
-import imgQuests from '../../assets/quest.png';
-import imgRewards from '../../assets/reward.png';
-import imgLeaderboard from '../../assets/leader.png';
-import imgWallet from '../../assets/wallet.png';
-import imgTransactions from '../../assets/transaction.png';
-
 export default defineComponent({
     name: 'Sidebar',
     props: {
@@ -46,11 +40,11 @@ export default defineComponent({
     data() {
         return {
             navItems: [
-                { name: 'quests', label: 'Quests', icon: imgQuests },
-                { name: 'rewards', label: 'Rewards', icon: imgRewards },
-                { name: 'leaderboard', label: 'Leaderboard', icon: imgLeaderboard },
-                { name: 'wallet', label: 'Wallet', icon: imgWallet },
-                { name: 'transactions', label: 'Transactions', icon: imgTransactions },
+                { name: 'quests', label: 'Quests' },
+                { name: 'rewards', label: 'Rewards' },
+                { name: 'leaderboard', label: 'Leaderboard' },
+                { name: 'wallet', label: 'Wallet' },
+                { name: 'transactions', label: 'Transactions' },
             ],
             aptosBanner: null,
         };
@@ -74,22 +68,67 @@ export default defineComponent({
 <style scoped>
 .side-nav-item {
     width: 167px;
-    border: 0.5px solid #1d1d1d;
-    background: rgba(27, 27, 27, 0.4);
-    color: #cacaca;
+    border: 0.5px solid var(--btn-sidebar-border-color);
+    background: var(--btn-sidebar-bg);
+    color: var(--btn-sidebar-color);
     font-size: 12px;
-    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+        border-radius 0.15s ease-in-out;
+    border-radius: 5px;
 }
 .active {
-    background-color: #d44646;
+    background-color: var(--btn-sidebar-active-bg);
     font-weight: 600;
     border-color: transparent;
     color: #ffffff;
+    border-radius: 8px;
 }
 .sidebar-wrap {
     min-width: 220px;
 }
 .sidebar-wrap::-webkit-scrollbar {
     display: none !important;
+}
+.side-nav-item.active .sidebar-icon {
+    filter: brightness(0) invert(1);
+}
+.sidebar-icon {
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+
+[data-theme='dark'] .sidebar-icon-quests {
+    background-image: url('/src/assets/quest.png');
+}
+[data-theme='dark'] .sidebar-icon-rewards {
+    background-image: url('/src/assets/reward.png');
+}
+[data-theme='dark'] .sidebar-icon-leaderboard {
+    background-image: url('/src/assets/leader.png');
+}
+[data-theme='dark'] .sidebar-icon-wallet {
+    background-image: url('/src/assets/wallet.png');
+}
+[data-theme='dark'] .sidebar-icon-transactions {
+    background-image: url('/src/assets/transaction.png');
+}
+
+.sidebar-icon-quests {
+    background-image: url('/src/assets/quest-light.png');
+}
+.sidebar-icon-rewards {
+    background-image: url('/src/assets/reward-light.png');
+}
+.sidebar-icon-leaderboard {
+    background-image: url('/src/assets/leader-light.png');
+}
+.sidebar-icon-wallet {
+    background-image: url('/src/assets/wallet-light.png');
+}
+.sidebar-icon-transactions {
+    background-image: url('/src/assets/transaction-light.png');
 }
 </style>

@@ -152,6 +152,7 @@ export default defineComponent({
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
+    color: var(--body-text);
 }
 .offer-categories span {
     font-weight: 500;
@@ -165,7 +166,7 @@ export default defineComponent({
     color: rgba(93, 154, 238, 1);
 }
 .modal-title {
-    color: #fff;
+    color: var(--body-text);
     font-size: 1rem;
     font-weight: 600;
     padding: 10px 0;
@@ -176,13 +177,12 @@ export default defineComponent({
     text-overflow: ellipsis;
 }
 .offer-payout {
-    color: rgba(163, 163, 163, 1);
+    color: var(--title-color);
     font-size: 1.87rem;
     font-weight: 600;
     margin: 0;
 }
 .offer-provider {
-    color: rgba(163, 163, 163, 1);
     font-size: 0.7rem;
     margin: 0;
 }
@@ -191,7 +191,6 @@ export default defineComponent({
     padding: 0.5rem 0;
 }
 .modal-offer-description {
-    color: rgba(163, 163, 163, 1);
     font-size: 1rem;
     margin: 0;
     white-space: normal;
@@ -219,12 +218,10 @@ export default defineComponent({
     color: rgba(95, 185, 126, 1);
 }
 .reward-name {
-    color: rgba(163, 163, 163, 1);
     font-size: 0.9rem;
     margin: 0;
 }
 .offer-steps {
-    color: rgba(163, 163, 163, 1);
     margin-top: 4px;
     font-weight: 500;
     font-size: 0.775rem;
@@ -250,7 +247,7 @@ export default defineComponent({
     top: 10px;
     right: 10px;
     border: none;
-    color: #fff;
+    color: var(--body-text);
     opacity: 0.5;
     font-size: 1.5rem;
     z-index: 111;
@@ -270,10 +267,10 @@ export default defineComponent({
     padding: 7px 0;
 }
 .my-offer-card {
-    background: linear-gradient(178deg, rgb(21, 20, 21) -37.16%, rgb(14, 13, 16) 98.54%);
+    background: var(--main-content-bg);
 }
 .modal-content {
-    background-color: #15171a;
+    background-color: var(--modal-bg);
 }
 .qr-icon {
     position: absolute;

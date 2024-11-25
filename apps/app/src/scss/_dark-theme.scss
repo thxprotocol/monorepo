@@ -1,4 +1,36 @@
 :root[data-theme='dark'] {
+    --body-rewards-bg: #151415;
     --home-background: linear-gradient(178deg, #151415 -37.16%, #0E0D10 98.54%);
+    --body-text: #ffffff;
+    --title-color: #E4E5E9;
+    --dropdown-background: #202020;
+    --dropdown-border-color: #292929;
+    --avatar-background: rgba(131, 75, 196, 0.5);
+    --modal-bg: #15171a;
+    --nav-link-bg: #202020;
+    --nav-link-active-bg: rgba(255, 255, 255, 0.03);
+    --nav-border-color: #292929;
+    --border-as-nav-color: #151415;
+    --btn-primary-santa: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
+    --btn-sidebar-bg: rgba(27, 27, 27, 0.4);
+    --btn-sidebar-active-bg: #d44646;
+    --btn-sidebar-color: #CACACA;
+    --btn-sidebar-border-color: #1d1d1d;
+    --discord-bg: #000;
+    --discord-border-color: transparent;
+    --discord-highlight-color: linear-gradient(180deg, #d2cc52 0%, #ccc300 100%);
+    --main-content-border: #1a1a1a;
+    --main-content-bg: transparent;
+    --quest-item-bg: #202020;
+    --scroll-track-bg: #393939;
+    --scroll-thumb-bg: #49494b;
+    --reward-item-bg: linear-gradient(
+        182deg,
+        rgba(189, 189, 189, 0.2) -17.86%,
+        rgba(81, 81, 81, 0.15) 36.23%,
+        rgba(42, 42, 42, 0.18) 98.68%
+    );
+    --reward-title-color: #e7e7e7;
     // Add other dark theme variables as needed
+    
 }

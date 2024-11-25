@@ -36,7 +36,7 @@ export default defineComponent({
     data() {
         return {
             test: false,
-            currentTheme: 'light',
+            currentTheme: 'dark',
             colorSchemeMediaQuery: null as MediaQueryList | null,
         };
     },
@@ -79,6 +79,9 @@ export default defineComponent({
     async created() {
         if (GTM) initGTM();
         // await this.authStore.restoreUser();
+        const initialTheme = this.preferredTheme;
+        document.documentElement.setAttribute('data-theme', initialTheme);
+        this.currentTheme = initialTheme;
     },
     async mounted() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -146,12 +149,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-#app {
-    background-color: #000;
-}
-[data-theme='dark'] #app {
-    background-color: #ffffff;
-}
 .router-view-app {
     display: flex;
     flex-grow: 1;
