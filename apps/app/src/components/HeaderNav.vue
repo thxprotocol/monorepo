@@ -93,6 +93,12 @@ export default defineComponent({
             },
             immediate: true,
         },
+        'accountStore.account': {
+            handler(newVal) {
+                this.updateParticipants();
+            },
+            immediate: true,
+        },
     },
     async created() {
         // await this.accountStore.getParticipants();
@@ -105,6 +111,9 @@ export default defineComponent({
     },
     methods: {
         updateParticipants() {
+            if (!this.accountStore.account?.sub) {
+                return;
+            }
             this.participantSantaState = this.accountStore.participants.find(
                 (p) => p.sub === this.accountStore.account?.sub && p.poolId === this.SANTA_CAMPAIGN,
             );
