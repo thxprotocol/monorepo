@@ -100,7 +100,7 @@ export default defineComponent({
         this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         this.colorSchemeMediaQuery.addEventListener('change', this.handleColorSchemeChange);
 
-        console.log('Initial Preferred Theme Applied:', this.preferredTheme);
+        console.log('Initial Preferred Theme Applied!!:', this.preferredTheme);
     },
     beforeUnmount() {
         if (this.colorSchemeMediaQuery) {
