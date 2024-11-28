@@ -5,7 +5,7 @@
         <!-- Your header content -->
         <!-- <h1>Header Navigation</h1> -->
         <div class="d-flex media-header">
-            <div class="d-flex align-items-center gap-2 media-header-first">
+            <div class="d-flex align-items-center gap-2 media-header-first rewards-navbar">
                 <img :src="rewardsIcon" alt="rewards" width="40" height="40" />
                 <h1 class="m-0 fs-3 fw-bold">Rewards</h1>
             </div>
@@ -256,12 +256,23 @@ export default defineComponent({
 .dropdown-content p {
     font-size: 12px;
 }
+
 .dropdown-content p span {
     color: #c1c1c1;
 }
+
+@media (min-width: 992px) {
+    .rewards-navbar {
+        margin-left: 16px;
+        width: 167px;
+        justify-content: center;
+    }
+}
+
 @media (max-width: 992px) {
     .header-nav {
         padding-right: 0;
+        flex-direction: column;
     }
     .b-avatar-header {
         position: relative;
@@ -274,12 +285,6 @@ export default defineComponent({
         width: 100% !important;
         box-sizing: border-box;
         padding-right: 8px;
-    }
-}
-
-@media (max-width: 992px) {
-    .header-nav {
-        flex-direction: column;
     }
     .media-header {
         flex-direction: column;
