@@ -264,8 +264,10 @@ export default defineComponent({
 @media (min-width: 992px) {
     .rewards-navbar {
         margin-left: 16px;
-        width: 167px;
         justify-content: center;
+    }
+    .balance-wrap {
+        margin-left: 40px;
     }
 }
 

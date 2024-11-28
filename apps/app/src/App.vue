@@ -78,10 +78,19 @@ export default defineComponent({
     },
     async created() {
         if (GTM) initGTM();
-        // await this.authStore.restoreUser();
-        const initialTheme = this.preferredTheme;
+
+        // Check for the theme parameter in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const themeParam = urlParams.get('theme');
+
+        // Determine the initial theme
+        const initialTheme = themeParam || this.preferredTheme;
+
+        // Apply the initial theme
         document.documentElement.setAttribute('data-theme', initialTheme);
         this.currentTheme = initialTheme;
+
+        console.log('Initial Theme Applied!!:', initialTheme);
     },
     async mounted() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -96,16 +105,14 @@ export default defineComponent({
             await this.authenticateUser(clid);
         }
 
-        this.applyTheme(this.preferredTheme);
-        this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        this.colorSchemeMediaQuery.addEventListener('change', this.handleColorSchemeChange);
-
-        console.log('Initial Preferred Theme Applied!!:', this.preferredTheme);
+        if (!urlParams.get('theme')) {
+            this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            this.colorSchemeMediaQuery.addEventListener('change', this.handleColorSchemeChange);
+        }
     },
     beforeUnmount() {
         if (this.colorSchemeMediaQuery) {
             this.colorSchemeMediaQuery.removeEventListener('change', this.handleColorSchemeChange);
-            console.log('Media query listener removed.');
         }
     },
     methods: {
@@ -140,9 +147,12 @@ export default defineComponent({
             }
         },
         handleColorSchemeChange(event: MediaQueryListEvent) {
-            const newPreferredTheme = event.matches ? 'dark' : 'light';
-            console.log(`System theme changed to: ${newPreferredTheme}`);
-            this.applyTheme(newPreferredTheme);
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.get('theme')) {
+                const newPreferredTheme = event.matches ? 'dark' : 'light';
+                console.log(`System theme changed to: ${newPreferredTheme}`);
+                this.applyTheme(newPreferredTheme);
+            }
         },
     },
 });

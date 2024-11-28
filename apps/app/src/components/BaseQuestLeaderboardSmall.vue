@@ -311,7 +311,6 @@ export default defineComponent({
         padding-left: 5px;
     }
     .leaderboard-wrapper .list-group {
-        padding: 0 10px;
         flex: 1;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;

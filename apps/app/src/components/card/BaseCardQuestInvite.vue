@@ -49,7 +49,7 @@
             label="Invitee Requirement"
             tooltip="The invitee needs to complete this quest before points are transferred to both parties."
         >
-            {{ requiredQuest.title }}
+            <span class="text-opaque">{{ requiredQuest.title }}</span>
             <strong>
                 <span v-if="requiredQuest.amount" class="text-accent">{{ requiredQuest.amount }}</span>
                 <span v-if="quest.amountInvitee" class="text-accent"> + {{ quest.amountInvitee }} </span>

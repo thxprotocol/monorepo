@@ -45,7 +45,7 @@
                 </div> -->
             </div>
         </b-collapse>
-        <b-modal v-model="showModal" size="lg" hide-footer hide-header>
+        <b-modal v-model="showModal" size="lg" hide-footer hide-header centered>
             <div class="offer-wrap">
                 <button type="button" class="modal-btn-close" aria-label="Close" @click="showModal = false">
                     <i class="fas fa-times"></i>
@@ -290,7 +290,7 @@ export default defineComponent({
     .offer-wrap {
         display: flex;
         flex-direction: column;
-        height: 90vh;
+        height: 70vh;
     }
     .modal-body {
         overflow: auto;

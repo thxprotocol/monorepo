@@ -32,64 +32,13 @@
             <div>Wallet</div>
         </router-link> -->
         <a
-            :style="{
-                background:
-                    selectedPart === 'quests'
-                        ? 'linear-gradient(270deg, #5D2A2A 0%, #944 100%)'
-                        : 'rgba(255, 255, 255, 0.02)',
-            }"
-            @click="selectNavItem('quests')"
+            v-for="item in navbarItems"
+            :key="item.key"
+            :class="['navbar-item', { active: selectedPart === item.key }]"
+            @click="selectNavItem(item.key)"
         >
-            <img :src="imgQuests" alt="quests" width="24" height="24" />
-            <div class="navbar-item-label">Quests</div>
-        </a>
-        <a
-            :style="{
-                background:
-                    selectedPart === 'rewards'
-                        ? 'linear-gradient(270deg, #5D2A2A 0%, #944 100%)'
-                        : 'rgba(255, 255, 255, 0.02)',
-            }"
-            @click="selectNavItem('rewards')"
-        >
-            <img :src="imgRewards" alt="rewards" width="24" height="24" />
-            <div class="navbar-item-label">Rewards</div>
-        </a>
-        <a
-            :style="{
-                background:
-                    selectedPart === 'leaderboard'
-                        ? 'linear-gradient(270deg, #5D2A2A 0%, #944 100%)'
-                        : 'rgba(255, 255, 255, 0.02)',
-            }"
-            @click="selectNavItem('leaderboard')"
-        >
-            <img :src="imgLeaderboard" alt="leaderboard" width="24" height="24" />
-            <div class="navbar-item-label">Rank</div>
-        </a>
-        <a
-            :style="{
-                background:
-                    selectedPart === 'wallet'
-                        ? 'linear-gradient(270deg, #5D2A2A 0%, #944 100%)'
-                        : 'rgba(255, 255, 255, 0.02)',
-            }"
-            @click="selectNavItem('wallet')"
-        >
-            <img :src="imgWallet" alt="wallet" width="24" height="24" />
-            <div class="navbar-item-label">Wallet</div>
-        </a>
-        <a
-            :style="{
-                background:
-                    selectedPart === 'transactions'
-                        ? 'linear-gradient(270deg, #5D2A2A 0%, #944 100%)'
-                        : 'rgba(255, 255, 255, 0.02)',
-            }"
-            @click="selectNavItem('transactions')"
-        >
-            <img :src="imgTransactions" alt="transactions" width="24" height="24" />
-            <div class="navbar-item-label">Transactions</div>
+            <span :class="['navbar-icon', `navbar-icon-${item.key}`]" />
+            <div class="navbar-item-label">{{ item.label }}</div>
         </a>
         <!-- <BaseNavbarSecondary v-if="!accountStore.isMobile" class="ms-auto" /> -->
     </b-navbar>
@@ -102,12 +51,6 @@ import { useAccountStore } from '../../stores/Account';
 import { useQuestStore } from '../../stores/Quest';
 import { useRewardStore } from '../../stores/Reward';
 import { decodeHTML } from '../../utils/decode-html';
-import imgQuests from '../../assets/quest.png';
-import imgRewards from '../../assets/reward.png';
-import imgLeaderboard from '../../assets/leader.png';
-import imgWallet from '../../assets/wallet.png';
-import imgTransactions from '../../assets/transaction.png';
-
 export default defineComponent({
     props: {
         selectedPart: {
@@ -115,21 +58,41 @@ export default defineComponent({
             required: true,
         },
     },
-    data() {
-        return {
-            imgQuests,
-            imgRewards,
-            imgLeaderboard,
-            imgWallet,
-            imgTransactions,
-        };
-    },
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useQuestStore),
         ...mapStores(useRewardStore),
         isQuestCampaign() {
             return this.questStore.quests.length || this.rewardStore.rewards.length;
+        },
+        navbarItems() {
+            const items = [
+                {
+                    key: 'quests',
+                    label: 'Quests',
+                },
+                {
+                    key: 'rewards',
+                    label: 'Rewards',
+                },
+                {
+                    key: 'leaderboard',
+                    label: 'Rank',
+                },
+                {
+                    key: 'transactions',
+                    label: 'Transactions',
+                },
+            ];
+
+            if (this.accountStore.isMobile) {
+                items.push({
+                    key: 'wallet',
+                    label: 'Wallet',
+                });
+            }
+
+            return items;
         },
     },
     methods: {
@@ -146,8 +109,7 @@ export default defineComponent({
     position: fixed;
     bottom: 0px;
     z-index: 22;
-    background: #181818;
-    box-shadow: 0px 1px 5px 0px rgba(74, 44, 44, 0.36) inset, 0px -2px 20px -16px rgba(15, 15, 15, 0.4) !important;
+    background: var(--navbar-bottom-bg);
     backdrop-filter: blur(27px);
     zoom: 0.75;
     left: 0;
@@ -161,7 +123,6 @@ export default defineComponent({
 }
 
 .navbar-item-label {
-    color: #d4d4d4;
     text-align: center;
     leading-trim: both;
     text-edge: cap;
@@ -175,5 +136,57 @@ export default defineComponent({
 
 .nav-campaign .router-link-exact-active {
     background-color: rgba(229, 229, 229, 0.11) !important;
+}
+.navbar-icon {
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+.navbar-item.active {
+    color: #ffffff !important;
+    background: var(--navbar-bottom-selected-bg);
+}
+
+.navbar-item {
+    color: var(--navbar-bottom-color) !important;
+    background: var(--navbar-bottom-default-bg);
+}
+.navbar-item.active .navbar-icon {
+    filter: brightness(0) invert(1);
+}
+
+.navbar-icon-quests {
+    background-image: url('/src/assets/quest-light.png');
+}
+.navbar-icon-rewards {
+    background-image: url('/src/assets/reward-light.png');
+}
+.navbar-icon-leaderboard {
+    background-image: url('/src/assets/leader-light.png');
+}
+.navbar-icon-wallet {
+    background-image: url('/src/assets/wallet-light.png');
+}
+.navbar-icon-transactions {
+    background-image: url('/src/assets/transaction-light.png');
+}
+
+/* Dark Theme Icons */
+[data-theme='dark'] .navbar-icon-quests {
+    background-image: url('/src/assets/quest.png');
+}
+[data-theme='dark'] .navbar-icon-rewards {
+    background-image: url('/src/assets/reward.png');
+}
+[data-theme='dark'] .navbar-icon-leaderboard {
+    background-image: url('/src/assets/leader.png');
+}
+[data-theme='dark'] .navbar-icon-wallet {
+    background-image: url('/src/assets/wallet.png');
+}
+[data-theme='dark'] .navbar-icon-transactions {
+    background-image: url('/src/assets/transaction.png');
 }
 </style>
