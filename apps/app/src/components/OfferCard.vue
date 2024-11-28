@@ -45,14 +45,14 @@
                 </div> -->
             </div>
         </b-collapse>
-        <b-modal v-model="showModal" size="lg" hide-footer hide-header>
-            <div>
+        <b-modal v-model="showModal" size="lg" hide-footer hide-header centered>
+            <div class="offer-wrap">
                 <button type="button" class="modal-btn-close" aria-label="Close" @click="showModal = false">
                     <i class="fas fa-times"></i>
                 </button>
                 <h2 class="modal-title">{{ decodeHTML(offer.title) }}</h2>
                 <div class="modal-body d-flex flex-column">
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center offer-details">
                         <img
                             v-if="offer.imageUrl"
                             class="img-fluid mb-3"
@@ -73,33 +73,21 @@
                             </p>
                             <p class="modal-offer-description" v-html="decodeHTML(offer.description)"></p>
                         </div>
+                        <div v-if="accountStore.isMobile">
+                            <OfferSteps :offer="offer" />
+                        </div>
                     </div>
                 </div>
                 <div class="d-flex gap-4 modal-info-wrap justify-content-between">
-                    <div>
-                        <div v-if="offer.events && offer.events.length">
-                            <h2 class="modal-title mt-4">Rewards</h2>
-                            <div class="rewards-list">
-                                <div
-                                    v-for="event in offer.events"
-                                    :key="event.name"
-                                    class="reward-item d-flex align-items-center mb-2"
-                                >
-                                    <div class="reward-amount me-2">${{ event.payout.toFixed(2) }}</div>
-                                    <div class="reward-name">
-                                        {{ event.name }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-if="offer.terms">
-                            <h2 class="modal-title mt-4">Steps</h2>
-                            <p class="offer-steps">{{ offer.terms }}</p>
-                        </div>
+                    <div v-if="!accountStore.isMobile">
+                        <OfferSteps :offer="offer" />
                     </div>
                     <div v-if="!accountStore.isMobile" class="qr-code mt-4">
                         <h3 class="modal-title">Scan on your mobile</h3>
-                        <Qrcode :value="offer.santaClickUrl" :size="200" />
+                        <div class="position-relative">
+                            <Qrcode :value="offer.santaClickUrl" :size="200" />
+                            <img class="qr-icon" :src="imgSanta" alt="icon" />
+                        </div>
                     </div>
 
                     <div v-else>
@@ -119,6 +107,7 @@ import { decodeHTML } from '@thxnetwork/app/utils/decode-html';
 import Qrcode from 'vue-qrcode';
 import { useAccountStore } from '../stores/Account';
 import { mapStores } from 'pinia';
+import imgSanta from '../assets/santa-logo.png';
 export default defineComponent({
     name: 'OfferCard',
     components: {
@@ -140,6 +129,7 @@ export default defineComponent({
                 Adgate: 'fas fa-tags',
                 // Add more mappings as needed
             } as { [provider: string]: string },
+            imgSanta,
         };
     },
     methods: {
@@ -153,7 +143,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style lang="scss">
 .offer-description {
     font-family: 'Poppins', sans-serif;
     white-space: normal;
@@ -162,6 +152,7 @@ export default defineComponent({
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
+    color: var(--body-text);
 }
 .offer-categories span {
     font-weight: 500;
@@ -175,7 +166,7 @@ export default defineComponent({
     color: rgba(93, 154, 238, 1);
 }
 .modal-title {
-    color: #fff;
+    color: var(--body-text);
     font-size: 1rem;
     font-weight: 600;
     padding: 10px 0;
@@ -186,13 +177,12 @@ export default defineComponent({
     text-overflow: ellipsis;
 }
 .offer-payout {
-    color: rgba(163, 163, 163, 1);
+    color: var(--title-color);
     font-size: 1.87rem;
     font-weight: 600;
     margin: 0;
 }
 .offer-provider {
-    color: rgba(163, 163, 163, 1);
     font-size: 0.7rem;
     margin: 0;
 }
@@ -201,7 +191,6 @@ export default defineComponent({
     padding: 0.5rem 0;
 }
 .modal-offer-description {
-    color: rgba(163, 163, 163, 1);
     font-size: 1rem;
     margin: 0;
     white-space: normal;
@@ -229,12 +218,10 @@ export default defineComponent({
     color: rgba(95, 185, 126, 1);
 }
 .reward-name {
-    color: rgba(163, 163, 163, 1);
     font-size: 0.9rem;
     margin: 0;
 }
 .offer-steps {
-    color: rgba(163, 163, 163, 1);
     margin-top: 4px;
     font-weight: 500;
     font-size: 0.775rem;
@@ -256,18 +243,18 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
     position: absolute;
     top: 10px;
     right: 10px;
-    background: rgba(37, 37, 41, 1);
     border: none;
-    color: rgba(142, 142, 142, 1);
+    color: var(--body-text);
+    opacity: 0.5;
     font-size: 1.5rem;
-    cursor: pointer;
     z-index: 111;
-    border-radius: 50%;
+    background: none;
+}
+.modal-btn-close:hover {
+    opacity: 0.75;
 }
 .offer-card-img {
     margin-top: 0.5rem;
@@ -280,16 +267,38 @@ export default defineComponent({
     padding: 7px 0;
 }
 .my-offer-card {
-    background: linear-gradient(178deg, rgb(21, 20, 21) -37.16%, rgb(14, 13, 16) 98.54%);
+    background: var(--main-content-bg);
 }
 .modal-content {
-    background-color: #15171a;
+    background-color: var(--modal-bg);
+}
+.qr-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    pointer-events: none;
 }
 @media (max-width: 992px) {
     .modal-info-wrap {
         display: block !important;
     }
     .offer-card-img {
+    }
+    .offer-wrap {
+        display: flex;
+        flex-direction: column;
+        height: 70vh;
+    }
+    .modal-body {
+        overflow: auto;
+        flex: 1;
+    }
+    .offer-details {
+        flex-direction: column;
+        align-items: baseline !important;
     }
 }
 </style>

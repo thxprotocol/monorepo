@@ -74,6 +74,7 @@
                             -webkit-box-orient: vertical;
                             overflow: hidden;
                             text-overflow: ellipsis;
+                            color: var(--body-text);
                         "
                         v-html="decodeHTML(quest.description)"
                     />
@@ -234,7 +235,7 @@ export default defineComponent({
 .quest-card-btns .btn {
     bottom: 0;
     border-radius: 5px;
-    background: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
+    background: var(--btn-primary-santa);
     padding: 7px 0px;
 }
 </style>

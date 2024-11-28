@@ -12,10 +12,7 @@
                     <div v-if="selectedPart === 'wallet'">
                         <BaseCardRewards />
                     </div>
-                    <div
-                        v-if="selectedPart === 'transactions'"
-                        class="d-flex align-items-center justify-content-center h-100"
-                    >
+                    <div v-if="selectedPart === 'transactions'" class="h-100">
                         <Transactions />
                     </div>
                 </div>
@@ -476,9 +473,10 @@ export default defineComponent({
 
 .main-content {
     flex-grow: 1;
-    border: 1px solid #1a1a1a;
+    border: 1px solid var(--main-content-border);
     border-radius: 10px;
-    margin-top: 20px;
+    margin-top: 16px;
+    background: var(--main-content-bg);
 }
 
 @media (max-width: 424px) {

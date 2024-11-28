@@ -5,7 +5,7 @@
         <!-- Your header content -->
         <!-- <h1>Header Navigation</h1> -->
         <div class="d-flex media-header">
-            <div class="d-flex align-items-center gap-2 media-header-first">
+            <div class="d-flex align-items-center gap-2 media-header-first rewards-navbar">
                 <img :src="rewardsIcon" alt="rewards" width="40" height="40" />
                 <h1 class="m-0 fs-3 fw-bold">Rewards</h1>
             </div>
@@ -93,6 +93,12 @@ export default defineComponent({
             },
             immediate: true,
         },
+        'accountStore.account': {
+            handler(newVal) {
+                this.updateParticipants();
+            },
+            immediate: true,
+        },
     },
     async created() {
         // await this.accountStore.getParticipants();
@@ -105,6 +111,9 @@ export default defineComponent({
     },
     methods: {
         updateParticipants() {
+            if (!this.accountStore.account?.sub) {
+                return;
+            }
             this.participantSantaState = this.accountStore.participants.find(
                 (p) => p.sub === this.accountStore.account?.sub && p.poolId === this.SANTA_CAMPAIGN,
             );
@@ -149,6 +158,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.media-header-first h1 {
+    color: var(--title-color);
+}
 .header-nav {
     position: relative;
     background: transparent;
@@ -181,11 +193,11 @@ export default defineComponent({
 }
 
 .name-avatar {
-    width: 133px;
+    width: 100%;
     height: 32px;
     border-radius: 4px;
     border: 0.5px solid #834bc4;
-    background: rgba(131, 75, 196, 0.5);
+    background: var(--avatar-background);
 }
 
 .name-avatar:hover h2 {
@@ -197,7 +209,7 @@ export default defineComponent({
 }
 .username {
     padding-left: 10px;
-    max-width: 100px;
+    max-width: 160px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -229,7 +241,7 @@ export default defineComponent({
 }
 
 .media-header {
-    gap: 3rem;
+    gap: 37px;
 }
 
 @keyframes fadeIn {
@@ -244,12 +256,25 @@ export default defineComponent({
 .dropdown-content p {
     font-size: 12px;
 }
+
 .dropdown-content p span {
     color: #c1c1c1;
 }
+
+@media (min-width: 992px) {
+    .rewards-navbar {
+        margin-left: 16px;
+        justify-content: center;
+    }
+    .balance-wrap {
+        margin-left: 40px;
+    }
+}
+
 @media (max-width: 992px) {
     .header-nav {
         padding-right: 0;
+        flex-direction: column;
     }
     .b-avatar-header {
         position: relative;
@@ -262,12 +287,6 @@ export default defineComponent({
         width: 100% !important;
         box-sizing: border-box;
         padding-right: 8px;
-    }
-}
-
-@media (max-width: 992px) {
-    .header-nav {
-        flex-direction: column;
     }
     .media-header {
         flex-direction: column;

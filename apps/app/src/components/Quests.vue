@@ -490,7 +490,7 @@ export default defineComponent({
             });
 
             const groupedQuests = [
-                { title: 'Santa Quests', quests: santaQuests },
+                { title: "Santa's Quests", quests: santaQuests },
                 { title: 'X Quests', quests: xQuests },
                 { title: 'Discord Quests', quests: discordQuests },
                 { title: 'YouTube Quests', quests: youtubeQuests },
@@ -543,7 +543,6 @@ export default defineComponent({
                     this.questStore.list(SANTA_CAMPAIGN),
                     this.rewardStore.list(CP_CAMPAIGN),
                     this.reward2Store.list(SANTA_CAMPAIGN),
-                    this.accountStore.getParticipants(SANTA_CAMPAIGN),
                 ]);
             },
             immediate: true,
@@ -695,9 +694,16 @@ export default defineComponent({
     position: relative;
     z-index: 1;
     overflow: hidden;
-    background: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
+    background: var(--btn-primary-santa) !important;
+    border: none;
+    color: #ffffff;
 }
 
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:disabled {
+    background: var(--btn-primary-santa);
+}
 .my-leader {
     background-color: #151515;
 }
@@ -797,7 +803,7 @@ export default defineComponent({
 }
 
 .text-opaque {
-    color: #fff;
+    color: var(--body-text);
     font-family: Poppins;
     font-size: 12px;
     font-style: normal;
@@ -821,7 +827,7 @@ export default defineComponent({
     //margin: 1%;
     max-width: 45%;
     box-sizing: border-box;
-    background: linear-gradient(178deg, rgb(21, 20, 21) -37.16%, rgb(14, 13, 16) 98.54%);
+    background: var(--home-background);
     border-radius: 20px;
     margin-bottom: 15px;
     .card {
@@ -857,14 +863,14 @@ export default defineComponent({
 }
 
 .offers-box {
-    background: #202020;
+    background: var(--quest-item-bg);
     border-radius: 20px;
     padding: 15px 20px;
     padding-bottom: 0;
-
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     h3 {
         font-family: 'Poppins', sans-serif;
-        color: #d4d4d4;
+        color: var(--title-color);
         font-feature-settings: 'liga' off, 'clig' off;
         text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
         font-size: 18px;
@@ -921,12 +927,15 @@ export default defineComponent({
 .quests-column .nav-item {
     flex-grow: 0;
 }
-
+.nav-link {
+    background: var(--nav-link-bg);
+    color: #8e8e8e !important;
+}
 .quests-column .nav-link {
     width: 158px !important;
     display: flex;
     justify-content: center;
-    background: #202020;
+
     border-bottom-color: transparent;
     border-bottom-width: 0px;
     color: #8e8e8e;
@@ -936,15 +945,20 @@ export default defineComponent({
 }
 
 .quests-column .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.03);
-    border-color: #5b5b5b;
-    border-bottom-color: #1c1b1c;
+    border-color: var(--nav-border-color);
+    border-bottom-color: var(--border-as-nav-color) !important;
     border-bottom-width: 1px;
+    font-weight: 600;
+}
+.nav-link.active {
+    background-color: var(--nav-link-active-bg) !important;
+    border-color: var(--nav-border-color) !important;
+    color: var(--body-text) !important;
     font-weight: 600;
 }
 
 .quests-column .nav {
-    border-bottom-color: #5b5b5b;
+    border-bottom-color: var(--nav-border-color);
     gap: 3px;
 }
 
@@ -959,7 +973,7 @@ export default defineComponent({
     height: 100%;
     min-height: 280px;
     overflow: hidden;
-    background-color: #202020;
+    background-color: var(--quest-item-bg);
     border-radius: 10px;
     padding: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -971,7 +985,7 @@ export default defineComponent({
 }
 
 .quest-group-title {
-    color: #d4d4d4;
+    color: var(--title-color);
     font-feature-settings: 'liga' off, 'clig' off;
     text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
     font-family: Poppins;
@@ -984,6 +998,10 @@ export default defineComponent({
 
 .reward-group {
     grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+}
+
+.text-muted {
+    color: var(--body-text) !important;
 }
 
 @keyframes pulse {

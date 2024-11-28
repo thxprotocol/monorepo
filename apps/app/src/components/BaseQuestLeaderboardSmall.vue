@@ -11,10 +11,10 @@
             <!-- <img :src="trophyImage" alt="trophy" loading="lazy" width="17" height="17" class="me-2" /> -->
             <!-- </div> -->
             <div class="flex-grow-1 pe-2">
-                <h3 class="leaderboard-title">Leaderboard</h3>
+                <h3 class="quest-group-title">Leaderboard</h3>
                 <span
                     class="d-block flex-grow-1 pe-2 fa-xs mt-2"
-                    style="color: #fff; opacity: 0.6; font-family: Poppins"
+                    style="color: var(--body-color); opacity: 0.6; font-family: Poppins"
                 >
                     (Monthly)
                 </span>
@@ -144,7 +144,6 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #d4d4d4;
     font-family: Poppins;
     font-size: 14px;
     font-style: normal;
@@ -161,7 +160,6 @@ export default defineComponent({
     align-items: center;
     //text-align: right;
     white-space: nowrap;
-    color: #d4d4d4;
     font-family: Poppins;
     font-size: 14px;
     font-style: normal;
@@ -177,7 +175,6 @@ export default defineComponent({
 .list-item-field-score {
     width: 50px;
     text-align: right;
-    color: #d4d4d4;
     font-family: Poppins;
     font-size: 16px;
     font-style: normal;
@@ -198,10 +195,10 @@ export default defineComponent({
     border-radius: 0;
     padding: 4px 0;
     &:nth-child(odd) {
-        background-color: #202020;
+        background-color: var(--quest-item-bg);
     }
     &:nth-child(even) {
-        background-color: transparent;
+        background-color: var(--main-content-bg);
     }
 }
 
@@ -209,8 +206,7 @@ export default defineComponent({
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 300px;
-    color: #d4d4d4;
+    width: 160px;
     font-family: Poppins;
     font-size: 14px;
     font-style: normal;
@@ -225,7 +221,7 @@ export default defineComponent({
 }
 
 .leaderboard-wrapper .list-group {
-    padding: 13.5px 20px;
+    margin: 13.5px 20px;
 }
 .skeleton-loader {
     display: flex;
@@ -235,10 +231,10 @@ export default defineComponent({
 
 .skeleton-item {
     &:nth-child(odd) {
-        background-color: #202020;
+        background-color: var(--quest-item-bg);
     }
     &:nth-child(even) {
-        background-color: transparent;
+        background-color: var(--main-content-bg);
     }
 }
 
@@ -252,7 +248,6 @@ export default defineComponent({
 .skeleton-rank {
     width: 30px;
     text-align: center;
-    color: #d4d4d4;
     font-family: Poppins;
     font-size: 14px;
     font-style: normal;
@@ -261,8 +256,8 @@ export default defineComponent({
 }
 
 .skeleton-avatar {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     margin: 0 10px;
 }
@@ -273,7 +268,6 @@ export default defineComponent({
 }
 
 .leaderboard-title {
-    color: #d4d4d4;
     font-feature-settings: 'liga' off, 'clig' off;
     text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
     font-family: Poppins;
@@ -287,7 +281,11 @@ export default defineComponent({
     width: 32px;
     height: 32px;
 }
-
+.my-list,
+.skeleton-loader {
+    border: 1px solid var(--btn-sidebar-border-color);
+    border-radius: 3px;
+}
 @keyframes pulse {
     0% {
         opacity: 1;
@@ -310,16 +308,26 @@ export default defineComponent({
         width: 100%;
     }
     .username-text {
-        width: 100px;
+        padding-left: 5px;
     }
     .leaderboard-wrapper .list-group {
-        padding: 0 10px;
         flex: 1;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
     .list-group-item {
         padding-left: 30px !important;
+    }
+}
+@media (max-width: 420px) {
+    .list-item-field-questcount {
+        display: none;
+    }
+}
+
+@media (max-width: 360px) {
+    .username-text {
+        width: 110px;
     }
 }
 //@media (max-height: 894px) {

@@ -3,7 +3,7 @@ import { query } from 'express-validator';
 import { Transaction, Wallet } from '@thxnetwork/api/models';
 import { NotFoundError } from '@thxnetwork/api/util/errors';
 
-const validation = [query('chainId').isNumeric(), query('walletId').isMongoId()];
+const validation = [query('walletId').isMongoId()];
 
 const controller = async (req: Request, res: Response) => {
     const wallet = await Wallet.findById(req.query.walletId);

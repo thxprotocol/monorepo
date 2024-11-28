@@ -13,7 +13,7 @@
             </b-link>
         </template>
 
-        <b-tabs v-model="tabIndex" pills justified content-class="pt-3">
+        <b-tabs v-model="tabIndex" pills justified content-class="pt-3" class="tab-link-wallet">
             <b-tab title="1. Choose">
                 <BaseTabWalletVariant :variant="variant" @change="variant = $event" @next="tabIndex = 1" />
             </b-tab>
@@ -60,3 +60,8 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.tab-link-wallet .nav-link {
+    border: 1px solid transparent !important;
+}
+</style>

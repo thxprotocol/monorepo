@@ -76,7 +76,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #49494b;
+    background-color: var(--scroll-thumb-bg);
     border: 5.5px solid transparent;
     border-radius: 9px;
     background-clip: content-box;
@@ -87,7 +87,7 @@
     border-right: 6.75px solid transparent;
     border-top: 6.75px solid transparent;
     border-bottom: 6.75px solid transparent;
-    background-color: #393939;
+    background-color: var(--scroll-track-bg);
     border-radius: 2px;
     background-clip: content-box;
 }

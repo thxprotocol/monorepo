@@ -121,10 +121,13 @@ export default defineComponent({
     text-overflow: ellipsis;
 }
 .disc-black .card-header {
-    background-color: #000 !important;
+    background-color: var(--discord-bg) !important;
     width: 100%;
     margin: 0;
     border-radius: 0.5rem !important;
+    border: 1px solid var(--discord-border-color);
+    padding: 10px;
+    color: var(--body-text);
 }
 
 .target-body {
@@ -138,9 +141,10 @@ export default defineComponent({
 .discord-icon {
     font-size: 1rem;
     color: #6c86ff;
+    margin-left: 0;
 }
 .discord-highlight-text {
-    background: linear-gradient(180deg, #d2cc52 0%, #ccc300 100%);
+    background: var(--discord-highlight-color);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

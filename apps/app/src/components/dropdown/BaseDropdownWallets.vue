@@ -4,7 +4,7 @@
             v-model="dropdownModel"
             variant="link"
             class="w-100 rounded"
-            toggle-class="d-flex align-items-center text-white text-decoration-none p-2"
+            toggle-class="d-flex align-items-center text-decoration-none p-2 body-color"
             auto-close="outside"
             :menu-class="[{ 'd-none': !walletStore.wallet }, 'dropdown-move', 'fade-in']"
             no-caret
@@ -64,7 +64,7 @@
                         </b-avatar> -->
                         <div>
                             <div class="d-flex align-items-center">
-                                <strong class="me-5">
+                                <strong class="me-5 text-opaque">
                                     {{ walletStore.wallet.short }}
                                 </strong>
                                 <b-button
@@ -94,7 +94,7 @@
                                     <i class="fas fa-external-link-alt" style="font-size: 0.7rem" />
                                 </b-button>
                             </div>
-                            <div v-if="walletStore.wallet" class="d-flex align-items-center me-2">
+                            <div v-if="walletStore.wallet" class="d-flex align-items-center me-2 text-opaque">
                                 {{ walletVariantMap[walletStore.wallet.variant] }}
                                 <b-img
                                     v-if="walletLogoMap[walletStore.wallet.variant]"
@@ -128,10 +128,10 @@
             no-caret
             end
             :disabled="!accountStore.isAuthenticated"
-            toggle-class="p-0"
+            toggle-class="p-0 body-color"
         >
             <template #button-content>
-                <i class="fas fa-chevron-down text-white me-2" />
+                <i class="fas fa-chevron-down me-2 body-color" />
             </template>
             <b-dropdown-item
                 v-for="wallet of walletStore.wallets"
@@ -291,21 +291,24 @@ export default defineComponent({
 });
 </script>
 <style>
-.dropdown-toggle .fa-ellipsis-v {
-    color: var(--bs-body-color);
+.dropdown-toggle .fa-ellipsis-v,
+.body-color {
+    color: var(--body-text) !important;
 }
-
+.body-color:hover {
+    color: var(--body-text);
+}
 .h-wallet {
     width: 133px;
     height: 32px;
     border-radius: 5px;
-    border: 1px solid #292929;
+    border: 1px solid var(--dropdown-border-color);
     transition: all 0.3s ease-in-out;
-    background: #202020;
+    background: var(--dropdown-background);
 }
 
 .dropdown {
-    background: #202020;
+    background: var(--dropdown-background);
 }
 
 .h-wallet button div {
@@ -317,11 +320,11 @@ export default defineComponent({
 }
 .dropdown-menu {
     border-radius: 5px;
-    border: 1px solid #292929;
-    background: #202020;
+    border: 1px solid var(--dropdown-border-color);
+    background: var(--dropdown-background);
 }
 .dropdown-menu .dropdown-item:hover {
-    background: #292929;
+    background: var(--dropdown-border-color);
 }
 @keyframes fadeIn {
     from {

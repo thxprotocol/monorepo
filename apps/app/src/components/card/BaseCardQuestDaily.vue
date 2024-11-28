@@ -24,7 +24,9 @@
                 style="width: 50px; height: 50px"
                 class="my-1 me-3 d-flex flex-column align-items-center justify-content-center"
                 :variant="key < quest.entries.length ? 'success' : 'primary'"
-                :class="key < quest.entries.length ? 'bg-success text-white bg-purple' : 'bg-primary text-white'"
+                :class="
+                    key < quest.entries.length ? 'bg-success text-white bg-daily-completed' : 'bg-primary text-white'
+                "
             >
                 <small>Day {{ key + 1 }}</small>
                 <strong class="h5 mb-0">{{ formatAmount(amount) }} </strong>
@@ -144,8 +146,7 @@ export default defineComponent({
 </script>
 
 <style>
-.bg-purple {
-    background-color: #642a9f !important;
-    border-color: #642a9f !important;
+.bg-daily-completed {
+    background: var(--btn-primary-santa) !important;
 }
 </style>

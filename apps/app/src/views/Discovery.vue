@@ -2,7 +2,7 @@
     <div
         :style="{
             minHeight: '100%',
-            background: 'linear-gradient(178deg, #151415 -37.16%, #0E0D10 98.54%)',
+            background: 'var(--home-background)',
         }"
     >
         <!-- <BaseNavbarTicker /> -->
