@@ -475,7 +475,7 @@ export default defineComponent({
     flex-grow: 1;
     border: 1px solid var(--main-content-border);
     border-radius: 10px;
-    margin-top: 20px;
+    margin-top: 16px;
     background: var(--main-content-bg);
 }
 

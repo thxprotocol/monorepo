@@ -173,6 +173,8 @@ export default defineComponent({
 
 .dropdown {
     position: absolute !important;
+    z-index: 1;
+    width: 230.39px;
     top: 110%;
     left: 0;
     display: none;

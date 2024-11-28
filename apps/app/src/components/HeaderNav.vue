@@ -241,7 +241,7 @@ export default defineComponent({
 }
 
 .media-header {
-    gap: 3rem;
+    gap: 37px;
 }
 
 @keyframes fadeIn {
