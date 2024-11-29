@@ -10,7 +10,7 @@
     >
         <template #button>
             <b-button variant="primary" block class="w-100" @click="showQuestModal = true">
-                Earn {{ quest.amount }} points
+                Earn {{ quest.amount }} Pts
             </b-button>
         </template>
         <!-- <b-alert v-model="isAlertInviteLinkUsesShown" class="p-2" variant="primary">

@@ -12,7 +12,7 @@
 
         <template #button>
             <b-button variant="primary" class="w-100" block @click="showQuestModal = true">
-                Earn {{ quest.amount }} points
+                Earn {{ quest.amount }} Pts
             </b-button>
             <!-- <BButtonGroup v-if="!isConnected" block class="w-100">
                 <b-button variant="primary" :disabled="isSubmitting" @click="onClickConnect">
@@ -59,14 +59,14 @@
             </b-link>
         </template>
         <!-- Component inside the modal -->
-        <div class="d-flex mb-3">
+        <div class="d-flex justify-content-center mb-3">
             <img v-if="quest.image" :src="quest.image" :alt="quest.title" />
         </div>
         <component :is="interactionComponentMap[quest.interaction]" :quest="quest" />
         <div>
             <p>
                 You can earn
-                <span style="color: #1bff2e"
+                <span class="text-accent"
                     ><strong>{{ quest.amount }}</strong></span
                 >
                 points

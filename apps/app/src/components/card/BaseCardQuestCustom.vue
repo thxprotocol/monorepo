@@ -27,7 +27,7 @@
             </b-button> -->
             <!-- Button to open the modal -->
             <b-button variant="primary" block class="w-100" @click="isModalVisible = true">
-                Earn <strong>{{ formattedAmount }}</strong> points
+                Earn <strong>{{ formattedAmount }}</strong> Pts
             </b-button>
         </template>
     </BaseCardQuest>
@@ -38,7 +38,7 @@
                 <i class="fas fa-times" />
             </b-link>
         </template>
-        <div class="d-flex justify-center overflow-hidden">
+        <div class="d-flex justify-content-center overflow-hidden">
             <img v-if="quest.image" :src="quest.image" :alt="quest.title" />
         </div>
         <div class="d-flex flex-column">

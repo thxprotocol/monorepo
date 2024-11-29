@@ -742,7 +742,6 @@ export default defineComponent({
 
 .quests-column .tab-content .card {
     overflow: hidden;
-    margin-bottom: 15px;
     border-radius: 0px;
 }
 
