@@ -60,9 +60,9 @@ export default defineComponent({
                 this.error = 'Username is required.';
             } else if (this.value.length < 3) {
                 this.error = 'Username must be at least 3 characters long.';
-            } else if (this.value.length > 20) {
+            } else if (this.value.length > 15) {
                 console.log(this.value.length);
-                this.error = 'Username must not exceed 20 characters.';
+                this.error = 'Username must not exceed 15 characters.';
             } else {
                 this.error = '';
             }
