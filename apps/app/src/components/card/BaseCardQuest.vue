@@ -76,7 +76,7 @@
                             text-overflow: ellipsis;
                             color: var(--body-text);
                         "
-                        v-html="decodeHTML(quest.description)"
+                        v-html="decodeHTML(quest.title)"
                     />
                     <!-- <b-dropdown
                         v-if="quest.infoLinks.length"
@@ -139,7 +139,12 @@
                     Quest Completed
                 </b-button>
 
-                <BaseButtonQuestLocked v-else-if="quest.isLocked" :id="quest._id" :locks="quest.locks" />
+                <BaseButtonQuestLocked
+                    v-else-if="quest.isLocked"
+                    :id="quest._id"
+                    :locks="quest.locks"
+                    :amount="quest.amount"
+                />
                 <slot v-else name="button"></slot>
             </div>
         </b-collapse>

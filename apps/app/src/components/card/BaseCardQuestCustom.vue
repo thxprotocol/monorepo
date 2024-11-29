@@ -14,7 +14,7 @@
         </b-progress> -->
 
         <template #button>
-            <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
+            <!-- <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
                 <b-spinner v-if="isSubmitting" small />
                 <template v-else-if="quest.amount">
                     Earn
@@ -24,9 +24,41 @@
                     </strong>
                 </template>
                 <template v-else>Complete Quest</template>
+            </b-button> -->
+            <!-- Button to open the modal -->
+            <b-button variant="primary" block class="w-100" @click="isModalVisible = true">
+                Earn <strong>{{ formattedAmount }}</strong> points
             </b-button>
         </template>
     </BaseCardQuest>
+    <b-modal v-model="isModalVisible" centered title="Quest Details" hide-footer @hide="resetModal">
+        <template #header>
+            <h5 class="modal-title">{{ quest.title }}</h5>
+            <b-link class="btn-close" @click="isModalVisible = false">
+                <i class="fas fa-times" />
+            </b-link>
+        </template>
+        <div class="d-flex flex-column">
+            <img v-if="quest.image" :src="quest.image" :alt="quest.title" />
+            <p class="mt-3">{{ quest.description }}</p>
+            <p>
+                You can earn <span style="color: #1bff2e">{{ formattedAmount }}</span> points
+            </p>
+        </div>
+        <!-- Button inside modal to trigger onClickClaim -->
+        <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
+            <b-spinner v-if="isSubmitting" small />
+            <template v-else-if="quest.amount">
+                Earn
+                <strong>
+                    {{ `${pendingCount} x` }}
+                    {{ formattedAmount }}
+                </strong>
+                points
+            </template>
+            <template v-else>Complete Quest</template>
+        </b-button>
+    </b-modal>
 </template>
 
 <script lang="ts">
@@ -46,7 +78,7 @@ export default defineComponent({
         },
     },
     data() {
-        return { error: '', isSubmitting: false, isModalQuestEntryShown: false };
+        return { error: '', isSubmitting: false, isModalQuestEntryShown: false, isModalVisible: false };
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore),
@@ -63,7 +95,7 @@ export default defineComponent({
                 const amount = this.quest.amount / 100;
                 return amount % 1 === 0 ? `$${amount.toFixed(0)}` : `$${amount.toFixed(2)}`;
             }
-            return `${this.quest.amount} points`;
+            return `${this.quest.amount}`;
         },
     },
     methods: {
@@ -78,6 +110,9 @@ export default defineComponent({
             } finally {
                 this.isSubmitting = false;
             }
+        },
+        resetModal() {
+            this.isModalVisible = false;
         },
     },
 });

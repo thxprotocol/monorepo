@@ -1,7 +1,7 @@
 <template>
     <b-button variant="primary" block class="w-100 locked-btn" @click="isModalShown = true">
-        <i class="fas fa-lock me-1" />
-        Locked
+        <!-- <i class="fas fa-lock me-1" /> -->
+        Earn {{ amount }} points
     </b-button>
     <b-modal :id="`modalQuestLock${id}`" v-model="isModalShown" title="Locked!" centered no-close-on-backdrop>
         <p class="text-opaque ms-0">To unlock this quest, complete these quests:</p>
@@ -34,6 +34,7 @@ export default defineComponent({
             type: Array as PropType<{ questId: string; variant: number }[]>,
             required: true,
         },
+        amount: Number,
     },
     data() {
         return { isAlertShown: true, isModalShown: false };
