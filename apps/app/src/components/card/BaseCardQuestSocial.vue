@@ -65,7 +65,11 @@
         <component :is="interactionComponentMap[quest.interaction]" :quest="quest" />
         <div>
             <p>
-                You can earn <span style="color: #1bff2e">{{ quest.amount }}</span> points
+                You can earn
+                <span style="color: #1bff2e"
+                    ><strong>{{ quest.amount }}</strong></span
+                >
+                points
             </p>
         </div>
 

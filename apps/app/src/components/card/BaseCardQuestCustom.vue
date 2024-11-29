@@ -38,15 +38,27 @@
                 <i class="fas fa-times" />
             </b-link>
         </template>
-        <div class="d-flex flex-column">
+        <div class="d-flex justify-center overflow-hidden">
             <img v-if="quest.image" :src="quest.image" :alt="quest.title" />
+        </div>
+        <div class="d-flex flex-column">
             <p class="mt-3">{{ quest.description }}</p>
             <p>
-                You can earn <span style="color: #1bff2e">{{ formattedAmount }}</span> points
+                You can earn
+                <span class="text-accent"
+                    ><strong>{{ formattedAmount }}</strong></span
+                >
+                points
             </p>
         </div>
         <!-- Button inside modal to trigger onClickClaim -->
-        <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
+        <b-button
+            variant="primary"
+            block
+            class="w-100"
+            :disabled="isSubmitting || pendingCount === 0"
+            @click="onClickClaim"
+        >
             <b-spinner v-if="isSubmitting" small />
             <template v-else-if="quest.amount">
                 Earn
