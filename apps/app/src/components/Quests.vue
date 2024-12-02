@@ -70,7 +70,11 @@
                                                 }"
                                                 class="quest-group-item"
                                             >
-                                                <component :is="questComponentMap[quest.variant]" :quest="quest" />
+                                                <component
+                                                    :is="questComponentMap[quest.variant]"
+                                                    :quest="quest"
+                                                    :group-title="group.title"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -1013,6 +1017,22 @@ export default defineComponent({
     color: var(--body-text) !important;
 }
 
+.quest-modal-title {
+    color: var(--modal-text-color);
+    font-size: 17px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+}
+
+.quest-modal-text {
+    color: var(--modal-text-color);
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 17px;
+    margin-bottom: 10px;
+}
 @keyframes pulse {
     0% {
         opacity: 1;

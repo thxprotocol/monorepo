@@ -72,13 +72,13 @@
     </BaseCardQuest>
     <b-modal v-model="showQuestModal" centered hide-footer>
         <template #header>
-            <h5 class="modal-title">{{ quest.title }}</h5>
+            <h5 class="modal-title">{{ groupTitle }}</h5>
             <b-link class="btn-close" @click="showQuestModal = false">
                 <i class="fas fa-times" />
             </b-link>
         </template>
         <div class="d-flex justify-content-center overflow-hidden">
-            <img :src="quest.image" :alt="quest.title" />
+            <img :src="quest.image" :alt="quest.title" width="100%" />
         </div>
         <!-- Modal content -->
         <div class="mt-3">
@@ -162,6 +162,10 @@ export default defineComponent({
         quest: {
             type: Object as PropType<TQuestInvite>,
             required: true,
+        },
+        groupTitle: {
+            type: String,
+            required: false,
         },
     },
     data() {

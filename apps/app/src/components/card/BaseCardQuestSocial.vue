@@ -53,17 +53,17 @@
     </BaseCardQuest>
     <b-modal v-model="showQuestModal" centered hide-footer>
         <template #header>
-            <h5 class="modal-title">{{ quest.title }}</h5>
+            <h5 class="modal-title">{{ groupTitle }}</h5>
             <b-link class="btn-close" @click="showQuestModal = false">
                 <i class="fas fa-times" />
             </b-link>
         </template>
         <!-- Component inside the modal -->
         <div class="d-flex justify-content-center mb-3">
-            <img v-if="quest.image" :src="quest.image" :alt="quest.title" />
+            <img v-if="quest.image" :src="quest.image" :alt="quest.title" width="100%" />
         </div>
         <component :is="interactionComponentMap[quest.interaction]" :quest="quest" />
-        <div>
+        <div class="mb-5">
             <p>
                 You can earn
                 <span class="text-accent"
@@ -156,6 +156,10 @@ export default defineComponent({
         quest: {
             type: Object as PropType<TQuestSocial>,
             required: true,
+        },
+        groupTitle: {
+            type: String,
+            required: false,
         },
     },
     data() {

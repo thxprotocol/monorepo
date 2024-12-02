@@ -33,17 +33,18 @@
     </BaseCardQuest>
     <b-modal v-model="isModalVisible" centered title="Quest Details" hide-footer @hide="resetModal">
         <template #header>
-            <h5 class="modal-title">{{ quest.title }}</h5>
+            <h5 class="modal-title">{{ groupTitle }}</h5>
             <b-link class="btn-close" @click="isModalVisible = false">
                 <i class="fas fa-times" />
             </b-link>
         </template>
         <div class="d-flex justify-content-center overflow-hidden">
-            <img v-if="quest.image" :src="quest.image" :alt="quest.title" />
+            <img v-if="quest.image" :src="quest.image" :alt="quest.title" width="100%" />
         </div>
-        <div class="d-flex flex-column">
-            <p class="mt-3">{{ quest.description }}</p>
-            <p>
+        <div class="d-flex flex-column mt-3">
+            <p class="quest-modal-title">{{ quest.title }}</p>
+            <p class="quest-modal-text">{{ quest.description }}</p>
+            <p class="quest-modal-text mb-5">
                 You can earn
                 <span class="text-accent"
                     ><strong>{{ formattedAmount }}</strong></span
@@ -87,6 +88,10 @@ export default defineComponent({
         quest: {
             required: true,
             type: Object as PropType<TQuestCustom>,
+        },
+        groupTitle: {
+            type: String,
+            required: false,
         },
     },
     data() {
