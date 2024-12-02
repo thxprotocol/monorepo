@@ -181,6 +181,7 @@ export const useAccountStore = defineStore('account', {
             }
         },
         async connect(kind: AccessTokenKind, scopes: TOAuthScope[]) {
+            let checkWindowClosed: any;
             try {
                 const data = await this.api.request.get('/v1/oauth/authorize/' + kind, {
                     params: {
@@ -189,10 +190,22 @@ export const useAccountStore = defineStore('account', {
                     },
                 });
                 if (!data.url) throw new Error('Could not get authorize URL');
-                popup.open(data.url);
+                const authWindow: any = popup.open(data.url);
 
-                await this.waitForToken({ kind, scopes });
+                const windowClosedPromise = new Promise((_, reject) => {
+                    checkWindowClosed = setInterval(() => {
+                        if (authWindow.closed) {
+                            clearInterval(checkWindowClosed);
+                            reject(new Error('Authentication window closed by the user.'));
+                        }
+                    }, 500);
+                });
+
+                await Promise.race([this.waitForToken({ kind, scopes }), windowClosedPromise]);
+
+                clearInterval(checkWindowClosed);
             } catch (error) {
+                if (checkWindowClosed) clearInterval(checkWindowClosed);
                 console.error(error);
                 throw error;
             }
