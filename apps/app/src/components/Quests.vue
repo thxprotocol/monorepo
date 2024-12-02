@@ -990,7 +990,7 @@ export default defineComponent({
 
 .quest-item-daily,
 .reward-item-promoted {
-    grid-column: span 3;
+    grid-column: span 2;
 }
 
 .quest-group-title {

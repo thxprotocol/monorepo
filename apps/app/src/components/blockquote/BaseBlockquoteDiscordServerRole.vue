@@ -5,11 +5,7 @@
         in Discord Server: "<em>{{ quest.contentMetadata.serverName }}</em
         >".
         <div class="text-end">
-            <b-link
-                class="text-opaque"
-                :href="quest.contentMetadata.inviteURL ? quest.contentMetadata.inviteURL : null"
-                target="_blank"
-            >
+            <b-link class="text-opaque" href="#" @click.prevent="openPopup(quest.contentMetadata.inviteURL)">
                 Join this server
                 <i class="fas fa-external-link-alt"></i>
             </b-link>
@@ -18,6 +14,7 @@
 </template>
 
 <script lang="ts">
+import { popup } from '@thxnetwork/app/utils/popup';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
@@ -28,7 +25,15 @@ export default defineComponent({
             required: true,
         },
     },
-    methods: {},
+    methods: {
+        openPopup(link: string) {
+            if (link) {
+                popup.open(link);
+            } else {
+                console.warn('No invite URL provided');
+            }
+        },
+    },
 });
 </script>
 <style scoped>
