@@ -18,7 +18,7 @@
                     </div>
                 </div> -->
 
-                <b-tabs content-class="mt-3" justified class="mt-3">
+                <b-tabs justified>
                     <b-tab active>
                         <template #title>
                             Available
@@ -42,7 +42,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-else class="d-flex flex-column gap-4">
+                            <div v-else class="d-flex flex-column">
                                 <div v-for="group in mergedQuestsAndOffers" :key="group.title">
                                     <div
                                         v-if="!group.isOfferRow"
@@ -54,7 +54,8 @@
                                                 return !quest.isAvailable;
                                             }
                                         }), 
-                                    }"
+                                        }"
+                                        class="mt-4"
                                     >
                                         <h3 class="quest-group-title">{{ group.title }}</h3>
                                         <div class="quest-group">
@@ -69,12 +70,16 @@
                                                 }"
                                                 class="quest-group-item"
                                             >
-                                                <component :is="questComponentMap[quest.variant]" :quest="quest" />
+                                                <component
+                                                    :is="questComponentMap[quest.variant]"
+                                                    :quest="quest"
+                                                    :group-title="group.title"
+                                                />
                                             </div>
                                         </div>
                                     </div>
-                                    <div v-else class="offers-box">
-                                        <h3>{{ group.title }}</h3>
+                                    <div v-else class="offers-box mt-4">
+                                        <h3 class="quest-group-title">{{ group.title }}</h3>
                                         <div class="d-flex flex-wrap offer-row">
                                             <div
                                                 v-for="offer in group.offers"
@@ -84,15 +89,15 @@
                                                     width:
                                                         group.offers.length === 1
                                                             ? '100%'
-                                                            : offersPerRow === 3
-                                                            ? '30%'
-                                                            : '49%',
+                                                            : `calc((100% - (${
+                                                                  offersPerRow - 1
+                                                              } * 1%)) / ${offersPerRow})`,
                                                     maxWidth:
                                                         group.offers.length === 1
                                                             ? '100%'
-                                                            : offersPerRow === 3
-                                                            ? '30%'
-                                                            : '49%',
+                                                            : `calc((100% - (${
+                                                                  offersPerRow - 1
+                                                              } * 1%)) / ${offersPerRow})`,
                                                 }"
                                             >
                                                 <OfferCard :offer="offer" />
@@ -169,7 +174,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-else class="d-flex flex-column gap-4">
+                            <div v-else class="d-flex flex-column">
                                 <div
                                     v-for="group in filteredCompletedQuests"
                                     :key="group.title"
@@ -181,7 +186,8 @@
                                             return quest.isAvailable;
                                         }
                                     }) && !group.isOfferRow,
-                                }"
+                                    }"
+                                    class="mt-4"
                                 >
                                     <h3 class="quest-group-title">{{ group.title }}</h3>
                                     <div class="quest-group">
@@ -375,7 +381,7 @@ export default defineComponent({
             activeFilters: [],
             entry: null,
             offers: [],
-            offersPerRow: window.innerWidth > 1350 ? 3 : 2,
+            offersPerRow: 5,
             isLoadingOffers: false,
         };
     },
@@ -569,14 +575,14 @@ export default defineComponent({
             try {
                 const clid = this.accountStore.account?.providerUserId;
                 const response = await axios.get(
-                    `https://offers-api.santabrowser.com/offers/list?pageSize=10&pageNo=0&clid=${clid}`,
+                    `https://offers-api.santabrowser.com/offers/list?pageSize=15&pageNo=0&clid=${clid}`,
                 );
                 this.offers = response.data.trending
                     .filter(
                         (offer: any) =>
                             offer.imageUrl !== 'https://banners.hangmyads.com/files/uploads/Off_A_86634.png',
                     )
-                    .slice(0, 9);
+                    .slice(0, 15);
             } catch (error) {
                 console.error('Failed to fetch offers', error);
             } finally {
@@ -584,7 +590,15 @@ export default defineComponent({
             }
         },
         handleResize() {
-            this.offersPerRow = window.innerWidth > 1350 ? 3 : 2;
+            if (window.innerWidth > 1500) {
+                this.offersPerRow = 5;
+            } else if (window.innerWidth > 1280) {
+                this.offersPerRow = 4;
+            } else if (window.innerWidth > 775) {
+                this.offersPerRow = 3;
+            } else {
+                this.offersPerRow = 2;
+            }
         },
         formatQuests(quests: any) {
             return quests.map((quest: TBaseQuest, index: number) => {
@@ -742,7 +756,6 @@ export default defineComponent({
 
 .quests-column .tab-content .card {
     overflow: hidden;
-    margin-bottom: 15px;
     border-radius: 0px;
 }
 
@@ -827,9 +840,9 @@ export default defineComponent({
     //margin: 1%;
     max-width: 45%;
     box-sizing: border-box;
-    background: var(--home-background);
+    background: var(--quest-item-bg);
     border-radius: 20px;
-    margin-bottom: 15px;
+    //margin-bottom: 15px;
     .card {
         border: 0 !important;
         border-radius: 20px !important;
@@ -863,9 +876,9 @@ export default defineComponent({
 }
 
 .offers-box {
-    background: var(--quest-item-bg);
+    // background: var(--quest-item-bg);
     border-radius: 20px;
-    padding: 15px 20px;
+    // padding: 15px 20px;
     padding-bottom: 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     h3 {
@@ -971,7 +984,7 @@ export default defineComponent({
 
 .quest-item {
     height: 100%;
-    min-height: 280px;
+    min-height: 275px;
     overflow: hidden;
     background-color: var(--quest-item-bg);
     border-radius: 10px;
@@ -981,7 +994,7 @@ export default defineComponent({
 
 .quest-item-daily,
 .reward-item-promoted {
-    grid-column: span 3;
+    grid-column: span 2;
 }
 
 .quest-group-title {
@@ -1004,6 +1017,22 @@ export default defineComponent({
     color: var(--body-text) !important;
 }
 
+.quest-modal-title {
+    color: var(--modal-text-color);
+    font-size: 17px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+}
+
+.quest-modal-text {
+    color: var(--modal-text-color);
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 17px;
+    margin-bottom: 10px;
+}
 @keyframes pulse {
     0% {
         opacity: 1;
@@ -1091,6 +1120,9 @@ export default defineComponent({
     .quest-group,
     .reward-group {
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .offer-row {
         gap: 10px;
     }
 }

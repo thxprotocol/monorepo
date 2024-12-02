@@ -1,6 +1,6 @@
 <template>
     <b-card
-        class="mb-3 w-100 d-flex flex-column h-100"
+        class="w-100 d-flex flex-column h-100"
         header-class="p-0"
         body-class="d-flex flex-column p-0"
         :class="{ 'card-collapsed': isVisible, 'card-promoted': quest.isPromoted }"
@@ -75,8 +75,10 @@
                             overflow: hidden;
                             text-overflow: ellipsis;
                             color: var(--body-text);
+                            text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
+                            text-align: center;
                         "
-                        v-html="decodeHTML(quest.description)"
+                        v-html="decodeHTML(quest.title)"
                     />
                     <!-- <b-dropdown
                         v-if="quest.infoLinks.length"
@@ -130,7 +132,7 @@
                     @click="authStore.isModalLoginShown = true"
                 >
                     <template v-if="quest.amount">
-                        Earn <strong>{{ quest.amount }} points</strong>
+                        Earn <strong>{{ quest.amount }} Pts</strong>
                     </template>
                     <strong v-else> Complete! </strong>
                 </b-button>
@@ -139,7 +141,12 @@
                     Quest Completed
                 </b-button>
 
-                <BaseButtonQuestLocked v-else-if="quest.isLocked" :id="quest._id" :locks="quest.locks" />
+                <BaseButtonQuestLocked
+                    v-else-if="quest.isLocked"
+                    :id="quest._id"
+                    :locks="quest.locks"
+                    :amount="quest.amount"
+                />
                 <slot v-else name="button"></slot>
             </div>
         </b-collapse>

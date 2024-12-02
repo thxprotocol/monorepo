@@ -8,9 +8,72 @@
         :error="error"
         @modal-close="isModalQuestEntryShown = false"
     >
-        <component :is="interactionComponentMap[quest.interaction]" :quest="quest" />
+        <!-- <component :is="interactionComponentMap[quest.interaction]" :quest="quest" /> -->
 
         <template #button>
+            <b-button variant="primary" class="w-100" block @click="showQuestModal = true">
+                Earn {{ quest.amount }} Pts
+            </b-button>
+            <!-- <BButtonGroup v-if="!isConnected" block class="w-100">
+                <b-button variant="primary" :disabled="isSubmitting" @click="onClickConnect">
+                    <template v-if="isSubmitting">
+                        <b-spinner small class="me-1" />
+                        Connecting platform...
+                    </template>
+                    <template v-else>
+                        Connect <strong>{{ kinds[quest.kind] }}</strong>
+                    </template>
+                </b-button>
+                <BButton v-if="isSubmitting" variant="primary" style="max-width: 40px" @click="onClickCancel">
+                    <i class="fas fa-times text-opaque m-0" />
+                </BButton>
+            </BButtonGroup>
+            <b-button
+                v-else-if="contentURL && !isViewed"
+                variant="primary"
+                block
+                class="w-100"
+                :disabled="isLoadingView"
+                @click="onClickView"
+            >
+                <b-spinner v-if="isLoadingView" small></b-spinner>
+                <template v-else>
+                    {{ interactionLabelMap[quest.interaction] }}
+                    <i class="fas fa-external-link-alt ms-1"></i>
+                </template>
+            </b-button>
+            <b-button v-else variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickComplete">
+                <b-spinner v-if="isSubmitting" small />
+                <template v-else-if="quest.amount">
+                    Claim <strong>{{ quest.amount }} points</strong>
+                </template>
+                <template v-else>Complete Quest</template>
+            </b-button> -->
+        </template>
+    </BaseCardQuest>
+    <b-modal v-model="showQuestModal" centered hide-footer>
+        <template #header>
+            <h5 class="modal-title">{{ groupTitle }}</h5>
+            <b-link class="btn-close" @click="showQuestModal = false">
+                <i class="fas fa-times" />
+            </b-link>
+        </template>
+        <!-- Component inside the modal -->
+        <div class="d-flex justify-content-center mb-3">
+            <img v-if="quest.image" :src="quest.image" :alt="quest.title" width="100%" />
+        </div>
+        <component :is="interactionComponentMap[quest.interaction]" :quest="quest" />
+        <div class="mb-5">
+            <p>
+                You can earn
+                <span class="text-accent"
+                    ><strong>{{ quest.amount }}</strong></span
+                >
+                points
+            </p>
+        </div>
+
+        <div class="mt-3">
             <BButtonGroup v-if="!isConnected" block class="w-100">
                 <b-button variant="primary" :disabled="isSubmitting" @click="onClickConnect">
                     <template v-if="isSubmitting">
@@ -46,8 +109,8 @@
                 </template>
                 <template v-else>Complete Quest</template>
             </b-button>
-        </template>
-    </BaseCardQuest>
+        </div>
+    </b-modal>
 </template>
 
 <script lang="ts">
@@ -74,6 +137,7 @@ import BaseBlockquoteDiscordServerRole from '../../components/blockquote/BaseBlo
 import BaseBlockquoteDiscordMessage from '../../components/blockquote/BaseBlockquoteDiscordMessage.vue';
 import BaseBlockquoteDiscordInviteUsed from '../../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
 import { interactionLabelMap } from '../../utils/social';
+import { popup } from '@thxnetwork/app/utils/popup';
 
 export default defineComponent({
     name: 'BaseCardQuestSocial',
@@ -93,6 +157,10 @@ export default defineComponent({
             type: Object as PropType<TQuestSocial>,
             required: true,
         },
+        groupTitle: {
+            type: String,
+            required: false,
+        },
     },
     data() {
         return {
@@ -110,6 +178,7 @@ export default defineComponent({
             platformIconMap,
             isModalQuestEntryShown: false,
             interactionLabelMap,
+            showQuestModal: false,
         };
     },
     computed: {
@@ -156,12 +225,18 @@ export default defineComponent({
         async onClickView() {
             this.isLoadingView = true;
 
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            try {
+                await new Promise((resolve) => setTimeout(resolve, 500));
 
-            window.open(this.contentURL, '_blank');
-
-            this.isLoadingView = false;
-            this.isViewed = true;
+                if (this.contentURL) {
+                    popup.open(this.contentURL);
+                } else {
+                    console.warn('No content URL provided');
+                }
+            } finally {
+                this.isLoadingView = false;
+                this.isViewed = true;
+            }
         },
         async onClickComplete() {
             try {

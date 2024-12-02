@@ -8,7 +8,12 @@
         :error="error"
         @modal-close="isModalQuestEntryShown = false"
     >
-        <b-alert v-model="isAlertInviteLinkUsesShown" class="p-2" variant="primary">
+        <template #button>
+            <b-button variant="primary" block class="w-100" @click="showQuestModal = true">
+                Earn {{ quest.amount }} Pts
+            </b-button>
+        </template>
+        <!-- <b-alert v-model="isAlertInviteLinkUsesShown" class="p-2" variant="primary">
             <i class="fas fa-sparkles mx-2" />
             Your Invite Link has been used <strong>{{ quest.uses }} {{ quest.uses > 1 ? 'times' : 'time' }}!</strong>
         </b-alert>
@@ -35,7 +40,7 @@
                     Sign in to see your Invite Link
                 </b-alert>
             </template>
-        </BaseFormGroup>
+        </BaseFormGroup> -->
 
         <!-- <div class="py-2">
             <BaseBtnShareTwitter :url="inviteUrl" text="Please have a look at this:" class="me-2" />
@@ -45,7 +50,7 @@
             <BaseBtnShareEmail :url="inviteUrl" subject="Please have a look at this!" class="me-2" />
         </div> -->
 
-        <BaseFormGroup
+        <!-- <BaseFormGroup
             label="Invitee Requirement"
             tooltip="The invitee needs to complete this quest before points are transferred to both parties."
         >
@@ -63,8 +68,84 @@
                     Claim <strong>{{ quest.amount }} points</strong>
                 </template>
             </b-button>
-        </template>
+        </template> -->
     </BaseCardQuest>
+    <b-modal v-model="showQuestModal" centered hide-footer>
+        <template #header>
+            <h5 class="modal-title">{{ groupTitle }}</h5>
+            <b-link class="btn-close" @click="showQuestModal = false">
+                <i class="fas fa-times" />
+            </b-link>
+        </template>
+        <div class="d-flex justify-content-center overflow-hidden">
+            <img :src="quest.image" :alt="quest.title" width="100%" />
+        </div>
+        <!-- Modal content -->
+        <div class="mt-3">
+            <b-alert v-if="isAlertInviteLinkUsesShown" class="p-2" variant="primary">
+                <i class="fas fa-sparkles mx-2" />
+                Your Invite Link has been used
+                <strong>{{ quest.uses }} {{ quest.uses > 1 ? 'times' : 'time' }}!</strong>
+            </b-alert>
+
+            <BaseFormGroup label="Your Invite Link" tooltip="Your Invite Link">
+                <template v-if="inviteUrl">
+                    <b-input-group>
+                        <b-form-input :model-value="inviteUrl" readonly />
+                        <b-input-group-append>
+                            <b-button
+                                v-clipboard:copy="inviteUrl"
+                                v-clipboard:success="onCopySuccess"
+                                size="sm"
+                                variant="primary"
+                            >
+                                <i v-if="isCopied" class="fas fa-clipboard-check px-2"></i>
+                                <i v-else class="fas fa-clipboard px-2"></i>
+                            </b-button>
+                        </b-input-group-append>
+                    </b-input-group>
+                </template>
+                <template v-else>
+                    <b-alert class="p-2 mb-0" variant="primary">
+                        <i class="fas fa-exclamation-circle mx-1" />
+                        Sign in to see your Invite Link
+                    </b-alert>
+                </template>
+            </BaseFormGroup>
+
+            <!-- Optional sharing buttons -->
+            <!--
+          <div class="py-2">
+            <BaseBtnShareTwitter :url="inviteUrl" text="Please have a look at this:" class="me-2" />
+            <BaseBtnShareLinkedin :url="inviteUrl" class="me-2" />
+            <BaseBtnShareWhatsapp :url="inviteUrl" class="me-2" />
+            <BaseBtnShareTelegram :url="inviteUrl" text="Please have a look at this!" class="me-2" />
+            <BaseBtnShareEmail :url="inviteUrl" subject="Please have a look at this!" class="me-2" />
+          </div>
+          -->
+
+            <BaseFormGroup
+                label="Invitee Requirement"
+                tooltip="The invitee needs to complete this quest before points are transferred to both parties."
+            >
+                <span class="text-opaque">{{ requiredQuest.title }}</span>
+                <strong>
+                    <span v-if="requiredQuest.amount" class="text-accent">{{ requiredQuest.amount }}</span>
+                    <span v-if="quest.amountInvitee" class="text-accent"> + {{ quest.amountInvitee }} </span>
+                </strong>
+            </BaseFormGroup>
+
+            <!-- Original button content -->
+            <div class="mt-3">
+                <b-button variant="primary" block class="w-100" :disabled="isDisabled" @click="onClick">
+                    <b-spinner v-if="isSubmitting" small></b-spinner>
+                    <template v-else>
+                        Claim <strong>{{ quest.amount }} points</strong>
+                    </template>
+                </b-button>
+            </div>
+        </div>
+    </b-modal>
 </template>
 
 <script lang="ts">
@@ -82,9 +163,19 @@ export default defineComponent({
             type: Object as PropType<TQuestInvite>,
             required: true,
         },
+        groupTitle: {
+            type: String,
+            required: false,
+        },
     },
     data() {
-        return { error: '', isModalQuestEntryShown: false, isSubmitting: false, isCopied: false };
+        return {
+            error: '',
+            isModalQuestEntryShown: false,
+            isSubmitting: false,
+            isCopied: false,
+            showQuestModal: false,
+        };
     },
     computed: {
         ...mapStores(useAccountStore),

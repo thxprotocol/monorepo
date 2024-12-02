@@ -14,7 +14,7 @@
         </b-progress> -->
 
         <template #button>
-            <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
+            <!-- <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
                 <b-spinner v-if="isSubmitting" small />
                 <template v-else-if="quest.amount">
                     Earn
@@ -24,9 +24,54 @@
                     </strong>
                 </template>
                 <template v-else>Complete Quest</template>
+            </b-button> -->
+            <!-- Button to open the modal -->
+            <b-button variant="primary" block class="w-100" @click="isModalVisible = true">
+                Earn <strong>{{ formattedAmount }}</strong> Pts
             </b-button>
         </template>
     </BaseCardQuest>
+    <b-modal v-model="isModalVisible" centered title="Quest Details" hide-footer @hide="resetModal">
+        <template #header>
+            <h5 class="modal-title">{{ groupTitle }}</h5>
+            <b-link class="btn-close" @click="isModalVisible = false">
+                <i class="fas fa-times" />
+            </b-link>
+        </template>
+        <div class="d-flex justify-content-center overflow-hidden">
+            <img v-if="quest.image" :src="quest.image" :alt="quest.title" width="100%" />
+        </div>
+        <div class="d-flex flex-column mt-3">
+            <p class="quest-modal-title">{{ quest.title }}</p>
+            <p class="quest-modal-text">{{ quest.description }}</p>
+            <p class="quest-modal-text mb-5">
+                You can earn
+                <span class="text-accent"
+                    ><strong>{{ formattedAmount }}</strong></span
+                >
+                points
+            </p>
+        </div>
+        <!-- Button inside modal to trigger onClickClaim -->
+        <b-button
+            variant="primary"
+            block
+            class="w-100"
+            :disabled="isSubmitting || pendingCount === 0"
+            @click="onClickClaim"
+        >
+            <b-spinner v-if="isSubmitting" small />
+            <template v-else-if="quest.amount">
+                Earn
+                <strong>
+                    {{ `${pendingCount} x` }}
+                    {{ formattedAmount }}
+                </strong>
+                points
+            </template>
+            <template v-else>Complete Quest</template>
+        </b-button>
+    </b-modal>
 </template>
 
 <script lang="ts">
@@ -44,9 +89,13 @@ export default defineComponent({
             required: true,
             type: Object as PropType<TQuestCustom>,
         },
+        groupTitle: {
+            type: String,
+            required: false,
+        },
     },
     data() {
-        return { error: '', isSubmitting: false, isModalQuestEntryShown: false };
+        return { error: '', isSubmitting: false, isModalQuestEntryShown: false, isModalVisible: false };
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore),
@@ -63,7 +112,7 @@ export default defineComponent({
                 const amount = this.quest.amount / 100;
                 return amount % 1 === 0 ? `$${amount.toFixed(0)}` : `$${amount.toFixed(2)}`;
             }
-            return `${this.quest.amount} points`;
+            return `${this.quest.amount}`;
         },
     },
     methods: {
@@ -78,6 +127,9 @@ export default defineComponent({
             } finally {
                 this.isSubmitting = false;
             }
+        },
+        resetModal() {
+            this.isModalVisible = false;
         },
     },
 });

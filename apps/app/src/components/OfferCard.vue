@@ -34,7 +34,7 @@
                     target="_blank"
                     @click="openModal"
                 >
-                    Claim <strong>${{ offer.payout }}</strong>
+                    Claim <strong>${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}</strong>
                 </button>
 
                 <!-- <div class="d-flex align-items-center justify-content-between mt-2 pb-2" style="opacity: 0.5">
@@ -64,7 +64,9 @@
                             style="border-radius: 5px; object-fit: cover"
                         />
                         <div class="modal-details ms-3">
-                            <p class="offer-payout">${{ offer.payout }}</p>
+                            <p class="offer-payout">
+                                ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
+                            </p>
                             <p class="offer-provider">{{ offer.provider }}</p>
                             <p class="offer-categories">
                                 <span v-for="category in offer.categories" :key="category" class="me-1">
@@ -92,7 +94,7 @@
 
                     <div v-else>
                         <b-button variant="primary" block class="w-100" @click="openOffer">
-                            Earn ${{ offer.payout }}
+                            Earn ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
                         </b-button>
                     </div>
                 </div>
@@ -166,10 +168,9 @@ export default defineComponent({
     color: rgba(93, 154, 238, 1);
 }
 .modal-title {
-    color: var(--body-text);
+    color: var(--modal-title-color) !important;
     font-size: 1rem;
     font-weight: 600;
-    padding: 10px 0;
     padding-right: 24px;
     display: block;
     white-space: nowrap;

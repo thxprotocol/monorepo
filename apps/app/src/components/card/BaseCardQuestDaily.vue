@@ -43,7 +43,8 @@
             >
                 <b-spinner v-if="isSubmitting" small />
                 <template v-else-if="quest.amount">
-                    Claim <strong>{{ quest.amount }} points</strong>
+                    <!-- Claim <strong>{{ quest.amount }} points</strong> -->
+                    Claim
                 </template>
                 <template v-else>Complete Quest</template>
             </b-button>
