@@ -47,7 +47,7 @@ export default defineComponent({
                 !this.value.length ||
                 this.value.length < 3 ||
                 this.value.length > 15 ||
-                this.value.includes(' ')
+                !/^[a-zA-Z0-9]+$/.test(this.value)
             );
         },
         isValidUsername() {
@@ -67,10 +67,9 @@ export default defineComponent({
             } else if (this.value.length < 3) {
                 this.error = 'Username must be at least 3 characters long.';
             } else if (this.value.length > 15) {
-                console.log(this.value.length);
                 this.error = 'Username must not exceed 15 characters.';
-            } else if (this.value.includes(' ')) {
-                this.error = 'Username must not contain space.';
+            } else if (!/^[a-zA-Z0-9]+$/.test(this.value)) {
+                this.error = 'Username must contain only letters and numbers.';
             } else {
                 this.error = '';
             }
