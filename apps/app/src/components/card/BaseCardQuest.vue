@@ -66,7 +66,7 @@
 
                 <div class="d-flex align-items-start justify-content-between">
                     <b-card-text
-                        v-if="quest.description"
+                        v-if="quest.title"
                         class="mb-2"
                         style="
                             display: -webkit-box;
