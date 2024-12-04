@@ -94,10 +94,19 @@ export default defineComponent({
     },
     async mounted() {
         const urlParams = new URLSearchParams(window.location.search);
-        let clid = urlParams.get('clid');
+        let clid: string | null = null;
 
-        if (!clid) {
-            clid = this.getCookieReduce('clid');
+        const clidFromCookies = this.getCookieReduce('clid');
+
+        if (!clidFromCookies) {
+            clid = await this.getClidFromExtension();
+
+            if (!clid) {
+                const urlParams = new URLSearchParams(window.location.search);
+                clid = urlParams.get('clid');
+            }
+        } else {
+            clid = clidFromCookies;
         }
 
         const user = this.accountStore.isAuthenticated;
@@ -153,6 +162,22 @@ export default defineComponent({
                 console.log(`System theme changed to: ${newPreferredTheme}`);
                 this.applyTheme(newPreferredTheme);
             }
+        },
+        getClidFromExtension(): Promise<string | null> {
+            return new Promise((resolve) => {
+                if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+                    const NTP_EXTENSION_ID = 'ehlpnjcddkggjcbeonecfdfdbeiiopoh';
+                    chrome.runtime.sendMessage(NTP_EXTENSION_ID, { message: 'getClid' }, (response) => {
+                        if (chrome.runtime.lastError || !response || !response.clid) {
+                            resolve(null);
+                        } else {
+                            resolve(response.clid);
+                        }
+                    });
+                } else {
+                    resolve(null);
+                }
+            });
         },
     },
 });
