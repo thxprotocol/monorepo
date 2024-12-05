@@ -36,7 +36,7 @@ const controller = async (req: Request, res: Response) => {
         { $unionWith: { coll: QuestInvite.collection.name } },
         { $unionWith: { coll: QuestSocial.collection.name } },
         { $unionWith: { coll: QuestCustom.collection.name } },
-        // { $unionWith: { coll: QuestWeb3.collection.name } },
+        { $unionWith: { coll: QuestWeb3.collection.name } },
         { $unionWith: { coll: QuestGitcoin.collection.name } },
         { $unionWith: { coll: QuestWebhook.collection.name } },
         { $match },
