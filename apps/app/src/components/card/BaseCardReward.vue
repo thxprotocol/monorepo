@@ -137,16 +137,11 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore, useAuthStore),
         participantBalance() {
-            const participant = this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
+            const participant = this.accountStore.participants.find(
+                (p) => p.sub === this.accountStore.account?.sub && p.poolId === this.reward.poolId,
+            );
             if (!participant) return 0;
-
-            if (this.reward.poolId === SANTA_CAMPAIGN && participant.poolId === SANTA_CAMPAIGN) {
-                return participant.balance || 0;
-            } else if (this.reward.poolId === CP_CAMPAIGN && participant.poolId === CP_CAMPAIGN) {
-                return participant.balance || 0;
-            }
-
-            return 0;
+            return participant.balance || 0;
         },
         isInsufficientPoints() {
             return this.participantBalance < this.reward.pointPrice;
