@@ -26,7 +26,13 @@
                 <template v-else>Complete Quest</template>
             </b-button> -->
             <!-- Button to open the modal -->
-            <b-button variant="primary" block class="w-100" @click="isModalVisible = true">
+            <b-button
+                variant="primary"
+                block
+                class="w-100"
+                :style="{ opacity: quest.isLocked ? 0.3 : 1 }"
+                @click="isModalVisible = true"
+            >
                 Earn <strong>{{ formattedAmount }}</strong> Pts
             </b-button>
         </template>

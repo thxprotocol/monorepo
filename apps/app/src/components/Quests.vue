@@ -842,16 +842,17 @@ export default defineComponent({
     box-sizing: border-box;
     background: var(--quest-item-bg);
     border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     //margin-bottom: 15px;
     .card {
         border: 0 !important;
         border-radius: 20px !important;
         img {
-            border-radius: 20px;
-            background: aliceblue;
-            max-height: 130px;
+            border-radius: 4px;
             overflow: hidden;
-            border: 0.5px solid rgba(13, 92, 226, 0.2705882353);
+            width: 100%;
+            height: 162px;
+            object-fit: cover;
         }
     }
 }
@@ -880,7 +881,6 @@ export default defineComponent({
     border-radius: 20px;
     // padding: 15px 20px;
     padding-bottom: 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     h3 {
         font-family: 'Poppins', sans-serif;
         color: var(--title-color);

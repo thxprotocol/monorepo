@@ -1,20 +1,24 @@
 <template>
-    <b-card class="w-100 my-offer-card m-0 p-3" header-class="p-0" body-class="d-flex flex-column p-0">
-        <div class="d-flex p-3 m-0 align-items-center pt-0">
+    <b-card class="w-100 my-offer-card m-0" header-class="p-0" body-class="d-flex flex-column p-0">
+        <!-- <div class="d-flex p-3 m-0 align-items-center pt-0">
             <div class="d-flex align-items-center justify-content-center" style="width: 25px">
                 <i class="me-2 text-primary fas fa-gift fs-5"></i>
             </div>
             <div class="flex-grow-1 pe-2 offer-description fs-5">
                 {{ decodeHTML(offer.title) }}
             </div>
-            <!-- <div v-if="offer.payout" class="text-primary fw-bold" style="white-space: nowrap">
-                    {{ offer.payout }} {{ offer.currency }}
-                </div> -->
-        </div>
+        </div> -->
 
         <b-collapse v-model="isVisible">
             <div class="d-flex justify-content-center w-100 offer-card-img">
-                <img v-if="offer.imageUrl" class="img-fluid" :src="offer.imageUrl" alt="header image" loading="lazy" />
+                <img
+                    v-if="offer.imageUrl"
+                    class="img-fluid"
+                    :src="offer.imageUrl"
+                    alt="header image"
+                    loading="lazy"
+                    width="100"
+                />
                 <div v-else class="placeholder"></div>
             </div>
 
@@ -23,7 +27,7 @@
                     <b-card-text
                         v-if="offer.description"
                         class="flex-grow-1 mb-2 offer-description"
-                        v-html="decodeHTML(offer.description)"
+                        v-html="decodeHTML(offer.title)"
                     />
                 </div>
 
@@ -80,8 +84,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="d-flex gap-4 modal-info-wrap justify-content-between">
-                    <div v-if="!accountStore.isMobile">
+                <div
+                    :class="[
+                        'd-flex',
+                        'modal-info-wrap',
+                        { 'justify-content-center': !offer.events, 'justify-content-between': offer.events },
+                    ]"
+                >
+                    <div v-if="!accountStore.isMobile && offer.events">
                         <OfferSteps :offer="offer" />
                     </div>
                     <div v-if="!accountStore.isMobile" class="qr-code mt-4">
@@ -155,6 +165,7 @@ export default defineComponent({
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     color: var(--body-text);
+    text-align: center;
 }
 .offer-categories span {
     font-weight: 500;
@@ -257,9 +268,6 @@ export default defineComponent({
 .modal-btn-close:hover {
     opacity: 0.75;
 }
-.offer-card-img {
-    margin-top: 0.5rem;
-}
 .offer-btn {
     outline: none;
     border-radius: 5px;
@@ -269,6 +277,7 @@ export default defineComponent({
 }
 .my-offer-card {
     background: var(--main-content-bg);
+    padding: 10px;
 }
 .modal-content {
     background-color: var(--modal-bg);
@@ -282,6 +291,14 @@ export default defineComponent({
     height: 50px;
     pointer-events: none;
 }
+
+.placeholder {
+    background-color: #8e8e8e;
+    width: 100%;
+    height: 162px;
+    border-radius: 4px;
+}
+
 @media (max-width: 992px) {
     .modal-info-wrap {
         display: block !important;

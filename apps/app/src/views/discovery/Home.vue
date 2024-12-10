@@ -132,7 +132,8 @@ export default defineComponent({
     methods: {
         async getParticipants() {
             if (this.accountStore.isAuthenticated) {
-                await this.accountStore.getParticipants();
+                await this.accountStore.getParticipants(SANTA_CAMPAIGN);
+                await this.accountStore.getParticipants(CP_CAMPAIGN);
                 // console.log('participants: ', this.accountStore.participants);
             }
         },

@@ -141,12 +141,12 @@
                     Quest Completed
                 </b-button>
 
-                <BaseButtonQuestLocked
+                <!-- <BaseButtonQuestLocked
                     v-else-if="quest.isLocked"
                     :id="quest._id"
                     :locks="quest.locks"
                     :amount="quest.amount"
-                />
+                /> -->
                 <slot v-else name="button"></slot>
             </div>
         </b-collapse>
