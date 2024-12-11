@@ -22,15 +22,17 @@
                 <div v-else class="placeholder"></div>
             </div>
 
-            <div class="px-3 mt-3">
+            <div class="px-3 mt-2">
                 <div class="d-flex align-items-start justify-content-between">
                     <b-card-text
                         v-if="offer.description"
-                        class="flex-grow-1 mb-2 offer-description"
+                        class="flex-grow-1 offer-description"
                         v-html="decodeHTML(offer.title)"
                     />
                 </div>
-
+                <div class="d-flex justify-content-center mb-1 hr-divider">
+                    <img :src="hrDivider" alt="hr divider" width="72" height="2" />
+                </div>
                 <button
                     variant="primary"
                     block
@@ -120,6 +122,7 @@ import Qrcode from 'vue-qrcode';
 import { useAccountStore } from '../stores/Account';
 import { mapStores } from 'pinia';
 import imgSanta from '../assets/santa-logo.png';
+import hrDivider from '../assets/hr-line.png';
 export default defineComponent({
     name: 'OfferCard',
     components: {
@@ -142,6 +145,7 @@ export default defineComponent({
                 // Add more mappings as needed
             } as { [provider: string]: string },
             imgSanta,
+            hrDivider,
         };
     },
     methods: {
@@ -166,6 +170,9 @@ export default defineComponent({
     -webkit-box-orient: vertical;
     color: var(--body-text);
     text-align: center;
+    font-size: 14px;
+    text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
+    margin-bottom: 4px !important;
 }
 .offer-categories span {
     font-weight: 500;
@@ -299,6 +306,10 @@ export default defineComponent({
     border-radius: 4px;
 }
 
+.hr-divider img {
+    height: 2px !important;
+    width: 72px !important;
+}
 @media (max-width: 992px) {
     .modal-info-wrap {
         display: block !important;

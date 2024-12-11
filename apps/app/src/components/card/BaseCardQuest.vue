@@ -39,9 +39,11 @@
                 alt="header image"
                 loading="lazy"
                 style="border-radius: 4px"
+                :style="{ height: quest.variant === QuestVariant.Daily ? '130px' : 'unset' }"
             />
+            <div></div>
 
-            <div class="px-3 mt-2 d-flex flex-column flex-grow-1">
+            <div class="px-3 mt-2 d-flex flex-column flex-grow-1 justify-content-end">
                 <!-- <b-alert v-model="hasExpiry" variant="primary" class="px-2 py-1 flex-grow-1 mb-2">
                     <i class="fas fa-clock me-1" />
                     Quest ends in <strong>{{ expiryDate }} </strong>!
@@ -64,20 +66,11 @@
                     <strong>{{ quest.entriesPendingReview.length }}</strong> entries pending a review.
                 </b-alert> -->
 
-                <div class="d-flex align-items-start justify-content-between">
+                <div class="d-flex align-items-start justify-content-center">
                     <b-card-text
-                        v-if="quest.title"
-                        class="mb-2"
-                        style="
-                            display: -webkit-box;
-                            -webkit-line-clamp: 2;
-                            -webkit-box-orient: vertical;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            color: var(--body-text);
-                            text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
-                            text-align: center;
-                        "
+                        v-if="quest.title && quest.variant !== QuestVariant.Daily"
+                        class="quest-title-main"
+                        :style="titleStyle"
                         v-html="decodeHTML(quest.title)"
                     />
                     <!-- <b-dropdown
@@ -120,7 +113,7 @@
                     </div> -->
                 <!-- </div> -->
             </div>
-            <div class="d-flex justify-content-center mb-1">
+            <div v-if="quest.variant !== QuestVariant.Daily" class="d-flex justify-content-center mb-1">
                 <img :src="hrDivider" alt="hr divider" width="72" height="2" />
             </div>
             <div class="px-3 quest-card-btns">
@@ -137,7 +130,13 @@
                     <strong v-else> Complete! </strong>
                 </b-button>
 
-                <b-button v-else-if="!quest.isAvailable" variant="primary" block class="w-100" disabled>
+                <b-button
+                    v-else-if="(!quest.isAvailable && quest.variant !== QuestVariant.Daily) || quest.isCompleted"
+                    variant="primary"
+                    block
+                    class="w-100"
+                    disabled
+                >
                     Quest Completed
                 </b-button>
 
@@ -199,6 +198,7 @@ export default defineComponent({
                 [QuestVariant.Webhook]: 'fas fa-globe',
             } as { [variant: string]: string },
             hrDivider,
+            QuestVariant,
         };
     },
     computed: {
@@ -220,6 +220,18 @@ export default defineComponent({
         },
         isAlertEntriesPendingReviewShown() {
             return this.quest.entriesPendingReview.length > 0;
+        },
+        titleStyle() {
+            const titleLength = this.quest.title.length;
+            if (titleLength <= 20) {
+                return { width: '100%' };
+            } else if (titleLength <= 25) {
+                return { width: '130px' };
+            } else if (titleLength <= 30) {
+                return { width: '170px' };
+            } else {
+                return { width: '100%' };
+            }
         },
     },
     watch: {
@@ -244,5 +256,18 @@ export default defineComponent({
     border-radius: 5px;
     background: var(--btn-primary-santa);
     padding: 7px 0px;
+}
+.quest-title-main {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--body-text);
+    text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
+    text-align: center;
+    line-height: 18px;
+    padding-bottom: 4px;
+    font-size: 14px;
 }
 </style>

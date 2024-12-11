@@ -8,21 +8,14 @@
         :error="error"
         @modal-close="isModalQuestEntryShown = false"
     >
-        <b-alert v-model="isAlertWaitDurationShown" variant="primary" class="p-2">
-            <i class="fas fa-clock mx-2" />
-            <span v-if="waitDuration">
-                You can claim again in
-                <strong>{{ waitDuration.hours }}</strong
-                >:<strong>{{ waitDuration.minutes }}</strong
-                >:<strong>{{ waitDuration.seconds }}</strong>
-            </span>
-        </b-alert>
-
-        <div class="d-flex flex-wrap pb-3 justify-content-start">
+        <div class="d-flex mb-2">
+            <p class="card-text quest-title-main">{{ quest.description }}</p>
+        </div>
+        <div class="d-flex flex-wrap justify-content-start mb-2">
             <b-badge
                 v-for="(amount, key) of quest.amounts"
-                style="width: 50px; height: 50px"
-                class="my-1 me-3 d-flex flex-column align-items-center justify-content-center"
+                style="width: 44px; height: 38px"
+                class="me-3 d-flex flex-column align-items-center justify-content-center"
                 :variant="key < quest.entries.length ? 'success' : 'primary'"
                 :class="
                     key < quest.entries.length ? 'bg-success text-white bg-daily-completed' : 'bg-primary text-white'
@@ -32,21 +25,25 @@
                 <strong class="h5 mb-0">{{ formatAmount(amount) }} </strong>
             </b-badge>
         </div>
-
         <template #button>
             <b-button
-                class="w-100"
-                block
                 variant="primary"
-                :disabled="isSubmitting || !quest.isAvailable"
-                @click="onClickClaim"
+                block
+                class="w-100"
+                :style="{ opacity: quest.isLocked || !quest.isAvailable || isSubmitting ? 0.3 : 1 }"
+                :disabled="isSubmitting"
+                @click="quest.isAvailable ? onClickClaim() : null"
             >
                 <b-spinner v-if="isSubmitting" small />
-                <template v-else-if="quest.amount">
-                    <!-- Claim <strong>{{ quest.amount }} points</strong> -->
-                    Claim
+                <template v-if="quest.isAvailable"> Earn {{ quest.amount }} Pts </template>
+                <template v-else-if="!quest.isAvailable">
+                    You can claim again in
+                    <span v-if="waitDuration"
+                        ><strong>{{ waitDuration.hours }}</strong
+                        >:<strong>{{ waitDuration.minutes }}</strong
+                        >:<strong>{{ waitDuration.seconds }}</strong></span
+                    >
                 </template>
-                <template v-else>Complete Quest</template>
             </b-button>
         </template>
     </BaseCardQuest>
@@ -69,6 +66,10 @@ export default defineComponent({
         quest: {
             type: Object as PropType<TQuestDaily>,
             required: true,
+        },
+        groupTitle: {
+            type: String,
+            required: false,
         },
     },
     data(): {

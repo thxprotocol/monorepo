@@ -33,7 +33,7 @@
                 :style="{ opacity: quest.isLocked ? 0.3 : 1 }"
                 @click="isModalVisible = true"
             >
-                Earn <strong>{{ formattedAmount }}</strong> Pts
+                Earn {{ formattedAmount }} Pts
             </b-button>
         </template>
     </BaseCardQuest>
