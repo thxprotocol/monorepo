@@ -6,7 +6,7 @@
                 lg="6"
                 xl="7"
                 offset-xl="0"
-                class="quests-column flex-grow-1 my-col-xl-7 p-3 pt-2"
+                class="quests-column flex-grow-1 my-col-xl-7"
             >
                 <!-- <div class="mb-2 align-items-center bg-quests rounded">
                     <div class="quests-title d-flex p-2">
@@ -42,8 +42,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-else class="d-flex flex-column">
-                                <div v-for="group in mergedQuestsAndOffers" :key="group.title">
+                            <div v-else class="d-flex flex-column gap-5">
+                                <div v-for="group in filteredQuests" :key="group.title">
                                     <div
                                         v-if="!group.isOfferRow"
                                         :class="{
@@ -55,7 +55,6 @@
                                             }
                                         }), 
                                         }"
-                                        class="mt-4"
                                     >
                                         <h3 class="quest-group-title">{{ group.title }}</h3>
                                         <div class="quest-group">
@@ -78,7 +77,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div v-else class="offers-box mt-4">
+                                    <div v-else class="offers-box">
                                         <h3 class="quest-group-title">{{ group.title }}</h3>
                                         <div class="d-flex flex-wrap offer-row">
                                             <div
@@ -174,7 +173,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-else class="d-flex flex-column">
+                            <div v-else class="d-flex flex-column gap-5">
                                 <div
                                     v-for="group in filteredCompletedQuests"
                                     :key="group.title"
@@ -230,16 +229,29 @@
                         </div>
                     </b-tab>
                 </b-tabs>
+                <div ref="filterDropdown" class="h-wallet filter-wrapper" @click="toggleDropdown">
+                    <div class="custom-dropdown">
+                        <span class="selected-option">{{ selectedQuestFilterLabel }}</span>
+                        <i class="fas fa-chevron-down custom-select-icon body-color"></i>
+                    </div>
+                    <transition name="fade">
+                        <ul v-if="showDropdown" class="custom-dropdown-options" @click.stop>
+                            <li v-for="filter in questFilters" :key="filter.value" @click="selectFilter(filter.value)">
+                                {{ filter.label }}
+                            </li>
+                        </ul>
+                    </transition>
+                </div>
             </b-col>
             <b-col
                 v-if="selectedPart === 'rewards'"
                 lg="5"
                 xl="5"
                 xxl="4"
-                class="quests-column flex-grow-1 pt-2 px-3"
+                class="quests-column flex-grow-1 px-3"
                 offset-xl="0"
             >
-                <b-tabs content-class="mt-3" justified class="mt-3">
+                <b-tabs content-class="mt-3" justified>
                     <b-tab active>
                         <template #title> Available </template>
                         <div class="quests-box">
@@ -383,6 +395,15 @@ export default defineComponent({
             offers: [],
             offersPerRow: 5,
             isLoadingOffers: false,
+            selectedQuestFilter: 'all', // initial selection
+            questFilters: [
+                { label: 'All Quests', value: 'all' },
+                { label: 'Santa', value: 'santa' },
+                { label: 'Quest X', value: 'x' },
+                { label: 'Quest Discord', value: 'discord' },
+                { label: 'Quest Youtube', value: 'youtube' },
+            ],
+            showDropdown: false,
         };
     },
     computed: {
@@ -535,6 +556,30 @@ export default defineComponent({
         filteredCompletedQuests() {
             return this.mergedQuestsAndOffers.filter((group) => !group.isOfferRow);
         },
+        filteredQuests() {
+            if (this.selectedQuestFilter === 'all') return this.mergedQuestsAndOffers;
+
+            return this.mergedQuestsAndOffers.filter((group) => {
+                if (group.isOfferRow) return false;
+
+                switch (this.selectedQuestFilter) {
+                    case 'santa':
+                        return group.title === "Santa's Quests";
+                    case 'x':
+                        return group.title === 'X Quests';
+                    case 'discord':
+                        return group.title === 'Discord Quests';
+                    case 'youtube':
+                        return group.title === 'YouTube Quests';
+                    default:
+                        return true;
+                }
+            });
+        },
+        selectedQuestFilterLabel() {
+            const f = this.questFilters.find((f) => f.value === this.selectedQuestFilter);
+            return f ? f.label : 'All Quests';
+        },
     },
     watch: {
         'accountStore.isAuthenticated': {
@@ -609,6 +654,13 @@ export default defineComponent({
                     isDaily: false,
                 };
             });
+        },
+        toggleDropdown() {
+            this.showDropdown = !this.showDropdown;
+        },
+        selectFilter(value: string) {
+            this.selectedQuestFilter = value;
+            this.showDropdown = false;
         },
     },
 });
@@ -752,6 +804,7 @@ export default defineComponent({
     height: calc(100vh - 70px);
     margin-right: 20px;
     margin-left: 12px;
+    margin-top: 20px;
 }
 
 .quests-column .tab-content .card {
@@ -841,12 +894,12 @@ export default defineComponent({
     max-width: 45%;
     box-sizing: border-box;
     background: var(--quest-item-bg);
-    border-radius: 20px;
+    border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     //margin-bottom: 15px;
     .card {
         border: 0 !important;
-        border-radius: 20px !important;
+        border-radius: 10px !important;
         img {
             border-radius: 4px;
             overflow: hidden;
@@ -874,6 +927,7 @@ export default defineComponent({
     flex-direction: column;
     overflow-y: auto;
     gap: 25px;
+    margin-top: 24px;
 }
 
 .offers-box {
@@ -958,7 +1012,7 @@ export default defineComponent({
 }
 
 .quests-column .nav-link.active {
-    border-color: var(--nav-border-color);
+    border-color: var(--nav-border-color) !important;
     border-bottom-color: var(--border-as-nav-color) !important;
     border-bottom-width: 1px;
     font-weight: 600;
@@ -971,8 +1025,46 @@ export default defineComponent({
 }
 
 .quests-column .nav {
+    position: relative;
     border-bottom-color: var(--nav-border-color);
     gap: 3px;
+    border: none;
+}
+
+.quests-column .nav-item .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 157px;
+    width: 70%;
+    height: 1px;
+    background: linear-gradient(90deg, #414141 0%, rgba(198, 196, 196, 0) 100%);
+}
+.quests-column .nav-item .nav-link.active::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    height: 1px;
+    background: var(--nav-border-color);
+}
+.quests-column .nav-item:nth-child(1) .nav-link.active::before {
+    display: none;
+}
+.quests-column .nav-item:nth-child(2) .nav-link.active::after {
+    left: 319px;
+    width: 60%;
+}
+.quests-column .nav-item:nth-child(2) .nav-link.active::before {
+    left: 0;
+    width: 161px;
+}
+.quests-column .nav-item:nth-child(3) .nav-link.active::after {
+    left: 480px;
+    width: 50%;
+}
+.quests-column .nav-item:nth-child(3) .nav-link.active::before {
+    left: 0;
+    width: 322px;
 }
 
 .quest-group,
@@ -1033,6 +1125,67 @@ export default defineComponent({
     line-height: 17px;
     margin-bottom: 10px;
 }
+
+.filter-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 24px;
+    margin-right: 25px;
+    display: flex;
+}
+
+.custom-dropdown {
+    display: flex;
+    align-items: center;
+    background: var(--dropdown-background);
+    padding: 0px 12px;
+    border-radius: 5px;
+    position: relative;
+    justify-content: space-between;
+    width: 100%;
+    cursor: pointer;
+}
+
+.selected-option {
+    margin-right: 10px;
+    font-size: 12px;
+    color: var(--body-text);
+}
+
+.custom-dropdown-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    border-radius: 5px;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--dropdown-border-color);
+    background: var(--dropdown-background);
+    li {
+        padding: 8px 12px;
+        font-size: 12px;
+        color: var(--body-text);
+        &:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        cursor: pointer;
+    }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s;
+}
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
 @keyframes pulse {
     0% {
         opacity: 1;
@@ -1114,6 +1267,13 @@ export default defineComponent({
     .quests-column .tabs .tab-content {
         flex: 1;
         overflow: auto;
+    }
+    .nav-link.active::before,
+    .nav-link.active::after {
+        display: none;
+    }
+    .quests-column .nav {
+        border-bottom: 1px solid var(--nav-border-color);
     }
 }
 @media (max-width: 774px) {

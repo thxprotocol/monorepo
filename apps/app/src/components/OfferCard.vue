@@ -9,7 +9,7 @@
             </div>
         </div> -->
 
-        <b-collapse v-model="isVisible">
+        <b-collapse v-model="isVisible" class="h-100 d-flex flex-column">
             <div class="d-flex justify-content-center w-100 offer-card-img">
                 <img
                     v-if="offer.imageUrl"
@@ -22,8 +22,8 @@
                 <div v-else class="placeholder"></div>
             </div>
 
-            <div class="px-3 mt-2">
-                <div class="d-flex align-items-start justify-content-between">
+            <div class="px-3 mt-2 d-flex flex-column flex-grow-1">
+                <div class="d-flex align-items-end justify-content-between flex-grow-1">
                     <b-card-text
                         v-if="offer.description"
                         class="flex-grow-1 offer-description"
@@ -285,6 +285,8 @@ export default defineComponent({
 .my-offer-card {
     background: var(--main-content-bg);
     padding: 10px;
+    height: 100%;
+    min-height: 265px;
 }
 .modal-content {
     background-color: var(--modal-bg);
