@@ -984,7 +984,7 @@ export default defineComponent({
 
 .quest-item {
     height: 100%;
-    //min-height: 275px;
+    min-height: 265px;
     overflow: hidden;
     background-color: var(--quest-item-bg);
     border-radius: 10px;

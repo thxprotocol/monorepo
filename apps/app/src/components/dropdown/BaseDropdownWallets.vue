@@ -11,7 +11,15 @@
             end
         >
             <template #button-content>
-                <i class="text-success fas fa-circle me-2" />
+                <!-- <i class="text-success fas fa-circle me-2" /> -->
+                <img
+                    :src="onlineEllipse"
+                    alt="online"
+                    width="10"
+                    height="10"
+                    style="filter: drop-shadow(0px 2px 7px rgba(187, 255, 175, 0.3))"
+                    class="me-2"
+                />
                 <div class="fs-6 fw-normal">
                     {{ walletStore.wallet ? walletStore.wallet.short : 'Connect' }}
                 </div>
@@ -184,7 +192,7 @@ import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useAccountStore } from '../../stores/Account';
 import { WalletVariant } from '../../types/enums/accountVariant';
 import { chainList } from '@thxnetwork/app/utils/chains';
-
+import onlineEllipse from '../../assets/online-ellipse.png';
 export default defineComponent({
     name: 'BaseDropdownWallets',
     props: {
@@ -201,6 +209,7 @@ export default defineComponent({
                 [WalletVariant.WalletConnect]: 'Wallet Connect',
                 [WalletVariant.Safe]: 'Safe Multisig',
             } as Record<string, string>,
+            onlineEllipse,
         };
     },
     computed: {
