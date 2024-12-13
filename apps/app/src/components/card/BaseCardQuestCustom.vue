@@ -26,20 +26,7 @@
                 <template v-else>Complete Quest</template>
             </b-button> -->
             <!-- Button to open the modal -->
-            <b-button
-                variant="primary"
-                block
-                class="w-100"
-                :class="{ 'no-before': quest.isLocked }"
-                :style="{
-                    opacity: quest.isLocked ? 0.55 : 1,
-                    background: quest.isLocked ? 'var(--btn-disabled-bg)!important' : '',
-                    border: quest.isLocked ? '1px solid var(--btn-disabled-border)' : '',
-                    color: quest.isLocked ? 'var(--btn-disabled-color)' : '',
-                    fontWeight: quest.isLocked ? '500' : '',
-                }"
-                @click="isModalVisible = true"
-            >
+            <b-button variant="primary" block class="w-100" @click="isModalVisible = true">
                 Earn {{ formattedAmount }} Pts
             </b-button>
         </template>
@@ -66,13 +53,7 @@
             </p>
         </div>
         <!-- Button inside modal to trigger onClickClaim -->
-        <b-button
-            variant="primary"
-            block
-            class="w-100"
-            :disabled="isSubmitting || pendingCount === 0"
-            @click="onClickClaim"
-        >
+        <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
             <b-spinner v-if="isSubmitting" small />
             <template v-else-if="quest.amount">
                 Earn
@@ -130,6 +111,8 @@ export default defineComponent({
     },
     methods: {
         onClickClaim: async function () {
+            console.log('Quest:', this.quest);
+            console.log('Quest Events:', this.quest.events);
             try {
                 this.error = '';
                 this.isSubmitting = true;
