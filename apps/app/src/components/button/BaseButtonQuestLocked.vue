@@ -65,9 +65,11 @@ export default defineComponent({
     color: var(--btn-disabled-color);
     font-weight: 500;
 }
-.locked-btn:hover {
+.locked-btn:hover,
+.locked-btn:focus,
+.locked-btn:active {
     background: var(--btn-disabled-bg) !important;
     border-color: var(--btn-disabled-border) !important;
-    color: var(--btn-disabled-color);
+    color: var(--btn-disabled-color) !important;
 }
 </style>
