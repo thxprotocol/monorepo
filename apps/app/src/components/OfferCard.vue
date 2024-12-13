@@ -22,26 +22,17 @@
                 <div v-else class="placeholder"></div>
             </div>
 
-            <div class="px-3 mt-2 d-flex flex-column flex-grow-1">
+            <div class="px-2 my-3 d-flex flex-column flex-grow-1">
                 <div class="d-flex align-items-end justify-content-between flex-grow-1">
                     <b-card-text
                         v-if="offer.description"
-                        class="flex-grow-1 offer-description"
+                        class="flex-grow-1 quest-title-main"
                         v-html="decodeHTML(offer.title)"
                     />
                 </div>
-                <div class="d-flex justify-content-center mb-1 hr-divider">
+                <!-- <div class="d-flex justify-content-center mb-1 hr-divider">
                     <img :src="hrDivider" alt="hr divider" width="72" height="2" />
-                </div>
-                <button
-                    variant="primary"
-                    block
-                    class="w-100 mb-1 offer-btn btn-primary"
-                    target="_blank"
-                    @click="openModal"
-                >
-                    Claim <strong>${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}</strong>
-                </button>
+                </div> -->
 
                 <!-- <div class="d-flex align-items-center justify-content-between mt-2 pb-2" style="opacity: 0.5">
                     <div class="d-flex align-items-center text-opaque small">
@@ -50,6 +41,9 @@
                     </div>
                 </div> -->
             </div>
+            <button variant="primary" block class="w-100 mb-1 offer-btn btn-primary" target="_blank" @click="openModal">
+                Claim <strong>${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}</strong>
+            </button>
         </b-collapse>
         <b-modal v-model="showModal" size="lg" hide-footer hide-header centered>
             <div class="offer-wrap">
@@ -283,7 +277,7 @@ export default defineComponent({
     padding: 7px 0;
 }
 .my-offer-card {
-    background: var(--main-content-bg);
+    background: var(--quest-item-bg);
     padding: 10px;
     height: 100%;
     min-height: 265px;

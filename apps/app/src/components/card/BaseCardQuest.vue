@@ -43,7 +43,7 @@
             />
             <div></div>
 
-            <div class="px-3 mt-2 d-flex flex-column flex-grow-1 justify-content-end">
+            <div class="px-2 my-3 d-flex flex-column flex-grow-1 justify-content-end">
                 <!-- <b-alert v-model="hasExpiry" variant="primary" class="px-2 py-1 flex-grow-1 mb-2">
                     <i class="fas fa-clock me-1" />
                     Quest ends in <strong>{{ expiryDate }} </strong>!
@@ -66,7 +66,7 @@
                     <strong>{{ quest.entriesPendingReview.length }}</strong> entries pending a review.
                 </b-alert> -->
 
-                <div class="d-flex align-items-start justify-content-center">
+                <div class="d-flex align-items-start">
                     <b-card-text
                         v-if="quest.title && quest.variant !== QuestVariant.Daily"
                         class="quest-title-main"
@@ -113,10 +113,10 @@
                     </div> -->
                 <!-- </div> -->
             </div>
-            <div v-if="quest.variant !== QuestVariant.Daily" class="d-flex justify-content-center mb-1">
+            <!-- <div v-if="quest.variant !== QuestVariant.Daily" class="d-flex justify-content-center mb-1">
                 <img :src="hrDivider" alt="hr divider" width="72" height="2" />
-            </div>
-            <div class="px-3 quest-card-btns">
+            </div> -->
+            <div class="quest-card-btns">
                 <b-button
                     v-if="!accountStore.isAuthenticated"
                     variant="primary"
@@ -140,12 +140,12 @@
                     Quest Completed
                 </b-button>
 
-                <!-- <BaseButtonQuestLocked
+                <BaseButtonQuestLocked
                     v-else-if="quest.isLocked"
                     :id="quest._id"
                     :locks="quest.locks"
                     :amount="quest.amount"
-                /> -->
+                />
                 <slot v-else name="button"></slot>
             </div>
         </b-collapse>
@@ -264,10 +264,9 @@ export default defineComponent({
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--body-text);
-    text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
-    text-align: center;
+    text-align: left;
     line-height: 18px;
-    padding-bottom: 4px;
     font-size: 14px;
+    opacity: 1;
 }
 </style>

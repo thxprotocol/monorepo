@@ -166,7 +166,7 @@ export default defineComponent({
     background: transparent;
     padding-right: 50px;
     padding-bottom: 17px;
-    border-bottom: 1px solid rgba(27, 27, 27, 0.5);
+    border-bottom: 1px solid var(--quest-daily-item-bg);
     width: auto !important;
 }
 
