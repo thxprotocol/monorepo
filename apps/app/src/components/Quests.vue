@@ -18,8 +18,8 @@
                     </div>
                 </div> -->
 
-                <b-tabs justified>
-                    <b-tab active>
+                <b-tabs v-model="activeTab" justified>
+                    <b-tab>
                         <template #title>
                             Available
                             <!-- <sup v-if="availableQuestCount">
@@ -229,7 +229,12 @@
                         </div>
                     </b-tab>
                 </b-tabs>
-                <div ref="filterDropdown" class="h-wallet filter-wrapper" @click="toggleDropdown">
+                <div
+                    v-if="[0, 1].includes(activeTab)"
+                    ref="filterDropdown"
+                    class="h-wallet filter-wrapper"
+                    @click="toggleDropdown"
+                >
                     <div class="custom-dropdown">
                         <span class="selected-option">{{ selectedQuestFilterLabel }}</span>
                         <i class="fas fa-chevron-down custom-select-icon body-color"></i>
@@ -404,6 +409,7 @@ export default defineComponent({
                 { label: 'Quest Youtube', value: 'youtube' },
             ],
             showDropdown: false,
+            activeTab: 0,
         };
     },
     computed: {
@@ -554,7 +560,24 @@ export default defineComponent({
             return merged;
         },
         filteredCompletedQuests() {
-            return this.mergedQuestsAndOffers.filter((group) => !group.isOfferRow);
+            const completedQuests = this.mergedQuestsAndOffers.filter((group) => !group.isOfferRow);
+
+            if (this.selectedQuestFilter === 'all') return completedQuests;
+
+            return completedQuests.filter((group) => {
+                switch (this.selectedQuestFilter) {
+                    case 'santa':
+                        return group.title === "Santa's Quests";
+                    case 'x':
+                        return group.title === 'X Quests';
+                    case 'discord':
+                        return group.title === 'Discord Quests';
+                    case 'youtube':
+                        return group.title === 'YouTube Quests';
+                    default:
+                        return true;
+                }
+            });
         },
         filteredQuests() {
             if (this.selectedQuestFilter === 'all') return this.mergedQuestsAndOffers;
@@ -610,9 +633,11 @@ export default defineComponent({
     },
     mounted() {
         window.addEventListener('resize', this.handleResize);
+        document.addEventListener('click', this.handleClickOutside);
     },
     beforeUnmount() {
         window.removeEventListener('resize', this.handleResize);
+        document.removeEventListener('click', this.handleClickOutside);
     },
     methods: {
         async fetchOffers() {
@@ -661,6 +686,12 @@ export default defineComponent({
         selectFilter(value: string) {
             this.selectedQuestFilter = value;
             this.showDropdown = false;
+        },
+        handleClickOutside(event: MouseEvent) {
+            const dropdown = this.$refs.filterDropdown as HTMLElement;
+            if (!dropdown.contains(event.target as Node)) {
+                this.showDropdown = false;
+            }
         },
     },
 });
@@ -754,7 +785,7 @@ export default defineComponent({
 }
 
 .btn-primary {
-    box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px, rgba(255, 255, 255, 0.12) 0px 4px 4px 0px inset;
+    position: relative;
     border-radius: 5px;
     transition: all 0.3s ease;
     position: relative;
@@ -763,12 +794,35 @@ export default defineComponent({
     background: var(--btn-primary-santa) !important;
     border: none;
     color: #ffffff;
+    transition: background 0.15s ease-in-out, border-color 0.3s ease;
+    z-index: 0;
+}
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: transparent;
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+
+.btn-primary:hover::before {
+    background: var(--btn-primary-santa-hover);
+    opacity: 1;
 }
 
 .btn-primary:hover,
 .btn-primary:active,
 .btn-primary:disabled {
     background: var(--btn-primary-santa);
+}
+.btn-primary:disabled {
+    background: var(--btn-disabled-bg) !important;
+    border: 1px solid var(--btn-disabled-border);
+    opacity: 0.55;
+    color: var(--btn-disabled-color);
+    font-weight: 500;
 }
 .my-leader {
     background-color: #151515;
@@ -922,7 +976,7 @@ export default defineComponent({
 }
 
 .quests-box {
-    height: calc(100vh - 180px);
+    height: calc(100vh - 200px);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -1038,7 +1092,7 @@ export default defineComponent({
     left: 157px;
     width: 70%;
     height: 1px;
-    background: linear-gradient(90deg, #414141 0%, rgba(198, 196, 196, 0) 100%);
+    background: var(--border-tab-gradient);
 }
 .quests-column .nav-item .nav-link.active::before {
     content: '';
@@ -1171,7 +1225,7 @@ export default defineComponent({
         font-size: 12px;
         color: var(--body-text);
         &:hover {
-            background: rgba(255, 255, 255, 0.5);
+            background: var(--dropdown-border-color);
         }
         cursor: pointer;
     }
@@ -1207,10 +1261,8 @@ export default defineComponent({
         flex-direction: column;
         height: 100%;
         padding-bottom: 10px !important;
-    }
-    .quests-column {
-        margin: 0 !important;
-        padding: 0 12px !important;
+        margin: 0;
+        padding-top: 10px;
     }
     .quest-cont {
         max-width: 100%;
@@ -1241,6 +1293,7 @@ export default defineComponent({
     .quests-box {
         height: 100%;
         overflow: hidden;
+        margin: 0;
     }
     .reward-group {
         gap: 0;
@@ -1267,6 +1320,7 @@ export default defineComponent({
     .quests-column .tabs .tab-content {
         flex: 1;
         overflow: auto;
+        margin-top: 56px;
     }
     .nav-link.active::before,
     .nav-link.active::after {
@@ -1274,6 +1328,10 @@ export default defineComponent({
     }
     .quests-column .nav {
         border-bottom: 1px solid var(--nav-border-color);
+    }
+    .filter-wrapper {
+        margin-top: 60px;
+        margin-right: 10px;
     }
 }
 @media (max-width: 774px) {
@@ -1316,10 +1374,6 @@ export default defineComponent({
     .reward-group {
         grid-template-columns: repeat(1, 1fr);
         gap: 10px;
-    }
-    .quests-column {
-        padding: 0 10px !important;
-        margin: 0;
     }
     .quest-item-daily,
     .reward-item-promoted {

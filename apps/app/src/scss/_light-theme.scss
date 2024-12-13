@@ -13,6 +13,7 @@
     --nav-border-color: #CACACA;
     --border-as-nav-color: #f6f6f6;
     --btn-primary-santa: #29B6F6;
+    --btn-primary-santa-hover: linear-gradient(89deg, #29B6F6 0.59%, #0B98D8 51.81%, #51C4F9 103.02%);
     --btn-sidebar-bg: #FBFBFB;
     --btn-sidebar-active-bg: #1ABCFE;
     --btn-sidebar-color: #61656B;
@@ -35,5 +36,9 @@
     --green-highlight-color: #78BC61;
     --modal-text-color: #1C1C1C;
     --balance-box-bg: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
+    --border-tab-gradient: linear-gradient(90deg, #C4C4C4 0%, rgba(196, 196, 196, 0.00) 100%);
+    --btn-disabled-bg: #E5E5E5;
+    --btn-disabled-border: transparent;
+    --btn-disabled-color: #A3A3A3;
     // Add other light theme variables as needed
 }

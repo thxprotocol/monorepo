@@ -334,6 +334,7 @@ export default defineComponent({
 }
 .dropdown-menu .dropdown-item:hover {
     background: var(--dropdown-border-color);
+    color: inherit;
 }
 @keyframes fadeIn {
     from {

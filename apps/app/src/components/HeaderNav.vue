@@ -165,6 +165,9 @@ export default defineComponent({
     position: relative;
     background: transparent;
     padding-right: 50px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid rgba(27, 27, 27, 0.5);
+    width: auto !important;
 }
 
 .header-nav h2 {
@@ -276,11 +279,13 @@ export default defineComponent({
 
 @media (min-width: 992px) {
     .rewards-navbar {
-        margin-left: 16px;
         justify-content: center;
     }
     .balance-wrap {
-        margin-left: 50px;
+        margin-left: 47px;
+    }
+    .header-nav {
+        margin-left: 15px;
     }
 }
 

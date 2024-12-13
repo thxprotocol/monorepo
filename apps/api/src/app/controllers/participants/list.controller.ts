@@ -18,20 +18,19 @@ const controller = async (req: Request, res: Response) => {
     const participants = await Participant.find(query);
     const pools = await Pool.find({ _id: participants.map((p) => p.poolId) });
 
-    // Run pool specific operations
-    if (poolId) {
-        const pool = await PoolService.getById(poolId);
-        const account = await AccountProxy.findById(req.auth.sub);
-        if (!account) throw new NotFoundError('Account not found.');
+    const account = await AccountProxy.findById(req.auth.sub);
+    if (!account) throw new NotFoundError('Account not found.');
 
-        // Force connect account address as identity might be available
+    // Apply IdentityService connection to all pools
+    for (const pool of pools) {
         await IdentityService.forceConnect(pool, account);
         await IdentityService.forceConnectClidUUID(pool, account);
+    }
 
-
-        // If no participants were found, create a participant for the authenticated user
-        if (!participants.length) {
-            const query = { poolId, sub: account.sub };
+    // If no participants were found, create a participant for the authenticated user
+    if (!participants.length) {
+        for (const pool of pools) {
+            const query = { poolId: pool.id, sub: account.sub };
             const participant = await Participant.findOneAndUpdate(query, { ...query }, { new: true, upsert: true });
             participants.push(participant);
         }

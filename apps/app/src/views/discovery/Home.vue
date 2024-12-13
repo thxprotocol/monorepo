@@ -132,8 +132,7 @@ export default defineComponent({
     methods: {
         async getParticipants() {
             if (this.accountStore.isAuthenticated) {
-                await this.accountStore.getParticipants(SANTA_CAMPAIGN);
-                await this.accountStore.getParticipants(CP_CAMPAIGN);
+                await this.accountStore.getParticipants();
                 // console.log('participants: ', this.accountStore.participants);
             }
         },
@@ -476,8 +475,9 @@ export default defineComponent({
     flex-grow: 1;
     border: 1px solid var(--main-content-border);
     border-radius: 10px;
-    margin-top: 16px;
+    margin: 16px 0;
     background: var(--main-content-bg);
+    overflow: hidden;
 }
 
 @media (max-width: 424px) {

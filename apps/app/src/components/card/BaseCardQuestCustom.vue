@@ -30,7 +30,14 @@
                 variant="primary"
                 block
                 class="w-100"
-                :style="{ opacity: quest.isLocked ? 0.3 : 1 }"
+                :class="{ 'no-before': quest.isLocked }"
+                :style="{
+                    opacity: quest.isLocked ? 0.55 : 1,
+                    background: quest.isLocked ? 'var(--btn-disabled-bg)!important' : '',
+                    border: quest.isLocked ? '1px solid var(--btn-disabled-border)' : '',
+                    color: quest.isLocked ? 'var(--btn-disabled-color)' : '',
+                    fontWeight: quest.isLocked ? '500' : '',
+                }"
                 @click="isModalVisible = true"
             >
                 Earn {{ formattedAmount }} Pts
@@ -140,3 +147,8 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.no-before::before {
+    content: none !important;
+}
+</style>
