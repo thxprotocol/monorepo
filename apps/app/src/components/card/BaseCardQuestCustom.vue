@@ -52,8 +52,16 @@
                 points
             </p>
         </div>
+        <div v-if="error" variant="danger" class="p-2"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+
         <!-- Button inside modal to trigger onClickClaim -->
-        <b-button variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickClaim">
+        <b-button
+            variant="primary"
+            block
+            class="w-100"
+            :disabled="isSubmitting || pendingCount === 0"
+            @click="onClickClaim"
+        >
             <b-spinner v-if="isSubmitting" small />
             <template v-else-if="quest.amount">
                 Earn
@@ -111,15 +119,13 @@ export default defineComponent({
     },
     methods: {
         onClickClaim: async function () {
-            console.log('Quest:', this.quest);
-            console.log('Quest Events:', this.quest.events);
             try {
                 this.error = '';
                 this.isSubmitting = true;
                 await this.questStore.completeQuest(this.quest);
                 this.isModalQuestEntryShown = true;
             } catch (error) {
-                this.error = error as string;
+                this.error = error?.message || String(error);
             } finally {
                 this.isSubmitting = false;
             }

@@ -16,7 +16,14 @@ const controller = async (req: Request, res: Response) => {
     // console.log(req, '------------------------------------------------');
     // Extend participant details with pool info
     const participants = await Participant.find(query);
-    const pools = await Pool.find({ _id: participants.map((p) => p.poolId) });
+    let pools;
+
+    if (participants.length) {
+        pools = await Pool.find({ _id: participants.map((p) => p.poolId) });
+    } else {
+        // Fetch all pools if no participants are found
+        pools = await Pool.find({});
+    }
 
     const account = await AccountProxy.findById(req.auth.sub);
     if (!account) throw new NotFoundError('Account not found.');
