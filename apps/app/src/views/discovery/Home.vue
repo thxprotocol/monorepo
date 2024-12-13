@@ -475,8 +475,9 @@ export default defineComponent({
     flex-grow: 1;
     border: 1px solid var(--main-content-border);
     border-radius: 10px;
-    margin-top: 16px;
+    margin: 16px 0;
     background: var(--main-content-bg);
+    overflow: hidden;
 }
 
 @media (max-width: 424px) {

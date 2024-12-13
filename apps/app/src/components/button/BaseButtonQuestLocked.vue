@@ -1,14 +1,14 @@
 <template>
-    <b-button variant="primary" block class="w-100 locked-btn" @click="isModalShown = true">
+    <b-button block class="w-100 locked-btn" @click="isModalShown = true">
         <!-- <i class="fas fa-lock me-1" /> -->
         Earn {{ amount }} Pts
     </b-button>
     <b-modal :id="`modalQuestLock${id}`" v-model="isModalShown" title="Locked!" centered no-close-on-backdrop>
-        <p class="text-opaque ms-0">To unlock this quest, complete these quests:</p>
+        <p class="text-opaque ms-0">To unlock, complete {{ locked?.length === 1 ? 'this quest' : 'these quests' }}:</p>
         <template v-for="lock of locked">
             <div v-if="lock" class="d-flex justify-content-between">
                 {{ lock.title }}
-                <strong class="text-accent">{{ lock.amount }}</strong>
+                <!-- <strong class="text-accent">{{ lock.amount }}</strong> -->
             </div>
             <b-alert v-else v-model="isAlertShown" show variant="info" class="p-2 px-3">
                 <i class="fas fa-info-circle me-1" />
@@ -59,6 +59,17 @@ export default defineComponent({
     height: auto;
 }
 .locked-btn {
-    opacity: 0.3;
+    background: var(--btn-disabled-bg) !important;
+    border: 1px solid var(--btn-disabled-border);
+    opacity: 0.55;
+    color: var(--btn-disabled-color);
+    font-weight: 500;
+}
+.locked-btn:hover,
+.locked-btn:focus,
+.locked-btn:active {
+    background: var(--btn-disabled-bg) !important;
+    border-color: var(--btn-disabled-border) !important;
+    color: var(--btn-disabled-color) !important;
 }
 </style>

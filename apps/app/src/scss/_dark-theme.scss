@@ -10,9 +10,10 @@
     --modal-bg: #15171a;
     --nav-link-bg: #202020;
     --nav-link-active-bg: rgba(255, 255, 255, 0.03);
-    --nav-border-color: #292929;
+    --nav-border-color: #414141;
     --border-as-nav-color: #151415;
-    --btn-primary-santa: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
+    --btn-primary-santa: linear-gradient(227deg, #B13434 62.23%, #D84F4F 144.78%, #9368B7 162.03%);
+    --btn-primary-santa-hover: linear-gradient(48deg, #B13434 18.58%, #D84F4F 125.78%);
     --btn-sidebar-bg: rgba(27, 27, 27, 0.4);
     --btn-sidebar-active-bg: #d44646;
     --btn-sidebar-color: #CACACA;
@@ -21,7 +22,7 @@
     --discord-border-color: transparent;
     --discord-highlight-color: linear-gradient(180deg, #d2cc52 0%, #ccc300 100%);
     --main-content-border: #1a1a1a;
-    --main-content-bg: transparent;
+    --main-content-bg: #151515;
     --quest-item-bg: #202020;
     --scroll-track-bg: #393939;
     --scroll-thumb-bg: #49494b;
@@ -39,6 +40,11 @@
     --navbar-bottom-color: #B7B7B7;
     --green-highlight-color: #1BFF2E;
     --modal-text-color: #cdcdcd;
+    --balance-box-bg: linear-gradient(227deg, #2E2E2E 62.23%, #272020 144.78%, #000 162.03%);
+    --border-tab-gradient: linear-gradient(90deg, #414141 0%, rgba(198, 196, 196, 0) 100%);
+    --btn-disabled-bg: linear-gradient(227deg, #2E2E2E 62.23%, #272020 144.78%, #000 162.03%);
+    --btn-disabled-border: rgba(255, 255, 255, 0.07);
+    --btn-disabled-color: inherit;
     // Add other dark theme variables as needed
     
 }

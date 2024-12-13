@@ -111,7 +111,7 @@ export default defineComponent({
     z-index: 22;
     background: var(--navbar-bottom-bg);
     backdrop-filter: blur(27px);
-    zoom: 0.75;
+    zoom: 0.8;
     left: 0;
     padding: 1rem;
 }

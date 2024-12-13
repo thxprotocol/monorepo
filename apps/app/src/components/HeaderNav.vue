@@ -15,7 +15,7 @@
                     <h2>Santa <span class="d-block">Points</span></h2>
                     <div class="d-flex align-items-center">
                         <p>{{ numberWithCommas(formattedBalance(participantSantaState, SANTA_CAMPAIGN)) }}</p>
-                        <img :src="imgStarCoin" alt="Star Coin" loading="lazy" width="24" />
+                        <img :src="imgStarCoin" alt="Star Coin" loading="lazy" width="24" class="ps-1" />
                     </div>
                 </div>
                 <div class="balance-box">
@@ -165,6 +165,9 @@ export default defineComponent({
     position: relative;
     background: transparent;
     padding-right: 50px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid var(--quest-daily-item-bg);
+    width: auto !important;
 }
 
 .header-nav h2 {
@@ -176,6 +179,7 @@ export default defineComponent({
     text-transform: uppercase;
     margin: 0;
     white-space: nowrap;
+    line-height: 15px;
 }
 
 .header-nav p {
@@ -186,6 +190,7 @@ export default defineComponent({
     font-weight: 600;
     line-height: 16px;
     margin: 0;
+    padding-top: 1px;
 }
 
 .b-avatar-header {
@@ -230,14 +235,25 @@ export default defineComponent({
 }
 
 .balance-box {
+    position: relative;
     width: 190px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
-    border-radius: 5px;
-    padding: 11px 10px;
+    background: var(--balance-box-bg);
+    border-radius: 8px;
+    padding: 0 12px;
+}
+.balance-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.47);
+    box-sizing: border-box;
+    border-radius: 8px;
+    mix-blend-mode: overlay;
 }
 
 .media-header {
@@ -263,11 +279,13 @@ export default defineComponent({
 
 @media (min-width: 992px) {
     .rewards-navbar {
-        margin-left: 16px;
         justify-content: center;
     }
     .balance-wrap {
-        margin-left: 40px;
+        margin-left: 47px;
+    }
+    .header-nav {
+        margin-left: 15px;
     }
 }
 

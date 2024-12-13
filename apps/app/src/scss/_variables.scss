@@ -443,7 +443,7 @@ $position-values: (
 
 $body-text-align:           null !default;
 $body-color:                $white !default;
-$body-bg:                   $purple-darker !default;
+$body-bg:                   transparent !default;
 
 $body-secondary-color:      rgba($body-color, .75) !default;
 $body-secondary-bg:         $purple-dark !default;

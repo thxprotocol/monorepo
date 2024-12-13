@@ -66,7 +66,7 @@ export default defineComponent({
 }
 
 .select-button {
-    color: #d4d4d4 !important;
+    color: var(--body-text) !important;
     background-color: rgba(255, 255, 255, 0.02) !important;
     border: 0.5px solid #1d1d1d !important;
     font-size: 15px !important;
@@ -81,6 +81,6 @@ export default defineComponent({
 }
 
 .select-button:hover {
-    background-color: #3b3a3ac2 !important;
+    background-color: var(--dropdown-border-color) !important;
 }
 </style>
