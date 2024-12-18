@@ -222,11 +222,7 @@
                     </b-tab>
 
                     <b-tab title="About">
-                        <div class="quests-box d-flex justify-content-center align-items-center">
-                            <p class="text-center text-muted mt-3 text-opaque empty-message">
-                                No information available.
-                            </p>
-                        </div>
+                        <AboutQuests />
                     </b-tab>
                 </b-tabs>
                 <div
@@ -859,6 +855,7 @@ export default defineComponent({
     margin-right: 20px;
     margin-left: 12px;
     margin-top: 20px;
+    overflow: hidden;
 }
 
 .quests-column .tab-content .card {
@@ -1321,6 +1318,8 @@ export default defineComponent({
         flex: 1;
         overflow: auto;
         margin-top: 56px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
     .nav-link.active::before,
     .nav-link.active::after {
@@ -1384,7 +1383,12 @@ export default defineComponent({
         max-width: 100% !important;
     }
 }
-
+@media (max-width: 340px) {
+    .quests-column .nav-link {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
 @media (min-width: 1400px) {
     .quest-cont {
         max-width: 100%;
