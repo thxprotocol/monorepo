@@ -1123,10 +1123,11 @@ export default defineComponent({
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .quest-item {
-    height: 100%;
     min-height: 265px;
     overflow: hidden;
     background-color: var(--quest-item-bg);
@@ -1303,6 +1304,9 @@ export default defineComponent({
     .quests-column .nav-link {
         width: 100% !important;
     }
+    .quest-item {
+        grid-column: span 1;
+    }
     .quest-item-daily,
     .reward-item-promoted {
         grid-column: span 2;
@@ -1332,9 +1336,13 @@ export default defineComponent({
         margin-top: 60px;
         margin-right: 10px;
     }
+    .quest-group {
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(220px, 1fr);
+        overflow-x: auto;
+    }
 }
 @media (max-width: 774px) {
-    .quest-group,
     .reward-group {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
@@ -1369,7 +1377,6 @@ export default defineComponent({
     }
 }
 @media (max-width: 576px) {
-    .quest-group,
     .reward-group {
         grid-template-columns: repeat(1, 1fr);
         gap: 10px;
