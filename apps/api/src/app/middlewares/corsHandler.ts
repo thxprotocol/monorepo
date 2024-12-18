@@ -8,6 +8,7 @@ export const corsHandler = cors(async (req: any, callback: any) => {
         API_URL,
         DASHBOARD_URL,
         WIDGET_URL,
+        'chrome://verification.top-chrome',
         'https://localhost:8080',
         // 'https://thx.network',
         // 'https://www.thx.network',
