@@ -222,7 +222,7 @@
                     </b-tab>
 
                     <b-tab title="About">
-                        <AboutQuests />
+                        <AboutQuests :active-tab="activeTab" />
                     </b-tab>
                 </b-tabs>
                 <div

@@ -24,16 +24,18 @@
                     :key="section.ref"
                     :ref="(el) => (sectionRefs[section.ref] = el)"
                     class="about-section"
+                    :class="[`about-section-${section.ref}`]"
+                    :style="{ marginBottom: section.ref === 'help' ? marginBottomLastSection + 'px' : '0' }"
                     v-html="section.content"
                 ></section>
             </template>
 
-            <!-- Mobile View: Show only the active section -->
             <template v-else>
                 <section
                     v-for="section in filteredSections"
                     :key="section.ref"
                     class="about-section"
+                    :class="[`about-section-${section.ref}`]"
                     v-html="section.content"
                 ></section>
             </template>
@@ -42,9 +44,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { getAboutContent } from '@thxnetwork/app/config/aboutContent';
 import { useAccountStore } from '@thxnetwork/app/stores/Account';
+
+const props = defineProps({
+    activeTab: {
+        type: Number,
+        required: true,
+    },
+});
 
 const accountStore = useAccountStore();
 const content = ref([]);
@@ -52,6 +61,7 @@ const activeNavItem = ref('journey');
 const sectionRefs = ref({});
 const mainContent = ref(null);
 let isManualScrolling = false;
+const marginBottomLastSection = ref(0);
 
 const flatSections = computed(() => content.value.flatMap((group) => group.sections));
 
@@ -80,7 +90,19 @@ const scrollToSection = (refName) => {
     const section = sectionRefs.value[refName];
     if (mainContent.value && section && !accountStore.isMobile) {
         const offsetTop = section.offsetTop;
-        mainContent.value.scrollTo({ top: offsetTop, behavior: 'smooth' });
+        const mainContentHeight = mainContent.value.offsetHeight;
+        const sectionHeight = section.offsetHeight;
+        const maxScrollTop = mainContent.value.scrollHeight - mainContentHeight;
+
+        let targetScrollTop = offsetTop;
+        if (offsetTop + sectionHeight > mainContent.value.scrollHeight) {
+            targetScrollTop = maxScrollTop;
+        }
+
+        mainContent.value.scrollTo({
+            top: targetScrollTop,
+            behavior: 'smooth',
+        });
 
         setTimeout(() => {
             isManualScrolling = false;
@@ -122,8 +144,27 @@ const updateActiveNavItemOnScroll = () => {
     }
 };
 
+const calculateBottomPadding = async () => {
+    await nextTick();
+    const mainContentEl = mainContent.value;
+    const lastSectionEl = mainContentEl.querySelector('.about-section-help');
+    console.log(mainContentEl, lastSectionEl);
+    if (mainContentEl && lastSectionEl) {
+        console.log('asdsadasd');
+        const mainContentHeight = mainContentEl.getBoundingClientRect().height;
+        console.log('msad: ', mainContentHeight);
+        const lastSectionHeight = lastSectionEl.getBoundingClientRect().height;
+        console.log('msad: ', lastSectionHeight);
+        marginBottomLastSection.value = mainContentHeight - lastSectionHeight;
+        if (marginBottomLastSection.value < 0) {
+            marginBottomLastSection.value = 0;
+        }
+    }
+};
+
 onMounted(async () => {
     content.value = await getAboutContent();
+
     if (mainContent.value) {
         mainContent.value.addEventListener('scroll', updateActiveNavItemOnScroll);
     }
@@ -137,6 +178,19 @@ onUnmounted(() => {
     }
     window.removeEventListener('resize', accountStore.onResize);
 });
+watch(
+    [() => accountStore.isMobile, () => props.activeTab],
+    ([isMobile, newTab]) => {
+        if (isMobile) {
+            activeNavItem.value = 'journey';
+        }
+
+        if (newTab === 2) {
+            calculateBottomPadding();
+        }
+    },
+    { immediate: true },
+);
 </script>
 <style>
 .about-wrapper {
@@ -151,10 +205,10 @@ onUnmounted(() => {
 }
 .about-header {
     color: var(--about-header-color);
-    font-size: 12px;
+    font-size: 14px;
     font-style: normal;
     font-weight: 600;
-    line-height: 18px;
+    line-height: 20px;
     text-transform: uppercase;
     padding-block-end: 10px;
 }
@@ -166,10 +220,10 @@ onUnmounted(() => {
     padding-left: 10px;
     transition: color 0.2s ease;
     color: var(--about-nav-item-color);
-    font-size: 12px;
+    font-size: 14px;
     font-style: normal;
     font-weight: 400;
-    line-height: 16px;
+    line-height: 20px;
     text-decoration: none;
 }
 .active-about-nav-item {
@@ -192,46 +246,61 @@ nav > div:not(:first-child) .about-header {
 }
 .about-section h2 {
     color: var(--about-title-color);
-    font-size: 22px;
+    font-size: 30px;
     font-style: normal;
     font-weight: 600;
-    line-height: 18px;
+    line-height: 30px;
     margin-bottom: 15px;
 }
 .about-section h3,
 .about-section h4 {
     color: var(--about-subtitle-color);
-    font-size: 12px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 600;
-    line-height: normal;
+    line-height: 24px;
     margin-bottom: 0;
-}
-.about-section h4 {
-    font-size: 16px;
+    margin-bottom: 15px;
 }
 .about-section p,
 .about-section li,
 .about-section a {
     color: var(--about-nav-item-color);
-    font-size: 12px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 400;
-    line-height: normal;
+    line-height: 26px;
+}
+.about-section p {
+    text-align: justify;
 }
 .about-section p:last-of-type {
     margin-bottom: 0;
 }
 .about-section img {
-    max-width: 80%;
     margin-top: 20px;
+}
+.about-section-journey img,
+.about-section-wallet img {
+    max-width: 80%;
+}
+.about-section-dashboard img,
+.about-section-navigating img {
+    max-width: 50%;
+}
+.about-section-rewards img {
+    max-width: 30%;
 }
 .about-section:not(:first-of-type) {
     margin-top: 60px;
 }
+.about-section ul {
+    margin-top: 15px;
+}
 .about-section strong,
 .about-section ul li::marker {
     color: var(--about-subtitle-color);
+    font-weight: 500;
 }
 .about-section ul ul {
     list-style-type: disc;
@@ -239,6 +308,10 @@ nav > div:not(:first-child) .about-header {
 }
 .about-section li {
     line-height: 26px;
+}
+
+.about-section li:not(:first-child) {
+    margin-top: 8px;
 }
 .text-before-bullet {
     margin-bottom: 0;
@@ -273,7 +346,16 @@ nav > div:not(:first-child) .about-header {
         margin-left: 10px;
     }
     .about-section h2 {
-        font-size: 16px;
+        font-size: 22px;
+    }
+    .about-section h3,
+    .about-section h4 {
+        font-size: 14px;
+    }
+    .about-section p,
+    .about-section li,
+    .about-section a {
+        font-size: 13px;
     }
     .about-header {
         display: none;
@@ -284,11 +366,15 @@ nav > div:not(:first-child) .about-header {
     }
     .about-nav-item {
         padding: 10px !important;
+        font-size: 12px;
     }
     .active-about-nav-item {
         border-radius: 5px;
         background: var(--about-mob-nav-bg);
         box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
+    }
+    .about-section img {
+        max-width: 100% !important;
     }
 }
 </style>

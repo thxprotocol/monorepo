@@ -35,7 +35,7 @@ export async function getAboutContent(): Promise<ContentGroup[]> {
                 <h2>Rewards Dashboard Overview</h2>
                 <h3>Welcome to Santa Rewards</h3>
                 <p>We're all about making your web experiences richer and your online time more rewarding! This Rewards Dashboard is your go-to spot where you can oversee how your browser is working for you!</p>
-                <h3>We’ve written this guide to help you get started and make the most out of your rewarding journey with us.</h3>
+                <h3>We’ve written this guide to help you get started and make the most out of your rewarding journey with us</h3>
                 <p>Here’s how you can effortlessly keep track of your progress, jump into various quests, and redeem your rewards — all in one place.</p>
                 
                 <img src="${journeyImage}" alt="Rewards Overview" />
@@ -47,7 +47,7 @@ export async function getAboutContent(): Promise<ContentGroup[]> {
                     ref: 'dashboard',
                     content: `
                 <h1>🌟 Understanding Your Dashboard</h1>
-                <h3>Your dashboard is divided into several key sections, each designed to help you manage and enhance your rewarding experience:</h3>
+                <h3>Your dashboard is divided into several key sections, each designed to help you manage and enhance your rewarding experience</h3>
                 <p>We're all about making your web experiences richer and your online time more rewarding! This Rewards Dashboard is your go-to spot where you can oversee how your browser is working for you!</p>
                 <h3>Santa Points and Cash Rewards:</h3>
                     <ul>
@@ -55,7 +55,7 @@ export async function getAboutContent(): Promise<ContentGroup[]> {
                         <li><strong>Cash Rewards:</strong> Earned through shopping cashbacks and tasks.</li>
                     </ul>
                 <p>(More reward redemption options, like gift cards, Santa tokens, exclusive merch and much more! — Coming soon)</p>
-                <img src="${underStandImage}" alt="Reward System" width="50%"/>
+                <img src="${underStandImage}" alt="Reward System"/>
                 <h3>What to Collect?</h3>
                 <p>Both points and rewards can be exchanged for exciting items like USDT, gift cards, and exclusive merch. The choice is yours!</p>
             `,
@@ -65,7 +65,7 @@ export async function getAboutContent(): Promise<ContentGroup[]> {
                     shortName: '',
                     ref: 'navigating',
                     content: `
-                <h1 style="margin-top: 95px">🗺️ Navigating the Dashboard</h1>
+                <h1 style="margin-top: 65px">🗺️ Navigating the Dashboard</h1>
                 <h2>Dashboard</h2>
                 <h3>Here's how you can interact with each part:</h3>
                 <ul>
@@ -75,7 +75,7 @@ export async function getAboutContent(): Promise<ContentGroup[]> {
                 <li><strong>Wallet:</strong> Manage your earnings.</li>
                 <li><strong>Transactions:</strong> Monitor your claims and transfers.</li>
                 </ul>
-                <img src="${dashboardImage}" alt="Navigating Dashboard" width="50%" />
+                <img src="${dashboardImage}" alt="Navigating Dashboard" />
             `,
                 },
                 {
@@ -154,7 +154,7 @@ export async function getAboutContent(): Promise<ContentGroup[]> {
                         <li><strong>Step 2:</strong> Visit the Rewards section to see what’s available.</li>
                         <li><strong>Step 3:</strong> Click to redeem your points or cash for desired rewards.</li>
                     </ul>
-                    <img src="${rewardImage}" alt="Claiming Rewards" width="30%" />
+                    <img src="${rewardImage}" alt="Claiming Rewards" />
                     `,
                 },
                 {
