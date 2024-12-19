@@ -39,11 +39,14 @@
                 alt="header image"
                 loading="lazy"
                 style="border-radius: 4px"
-                :style="{ height: quest.variant === QuestVariant.Daily ? '130px' : 'unset' }"
+                :style="{ height: quest.variant === QuestVariant.Daily ? '130px' : '' }"
             />
             <div></div>
 
-            <div class="px-2 my-3 d-flex flex-column flex-grow-1 justify-content-end">
+            <div
+                class="px-2 d-flex flex-column flex-grow-1 justify-content-end"
+                :class="quest.variant === QuestVariant.Daily ? 'my-0' : 'my-3'"
+            >
                 <!-- <b-alert v-model="hasExpiry" variant="primary" class="px-2 py-1 flex-grow-1 mb-2">
                     <i class="fas fa-clock me-1" />
                     Quest ends in <strong>{{ expiryDate }} </strong>!

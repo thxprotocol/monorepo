@@ -4,6 +4,12 @@
         Earn {{ amount }} Pts
     </b-button>
     <b-modal :id="`modalQuestLock${id}`" v-model="isModalShown" title="Locked!" centered no-close-on-backdrop>
+        <template #header>
+            <h5 class="modal-title">Locked</h5>
+            <b-link class="btn-close" @click="isModalShown = false">
+                <i class="fas fa-times" />
+            </b-link>
+        </template>
         <p class="text-opaque ms-0">To unlock, complete {{ locked?.length === 1 ? 'this quest' : 'these quests' }}:</p>
         <template v-for="lock of locked">
             <div v-if="lock" class="d-flex justify-content-between">
@@ -16,7 +22,7 @@
             </b-alert>
         </template>
         <template #footer>
-            <b-button class="w-100" variant="primary" @click="isModalShown = false">Continue</b-button>
+            <b-button class="w-100 locked-btn" @click="isModalShown = false">Continue</b-button>
         </template>
     </b-modal>
 </template>
@@ -43,9 +49,10 @@ export default defineComponent({
         ...mapStores(useQuestStore),
         locked() {
             if (!this.questStore.quests.length) return;
-            return this.locks.map((lock: { questId: string }) => {
+            const lockedQuests = this.locks.map((lock: { questId: string }) => {
                 return this.questStore.quests.find((q) => lock.questId === q._id);
             });
+            return lockedQuests;
         },
     },
 });

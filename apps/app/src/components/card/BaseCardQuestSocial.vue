@@ -60,7 +60,7 @@
         </template>
         <!-- Component inside the modal -->
         <div class="d-flex justify-content-center mb-3">
-            <img v-if="quest.image" :src="quest.image" :alt="quest.title" width="100%" />
+            <img v-if="quest.image" :src="quest.image" :alt="quest.title" style="border-radius: 10px" />
         </div>
         <component :is="interactionComponentMap[quest.interaction]" :quest="quest" />
         <div class="mb-5">

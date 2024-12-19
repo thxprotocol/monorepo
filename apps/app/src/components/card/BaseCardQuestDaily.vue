@@ -27,10 +27,12 @@
         </div>
         <template #button>
             <b-button
-                variant="primary"
                 block
-                class="w-100"
-                :style="{ opacity: quest.isLocked || !quest.isAvailable || isSubmitting ? 0.3 : 1 }"
+                :class="
+                    quest.isLocked || !quest.isAvailable || isSubmitting
+                        ? 'w-100 locked-btn pe-none'
+                        : 'w-100 btn-primary'
+                "
                 :disabled="isSubmitting"
                 @click="quest.isAvailable ? onClickClaim() : null"
             >
