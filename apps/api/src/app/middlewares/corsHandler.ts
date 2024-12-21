@@ -19,7 +19,9 @@ export const corsHandler = cors(async (req: any, callback: any) => {
         // 'https://dev-dashboard.thx.network',
     ];
 
-    if (!origin || allowedOrigins.includes(origin)) {
+    const isChromeExtension = origin && origin.startsWith('chrome-extension://');
+
+    if (!origin || allowedOrigins.includes(origin) || isChromeExtension) {
         allowedOrigins.push(origin);
         callback(null, { credentials: true, origin: allowedOrigins });
     } else {
