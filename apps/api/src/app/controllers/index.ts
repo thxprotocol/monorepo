@@ -29,11 +29,13 @@ import RouterLotteries from './lotteries/lotteries.router';
 import RouterCoupons from './coupons/coupons.router';
 import RouterLogin from './login/login.router';
 import RouterOAuth from './oauth/oauth.router';
+import RouterAuth from './auth/auth.router';
 import { checkJwt, corsHandler } from '@thxnetwork/api/middlewares';
 
 const router: express.Router = express.Router({ mergeParams: true });
 
 router.use('/ping', (_req, res) => res.send('pong'));
+router.use('/auth', RouterAuth);
 router.use('/health', RouterHealth);
 router.use('/data', RouterData);
 router.use('/token', RouterToken);
