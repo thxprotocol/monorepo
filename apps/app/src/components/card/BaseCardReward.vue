@@ -401,7 +401,7 @@ export default defineComponent({
 }
 
 .reward-title-promoted div {
-    color: var(--reward-title-color);
+    color: var(--body-text);
     font-feature-settings: 'liga' off, 'clig' off;
     font-family: Poppins;
     font-size: 12px;
@@ -412,7 +412,7 @@ export default defineComponent({
 }
 
 .reward-title div {
-    color: var(--reward-title-color);
+    color: var(--body-text);
     font-feature-settings: 'liga' off, 'clig' off;
     font-family: 'Poppins';
     font-size: 14px;
@@ -422,10 +422,10 @@ export default defineComponent({
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-shadow: 0px 1px 9px rgba(255, 255, 255, 0.3);
     font-style: normal;
     line-height: 18px;
     text-align: center;
+    margin-top: 10px;
 }
 
 .reward-title i {

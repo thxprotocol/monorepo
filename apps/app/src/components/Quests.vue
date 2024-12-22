@@ -64,7 +64,7 @@
                                                 :class="{
                                                     'd-none':
                                                         quest.variant === 0 ? quest.isCompleted : !quest.isAvailable,
-                                                    'quest-item': true,
+                                                    'quest-item': !(quest.variant === 0),
                                                     'quest-item-daily': quest.variant === 0,
                                                 }"
                                                 class="quest-group-item"
@@ -79,70 +79,13 @@
                                     </div>
                                     <div v-else class="offers-box">
                                         <h3 class="quest-group-title">{{ group.title }}</h3>
-                                        <div class="d-flex flex-wrap offer-row">
-                                            <div
-                                                v-for="offer in group.offers"
-                                                :key="offer.id"
-                                                class="offer-item"
-                                                :style="{
-                                                    width:
-                                                        group.offers.length === 1
-                                                            ? '100%'
-                                                            : `calc((100% - (${
-                                                                  offersPerRow - 1
-                                                              } * 1%)) / ${offersPerRow})`,
-                                                    maxWidth:
-                                                        group.offers.length === 1
-                                                            ? '100%'
-                                                            : `calc((100% - (${
-                                                                  offersPerRow - 1
-                                                              } * 1%)) / ${offersPerRow})`,
-                                                }"
-                                            >
+                                        <div class="offer-row">
+                                            <div v-for="offer in group.offers" :key="offer.id" class="offer-item">
                                                 <OfferCard :offer="offer" />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- <div
-                                v-for="(item, index) in mergedQuestsAndOffers"
-                                :key="index"
-                                :class="{
-                                    'w-100': item.isDaily || item.isOfferRow || item.isAlone,
-                                    'regular-quest': !item.isDaily && !item.isOfferRow && !item.isAlone,
-                                    'd-none': item.quest?.isAvailable === false,
-                                }"
-                            >
-                                <div v-if="item.isOfferRow" class="offers-box">
-                                    <h3>Top performing offers</h3>
-                                    <div class="d-flex flex-wrap offer-row">
-                                        <div
-                                            v-for="offer in item.offers"
-                                            :key="offer.id"
-                                            class="offer-item"
-                                            :style="{
-                                                width:
-                                                    item.offers.length === 1
-                                                        ? '100%'
-                                                        : offersPerRow === 3
-                                                        ? '30%'
-                                                        : '49%',
-                                                maxWidth:
-                                                    item.offers.length === 1
-                                                        ? '100%'
-                                                        : offersPerRow === 3
-                                                        ? '30%'
-                                                        : '49%',
-                                            }"
-                                        >
-                                            <OfferCard :offer="offer" class="mb-2" />
-                                        </div>
-                                    </div>
-                                </div> -->
-                                <!-- <div v-else :class="{ 'd-none': !item.quest?.isAvailable }"> -->
-                                <!-- <component :is="questComponentMap[item.quest.variant]" v-else :quest="item.quest" /> -->
-                                <!-- </div> -->
-                                <!-- </div> -->
                                 <div v-if="!availableQuestCount" class="text-center mt-5">
                                     <i class="h1 fas fa-trophy text-accent" />
                                     <p class="lead text-accent">Well done!</p>
@@ -151,16 +94,6 @@
                             </div>
                         </div>
                     </b-tab>
-                    <!-- <b-tab title="Completed">
-                        <div v-for="(quest, key) of quests" :key="key" :class="{ 'd-none': quest.isAvailable }">
-                            <component
-                                :is="questComponentMap[quest.variant]"
-                                :quest="quest"
-                                class="mb-2 mx-lg-0 my-lg-3"
-                                :available-quest="!quest?.isAvailable"
-                            />
-                        </div>
-                    </b-tab> -->
                     <b-tab title="Completed">
                         <div class="quests-box">
                             <div v-if="questStore.isLoading" class="d-flex justify-content-center p-3">
@@ -195,7 +128,7 @@
                                             :key="quest._id"
                                             :class="{
                                                 'd-none': quest.isAvailable === true,
-                                                'quest-item': true,
+                                                'quest-item': !(quest.variant === 0),
                                                 'quest-item-daily': quest.variant === 0,
                                             }"
                                             class="quest-group-item"
@@ -222,17 +155,13 @@
                     </b-tab>
 
                     <b-tab title="About">
-                        <div class="quests-box d-flex justify-content-center align-items-center">
-                            <p class="text-center text-muted mt-3 text-opaque empty-message">
-                                No information available.
-                            </p>
-                        </div>
+                        <AboutQuests :active-tab="activeTab" />
                     </b-tab>
                 </b-tabs>
                 <div
                     v-if="[0, 1].includes(activeTab)"
                     ref="filterDropdown"
-                    class="h-wallet filter-wrapper"
+                    class="filter-wrapper"
                     @click="toggleDropdown"
                 >
                     <div class="custom-dropdown">
@@ -632,11 +561,9 @@ export default defineComponent({
         },
     },
     mounted() {
-        window.addEventListener('resize', this.handleResize);
         document.addEventListener('click', this.handleClickOutside);
     },
     beforeUnmount() {
-        window.removeEventListener('resize', this.handleResize);
         document.removeEventListener('click', this.handleClickOutside);
     },
     methods: {
@@ -657,17 +584,6 @@ export default defineComponent({
                 console.error('Failed to fetch offers', error);
             } finally {
                 this.isLoadingOffers = false;
-            }
-        },
-        handleResize() {
-            if (window.innerWidth > 1500) {
-                this.offersPerRow = 5;
-            } else if (window.innerWidth > 1280) {
-                this.offersPerRow = 4;
-            } else if (window.innerWidth > 775) {
-                this.offersPerRow = 3;
-            } else {
-                this.offersPerRow = 2;
             }
         },
         formatQuests(quests: any) {
@@ -850,7 +766,7 @@ export default defineComponent({
 
 .gr-2 .card-body {
     height: 205px;
-    min-height: 205px !important;
+    min-height: 180px !important;
     max-height: 205px !important;
 }
 
@@ -859,6 +775,7 @@ export default defineComponent({
     margin-right: 20px;
     margin-left: 12px;
     margin-top: 20px;
+    overflow: hidden;
 }
 
 .quests-column .tab-content .card {
@@ -933,19 +850,16 @@ export default defineComponent({
 }
 
 .offer-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-    gap: 1%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    scrollbar-width: none;
 }
 
 .offer-item {
-    flex: 1 0 45%;
+    //flex: 1 0 45%;
     //margin: 1%;
-    max-width: 45%;
+    //max-width: 45%;
     box-sizing: border-box;
     background: var(--quest-item-bg);
     border-radius: 10px;
@@ -982,6 +896,9 @@ export default defineComponent({
     overflow-y: auto;
     gap: 25px;
     margin-top: 24px;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .offers-box {
@@ -1126,10 +1043,11 @@ export default defineComponent({
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .quest-item {
-    height: 100%;
     min-height: 265px;
     overflow: hidden;
     background-color: var(--quest-item-bg);
@@ -1137,7 +1055,12 @@ export default defineComponent({
     padding: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
+.quest-item-daily {
+    background-color: var(--quest-item-bg);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 .quest-item-daily,
 .reward-item-promoted {
     grid-column: span 2;
@@ -1199,10 +1122,12 @@ export default defineComponent({
     justify-content: space-between;
     width: 100%;
     cursor: pointer;
+    padding: 8px 12px;
+    border: 1px solid var(--dropdown-border-color);
 }
 
 .selected-option {
-    margin-right: 10px;
+    margin-right: 20px;
     font-size: 12px;
     color: var(--body-text);
 }
@@ -1306,6 +1231,11 @@ export default defineComponent({
     .quests-column .nav-link {
         width: 100% !important;
     }
+    .quest-item {
+        grid-column: span 1;
+        min-width: 235px;
+        max-width: 235px;
+    }
     .quest-item-daily,
     .reward-item-promoted {
         grid-column: span 2;
@@ -1321,6 +1251,8 @@ export default defineComponent({
         flex: 1;
         overflow: auto;
         margin-top: 56px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
     .nav-link.active::before,
     .nav-link.active::after {
@@ -1333,9 +1265,24 @@ export default defineComponent({
         margin-top: 60px;
         margin-right: 10px;
     }
+    .quest-group {
+        grid-auto-flow: column;
+        grid-auto-columns: 235px;
+        overflow-x: auto;
+        grid-template-columns: none;
+    }
+    .offer-row {
+        gap: 20px;
+        display: grid !important;
+        grid-auto-flow: column;
+        grid-auto-columns: 235px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        grid-template-columns: none;
+    }
 }
 @media (max-width: 774px) {
-    .quest-group,
     .reward-group {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
@@ -1370,21 +1317,25 @@ export default defineComponent({
     }
 }
 @media (max-width: 576px) {
-    .quest-group,
     .reward-group {
         grid-template-columns: repeat(1, 1fr);
         gap: 10px;
     }
-    .quest-item-daily,
     .reward-item-promoted {
         grid-column: span 1;
     }
     .offer-item {
         flex: 1 0 100%;
         max-width: 100% !important;
+        width: 100% !important;
     }
 }
-
+@media (max-width: 340px) {
+    .quests-column .nav-link {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
 @media (min-width: 1400px) {
     .quest-cont {
         max-width: 100%;

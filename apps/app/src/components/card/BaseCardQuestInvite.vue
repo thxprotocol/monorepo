@@ -78,7 +78,7 @@
             </b-link>
         </template>
         <div class="d-flex justify-content-center overflow-hidden">
-            <img :src="quest.image" :alt="quest.title" width="100%" />
+            <img v-if="quest.image" :src="quest.image" :alt="quest.title" style="border-radius: 10px" />
         </div>
         <!-- Modal content -->
         <div class="mt-3">

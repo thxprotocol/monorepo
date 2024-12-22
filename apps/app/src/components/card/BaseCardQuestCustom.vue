@@ -39,7 +39,7 @@
             </b-link>
         </template>
         <div class="d-flex justify-content-center overflow-hidden">
-            <img v-if="quest.image" :src="quest.image" :alt="quest.title" width="100%" />
+            <img v-if="quest.image" :src="quest.image" :alt="quest.title" style="border-radius: 10px" />
         </div>
         <div class="d-flex flex-column mt-3">
             <p class="quest-modal-title">{{ quest.title }}</p>

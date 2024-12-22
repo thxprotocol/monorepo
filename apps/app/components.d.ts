@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AboutQuests: typeof import('./src/components/new-ui/AboutQuests.vue')['default']
     BAlert: typeof import('bootstrap-vue-next')['BAlert']
     BaseAlertErrorList: typeof import('./src/components/alert/BaseAlertErrorList.vue')['default']
     BaseBlockquoteDiscordInviteUsed: typeof import('./src/components/blockquote/BaseBlockquoteDiscordInviteUsed.vue')['default']

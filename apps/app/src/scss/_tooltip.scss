@@ -13,3 +13,44 @@
         color: var(--bs-body-color) !important;      
     }
 }
+
+.reward-info-wrap {
+    position: relative;
+    display: inline-block;
+
+    .tooltip-text {
+        visibility: hidden;
+        width: 250px;
+        background: var(--home-background);
+        color: var(--modal-text-color);
+        text-align: center;
+        padding: 10px;
+        border-radius: 8px;
+        position: absolute;
+        top: 125%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 12px;
+        z-index: 10;
+        border: 1px solid var(--dropdown-border-color);
+        box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.2);
+        text-shadow: none;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 47%;
+            transform: translateX(-53%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent var(--dropdown-border-color) transparent;
+        }
+    }
+
+    &:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
+}

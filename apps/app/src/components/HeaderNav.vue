@@ -7,7 +7,7 @@
         <div class="d-flex media-header">
             <div class="d-flex align-items-center gap-2 media-header-first rewards-navbar">
                 <img :src="rewardsIcon" alt="rewards" width="40" height="40" />
-                <h1 class="m-0 fs-3 fw-bold">Rewards</h1>
+                <h1 class="m-0 fs-3 fw-bold" :class="{ 'hide-on-small': !showHeaderTitle }">Rewards</h1>
             </div>
 
             <div class="d-flex gap-3 balance-wrap media-header-third">
@@ -26,7 +26,7 @@
         </div>
 
         <div class="d-flex gap-2 media-header-second">
-            <BaseCardWalletInfo />
+            <BaseCardWalletInfo @list-updated="updateHeaderVisibility" />
             <BaseDropdownWallets />
             <div
                 class="d-flex align-items-center justify-content-between name-avatar"
@@ -74,6 +74,7 @@ export default defineComponent({
             dotCount: 0,
             typingInterval: undefined as ReturnType<typeof setInterval> | undefined,
             rewardsIcon,
+            showHeaderTitle: true,
         };
     },
     computed: {
@@ -152,6 +153,9 @@ export default defineComponent({
             this.typingInterval = setInterval(() => {
                 this.dotCount = (this.dotCount + 1) % 12;
             }, 100);
+        },
+        updateHeaderVisibility(isListEmpty: any) {
+            this.showHeaderTitle = isListEmpty;
         },
     },
 });
@@ -293,6 +297,8 @@ export default defineComponent({
     .header-nav {
         padding-right: 0;
         flex-direction: column;
+        padding-bottom: 0;
+        border-width: 0;
     }
     .b-avatar-header {
         position: relative;
@@ -331,31 +337,14 @@ export default defineComponent({
     }
 }
 @media (max-width: 527px) {
-    .media-header-first h1 {
+    .hide-on-small {
         display: none;
     }
 }
 
 @media (max-width: 426px) {
-    .media-header-first img {
-        display: none;
-    }
-    .media-header-third {
-        margin-top: 40px;
-    }
-    .media-header-second > * {
-        flex: 1 1 100%;
-        max-width: 100%;
-    }
-    .media-header-second {
-        width: 100%;
-    }
     .username {
-        display: none;
-    }
-    .name-avatar {
-        padding-right: 0 !important;
-        justify-content: center !important;
+        max-width: 80px;
     }
 }
 .total-earnings p {
