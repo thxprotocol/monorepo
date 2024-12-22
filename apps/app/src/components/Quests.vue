@@ -128,7 +128,7 @@
                                             :key="quest._id"
                                             :class="{
                                                 'd-none': quest.isAvailable === true,
-                                                'quest-item': true,
+                                                'quest-item': !(quest.variant === 0),
                                                 'quest-item-daily': quest.variant === 0,
                                             }"
                                             class="quest-group-item"

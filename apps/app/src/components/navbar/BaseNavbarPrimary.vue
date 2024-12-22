@@ -111,15 +111,18 @@ export default defineComponent({
     z-index: 22;
     background: var(--navbar-bottom-bg);
     backdrop-filter: blur(27px);
-    zoom: 0.8;
     left: 0;
     padding: 1rem;
+    gap: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
 }
 
 .navbar-bottom a {
     width: 80px;
     height: 50px;
     padding: 5px;
+    flex-shrink: 0;
 }
 
 .navbar-item-label {
