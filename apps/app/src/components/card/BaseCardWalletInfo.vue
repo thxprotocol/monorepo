@@ -113,8 +113,14 @@ export default defineComponent({
                 .reverse();
         },
     },
+    watch: {
+        list(newList) {
+            this.$emit('list-updated', newList.length === 0);
+        },
+    },
     mounted() {
         this.listRewards();
+        this.$emit('list-updated', this.list.length === 0);
         // document.addEventListener('click', this.handleClickOutside);
     },
     beforeUnmount() {

@@ -331,7 +331,7 @@ nav > div:not(:first-child) .about-header {
     .about-aside {
         position: fixed;
         z-index: 10;
-        top: 200px;
+        top: 175px;
         width: 80%;
     }
     .about-nav {

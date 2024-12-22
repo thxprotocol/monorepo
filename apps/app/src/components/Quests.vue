@@ -161,7 +161,7 @@
                 <div
                     v-if="[0, 1].includes(activeTab)"
                     ref="filterDropdown"
-                    class="h-wallet filter-wrapper"
+                    class="filter-wrapper"
                     @click="toggleDropdown"
                 >
                     <div class="custom-dropdown">
@@ -766,7 +766,7 @@ export default defineComponent({
 
 .gr-2 .card-body {
     height: 205px;
-    min-height: 205px !important;
+    min-height: 180px !important;
     max-height: 205px !important;
 }
 
@@ -1122,10 +1122,12 @@ export default defineComponent({
     justify-content: space-between;
     width: 100%;
     cursor: pointer;
+    padding: 8px 12px;
+    border: 1px solid var(--dropdown-border-color);
 }
 
 .selected-option {
-    margin-right: 10px;
+    margin-right: 20px;
     font-size: 12px;
     color: var(--body-text);
 }

@@ -11,7 +11,15 @@
             <!-- <img :src="trophyImage" alt="trophy" loading="lazy" width="17" height="17" class="me-2" /> -->
             <!-- </div> -->
             <div class="flex-grow-1 pe-2">
-                <h3 class="quest-group-title">Leaderboard</h3>
+                <h3 class="quest-group-title">
+                    Leaderboard
+                    <span class="reward-info-wrap">
+                        <i class="fas fa-info-circle fs-6" style="opacity: 0.35"></i>
+                        <span class="tooltip-text"
+                            ><b>The Stars Atop Our Tree!</b> Monthly ranking of highest earning Santa users.</span
+                        >
+                    </span>
+                </h3>
                 <span
                     class="d-block flex-grow-1 pe-2 fa-xs mt-2"
                     style="color: var(--body-color); opacity: 0.6; font-family: Poppins"
@@ -286,6 +294,46 @@ export default defineComponent({
     border: 1px solid var(--btn-sidebar-border-color);
     border-radius: 3px;
 }
+.reward-info-wrap {
+    position: relative;
+    display: inline-block;
+
+    .tooltip-text {
+        visibility: hidden;
+        width: 200px;
+        background: var(--home-background);
+        color: var(--modal-text-color);
+        text-align: center;
+        padding: 10px;
+        border-radius: 8px;
+        position: absolute;
+        top: 125%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 12px;
+        z-index: 10;
+        border: 1px solid var(--dropdown-border-color);
+        box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.2);
+        text-shadow: none;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 47%;
+            transform: translateX(-53%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent var(--dropdown-border-color) transparent;
+        }
+    }
+
+    &:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
+}
 @keyframes pulse {
     0% {
         opacity: 1;
@@ -313,6 +361,7 @@ export default defineComponent({
     .leaderboard-wrapper .list-group {
         flex: 1;
         overflow-y: auto;
+        scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
     }
     .list-group-item {

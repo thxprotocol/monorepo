@@ -18,9 +18,9 @@
                     width="10"
                     height="10"
                     style="filter: drop-shadow(0px 2px 7px rgba(187, 255, 175, 0.3))"
-                    class="me-2"
+                    class="wallet-online"
                 />
-                <div class="fs-6 fw-normal">
+                <div class="fs-6 fw-normal wallet-online-word">
                     {{ walletStore.wallet ? walletStore.wallet.short : 'Connect' }}
                 </div>
             </template>
@@ -347,5 +347,19 @@ export default defineComponent({
 
 .fade-in {
     animation: fadeIn 0.5s ease-in-out;
+}
+.wallet-online {
+    margin-right: 8px;
+}
+@media (max-width: 600px) {
+    .wallet-online-word {
+        display: none;
+    }
+    .h-wallet {
+        width: 100%;
+    }
+    .wallet-online {
+        margin-right: 0;
+    }
 }
 </style>

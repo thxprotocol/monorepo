@@ -3,8 +3,14 @@
         <!-- <BaseNavbarSecondary v-if="accountStore.isMobile" class="ms-auto" /> -->
 
         <div class="d-flex p-2 m-0 align-items-center">
-            <div class="flex-grow-1 pe-2 d-flex quest-group-title">
+            <div class="flex-grow-1 pe-2 d-flex quest-group-title align-items-center">
                 Your Wallet
+                <span class="reward-info-wrap ms-1">
+                    <i class="fas fa-info-circle fs-6" style="opacity: 0.35"></i>
+                    <span class="tooltip-text"
+                        >Securely holds your web3 earnings and allows for easy transactions.</span
+                    >
+                </span>
                 <b-spinner v-if="walletStore.isLoading" class="ms-2" variant="primary" small />
             </div>
             <b-dropdown variant="primary" size="sm" no-caret>
