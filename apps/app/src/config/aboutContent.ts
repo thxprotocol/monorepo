@@ -1,10 +1,18 @@
-import journeyImage from '@thxnetwork/app/assets/about-journey.png';
-import underStandImage from '@thxnetwork/app/assets/about-understand.png';
-import dashboardImage from '@thxnetwork/app/assets/about-dashboard.png';
-import rewardImage from '@thxnetwork/app/assets/about-reward.png';
-import walletImage from '@thxnetwork/app/assets/about-wallet.png';
 import axios from 'axios';
+import journeyImageDark from '@thxnetwork/app/assets/about-journey-dark.png';
+import journeyImageLight from '@thxnetwork/app/assets/about-journey-light.png';
+import underStandImageDark from '@thxnetwork/app/assets/about-rewards-dark.png';
+import underStandImageLight from '@thxnetwork/app/assets/about-rewards-light.png';
 
+import dashboardImageDark from '@thxnetwork/app/assets/about-navigating-dark.png';
+import dashboardImageLight from '@thxnetwork/app/assets/about-navigating-light.png';
+import rewardImageDark from '@thxnetwork/app/assets/about-claim-dark.png';
+import rewardImageLight from '@thxnetwork/app/assets/about-claim-light.png';
+
+import walletImageDark from '@thxnetwork/app/assets/about-wallet-dark.png';
+import walletImageLight from '@thxnetwork/app/assets/about-wallet-light.png';
+import importImageDark from '@thxnetwork/app/assets/about-import-dark.png';
+import importImageLight from '@thxnetwork/app/assets/about-import-light.png';
 export interface Section {
     name: string;
     shortName: string;
@@ -17,10 +25,16 @@ export interface ContentGroup {
     sections: Section[];
 }
 
-export async function getAboutContent(): Promise<ContentGroup[]> {
+export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
     let inviteURL = '';
     const { data } = await axios('https://discord.com/api/guilds/997069800092225576/widget.json');
     inviteURL = data.instant_invite || inviteURL;
+    const journeyImage = theme === 'dark' ? journeyImageDark : journeyImageLight;
+    const underStandImage = theme === 'dark' ? underStandImageDark : underStandImageLight;
+    const dashboardImage = theme === 'dark' ? dashboardImageDark : dashboardImageLight;
+    const rewardImage = theme === 'dark' ? rewardImageDark : rewardImageLight;
+    const walletImage = theme === 'dark' ? walletImageDark : walletImageLight;
+    const importImage = theme === 'dark' ? importImageDark : importImageLight;
 
     return [
         {
@@ -168,7 +182,10 @@ export async function getAboutContent(): Promise<ContentGroup[]> {
                         <li><strong>Supported Wallets:</strong> You're not just limited to the Santa Wallet; various popular wallets are compatible.</li>
                         <li><strong>Setting Up:</strong> Navigate to the Wallet section, choose your preferred wallet, and follow the setup instructions.</li>
                     </ul>
-                    <img src="${walletImage}" alt="Claiming Rewards" />
+                    <img src="${walletImage}" alt="Wallet" />
+                    <h3>Already have another Wallet?</h3>
+                    <p>Santa supports a wide range of popular wallets, enabling you to manage your Web3 assets effortlessly. You can import your existing support wallets into your Santa Wallet and manage all your assetsfrom here.</p>
+                    <img src="${importImage}" alt="Wallet Import" />
                     `,
                 },
             ],
