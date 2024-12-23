@@ -31,6 +31,8 @@ import { mapStores } from 'pinia';
 import { useAuthStore } from './stores/Auth';
 import { useAccountStore } from './stores/Account';
 import { useWalletStore } from './stores/Wallet';
+import { getAboutContent } from './config/aboutContent';
+import { useThemeStore } from './stores/Stores';
 
 export default defineComponent({
     data() {
@@ -41,7 +43,7 @@ export default defineComponent({
         };
     },
     computed: {
-        ...mapStores(useAccountStore, useAuthStore, useWalletStore),
+        ...mapStores(useAccountStore, useAuthStore, useWalletStore, useThemeStore),
         isOffline(): boolean {
             try {
                 return this.$route.query.maintenance
@@ -118,6 +120,7 @@ export default defineComponent({
             this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             this.colorSchemeMediaQuery.addEventListener('change', this.handleColorSchemeChange);
         }
+        const aboutContent = await getAboutContent(this.currentTheme);
     },
     beforeUnmount() {
         if (this.colorSchemeMediaQuery) {
@@ -148,6 +151,7 @@ export default defineComponent({
             //     }
         },
         applyTheme(theme: string) {
+            this.themeStore.setTheme(theme);
             this.currentTheme = theme;
             if (theme === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');

@@ -47,6 +47,7 @@
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { getAboutContent } from '@thxnetwork/app/config/aboutContent';
 import { useAccountStore } from '@thxnetwork/app/stores/Account';
+import { useThemeStore } from '@thxnetwork/app/stores/Stores';
 
 const props = defineProps({
     activeTab: {
@@ -56,6 +57,7 @@ const props = defineProps({
 });
 
 const accountStore = useAccountStore();
+const themeStore = useThemeStore();
 const content = ref([]);
 const activeNavItem = ref('journey');
 const sectionRefs = ref({});
@@ -163,7 +165,7 @@ const calculateBottomPadding = async () => {
 };
 
 onMounted(async () => {
-    content.value = await getAboutContent();
+    content.value = await getAboutContent(themeStore.currentTheme);
 
     if (mainContent.value) {
         mainContent.value.addEventListener('scroll', updateActiveNavItemOnScroll);
@@ -179,8 +181,8 @@ onUnmounted(() => {
     window.removeEventListener('resize', accountStore.onResize);
 });
 watch(
-    [() => accountStore.isMobile, () => props.activeTab],
-    ([isMobile, newTab]) => {
+    [() => accountStore.isMobile, () => props.activeTab, () => themeStore.currentTheme],
+    async ([isMobile, newTab, currentTheme]) => {
         if (isMobile) {
             activeNavItem.value = 'journey';
         }
@@ -188,6 +190,8 @@ watch(
         if (newTab === 2) {
             calculateBottomPadding();
         }
+
+        content.value = await getAboutContent(currentTheme);
     },
     { immediate: true },
 );
@@ -279,17 +283,14 @@ nav > div:not(:first-child) .about-header {
 }
 .about-section img {
     margin-top: 20px;
-}
-.about-section-journey img,
-.about-section-wallet img {
+    margin-bottom: 20px;
     max-width: 80%;
 }
-.about-section-dashboard img,
-.about-section-navigating img {
-    max-width: 50%;
+.about-section-dashboard img {
+    max-width: 60%;
 }
-.about-section-rewards img {
-    max-width: 30%;
+.about-section-wallet img {
+    max-width: 50%;
 }
 .about-section:not(:first-of-type) {
     margin-top: 60px;
