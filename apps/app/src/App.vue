@@ -87,7 +87,7 @@ export default defineComponent({
 
         // Determine the initial theme
         const initialTheme = themeParam || this.preferredTheme;
-
+        this.themeStore.setTheme(initialTheme);
         // Apply the initial theme
         document.documentElement.setAttribute('data-theme', initialTheme);
         this.currentTheme = initialTheme;
