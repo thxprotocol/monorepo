@@ -190,7 +190,7 @@ export default class TwitterDataProxy {
 
             return {
                 result: false,
-                reason: `X: Your account does not meet the threshold of ${minFollowersCount} followers.`,
+                reason: `X: Your account does not meet the threshold of ${minFollowersCount} follower${minFollowersCount > 1 ? 's' : ''}.`,
             };
         } catch (res) {
             return this.handleError(account, token, res);
