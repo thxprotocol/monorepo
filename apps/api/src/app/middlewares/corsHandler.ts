@@ -11,7 +11,6 @@ export const corsHandler = cors(async (req: any, callback: any) => {
         'chrome://verification.top-chrome',
         'chrome://mobile-ntp',
         'https://localhost:8080',
-        'http://localhost:5173',
         // 'https://thx.network',
         // 'https://www.thx.network',
         // 'https://dev-www.thx.network',
