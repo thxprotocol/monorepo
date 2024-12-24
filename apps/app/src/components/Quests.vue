@@ -1287,9 +1287,6 @@ export default defineComponent({
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
     }
-    .offer-row {
-        gap: 10px;
-    }
 }
 
 @media (max-width: 1400px) {

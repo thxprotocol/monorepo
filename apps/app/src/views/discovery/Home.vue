@@ -521,4 +521,10 @@ export default defineComponent({
         overflow: hidden;
     }
 }
+@media only screen and (max-height: 560px) {
+    .mainComponent {
+        height: auto;
+        overflow: unset;
+    }
+}
 </style>

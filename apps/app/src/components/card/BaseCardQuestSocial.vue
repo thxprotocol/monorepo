@@ -72,6 +72,7 @@
                 points
             </p>
         </div>
+        <div v-if="error" variant="danger" class="p-2"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
 
         <div class="mt-3">
             <BButtonGroup v-if="!isConnected" block class="w-100">

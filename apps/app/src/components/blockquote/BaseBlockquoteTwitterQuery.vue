@@ -38,7 +38,7 @@
                 <em v-for="mention of operators.mentions" class="me-1">@{{ mention }}</em>
             </div>
         </blockquote>
-        <blockquote v-if="operators.url && operators.url.length" class="mb-1">
+        <!-- <blockquote v-if="operators.url && operators.url.length" class="mb-1">
             <div class="card-text ps-2 position-relative">
                 <div class="d-flex text-opaque pb-1">Your post contains URL:</div>
                 <span v-for="(url, index) of operators.url" class="me-1">
@@ -46,7 +46,7 @@
                     <span v-if="index === operators.url.length">,</span>
                 </span>
             </div>
-        </blockquote>
+        </blockquote> -->
         <blockquote v-if="operators.media && operators.media !== 'ignore'" class="mb-1">
             <div class="card-text ps-2 position-relative">
                 <div class="d-flex text-opaque pb-1">Required media:</div>
