@@ -2,15 +2,17 @@
     opacity: 1 !important;
 
     .tooltip-arrow:before {
-        border-top-color: var(--bs-primary) !important;
+        border-top-color: var(--dropdown-border-color) !important;
     }
     
     .tooltip-inner {
-        max-width: 280px;
-        background-color: var(--bs-primary) !important;
+        max-width: 150px;
+        background: var(--home-background) !important;
         text-align: left;
         padding: .75rem;
-        color: var(--bs-body-color) !important;      
+        color: var(--modal-text-color) !important;      
+        box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.354);
+        border: 1px solid var(--dropdown-border-color);
     }
 }
 

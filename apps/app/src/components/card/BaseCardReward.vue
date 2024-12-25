@@ -26,6 +26,37 @@
                 <!-- <i class="me-2 text-opaque small" :class="iconMap[reward.variant]" /> -->
                 <slot name="title" />
             </b-card-title>
+            <div
+                v-if="reward.limitSupplyProgress.max"
+                :class="[
+                    'd-flex align-items-center',
+                    accountStore.isMobile ? 'justify-content-center' : 'justify-content-end',
+                    'px-3 pb-2',
+                ]"
+                style="color: var(--body-text)"
+            >
+                <span class="me-1"> Supply: </span>
+                <div class="ms-1 p-1 px-2 reward-supply-box">
+                    <span :class="limitSupplyVariant" style="color: var(--green-highlight-color) !important">
+                        {{ reward.limitSupplyProgress.max - reward.limitSupplyProgress.count }}
+                    </span>
+                    <span class="">/{{ reward.limitSupplyProgress.max }}</span>
+                </div>
+            </div>
+
+            <b-progress
+                v-if="reward.limitProgress.max"
+                v-b-tooltip.bottom
+                :variant="limitVariant"
+                :title="`You can purchase this reward ${reward.limitProgress.max} time${
+                    reward.limitProgress.max > 1 ? 's' : ''
+                }.`"
+                :value="reward.limitProgress.count"
+                :max="reward.limitProgress.max"
+                style="height: 6px"
+                class="mb-2 mx-3"
+            />
+
             <div class="d-flex justify-content-between">
                 <b-card-title v-if="reward.isPromoted" class="d-flex align-items-center reward-title-promoted">
                     <slot name="title" />
@@ -76,15 +107,6 @@
                         <div v-if="!reward.pointPrice" class="d-flex align-items-center justify-content-center">
                             Free!
                         </div>
-                        <b-progress
-                            v-if="reward.limitProgress.max"
-                            v-b-tooltip.bottom
-                            :variant="limitVariant"
-                            :title="`You can purchase this reward ${reward.limitProgress.max} times.`"
-                            :value="reward.limitProgress.count"
-                            :max="reward.limitProgress.max"
-                            style="height: 6px"
-                        />
                     </button>
                 </span>
             </div>
@@ -455,5 +477,12 @@ export default defineComponent({
 }
 .promoted-reward-btn {
     width: 112px;
+}
+.reward-supply-box {
+    background-color: var(--reward-supply-box);
+    border-radius: 4px;
+}
+.progress {
+    background-color: var(--nav-link-bg);
 }
 </style>
