@@ -73,6 +73,7 @@ import { useAccountStore } from '../stores/Account';
 import { useQuestStore } from '../stores/Quest';
 import { SANTA_CAMPAIGN, CP_CAMPAIGN } from '../config/secrets';
 import trophyImage from '../assets/trophy.png';
+import { useTrackPageview } from '../utils/snowplowTracker';
 export default defineComponent({
     name: 'BaseQuestLeaderboardSmall',
     props: {
@@ -103,6 +104,7 @@ export default defineComponent({
         // },
     },
     mounted() {
+        useTrackPageview();
         this.updateLeaderboard();
     },
     methods: {

@@ -280,6 +280,7 @@ import { ref } from 'vue';
 import { useAuthStore } from '@thxnetwork/app/stores/Auth';
 import axios from 'axios';
 import OfferCard from '@thxnetwork/app/components/OfferCard.vue';
+import { useTrackPageview } from '../utils/snowplowTracker';
 
 const selectedValue = ref<string>('All');
 const componentMap: { [variant: string]: string } = {
@@ -333,9 +334,9 @@ export default defineComponent({
             questFilters: [
                 { label: 'All Quests', value: 'all' },
                 { label: 'Santa', value: 'santa' },
-                { label: 'Quest X', value: 'x' },
-                { label: 'Quest Discord', value: 'discord' },
-                { label: 'Quest Youtube', value: 'youtube' },
+                { label: 'X Quest', value: 'x' },
+                { label: 'Discord Quest', value: 'discord' },
+                { label: 'Youtube Quest', value: 'youtube' },
             ],
             showDropdown: false,
             activeTab: 0,
@@ -561,6 +562,7 @@ export default defineComponent({
         },
     },
     mounted() {
+        useTrackPageview();
         document.addEventListener('click', this.handleClickOutside);
     },
     beforeUnmount() {

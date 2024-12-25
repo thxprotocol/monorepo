@@ -42,7 +42,7 @@
                 </div> -->
             </div>
             <button variant="primary" block class="w-100 mb-1 offer-btn btn-primary" target="_blank" @click="openModal">
-                Claim <strong>${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}</strong>
+                Earn ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
             </button>
         </b-collapse>
         <b-modal v-model="showModal" size="lg" hide-footer hide-header centered>

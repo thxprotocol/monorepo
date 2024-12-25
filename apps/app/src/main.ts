@@ -8,12 +8,15 @@ import Vue3Toastify from 'vue3-toastify';
 import router from './router';
 import Mixpanel from '@thxnetwork/common/mixpanel';
 import './scss/main.scss';
+import { initializeTracker } from './utils/snowplowTracker';
 
 declare global {
     interface Window {
         ethereum: any;
     }
 }
+// Snowplow
+initializeTracker('https://snowplow-test.santabrowser.com');
 
 const pinia = createPinia();
 const app = createApp(App);

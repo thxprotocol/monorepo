@@ -166,6 +166,7 @@ declare module 'vue' {
     BTabs: typeof import('bootstrap-vue-next')['BTabs']
     CampaignCard: typeof import('./src/components/CampaignCard.vue')['default']
     HeaderNav: typeof import('./src/components/HeaderNav.vue')['default']
+    ImageModal: typeof import('./src/components/new-ui/ImageModal.vue')['default']
     OfferCard: typeof import('./src/components/OfferCard.vue')['default']
     OfferSteps: typeof import('./src/components/new-ui/OfferSteps.vue')['default']
     Quests: typeof import('./src/components/Quests.vue')['default']

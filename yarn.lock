@@ -7004,6 +7004,33 @@
     "@smithy/types" "^3.0.0"
     tslib "^2.6.2"
 
+"@snowplow/browser-tracker-core@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@snowplow/browser-tracker-core/-/browser-tracker-core-4.1.0.tgz#172ecbd510b3b3c4edf04acc1337bca517796025"
+  integrity sha512-QsC80kv8lu3f+r4PxahlueklcuueYpJ/oM/X5rHIxPzefsgIJI5felOguxXMEZptPicLG7riwWnsiFN6g6vM1g==
+  dependencies:
+    "@snowplow/tracker-core" "4.1.0"
+    sha1 "^1.1.1"
+    tslib "^2.3.1"
+    uuid "^10.0.0"
+
+"@snowplow/browser-tracker@^4.0.4":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@snowplow/browser-tracker/-/browser-tracker-4.1.0.tgz#1d7285dd95a7cdb6d0d24c1484a0efb0cd343dd3"
+  integrity sha512-4Ccuny+Hb4JiL5bKaZ3WWxfKxNYZsQeHSotf40yX8IWQ/Ttys9ohom2kk2dEIunOTEec7vkKGhNA44DV+B4rUQ==
+  dependencies:
+    "@snowplow/browser-tracker-core" "4.1.0"
+    "@snowplow/tracker-core" "4.1.0"
+    tslib "^2.3.1"
+
+"@snowplow/tracker-core@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@snowplow/tracker-core/-/tracker-core-4.1.0.tgz#833c401b79227ca2c30fdac6a51444b9ab052766"
+  integrity sha512-mj+yAjFSADQAbAuLx/bFW2BLkjjpMYFzW8HpNvsTkBXilEyQNkhpV/CE36YKZCJXghZomozQRlohWamISFmm3Q==
+  dependencies:
+    tslib "^2.3.1"
+    uuid "^10.0.0"
+
 "@socket.io/component-emitter@~3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.0.tgz#96116f2a912e0c02817345b3c10751069920d553"
@@ -26920,6 +26947,11 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==
+
+uuid@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-10.0.0.tgz#5a95aa454e6e002725c79055fd42aaba30ca6294"
+  integrity sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==
 
 uuid@^3.3.2:
   version "3.4.0"

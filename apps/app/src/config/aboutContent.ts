@@ -51,8 +51,9 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
                 <p>We're all about making your web experiences richer and your online time more rewarding! This Rewards Dashboard is your go-to spot where you can oversee how your browser is working for you!</p>
                 <h3>We’ve written this guide to help you get started and make the most out of your rewarding journey with us</h3>
                 <p>Here’s how you can effortlessly keep track of your progress, jump into various quests, and redeem your rewards — all in one place.</p>
-                
-                <img src="${journeyImage}" alt="Rewards Overview" />
+                <div class="d-flex justify-content-center">
+                    <img src="${journeyImage}" alt="Rewards Overview" />
+                </div>
             `,
                 },
                 {
@@ -69,7 +70,9 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
                         <li><strong>Cash Rewards:</strong> Earned through shopping cashbacks and tasks.</li>
                     </ul>
                 <p>(More reward redemption options, like gift cards, Santa tokens, exclusive merch and much more! — Coming soon)</p>
-                <img src="${underStandImage}" alt="Reward System"/>
+                <div class="d-flex justify-content-center">
+                    <img src="${underStandImage}" alt="Reward System"/>
+                </div>
                 <h3>What to Collect?</h3>
                 <p>Both points and rewards can be exchanged for exciting items like USDT, gift cards, and exclusive merch. The choice is yours!</p>
             `,
@@ -89,7 +92,9 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
                 <li><strong>Wallet:</strong> Manage your earnings.</li>
                 <li><strong>Transactions:</strong> Monitor your claims and transfers.</li>
                 </ul>
-                <img src="${dashboardImage}" alt="Navigating Dashboard" />
+                <div class="d-flex justify-content-center">
+                    <img src="${dashboardImage}" alt="Navigating Dashboard" />
+                </div>
             `,
                 },
                 {
@@ -168,7 +173,9 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
                         <li><strong>Step 2:</strong> Visit the Rewards section to see what’s available.</li>
                         <li><strong>Step 3:</strong> Click to redeem your points or cash for desired rewards.</li>
                     </ul>
-                    <img src="${rewardImage}" alt="Claiming Rewards" />
+                    <div class="d-flex justify-content-center">
+                        <img src="${rewardImage}" alt="Claiming Rewards" />
+                    </div>
                     `,
                 },
                 {
@@ -182,10 +189,14 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
                         <li><strong>Supported Wallets:</strong> You're not just limited to the Santa Wallet; various popular wallets are compatible.</li>
                         <li><strong>Setting Up:</strong> Navigate to the Wallet section, choose your preferred wallet, and follow the setup instructions.</li>
                     </ul>
-                    <img src="${walletImage}" alt="Wallet" />
+                    <div class="d-flex justify-content-center">
+                        <img src="${walletImage}" alt="Wallet" />
+                    </div>
                     <h3>Already have another Wallet?</h3>
                     <p>Santa supports a wide range of popular wallets, enabling you to manage your Web3 assets effortlessly. You can import your existing support wallets into your Santa Wallet and manage all your assetsfrom here.</p>
-                    <img src="${importImage}" alt="Wallet Import" />
+                    <div class="d-flex justify-content-center">
+                        <img src="${importImage}" alt="Wallet Import" />
+                    </div>
                     `,
                 },
             ],

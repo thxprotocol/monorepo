@@ -29,6 +29,7 @@
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
 import { useAccountStore } from '../../stores/Account';
+import { useTrackPageview } from '@thxnetwork/app/utils/snowplowTracker';
 export default defineComponent({
     name: 'Sidebar',
     props: {
@@ -53,6 +54,7 @@ export default defineComponent({
         ...mapStores(useAccountStore),
     },
     mounted() {
+        useTrackPageview();
         import('../../assets/aptos-banner.png').then((module) => {
             this.aptosBanner = module.default;
         });

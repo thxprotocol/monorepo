@@ -54,6 +54,7 @@ import { SANTA_CAMPAIGN, CP_CAMPAIGN } from '../config/secrets';
 import imgStarCoin from '../assets/star-coin.png';
 import { useQuestStore } from '../stores/Quest';
 import rewardsIcon from '../assets/rewards-icon.png';
+import { useTrackPageview } from '../utils/snowplowTracker';
 export default defineComponent({
     name: 'HeaderNav',
     props: {
@@ -105,6 +106,7 @@ export default defineComponent({
         // await this.accountStore.getParticipants();
     },
     mounted() {
+        useTrackPageview();
         this.startTypingAnimation();
     },
     beforeUnmount() {

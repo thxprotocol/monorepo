@@ -37,6 +37,7 @@
         "@popperjs/core": "^2.11.6",
         "@safe-global/api-kit": "^1.1.0",
         "@safe-global/protocol-kit": "1.2.0",
+        "@snowplow/browser-tracker": "^4.0.4",
         "@solana/spl-token": "^0.4.8",
         "@solana/web3.js": "^1.95.3",
         "@supabase/supabase-js": "^2.44.4",

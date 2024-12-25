@@ -65,6 +65,7 @@ import earningsIcon from '../../assets/earnings-logo.png';
 import * as html from 'html-entities';
 import { defineComponent } from 'vue';
 import Quests from '@thxnetwork/app/components/Quests.vue';
+import { useTrackPageview } from '@thxnetwork/app/utils/snowplowTracker';
 const CACHE_EXPIRY = 1000 * 60 * 60 * 24 * 7;
 
 export default defineComponent({
@@ -117,6 +118,7 @@ export default defineComponent({
         },
     },
     async mounted() {
+        useTrackPageview();
         await this.getCampaigns();
         await this.getQuests();
         await this.getStoreLogos();

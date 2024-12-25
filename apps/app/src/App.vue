@@ -120,7 +120,6 @@ export default defineComponent({
             this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             this.colorSchemeMediaQuery.addEventListener('change', this.handleColorSchemeChange);
         }
-        const aboutContent = await getAboutContent(this.currentTheme);
     },
     beforeUnmount() {
         if (this.colorSchemeMediaQuery) {

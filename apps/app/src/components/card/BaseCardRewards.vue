@@ -41,6 +41,7 @@ import BaseCardCoin from '../../components/card/BaseCardCoin.vue';
 import BaseCardNFT from '../../components/card/BaseCardNFT.vue';
 import BaseCardCouponCode from '../../components/card/BaseCardCouponCode.vue';
 import BaseCardDiscordRole from '../../components/card/BaseCardDiscordRole.vue';
+import { useTrackPageview } from '@thxnetwork/app/utils/snowplowTracker';
 
 export default defineComponent({
     name: 'BaseViewWallet',
@@ -103,6 +104,7 @@ export default defineComponent({
         },
     },
     mounted() {
+        useTrackPageview();
         this.listRewards();
     },
     methods: {
