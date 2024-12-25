@@ -77,11 +77,12 @@
                                             </div>
                                             <div class="quest-item quest-group-item">
                                                 <BaseCardQuestReferral
+                                                    v-if="group.title === 'Santa\'s Quests'"
                                                     :referral="
                                                         'https://santabrowser.com/download?install_referrer=' +
                                                         hashedCode
                                                     "
-                                                    :imageurl="'/src/assets/referral.jpg'"
+                                                    :imageurl="'https://thx-public.s3.ap-south-1.amazonaws.com/referral-3XnqvStm6VM72C2jFv8fua.jpg'"
                                                 />
                                             </div>
                                         </div>
