@@ -84,7 +84,7 @@
                                                         'https://santabrowser.com/download?install_referrer=' +
                                                         hashedCode
                                                     "
-                                                    :imageurl="'https://thx-public.s3.ap-south-1.amazonaws.com/referral-3XnqvStm6VM72C2jFv8fua.jpg'"
+                                                    :imageurl="'https://thx-public.s3.ap-south-1.amazonaws.com/newreferral-neGnhMMfjymfApS8jx7BaJ.jpg'"
                                                 />
                                             </div>
                                         </div>
