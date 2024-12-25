@@ -13,10 +13,10 @@
         </template>
 
         <div class="select-group">
-            <b-button class="select-button" disabled @click="onClickEVM">
+            <!-- <b-button class="select-button" disabled @click="onClickEVM">
                 <img :src="ImgLogoSepolia" alt="Add Icon" style="width: 32px; height: 32px; border-radius: 8px" />
                 EVM
-            </b-button>
+            </b-button> -->
             <b-button class="select-button" @click="onClickAptos">
                 <img :src="ImgLogoAptos" alt="Add Icon" style="width: 32px; height: 32px; border-radius: 8px" />
                 Aptos
