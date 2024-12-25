@@ -29,7 +29,9 @@
                 <slot></slot>
             </div>
             <div class="quest-card-btns">
-                <b-button variant="primary" block class="w-100" @click="onClickCopy"> Copy URL </b-button>
+                <b-button variant="primary" block class="w-100" @click="onClickCopy">
+                    Copy Link<i class="fas fa-copy" aria-hidden="true"></i>
+                </b-button>
             </div>
         </b-collapse>
     </b-card>

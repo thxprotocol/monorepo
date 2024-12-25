@@ -75,9 +75,11 @@
                                                     :group-title="group.title"
                                                 />
                                             </div>
-                                            <div class="quest-item quest-group-item">
+                                            <div
+                                                class="quest-item quest-group-item"
+                                                v-if="group.title === 'Santa\'s Quests'"
+                                            >
                                                 <BaseCardQuestReferral
-                                                    v-if="group.title === 'Santa\'s Quests'"
                                                     :referral="
                                                         'https://santabrowser.com/download?install_referrer=' +
                                                         hashedCode
