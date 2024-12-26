@@ -9,7 +9,7 @@
                 Promoted
             </b-button>
 
-            <div :class="`d-flex justify-content-center ${reward.isPromoted ? 'mt-0' : 'mt-2'}`">
+            <div class="d-flex justify-content-center mt-0">
                 <div
                     v-if="!image"
                     :class="!reward.isPromoted ? 'reward-image-placeholder' : 'reward-img-promoted-ph'"
