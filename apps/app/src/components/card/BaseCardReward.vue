@@ -467,7 +467,7 @@ export default defineComponent({
 }
 .reward-image {
     height: 75px;
-    width: 75px;
+    // width: 75px;
     object-fit: cover;
 }
 .reward-img-promoted {
