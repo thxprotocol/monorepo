@@ -52,12 +52,15 @@
         <div class="d-flex flex-column mt-3">
             <p class="quest-modal-title">{{ quest.title }}</p>
             <p class="quest-modal-text">{{ quest.description }}</p>
-            <p class="quest-modal-text mb-5">
+            <p class="quest-modal-text" :class="{ 'mb-5': !quest.description.includes('week') }">
                 You can earn
                 <span class="text-accent"
                     ><strong>{{ formattedAmount }}</strong></span
                 >
                 points
+            </p>
+            <p v-if="quest.description.includes('week')" class="quest-modal-text mb-5">
+                You can claim the points every weekend as it's a weekly quest.
             </p>
         </div>
         <div v-if="error" variant="danger" class="p-2"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>

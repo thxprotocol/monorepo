@@ -3,13 +3,13 @@
         <b-card-body
             v-if="reward.poolId === CP_CAMPAIGN || reward.poolId === SANTA_CAMPAIGN"
             class="d-flex flex-column justify-content-between cp-campaign-card"
-            :style="{ height: 'auto', background: !reward.isPromoted ? backgroundColor : '' }"
+            :style="{ height: '100%', background: !reward.isPromoted ? backgroundColor : '' }"
         >
             <b-button v-if="reward.isPromoted" class="d-flex align-items-center promoted-title" variant="success">
                 Promoted
             </b-button>
 
-            <div class="d-flex justify-content-center mt-0">
+            <div :class="`d-flex justify-content-center ${reward.isPromoted ? 'mt-0' : 'mt-1 mx-1'}`">
                 <div
                     v-if="!image"
                     :class="!reward.isPromoted ? 'reward-image-placeholder' : 'reward-img-promoted-ph'"
@@ -22,29 +22,15 @@
                     :class="!reward.isPromoted ? 'reward-image' : 'reward-img-promoted'"
                 />
             </div>
-            <b-card-title v-if="!reward.isPromoted" class="d-flex align-items-center reward-title px-2 flex-grow-1">
+            <b-card-title
+                v-if="!reward.isPromoted"
+                class="d-flex align-items-center reward-title px-2 flex-grow-1 pb-3"
+            >
                 <!-- <i class="me-2 text-opaque small" :class="iconMap[reward.variant]" /> -->
                 <slot name="title" />
             </b-card-title>
-            <div
-                v-if="reward.limitSupplyProgress.max"
-                :class="[
-                    'd-flex align-items-center',
-                    accountStore.isMobile ? 'justify-content-center' : 'justify-content-end',
-                    'px-3 pb-2',
-                ]"
-                style="color: var(--body-text)"
-            >
-                <span class="me-1"> Supply: </span>
-                <div class="ms-1 p-1 px-2 reward-supply-box">
-                    <span :class="limitSupplyVariant" style="color: var(--green-highlight-color) !important">
-                        {{ reward.limitSupplyProgress.max - reward.limitSupplyProgress.count }}
-                    </span>
-                    <span class="">/{{ reward.limitSupplyProgress.max }}</span>
-                </div>
-            </div>
 
-            <b-progress
+            <!-- <b-progress
                 v-if="reward.limitProgress.max"
                 v-b-tooltip.bottom
                 :variant="limitVariant"
@@ -55,12 +41,35 @@
                 :max="reward.limitProgress.max"
                 style="height: 6px"
                 class="mb-2 mx-3"
-            />
+            /> -->
 
-            <div class="d-flex justify-content-between">
+            <div
+                :class="`d-flex ${
+                    !reward.isPromoted && !reward.limitSupplyProgress.max
+                        ? 'justify-content-end'
+                        : 'justify-content-between'
+                }`"
+            >
                 <b-card-title v-if="reward.isPromoted" class="d-flex align-items-center reward-title-promoted">
                     <slot name="title" />
                 </b-card-title>
+                <div
+                    v-if="reward.limitSupplyProgress.max && !reward.isPromoted"
+                    :class="[
+                        'd-flex align-items-center',
+                        accountStore.isMobile ? 'justify-content-center' : 'justify-content-end',
+                        'ps-2 pb-2',
+                    ]"
+                    style="color: var(--body-text)"
+                >
+                    <span class="me-1" style="color: var(--reward-supply-text)"> Supply: </span>
+                    <div>
+                        <span :class="limitSupplyVariant" style="color: var(--green-highlight-color) !important">
+                            {{ reward.limitSupplyProgress.max - reward.limitSupplyProgress.count }}
+                        </span>
+                        <span style="color: var(--reward-supply-limit)">/{{ reward.limitSupplyProgress.max }}</span>
+                    </div>
+                </div>
                 <button
                     v-if="!accountStore.isAuthenticated"
                     class="w-100 my-reward-btn"
@@ -72,21 +81,17 @@
                     </template>
                     <strong v-else> Free! </strong>
                 </button>
-                <span
-                    v-else
-                    id="disabled-wrapper"
-                    :class="`d-block mx-3 mb-2 ${reward.isPromoted ? '' : 'w-100'}`"
-                    tabindex="0"
-                >
+                <span v-else id="disabled-wrapper" :class="`d-block me-2 mb-2 `" tabindex="0">
                     <button
                         v-b-modal="`modalRewardPayment${reward._id}`"
                         variant="primary"
                         block
-                        :class="`position-relative mb-0 ${isInsufficientPoints ? 'locked' : 'my-reward-btn '} ${
-                            reward.isPromoted ? 'promoted-reward-btn' : ''
-                        } btn-primary`"
+                        :class="`position-relative mb-0 px-5 py-1 ${
+                            isInsufficientPoints || reward.isLimitSupplyReached ? 'locked-btn' : ' btn-primary'
+                        }`"
                         :disabled="isDisabled"
                     >
+                        <div v-if="reward.isLimitSupplyReached">Sold out</div>
                         <div v-if="isInsufficientPoints">Locked</div>
                         <div
                             v-if="reward.pointPrice && !isInsufficientPoints"
@@ -434,7 +439,7 @@ export default defineComponent({
 }
 
 .reward-title div {
-    color: var(--body-text);
+    color: var(--reward-title-color);
     font-feature-settings: 'liga' off, 'clig' off;
     font-family: 'Poppins';
     font-size: 14px;
@@ -446,7 +451,6 @@ export default defineComponent({
     text-overflow: ellipsis;
     font-style: normal;
     line-height: 18px;
-    text-align: center;
     margin-top: 10px;
 }
 
@@ -455,8 +459,8 @@ export default defineComponent({
     font-size: 16px;
 }
 .reward-image-placeholder {
-    height: 75px;
-    width: 75px;
+    height: 98px;
+    width: 100px;
     background-color: #000;
     border-radius: 50%;
 }
@@ -466,9 +470,10 @@ export default defineComponent({
     height: 120px;
 }
 .reward-image {
-    height: 75px;
-    // width: 75px;
+    height: 98px;
+    width: 100%;
     object-fit: cover;
+    border-radius: 10px 10px 0 0;
 }
 .reward-img-promoted {
     width: 100%;
@@ -477,10 +482,6 @@ export default defineComponent({
 }
 .promoted-reward-btn {
     width: 112px;
-}
-.reward-supply-box {
-    background-color: var(--reward-supply-box);
-    border-radius: 4px;
 }
 .progress {
     background-color: var(--nav-link-bg);

@@ -118,7 +118,7 @@ export default defineComponent({
 
         if (!urlParams.get('theme')) {
             this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            this.colorSchemeMediaQuery.addEventListener('change', this.handleColorSchemeChange);
+            // this.colorSchemeMediaQuery.addEventListener('change', this.handleColorSchemeChange);
         }
     },
     beforeUnmount() {

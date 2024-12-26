@@ -218,8 +218,7 @@
                                 <div
                                     v-for="reward in mergedRewards.filter((reward) => reward.isAvailable)"
                                     :key="reward._id"
-                                    :class="{ 'reward-item-promoted': reward.isPromoted }"
-                                    class="reward-item"
+                                    :class="[reward.isPromoted ? 'reward-item-promoted' : 'reward-item']"
                                 >
                                     <component :is="componentMap[reward.variant]" :reward="reward" />
                                 </div>
@@ -1087,11 +1086,12 @@ export default defineComponent({
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-.quest-item-daily,
-.reward-item-promoted {
+.quest-item-daily {
     grid-column: span 2;
 }
-
+.reward-item-promoted {
+    grid-column: span 3;
+}
 .quest-group-title {
     color: var(--title-color);
     font-feature-settings: 'liga' off, 'clig' off;
@@ -1181,7 +1181,6 @@ export default defineComponent({
         cursor: pointer;
     }
 }
-
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.3s;
@@ -1190,7 +1189,9 @@ export default defineComponent({
 .fade-leave-to {
     opacity: 0;
 }
-
+.reward-item {
+    grid-column: span 2;
+}
 @keyframes pulse {
     0% {
         opacity: 1;
@@ -1262,8 +1263,7 @@ export default defineComponent({
         min-width: 235px;
         max-width: 235px;
     }
-    .quest-item-daily,
-    .reward-item-promoted {
+    .quest-item-daily {
         grid-column: span 2;
     }
     .quests-column .tabs {
@@ -1306,6 +1306,10 @@ export default defineComponent({
         scrollbar-width: none;
         -ms-overflow-style: none;
         grid-template-columns: none;
+    }
+
+    .reward-item-promoted {
+        grid-column: 1/-1;
     }
 }
 @media (max-width: 774px) {

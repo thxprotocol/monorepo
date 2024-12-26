@@ -71,6 +71,7 @@ export default defineComponent({
     opacity: 0.55;
     color: var(--btn-disabled-color);
     font-weight: 500;
+    border-radius: 5px;
 }
 .locked-btn:hover,
 .locked-btn:focus,
