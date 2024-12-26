@@ -231,7 +231,7 @@ export const useWalletStore = defineStore('wallet', {
                 api.request.get('/v1/rewards/payments'),
                 ...(this.wallet
                     ? [
-                          api.erc20.list({ walletId: this.wallet._id, chainId: this.chainId }),
+                          api.erc20.list({ walletId: this.wallet._id, chainId: 1000000001 }),
                           api.erc721.list({ walletId: this.wallet._id, chainId: this.chainId }),
                           api.erc1155.list({ walletId: this.wallet._id, chainId: this.chainId }),
                       ]

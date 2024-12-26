@@ -86,7 +86,7 @@ export default defineComponent({
         ...mapStores(useAuthStore, useAccountStore, useWalletStore),
         list() {
             return [
-                ...this.walletStore.erc20.filter((item) => item.chainId === this.walletStore.chainId),
+                ...this.walletStore.erc20,
                 ...this.walletStore.erc721.filter((item) => item.chainId === this.walletStore.chainId),
                 ...this.walletStore.erc1155.filter((item) => item.chainId === this.walletStore.chainId),
                 ...this.walletStore.couponCodes,

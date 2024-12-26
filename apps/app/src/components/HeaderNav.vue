@@ -26,7 +26,7 @@
         </div>
 
         <div class="d-flex gap-2 media-header-second">
-            <BaseCardWalletInfo @list-updated="updateHeaderVisibility" />
+            <!-- <BaseCardWalletInfo @list-updated="updateHeaderVisibility" /> -->
             <BaseDropdownWallets />
             <div
                 class="d-flex align-items-center justify-content-between name-avatar"

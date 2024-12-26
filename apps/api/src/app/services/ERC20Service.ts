@@ -44,6 +44,28 @@ async function decorate(token: ERC20TokenDocument, wallet: WalletDocument) {
     };
 }
 
+async function decorateERC20(token: ERC20TokenDocument, erc20: ERC20Document, wallet: WalletDocument) {
+    if (wallet.variant === WalletVariant.Safe && erc20.chainId !== wallet.chainId) {
+        throw new Error(`ERC20 chain ${erc20.chainId} not equal walllet chain ${wallet.chainId}`);
+    }
+
+    let walletBalance;
+    if (erc20.chainId === ChainId.Aptos) {
+        const balanceOfPool = await AptosService.getCoinBalance(wallet.address, erc20.address);
+        const [, , decimals] = await AptosService.getCoinInfo(erc20.address);
+        walletBalance = balanceOfPool / 10 ** decimals;
+    } else {
+        const walletBalanceInWei = await erc20.contract.methods.balanceOf(wallet.address).call();
+        walletBalance = fromWei(walletBalanceInWei, 'ether');
+    }
+
+    return {
+        ...(token.toJSON() as TERC20Token),
+        walletBalance,
+        erc20,
+    };
+}
+
 function getDeployArgs(erc20: ERC20Document, totalSupply?: string) {
     const { defaultAccount } = NetworkService.getProvider(erc20.chainId);
 
@@ -156,8 +178,9 @@ export const getTokensForSub = (sub: string) => {
 };
 
 export const getTokensForWallet = async (wallet: WalletDocument, chainId: ChainId) => {
-    const tokens = await ERC20Token.find({ sub: wallet.sub, walletId: wallet.id });
-    const erc20Tokens = await PromiseParser.parse(tokens.map((token) => decorate(token, wallet)));
+    const tokens = await ERC20Token.find({ sub: wallet.sub });
+    const erc20s = await ERC20.find({ chainId });
+    const erc20Tokens = await PromiseParser.parse(erc20s.map((erc20) => decorateERC20(tokens[0], erc20, wallet)));
 
     // We add additional veTHX related tokens for Polygon and Hardhat
     const defaults = await findDefaultTokens(wallet, chainId);

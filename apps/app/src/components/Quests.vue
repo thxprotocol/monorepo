@@ -76,8 +76,8 @@
                                                 />
                                             </div>
                                             <div
-                                                class="quest-item quest-group-item"
                                                 v-if="group.title === 'Santa\'s Quests'"
+                                                class="quest-item quest-group-item"
                                             >
                                                 <BaseCardQuestReferral
                                                     :referral="
