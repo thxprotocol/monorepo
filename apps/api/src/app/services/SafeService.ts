@@ -262,8 +262,8 @@ class SafeService {
             });
             await client.generateSignSubmitWaitForTransaction(signer, createMultisigTx.payload);
 
-            await client.generateSignSubmitWaitForTransaction(signer, multisigTxExecution);
-            await tx.updateOne({ state: TransactionState.Mined });
+            const result = await client.generateSignSubmitWaitForTransaction(signer, multisigTxExecution);
+            await tx.updateOne({ state: TransactionState.Mined, transactionHash: result.hash });
             logger.debug('Safe TX Executed');
         } else if (wallet.chainId == ChainId.Sui) {
             await tx.updateOne({ state: TransactionState.Executed });
