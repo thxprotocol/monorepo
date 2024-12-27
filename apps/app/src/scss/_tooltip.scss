@@ -15,6 +15,49 @@
         border: 1px solid var(--dropdown-border-color);
     }
 }
+.skeleton-loader {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.skeleton-item {
+    &:nth-child(odd) {
+        background-color: var(--quest-item-bg);
+    }
+    &:nth-child(even) {
+        background-color: var(--main-content-bg);
+    }
+}
+
+.skeleton-avatar,
+.skeleton-username {
+    background-color: #c0c0c0;
+    border-radius: 4px;
+    animation: pulse 1.5s infinite;
+}
+
+.skeleton-rank {
+    width: 30px;
+    text-align: center;
+    font-family: Poppins;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.skeleton-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin: 0 10px;
+}
+
+.skeleton-username {
+    flex-grow: 1;
+    height: 20px;
+}
 
 .reward-info-wrap {
     position: relative;

@@ -350,7 +350,7 @@ export default defineComponent({
                 { label: 'Santa', value: 'santa' },
                 { label: 'X Quest', value: 'x' },
                 { label: 'Discord Quest', value: 'discord' },
-                { label: 'Youtube Quest', value: 'youtube' },
+                // { label: 'Youtube Quest', value: 'youtube' },
             ],
             showDropdown: false,
             activeTab: 0,

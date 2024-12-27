@@ -12,7 +12,7 @@
                     <div v-if="selectedPart === 'wallet'">
                         <BaseCardRewards />
                     </div>
-                    <div v-if="selectedPart === 'transactions'" class="h-100">
+                    <div v-if="selectedPart === 'transactions'" class="h-100 leaderboard-mobile">
                         <Transactions />
                     </div>
                 </div>
