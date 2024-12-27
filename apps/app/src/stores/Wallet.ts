@@ -418,5 +418,12 @@ export const useWalletStore = defineStore('wallet', {
             const { api } = useAccountStore();
             await api.request.delete(`/v1/account/wallets/${this.wallet._id}/transactions/${tx._id}`);
         },
+        async getTransactions() {
+            if (!this.wallet) return;
+
+            const { api } = useAccountStore();
+            const transactions = await api.request.get(`/v1/transactions/${this.wallet._id}`);
+            return transactions;
+        },
     },
 });
