@@ -482,6 +482,12 @@ export default defineComponent({
     overflow: hidden;
 }
 
+.leaderboard-mobile {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 @media (max-width: 424px) {
     .campaigns-box {
         flex-direction: column;
@@ -511,12 +517,6 @@ export default defineComponent({
         flex: 1;
     }
     .main-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-    .leaderboard-mobile {
         flex: 1;
         display: flex;
         flex-direction: column;

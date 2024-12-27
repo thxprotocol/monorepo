@@ -84,17 +84,19 @@
                 <span v-else id="disabled-wrapper" :class="`d-block me-2 mb-2 `" tabindex="0">
                     <button
                         v-b-modal="`modalRewardPayment${reward._id}`"
-                        variant="primary"
                         block
                         :class="`position-relative mb-0 px-5 py-1 ${
-                            isInsufficientPoints || reward.isLimitSupplyReached ? 'locked-btn' : ' btn-primary'
+                            isInsufficientPoints || reward.isLimitSupplyReached || !reward.isAvailable
+                                ? 'locked-btn'
+                                : ' btn-primary'
                         }`"
-                        :disabled="isDisabled"
+                        :disabled="isDisabled || !reward.isAvailable"
                     >
-                        <div v-if="reward.isLimitSupplyReached">Sold out</div>
-                        <div v-if="isInsufficientPoints">Locked</div>
+                        <div v-if="!reward.isAvailable">Completed</div>
+                        <div v-else-if="reward.isLimitSupplyReached">Sold out</div>
+                        <div v-else-if="isInsufficientPoints">Locked</div>
                         <div
-                            v-if="reward.pointPrice && !isInsufficientPoints"
+                            v-else-if="reward.pointPrice && !isInsufficientPoints"
                             class="d-flex align-items-center justify-content-center"
                         >
                             <span class="point me-1">Buy now</span>
@@ -109,7 +111,7 @@
                             />
                             <span v-if="reward.poolId === SANTA_CAMPAIGN" class="coins-text">Points</span> -->
                         </div>
-                        <div v-if="!reward.pointPrice" class="d-flex align-items-center justify-content-center">
+                        <div v-else-if="!reward.pointPrice" class="d-flex align-items-center justify-content-center">
                             Free!
                         </div>
                     </button>

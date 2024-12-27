@@ -35,13 +35,7 @@
             </div>
             <div v-for="tx in transactions" :key="tx._id" class="table-row">
                 <div class="d-flex justify-content-center">
-                    <img
-                        v-if="getChainName(tx.chainId) === 'Aptos'"
-                        :src="aptosLogo"
-                        alt="Aptos"
-                        width="34"
-                        height="29"
-                    />
+                    <div v-if="getChainName(tx.chainId) === 'Aptos'" class="chain-image"></div>
                 </div>
                 <div class="chain-name">
                     {{ getChainName(tx.chainId) }}
@@ -227,18 +221,28 @@ export default defineComponent({
     height: 40px;
     margin-bottom: 8px;
 }
+.chain-image {
+    background-image: url('../../assets/aptos-logo.png');
+    width: 34px;
+    height: 29px;
+    filter: invert(1);
+    background-size: cover;
+}
+[data-theme='dark'] .chain-image {
+    filter: invert(0);
+}
+.transaction-wrap {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.transaction-table {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
 @media (max-width: 992px) {
-    .transaction-wrap {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-    .transaction-table {
-        width: 100%;
-        flex: 1;
-        overflow-y: auto;
-        scrollbar-width: none;
-    }
     .table-row {
         padding: 10px;
     }
