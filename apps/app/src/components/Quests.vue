@@ -467,6 +467,8 @@ export default defineComponent({
                 }
             });
 
+            xQuests.sort((a: any, b: any) => a.amount - b.amount);
+
             const groupedQuests = [
                 { title: "Santa's Quests", quests: santaQuests },
                 { title: 'X Quests', quests: xQuests },

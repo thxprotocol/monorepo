@@ -10,7 +10,10 @@
             </span>
         </div>
 
-        <b-list-group v-if="isTransLoading" class="skeleton-loader transaction-table">
+        <b-list-group
+            v-if="isTransLoading && (!transactions || !transactions.length)"
+            class="skeleton-loader transaction-table"
+        >
             <div class="skeleton-item d-flex p-3 align-items-center">
                 <div class="skeleton-username"></div>
             </div>
@@ -135,8 +138,11 @@ export default defineComponent({
     methods: {
         async fetchTransactions() {
             try {
-                this.isTransLoading = true;
-                this.transactions = await this.walletStore.getTransactions();
+                if (!this.transactions || !this.transactions.length) {
+                    this.isTransLoading = true;
+                }
+                const newTransactions = await this.walletStore.getTransactions();
+                this.transactions = newTransactions;
             } catch (error) {
                 console.error('Error fetching transactions:', error);
                 this.transactions = [];

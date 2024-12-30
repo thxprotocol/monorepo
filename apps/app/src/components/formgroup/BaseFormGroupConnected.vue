@@ -33,12 +33,12 @@ export default defineComponent({
         },
         providers() {
             return {
-                [AccessTokenKind.Google]: {
-                    kind: AccessTokenKind.Google,
-                    scopes: OAuthRequiredScopes.GoogleAuth,
-                    label: 'Google (YouTube)',
-                    color: '#4285F4',
-                },
+                // [AccessTokenKind.Google]: {
+                //     kind: AccessTokenKind.Google,
+                //     scopes: OAuthRequiredScopes.GoogleAuth,
+                //     label: 'Google (YouTube)',
+                //     color: '#4285F4',
+                // },
                 [AccessTokenKind.Twitter]: {
                     kind: AccessTokenKind.Twitter,
                     scopes: OAuthRequiredScopes.TwitterAuth,
