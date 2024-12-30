@@ -90,9 +90,9 @@
                                 ? 'locked-btn'
                                 : ' btn-primary'
                         }`"
-                        :disabled="isDisabled || !reward.isAvailable"
+                        :disabled="isDisabled || !reward.isAvailable || reward.isLimitReached"
                     >
-                        <div v-if="!reward.isAvailable">Completed</div>
+                        <div v-if="!reward.isAvailable || reward.isLimitReached">Completed</div>
                         <div v-else-if="reward.isLimitSupplyReached">Sold out</div>
                         <div v-else-if="isInsufficientPoints">Locked</div>
                         <div

@@ -216,7 +216,9 @@
                             </div>
                             <div v-else class="reward-group">
                                 <div
-                                    v-for="reward in mergedRewards.filter((reward) => reward.isAvailable)"
+                                    v-for="reward in mergedRewards.filter(
+                                        (reward) => reward.isAvailable && !reward.isLimitReached,
+                                    )"
                                     :key="reward._id"
                                     :class="[reward.isPromoted ? 'reward-item-promoted' : 'reward-item']"
                                 >
@@ -242,14 +244,19 @@
                             </div>
                             <div v-else class="reward-group">
                                 <div
-                                    v-for="reward in mergedRewards.filter((reward) => !reward.isAvailable)"
+                                    v-for="reward in mergedRewards.filter(
+                                        (reward) => !reward.isAvailable || reward.isLimitReached,
+                                    )"
                                     :key="reward._id"
                                     :class="{ 'reward-item-promoted': reward.isPromoted }"
                                     class="reward-item"
                                 >
                                     <component :is="componentMap[reward.variant]" :reward="reward" />
                                 </div>
-                                <div v-if="!mergedRewards.some((reward) => !reward.isAvailable)" class="empty-message">
+                                <div
+                                    v-if="!mergedRewards.some((reward) => !reward.isAvailable || reward.isLimitReached)"
+                                    class="empty-message"
+                                >
                                     <p class="text-center text-muted mt-3 text-opaque">
                                         You haven't completed any rewards yet.
                                     </p>
