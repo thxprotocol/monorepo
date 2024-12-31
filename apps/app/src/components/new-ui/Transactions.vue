@@ -17,7 +17,7 @@
             <div class="skeleton-item d-flex p-3 align-items-center">
                 <div class="skeleton-username"></div>
             </div>
-            <div v-for="n in 10" :key="n" class="skeleton-item d-flex p-1 align-items-center">
+            <div v-for="n in 5" :key="n" class="skeleton-item d-flex p-1 align-items-center">
                 <div class="skeleton-avatar"></div>
                 <div class="skeleton-username"></div>
             </div>

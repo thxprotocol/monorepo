@@ -17,8 +17,31 @@
                         <i class="fas fa-tasks text-opaque ms-auto me-3" style="font-size: 1.2rem" />
                     </div>
                 </div> -->
-
                 <b-tabs v-model="activeTab" justified>
+                    <template #tabs-end>
+                        <div
+                            v-if="[0, 1].includes(activeTab)"
+                            ref="filterDropdown"
+                            class="filter-wrapper"
+                            @click="toggleDropdown"
+                        >
+                            <div class="custom-dropdown">
+                                <span class="selected-option">{{ selectedQuestFilterLabel }}</span>
+                                <i class="fas fa-chevron-down custom-select-icon"></i>
+                            </div>
+                            <transition name="fade">
+                                <ul v-if="showDropdown" class="custom-dropdown-options" @click.stop>
+                                    <li
+                                        v-for="filter in questFilters"
+                                        :key="filter.value"
+                                        @click="selectFilter(filter.value)"
+                                    >
+                                        {{ filter.label }}
+                                    </li>
+                                </ul>
+                            </transition>
+                        </div>
+                    </template>
                     <b-tab>
                         <template #title>
                             Available
@@ -170,24 +193,6 @@
                         <AboutQuests :active-tab="activeTab" />
                     </b-tab>
                 </b-tabs>
-                <div
-                    v-if="[0, 1].includes(activeTab)"
-                    ref="filterDropdown"
-                    class="filter-wrapper"
-                    @click="toggleDropdown"
-                >
-                    <div class="custom-dropdown">
-                        <span class="selected-option">{{ selectedQuestFilterLabel }}</span>
-                        <i class="fas fa-chevron-down custom-select-icon body-color"></i>
-                    </div>
-                    <transition name="fade">
-                        <ul v-if="showDropdown" class="custom-dropdown-options" @click.stop>
-                            <li v-for="filter in questFilters" :key="filter.value" @click="selectFilter(filter.value)">
-                                {{ filter.label }}
-                            </li>
-                        </ul>
-                    </transition>
-                </div>
             </b-col>
             <b-col
                 v-if="selectedPart === 'rewards'"
@@ -355,8 +360,8 @@ export default defineComponent({
             questFilters: [
                 { label: 'All Quests', value: 'all' },
                 { label: 'Santa', value: 'santa' },
-                { label: 'X Quest', value: 'x' },
-                { label: 'Discord Quest', value: 'discord' },
+                { label: 'X', value: 'x' },
+                { label: 'Discord', value: 'discord' },
                 // { label: 'Youtube Quest', value: 'youtube' },
             ],
             showDropdown: false,
@@ -1142,7 +1147,6 @@ export default defineComponent({
     position: absolute;
     top: 0;
     right: 0;
-    margin-top: 24px;
     margin-right: 25px;
     display: flex;
 }
@@ -1150,7 +1154,7 @@ export default defineComponent({
 .custom-dropdown {
     display: flex;
     align-items: center;
-    background: var(--dropdown-background);
+    background: var(--btn-primary-santa);
     padding: 0px 12px;
     border-radius: 5px;
     position: relative;
@@ -1159,12 +1163,12 @@ export default defineComponent({
     cursor: pointer;
     padding: 8px 12px;
     border: 1px solid var(--dropdown-border-color);
+    color: #fff;
 }
 
 .selected-option {
     margin-right: 20px;
     font-size: 12px;
-    color: var(--body-text);
 }
 
 .custom-dropdown-options {
@@ -1218,18 +1222,19 @@ export default defineComponent({
         flex-shrink: unset;
         display: flex;
         flex: 1;
-        overflow: hidden;
+        // overflow: hidden;
         flex-direction: column;
         height: 100%;
         padding-bottom: 10px !important;
         margin: 0;
         padding-top: 10px;
+        padding: 10px 5px;
     }
     .quest-cont {
         max-width: 100%;
         flex: 1;
         display: flex;
-        overflow: hidden;
+        // overflow: hidden;
         flex-direction: column;
     }
     .rewards-column {
@@ -1241,7 +1246,7 @@ export default defineComponent({
         height: 100%;
         display: flex;
         flex: 1;
-        overflow: hidden;
+        // overflow: hidden;
         flex-wrap: nowrap;
     }
     .rewards-column {
@@ -1261,11 +1266,12 @@ export default defineComponent({
         column-gap: 10px;
     }
     .quests-column .nav-item {
-        flex: 1 1 30%;
+        flex: 1 1 20%;
         box-sizing: border-box;
     }
     .quests-column .nav-link {
         width: 100% !important;
+        padding: 12px 16px;
     }
     .quest-item {
         grid-column: span 1;
@@ -1279,26 +1285,38 @@ export default defineComponent({
         flex: 1;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        // overflow: hidden;
     }
-
+    .quests-column .tabs > div:first-child {
+        padding-top: 10px;
+        position: sticky;
+        top: 0;
+        z-index: 22;
+        background-color: var(--sticky-header-bg);
+    }
     .quests-column .tabs .tab-content {
         flex: 1;
-        overflow: auto;
-        margin-top: 56px;
+        margin-top: 10px;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        padding: 0 10px;
     }
     .nav-link.active::before,
     .nav-link.active::after {
         display: none;
     }
     .quests-column .nav {
-        border-bottom: 1px solid var(--nav-border-color);
+        //border-bottom: 1px solid var(--nav-border-color);
+        align-items: center;
     }
+
     .filter-wrapper {
-        margin-top: 60px;
-        margin-right: 10px;
+        position: relative;
+        margin: 0;
+        top: 0;
+        left: 0;
+        height: 30px;
+        margin-left: 20px;
     }
     .quest-group {
         grid-auto-flow: column;
@@ -1319,6 +1337,9 @@ export default defineComponent({
 
     .reward-item-promoted {
         grid-column: 1/-1;
+    }
+    .quests-column {
+        overflow: unset;
     }
 }
 @media (max-width: 774px) {
@@ -1375,6 +1396,43 @@ export default defineComponent({
 @media (min-width: 1400px) {
     .quest-cont {
         max-width: 100%;
+    }
+}
+@media (max-width: 476px) {
+    .quests-column .nav-link {
+        padding: 12px 12px;
+    }
+    .filter-wrapper {
+        height: 28px;
+    }
+    .quests-column .nav-item {
+        flex: 1 1 0;
+    }
+}
+@media (max-width: 447px) {
+    .quests-column .nav-link {
+        padding: 12px 5px;
+    }
+}
+@media (max-width: 388px) {
+    .quests-column .nav-link {
+        font-size: 10px;
+    }
+    .filter-wrapper {
+        margin-left: 10px;
+    }
+    .quests-column .nav {
+        border: none;
+    }
+
+    .quests-column .nav {
+        overflow-x: auto;
+        width: 100%;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+    }
+    .custom-dropdown {
+        width: 105px;
     }
 }
 </style>

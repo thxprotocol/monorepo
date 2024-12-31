@@ -2,7 +2,6 @@
     <div
         :style="{
             minHeight: '100%',
-            background: 'var(--home-background)',
         }"
     >
         <!-- <BaseNavbarTicker /> -->

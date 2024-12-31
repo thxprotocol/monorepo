@@ -118,7 +118,7 @@ export function getStyles(elements: any, colors: any) {
         },
         'body,.bg-splash,.card-header-bg': {
             '--bs-secondary-bg': theme.elements.bodyBg,
-            '--bs-body-bg': 'var(--body-rewards-bg)',
+            '--bs-body-bg': 'var(--home-background)',
             '--bs-body-color': theme.elements.text,
             '--bs-btn-bg': theme.elements.btnBg,
         },
@@ -151,9 +151,9 @@ export function getStyles(elements: any, colors: any) {
             '--bs-dropdown-link-active-color': theme.elements.btnText,
         },
         '.card, .card .badge': {
-            '--bs-card-bg': theme.elements.cardBg,
-            '--bs-card-color': theme.elements.cardText,
-            '--bs-card-cap-color': theme.elements.cardText,
+            '--bs-card-bg': 'transparent',
+            '--bs-card-color': 'var(--body-text)',
+            '--bs-card-cap-color': 'var(--body-text)',
             '--bs-badge-bg': theme.elements.btnBg,
             '--bs-badge-color': theme.elements.btnText,
             '--thx-card-header-hover-bg': theme.elements.cardHeaderHoverBg,

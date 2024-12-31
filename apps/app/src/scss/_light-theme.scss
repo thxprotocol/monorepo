@@ -1,6 +1,6 @@
 :root {
     --body-rewards-bg: #ffffff;
-    --home-background: linear-gradient(180deg, #FFF 0%, #FFF 100%);
+    --home-background: #fff;
     --body-text: #494949;
     --title-color: #090A0C;
     --dropdown-background: #FAFAFA;
@@ -53,5 +53,7 @@
     --reward-supply-limit: #494949;
     --transaction-header-color: #767676;
     --transaction-chain-color: #494949;
+    --image-modal-backdrop: rgba(255, 255, 255, 0.8);
+    --sticky-header-bg: #f6f6f6;
     // Add other light theme variables as needed
 }

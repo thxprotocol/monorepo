@@ -1,8 +1,8 @@
 <template>
     <div ref="mainComponent" class="mainComponent pt-3 px-3">
-        <div class="d-flex flex-column h-100">
+        <div class="d-flex flex-column components-wrap">
             <HeaderNav :is-visible="true" />
-            <div class="d-flex h-100 overflow-hidden component-wrap">
+            <div class="d-flex component-wrap">
                 <Sidebar :selected-part="selectedPart" @nav-clicked="handleNavClick" />
                 <div class="main-content position-relative">
                     <Quests :selected-part="selectedPart" />
@@ -481,7 +481,13 @@ export default defineComponent({
     background: var(--main-content-bg);
     overflow: hidden;
 }
-
+.component-wrap {
+    height: 100%;
+    overflow: hidden;
+}
+.components-wrap {
+    height: 100%;
+}
 .leaderboard-mobile {
     flex: 1;
     display: flex;
@@ -512,6 +518,7 @@ export default defineComponent({
         padding: 12px 12px 0;
     }
     .component-wrap {
+        height: unset;
         margin-bottom: 75px;
         flex-direction: column;
         flex: 1;
@@ -520,13 +527,22 @@ export default defineComponent({
         flex: 1;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        // margin-bottom: 98px;
+        // overflow: hidden;
     }
-}
-@media only screen and (max-height: 560px) {
-    .mainComponent {
-        height: auto;
+    .component-wrap {
         overflow: unset;
+    }
+    .main-content {
+        overflow: unset;
+    }
+    .mainComponent {
+        overflow: unset;
+        min-height: 100vh;
+    }
+    .components-wrap {
+        min-height: inherit;
+        height: auto;
     }
 }
 </style>

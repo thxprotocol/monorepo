@@ -301,6 +301,8 @@ export default defineComponent({
         flex-direction: column;
         padding-bottom: 0;
         border-width: 0;
+        position: sticky;
+        top: 0;
     }
     .b-avatar-header {
         position: relative;
@@ -347,6 +349,11 @@ export default defineComponent({
 @media (max-width: 426px) {
     .username {
         max-width: 80px;
+    }
+}
+@media (max-width: 350px) {
+    .media-header-first h1 {
+        display: none;
     }
 }
 .total-earnings p {

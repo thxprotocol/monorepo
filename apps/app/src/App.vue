@@ -6,7 +6,7 @@
     <!-- <div v-else id="main" :class="{ 'overflow-hidden': accountStore.isMobile }"> -->
     <div v-show="!isOffline" id="main">
         <BaseNavbarTop />
-        <div class="h-100">
+        <div>
             <router-view v-slot="{ Component }">
                 <transition name="fade" mode="out-in">
                     <component :is="Component" class="router-view-app order-lg-0" />

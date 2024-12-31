@@ -8,10 +8,10 @@
     transition: background-color ease .15s;
     border: 0;
     border-radius: var(--bs-card-inner-border-radius) !important;
-
-    &:hover {
-        background-color: var(--thx-card-header-hover-bg);
-    }
+    background: transparent;
+    // &:hover {
+    //     background-color: var(--thx-card-header-hover-bg);
+    // }
 }
 
 .card-collapsed .card-header {

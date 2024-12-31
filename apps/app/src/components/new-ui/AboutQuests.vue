@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex overflow-hidden about-wrapper">
+    <div class="d-flex about-wrapper">
         <aside class="about-aside">
             <nav class="d-flex about-nav">
                 <div v-for="(group, idx) in filteredSectionsForNav" :key="idx" class="text-nowrap about-group">
@@ -212,6 +212,7 @@ watch(
 <style>
 .about-wrapper {
     margin-top: 30px;
+    overflow: hidden;
 }
 .about-main-content {
     height: calc(100vh - 200px);
@@ -345,13 +346,18 @@ nav > div:not(:first-child) .about-header {
 @media (max-width: 992px) {
     .about-wrapper {
         flex-direction: column;
-        margin-top: 10px;
+        margin-top: 0;
+        overflow: unset;
     }
     .about-aside {
-        position: fixed;
-        z-index: 10;
-        top: 175px;
-        width: 85%;
+        position: sticky;
+        top: 50px;
+        background: var(--sticky-header-bg);
+        z-index: 11;
+        height: 50px;
+        width: 100%;
+        padding-top: 10px;
+        margin-bottom: 20px;
     }
     .about-nav {
         flex-direction: row;
