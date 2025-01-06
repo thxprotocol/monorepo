@@ -35,7 +35,7 @@
                 }"
                 @click="isModalVisible = true"
             >
-                Earn {{ formattedAmount }} Pts
+                {{ pendingCount !== 0 ? `Claim ` : `Earn` }} {{ formattedAmount }} Pts
             </b-button>
         </template>
     </BaseCardQuest>
@@ -75,7 +75,7 @@
         >
             <b-spinner v-if="isSubmitting" small />
             <template v-else-if="quest.amount">
-                Earn
+                {{ pendingCount !== 0 ? 'Claim' : 'Earn' }}
                 <strong>
                     {{ `${pendingCount} x` }}
                     {{ formattedAmount }}

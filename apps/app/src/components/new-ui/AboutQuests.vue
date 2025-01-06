@@ -27,7 +27,7 @@
                     :class="[`about-section-${section.ref}`]"
                     :style="{ marginBottom: section.ref === 'help' ? marginBottomLastSection + 'px' : '0' }"
                 >
-                    <div @click="handleImageClick" v-html="section.content"></div>
+                    <div v-html="section.content"></div>
                 </section>
             </template>
 
@@ -38,7 +38,7 @@
                     class="about-section"
                     :class="[`about-section-${section.ref}`]"
                 >
-                    <div @click="handleImageClick" v-html="section.content"></div>
+                    <div v-html="section.content"></div>
                 </section>
             </template>
         </div>
@@ -90,14 +90,6 @@ const filteredSectionsForNav = computed(() => {
         ),
     }));
 });
-
-const handleImageClick = (event) => {
-    const img = event.target.closest('img');
-    if (img) {
-        selectedImage.value = img.src;
-        isModalVisible.value = true;
-    }
-};
 
 const scrollToSection = (refName) => {
     isManualScrolling = true;
@@ -299,11 +291,6 @@ nav > div:not(:first-child) .about-header {
     margin-top: 20px;
     margin-bottom: 20px;
     max-width: 80%;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-}
-.about-section img:hover {
-    transform: scale(1.05);
 }
 .about-section-dashboard img {
     max-width: 60%;

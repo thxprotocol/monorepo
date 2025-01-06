@@ -302,7 +302,7 @@ export default defineComponent({
 .transaction-wrap {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    height: 100%;
 }
 .transaction-table {
     flex: 1;
