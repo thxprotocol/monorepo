@@ -209,6 +209,7 @@ export default defineComponent({
     border-radius: 4px;
     border: 0.5px solid #834bc4;
     background: var(--avatar-background);
+    min-width: 140px;
 }
 
 .name-avatar:hover h2 {

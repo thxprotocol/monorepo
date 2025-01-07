@@ -462,9 +462,9 @@ export default defineComponent({
 }
 .reward-image-placeholder {
     height: 98px;
-    width: 100px;
-    background-color: #000;
-    border-radius: 50%;
+    width: 100%;
+    background-color: var(--modal-title-color);
+    border-radius: 10px 10px 0 0;
 }
 .reward-img-promoted-ph {
     width: 100%;

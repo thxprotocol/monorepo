@@ -967,7 +967,7 @@ export default defineComponent({
     flex-direction: column;
     padding: 10px;
     border-radius: 5px;
-    background-color: #393939; /* Light gray background */
+    background-color: var(--skeleton-item-bg);
     animation: pulse 1.5s infinite;
 }
 
@@ -1379,7 +1379,7 @@ export default defineComponent({
         gap: 10px;
     }
     .reward-item-promoted {
-        grid-column: span 1;
+        grid-column: span 2;
     }
     .offer-item {
         flex: 1 0 100%;
