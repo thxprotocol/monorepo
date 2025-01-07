@@ -35,6 +35,7 @@
             v-for="item in navbarItems"
             :key="item.key"
             :class="['navbar-item', { active: selectedPart === item.key }]"
+            :style="{ width: item.key === 'transactions' ? '80px' : '' }"
             @click="selectNavItem(item.key)"
         >
             <span :class="['navbar-icon', `navbar-icon-${item.key}`]" />
@@ -119,7 +120,6 @@ export default defineComponent({
 }
 
 .navbar-bottom a {
-    width: 80px;
     height: 50px;
     padding: 5px;
     flex-shrink: 0;
