@@ -301,8 +301,6 @@ export default defineComponent({
         flex-direction: column;
         padding-bottom: 0;
         border-width: 0;
-        position: sticky;
-        top: 0;
     }
     .b-avatar-header {
         position: relative;
