@@ -6,16 +6,9 @@
                     style="height: 30px; width: 30px"
                     class="d-flex align-items-center justify-content-center rounded position-relative me-3"
                 >
-                    <b-img v-if="icon" :src="icon" width="30" height="30" class="rounded" />
-                    <div
-                        :class="
-                            icon
-                                ? 'small position-absolute bg-primary rounded-circle d-flex align-items-center justify-content-center'
-                                : ''
-                        "
-                        style="right: -5px; bottom: -5px; width: 20px; height: 20px"
-                    >
-                        <i class="" :class="(icon ? '' : ' ') + iconMap[rewardVariant]" />
+                    <b-img v-if="icon" :src="icon" width="30" height="30" class="rounded object-fit-cover" />
+                    <div v-else>
+                        <i class="text-opaque" :class="iconMap[rewardVariant]" />
                     </div>
                 </div>
                 <div class="d-flex flex-grow-1 justify-content-between pe-3">
