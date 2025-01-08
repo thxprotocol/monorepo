@@ -12,7 +12,7 @@
         <span class="text-opaque">{{ address }}</span>
     </b-form-group>
     <b-button v-if="!address" variant="primary" class="w-100" @click="onClickConnect"> Connect Wallet </b-button>
-    <b-button v-else variant="success" :disabled="isLoading" class="w-100" @click="onClickAdd">
+    <b-button v-else :disabled="isLoading" class="w-100 btn-primary" @click="onClickAdd">
         <b-spinner v-if="isLoading" small />
         <template v-else>
             Add <strong>{{ walletStore.account.address && shortenAddress(walletStore.account.address) }}</strong>
@@ -82,7 +82,11 @@ export default defineComponent({
                     this.publicKey = response.args.publicKey;
                     this.walletStore.account = { address: response.args.address };
                 } catch (error) {
-                    console.log(error);
+                    if (error.status === 'Rejected') {
+                        this.error = 'Wallet connect is rejected. Please check your wallet.';
+                    } else {
+                        console.log(error);
+                    }
                 }
             } else if (this.walletStore.currentChainId == ChainId.Sui) {
                 console.log('Not supporting Sui at the moment.');
@@ -180,7 +184,7 @@ export default defineComponent({
                     this.$emit('close');
                 } catch (error) {
                     console.error(error);
-                    this.error = 'An issue occurred while creating your wallet. Please try again.';
+                    this.error = 'Wallet connect is rejected. Please check your wallet.';
                 } finally {
                     this.isLoading = false;
                 }
