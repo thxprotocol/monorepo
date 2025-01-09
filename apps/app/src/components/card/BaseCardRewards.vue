@@ -145,5 +145,6 @@ export default defineComponent({
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
+    font-size: 16px !important;
 }
 </style>

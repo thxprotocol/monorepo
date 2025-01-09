@@ -118,6 +118,7 @@ export default defineComponent({
                     this.fetchTransactions();
                 } else {
                     this.transactions = [];
+                    this.isTransLoading = false;
                 }
             },
             immediate: true,

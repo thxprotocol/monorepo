@@ -179,11 +179,9 @@
                                             group.quests.every((quest) => quest.isAvailable),
                                         )
                                     "
-                                    class="empty-message"
+                                    class="text-center text-muted mt-3 text-opaque empty-message"
                                 >
-                                    <p class="text-center text-muted mt-3 text-opaque">
-                                        You haven't completed any quests yet.
-                                    </p>
+                                    You haven't completed any quests yet.
                                 </div>
                             </div>
                         </div>
@@ -260,11 +258,9 @@
                                 </div>
                                 <div
                                     v-if="!mergedRewards.some((reward) => !reward.isAvailable || reward.isLimitReached)"
-                                    class="empty-message"
+                                    class="text-center text-muted mt-3 text-opaque empty-message"
                                 >
-                                    <p class="text-center text-muted mt-3 text-opaque">
-                                        You haven't completed any rewards yet.
-                                    </p>
+                                    You haven't completed any rewards yet.
                                 </div>
                             </div>
                         </div>

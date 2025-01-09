@@ -1,5 +1,7 @@
 <template>
-    <b-alert v-model="isAlertShown" variant="primary" class="p-2">{{ error }}</b-alert>
+    <b-alert v-model="isAlertShown" variant="primary" class="p-2" style="font-weight: 600; font-size: 14px">{{
+        error
+    }}</b-alert>
     <b-form-group label="Proof ownership">
         <p class="text-opaque">Sign this message using your wallet to confirm it's address.</p>
         <blockquote class="mb-0">
@@ -53,6 +55,16 @@ export default defineComponent({
             return !!this.error;
         },
     },
+    watch: {
+        error(newVal) {
+            if (newVal) {
+                setTimeout(() => {
+                    this.error = '';
+                }, 2500);
+            }
+        },
+    },
+
     mounted() {
         this.walletStore.setWallet(null);
     },
