@@ -165,10 +165,9 @@ export default defineComponent({
                 // });
 
                 try {
-                    const response = await window.santaAptos.signMessage({
-                        message: this.message,
-                        nonce: 'random',
-                    });
+                    const response = await window.santaAptos.signMessage(
+                        `APTOS\nmessage: ${this.message}\nnonce: random`,
+                    );
                     await this.walletStore.create({
                         chainId: ChainId.Aptos,
                         variant: this.variant,
