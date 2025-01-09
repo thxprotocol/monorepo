@@ -20,6 +20,11 @@
                     width="100"
                 />
                 <div v-else class="placeholder"></div>
+                <div v-if="filteredPlatforms.length" class="corner-icons">
+                    <span v-for="(platform, index) in filteredPlatforms" :key="index">
+                        <i :class="getPlatformIcon(platform)" class="d-flex justify-content-center"></i>
+                    </span>
+                </div>
             </div>
 
             <div class="px-2 my-3 d-flex flex-column flex-grow-1">
@@ -127,6 +132,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore),
+        filteredPlatforms(): string[] {
+            return (this.offer.platforms || []).filter((platform: string) => this.getPlatformIcon(platform) !== '');
+        },
     },
     data() {
         return {
@@ -148,6 +156,19 @@ export default defineComponent({
         },
         openOffer() {
             window.open(this.offer.santaClickUrl, '_blank');
+        },
+        getPlatformIcon(platform: string) {
+            switch (platform) {
+                case 'ios':
+                    return 'fab fa-apple';
+                case 'android':
+                case 'smartphone':
+                    return 'fab fa-android';
+                case 'desktop':
+                    return 'fas fa-laptop';
+                default:
+                    return '';
+            }
         },
     },
 });
@@ -305,6 +326,27 @@ export default defineComponent({
 .hr-divider img {
     height: 2px !important;
     width: 72px !important;
+}
+.offer-card-img {
+    position: relative;
+}
+.corner-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    color: #fff;
+    font-size: 1rem;
+    background: rgba(52, 52, 52, 0.65);
+    border-top-right-radius: 4px;
+    padding: 5px;
+}
+.corner-icons i {
+    width: 20px;
+    height: 15px;
 }
 @media (max-width: 992px) {
     .modal-info-wrap {

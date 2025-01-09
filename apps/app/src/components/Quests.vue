@@ -747,7 +747,7 @@ export default defineComponent({
     z-index: 1;
     overflow: hidden;
     background: var(--btn-primary-santa) !important;
-    border: none;
+    border: 1px solid transparent;
     color: #ffffff;
     transition: background 0.15s ease-in-out, border-color 0.3s ease;
     z-index: 0;
@@ -771,6 +771,7 @@ export default defineComponent({
 .btn-primary:active,
 .btn-primary:disabled {
     background: var(--btn-primary-santa);
+    border-color: transparent !important;
 }
 .btn-primary:disabled {
     background: var(--btn-disabled-bg) !important;
@@ -1164,6 +1165,7 @@ export default defineComponent({
     padding: 8px 12px;
     border: 1px solid var(--dropdown-border-color);
     color: #fff;
+    min-width: 100px;
 }
 
 .selected-option {

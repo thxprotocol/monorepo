@@ -12,12 +12,13 @@
 
         <b-list-group
             v-if="isTransLoading && (!transactions || !transactions.length)"
-            class="skeleton-loader transaction-table"
+            class="transaction-table skeleton-loader flex-grow-0 flex-shrink-0"
+            style="flex-basis: auto"
         >
             <div class="skeleton-item d-flex p-3 align-items-center">
                 <div class="skeleton-username"></div>
             </div>
-            <div v-for="n in 5" :key="n" class="skeleton-item d-flex p-1 align-items-center">
+            <div v-for="n in 10" :key="n" class="skeleton-item d-flex p-1 align-items-center">
                 <div class="skeleton-avatar"></div>
                 <div class="skeleton-username"></div>
             </div>

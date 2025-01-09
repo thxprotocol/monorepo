@@ -29,9 +29,12 @@
                 <slot></slot>
             </div>
             <div class="quest-card-btns">
-                <b-button variant="primary" block class="w-100" @click="onClickCopy">
-                    Copy Link <i class="fas fa-copy" aria-hidden="true"></i>
-                </b-button>
+                <transition name="fade">
+                    <b-button variant="primary" block class="w-100" :disabled="copyInProgress" @click="onClickCopy">
+                        {{ copyButtonText }}
+                        <i :class="copyButtonIcon" aria-hidden="true"></i>
+                    </b-button>
+                </transition>
             </div>
         </b-collapse>
     </b-card>
@@ -71,6 +74,9 @@ export default defineComponent({
             } as { [variant: string]: string },
             hrDivider,
             QuestVariant,
+            copyButtonText: 'Copy Link',
+            copyButtonIcon: 'fas fa-copy',
+            copyInProgress: false,
         };
     },
     computed: {
@@ -101,7 +107,18 @@ export default defineComponent({
             window.open(url, '_blank');
         },
         onClickCopy() {
-            navigator.clipboard.writeText(this.referral || 'https://santabrowser.com');
+            navigator.clipboard.writeText(this.referral || 'https://santabrowser.com').then(() => {
+                // Change button to "Copied!"
+                this.copyButtonText = 'Copied';
+                this.copyButtonIcon = 'fas fa-check';
+                this.copyInProgress = true;
+                // Revert after 2 seconds
+                setTimeout(() => {
+                    this.copyButtonText = 'Copy Link';
+                    this.copyButtonIcon = 'fas fa-copy';
+                    this.copyInProgress = false;
+                }, 2000);
+            });
         },
     },
 });
@@ -125,5 +142,13 @@ export default defineComponent({
     line-height: 18px;
     font-size: 14px;
     opacity: 1;
+}
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
