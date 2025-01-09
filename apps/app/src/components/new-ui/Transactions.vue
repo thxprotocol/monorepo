@@ -11,7 +11,7 @@
         </div>
 
         <b-list-group
-            v-if="isTransLoading && (!transactions || !transactions.length)"
+            v-if="isTransLoading"
             class="transaction-table skeleton-loader flex-grow-0 flex-shrink-0"
             style="flex-basis: auto"
         >
@@ -24,44 +24,45 @@
             </div>
         </b-list-group>
 
-        <div v-else-if="!transactions || !transactions.length" class="m-auto text-opaque text-muted empty-message">
-            No transactions found.
-        </div>
-
-        <div v-else class="transaction-table">
-            <div class="table-header">
-                <div class="t-image-column"></div>
-                <div>Chain</div>
-                <div>Amount</div>
-                <div>Token</div>
-                <div>Hash</div>
-                <div>Date</div>
-                <div></div>
+        <template v-else>
+            <div v-if="!transactions || !transactions.length" class="m-auto text-opaque text-muted empty-message">
+                No transactions found.
             </div>
-            <div v-for="tx in transactions" :key="tx._id" class="table-row">
-                <div class="d-flex justify-content-center t-image-column">
-                    <div v-if="getChainName(tx.chainId) === 'Aptos'" class="chain-image"></div>
+            <div v-else class="transaction-table">
+                <div class="table-header">
+                    <div class="t-image-column"></div>
+                    <div>Chain</div>
+                    <div>Amount</div>
+                    <div>Token</div>
+                    <div>Hash</div>
+                    <div>Date</div>
+                    <div></div>
                 </div>
-                <div class="chain-name">
-                    {{ getChainName(tx.chainId) }}
-                </div>
-                <div class="chain-amount">{{ (tx.amount / 1000000).toFixed(2) }}</div>
-                <div class="chain-token">{{ parseTokenNameFromTo(tx.to) }}</div>
-                <div class="chain-hash">
-                    <a
-                        :href="`https://explorer.aptoslabs.com/txn/${tx.transactionHash}?network=mainnet`"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="hash-link"
-                    >
-                        {{ truncateHash(tx.transactionHash) }}
-                    </a>
-                </div>
-                <div class="chain-date">{{ formatDate(tx.createdAt) }}</div>
+                <div v-for="tx in transactions" :key="tx._id" class="table-row">
+                    <div class="d-flex justify-content-center t-image-column">
+                        <div v-if="getChainName(tx.chainId) === 'Aptos'" class="chain-image"></div>
+                    </div>
+                    <div class="chain-name">
+                        {{ getChainName(tx.chainId) }}
+                    </div>
+                    <div class="chain-amount">{{ (tx.amount / 1000000).toFixed(2) }}</div>
+                    <div class="chain-token">{{ parseTokenNameFromTo(tx.to) }}</div>
+                    <div class="chain-hash">
+                        <a
+                            :href="`https://explorer.aptoslabs.com/txn/${tx.transactionHash}?network=mainnet`"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="hash-link"
+                        >
+                            {{ truncateHash(tx.transactionHash) }}
+                        </a>
+                    </div>
+                    <div class="chain-date">{{ formatDate(tx.createdAt) }}</div>
 
-                <div></div>
+                    <div></div>
+                </div>
             </div>
-        </div>
+        </template>
     </div>
 </template>
 
@@ -103,7 +104,6 @@ export default defineComponent({
             // ],
             transactions: [],
             isTransLoading: true,
-            checkWalletInterval: null,
             aptosLogo,
             windowWidth: window.innerWidth,
         };
@@ -112,10 +112,12 @@ export default defineComponent({
         ...mapStores(useWalletStore),
     },
     watch: {
-        'walletStore.isLoading': {
-            handler(newVal) {
-                if (!newVal) {
+        'walletStore.wallet': {
+            handler(newWallet, oldWallet) {
+                if (newWallet && newWallet._id) {
                     this.fetchTransactions();
+                } else {
+                    this.transactions = [];
                 }
             },
             immediate: true,
@@ -123,25 +125,14 @@ export default defineComponent({
     },
     mounted() {
         window.addEventListener('resize', this.updateWindowWidth);
-        this.checkWalletInterval = setInterval(() => {
-            if (this.walletStore && !this.walletStore.isLoading) {
-                clearInterval(this.checkWalletInterval);
-                this.fetchTransactions();
-            }
-        }, 100);
     },
     beforeUnmount() {
-        if (this.checkWalletInterval) {
-            clearInterval(this.checkWalletInterval);
-        }
         window.removeEventListener('resize', this.updateWindowWidth);
     },
     methods: {
         async fetchTransactions() {
             try {
-                if (!this.transactions || !this.transactions.length) {
-                    this.isTransLoading = true;
-                }
+                this.isTransLoading = true;
                 const newTransactions = await this.walletStore.getTransactions();
                 this.transactions = newTransactions;
             } catch (error) {
