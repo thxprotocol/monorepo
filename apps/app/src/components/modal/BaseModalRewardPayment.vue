@@ -102,7 +102,9 @@ export default defineComponent({
             return !!this.reward.chainId;
         },
         participantBalance() {
-            const participant = this.accountStore.participants.find((p) => p.sub === this.accountStore.account?.sub);
+            const participant = this.accountStore.participants.find(
+                (p) => p.sub === this.accountStore.account?.sub && p.poolId === this.reward.poolId,
+            );
             if (!participant) return 0;
             return participant.balance;
         },
