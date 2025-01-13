@@ -108,7 +108,7 @@ export default defineComponent({
 .navbar-bottom {
     width: 100%;
     position: fixed;
-    bottom: 0px;
+    bottom: -5px;
     z-index: 22;
     background: var(--navbar-bottom-bg);
     backdrop-filter: blur(27px);

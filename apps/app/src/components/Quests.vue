@@ -1226,7 +1226,7 @@ export default defineComponent({
         padding-bottom: 10px !important;
         margin: 0;
         padding-top: 10px;
-        padding: 10px 5px;
+        padding: 0 5px 10px 5px;
     }
     .quest-cont {
         max-width: 100%;
@@ -1286,11 +1286,12 @@ export default defineComponent({
         // overflow: hidden;
     }
     .quests-column .tabs > div:first-child {
-        padding-top: 10px;
+        padding-top: 15px;
         position: sticky;
-        top: 0;
+        top: -5px;
         z-index: 22;
         background-color: var(--sticky-header-bg);
+        padding-bottom: 10px;
     }
     .quests-column .tabs .tab-content {
         flex: 1;

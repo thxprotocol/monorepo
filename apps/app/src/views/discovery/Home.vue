@@ -527,6 +527,9 @@ export default defineComponent({
         flex: 1;
         display: flex;
         flex-direction: column;
+        background: transparent;
+        border: none;
+        margin-top: 0;
         // margin-bottom: 98px;
         // overflow: hidden;
     }

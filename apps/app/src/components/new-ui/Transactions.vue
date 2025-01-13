@@ -298,7 +298,6 @@ export default defineComponent({
     height: 100%;
 }
 .transaction-table {
-    flex: 1;
     overflow-y: auto;
     scrollbar-width: none;
 }
