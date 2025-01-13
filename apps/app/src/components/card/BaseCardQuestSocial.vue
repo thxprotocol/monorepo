@@ -89,7 +89,34 @@
                     <i class="fas fa-times text-opaque m-0" />
                 </BButton>
             </BButtonGroup>
+            <!-- <b-button v-else variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickValidate">
+                <b-spinner v-if="isSubmitting" small />
+                <template v-else>Validate Quest</template>
+            </b-button> -->
+
             <b-button
+                v-else-if="!isValidated"
+                variant="primary"
+                block
+                class="w-100"
+                :disabled="isSubmitting"
+                @click="onClickValidate"
+            >
+                <b-spinner v-if="isSubmitting" small />
+                <template v-else>
+                    {{ interactionLabelMap[quest.interaction] }}
+                </template>
+            </b-button>
+
+            <b-button v-else variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickComplete">
+                <b-spinner v-if="isSubmitting" small />
+                <template v-else-if="quest.amount">
+                    Claim <strong>{{ quest.amount }} points</strong>
+                </template>
+                <template v-else>Complete Quest</template>
+            </b-button>
+
+            <!-- <b-button
                 v-else-if="contentURL && !isViewed"
                 variant="primary"
                 block
@@ -109,7 +136,7 @@
                     Claim <strong>{{ quest.amount }} points</strong>
                 </template>
                 <template v-else>Complete Quest</template>
-            </b-button>
+            </b-button> -->
         </div>
     </b-modal>
 </template>
@@ -180,6 +207,7 @@ export default defineComponent({
             isModalQuestEntryShown: false,
             interactionLabelMap,
             showQuestModal: false,
+            isValidated: false,
         };
     },
     computed: {
@@ -249,6 +277,25 @@ export default defineComponent({
                 const err = error as Error;
                 this.error = err.message ? err.message : 'Could not claim points.';
                 console.error(error);
+            } finally {
+                this.isSubmitting = false;
+            }
+        },
+        async onClickValidate() {
+            try {
+                this.error = '';
+                this.isSubmitting = true;
+                this.isValidated = false;
+
+                const validationResult = await this.questStore.validateQuest(this.quest);
+
+                if (!validationResult?.result) {
+                    await this.onClickView();
+                } else {
+                    this.isValidated = true;
+                }
+            } catch (err) {
+                console.error(err);
             } finally {
                 this.isSubmitting = false;
             }

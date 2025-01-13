@@ -44,6 +44,41 @@ export const useQuestStore = defineStore('quest', {
                 });
             });
         },
+        async validateQuest(quest: TQuest, payload = {}) {
+            const { api, account } = useAccountStore();
+            if (!account) return;
+
+            const questEntrySocialDetails = { apiKey: 'social', eventKey: 'conditional reward claim' };
+            const questEntryDetailsMap: any = {
+                [QuestVariant.Daily]: { apiKey: 'daily', eventKey: 'daily reward claim' },
+                [QuestVariant.Twitter]: questEntrySocialDetails,
+                [QuestVariant.YouTube]: questEntrySocialDetails,
+                [QuestVariant.Discord]: questEntrySocialDetails,
+                [QuestVariant.Invite]: { apiKey: 'invite', eventKey: 'invite quest entry' },
+                [QuestVariant.Web3]: { apiKey: 'web3', eventKey: 'web3 quest entry' },
+                [QuestVariant.Custom]: { apiKey: 'custom', eventKey: 'milestone reward claim' },
+                [QuestVariant.Gitcoin]: { apiKey: 'gitcoin', eventKey: 'gitcoin quest entry' },
+                [QuestVariant.Webhook]: { apiKey: 'webhook', eventKey: 'webhook quest entry' },
+            };
+
+            const key = QuestVariant[quest.variant].toLowerCase();
+            const recaptcha = await this.getReCAPTCHAToken(`QUEST_${key.toUpperCase()}_ENTRY_CREATE`);
+            if (!recaptcha) throw new Error('Was not able to create recaptcha token.');
+
+            const { apiKey } = questEntryDetailsMap[quest.variant] || {};
+            if (!apiKey) {
+                throw new Error('No API key found for this quest variant.');
+            }
+            const response = await api.request.post(`/v1/quests/${apiKey}/${quest._id}/validate`, {
+                data: {
+                    ...payload,
+                    recaptcha,
+                },
+            });
+
+            return response;
+        },
+
         async completeQuest(quest: TQuest, payload = {}) {
             const { api, account, poolId, waitForJob } = useAccountStore();
             if (!account) return;
