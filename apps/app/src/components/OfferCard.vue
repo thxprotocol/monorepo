@@ -57,7 +57,7 @@
                 </button>
                 <h2 class="modal-title">{{ decodeHTML(offer.title) }}</h2>
                 <div class="modal-body d-flex flex-column">
-                    <div class="d-flex align-items-center offer-details">
+                    <div class="d-flex offer-details">
                         <img
                             v-if="offer.imageUrl"
                             class="img-fluid mb-3"
@@ -78,35 +78,51 @@
                                     {{ category }}
                                 </span>
                             </p>
-                            <p class="modal-offer-description" v-html="decodeHTML(offer.description)"></p>
                         </div>
-                        <div v-if="accountStore.isMobile">
+
+                        <!-- <div v-if="accountStore.isMobile">
                             <OfferSteps :offer="offer" />
-                        </div>
+                        </div> -->
                     </div>
                 </div>
-                <div
-                    :class="[
-                        'd-flex',
-                        'modal-info-wrap',
-                        { 'justify-content-center': !offer.events, 'justify-content-between': offer.events },
-                    ]"
-                >
-                    <div v-if="!accountStore.isMobile && offer.events">
-                        <OfferSteps :offer="offer" />
-                    </div>
-                    <div v-if="!accountStore.isMobile" class="qr-code mt-4">
-                        <h3 class="modal-title">Scan on your mobile</h3>
-                        <div class="position-relative">
-                            <Qrcode :value="offer.santaClickUrl" :size="200" />
-                            <img class="qr-icon" :src="imgSanta" alt="icon" />
+                <div :class="['d-flex flex-column', 'modal-info-wrap']">
+                    <div
+                        :class="[
+                            'd-flex',
+                            {
+                                'justify-content-center flex-column': !offer.events,
+                                'justify-content-between': offer.events,
+                            },
+                            'offer-action-wrap',
+                        ]"
+                    >
+                        <div class="overflow-auto">
+                            <div>
+                                <h4 class="fs-5" style="color: var(--modal-title-color)">Description</h4>
+                                <p class="modal-offer-description" v-html="decodeHTML(offer.description)"></p>
+                            </div>
+                            <div v-if="offer.events">
+                                <OfferSteps :offer="offer" />
+                            </div>
                         </div>
-                    </div>
-
-                    <div v-else>
-                        <b-button variant="primary" block class="w-100" @click="openOffer">
-                            Earn ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
-                        </b-button>
+                        <div
+                            v-if="!accountStore.isMobile"
+                            class="d-flex justify-content-center"
+                            :class="`${!offer.events ? 'w-100' : ''}`"
+                        >
+                            <div class="qr-code" :style="`margin-top: ${offer.events ? '150px' : '20px'}`">
+                                <h3 class="modal-title">Scan on your mobile</h3>
+                                <div class="position-relative">
+                                    <Qrcode :value="offer.santaClickUrl" :size="200" />
+                                    <img class="qr-icon" :src="imgSanta" alt="icon" />
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="w-100">
+                            <b-button variant="primary" block class="w-100" @click="openOffer">
+                                Earn ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
+                            </b-button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -225,7 +241,7 @@ export default defineComponent({
     padding: 0.5rem 0;
 }
 .modal-offer-description {
-    font-size: 1rem;
+    font-size: 14px;
     margin: 0;
     white-space: normal;
     overflow: hidden;
@@ -233,6 +249,7 @@ export default defineComponent({
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+    padding-left: 10px;
 }
 .reward-amount {
     padding: 0 0.4rem;
@@ -349,23 +366,23 @@ export default defineComponent({
     height: 15px;
 }
 @media (max-width: 992px) {
-    .modal-info-wrap {
-        display: block !important;
-    }
-    .offer-card-img {
-    }
     .offer-wrap {
         display: flex;
         flex-direction: column;
         height: 70vh;
     }
     .modal-body {
-        overflow: auto;
-        flex: 1;
+        flex: unset;
     }
-    .offer-details {
+    .offer-action-wrap {
         flex-direction: column;
-        align-items: baseline !important;
+        justify-content: space-between !important;
+        flex: 1;
+        overflow: hidden;
+    }
+    .modal-info-wrap {
+        flex: 1;
+        overflow: hidden;
     }
 }
 </style>
