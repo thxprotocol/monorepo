@@ -11,7 +11,7 @@
         <p class="text-opaque mb-0">
             <i class="fas fa-info-circle me-2" />
             We will only check the last 50 likes of your connected account.
-            <b-link href="#" @click.prevent="openPopup(`https://www.youtube.com/watch?v=${quest.content}`)">
+            <b-link target="_blank" :href="`https://www.youtube.com/watch?v=${quest.content}`">
                 YouTube
                 <i class="fas fa-external-link-alt ms-1" />
             </b-link>
@@ -20,7 +20,6 @@
 </template>
 
 <script lang="ts">
-import { popup } from '@thxnetwork/app/utils/popup';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
@@ -38,15 +37,6 @@ export default defineComponent({
         height() {
             const element = document.getElementById(this.id);
             return element ? (element.clientWidth / 16) * 9 : 200;
-        },
-    },
-    methods: {
-        openPopup(link: string) {
-            if (link) {
-                popup.open(link);
-            } else {
-                console.warn('No video URL provided');
-            }
         },
     },
 });

@@ -165,7 +165,6 @@ import BaseBlockquoteDiscordServerRole from '../../components/blockquote/BaseBlo
 import BaseBlockquoteDiscordMessage from '../../components/blockquote/BaseBlockquoteDiscordMessage.vue';
 import BaseBlockquoteDiscordInviteUsed from '../../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
 import { interactionLabelMap } from '../../utils/social';
-import { popup } from '@thxnetwork/app/utils/popup';
 
 export default defineComponent({
     name: 'BaseCardQuestSocial',
@@ -254,18 +253,12 @@ export default defineComponent({
         async onClickView() {
             this.isLoadingView = true;
 
-            try {
-                await new Promise((resolve) => setTimeout(resolve, 500));
+            await new Promise((resolve) => setTimeout(resolve, 500));
 
-                if (this.contentURL) {
-                    popup.open(this.contentURL);
-                } else {
-                    console.warn('No content URL provided');
-                }
-            } finally {
-                this.isLoadingView = false;
-                this.isViewed = true;
-            }
+            window.open(this.contentURL, '_blank');
+
+            this.isLoadingView = false;
+            this.isViewed = true;
         },
         async onClickComplete() {
             try {

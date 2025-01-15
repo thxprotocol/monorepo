@@ -1,7 +1,11 @@
 <template>
     <blockquote>
         <div class="text-center">
-            <b-link class="text-opaque ms-auto" href="#" @click.prevent="openPopup(quest.contentMetadata.inviteURL)">
+            <b-link
+                class="text-opaque ms-auto"
+                :href="quest.contentMetadata.inviteURL ? quest.contentMetadata.inviteURL : null"
+                target="_blank"
+            >
                 At least <strong>{{ quest.contentMetadata.treshold }}</strong> users are joined through this invite
                 <i class="fas fa-external-link-alt"></i>
             </b-link>
@@ -10,7 +14,6 @@
 </template>
 
 <script lang="ts">
-import { popup } from '@thxnetwork/app/utils/popup';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
@@ -21,15 +24,7 @@ export default defineComponent({
             required: true,
         },
     },
-    methods: {
-        openPopup(link: string) {
-            if (link) {
-                popup.open(link);
-            } else {
-                console.warn('No invite URL provided');
-            }
-        },
-    },
+    methods: {},
 });
 </script>
 <style scoped>
