@@ -6,7 +6,7 @@
     <b-modal :id="`modalQuestLock${id}`" v-model="isModalShown" title="Locked!" centered no-close-on-backdrop>
         <template #header>
             <h5 class="modal-title">Locked</h5>
-            <b-link class="btn-close" @click="isModalShown = false">
+            <b-link class="btn-close" @click.prevent="isModalShown = false">
                 <i class="fas fa-times" />
             </b-link>
         </template>

@@ -42,7 +42,7 @@
     <b-modal v-model="isModalVisible" centered title="Quest Details" hide-footer @hide="resetModal">
         <template #header>
             <h5 class="modal-title">{{ groupTitle }}</h5>
-            <b-link class="btn-close" @click="isModalVisible = false">
+            <b-link class="btn-close" @click.prevent="isModalVisible = false">
                 <i class="fas fa-times" />
             </b-link>
         </template>

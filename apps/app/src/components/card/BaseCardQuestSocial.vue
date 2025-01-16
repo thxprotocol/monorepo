@@ -54,7 +54,7 @@
     <b-modal v-model="showQuestModal" centered hide-footer>
         <template #header>
             <h5 class="modal-title">{{ groupTitle }}</h5>
-            <b-link class="btn-close" @click="showQuestModal = false">
+            <b-link class="btn-close" @click.prevent="showQuestModal = false">
                 <i class="fas fa-times" />
             </b-link>
         </template>
@@ -274,6 +274,20 @@ export default defineComponent({
                 this.isSubmitting = false;
             }
         },
+        async onClickDisconnect() {
+            try {
+                this.error = '';
+                this.isSubmitting = true;
+
+                const { kind } = tokenInteractionMap[this.quest.interaction];
+                await this.accountStore.disconnect(kind);
+            } catch (error) {
+                this.error = 'Could not disconnect platform.';
+                console.error(error);
+            } finally {
+                this.isSubmitting = false;
+            }
+        },
         async onClickValidate() {
             try {
                 this.error = '';
@@ -288,6 +302,7 @@ export default defineComponent({
                     this.isValidated = true;
                 }
             } catch (err) {
+                await this.onClickDisconnect();
                 console.error(err);
             } finally {
                 this.isSubmitting = false;

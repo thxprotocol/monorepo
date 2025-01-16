@@ -213,7 +213,8 @@ export const useAccountStore = defineStore('account', {
         async disconnect(kind: AccessTokenKind) {
             try {
                 await this.api.request.delete('/v1/account/disconnect/' + kind);
-                await this.waitForToken({ kind, scopes: [] });
+                // await this.waitForToken({ kind, scopes: [] });
+                await this.waitForNoToken(kind);
             } catch (error) {
                 console.error(error);
             }
@@ -243,6 +244,28 @@ export const useAccountStore = defineStore('account', {
 
                     return isAuthorized ? resolve('') : reject('token_invalid');
                 };
+                poll();
+            });
+        },
+        async waitForNoToken(kind: AccessTokenKind) {
+            return new Promise((resolve, reject) => {
+                const poll = async () => {
+                    await this.getAccount();
+
+                    if (!this.account) {
+                        return reject('account_not_found');
+                    }
+
+                    const stillAuthorized = this.account.tokens?.some((t) => t.kind === kind);
+
+                    if (stillAuthorized) {
+                        setTimeout(poll, 1000);
+                        return;
+                    }
+
+                    resolve('');
+                };
+
                 poll();
             });
         },
