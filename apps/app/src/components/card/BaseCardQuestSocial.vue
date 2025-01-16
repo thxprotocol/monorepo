@@ -75,7 +75,13 @@
         <div v-if="error" variant="danger" class="p-2"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
 
         <div class="mt-3">
-            <BButtonGroup v-if="!isConnected" block class="w-100">
+            <b-button variant="primary" class="w-100" block :disabled="isSubmitting" @click="buttonAction">
+                <b-spinner v-if="isSubmitting" small />
+                <template v-else>
+                    {{ buttonLabel }}
+                </template>
+            </b-button>
+            <!-- <BButtonGroup v-if="!isConnected" block class="w-100">
                 <b-button variant="primary" :disabled="isSubmitting" @click="onClickConnect">
                     <template v-if="isSubmitting">
                         <b-spinner small class="me-1" />
@@ -88,13 +94,13 @@
                 <BButton v-if="isSubmitting" variant="primary" style="max-width: 40px" @click="onClickCancel">
                     <i class="fas fa-times text-opaque m-0" />
                 </BButton>
-            </BButtonGroup>
+            </BButtonGroup> -->
             <!-- <b-button v-else variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickValidate">
                 <b-spinner v-if="isSubmitting" small />
                 <template v-else>Validate Quest</template>
             </b-button> -->
 
-            <b-button
+            <!-- <b-button
                 v-else-if="!isValidated"
                 variant="primary"
                 block
@@ -103,18 +109,15 @@
                 @click="onClickValidate"
             >
                 <b-spinner v-if="isSubmitting" small />
-                <template v-else>
-                    {{ interactionLabelMap[quest.interaction] }}
-                </template>
+                <template v-else> Validate </template>
             </b-button>
-
             <b-button v-else variant="primary" block class="w-100" :disabled="isSubmitting" @click="onClickComplete">
                 <b-spinner v-if="isSubmitting" small />
                 <template v-else-if="quest.amount">
                     Claim <strong>{{ quest.amount }} points</strong>
                 </template>
                 <template v-else>Complete Quest</template>
-            </b-button>
+            </b-button> -->
 
             <!-- <b-button
                 v-else-if="contentURL && !isViewed"
@@ -207,8 +210,11 @@ export default defineComponent({
             interactionLabelMap,
             showQuestModal: false,
             isValidated: false,
+            buttonLabel: this.isConnected ? 'Validate' : 'Connect',
+            buttonAction: this.isConnected ? this.onClickValidate : this.onClickConnect,
         };
     },
+
     computed: {
         ...mapStores(useAccountStore),
         ...mapStores(useAuthStore),
@@ -234,6 +240,16 @@ export default defineComponent({
             return map[this.quest.interaction];
         },
     },
+    watch: {
+        isConnected(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.initializeButtonState();
+            }
+        },
+    },
+    mounted() {
+        this.initializeButtonState();
+    },
     methods: {
         queryToURL(quest: TQuestSocial) {
             if (!quest.contentMetadata || !quest.contentMetadata.operators) return 'https://x.com';
@@ -256,6 +272,9 @@ export default defineComponent({
             await new Promise((resolve) => setTimeout(resolve, 500));
 
             window.open(this.contentURL, '_blank');
+
+            this.buttonLabel = 'Validate';
+            this.buttonAction = this.onClickValidate;
 
             this.isLoadingView = false;
             this.isViewed = true;
@@ -296,10 +315,14 @@ export default defineComponent({
 
                 const validationResult = await this.questStore.validateQuest(this.quest);
 
-                if (!validationResult?.result) {
-                    await this.onClickView();
-                } else {
+                if (validationResult?.result) {
                     this.isValidated = true;
+                    this.buttonLabel = `Claim ${this.quest.amount} points`;
+                    this.buttonAction = this.onClickComplete;
+                } else {
+                    this.error = validationResult.reason || 'Validation failed.';
+                    this.buttonLabel = interactionLabelMap[this.quest.interaction];
+                    this.buttonAction = this.onClickView;
                 }
             } catch (err) {
                 await this.onClickDisconnect();
@@ -315,10 +338,19 @@ export default defineComponent({
                 const { kind, scopes } = tokenInteractionMap[this.quest.interaction];
                 await this.accountStore.connect(kind, scopes);
             } catch (error) {
-                this.error = 'Could not connect platform.';
+                // this.error = 'Could not connect platform.';
                 console.error(error);
             } finally {
                 this.isSubmitting = false;
+            }
+        },
+        initializeButtonState() {
+            if (this.isConnected) {
+                this.buttonLabel = 'Validate';
+                this.buttonAction = this.onClickValidate;
+            } else {
+                this.buttonLabel = `Connect ${this.kinds[this.quest.kind]}`;
+                this.buttonAction = this.onClickConnect;
             }
         },
     },

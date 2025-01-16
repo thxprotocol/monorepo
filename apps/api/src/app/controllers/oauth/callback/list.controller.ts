@@ -1,13 +1,35 @@
 import { IOAuthService, serviceMap } from '@thxnetwork/api/services/interfaces/IOAuthService';
 import TokenService from '@thxnetwork/api/services/TokenService';
-import { NotFoundError } from '@thxnetwork/api/util/errors';
+import { NotFoundError, BadRequestError } from '@thxnetwork/api/util/errors';
 import { Request, Response } from 'express';
 
 const validation = [];
 
 async function controller(req: Request, res: Response) {
+    if (req.query.error) {
+        return res.send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Authorization Error</title>
+            </head>
+            <body>
+                <script>
+                    window.close();
+                </script>
+            </body>
+            </html>
+        `);
+    }
+
     const service = serviceMap[req.params.kind] as IOAuthService;
     if (!service) throw new NotFoundError(`Service not found for ${req.params.kind}`);
+
+    if (!req.query.code) {
+        throw new BadRequestError('Authorization code is missing.');
+    }
 
     const tokenInfo = await service.requestToken(req.query.code as string);
     const state = JSON.parse(Buffer.from(req.query.state as string, 'base64').toString());
@@ -21,7 +43,7 @@ async function controller(req: Request, res: Response) {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Login Redirect | THX Network </title>
+            <title>Login Redirect | Santa Rewards</title>
         </head>
         <body style="background-color: #777">
             <script>
