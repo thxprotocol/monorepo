@@ -639,10 +639,12 @@ export default defineComponent({
             this.showDropdown = false;
         },
         handleClickOutside(event: MouseEvent) {
-            const dropdown = this.$refs.filterDropdown as HTMLElement;
-            if (!dropdown.contains(event.target as Node)) {
-                this.showDropdown = false;
-            }
+            try {
+                const dropdown = this.$refs.filterDropdown as HTMLElement;
+                if (!dropdown.contains(event.target as Node)) {
+                    this.showDropdown = false;
+                }
+            } catch (error) {}
         },
     },
 });
