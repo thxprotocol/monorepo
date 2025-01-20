@@ -644,7 +644,9 @@ export default defineComponent({
                 if (!dropdown.contains(event.target as Node)) {
                     this.showDropdown = false;
                 }
-            } catch (error) {}
+            } catch (error) {
+                const errorMessage = error;
+            }
         },
     },
 });
