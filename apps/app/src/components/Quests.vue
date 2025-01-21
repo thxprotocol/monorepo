@@ -383,13 +383,11 @@ export default defineComponent({
         },
         quests() {
             const { quests } = this.questStore;
-            console.log('Quests: ', quests);
             return quests
                 .sort(sortMap[this.selectedSort.key])
                 .map((quest: any, index: number) => ({ ...quest, index }));
         },
         mergedRewards() {
-            console.log('rewards: ', this.rewardStore.rewards, this.reward2Store.rewards);
             if (this.selectedValue === 'All') {
                 return [...this.rewardStore.rewards, ...this.reward2Store.rewards];
             } else if (this.selectedValue === 'Santa') {

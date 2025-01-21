@@ -79,7 +79,9 @@ export default defineComponent({
 <style scoped>
 .select-bg {
     background: var(--border-as-nav-color);
-    border-right: none;
     border-color: var(--nav-border-color);
+    border-radius: 0.375rem !important;
+    margin-right: 4px;
+    appearance: auto;
 }
 </style>

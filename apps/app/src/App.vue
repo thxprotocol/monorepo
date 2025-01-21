@@ -162,7 +162,6 @@ export default defineComponent({
             const urlParams = new URLSearchParams(window.location.search);
             if (!urlParams.get('theme')) {
                 const newPreferredTheme = event.matches ? 'dark' : 'light';
-                console.log(`System theme changed to: ${newPreferredTheme}`);
                 this.applyTheme(newPreferredTheme);
             }
         },
