@@ -54,6 +54,7 @@ db.connection.once('open', async () => {
 
     // await agenda.every('1 minutes', JobType.UpdatePrices);
     await agenda.every('5 minutes', JobType.UpdateCampaignRanks);
+    await agenda.every('5 minutes', JobType.UpdateLeaderboard);
     // await agenda.every('15 minutes', JobType.UpsertInvoices);
     // await agenda.every('15 minutes', JobType.UpdateAPR);
 
