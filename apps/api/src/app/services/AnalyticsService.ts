@@ -49,8 +49,9 @@ class AnalyticsService {
         try {
             const { poolId } = job.attrs.data;
             const pool = await Pool.findById(poolId);
-            const endDate = new Date();
-            const startDate = subWeeks(endDate, pool.settings.leaderboardInWeeks);
+            const now = new Date();
+            const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
             const leaderboard = await this.createLeaderboard(pool, { startDate, endDate });
 
             this.cacheLeaderboard(poolId, leaderboard);
