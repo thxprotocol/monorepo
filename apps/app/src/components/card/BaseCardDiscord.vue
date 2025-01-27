@@ -5,7 +5,7 @@
         body-class="p-1"
     >
         <template #header>
-            <i class="fab fa-discord text-opaque mt-1 me-3 discord-icon" />
+            <i class="fab fa-discord mt-1 me-3 discord-icon" />
             <div>
                 <span>Got questions?</span>
                 <div>
