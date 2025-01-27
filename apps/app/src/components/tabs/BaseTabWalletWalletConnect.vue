@@ -81,18 +81,18 @@ export default defineComponent({
         },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
-                if (!window.santaAptos) return;
+                if (!window.okxwallet) return;
                 try {
-                    await window.santaAptos.disconnect();
+                    await window.okxwallet.aptos.disconnect();
                 } catch (error) {
                     console.log(error);
                 }
 
                 try {
-                    const response = await window.santaAptos.connect();
-                    this.address = response.args.address;
-                    this.publicKey = response.args.publicKey;
-                    this.walletStore.account = { address: response.args.address };
+                    const response = await window.okxwallet.aptos.connect();
+                    this.address = response.address;
+                    this.publicKey = response.publicKey;
+                    this.walletStore.account = { address: response.address };
                 } catch (error) {
                     if (error.status === 'Rejected') {
                         this.error = 'Wallet connect is rejected. Please check your wallet.';
@@ -100,6 +100,25 @@ export default defineComponent({
                         console.log(error);
                     }
                 }
+                // if (!window.santaAptos) return;
+                // try {
+                //     await window.santaAptos.disconnect();
+                // } catch (error) {
+                //     console.log(error);
+                // }
+
+                // try {
+                //     const response = await window.santaAptos.connect();
+                //     this.address = response.args.address;
+                //     this.publicKey = response.args.publicKey;
+                //     this.walletStore.account = { address: response.args.address };
+                // } catch (error) {
+                //     if (error.status === 'Rejected') {
+                //         this.error = 'Wallet connect is rejected. Please check your wallet.';
+                //     } else {
+                //         console.log(error);
+                //     }
+                // }
             } else if (this.walletStore.currentChainId == ChainId.Sui) {
                 console.log('Not supporting Sui at the moment.');
                 // try {
@@ -177,15 +196,20 @@ export default defineComponent({
                 // });
 
                 try {
-                    const response = await window.santaAptos.signMessage(
-                        `APTOS\nmessage: ${this.message}\nnonce: random`,
-                    );
+                    const response = await window.okxwallet.aptos.signMessage({
+                        message: this.message,
+                        nonce: 'random',
+                    });
+                    // const response = await window.santaAptos.signMessage(
+                    //     `APTOS\nmessage: ${this.message}\nnonce: random`,
+                    // );
                     await this.walletStore.create({
                         chainId: ChainId.Aptos,
                         variant: this.variant,
                         message: `APTOS\nmessage: ${this.message}\nnonce: random`,
                         publicKey: this.publicKey,
-                        signature: response.args.signature,
+                        signature: response.signature,
+                        // signature: response.args.signature,
                         rawAddress: this.address,
                     });
                     const wallet = this.walletStore.wallets.find((wallet: TWallet) => wallet.address === this.address);
