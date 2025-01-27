@@ -1,17 +1,16 @@
+import { API_URL } from '@thxnetwork/api/config/secrets';
 import { Request, Response } from 'express';
 import { param } from 'express-validator';
-import { QRCodeEntry } from '@thxnetwork/api/models';
-import { NotFoundError } from '@thxnetwork/api/util/errors';
 
 const validation = [param('uuid').isUUID(4)];
 
 const controller = async (req: Request, res: Response) => {
-    const entry = await QRCodeEntry.findOne({ uuid: req.params.uuid });
-    if (!entry) throw new NotFoundError('QR Code entry not found');
-    if (!entry.redirectURL) throw new NotFoundError('Redirect URL not found');
-
-    const url = new URL(entry.redirectURL);
-    url.searchParams.append('thx_widget_path', `/c/${req.params.uuid}`);
+    const urlMap = {
+        'https://api.thx.network': 'https://api.twinstory.io',
+        'https://dev.api.thx.network': 'https://dev.api.twinstory.io',
+    };
+    const url = new URL(urlMap[API_URL]);
+    url.pathname = `/entries/${req.params.uuid}/redirect`;
 
     res.redirect(302, url.toString());
 };
