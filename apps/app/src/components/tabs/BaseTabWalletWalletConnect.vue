@@ -81,7 +81,13 @@ export default defineComponent({
         },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
-                if (!window.okxwallet) return;
+                if (!window.okxwallet) {
+                    window.open(
+                        'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
+                        '_blank',
+                    );
+                    return;
+                }
                 try {
                     await window.okxwallet.aptos.disconnect();
                 } catch (error) {
