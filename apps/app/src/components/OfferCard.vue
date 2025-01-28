@@ -31,7 +31,7 @@
                 <div class="d-flex align-items-end justify-content-between flex-grow-1">
                     <b-card-text
                         v-if="offer.description"
-                        class="flex-grow-1 quest-title-main"
+                        class="flex-grow-1 quest-title-main offer-title-main"
                         v-html="decodeHTML(offer.title)"
                     />
                 </div>
@@ -365,6 +365,14 @@ export default defineComponent({
     width: 20px;
     height: 15px;
 }
+@media (max-width: 1400px) {
+    .my-offer-card {
+        min-height: unset;
+    }
+    .offer-title-main {
+        -webkit-line-clamp: 1 !important;
+    }
+}
 @media (max-width: 992px) {
     .offer-wrap {
         display: flex;
@@ -383,6 +391,9 @@ export default defineComponent({
     .modal-info-wrap {
         flex: 1;
         overflow: hidden;
+    }
+    .offer-title-main {
+        -webkit-line-clamp: 2 !important;
     }
 }
 </style>

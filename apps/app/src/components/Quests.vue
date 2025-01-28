@@ -889,7 +889,8 @@ export default defineComponent({
 
 .offer-row {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(auto, 1fr);
     gap: 20px;
     scrollbar-width: none;
 }
@@ -910,7 +911,7 @@ export default defineComponent({
             border-radius: 4px;
             overflow: hidden;
             width: 100%;
-            height: 162px;
+            max-height: 162px;
             object-fit: cover;
         }
     }
