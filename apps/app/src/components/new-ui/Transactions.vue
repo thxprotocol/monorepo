@@ -1,5 +1,5 @@
 <template>
-    <div class="p-2 transaction-wrap">
+    <div class="transaction-wrap">
         <div class="quest-group-title p-2">
             Transactions
             <span class="reward-info-wrap ms-1">
@@ -296,6 +296,7 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     height: 100%;
+    margin-left: 15px;
 }
 .transaction-table {
     overflow-y: auto;
@@ -309,7 +310,11 @@ export default defineComponent({
 .hash-link:hover {
     text-decoration: underline;
 }
-
+@media (max-width: 992px) {
+    .transaction-wrap {
+        margin-left: 0;
+    }
+}
 @media (max-width: 450px) {
     .table-row {
         grid-template-columns: 10% 40px 45px 55px repeat(1, 1fr) repeat(1, 1fr);

@@ -8,18 +8,15 @@
         :error="error"
         @modal-close="isModalQuestEntryShown = false"
     >
-        <div class="d-flex mb-2">
-            <p class="card-text quest-title-main">{{ quest.description }}</p>
-        </div>
-        <div class="d-flex flex-wrap justify-content-start mb-2">
+        <div class="d-flex justify-content-start mb-2 gap-2 overflow-hidden">
             <b-badge
                 v-for="(amount, key) of quest.amounts"
-                style="width: 44px; height: 38px"
-                class="me-3 d-flex flex-column align-items-center justify-content-center"
+                class="d-flex flex-column align-items-center justify-content-center"
                 :variant="key < quest.entries.length ? 'success' : 'primary'"
                 :class="
                     key < quest.entries.length ? 'bg-success text-white bg-daily-completed' : 'bg-primary text-white'
                 "
+                :style="{ transform: `translateX(-${shiftAmount}px)`, color: '#fff' }"
             >
                 <small>Day {{ key + 1 }}</small>
                 <strong class="h5 mb-0">{{ formatAmount(amount) }} </strong>
@@ -37,7 +34,7 @@
                 @click="quest.isAvailable ? onClickClaim() : null"
             >
                 <b-spinner v-if="isSubmitting" small />
-                <template v-if="quest.isAvailable"> Claim {{ quest.amount }} Pts </template>
+                <template v-if="quest.isAvailable"> Claim </template>
                 <template v-else-if="!quest.isAvailable">
                     You can claim again in
                     <span v-if="waitDuration"
@@ -95,6 +92,9 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore),
+        shiftAmount() {
+            return this.quest.entries.length == 4 ? 130 : 0;
+        },
         isAlertWaitDurationShown() {
             return !!this.waitDuration;
         },
@@ -152,5 +152,19 @@ export default defineComponent({
 <style>
 .bg-daily-completed {
     background: var(--btn-primary-santa) !important;
+}
+.badge {
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    flex: 0 0 44px;
+    border-radius: 5px;
+}
+.badge.text-bg-primary {
+    color: #7a7a7a !important;
+}
+.badge.text-bg-success {
+    color: #f6ebff !important;
 }
 </style>

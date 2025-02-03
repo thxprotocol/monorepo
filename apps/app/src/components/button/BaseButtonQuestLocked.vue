@@ -1,7 +1,7 @@
 <template>
     <b-button block class="w-100 locked-btn" @click="isModalShown = true">
         <!-- <i class="fas fa-lock me-1" /> -->
-        Earn {{ amount }} Pts
+        Claim
     </b-button>
     <b-modal :id="`modalQuestLock${id}`" v-model="isModalShown" title="Locked!" centered no-close-on-backdrop>
         <template #header>
@@ -72,10 +72,12 @@ export default defineComponent({
     color: var(--btn-disabled-color);
     font-weight: 500;
     border-radius: 5px;
+    box-shadow: var(--balance-box-shadow);
 }
 .locked-btn:hover,
 .locked-btn:focus,
-.locked-btn:active {
+.locked-btn:active,
+.locked-btn:focus-visible {
     background: var(--btn-disabled-bg) !important;
     border-color: var(--btn-disabled-border) !important;
     color: var(--btn-disabled-color) !important;

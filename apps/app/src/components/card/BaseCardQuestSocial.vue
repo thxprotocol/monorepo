@@ -10,9 +10,15 @@
     >
         <!-- <component :is="interactionComponentMap[quest.interaction]" :quest="quest" /> -->
 
+        <div v-if="error" variant="danger" class="p-2 alert-wrap" @click="error = ''">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+        </div>
         <template #button>
-            <b-button variant="primary" class="w-100" block @click="showQuestModal = true">
-                Earn {{ quest.amount }} Pts
+            <b-button variant="primary" class="w-100" block @click="buttonAction">
+                <b-spinner v-if="isSubmitting" small />
+                <template v-else>
+                    {{ buttonLabel }}
+                </template>
             </b-button>
             <!-- <BButtonGroup v-if="!isConnected" block class="w-100">
                 <b-button variant="primary" :disabled="isSubmitting" @click="onClickConnect">
@@ -356,3 +362,12 @@ export default defineComponent({
     },
 });
 </script>
+<style lang="scss">
+.alert-wrap {
+    position: absolute;
+    top: -130px;
+    width: calc(100% - 30px);
+    background: var(--bs-dark-bg-subtle);
+    border-radius: 10px;
+}
+</style>

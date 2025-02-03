@@ -1,19 +1,19 @@
 <template>
-    <div style="min-height: 70%; padding: 10px">
+    <div style="min-height: 70%" class="wallet-wrap">
         <!-- <BaseNavbarSecondary v-if="accountStore.isMobile" class="ms-auto" /> -->
 
         <div class="d-flex p-2 m-0 align-items-center">
             <div class="flex-grow-1 pe-2 d-flex quest-group-title align-items-center">
-                Your Wallet
+                Wallet
                 <span class="reward-info-wrap ms-1">
                     <i class="fas fa-info-circle fs-6" style="opacity: 0.35"></i>
                     <span class="tooltip-text"
                         >Securely holds your web3 earnings and allows for easy transactions.</span
                     >
                 </span>
-                <b-spinner v-if="walletStore.isLoading" class="ms-2" variant="primary" small />
+                <!-- <b-spinner v-if="walletStore.isLoading" class="ms-2" variant="primary" small /> -->
             </div>
-            <b-dropdown variant="primary" size="sm" no-caret>
+            <!-- <b-dropdown variant="primary" size="sm" no-caret>
                 <template #button-content>
                     {{ activeFilter.label }}
                     <i class="fas fa-caret-down ms-1" />
@@ -21,19 +21,149 @@
                 <b-dropdown-item-button v-for="filter of filters" @click="activeFilter = filter">
                     {{ filter.label }}
                 </b-dropdown-item-button>
-            </b-dropdown>
+            </b-dropdown> -->
         </div>
-        <div v-for="(token, key) of list" :key="key" class="mb-1">
+        <div v-if="accountStore.isAuthenticated" class="d-flex h-wallet h-100">
+            <div v-if="walletStore.isLoading || !walletStore.wallets.length || !isListShown" class="spinner-container">
+                <b-spinner variant="primary" small />
+            </div>
+            <div v-else class="d-flex w-100">
+                <div class="d-flex flex-column wallet-info">
+                    <div class="d-flex justify-content-between wallet-box align-items-baseline">
+                        <div v-if="walletStore.wallet" class="d-flex align-items-center">
+                            <img
+                                :src="onlineEllipse"
+                                alt="online"
+                                width="10"
+                                height="10"
+                                style="filter: drop-shadow(0px 2px 7px rgba(187, 255, 175, 0.3))"
+                                class="wallet-online"
+                            />
+                            <div class="wallet-online-word">
+                                {{ walletStore.wallet.short }}
+                            </div>
+                        </div>
+                        <button class="new-wallet-btn" @click="walletStore.isModalChainSelectShown = true">
+                            + New Wallet
+                        </button>
+                    </div>
+                    <div class="d-flex gap-3 wallet-boxes">
+                        <div class="d-flex flex-column wallet-connected w-100">
+                            <div class="wallet-text">Connected Wallets</div>
+                            <div class="d-flex flex-column gap-4 address-list">
+                                <div
+                                    v-for="wallet of walletStore.wallets"
+                                    class="d-flex align-items-center wallet-online-word justify-content-between"
+                                >
+                                    <div
+                                        :class="{
+                                            'cursor-pointer': wallet._id !== walletStore.wallet?._id,
+                                            'selected-wallet': wallet._id === walletStore.wallet?._id,
+                                        }"
+                                        @click="wallet._id !== walletStore.wallet?._id ? onClickWallet(wallet) : null"
+                                    >
+                                        <b-img
+                                            :src="walletLogoMap[wallet.variant]"
+                                            width="15"
+                                            height="15"
+                                            style="border-radius: 3px"
+                                            class="me-2"
+                                        />
+                                        {{ wallet.short }}
+                                    </div>
+
+                                    <div>
+                                        <b-button
+                                            v-clipboard:copy="wallet?.address"
+                                            v-clipboard:success="() => (isCopied = true)"
+                                            variant="primary"
+                                            size="sm"
+                                            class="ms-2 px-2 p-1"
+                                        >
+                                            <i
+                                                class="fas fa-clipboard"
+                                                :class="{ 'fa-clipboard-check': isCopied, 'fa-clipboard': !isCopied }"
+                                                style="font-size: 0.7rem"
+                                            />
+                                        </b-button>
+                                        <b-button
+                                            variant="primary"
+                                            size="sm"
+                                            class="ms-2 px-2 p-1"
+                                            :href="
+                                                chainList[walletStore.chainId].blockExplorer +
+                                                '/address/' +
+                                                wallet?.address
+                                            "
+                                            target="_blank"
+                                        >
+                                            <i class="fas fa-external-link-alt" style="font-size: 0.7rem" />
+                                        </b-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column wallet-connected w-100">
+                            <div class="d-flex justify-content-between px-2 wallet-text">
+                                <span class="selected-wallet">{{ walletStore?.wallet?.short }}</span>
+                                <div>
+                                    <b-button
+                                        v-clipboard:copy="walletStore.wallet?.address"
+                                        v-clipboard:success="() => (isCopied = true)"
+                                        variant="primary"
+                                        size="sm"
+                                        class="ms-2 px-2 p-1"
+                                    >
+                                        <i
+                                            class="fas fa-clipboard"
+                                            :class="{ 'fa-clipboard-check': isCopied, 'fa-clipboard': !isCopied }"
+                                            style="font-size: 0.7rem"
+                                        />
+                                    </b-button>
+                                    <b-button
+                                        variant="primary"
+                                        size="sm"
+                                        class="ms-2 px-2 p-1"
+                                        :href="
+                                            chainList[walletStore.chainId].blockExplorer +
+                                            '/address/' +
+                                            walletStore.wallet?.address
+                                        "
+                                        target="_blank"
+                                    >
+                                        <i class="fas fa-external-link-alt" style="font-size: 0.7rem" />
+                                    </b-button>
+                                </div>
+                            </div>
+
+                            <div class="d-flex h-100 w-100 align-items-center justify-content-center">
+                                <div class="d-flex justify-content-around w-100">
+                                    <div
+                                        v-for="token in twoTokens"
+                                        :key="token._id"
+                                        class="d-flex flex-column align-items-center token-display"
+                                    >
+                                        <div class="token-balance">{{ token.walletBalance || 0 }}</div>
+                                        <div class="token-symbol">{{ token.erc20.symbol }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div v-for="(token, key) of list" :key="key" class="mb-1">
             <component :is="token.component" :token="token" />
-        </div>
-        <div v-if="!list.length" class="text-center text-opaque empty-message text-muted">Nothing here...</div>
+        </div> -->
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapStores } from 'pinia';
-import { useWalletStore } from '../../stores/Wallet';
+import { useWalletStore, walletLogoMap } from '../../stores/Wallet';
 import { useAuthStore } from '../../stores/Auth';
 import { RewardVariant } from '@thxnetwork/common/enums';
 import { useAccountStore } from '../../stores/Account';
@@ -42,14 +172,16 @@ import BaseCardNFT from '../../components/card/BaseCardNFT.vue';
 import BaseCardCouponCode from '../../components/card/BaseCardCouponCode.vue';
 import BaseCardDiscordRole from '../../components/card/BaseCardDiscordRole.vue';
 import { useTrackPageview } from '@thxnetwork/app/utils/snowplowTracker';
-
+import onlineEllipse from '@thxnetwork/app/assets/online-ellipse.png';
+import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
+import { chainList } from '@thxnetwork/app/utils/chains';
 export default defineComponent({
     name: 'BaseViewWallet',
     components: {
-        BaseCardCoin,
-        BaseCardNFT,
-        BaseCardCouponCode,
-        BaseCardDiscordRole,
+        // BaseCardCoin,
+        // BaseCardNFT,
+        // BaseCardCouponCode,
+        // BaseCardDiscordRole,
     },
     data() {
         return {
@@ -80,6 +212,10 @@ export default defineComponent({
                     key: [RewardVariant.Coupon],
                 },
             ] as { label: string; key: number[] }[],
+            onlineEllipse,
+            walletLogoMap,
+            chainList,
+            isCopied: false,
         };
     },
     computed: {
@@ -102,10 +238,31 @@ export default defineComponent({
         isListShown() {
             return this.list.length;
         },
+        twoTokens() {
+            return this.list.filter((token) => token.erc20.symbol === 'USDC' || token.erc20.symbol === 'USDT');
+        },
+    },
+    watch: {
+        'accountStore.account': {
+            async handler(account) {
+                if (!account) return;
+                await this.walletStore.listWallets();
+
+                // Check if there a preferred wallet in global config
+                this.setActiveWallet();
+
+                // If no preferred wallet is set pick the safe multisig
+                // and a walletconnect one otherwise
+                if (!this.walletStore.wallet) {
+                    this.setDefaultWallet();
+                }
+                this.walletStore.list();
+            },
+            immediate: true,
+        },
     },
     mounted() {
-        useTrackPageview();
-        this.listRewards();
+        // useTrackPageview();
     },
     methods: {
         onClickSignin() {
@@ -119,11 +276,33 @@ export default defineComponent({
             await this.walletStore.list();
             this.isRefreshing = false;
         },
+        async onClickWallet(wallet: TWallet) {
+            this.walletStore.setWallet(wallet);
+            this.accountStore.setGlobals({ activeWalletId: wallet._id });
+            this.walletStore.list();
+        },
+        setActiveWallet() {
+            const { activeWalletId } = this.accountStore.globals();
+            if (activeWalletId) {
+                const wallet = this.walletStore.wallets.find((wallet) => wallet._id === activeWalletId) || null;
+                this.walletStore.setWallet(wallet);
+            }
+        },
+        setDefaultWallet() {
+            const wallet =
+                this.walletStore.wallets.find(
+                    (wallet) => wallet.variant === WalletVariant.Safe || wallet.variant === WalletVariant.WalletConnect,
+                ) || null;
+            this.walletStore.setWallet(wallet);
+        },
     },
 });
 </script>
 
 <style>
+.wallet-wrap {
+}
+
 .tabs-rewards {
 }
 
@@ -146,5 +325,110 @@ export default defineComponent({
     transform: translate(-50%, -50%);
     text-align: center;
     font-size: 16px !important;
+}
+.wallet-box {
+    height: 100%;
+    border-radius: 5px 5px 0px 0px;
+    background: var(--wallet-box-bg);
+    padding: 17px 10px 0 10px;
+    max-height: 100px;
+    max-width: 360px;
+}
+.wallet-online-word {
+    color: var(--wallet-online-color);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+.wallet-online {
+    margin-right: 2px;
+}
+.new-wallet-btn {
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: -0.13px;
+    background: var(--btn-primary-santa);
+    border: 0.753px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 2px 14px;
+}
+.wallet-info {
+    width: 100%;
+}
+.wallet-text {
+    color: var(--body-text);
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-align: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--wallet-connected-border-color);
+}
+.wallet-connected {
+    border-radius: 12px;
+    border: 1px solid var(--wallet-connected-border-color);
+    background: var(--wallet-connected-bg);
+    max-width: 360px;
+}
+.address-list {
+    padding: 12px 20px;
+}
+.selected-wallet {
+    color: var(--selected-wallet-color);
+}
+.token-display {
+    display: flex;
+    padding: 19px 38px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 6px;
+    background: var(--token-display-bg);
+}
+.token-symbol {
+    color: #a6a6a6;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+.token-balance {
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+.wallet-boxes {
+    margin-top: -40px;
+}
+.spinner-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@media (max-width: 992px) {
+    .wallet-box {
+        height: 100px;
+        max-width: 100%;
+    }
+    .wallet-boxes {
+        justify-content: space-between;
+    }
+}
+@media (max-width: 540px) {
+    .wallet-boxes {
+        flex-direction: column;
+    }
+    .wallet-connected {
+        min-height: 300px;
+        max-width: 100%;
+    }
 }
 </style>

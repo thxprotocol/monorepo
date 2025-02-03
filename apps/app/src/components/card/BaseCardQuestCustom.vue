@@ -33,9 +33,9 @@
                     'locked-btn': isSubmitting || pendingCount === 0,
                     'btn-primary': !(isSubmitting || pendingCount === 0),
                 }"
-                @click="isModalVisible = true"
+                @click="onClickClaim"
             >
-                {{ pendingCount !== 0 ? `Claim ` : `Earn` }} {{ formattedAmount }} Pts
+                Claim
             </b-button>
         </template>
     </BaseCardQuest>

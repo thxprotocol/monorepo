@@ -1,8 +1,8 @@
 :root[data-theme='dark'] {
     --body-rewards-bg: #151415;
-    --home-background: linear-gradient(178deg, #151415 -37.16%, #0E0D10 98.54%);
+    --home-background: #151415;
     --body-text: #ffffff;
-    --title-color: #E4E5E9;
+    --title-color: #e4e5e9;
     --dropdown-background: #202020;
     --dropdown-border-color: #292929;
     --avatar-background: rgba(131, 75, 196, 0.5);
@@ -12,11 +12,11 @@
     --nav-link-active-bg: rgba(255, 255, 255, 0.03);
     --nav-border-color: #414141;
     --border-as-nav-color: #151415;
-    --btn-primary-santa: linear-gradient(227deg, #B13434 62.23%, #D84F4F 144.78%, #9368B7 162.03%);
-    --btn-primary-santa-hover: linear-gradient(48deg, #B13434 18.58%, #D84F4F 125.78%);
+    --btn-primary-santa: linear-gradient(227deg, #b13434 62.23%, #d84f4f 144.78%, #9368b7 162.03%);
+    --btn-primary-santa-hover: linear-gradient(48deg, #b13434 18.58%, #d84f4f 125.78%);
     --btn-sidebar-bg: rgba(27, 27, 27, 0.4);
     --btn-sidebar-active-bg: #d44646;
-    --btn-sidebar-color: #CACACA;
+    --btn-sidebar-color: #cacaca;
     --btn-sidebar-border-color: #1d1d1d;
     --discord-bg: #000;
     --discord-border-color: transparent;
@@ -33,35 +33,65 @@
         rgba(42, 42, 42, 0.18) 98.68%
     );
     --reward-title-color: #e7e7e7;
-    --quest-daily-item-bg: rgba(255, 255, 255, 0.05);
+    --quest-daily-item-bg: rgba(0, 0, 0, 0.56);
     --navbar-bottom-bg: #181818;
-    --navbar-bottom-selected-bg: linear-gradient(270deg, #5D2A2A 0%, #944 100%);
+    --navbar-bottom-selected-bg: linear-gradient(270deg, #5d2a2a 0%, #944 100%);
     --navbar-bottom-default-bg: rgba(255, 255, 255, 0.02);
-    --navbar-bottom-color: #B7B7B7;
-    --green-highlight-color: #1BFF2E;
+    --navbar-bottom-color: #b7b7b7;
+    --green-highlight-color: #1bff2e;
     --modal-text-color: #cdcdcd;
-    --balance-box-bg: linear-gradient(227deg, #2E2E2E 62.23%, #272020 144.78%, #000 162.03%);
+    --balance-box-bg: linear-gradient(227deg, #2e2e2e 62.23%, #272020 144.78%, #000 162.03%);
+    --balance-box-shadow: transparent;
+    --balance-box-color: #d4d4d4;
+    --balance-box-amount-color: #f5f5f5;
+    --balance-box-border-color: rgba(255, 255, 255, 0);
     --border-tab-gradient: linear-gradient(90deg, #414141 0%, rgba(198, 196, 196, 0) 100%);
-    --btn-disabled-bg: linear-gradient(227deg, #2E2E2E 62.23%, #272020 144.78%, #000 162.03%);
+    --btn-disabled-bg: #323232;
     --btn-disabled-border: rgba(255, 255, 255, 0.07);
     --btn-disabled-color: inherit;
 
-    --about-header-color: #D4D4D4;
-    --about-nav-item-color: #8E8E8E;
+    --about-header-color: #d4d4d4;
+    --about-nav-item-color: #8e8e8e;
     --about-nav-item-active-color: #c0c0c0;
     --about-title-color: #d4d4d4;
-    --about-subtitle-color: #C9C9C9;
+    --about-subtitle-color: #c9c9c9;
     --about-mob-nav-bg: rgba(255, 255, 255, 0.06);
     --image-modal-backdrop: rgba(0, 0, 0, 0.8);
-    --reward-supply-text: #4B4B4B;
-    --reward-supply-green: #01E057;
-    --reward-supply-limit: #D1D1D1;
+    --reward-supply-text: #4b4b4b;
+    --reward-supply-green: #01e057;
+    --reward-supply-limit: #d1d1d1;
     --transaction-header-color: #898989;
     --transaction-chain-color: #d4d4d4;
     --image-modal-backdrop: rgba(0, 0, 0, 0.8);
     --sticky-header-bg: #131213;
 
     --skeleton-item-bg: #393939;
+
+    --quest-info-wrap-bg: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0) -1.11%,
+        rgba(21, 22, 25, 0.63) 23.83%,
+        #292929 99.56%
+    );
+    --quest-info-wrap-shadow: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+    --quest-points-wrap-bg: rgba(0, 0, 0, 0.61);
+    --quest-points-wrap-shadow: 0px 0px 15px 0px rgba(118, 61, 176, 0.5);
+    --quest-points-wrap-color: #ffefef;
+    --quest-points-wrap-span-color: #858585;
+    --offer-btn-color: #fff;
+    --offer-title-main-color: #fafafa;
+
+    --tabs-bg: #202020;
+
+    --invert-img: invert(0);
+
+    --wallet-box-bg: rgba(186, 186, 186, 0.13);
+    --wallet-online-color: #fff;
+    --wallet-connected-bg: #141414;
+    --wallet-connected-border-color: #333;
+    --selected-wallet-color: #28ff4a;
+    --token-display-bg: #1b1b1b;
+
+    --main-content-border-color: rgba(40, 40, 40, 0.25);
     // Add other dark theme variables as needed
-    
 }

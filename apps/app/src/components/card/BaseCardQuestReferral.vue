@@ -18,7 +18,7 @@
             />
             <div></div>
 
-            <div class="px-2 d-flex flex-column flex-grow-1 justify-content-end my-3">
+            <div class="d-flex flex-column flex-grow-1 quest-info-wrap">
                 <div class="d-flex align-items-start">
                     <b-card-text
                         class="quest-title-main"
@@ -27,14 +27,14 @@
                     />
                 </div>
                 <slot></slot>
-            </div>
-            <div class="quest-card-btns">
-                <transition name="fade">
-                    <b-button variant="primary" block class="w-100" :disabled="copyInProgress" @click="onClickCopy">
-                        {{ copyButtonText }}
-                        <i :class="copyButtonIcon" aria-hidden="true"></i>
-                    </b-button>
-                </transition>
+                <div class="quest-card-btns">
+                    <transition name="fade">
+                        <b-button variant="primary" block class="w-100" :disabled="copyInProgress" @click="onClickCopy">
+                            {{ copyButtonText }}
+                            <i :class="copyButtonIcon" aria-hidden="true"></i>
+                        </b-button>
+                    </transition>
+                </div>
             </div>
         </b-collapse>
     </b-card>

@@ -1,54 +1,60 @@
 :root {
-    --body-rewards-bg: #ffffff;
-    --home-background: #fff;
+    --body-rewards-bg: #f6f6f6;
+    --home-background: #f6f6f6;
     --body-text: #494949;
-    --title-color: #090A0C;
-    --dropdown-background: #FAFAFA;
-    --dropdown-border-color: #E0E0E0;
-    --avatar-background: #834BC4;
-    --modal-title-color: #1C1C1C;
-    --modal-bg: #F4F4F4;
-    --nav-link-bg: #E7E7E7;
-    --nav-link-active-bg: linear-gradient(180deg, #FFF 0%, rgba(255, 255, 255, 0.00) 100%);
-    --nav-border-color: #CACACA;
+    --title-color: #090a0c;
+    --dropdown-background: #fafafa;
+    --dropdown-border-color: transparent;
+    --avatar-background: #834bc4;
+    --modal-title-color: #1c1c1c;
+    --modal-bg: #f4f4f4;
+    --nav-link-bg: #e7e7e7;
+    --nav-link-active-bg: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0) 100%);
+    --nav-border-color: #cacaca;
     --border-as-nav-color: #f6f6f6;
-    --btn-primary-santa: #29B6F6;
-    --btn-primary-santa-hover: linear-gradient(89deg, #29B6F6 0.59%, #0B98D8 51.81%, #51C4F9 103.02%);
-    --btn-sidebar-bg: #FBFBFB;
-    --btn-sidebar-active-bg: #1ABCFE;
-    --btn-sidebar-color: #61656B;
-    --btn-sidebar-border-color: #E5E5E5;
+    --btn-primary-santa: radial-gradient(107.44% 50% at 50% 50%, #50bced 11.67%, #29b6f6 89%);
+    --btn-primary-santa-hover: radial-gradient(107.44% 50% at 50% 50%, #50bced 11.67%, #29b6f6 89%);
+    --btn-sidebar-bg: #fbfbfb;
+    --btn-sidebar-active-bg: #1abcfe;
+    --btn-sidebar-color: #61656b;
+    --btn-sidebar-border-color: #e5e5e5;
     --discord-bg: #fff;
-    --discord-border-color: #EAEAEA;
-    --discord-highlight-color: #FF9D00;
+    --discord-border-color: #eaeaea;
+    --discord-highlight-color: #ff9d00;
     --main-content-border: transparent;
     --main-content-bg: #f6f6f6;
     --quest-item-bg: #ffffff;
-    --scroll-track-bg: #B3B3B3;
-    --scroll-thumb-bg: #D4D4D4;
+    --scroll-track-bg: #b3b3b3;
+    --scroll-thumb-bg: #d4d4d4;
     --reward-item-bg: #ffffff;
     --reward-title-color: #494949;
     --quest-daily-item-bg: rgba(0, 0, 0, 0.06);
-    --navbar-bottom-bg: #F6F6F6;
-    --navbar-bottom-selected-bg: linear-gradient(270deg, #913030 -26%, #BE5252 100%);
+    --navbar-bottom-bg: #f6f6f6;
+    --navbar-bottom-selected-bg: linear-gradient(270deg, #913030 -26%, #be5252 100%);
     --navbar-bottom-default-bg: rgba(0, 0, 0, 0.04);
     --navbar-bottom-color: #404040;
-    --green-highlight-color: #78BC61;
-    --modal-text-color: #1C1C1C;
-    --balance-box-bg: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
-    --border-tab-gradient: linear-gradient(90deg, #C4C4C4 0%, rgba(196, 196, 196, 0.00) 100%);
-    --btn-disabled-bg: #E5E5E5;
-    --btn-disabled-border: transparent;
-    --btn-disabled-color: #A3A3A3;
+    --green-highlight-color: #78bc61;
+    --modal-text-color: #1c1c1c;
+    --balance-box-bg: #fff;
+    --balance-box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
+    --balance-box-color: #a5a5a5;
+
+    --balance-box-amount-color: #4f4f4f;
+
+    --balance-box-border-color: rgba(240, 240, 240, 0.5);
+    --border-tab-gradient: linear-gradient(90deg, #c4c4c4 0%, rgba(196, 196, 196, 0) 100%);
+    --btn-disabled-bg: #ffffff;
+    --btn-disabled-border: rgba(240, 240, 240, 0.5);
+    --btn-disabled-color: #a3a3a3;
 
     --about-header-color: #1d1d1d;
     --about-nav-item-color: #1d1d1d;
-    --about-nav-item-active-color: #1D1D1D;
-    --about-title-color: #1D1D1D;
-    --about-subtitle-color: #1D1D1D;
+    --about-nav-item-active-color: #1d1d1d;
+    --about-title-color: #1d1d1d;
+    --about-subtitle-color: #1d1d1d;
     --about-mob-nav-bg: #fff;
     --image-modal-backdrop: rgba(255, 255, 255, 0.8);
-    --reward-supply-text: #4B4B4B;
+    --reward-supply-text: #4b4b4b;
     --reward-supply-green: #494949;
     --reward-supply-limit: #494949;
     --transaction-header-color: #767676;
@@ -56,6 +62,32 @@
     --image-modal-backdrop: rgba(255, 255, 255, 0.8);
     --sticky-header-bg: #f6f6f6;
 
-    --skeleton-item-bg: #ffffff;
+    --skeleton-item-bg: #efefef;
+
+    --quest-info-wrap-bg: linear-gradient(
+        2deg,
+        rgba(197, 204, 222, 0.32) 9.69%,
+        rgba(239, 239, 239, 0.55) 38.42%,
+        rgba(255, 255, 255, 0.81) 70.6%
+    );
+    --quest-info-wrap-shadow: transparent;
+    --quest-points-wrap-bg: linear-gradient(180deg, rgba(255, 255, 255, 0) 48.05%, rgba(255, 255, 255, 0.2) 48.9%),
+        linear-gradient(183deg, rgba(255, 255, 255, 0.71) -76.36%, #fff 85.48%, rgba(255, 255, 255, 0.59) 128.74%);
+    --quest-points-wrap-shadow: transparent;
+    --quest-points-wrap-color: #000;
+    --quest-points-wrap-span-color: #000;
+    --offer-btn-color: #de5947;
+    --offer-title-main-color: #494949;
+    --tabs-bg: #ffffff;
+    --invert-img: invert(1);
+
+    --wallet-box-bg: #ffffff;
+    --wallet-online-color: #161616;
+    --wallet-connected-bg: #fff;
+    --wallet-connected-border-color: #e3e3e3;
+    --selected-wallet-color: #29b6f6;
+    --token-display-bg: #f6f6f6;
+
+    --main-content-border-color: transparent;
     // Add other light theme variables as needed
 }

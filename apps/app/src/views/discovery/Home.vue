@@ -9,11 +9,14 @@
                     <div v-if="selectedPart === 'leaderboard'" class="w-100 leaderboard-mobile">
                         <BaseQuestLeaderboardSmall :selected-part="selectedPart" />
                     </div>
-                    <div v-if="selectedPart === 'wallet'">
+                    <div v-if="selectedPart === 'wallet'" class="h-100 leaderboard-mobile">
                         <BaseCardRewards />
                     </div>
                     <div v-if="selectedPart === 'transactions'" class="h-100 leaderboard-mobile">
                         <Transactions />
+                    </div>
+                    <div v-if="selectedPart === 'about'" class="h-100 leaderboard-mobile">
+                        <AboutQuests />
                     </div>
                 </div>
             </div>
@@ -66,6 +69,7 @@ import * as html from 'html-entities';
 import { defineComponent } from 'vue';
 import Quests from '@thxnetwork/app/components/Quests.vue';
 import { useTrackPageview } from '@thxnetwork/app/utils/snowplowTracker';
+import AboutQuests from '@thxnetwork/app/components/new-ui/AboutQuests.vue';
 const CACHE_EXPIRY = 1000 * 60 * 60 * 24 * 7;
 
 export default defineComponent({
@@ -475,11 +479,9 @@ export default defineComponent({
 
 .main-content {
     flex-grow: 1;
-    border: 1px solid var(--main-content-border);
-    border-radius: 10px;
-    margin: 16px 0;
-    background: var(--main-content-bg);
+    padding: 16px 0 16px 16px;
     overflow: hidden;
+    border-top: 1px solid var(--main-content-border-color);
 }
 .component-wrap {
     height: 100%;
@@ -492,7 +494,7 @@ export default defineComponent({
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: unset;
 }
 @media (max-width: 424px) {
     .campaigns-box {
@@ -530,6 +532,7 @@ export default defineComponent({
         background: transparent;
         border: none;
         margin-top: 0;
+        padding-left: 0;
         // margin-bottom: 98px;
         // overflow: hidden;
     }
@@ -546,6 +549,9 @@ export default defineComponent({
     .components-wrap {
         min-height: inherit;
         height: auto;
+    }
+    .leaderboard-mobile {
+        margin-top: 15px;
     }
 }
 </style>

@@ -46,6 +46,7 @@ export default defineComponent({
                 { name: 'leaderboard', label: 'Leaderboard' },
                 { name: 'wallet', label: 'Wallet' },
                 { name: 'transactions', label: 'Transactions' },
+                { name: 'about', label: 'About' },
             ],
             aptosBanner: null,
         };
@@ -117,6 +118,9 @@ export default defineComponent({
 [data-theme='dark'] .sidebar-icon-transactions {
     background-image: url('/src/assets/transaction.png');
 }
+[data-theme='dark'] .sidebar-icon-about {
+    background-image: url('/src/assets/about.png');
+}
 
 .sidebar-icon-quests {
     background-image: url('/src/assets/quest-light.png');
@@ -132,5 +136,8 @@ export default defineComponent({
 }
 .sidebar-icon-transactions {
     background-image: url('/src/assets/transaction-light.png');
+}
+.sidebar-icon-about {
+    background-image: url('/src/assets/about-light.png');
 }
 </style>

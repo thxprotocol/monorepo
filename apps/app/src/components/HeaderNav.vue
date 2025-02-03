@@ -9,8 +9,12 @@
                 <img :src="rewardsIcon" alt="rewards" width="40" height="40" />
                 <h1 class="m-0 fs-3 fw-bold" :class="{ 'hide-on-small': !showHeaderTitle }">Rewards</h1>
             </div>
+        </div>
 
-            <div class="d-flex gap-3 balance-wrap media-header-third">
+        <div class="d-flex gap-3 align-items-center">
+            <!-- <BaseCardWalletInfo @list-updated="updateHeaderVisibility" /> -->
+            <!-- <BaseDropdownWallets /> -->
+            <div class="d-flex gap-2 balance-wrap media-header-third">
                 <div class="balance-box">
                     <h2>Santa <span class="d-block">Points</span></h2>
                     <div class="d-flex align-items-center">
@@ -23,13 +27,8 @@
                     <p>${{ numberWithCommas(formattedBalance(participantCPState, CP_CAMPAIGN)) }}</p>
                 </div>
             </div>
-        </div>
-
-        <div class="d-flex gap-2 media-header-second">
-            <!-- <BaseCardWalletInfo @list-updated="updateHeaderVisibility" /> -->
-            <BaseDropdownWallets />
             <div
-                class="d-flex align-items-center justify-content-between name-avatar"
+                class="d-flex align-items-center justify-content-between name-avatar media-header-second"
                 @click="accountStore.isModalAccountShown = true"
             >
                 <h2 class="username">
@@ -172,12 +171,11 @@ export default defineComponent({
     background: transparent;
     padding-right: 50px;
     padding-bottom: 17px;
-    border-bottom: 1px solid var(--quest-daily-item-bg);
     width: auto !important;
 }
 
 .header-nav h2 {
-    color: #f5f5f5;
+    color: var(--balance-box-color);
     font-feature-settings: 'clig' off, 'liga' off;
     font-size: 12px;
     font-style: italic;
@@ -189,9 +187,9 @@ export default defineComponent({
 }
 
 .header-nav p {
-    color: #f5f5f5;
+    color: var(--balance-box-amount-color);
     font-feature-settings: 'clig' off, 'liga' off;
-    font-size: 20px;
+    font-size: 15px;
     font-style: normal;
     font-weight: 600;
     line-height: 16px;
@@ -201,6 +199,7 @@ export default defineComponent({
 
 .b-avatar-header {
     border: 2px dotted #064f17;
+    margin-left: 2px;
 }
 
 .name-avatar {
@@ -220,6 +219,7 @@ export default defineComponent({
     padding-right: 2px !important;
 }
 .username {
+    color: #fff !important;
     padding-left: 10px;
     max-width: 160px;
     white-space: nowrap;
@@ -251,6 +251,8 @@ export default defineComponent({
     background: var(--balance-box-bg);
     border-radius: 8px;
     padding: 0 12px;
+    box-shadow: var(--balance-box-shadow);
+    border: 0.5px solid var(--balance-box-border-color);
 }
 .balance-box::before {
     content: '';
@@ -326,7 +328,8 @@ export default defineComponent({
         order: 2;
         position: absolute;
         right: 0;
-        //margin-right: 1rem;
+        top: 0;
+        width: 100px;
     }
     .media-header-third {
         order: 3;
@@ -337,6 +340,7 @@ export default defineComponent({
     }
     .balance-wrap {
         padding-right: 0;
+        margin-top: 14px;
     }
 }
 @media (max-width: 527px) {
@@ -345,12 +349,7 @@ export default defineComponent({
     }
 }
 
-@media (max-width: 426px) {
-    .username {
-        max-width: 80px;
-    }
-}
-@media (max-width: 350px) {
+@media (max-width: 320px) {
     .media-header-first h1 {
         display: none;
     }

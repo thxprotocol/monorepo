@@ -84,6 +84,10 @@ export default defineComponent({
                     key: 'transactions',
                     label: 'Transactions',
                 },
+                {
+                    key: 'about',
+                    label: 'About',
+                },
             ];
 
             if (this.accountStore.isMobile) {
@@ -175,6 +179,10 @@ export default defineComponent({
 .navbar-icon-transactions {
     background-image: url('/src/assets/transaction-light.png');
 }
+.navbar-icon-about {
+    margin-left: 4px;
+    background-image: url('/src/assets/about-light.png');
+}
 
 /* Dark Theme Icons */
 [data-theme='dark'] .navbar-icon-quests {
@@ -191,5 +199,9 @@ export default defineComponent({
 }
 [data-theme='dark'] .navbar-icon-transactions {
     background-image: url('/src/assets/transaction.png');
+}
+[data-theme='dark'] .navbar-icon-about {
+    margin-left: 4px;
+    background-image: url('/src/assets/about.png');
 }
 </style>

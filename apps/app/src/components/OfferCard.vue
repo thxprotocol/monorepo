@@ -9,7 +9,7 @@
             </div>
         </div> -->
 
-        <b-collapse v-model="isVisible" class="h-100 d-flex flex-column">
+        <b-collapse v-model="isVisible" class="h-100 d-flex flex-column" @click="openModal">
             <div class="d-flex justify-content-center w-100 offer-card-img">
                 <img
                     v-if="offer.imageUrl"
@@ -46,9 +46,7 @@
                     </div>
                 </div> -->
             </div>
-            <button variant="primary" block class="w-100 mb-1 offer-btn btn-primary" target="_blank" @click="openModal">
-                Earn ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
-            </button>
+            <div class="offer-btn">${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}</div>
         </b-collapse>
         <b-modal v-model="showModal" size="lg" hide-footer hide-header centered>
             <div class="offer-wrap">
@@ -308,17 +306,18 @@ export default defineComponent({
     opacity: 0.75;
 }
 .offer-btn {
-    outline: none;
-    border-radius: 5px;
-    background: linear-gradient(290deg, #b13030 30.17%, #de5947 97.55%);
-    border: none;
-    padding: 7px 0;
+    color: var(--offer-btn-color);
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 14px;
+    text-align: center;
 }
 .my-offer-card {
     background: var(--quest-item-bg);
     padding: 10px;
     height: 100%;
-    min-height: 265px;
 }
 .modal-content {
     background-color: var(--modal-bg);
@@ -336,7 +335,7 @@ export default defineComponent({
 .placeholder {
     background-color: #8e8e8e;
     width: 100%;
-    height: 162px;
+    height: 96px;
     border-radius: 4px;
 }
 
@@ -365,12 +364,18 @@ export default defineComponent({
     width: 20px;
     height: 15px;
 }
+.offer-title-main {
+    -webkit-line-clamp: 1 !important;
+    color: var(--offer-title-main-color);
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
 @media (max-width: 1400px) {
     .my-offer-card {
         min-height: unset;
-    }
-    .offer-title-main {
-        -webkit-line-clamp: 1 !important;
     }
 }
 @media (max-width: 992px) {
@@ -391,9 +396,6 @@ export default defineComponent({
     .modal-info-wrap {
         flex: 1;
         overflow: hidden;
-    }
-    .offer-title-main {
-        -webkit-line-clamp: 2 !important;
     }
 }
 </style>

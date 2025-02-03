@@ -3,7 +3,7 @@
         v-if="selectedPart === 'leaderboard'"
         header-class="p-0"
         body-class="d-flex flex-column pt-0"
-        class="leaderboard-wrapper mt-4"
+        class="leaderboard-wrapper"
     >
         <b-card-title class="d-flex m-0 align-items-center">
             <!-- <div class="d-flex align-items-center justify-content-center" style=""> -->
@@ -226,12 +226,11 @@ export default defineComponent({
 }
 
 .leaderboard-wrapper .card-title {
-    padding-left: 20px;
     padding-bottom: 18px;
 }
 
 .leaderboard-wrapper .list-group {
-    margin: 13.5px 20px;
+    margin: 13.5px 0;
 }
 .skeleton-loader {
     display: flex;
@@ -365,9 +364,13 @@ export default defineComponent({
         overflow-y: auto;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
+        margin: 13.5px 0;
     }
     .list-group-item {
         padding-left: 30px !important;
+    }
+    .leaderboard-wrapper .card-title {
+        padding-left: 0;
     }
 }
 @media (max-width: 420px) {
