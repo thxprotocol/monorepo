@@ -267,33 +267,38 @@ class SafeService {
             logger.debug('Safe TX Executed');
         } else if (wallet.chainId == ChainId.Sui) {
             await tx.updateOne({ state: TransactionState.Executed });
-            const client = new SuiClient({ url: SUI_NODE_URL });
-            const { signer } = NetworkService.getProvider(wallet.chainId);
-            const safeTx = new SuiTransaction();
-            safeTx.transferObjects([coinWithBalance({ balance: tx.amount, type: tx.to })], wallet.address);
-            safeTx.setSender(tx.data);
-            const bytes = await safeTx.build({ client: client });
-            const signature = (await signer.signTransaction(bytes)).signature;
-            const multiSigPublicKey = MultiSigPublicKey.fromPublicKeys({
-                threshold: 1,
-                publicKeys: [
-                    {
-                        publicKey: signer.getPublicKey(),
-                        weight: 1,
+            try {
+                const client = new SuiClient({ url: SUI_NODE_URL });
+                const { signer } = NetworkService.getProvider(wallet.chainId);
+                const safeTx = new SuiTransaction();
+                safeTx.transferObjects([coinWithBalance({ balance: tx.amount, type: tx.to })], wallet.address);
+                safeTx.setSender(tx.data);
+                const bytes = await safeTx.build({ client: client });
+                const signature = (await signer.signTransaction(bytes)).signature;
+                const multiSigPublicKey = MultiSigPublicKey.fromPublicKeys({
+                    threshold: 1,
+                    publicKeys: [
+                        {
+                            publicKey: signer.getPublicKey(),
+                            weight: 1,
+                        },
+                    ],
+                });
+                const combinedSignature = multiSigPublicKey.combinePartialSignatures([signature]);
+                const result = await client.executeTransactionBlock({
+                    transactionBlock: bytes,
+                    signature: combinedSignature,
+                    requestType: 'WaitForLocalExecution',
+                    options: {
+                        showEffects: true,
                     },
-                ],
-            });
-            const combinedSignature = multiSigPublicKey.combinePartialSignatures([signature]);
-            const result = await client.executeTransactionBlock({
-                transactionBlock: bytes,
-                signature: combinedSignature,
-                requestType: 'WaitForLocalExecution',
-                options: {
-                    showEffects: true,
-                },
-            });
-            await tx.updateOne({ state: TransactionState.Mined });
-            logger.debug('Safe TX Executed');
+                });
+                await tx.updateOne({ state: TransactionState.Mined });
+                logger.debug('Safe TX Executed');
+            } catch (error) {
+                await tx.updateOne({ state: TransactionState.Queued });
+                logger.debug('Safe TX Execution Failed!');
+            }
         } else if (wallet.chainId == ChainId.Solana) {
             await tx.updateOne({ state: TransactionState.Executed });
             const { signer, connection } = NetworkService.getProvider(wallet.chainId);
