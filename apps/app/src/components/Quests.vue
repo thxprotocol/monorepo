@@ -522,9 +522,7 @@ export default defineComponent({
                 { title: 'Other Quests', quests: otherQuests },
             ];
 
-            const availableGroups = groupedQuests
-                .map((group) => ({ ...group, quests: group.quests.filter((quest) => quest.isAvailable) }))
-                .filter((group) => group.quests.length);
+            const availableGroups = groupedQuests.filter((group) => group.quests.some((quest) => quest.isAvailable));
 
             const merged = [];
             let offerIndex = 0;
