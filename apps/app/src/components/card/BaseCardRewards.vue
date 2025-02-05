@@ -116,7 +116,7 @@
 
                         <div
                             class="d-flex flex-column wallet-connected w-100"
-                            :class="{ 'd-none': !walletStore.wallets.length || !isListShown }"
+                            :class="{ 'd-none': !walletStore.wallets.length }"
                         >
                             <div class="d-flex justify-content-between px-2 wallet-text">
                                 <span class="selected-wallet">{{ walletStore?.wallet?.short }}</span>
@@ -248,7 +248,23 @@ export default defineComponent({
             return this.list.length;
         },
         twoTokens() {
-            return this.list.filter((token) => token.erc20.symbol === 'USDC' || token.erc20.symbol === 'USDT');
+            const tokens = this.list.filter((token) => token.erc20.symbol === 'USDC' || token.erc20.symbol === 'USDT');
+
+            if (!tokens.some((t) => t.erc20.symbol === 'USDC')) {
+                tokens.push({
+                    erc20: { symbol: 'USDC' },
+                    walletBalance: 0,
+                });
+            }
+
+            if (!tokens.some((t) => t.erc20.symbol === 'USDT')) {
+                tokens.push({
+                    erc20: { symbol: 'USDT' },
+                    walletBalance: 0,
+                });
+            }
+
+            return tokens;
         },
     },
     watch: {
