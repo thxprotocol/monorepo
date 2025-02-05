@@ -81,17 +81,20 @@ export default defineComponent({
         },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
-                // if (!window.okxwallet) {
-                //     if (this.isMobile()) {
-                //         window.open('https://www.okx.com/download', '_blank');
-                //     } else {
-                //         window.open(
-                //             'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
-                //             '_blank',
-                //         );
-                //     }
-                //     return;
-                // }
+                if (this.isMobile()) {
+                    const dappUrl = window.location.href;
+                    const encodedDappUrl = encodeURIComponent(dappUrl);
+                    const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
+                    window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
+                } else {
+                    if (!window.okxwallet) {
+                        window.open(
+                            'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
+                            '_blank',
+                        );
+                        return;
+                    }
+                }
                 try {
                     await window.okxwallet.aptos.disconnect();
                 } catch (error) {
