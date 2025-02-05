@@ -21,7 +21,7 @@
                 </b-form-select-option>
             </b-form-select>
             <template #append>
-                <b-button variant="primary" class="rounded" @click="onClickAdd">
+                <b-button variant="primary" class="rounded" style="padding: 0.75rem" @click="onClickAdd">
                     <i class="fas fa-plus"></i>
                 </b-button>
             </template>

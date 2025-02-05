@@ -170,7 +170,7 @@ export default defineComponent({
     position: relative;
     background: transparent;
     padding-right: 50px;
-    padding-bottom: 17px;
+    padding-bottom: 10px;
     width: auto !important;
 }
 

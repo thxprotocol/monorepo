@@ -479,7 +479,7 @@ export default defineComponent({
 
 .main-content {
     flex-grow: 1;
-    padding: 16px 0 16px 16px;
+    padding: 8px 0 16px 16px;
     overflow: hidden;
     border-top: 1px solid var(--main-content-border-color);
 }

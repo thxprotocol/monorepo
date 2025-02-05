@@ -503,6 +503,15 @@ export default defineComponent({
                 }
             });
 
+            santaQuests.sort((a, b) => {
+                if (a.variant === QuestVariant.Daily && b.variant !== QuestVariant.Daily) {
+                    return -1;
+                } else if (a.variant !== QuestVariant.Daily && b.variant === QuestVariant.Daily) {
+                    return 1;
+                }
+                return 0;
+            });
+
             xQuests.sort((a: any, b: any) => a.amount - b.amount);
 
             const groupedQuests = [
@@ -513,29 +522,31 @@ export default defineComponent({
                 { title: 'Other Quests', quests: otherQuests },
             ];
 
+            const availableGroups = groupedQuests
+                .map((group) => ({ ...group, quests: group.quests.filter((quest) => quest.isAvailable) }))
+                .filter((group) => group.quests.length);
+
             const merged = [];
             let offerIndex = 0;
 
-            groupedQuests.forEach((group) => {
-                if (group.quests.length) {
-                    merged.push(group);
+            availableGroups.forEach((group, index) => {
+                merged.push(group);
 
-                    if (offerIndex < this.offers.length) {
-                        const offersForGroup = this.offers.slice(offerIndex, offerIndex + this.offersPerRow);
-                        merged.push({
-                            title: 'Top Performing Offers',
-                            isOfferRow: true,
-                            offers: offersForGroup,
-                        });
-                        offerIndex += this.offersPerRow;
-                    }
+                if (index < availableGroups.length - 1 && offerIndex < this.offers.length) {
+                    const offersForGroup = this.offers.slice(offerIndex, offerIndex + this.offersPerRow);
+                    merged.push({
+                        title: 'Top Performing Offers',
+                        isOfferRow: true,
+                        offers: offersForGroup,
+                    });
+                    offerIndex += this.offersPerRow;
                 }
             });
 
             if (offerIndex < this.offers.length) {
                 const remainingOffers = this.offers.slice(offerIndex);
                 merged.push({
-                    title: '',
+                    title: 'Top Performing Offers',
                     isOfferRow: true,
                     offers: remainingOffers,
                 });
