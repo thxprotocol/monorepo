@@ -73,6 +73,8 @@ export default defineComponent({
     font-weight: 500;
     border-radius: 5px;
     box-shadow: var(--balance-box-shadow);
+    padding: 7px 0px;
+    cursor: default !important;
 }
 .locked-btn:hover,
 .locked-btn:focus,

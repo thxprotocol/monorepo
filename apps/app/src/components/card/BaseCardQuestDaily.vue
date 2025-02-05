@@ -23,7 +23,7 @@
             </b-badge>
         </div>
         <template #button>
-            <b-button
+            <button
                 block
                 :class="
                     quest.isLocked || !quest.isAvailable || isSubmitting
@@ -43,7 +43,7 @@
                         >:<strong>{{ waitDuration.seconds }}</strong></span
                     >
                 </template>
-            </b-button>
+            </button>
         </template>
     </BaseCardQuest>
 </template>

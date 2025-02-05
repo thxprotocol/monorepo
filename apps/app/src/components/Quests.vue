@@ -808,6 +808,7 @@ export default defineComponent({
     color: #ffffff;
     transition: background 0.15s ease-in-out, border-color 0.3s ease;
     z-index: 0;
+    padding: 7px 2px;
 }
 .btn-primary::before {
     content: '';

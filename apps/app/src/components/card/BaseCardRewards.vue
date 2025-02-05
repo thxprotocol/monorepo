@@ -24,7 +24,7 @@
             </b-dropdown> -->
         </div>
         <div v-if="accountStore.isAuthenticated" class="d-flex h-wallet h-100">
-            <div v-if="walletStore.isLoading || !walletStore.wallets.length || !isListShown" class="spinner-container">
+            <div v-if="walletStore.isLoading" class="spinner-container">
                 <b-spinner variant="primary" small />
             </div>
             <div v-else class="d-flex w-100">
@@ -43,14 +43,17 @@
                                 {{ walletStore.wallet.short }}
                             </div>
                         </div>
+                        <div v-else>
+                            <div class="wallet-online-word">Connect Wallet</div>
+                        </div>
                         <button class="new-wallet-btn" @click="walletStore.isModalChainSelectShown = true">
                             + New Wallet
                         </button>
                     </div>
                     <div class="d-flex gap-3 wallet-boxes">
                         <div class="d-flex flex-column wallet-connected w-100">
-                            <div class="wallet-text">Connected Wallets</div>
-                            <div class="d-flex flex-column gap-4 address-list">
+                            <div v-if="walletStore.wallets.length" class="wallet-text">Connected Wallets</div>
+                            <div v-if="walletStore.wallets.length" class="d-flex flex-column gap-4 address-list">
                                 <div
                                     v-for="wallet of walletStore.wallets"
                                     class="d-flex align-items-center wallet-online-word justify-content-between"
@@ -72,68 +75,70 @@
                                         {{ wallet.short }}
                                     </div>
 
-                                    <div>
-                                        <b-button
+                                    <div class="d-flex gap-2">
+                                        <div
                                             v-clipboard:copy="wallet?.address"
                                             v-clipboard:success="() => (isCopied = true)"
-                                            variant="primary"
-                                            size="sm"
-                                            class="ms-2 px-2 p-1"
+                                            class="cursor-pointer"
                                         >
-                                            <i
-                                                class="fas fa-clipboard"
-                                                :class="{ 'fa-clipboard-check': isCopied, 'fa-clipboard': !isCopied }"
-                                                style="font-size: 0.7rem"
+                                            <img
+                                                :src="copyIcon"
+                                                alt="copy"
+                                                height="18"
+                                                width="18"
+                                                class="icon-shadow"
                                             />
-                                        </b-button>
-                                        <b-button
-                                            variant="primary"
-                                            size="sm"
-                                            class="ms-2 px-2 p-1"
+                                        </div>
+                                        <a
                                             :href="
                                                 chainList[walletStore.chainId].blockExplorer +
                                                 '/address/' +
                                                 wallet?.address
                                             "
                                             target="_blank"
+                                            class="cursor-pointer"
                                         >
-                                            <i class="fas fa-external-link-alt" style="font-size: 0.7rem" />
-                                        </b-button>
+                                            <img
+                                                :src="shareIcon"
+                                                alt="share"
+                                                height="18"
+                                                width="18"
+                                                class="icon-shadow"
+                                            />
+                                        </a>
                                     </div>
                                 </div>
                             </div>
+                            <div v-else class="position-absolute top-50 start-50 translate-middle opacity-50">
+                                No Wallet Connected!
+                            </div>
                         </div>
 
-                        <div class="d-flex flex-column wallet-connected w-100">
+                        <div
+                            class="d-flex flex-column wallet-connected w-100"
+                            :class="{ 'd-none': !walletStore.wallets.length || !isListShown }"
+                        >
                             <div class="d-flex justify-content-between px-2 wallet-text">
                                 <span class="selected-wallet">{{ walletStore?.wallet?.short }}</span>
-                                <div>
-                                    <b-button
+                                <div class="d-flex gap-2">
+                                    <div
                                         v-clipboard:copy="walletStore.wallet?.address"
                                         v-clipboard:success="() => (isCopied = true)"
-                                        variant="primary"
-                                        size="sm"
-                                        class="ms-2 px-2 p-1"
+                                        class="cursor-pointer"
                                     >
-                                        <i
-                                            class="fas fa-clipboard"
-                                            :class="{ 'fa-clipboard-check': isCopied, 'fa-clipboard': !isCopied }"
-                                            style="font-size: 0.7rem"
-                                        />
-                                    </b-button>
-                                    <b-button
-                                        variant="primary"
-                                        size="sm"
-                                        class="ms-2 px-2 p-1"
+                                        <img :src="copyIcon" alt="copy" height="18" width="18" class="icon-shadow" />
+                                    </div>
+                                    <a
                                         :href="
                                             chainList[walletStore.chainId].blockExplorer +
                                             '/address/' +
                                             walletStore.wallet?.address
                                         "
                                         target="_blank"
+                                        class="cursor-pointer"
                                     >
-                                        <i class="fas fa-external-link-alt" style="font-size: 0.7rem" />
-                                    </b-button>
+                                        <img :src="shareIcon" alt="share" height="18" width="18" class="icon-shadow" />
+                                    </a>
                                 </div>
                             </div>
 
@@ -175,6 +180,8 @@ import { useTrackPageview } from '@thxnetwork/app/utils/snowplowTracker';
 import onlineEllipse from '@thxnetwork/app/assets/online-ellipse.png';
 import { WalletVariant } from '@thxnetwork/app/types/enums/accountVariant';
 import { chainList } from '@thxnetwork/app/utils/chains';
+import copyIcon from '@thxnetwork/app/assets/copy.png';
+import shareIcon from '@thxnetwork/app/assets/share.png';
 export default defineComponent({
     name: 'BaseViewWallet',
     components: {
@@ -216,6 +223,8 @@ export default defineComponent({
             walletLogoMap,
             chainList,
             isCopied: false,
+            copyIcon,
+            shareIcon,
         };
     },
     computed: {
@@ -369,10 +378,12 @@ export default defineComponent({
     border-bottom: 1px solid var(--wallet-connected-border-color);
 }
 .wallet-connected {
+    position: relative;
     border-radius: 12px;
     border: 1px solid var(--wallet-connected-border-color);
     background: var(--wallet-connected-bg);
     max-width: 360px;
+    min-height: 245px;
 }
 .address-list {
     padding: 12px 20px;
@@ -412,7 +423,10 @@ export default defineComponent({
     left: 50%;
     transform: translate(-50%, -50%);
 }
-
+.icon-shadow {
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+}
 @media (max-width: 992px) {
     .wallet-box {
         height: 100px;

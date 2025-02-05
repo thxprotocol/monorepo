@@ -26,7 +26,7 @@
                 <template v-else>Complete Quest</template>
             </b-button> -->
             <!-- Button to open the modal -->
-            <b-button
+            <button
                 block
                 class="w-100"
                 :class="{
@@ -36,7 +36,7 @@
                 @click="onClickClaim"
             >
                 Claim
-            </b-button>
+            </button>
         </template>
     </BaseCardQuest>
     <b-modal v-model="isModalVisible" centered title="Quest Details" hide-footer @hide="resetModal">

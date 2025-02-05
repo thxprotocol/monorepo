@@ -14,12 +14,20 @@
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </div>
         <template #button>
-            <b-button variant="primary" class="w-100" block @click="buttonAction">
+            <button
+                class="w-100"
+                block
+                :onclick="buttonAction"
+                :class="{
+                    'locked-btn': isSubmitting,
+                    'btn-primary': !isSubmitting,
+                }"
+            >
                 <b-spinner v-if="isSubmitting" small />
                 <template v-else>
                     {{ buttonLabel }}
                 </template>
-            </b-button>
+            </button>
             <!-- <BButtonGroup v-if="!isConnected" block class="w-100">
                 <b-button variant="primary" :disabled="isSubmitting" @click="onClickConnect">
                     <template v-if="isSubmitting">
