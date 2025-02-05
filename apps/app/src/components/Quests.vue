@@ -65,7 +65,7 @@
                     <div class="quests-box">
                         <div v-if="questStore.isLoading || isLoadingOffers" class="d-flex justify-content-center">
                             <div class="w-100 quest-skeleton-group">
-                                <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
+                                <div v-for="n in 10" :key="n" class="quest-skeleton-loader mb-3">
                                     <div class="skeleton-image"></div>
                                     <div class="skeleton-title"></div>
                                     <div class="skeleton-description"></div>
@@ -138,7 +138,7 @@
                     <div class="quests-box">
                         <div v-if="questStore.isLoading" class="d-flex justify-content-center">
                             <div class="w-100 quest-skeleton-group">
-                                <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
+                                <div v-for="n in 10" :key="n" class="quest-skeleton-loader mb-3">
                                     <div class="skeleton-image"></div>
                                     <div class="skeleton-title"></div>
                                     <div class="skeleton-description"></div>
@@ -230,7 +230,7 @@
                             class="d-flex justify-content-center"
                         >
                             <div class="w-100 quest-skeleton-group">
-                                <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
+                                <div v-for="n in 10" :key="n" class="quest-skeleton-loader mb-3">
                                     <div class="skeleton-image"></div>
                                     <div class="skeleton-title"></div>
                                     <div class="skeleton-description"></div>
@@ -257,7 +257,7 @@
                             class="d-flex justify-content-center"
                         >
                             <div class="w-100 quest-skeleton-group">
-                                <div v-for="n in 8" :key="n" class="quest-skeleton-loader mb-3">
+                                <div v-for="n in 10" :key="n" class="quest-skeleton-loader mb-3">
                                     <div class="skeleton-image"></div>
                                     <div class="skeleton-title"></div>
                                     <div class="skeleton-description"></div>
@@ -367,8 +367,8 @@ export default defineComponent({
             selectedSort: { label: 'Default', key: RewardSortVariant.Default },
             activeFilters: [],
             entry: null,
-            offers: [],
-            offersPerRow: 5,
+            offers: [] as any[],
+            offersPerRow: this.calculateOffersPerRow(),
             isLoadingOffers: false,
             selectedQuestFilter: 'all', // initial selection
             questFilters: [
@@ -643,14 +643,12 @@ export default defineComponent({
                 const clid = this.accountStore.account?.providerUserId;
                 this.hashedCode = this.hashClid(clid);
                 const response = await axios.get(
-                    `https://offers-api.santabrowser.com/offers/list?pageSize=15&pageNo=0&clid=${clid}`,
+                    `https://offers-api.santabrowser.com/offers/list?&pageNo=0&clid=${clid}`,
                 );
-                this.offers = response.data.trending
-                    .filter(
-                        (offer: any) =>
-                            offer.imageUrl !== 'https://banners.hangmyads.com/files/uploads/Off_A_86634.png',
-                    )
-                    .slice(0, 15);
+                const trendingOffers = response.data.trending.slice(0, 10);
+                const dataOffers = response.data.data.slice(0, 10);
+
+                this.offers = [...trendingOffers, ...dataOffers];
             } catch (error) {
                 console.error('Failed to fetch offers', error);
             } finally {
@@ -704,6 +702,16 @@ export default defineComponent({
         setActiveRewardTab(index: number) {
             this.activeRewardTab = index;
             this.showRewardTabDropdown = false;
+        },
+
+        calculateOffersPerRow() {
+            const containerWidth = window.innerWidth;
+            if (containerWidth > 1560) return 8;
+            if (containerWidth > 1400) return 7;
+            if (containerWidth > 1240) return 6;
+            if (containerWidth > 1080) return 5;
+            if (containerWidth > 992) return 4;
+            if (containerWidth < 992) return 10;
         },
     },
 });
@@ -966,6 +974,12 @@ export default defineComponent({
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     //margin-bottom: 15px;
+    transition: transform 0.3s ease-in-out;
+
+    &:hover {
+        transform: scale(1.02);
+        cursor: pointer;
+    }
     .card {
         border: 0 !important;
         border-radius: 10px !important;
@@ -1020,7 +1034,7 @@ export default defineComponent({
 }
 .quest-skeleton-group {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
 }
 

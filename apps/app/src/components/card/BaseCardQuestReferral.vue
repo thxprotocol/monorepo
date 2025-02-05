@@ -19,13 +19,7 @@
             <div></div>
 
             <div class="d-flex flex-column flex-grow-1 quest-info-wrap">
-                <div class="d-flex align-items-start">
-                    <b-card-text
-                        class="quest-title-main"
-                        :style="titleStyle"
-                        v-html="decodeHTML(referral || 'https://santabrowser.com')"
-                    />
-                </div>
+                <div class="d-flex align-items-start"></div>
                 <slot></slot>
                 <div class="quest-card-btns">
                     <transition name="fade">

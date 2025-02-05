@@ -20,6 +20,10 @@
                     width="100"
                 />
                 <div v-else class="placeholder"></div>
+
+                <div class="position-absolute bottom-0 end-0 text-uppercase offer-category">
+                    {{ offer.categories && offer.categories.length ? offer.categories[0] : '' }}
+                </div>
                 <div v-if="filteredPlatforms.length" class="corner-icons">
                     <span v-for="(platform, index) in filteredPlatforms" :key="index">
                         <i :class="getPlatformIcon(platform)" class="d-flex justify-content-center"></i>
@@ -71,9 +75,16 @@
                                 ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
                             </p>
                             <p class="offer-provider">{{ offer.provider }}</p>
-                            <p class="offer-categories">
+                            <p v-if="offer.categories" class="offer-categories">
                                 <span v-for="category in offer.categories" :key="category" class="me-1">
                                     {{ category }}
+                                </span>
+                            </p>
+                            <p v-else class="offer-categories">
+                                <span v-if="offer.platforms">
+                                    <span v-for="platform in offer.platforms" :key="platform" class="me-1">
+                                        {{ platform }}
+                                    </span>
                                 </span>
                             </p>
                         </div>
@@ -372,6 +383,12 @@ export default defineComponent({
     font-style: normal;
     font-weight: 500;
     line-height: normal;
+}
+.offer-category {
+    background: var(--offers-tag-bg);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 10px;
 }
 @media (max-width: 1400px) {
     .my-offer-card {
