@@ -522,15 +522,15 @@ export default defineComponent({
                 { title: 'Other Quests', quests: otherQuests },
             ];
 
-            const availableGroups = groupedQuests.filter((group) => group.quests.some((quest) => quest.isAvailable));
-
             const merged = [];
             let offerIndex = 0;
 
-            availableGroups.forEach((group, index) => {
+            groupedQuests.forEach((group, index) => {
+                const hasAvailableQuests = group.quests.some((quest) => quest.isAvailable);
+
                 merged.push(group);
 
-                if (index < availableGroups.length - 1 && offerIndex < this.offers.length) {
+                if (hasAvailableQuests && index < groupedQuests.length - 2 && offerIndex < this.offers.length) {
                     const offersForGroup = this.offers.slice(offerIndex, offerIndex + this.offersPerRow);
                     merged.push({
                         title: 'Top Performing Offers',
