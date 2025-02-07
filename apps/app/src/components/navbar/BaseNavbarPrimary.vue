@@ -91,10 +91,13 @@ export default defineComponent({
             ];
 
             if (this.accountStore.isMobile) {
-                items.push({
-                    key: 'wallet',
-                    label: 'Wallet',
-                });
+                const transactionsIndex = items.findIndex((item) => item.key === 'transactions');
+                if (transactionsIndex !== -1) {
+                    items.splice(transactionsIndex + 1, 0, {
+                        key: 'wallet',
+                        label: 'Wallet',
+                    });
+                }
             }
 
             return items;

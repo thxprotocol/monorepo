@@ -91,24 +91,18 @@ export default defineComponent({
         // Apply the initial theme
         document.documentElement.setAttribute('data-theme', initialTheme);
         this.currentTheme = initialTheme;
-
-        console.log('Initial Theme Applied!!:', initialTheme);
     },
     async mounted() {
         const urlParams = new URLSearchParams(window.location.search);
-        let clid: string | null = null;
+        let clid = await this.getClidFromExtension();
 
-        const clidFromCookies = this.getCookieReduce('clid');
-
-        if (!clidFromCookies) {
-            clid = await this.getClidFromExtension();
-
-            if (!clid) {
-                const urlParams = new URLSearchParams(window.location.search);
+        if (!clid) {
+            const clidFromCookies = this.getCookieReduce('clid');
+            if (clidFromCookies) {
+                clid = clidFromCookies;
+            } else {
                 clid = urlParams.get('clid');
             }
-        } else {
-            clid = clidFromCookies;
         }
 
         const user = this.accountStore.isAuthenticated;
