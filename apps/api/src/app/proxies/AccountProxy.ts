@@ -93,7 +93,7 @@ class AccountProxy {
             // Find the account for the email used in the OTP flow
             case AccountVariant.EmailPassword:
                 email = user_metadata.email;
-                providerUserId =  user_metadata.address;
+                providerUserId = user_metadata.address;
                 account = await this.findByEmail(email);
                 break;
             // Find the account for the address stored in authenticated user metadata
@@ -119,7 +119,6 @@ class AccountProxy {
 
         // If all of the above are skipped we create a new account
         if (!account) {
-          console.log('in ----------------------------------------------')
             account = await this.create({
                 username: await this.genName(),
                 variant,
@@ -145,19 +144,18 @@ class AccountProxy {
         };
     }
 
-  private async genName() {
-    const username = generateUsername("", 2, 14);
-    const isUsed = await Account.exists({
-      username: username,
-    });
-    if (isUsed) {
-      this.genName()
+    private async genName() {
+        const username = generateUsername('', 2, 14);
+        const isUsed = await Account.exists({
+            username: username,
+        });
+        if (isUsed) {
+            this.genName();
+        }
+        return username;
     }
-    return username;
-  }
 
-
-  private async findTokensBySub(sub: string) {
+    private async findTokensBySub(sub: string) {
         const tokens = await Token.find({ sub });
         return (
             tokens
@@ -286,6 +284,19 @@ class AccountProxy {
 
     remove(sub: string) {
         return Account.findByIdAndDelete(sub);
+    }
+
+    async checkReferral(sub: string) {
+        const account = await Account.findById(sub);
+        if (!account) throw new NotFoundError('Account not found.');
+
+        // Create a SHA1 hash of the clid
+        const sha1Hash = crypto.createHash('sha1').update(Buffer.from(account.providerUserId, 'utf-8')).digest('hex');
+        // Take the substring from position 6 to 20
+        const substring = sha1Hash.substring(6, 20);
+        await account.updateOne({ referralCode: substring });
+
+        return { referralCode: substring, inviter: account.inviter };
     }
 }
 

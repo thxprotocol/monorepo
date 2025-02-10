@@ -67,6 +67,8 @@ type TAccountState = {
     leaderboard: { rank: number; score: number; questEntryCount: number; account: TAccount }[];
     leaderboardPrimary: { rank: number; score: number; questEntryCount: number; account: TAccount }[];
     isNavbarOffcanvasShown: boolean;
+    referralCode: string | null;
+    inviter: string | null;
 };
 
 type TWidgetTheme = {

@@ -25,6 +25,8 @@ const accountSchema = new mongoose.Schema(
         identity: String,
         goal: [String],
         providerUserId: { type: String, unique: true, sparse: true },
+        referralCode: String,
+        inviter: String,
     },
     { timestamps: true },
 );

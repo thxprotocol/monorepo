@@ -46,6 +46,8 @@ export const useAccountStore = defineStore('account', {
         isMobileIFrame: window.top !== window.self && isMobileDevice,
         isMobileEthereumBrowser: window.ethereum && isMobileDevice,
         isNavbarOffcanvasShown: false,
+        referralCode: null,
+        inviter: null,
     }),
     actions: {
         setGlobals(config: { activeWalletId: string }) {
@@ -148,6 +150,10 @@ export const useAccountStore = defineStore('account', {
         },
         async getAccount() {
             this.account = await this.api.request.get('/v1/account');
+            console.log(this.account);
+            const result = await this.api.request.get('/v1/account/referral');
+            this.referralCode = result.referralCode;
+            this.inviter = result.inviter;
             // if (
             //     this.account &&
             //     (!this.account.username || this.account.profileImg.startsWith('https://api.dicebear.com'))

@@ -19,11 +19,19 @@
             <div></div>
 
             <div class="d-flex flex-column flex-grow-1 quest-info-wrap">
-                <div class="d-flex align-items-start"></div>
+                <div class="d-flex align-items-start">
+                    <input v-model="referralCode" type="text" placeholder="Enter text" />
+                </div>
                 <slot></slot>
                 <div class="quest-card-btns">
                     <transition name="fade">
-                        <b-button variant="primary" block class="w-100" :disabled="copyInProgress" @click="onClickCopy">
+                        <b-button
+                            variant="primary"
+                            block
+                            class="w-100"
+                            :disabled="isButtonDisabled"
+                            @click="onClickCopy"
+                        >
                             {{ copyButtonText }}
                             <i :class="copyButtonIcon" aria-hidden="true"></i>
                         </b-button>
@@ -43,6 +51,7 @@ import { useQuestStore } from '../../stores/Quest';
 import { useAuthStore } from '../../stores/Auth';
 import { decodeHTML } from '@thxnetwork/app/utils/decode-html';
 import { QuestVariant } from '@thxnetwork/sdk/types/enums';
+import { SANTA_CAMPAIGN, CP_CAMPAIGN } from '@thxnetwork/app/config/secrets';
 import hrDivider from '../../assets/hr-line.png';
 export default defineComponent({
     name: 'BaseCardQuestReferral',
@@ -71,6 +80,8 @@ export default defineComponent({
             copyButtonText: 'Copy Link',
             copyButtonIcon: 'fas fa-copy',
             copyInProgress: false,
+            referralCode: '',
+            SANTA_CAMPAIGN,
         };
     },
     computed: {
@@ -87,6 +98,9 @@ export default defineComponent({
                 return { width: '100%' };
             }
         },
+        isButtonDisabled() {
+            return this.accountStore.inviter !== undefined; // Disable button if inviter is not empty
+        },
     },
     watch: {
         visible(value: boolean) {
@@ -100,19 +114,23 @@ export default defineComponent({
         onClickLink(url: string) {
             window.open(url, '_blank');
         },
-        onClickCopy() {
-            navigator.clipboard.writeText(this.referral || 'https://santabrowser.com').then(() => {
-                // Change button to "Copied!"
-                this.copyButtonText = 'Copied';
-                this.copyButtonIcon = 'fas fa-check';
-                this.copyInProgress = true;
-                // Revert after 2 seconds
-                setTimeout(() => {
-                    this.copyButtonText = 'Copy Link';
-                    this.copyButtonIcon = 'fas fa-copy';
-                    this.copyInProgress = false;
-                }, 2000);
+        async onClickCopy() {
+            const { api } = useAccountStore();
+            await api.request.post('/v1/account/referral', {
+                data: { inviter: this.referralCode, poolId: SANTA_CAMPAIGN },
             });
+            // navigator.clipboard.writeText(this.referral || 'https://santabrowser.com').then(() => {
+            //     // Change button to "Copied!"
+            //     this.copyButtonText = 'Copied';
+            //     this.copyButtonIcon = 'fas fa-check';
+            //     this.copyInProgress = true;
+            //     // Revert after 2 seconds
+            //     setTimeout(() => {
+            //         this.copyButtonText = 'Copy Link';
+            //         this.copyButtonIcon = 'fas fa-copy';
+            //         this.copyInProgress = false;
+            //     }, 2000);
+            // });
         },
     },
 });

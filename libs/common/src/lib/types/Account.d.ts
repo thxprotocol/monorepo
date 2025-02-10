@@ -24,4 +24,6 @@ type TAccount = {
     updatedAt: Date;
     clid: string;
     providerUserId: string;
+    referralCode: string;
+    inviter: string;
 };

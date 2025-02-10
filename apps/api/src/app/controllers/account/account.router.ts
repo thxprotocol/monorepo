@@ -17,6 +17,10 @@ import * as CreateTwitterUser from './twitter/user/post.controller';
 import * as CreateTwitterSearch from './twitter/search/post.controller';
 import * as CreateTwitterUserByUsername from './twitter/user/by/username/post.controller';
 
+//Referral
+import GetReferral from './invite/get.controller';
+import PostReferral from './invite/post.controller';
+
 // Dashboard routes
 import RouterInvoices from './invoices/invoices.router';
 import RouterClients from './developer/clients/clients.router';
@@ -34,6 +38,10 @@ router.use('/developer/clients', RouterClients); // Done
 router.use('/developer/events', RouterEvents);
 router.use('/developer/identities', RouterIdentities);
 router.use('/developer/webhooks', RouterWebhooks);
+
+// Referral routes
+router.get('/referral', GetReferral.controller);
+router.post('/referral', assertRequestInput(PostReferral.validation), PostReferral.controller);
 
 // App routes
 router.use('/wallets', RouterWallet);
