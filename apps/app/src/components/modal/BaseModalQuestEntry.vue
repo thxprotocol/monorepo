@@ -146,6 +146,7 @@ export default defineComponent({
         async onClickContinue() {
             try {
                 this.isSubmitting = true;
+                await this.accountStore.getAccount();
                 await this.accountStore.getParticipants();
                 this.questStore.list(SANTA_CAMPAIGN);
                 this.$emit('hidden');

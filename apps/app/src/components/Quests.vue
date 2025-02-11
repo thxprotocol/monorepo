@@ -105,7 +105,7 @@
                                             />
                                         </div>
                                         <div
-                                            v-if="group.title === 'Santa\'s Quests'"
+                                            v-if="group.title === 'Santa\'s Quests' && !referralClaimed"
                                             class="quest-item quest-group-item"
                                         >
                                             <BaseCardQuestReferral
@@ -162,6 +162,16 @@
                             >
                                 <h3 class="quest-group-title">{{ group.title }}</h3>
                                 <div class="quest-group">
+                                    <div v-if="group.title === 'Santa\'s Quests'" class="quest-item quest-group-item">
+                                        <BaseCardQuestReferral
+                                            v-if="referralClaimed"
+                                            :completed="true"
+                                            :referral="
+                                                'https://santabrowser.com/download?install_referrer=' + hashedCode
+                                            "
+                                            :imageurl="'https://thx-public.s3.ap-south-1.amazonaws.com/newreferral-neGnhMMfjymfApS8jx7BaJ.jpg'"
+                                        />
+                                    </div>
                                     <div
                                         v-for="quest in group.quests"
                                         :key="quest._id"
@@ -430,6 +440,9 @@ export default defineComponent({
         userManager() {
             return useAuthStore().userManager;
         },
+        referralClaimed() {
+            return !!this.accountStore.inviter;
+        },
         // mergedQuestsAndOffers() {
         //     let merged = [];
         //     let offerIndex = 0;
@@ -552,24 +565,37 @@ export default defineComponent({
             return merged;
         },
         filteredCompletedQuests() {
-            const completedQuests = this.mergedQuestsAndOffers.filter((group) => !group.isOfferRow);
+            let completedQuests = this.mergedQuestsAndOffers.filter((group) => !group.isOfferRow);
+            console.log('comp: ', completedQuests);
+            if (this.selectedQuestFilter !== 'all') {
+                completedQuests = completedQuests.filter((group) => {
+                    switch (this.selectedQuestFilter) {
+                        case 'santa':
+                            return group.title === "Santa's Quests";
+                        case 'x':
+                            return group.title === 'X Quests';
+                        case 'discord':
+                            return group.title === 'Discord Quests';
+                        case 'youtube':
+                            return group.title === 'YouTube Quests';
+                        default:
+                            return true;
+                    }
+                });
+            }
 
-            if (this.selectedQuestFilter === 'all') return completedQuests;
+            let santaQuestsGroup = completedQuests.find((group) => group.title === "Santa's Quests");
 
-            return completedQuests.filter((group) => {
-                switch (this.selectedQuestFilter) {
-                    case 'santa':
-                        return group.title === "Santa's Quests";
-                    case 'x':
-                        return group.title === 'X Quests';
-                    case 'discord':
-                        return group.title === 'Discord Quests';
-                    case 'youtube':
-                        return group.title === 'YouTube Quests';
-                    default:
-                        return true;
-                }
-            });
+            if (this.referralClaimed) {
+                santaQuestsGroup.quests.push({
+                    _id: 'referral-quest',
+                    title: 'Referral Quest',
+                    description: "You've successfully completed the referral quest!",
+                    isAvailable: false,
+                });
+            }
+
+            return completedQuests;
         },
         filteredQuests() {
             if (this.selectedQuestFilter === 'all') return this.mergedQuestsAndOffers;
