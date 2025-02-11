@@ -290,13 +290,34 @@ class AccountProxy {
         const account = await Account.findById(sub);
         if (!account) throw new NotFoundError('Account not found.');
 
-        // Create a SHA1 hash of the clid
-        const sha1Hash = crypto.createHash('sha1').update(Buffer.from(account.providerUserId, 'utf-8')).digest('hex');
-        // Take the substring from position 6 to 20
-        const substring = sha1Hash.substring(6, 20);
-        await account.updateOne({ referralCode: substring });
+        // // Create a SHA1 hash of the clid
+        // const sha1Hash = crypto.createHash('sha1').update(Buffer.from(account.providerUserId, 'utf-8')).digest('hex');
+        // // Take the substring from position 6 to 20
+        // const substring = sha1Hash.substring(6, 20);
 
-        return { referralCode: substring, inviter: account.inviter };
+        if (account.referralCode !== undefined && account.referralCode.length < 12) {
+            return { referralCode: account.referralCode, inviter: account.inviter };
+        }
+
+        const generateCode = () =>
+            Math.random()
+                .toString(36)
+                .replace(/[^a-z]+/g, '')
+                .substr(0, 10)
+                .toUpperCase();
+
+        // Test for dups
+        let code = generateCode();
+        let isCodeUnique = true;
+        while (isCodeUnique) {
+            isCodeUnique = !(await Account.exists({ referralCode: code }));
+            if (isCodeUnique) break;
+            code = generateCode();
+        }
+
+        await account.updateOne({ referralCode: code });
+
+        return { referralCode: code, inviter: account.inviter };
     }
 }
 
