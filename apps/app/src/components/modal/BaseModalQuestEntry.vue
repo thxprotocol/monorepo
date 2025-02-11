@@ -84,7 +84,7 @@ export default defineComponent({
         show: Boolean,
         quest: {
             type: Object as PropType<TBaseQuest>,
-            required: true,
+            required: false,
         },
     },
     data() {

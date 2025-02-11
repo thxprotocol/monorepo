@@ -16,10 +16,6 @@
             <!-- <BaseDropdownWallets /> -->
             <div class="d-flex gap-2 balance-wrap media-header-third">
                 <div class="balance-box">
-                    <h2>Referral <span class="d-block">Code</span></h2>
-                    <div class="d-flex align-items-center">{{ accountStore.referralCode }}</div>
-                </div>
-                <div class="balance-box">
                     <h2>Santa <span class="d-block">Points</span></h2>
                     <div class="d-flex align-items-center">
                         <p>{{ numberWithCommas(formattedBalance(participantSantaState, SANTA_CAMPAIGN)) }}</p>

@@ -8,11 +8,11 @@ const validation = [body('inviter').isString(), body('poolId').isString()];
 const controller = async (req: Request, res: Response) => {
     const account = await Account.findById(req.auth.sub);
     if (account.inviter) {
-        res.json({ success: false, reason: 'You already have inviter.' });
+        return res.json({ success: false, reason: 'You already have inviter.' });
     }
     const inviterAccount = await Account.findOne({ referralCode: req.body.inviter });
     if (!inviterAccount) {
-        res.json({ success: false, reason: 'Invalid referral code!' });
+        return res.json({ success: false, reason: 'Invalid referral code!' });
     }
 
     const pool = await Pool.findById(req.body.poolId);
@@ -23,7 +23,7 @@ const controller = async (req: Request, res: Response) => {
     await PointBalanceService.add(pool, inviterAccount, INVITER_POINTS);
     await account.updateOne({ inviter: req.body.inviter });
 
-    res.json({ success: true });
+    return res.json({ success: true });
 };
 
 export default { controller, validation };
