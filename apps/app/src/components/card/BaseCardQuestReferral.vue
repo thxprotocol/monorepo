@@ -106,7 +106,7 @@ import { decodeHTML } from '@thxnetwork/app/utils/decode-html';
 import { QuestVariant } from '@thxnetwork/sdk/types/enums';
 import { SANTA_CAMPAIGN, CP_CAMPAIGN } from '@thxnetwork/app/config/secrets';
 import hrDivider from '../../assets/hr-line.png';
-import refImg from '../../assets/Referral.jpg';
+import refImg from '../../assets/referral.jpg';
 import copyIcon from '../../assets/copy.png';
 import BaseModalQuestEntry from '../modal/BaseModalQuestEntry.vue';
 export default defineComponent({
