@@ -60,7 +60,7 @@ async function decorateERC20(token: ERC20TokenDocument, erc20: ERC20Document, wa
     }
 
     return {
-        ...(token.toJSON() as TERC20Token),
+        token,
         walletBalance,
         erc20,
     };
