@@ -151,18 +151,29 @@
                                 v-for="group in filteredCompletedQuests"
                                 :key="group.title"
                                 :class="{
-                                'd-none': group.quests && group.quests.every((quest: TBaseQuest) => {
-                                    if (quest.variant === 0) {
-                                        return !quest.isCompleted;
-                                    } else {
-                                        return quest.isAvailable;
-                                    }
-                                }) && !group.isOfferRow,
+                                'd-none': referralClaimed
+                                            ? (group.quests.every((quest: TBaseQuest) => {
+                                                if (quest.variant === 0) {
+                                                    return !quest.isCompleted;
+                                                } else {
+                                                    return quest.isAvailable;
+                                                }
+                                            }) && !referralClaimed)
+                                            : (group.quests && group.quests.every((quest: TBaseQuest) => {
+                                                if (quest.variant === 0) {
+                                                    return !quest.isCompleted;
+                                                } else {
+                                                    return quest.isAvailable;
+                                                }
+                                            }) && !group.isOfferRow),
                                 }"
                             >
                                 <h3 class="quest-group-title">{{ group.title }}</h3>
                                 <div class="quest-group">
-                                    <div v-if="group.title === 'Santa\'s Quests'" class="quest-item quest-group-item">
+                                    <div
+                                        v-if="group.title === 'Santa\'s Quests' && referralClaimed"
+                                        class="quest-item quest-group-item"
+                                    >
                                         <BaseCardQuestReferral
                                             v-if="referralClaimed"
                                             :completed="true"
@@ -528,7 +539,7 @@ export default defineComponent({
             xQuests.sort((a: any, b: any) => a.amount - b.amount);
 
             const groupedQuests = [
-                { title: "Santa's Quests", quests: santaQuests },
+                { title: "Santa's Quests", quests: santaQuests, refQuest: this.referralClaimed },
                 { title: 'X Quests', quests: xQuests },
                 { title: 'Discord Quests', quests: discordQuests },
                 { title: 'YouTube Quests', quests: youtubeQuests },
@@ -566,7 +577,6 @@ export default defineComponent({
         },
         filteredCompletedQuests() {
             let completedQuests = this.mergedQuestsAndOffers.filter((group) => !group.isOfferRow);
-            console.log('comp: ', completedQuests);
             if (this.selectedQuestFilter !== 'all') {
                 completedQuests = completedQuests.filter((group) => {
                     switch (this.selectedQuestFilter) {
@@ -581,17 +591,6 @@ export default defineComponent({
                         default:
                             return true;
                     }
-                });
-            }
-
-            let santaQuestsGroup = completedQuests.find((group) => group.title === "Santa's Quests");
-
-            if (this.referralClaimed) {
-                santaQuestsGroup.quests.push({
-                    _id: 'referral-quest',
-                    title: 'Referral Quest',
-                    description: "You've successfully completed the referral quest!",
-                    isAvailable: false,
                 });
             }
 
@@ -1527,9 +1526,6 @@ export default defineComponent({
     .quests-column .nav-link {
         padding: 12px 12px;
     }
-    .filter-wrapper {
-        height: 28px;
-    }
     .quests-column .nav-item {
         flex: 1 1 0;
     }
@@ -1552,9 +1548,6 @@ export default defineComponent({
         width: 100%;
         flex-wrap: nowrap;
         scrollbar-width: none;
-    }
-    .custom-dropdown {
-        width: 105px;
     }
 }
 </style>

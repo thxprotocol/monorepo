@@ -150,7 +150,6 @@ export const useAccountStore = defineStore('account', {
         },
         async getAccount() {
             this.account = await this.api.request.get('/v1/account');
-            console.log(this.account);
             const result = await this.api.request.get('/v1/account/referral');
             this.referralCode = result.referralCode;
             this.inviter = result.inviter;
