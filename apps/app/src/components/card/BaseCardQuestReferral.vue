@@ -22,7 +22,7 @@
                 alt="header image"
                 loading="lazy"
                 style="border-radius: 4px"
-                :style="{ height: '' }"
+                height="173"
             />
 
             <div class="d-flex flex-column flex-grow-1 quest-info-wrap">
@@ -47,7 +47,7 @@
                 </div>
                 <div class="quest-desc-wrap">
                     Earn <span style="color: var(--body-text)"> 200 points: </span>
-                    <span class="d-block">If your friend uses your code.</span>
+                    <span class="d-block">Each time a friend uses your code.</span>
                 </div>
                 <slot></slot>
                 <div class="d-flex align-items-center">

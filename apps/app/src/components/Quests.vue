@@ -74,19 +74,20 @@
                             </div>
                         </div>
                         <div v-else class="d-flex flex-column gap-5">
-                            <div v-for="group in filteredQuests" :key="group.title">
-                                <div
-                                    v-if="!group.isOfferRow"
-                                    :class="{
-                                    'd-none': group.quests.every((quest: TBaseQuest) => {
-                                        if (quest.variant === 0) {
-                                            return quest.isCompleted;
-                                        } else {
-                                            return !quest.isAvailable;
-                                        }
-                                    }), 
-                                    }"
-                                >
+                            <div
+                                v-for="group in filteredQuests"
+                                :key="group.title"
+                                :class="{
+                            'd-none': group.quests && group.quests.every((quest: TBaseQuest) => {
+                                if (quest.variant === 0) {
+                                    return quest.isCompleted;
+                                } else {
+                                    return !quest.isAvailable;
+                                }
+                            }), 
+                            }"
+                            >
+                                <div v-if="!group.isOfferRow">
                                     <h3 class="quest-group-title">{{ group.title }}</h3>
                                     <div class="quest-group">
                                         <div
@@ -151,21 +152,13 @@
                                 v-for="group in filteredCompletedQuests"
                                 :key="group.title"
                                 :class="{
-                                'd-none': referralClaimed
-                                            ? (group.quests.every((quest: TBaseQuest) => {
-                                                if (quest.variant === 0) {
-                                                    return !quest.isCompleted;
-                                                } else {
-                                                    return quest.isAvailable;
-                                                }
-                                            }) && !referralClaimed)
-                                            : (group.quests && group.quests.every((quest: TBaseQuest) => {
-                                                if (quest.variant === 0) {
-                                                    return !quest.isCompleted;
-                                                } else {
-                                                    return quest.isAvailable;
-                                                }
-                                            }) && !group.isOfferRow),
+                                'd-none': 
+                                    group.quests &&
+                                    group.quests.every((quest: TBaseQuest) =>
+                                        quest.variant === 0 ? !quest.isCompleted : quest.isAvailable
+                                    ) &&
+                                    !group.isOfferRow &&
+                                    (group.title === 'Santa\'s Quests' ? !referralClaimed : true)
                                 }"
                             >
                                 <h3 class="quest-group-title">{{ group.title }}</h3>
@@ -198,10 +191,16 @@
                             </div>
                             <div
                                 v-if="
-                                    filteredCompletedQuests.length === 0 ||
-                                    filteredCompletedQuests.every((group) =>
-                                        group.quests.every((quest) => quest.isAvailable),
-                                    )
+                                    referralClaimed
+                                        ? filteredCompletedQuests.length === 0 ||
+                                          (filteredCompletedQuests.every((group) =>
+                                              group.quests.every((quest) => quest.isAvailable),
+                                          ) &&
+                                              !referralClaimed)
+                                        : filteredCompletedQuests.length === 0 ||
+                                          filteredCompletedQuests.every((group) =>
+                                              group.quests.every((quest) => quest.isAvailable),
+                                          )
                                 "
                                 class="text-center text-muted mt-3 text-opaque empty-message"
                             >
@@ -496,87 +495,10 @@ export default defineComponent({
 
         //     return merged;
         // },
-        mergedQuestsAndOffers() {
-            const santaQuests: TBaseQuest[] = [];
-            const xQuests: TBaseQuest[] = [];
-            const discordQuests: TBaseQuest[] = [];
-            const youtubeQuests: TBaseQuest[] = [];
-            const otherQuests: TBaseQuest[] = [];
-
-            this.quests.forEach((quest: TBaseQuest) => {
-                switch (quest.variant) {
-                    case QuestVariant.Daily:
-                    case QuestVariant.Invite:
-                    case QuestVariant.Custom:
-                    case QuestVariant.Web3:
-                    case QuestVariant.Gitcoin:
-                    case QuestVariant.Webhook:
-                        santaQuests.push(quest);
-                        break;
-                    case QuestVariant.Twitter:
-                        xQuests.push(quest);
-                        break;
-                    case QuestVariant.Discord:
-                        discordQuests.push(quest);
-                        break;
-                    case QuestVariant.YouTube:
-                        youtubeQuests.push(quest);
-                        break;
-                    default:
-                        otherQuests.push(quest);
-                }
-            });
-
-            santaQuests.sort((a, b) => {
-                if (a.variant === QuestVariant.Daily && b.variant !== QuestVariant.Daily) {
-                    return -1;
-                } else if (a.variant !== QuestVariant.Daily && b.variant === QuestVariant.Daily) {
-                    return 1;
-                }
-                return 0;
-            });
-
-            xQuests.sort((a: any, b: any) => a.amount - b.amount);
-
-            const groupedQuests = [
-                { title: "Santa's Quests", quests: santaQuests, refQuest: this.referralClaimed },
-                { title: 'X Quests', quests: xQuests },
-                { title: 'Discord Quests', quests: discordQuests },
-                { title: 'YouTube Quests', quests: youtubeQuests },
-                { title: 'Other Quests', quests: otherQuests },
-            ];
-
-            const merged = [];
-            let offerIndex = 0;
-
-            groupedQuests.forEach((group, index) => {
-                const hasAvailableQuests = group.quests.some((quest) => quest.isAvailable);
-
-                merged.push(group);
-
-                if (hasAvailableQuests && index < groupedQuests.length - 2 && offerIndex < this.offers.length) {
-                    const offersForGroup = this.offers.slice(offerIndex, offerIndex + this.offersPerRow);
-                    merged.push({
-                        title: 'Top Performing Offers',
-                        isOfferRow: true,
-                        offers: offersForGroup,
-                    });
-                    offerIndex += this.offersPerRow;
-                }
-            });
-
-            if (offerIndex < this.offers.length) {
-                const remainingOffers = this.offers.slice(offerIndex);
-                merged.push({
-                    title: 'Top Performing Offers',
-                    isOfferRow: true,
-                    offers: remainingOffers,
-                });
-            }
-            return merged;
-        },
         filteredCompletedQuests() {
-            let completedQuests = this.mergedQuestsAndOffers.filter((group) => !group.isOfferRow);
+            let completedQuests = this.mergedQuestsAndOffers('completed');
+            completedQuests = completedQuests.filter((group) => !group.isOfferRow);
+
             if (this.selectedQuestFilter !== 'all') {
                 completedQuests = completedQuests.filter((group) => {
                     switch (this.selectedQuestFilter) {
@@ -597,9 +519,10 @@ export default defineComponent({
             return completedQuests;
         },
         filteredQuests() {
-            if (this.selectedQuestFilter === 'all') return this.mergedQuestsAndOffers;
+            let filterQuests = this.mergedQuestsAndOffers('available');
+            if (this.selectedQuestFilter === 'all') return filterQuests;
 
-            return this.mergedQuestsAndOffers.filter((group) => {
+            return filterQuests.filter((group) => {
                 if (group.isOfferRow) return false;
 
                 switch (this.selectedQuestFilter) {
@@ -746,6 +669,96 @@ export default defineComponent({
             if (containerWidth > 1080) return 5;
             if (containerWidth > 992) return 4;
             if (containerWidth < 992) return 10;
+        },
+
+        mergedQuestsAndOffers(filterType: 'completed' | 'available' = 'available') {
+            const santaQuests: TBaseQuest[] = [];
+            const xQuests: TBaseQuest[] = [];
+            const discordQuests: TBaseQuest[] = [];
+            const youtubeQuests: TBaseQuest[] = [];
+            const otherQuests: TBaseQuest[] = [];
+
+            this.quests.forEach((quest: TBaseQuest) => {
+                switch (quest.variant) {
+                    case QuestVariant.Daily:
+                    case QuestVariant.Invite:
+                    case QuestVariant.Custom:
+                    case QuestVariant.Web3:
+                    case QuestVariant.Gitcoin:
+                    case QuestVariant.Webhook:
+                        santaQuests.push(quest);
+                        break;
+                    case QuestVariant.Twitter:
+                        xQuests.push(quest);
+                        break;
+                    case QuestVariant.Discord:
+                        discordQuests.push(quest);
+                        break;
+                    case QuestVariant.YouTube:
+                        youtubeQuests.push(quest);
+                        break;
+                    default:
+                        otherQuests.push(quest);
+                }
+            });
+
+            santaQuests.sort((a, b) => {
+                if (a.variant === QuestVariant.Daily && b.variant !== QuestVariant.Daily) {
+                    return -1;
+                } else if (a.variant !== QuestVariant.Daily && b.variant === QuestVariant.Daily) {
+                    return 1;
+                }
+                return 0;
+            });
+
+            xQuests.sort((a: any, b: any) => a.amount - b.amount);
+
+            const groupedQuests = [
+                { title: "Santa's Quests", quests: santaQuests, refQuest: this.referralClaimed },
+                { title: 'X Quests', quests: xQuests },
+                { title: 'Discord Quests', quests: discordQuests },
+                { title: 'YouTube Quests', quests: youtubeQuests },
+                { title: 'Other Quests', quests: otherQuests },
+            ];
+            if (filterType === 'completed') {
+                return groupedQuests;
+            }
+
+            const visibleGroups = groupedQuests.filter((group) => {
+                return (
+                    group.quests &&
+                    group.quests.some((quest: TBaseQuest) => {
+                        return quest.isAvailable;
+                    })
+                );
+            });
+
+            const merged = [] as any[];
+            let offerIndex = 0;
+            const totalGroups = groupedQuests.length;
+
+            groupedQuests.forEach((group, index) => {
+                merged.push(group);
+
+                const isVisible = group.quests && group.quests.some((quest: TBaseQuest) => quest.isAvailable);
+
+                if (isVisible && offerIndex < this.offers.length) {
+                    let offersForGroup;
+                    if (index < totalGroups - 1) {
+                        offersForGroup = this.offers.slice(offerIndex, offerIndex + this.offersPerRow);
+                        offerIndex += this.offersPerRow;
+                    } else {
+                        offersForGroup = this.offers.slice(offerIndex);
+                    }
+                    merged.push({
+                        title: 'Top Performing Offers',
+                        isOfferRow: true,
+                        offers: offersForGroup,
+                    });
+                }
+            });
+
+            return merged;
         },
     },
 });
