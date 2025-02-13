@@ -179,6 +179,12 @@ export default defineComponent({
             window.open(url, '_blank');
         },
         async onClickClaim() {
+            if (this.referralCode.trim() === this.accountStore.referralCode) {
+                this.error = "You can't use your own referral code!";
+                this.isClaimMode = false;
+                this.referralCode = '';
+                return;
+            }
             this.isSubmitting = true;
             const { api } = useAccountStore();
             try {
@@ -199,6 +205,7 @@ export default defineComponent({
             } catch (error: any) {
                 const message = error.response?.data?.reason || error.message;
                 console.error('Claim failed:', message);
+                this.referralCode = '';
                 this.isClaimMode = false;
             } finally {
                 this.isSubmitting = false;
