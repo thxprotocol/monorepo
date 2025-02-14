@@ -110,7 +110,11 @@ export default class ParticipantService {
                 }),
             );
 
-            await Participant.bulkWrite(updates);
+            // Call touch() periodically to keep the job alive
+            for (let i = 0; i < updates.length; i += 100) {
+                await Participant.bulkWrite(updates.slice(i, i + 100));
+                job.touch(); // Reset the timeout counter
+            }
 
             logger.info('Updated participant ranks.');
         } catch (error) {

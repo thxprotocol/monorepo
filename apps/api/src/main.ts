@@ -21,7 +21,7 @@ if (LOCAL_CERT && LOCAL_CERT_KEY) {
         cert: fs.readFileSync(path.resolve(path.dirname(__dirname), LOCAL_CERT)),
     };
     server = https.createServer(ssl, app);
-    if(NODE_ENV == 'development'){
+    if (NODE_ENV == 'development') {
         httpProxy
             .createProxyServer({
                 target: {
@@ -58,7 +58,7 @@ process.on('uncaughtException', function (err: Error) {
             errorMessage: err.message,
             stack: err.stack,
         });
-        process.exit(1);
+        // process.exit(1);
     }
 });
 
