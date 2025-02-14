@@ -34,7 +34,7 @@
                 @click="quest.isAvailable ? onClickClaim() : null"
             >
                 <b-spinner v-if="isSubmitting" small />
-                <template v-if="quest.isAvailable"> Claim </template>
+                <template v-else-if="quest.isAvailable"> Claim </template>
                 <template v-else-if="!quest.isAvailable">
                     You can claim again in
                     <span v-if="waitDuration"

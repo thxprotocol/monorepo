@@ -35,7 +35,8 @@
                 }"
                 @click="onClickClaim"
             >
-                Claim
+                <b-spinner v-if="isSubmitting" small />
+                <template v-else> Claim </template>
             </button>
         </template>
     </BaseCardQuest>
