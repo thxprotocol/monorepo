@@ -33,6 +33,7 @@
                     'locked-btn': isSubmitting || pendingCount === 0,
                     'btn-primary': !(isSubmitting || pendingCount === 0),
                 }"
+                :disabled="isSubmitting || pendingCount === 0"
                 @click="onClickClaim"
             >
                 <b-spinner v-if="isSubmitting" small />

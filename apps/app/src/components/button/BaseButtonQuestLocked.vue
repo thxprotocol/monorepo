@@ -75,6 +75,7 @@ export default defineComponent({
     box-shadow: var(--balance-box-shadow);
     padding: 7px 0px;
     cursor: default !important;
+    min-height: 36px;
 }
 .locked-btn:hover,
 .locked-btn:focus,

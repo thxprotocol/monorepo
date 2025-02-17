@@ -10,9 +10,10 @@
     >
         <!-- <component :is="interactionComponentMap[quest.interaction]" :quest="quest" /> -->
 
-        <div v-if="error" variant="danger" class="p-2 alert-wrap" @click="error = ''">
+        <div v-if="error && error.length > 0" variant="danger" class="p-2 alert alert-primary alert-wrap">
             <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
         </div>
+
         <template #button>
             <button
                 class="w-100"
@@ -160,7 +161,7 @@
 
 <script lang="ts">
 import { mapStores } from 'pinia';
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, ref } from 'vue';
 import { useAccountStore } from '../../stores/Account';
 import { useAuthStore } from '../../stores/Auth';
 import { useQuestStore } from '../../stores/Quest';
@@ -375,7 +376,6 @@ export default defineComponent({
     position: absolute;
     top: -130px;
     width: calc(100% - 30px);
-    background: var(--bs-dark-bg-subtle);
     border-radius: 10px;
 }
 </style>
