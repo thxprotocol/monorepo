@@ -66,6 +66,10 @@ class RequestManager extends OIDCManager {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
+        if (this.clid) {
+            headers['Clid'] = this.clid;
+        }
+
         // Needs refactor in places where X-PoolId is as config.poolId or config header
         const options = this.client.options as THXBrowserClientOptions;
         if ((config && config.poolId) || (options && options.poolId)) {

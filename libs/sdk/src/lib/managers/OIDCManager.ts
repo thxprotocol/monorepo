@@ -10,6 +10,7 @@ export enum THXOIDCGrant {
 
 class OIDCManager extends BaseManager {
     user: THXOIDCUser | null;
+    clid: string;
     expiresAt: number;
     grantType: THXOIDCGrant;
     apiKey?: string;
@@ -20,6 +21,7 @@ class OIDCManager extends BaseManager {
         this.grantType = grantType;
         this.expiresAt = Date.now();
         this.user = null;
+        this.clid = '';
         this.apiKey = client.options.apiKey;
     }
 
@@ -38,6 +40,10 @@ class OIDCManager extends BaseManager {
     setUser(user: THXOIDCUser) {
         this.user = user;
         this.expiresAt = Date.now() + this.user.expires_in * 1000;
+    }
+
+    setClid(clid: string) {
+        this.clid = clid;
     }
 
     getUser() {

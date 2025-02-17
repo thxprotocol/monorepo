@@ -22,6 +22,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
 
 export const useAccountStore = defineStore('account', {
     state: (): TAccountState => ({
+        clid: null,
         session: null,
         poolId: '',
         isPreview: false,
@@ -96,20 +97,24 @@ export const useAccountStore = defineStore('account', {
                     authUrl: AUTH_URL,
                 } as any);
 
-                const authEventMap: { [event: string]: ((session: Session | null) => Promise<void>) | null } = {
-                    SIGNED_IN: this.onSignedIn,
-                    SIGNED_OUT: this.onSignedOut,
-                };
+                // const authEventMap: { [event: string]: ((session: Session | null) => Promise<void>) | null } = {
+                //     SIGNED_IN: this.onSignedIn,
+                //     SIGNED_OUT: this.onSignedOut,
+                // };
 
-                // Listen for supabase auth events
-                supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
-                    const fn = authEventMap[event];
-                    if (fn) fn(session);
-                });
+                // // Listen for supabase auth events
+                // supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
+                //     const fn = authEventMap[event];
+                //     if (fn) fn(session);
+                // });
             }
 
             this.poolId = SANTA_CAMPAIGN;
             this.api.setCampaignId(this.poolId);
+            if (this.clid) {
+                this.api.request.setClid(this.clid);
+                this.setStatus(true);
+            }
 
             // If no slug is provided we're not on a campaign page so we return early
             if (!slug) return;
@@ -140,6 +145,9 @@ export const useAccountStore = defineStore('account', {
                 this.isNavbarOffcanvasShown = false;
                 this.session = session;
             }
+        },
+        async setClid(clid: string) {
+            if (this.api) this.api.request.setClid(clid);
         },
         onResize() {
             this.isMobile = window.innerWidth < BREAKPOINT_LG;
@@ -281,9 +289,11 @@ export const useAccountStore = defineStore('account', {
         },
 
         async signinWithClid(address: string) {
-            const password = address;
-            const { error } = await this._signinWithPassword({ address, password });
-            if (error) throw error;
+            this.clid = address;
+            this.setClid(address);
+            // const password = address;
+            // const { error } = await this._signinWithPassword({ address, password });
+            // if (error) throw error;
         },
         async _signinWithPassword({ address, password }: { address: string; password: string }) {
             try {
@@ -384,7 +394,7 @@ export const useAccountStore = defineStore('account', {
             const walletStore = useWalletStore();
             walletStore.wallet = null;
             await walletStore.disconnect();
-            await supabase.auth.signOut();
+            // await supabase.auth.signOut();
         },
         setStatus(isAuthenticated: boolean) {
             this.isAuthenticated = isAuthenticated;

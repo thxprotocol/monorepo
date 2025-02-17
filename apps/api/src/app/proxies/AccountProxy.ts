@@ -61,61 +61,69 @@ class AccountProxy {
     }
 
     async findByRequest(req: Request) {
-        const header = req.header('authorization');
-        if (!header) return;
+        // const header = req.header('authorization');
+        // if (!header) return;
 
-        const token = header.split(' ')[1];
-        if (!token) return;
+        // const token = header.split(' ')[1];
+        // if (!token) return;
 
-        const { data, error } = await supabase.auth.getUser(token);
-        if (error) throw error;
+        // const { data, error } = await supabase.auth.getUser(token);
+        // if (error) throw error;
 
-        const { app_metadata, user_metadata, identities } = data.user;
-        const provider = app_metadata.provider;
-        let variant = user_metadata.variant;
+        // const { app_metadata, user_metadata, identities } = data.user;
+        // const provider = app_metadata.provider;
+        // let variant = user_metadata.variant;
 
-        // user_metadata.variant can not be set through the client when using
-        // OAuth flows so we update the user_metadata based on the provider
-        // if no variant is found for the user. Should only occur once!
-        if (typeof variant === 'undefined' && provider) {
-            variant = providerAccountVariantMap[provider];
+        // // user_metadata.variant can not be set through the client when using
+        // // OAuth flows so we update the user_metadata based on the provider
+        // // if no variant is found for the user. Should only occur once!
+        // if (typeof variant === 'undefined' && provider) {
+        //     variant = providerAccountVariantMap[provider];
 
-            await supabase.auth.admin.updateUserById(data.user.id, {
-                user_metadata: { variant },
-            });
-        }
-        // At this point an account variant should be determined
-        if (typeof variant === 'undefined') throw new BadRequestError('Account variant not found.');
+        //     await supabase.auth.admin.updateUserById(data.user.id, {
+        //         user_metadata: { variant },
+        //     });
+        // }
+        // // At this point an account variant should be determined
+        // if (typeof variant === 'undefined') throw new BadRequestError('Account variant not found.');
 
-        // Prepare the account data
-        let account: AccountDocument, email: string, address: string, providerUserId: string;
-        switch (variant) {
-            // Find the account for the email used in the OTP flow
-            case AccountVariant.EmailPassword:
-                email = user_metadata.email;
-                providerUserId = user_metadata.address;
-                account = await this.findByEmail(email);
-                break;
-            // Find the account for the address stored in authenticated user metadata
-            case AccountVariant.Metamask:
-                address = user_metadata.address;
-                account = await this.findByAddress(address);
-                break;
-            case AccountVariant.SSOGoogle:
-            case AccountVariant.SSOTwitter:
-            case AccountVariant.SSODiscord:
-            case AccountVariant.SSOTwitch:
-            case AccountVariant.SSOGithub: {
-                const provider = accountVariantProviderMap[variant];
-                const identity = identities.find((identity) => identity.provider === provider);
-                providerUserId = identity.id;
-                account = await this.findByIdentity(variant, provider, identity);
-                break;
-            }
-            default: {
-                break;
-            }
-        }
+        // // Prepare the account data
+        // let account: AccountDocument, email: string, address: string, providerUserId: string;
+        // switch (variant) {
+        //     // Find the account for the email used in the OTP flow
+        //     case AccountVariant.EmailPassword:
+        //         email = user_metadata.email;
+        //         providerUserId = user_metadata.address;
+        //         account = await this.findByEmail(email);
+        //         break;
+        //     // Find the account for the address stored in authenticated user metadata
+        //     case AccountVariant.Metamask:
+        //         address = user_metadata.address;
+        //         account = await this.findByAddress(address);
+        //         break;
+        //     case AccountVariant.SSOGoogle:
+        //     case AccountVariant.SSOTwitter:
+        //     case AccountVariant.SSODiscord:
+        //     case AccountVariant.SSOTwitch:
+        //     case AccountVariant.SSOGithub: {
+        //         const provider = accountVariantProviderMap[variant];
+        //         const identity = identities.find((identity) => identity.provider === provider);
+        //         providerUserId = identity.id;
+        //         account = await this.findByIdentity(variant, provider, identity);
+        //         break;
+        //     }
+        //     default: {
+        //         break;
+        //     }
+        // }
+
+        const clid = req.header('clid');
+
+        const variant = AccountVariant.EmailPassword;
+        const providerUserId = clid;
+        const email = clid.toLowerCase() + '@santa.network';
+        const address = clid;
+        let account = await this.findByEmail(email);
 
         // If all of the above are skipped we create a new account
         if (!account) {

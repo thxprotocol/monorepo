@@ -43,6 +43,7 @@ type TInvite = {
 } | null;
 
 type TAccountState = {
+    clid: null | string;
     session: null | Session;
     css: HTMLStyleElement | null;
     invite: TInvite;
