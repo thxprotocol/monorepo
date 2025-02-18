@@ -122,7 +122,6 @@ class AccountProxy {
             variant = AccountVariant.EmailPassword;
             providerUserId = clid;
             email = clid.toLowerCase() + '@santa.network';
-            address = clid;
             account = await this.findByEmail(email);
         }
 

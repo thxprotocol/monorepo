@@ -3,7 +3,7 @@ import { logger } from '../util/logger';
 import AccountProxy from '../proxies/AccountProxy';
 
 export const checkJwt = async (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers.authorization;
+    // const authHeader = req.headers.authorization;
     // if (!authHeader || !authHeader.startsWith('Bearer ')) {
     //     return res.status(401).json({ message: 'Missing or invalid authorization header' });
     // }
@@ -12,7 +12,13 @@ export const checkJwt = async (req: Request, res: Response, next: NextFunction) 
         req.auth = await AccountProxy.findByRequest(req);
         next();
     } catch (error) {
-        logger.error({ error });
+        if (error.code === 11000) {
+            setTimeout(() => {
+                res.redirect(req.originalUrl); // Redirect to the same route after 1 second
+            }, 1000);
+            return;
+        }
+        logger.error(error);
         res.status(401).json({ message: 'Unauthorized' });
     }
 };
