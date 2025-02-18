@@ -94,14 +94,14 @@ export default defineComponent({
     },
     async mounted() {
         const urlParams = new URLSearchParams(window.location.search);
-        let clid = await this.getClidFromExtension();
+        let clid: string | null = null;
+        const clidFromCookies = this.getCookieReduce('clid');
 
-        if (!clid) {
-            const clidFromCookies = this.getCookieReduce('clid');
-            if (clidFromCookies) {
-                clid = clidFromCookies;
-            } else {
-                clid = urlParams.get('clid');
+        if (!clidFromCookies) {
+            clid = await this.getClidFromExtension();
+            if (!clid) {
+                const clidFromUrl = urlParams.get('clid');
+                clid = clidFromUrl;
             }
         }
 
