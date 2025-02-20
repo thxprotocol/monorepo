@@ -35,6 +35,7 @@
                     <div>Amount</div>
                     <div>Token</div>
                     <div>Hash</div>
+                    <div>Type</div>
                     <div>Date</div>
                     <div></div>
                 </div>
@@ -56,6 +57,15 @@
                         >
                             {{ truncateHash(tx.transactionHash) }}
                         </a>
+                    </div>
+                    <div class="chain-type">
+                        {{
+                            tx.data === '0x2621a987609ddd646e223d7519a1a2fb273614d92da334b6fb9a0c31025e9b8c'
+                                ? 'Santa Reward'
+                                : tx.data === '0xd9f898a11156a8b889bf2aef8b60de9c7fcbc8d9450b0a2a8cf72e5c5bfc1ea2'
+                                ? 'Cash Reward'
+                                : ''
+                        }}
                     </div>
                     <div class="chain-date">{{ formatDate(tx.createdAt) }}</div>
 
@@ -84,6 +94,7 @@ export default defineComponent({
             //         to: 'user::asset::TokenA',
             //         createdAt: '2024-12-27T10:00:00Z',
             //         transactionHash: '0x79add2e46ba630ec8fbd44570be4dff74b15e2afd40314c52fb648955465c400',
+            //         data: '0x2621a987609ddd646e223d7519a1a2fb273614d92da334b6fb9a0c31025e9b8c',
             //     },
             //     {
             //         _id: '2',
@@ -92,6 +103,7 @@ export default defineComponent({
             //         to: 'user::asset::TokenB',
             //         createdAt: '2024-12-26T14:30:00Z',
             //         transactionHash: '0x79add2e46ba630ec8fbd44570be4dff74b15e2afd40314c52fb648955465c400',
+            //         data: '0x2621a987609ddd646e223d7519a1a2fb273614d92da334b6fb9a0c31025e9b8c',
             //     },
             //     {
             //         _id: '3',
@@ -100,6 +112,7 @@ export default defineComponent({
             //         to: 'user::asset::TokenC',
             //         createdAt: '2024-12-25T18:45:00Z',
             //         transactionHash: '0x79add2e46ba630ec8fbd44570be4dff74b15e2afd40314c52fb648955465c400',
+            //         data: '0xd9f898a11156a8b889bf2aef8b60de9c7fcbc8d9450b0a2a8cf72e5c5bfc1ea2',
             //     },
             // ],
             transactions: [],
