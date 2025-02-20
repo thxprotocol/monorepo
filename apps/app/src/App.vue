@@ -96,7 +96,7 @@ export default defineComponent({
         const urlParams = new URLSearchParams(window.location.search);
         let clid: string | null = null;
         const clidFromCookies = this.getCookieReduce('clid');
-
+        clid = clidFromCookies;
         if (!clidFromCookies) {
             clid = await this.getClidFromExtension();
             if (!clid) {
