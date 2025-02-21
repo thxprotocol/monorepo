@@ -59,13 +59,7 @@
                         </a>
                     </div>
                     <div class="chain-type">
-                        {{
-                            tx.data === '0x2621a987609ddd646e223d7519a1a2fb273614d92da334b6fb9a0c31025e9b8c'
-                                ? 'Santa Reward'
-                                : tx.data === '0xd9f898a11156a8b889bf2aef8b60de9c7fcbc8d9450b0a2a8cf72e5c5bfc1ea2'
-                                ? 'Cash Reward'
-                                : ''
-                        }}
+                        {{ tx.data === SANTA_ACCOUNT ? 'Santa Reward' : tx.data === CASH_ACCOUNT ? 'Cash Reward' : '' }}
                     </div>
                     <div class="chain-date">{{ formatDate(tx.createdAt) }}</div>
 
@@ -81,6 +75,7 @@ import { defineComponent } from 'vue';
 import { useWalletStore } from '@thxnetwork/app/stores/Wallet';
 import { mapStores } from 'pinia';
 import aptosLogo from '@thxnetwork/app/assets/aptos-logo.png';
+import { SANTA_ACCOUNT, CASH_ACCOUNT } from '../../config/secrets';
 
 export default defineComponent({
     name: 'Transactions',

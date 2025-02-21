@@ -24,4 +24,6 @@ export const CP_CAMPAIGN = import.meta.env.VITE_CP_CAMPAIGN_ID || '';
 export const NODE_ENV = import.meta.env.NODE_ENV || '';
 export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 export const SUPABASE_PUBLIC_KEY = import.meta.env.VITE_SUPABASE_PUBLIC_KEY || '';
+export const SANTA_ACCOUNT = import.meta.env.VITE_SANTA_ACCOUNT || '';
+export const CASH_ACCOUNT = import.meta.env.VITE_CASH_ACCOUNT || '';
 export const PROD = import.meta.env.PROD;
