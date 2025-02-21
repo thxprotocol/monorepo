@@ -5,10 +5,11 @@
         class="account-modal"
         @hidden="accountStore.isModalAccountShown = false"
         @show="onShow"
+        @hide="onHide"
     >
         <template #header>
             <h5 class="modal-title"><i class="fas fa-user me-2" /> Account</h5>
-            <b-link class="btn-close" @click="accountStore.isModalAccountShown = false">
+            <b-link class="btn-close" @click="closeModal">
                 <i class="fas fa-times" />
             </b-link>
         </template>
@@ -30,7 +31,7 @@
                 </b-alert>
                 <b-row>
                     <b-col cols="8">
-                        <BaseFormGroupUsername class="mb-3" />
+                        <BaseFormGroupUsername ref="usernameFormGroup" class="mb-3" />
                         <!-- <BaseFormGroupEmail class="mb-3" /> -->
                     </b-col>
                     <b-col cols="4" class="d-flex align-items-center justify-content-center">
@@ -49,14 +50,7 @@
         </b-tabs>
 
         <template #footer>
-            <b-button
-                class="w-100"
-                variant="primary"
-                :disabled="isDisabled"
-                @click="accountStore.isModalAccountShown = false"
-            >
-                Close
-            </b-button>
+            <b-button class="w-100" variant="primary" :disabled="isDisabled" @click="closeModal"> Close </b-button>
             <!--            <b-button variant="link" class="w-100 text-white" @click="onClickSignout">-->
             <!--                <b-spinner v-if="isLoadingReset" small variant="light" />-->
             <!--                <template v-else> Sign out </template>-->
@@ -73,6 +67,7 @@ import { useQuestStore } from '../../stores/Quest';
 import { mapStores } from 'pinia';
 import { defineComponent } from 'vue';
 import { AccountVariant } from '../../types/enums/accountVariant';
+import BaseFormGroupUsername from '../formgroup/BaseFormGroupUsername.vue';
 
 export default defineComponent({
     name: 'BaseModalAccount',
@@ -121,6 +116,19 @@ export default defineComponent({
         },
         onCopySuccess() {
             this.isCopied = true;
+        },
+        async closeModal() {
+            try {
+                await (this.$refs.usernameFormGroup as InstanceType<typeof BaseFormGroupUsername>).forceUpdate();
+            } catch (error) {
+                // Handle error, e.g., show a notification
+            }
+            this.accountStore.isModalAccountShown = false;
+        },
+        onHide(event: { trigger: string }) {
+            if (event.trigger === 'backdrop') {
+                this.closeModal();
+            }
         },
     },
 });

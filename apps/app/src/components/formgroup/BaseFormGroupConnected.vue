@@ -41,7 +41,7 @@ export default defineComponent({
                 // },
                 [AccessTokenKind.Twitter]: {
                     kind: AccessTokenKind.Twitter,
-                    scopes: OAuthRequiredScopes.TwitterAuth,
+                    scopes: OAuthRequiredScopes.TwitterValidateFollow,
                     label: 'Twitter',
                     color: '#1DA1F2',
                 },

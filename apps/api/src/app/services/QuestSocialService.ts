@@ -71,7 +71,7 @@ export default class QuestSocialService implements IQuestService {
         try {
             // Check quest requirements
             const validationResult = await requirementMap[quest.interaction](account, quest);
-            return validationResult || { result: true, reason: '' };
+            return validationResult;
         } catch (error) {
             logger.error(error);
             return { result: false, reason: 'We were unable to confirm the requirements for this quest.' };

@@ -74,6 +74,7 @@ export enum OAuthTwitterScope {
     TweetRead = 'tweet.read',
     FollowsWrite = 'follows.write',
     LikeRead = 'like.read',
+    FollowsRead = 'follows.read',
 }
 
 export enum OAuthDiscordScope {
@@ -105,6 +106,7 @@ export const OAuthRequiredScopes = {
         OAuthTwitterScope.TweetRead,
         OAuthTwitterScope.LikeRead,
         OAuthTwitterScope.FollowsWrite,
+        OAuthTwitterScope.FollowsRead,
     ],
     DiscordAuth: [OAuthDiscordScope.Identify, OAuthDiscordScope.Email],
     DiscordValidateGuild: [OAuthDiscordScope.Identify, OAuthDiscordScope.Email, OAuthDiscordScope.Guilds],
@@ -141,7 +143,10 @@ const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; sco
         kind: AccessTokenKind.Twitter,
         scopes: OAuthRequiredScopes.TwitterValidateFollow,
     },
-    [QuestSocialRequirement.TwitterQuery]: { kind: AccessTokenKind.Twitter, scopes: OAuthRequiredScopes.TwitterAuth },
+    [QuestSocialRequirement.TwitterQuery]: {
+        kind: AccessTokenKind.Twitter,
+        scopes: OAuthRequiredScopes.TwitterValidateFollow,
+    },
     [QuestSocialRequirement.DiscordGuildJoined]: {
         kind: AccessTokenKind.Discord,
         scopes: OAuthRequiredScopes.DiscordValidateGuild,

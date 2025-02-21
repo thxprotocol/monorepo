@@ -6,6 +6,7 @@
                 :state="isValidUsername"
                 placeholder="JohnDoe123"
                 style="border-radius: 0.375rem; padding-right: 40px"
+                class="username-input"
                 @input="onInput"
                 @change="onChange"
             />
@@ -97,6 +98,11 @@ export default defineComponent({
                 this.isLoading = false;
             }
         },
+        forceUpdate() {
+            if (!this.accountStore.account) return;
+            this.value = this.accountStore.account.username;
+            return this.reset();
+        },
     },
 });
 </script>
@@ -109,5 +115,9 @@ export default defineComponent({
 }
 .form-control:focus {
     box-shadow: none;
+}
+.username-input::placeholder {
+    color: var(--body-color);
+    opacity: 0.5;
 }
 </style>

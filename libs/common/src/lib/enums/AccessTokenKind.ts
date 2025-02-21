@@ -21,6 +21,7 @@ export enum OAuthTwitterScope {
     TweetRead = 'tweet.read',
     FollowsWrite = 'follows.write',
     LikeRead = 'like.read',
+    FollowsRead = 'follows.read',
 }
 
 export enum OAuthDiscordScope {
@@ -56,6 +57,7 @@ export const OAuthRequiredScopes = {
         OAuthTwitterScope.TweetRead,
         OAuthTwitterScope.LikeRead,
         OAuthTwitterScope.FollowsWrite,
+        OAuthTwitterScope.FollowsRead,
     ],
     TwitterAutoQuest: [OAuthTwitterScope.OfflineAccess, OAuthTwitterScope.UsersRead, OAuthTwitterScope.TweetRead],
     DiscordAuth: [OAuthDiscordScope.Identify, OAuthDiscordScope.Email],

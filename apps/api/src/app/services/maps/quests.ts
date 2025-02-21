@@ -19,6 +19,7 @@ export const requirementMap: {
         if (!resultUser.result) return resultUser;
         const validationResultMessage = await TwitterDataProxy.validateReply(account, quest);
         if (!validationResultMessage.result) return validationResultMessage;
+        return { result: true, reason: '' };
     },
     [QuestSocialRequirement.TwitterRetweet]: async (account, quest) => {
         logger.info(`[${quest.poolId}][${account.sub}] X Quest ${quest._id} Repost verification started`);
@@ -27,6 +28,7 @@ export const requirementMap: {
         if (!validationResultUser.result) return validationResultUser;
         const validationResultRepost = await TwitterDataProxy.validateRetweet(account, quest);
         if (!validationResultRepost.result) return validationResultRepost;
+        return { result: true, reason: '' };
     },
     [QuestSocialRequirement.TwitterFollow]: async (account, quest) => {
         logger.info(`[${quest.poolId}][${account.sub}] X Quest ${quest._id} Follow verification started`);
@@ -35,6 +37,7 @@ export const requirementMap: {
         if (!resultUser.result) return resultUser;
         const validationResultFollow = await TwitterDataProxy.validateFollow(account, quest.content);
         if (!validationResultFollow.result) return validationResultFollow;
+        return { result: true, reason: '' };
     },
     [QuestSocialRequirement.TwitterQuery]: async (account, quest) => {
         logger.info(`[${quest.poolId}][${account.sub}] X Quest ${quest._id} Message verification started`);
@@ -42,6 +45,7 @@ export const requirementMap: {
         if (!resultUser.result) return resultUser;
         const validationResultMessage = await TwitterDataProxy.validateQuery(account, quest);
         if (!validationResultMessage.result) return validationResultMessage;
+        return { result: true, reason: '' };
     },
     [QuestSocialRequirement.DiscordGuildJoined]: async (account, quest) => {
         return await DiscordDataProxy.validateGuildJoined(account, quest.content);
