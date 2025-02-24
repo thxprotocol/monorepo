@@ -362,13 +362,8 @@ export default defineComponent({
         },
         initializeButtonState() {
             if (this.isConnected) {
-                if (this.quest.interaction === 4) {
-                    this.buttonLabel = interactionLabelMap[this.quest.interaction];
-                    this.buttonAction = this.onClickView;
-                } else {
-                    this.buttonLabel = 'Validate';
-                    this.buttonAction = this.onClickValidate;
-                }
+                this.buttonLabel = interactionLabelMap[this.quest.interaction];
+                this.buttonAction = this.onClickView;
             } else {
                 this.buttonLabel = `Connect ${this.kinds[this.quest.kind]}`;
                 this.buttonAction = this.onClickConnect;
