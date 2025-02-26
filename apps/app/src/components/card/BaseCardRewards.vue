@@ -91,9 +91,9 @@
                                         </div>
                                         <a
                                             :href="
-                                                chainList[walletStore.chainId].blockExplorer +
-                                                '/address/' +
-                                                wallet?.address
+                                                'https://explorer.aptoslabs.com/account/' +
+                                                wallet?.address +
+                                                '?network=mainnet'
                                             "
                                             target="_blank"
                                             class="cursor-pointer"
@@ -128,11 +128,12 @@
                                     >
                                         <img :src="copyIcon" alt="copy" height="18" width="18" class="icon-shadow" />
                                     </div>
+                                    <!-- https://explorer.aptoslabs.com/account/0x15aa2e621f592264e1b726374fd3c5a41a9927f1332c14cdb2b47c95e339ba10?network=mainnet 1st one -->
                                     <a
                                         :href="
-                                            chainList[walletStore.chainId].blockExplorer +
-                                            '/address/' +
-                                            walletStore.wallet?.address
+                                            'https://explorer.aptoslabs.com/account/' +
+                                            walletStore.wallet?.address +
+                                            '?network=mainnet'
                                         "
                                         target="_blank"
                                         class="cursor-pointer"
