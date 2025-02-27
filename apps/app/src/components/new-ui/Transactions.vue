@@ -46,7 +46,7 @@
                     <div class="chain-name">
                         {{ getChainName(tx.chainId) }}
                     </div>
-                    <div class="chain-amount">{{ (tx.amount / 1000000).toFixed(2) }}</div>
+                    <div class="chain-amount">{{ (tx.amount / 1000000).toFixed(4).replace(/\.?0+$/, '') }}</div>
                     <div class="chain-token">{{ parseTokenNameFromTo(tx.to) }}</div>
                     <div class="chain-hash">
                         <a
