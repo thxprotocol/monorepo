@@ -114,6 +114,8 @@ export default defineComponent({
             isTransLoading: true,
             aptosLogo,
             windowWidth: window.innerWidth,
+            SANTA_ACCOUNT,
+            CASH_ACCOUNT,
         };
     },
     computed: {
