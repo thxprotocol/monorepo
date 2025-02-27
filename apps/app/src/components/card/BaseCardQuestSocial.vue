@@ -225,8 +225,8 @@ export default defineComponent({
             interactionLabelMap,
             showQuestModal: false,
             isValidated: false,
-            buttonLabel: this.isConnected ? 'Validate' : 'Connect',
-            buttonAction: this.isConnected ? this.onClickValidate : this.onClickConnect,
+            buttonLabel: this.isConnected ? interactionLabelMap[this.quest.interaction] : 'Connect',
+            buttonAction: this.isConnected ? this.onClickView : this.onClickConnect,
         };
     },
 
@@ -264,7 +264,6 @@ export default defineComponent({
     },
     mounted() {
         this.initializeButtonState();
-        console.log('questy:', this.quest);
     },
     methods: {
         queryToURL(quest: TQuestSocial) {
@@ -289,8 +288,8 @@ export default defineComponent({
 
             window.open(this.contentURL, '_blank');
 
-            this.buttonLabel = 'Validate';
-            this.buttonAction = this.onClickValidate;
+            this.buttonLabel = 'Claim';
+            this.buttonAction = this.onClickComplete;
 
             this.isLoadingView = false;
             this.isViewed = true;
@@ -299,9 +298,22 @@ export default defineComponent({
             try {
                 this.error = '';
                 this.isSubmitting = true;
+
+                await new Promise((resolve) => setTimeout(resolve, 7000));
+
+                const validationResult = await this.questStore.validateQuest(this.quest);
+
+                if (!validationResult?.result) {
+                    this.error = validationResult.reason || 'Validation failed.';
+                    this.buttonLabel = interactionLabelMap[this.quest.interaction];
+                    this.buttonAction = this.onClickView;
+                    return;
+                }
+
                 await this.questStore.completeQuest(this.quest);
                 this.isModalQuestEntryShown = true;
             } catch (error) {
+                await this.onClickDisconnect();
                 const err = error as Error;
                 this.error = err.message ? err.message : 'Could not claim points.';
                 console.error(error);
@@ -319,30 +331,6 @@ export default defineComponent({
             } catch (error) {
                 this.error = 'Could not disconnect platform.';
                 console.error(error);
-            } finally {
-                this.isSubmitting = false;
-            }
-        },
-        async onClickValidate() {
-            try {
-                this.error = '';
-                this.isSubmitting = true;
-                this.isValidated = false;
-
-                const validationResult = await this.questStore.validateQuest(this.quest);
-
-                if (validationResult?.result) {
-                    this.isValidated = true;
-                    this.buttonLabel = `Claim ${this.quest.amount} points`;
-                    this.buttonAction = this.onClickComplete;
-                } else {
-                    this.error = validationResult.reason || 'Validation failed.';
-                    this.buttonLabel = interactionLabelMap[this.quest.interaction];
-                    this.buttonAction = this.onClickView;
-                }
-            } catch (err) {
-                await this.onClickDisconnect();
-                console.error(err);
             } finally {
                 this.isSubmitting = false;
             }
