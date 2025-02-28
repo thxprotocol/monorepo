@@ -8,7 +8,7 @@
         :error="error"
         @modal-close="isModalQuestEntryShown = false"
     >
-        <div class="d-flex justify-content-start mb-2 gap-2 overflow-hidden">
+        <div class="d-flex justify-content-start mb-2 gap-2 overflow-auto daily-box">
             <b-badge
                 v-for="(amount, key) of quest.amounts"
                 class="d-flex flex-column align-items-center justify-content-center"
@@ -16,7 +16,7 @@
                 :class="
                     key < quest.entries.length ? 'bg-success text-white bg-daily-completed' : 'bg-primary text-white'
                 "
-                :style="{ transform: `translateX(-${shiftAmount}px)`, color: '#fff' }"
+                :style="{ color: '#fff' }"
             >
                 <small>Day {{ key + 1 }}</small>
                 <strong class="h5 mb-0">{{ formatAmount(amount) }} </strong>
@@ -92,9 +92,6 @@ export default defineComponent({
     },
     computed: {
         ...mapStores(useAccountStore, useAuthStore, useQuestStore),
-        shiftAmount() {
-            return this.quest.entries.length == 4 ? 130 : 0;
-        },
         isAlertWaitDurationShown() {
             return !!this.waitDuration;
         },
@@ -166,5 +163,13 @@ export default defineComponent({
 }
 .badge.text-bg-success {
     color: #f6ebff !important;
+}
+.daily-box::-webkit-scrollbar {
+    display: flex !important;
+}
+@media (max-width: 992px) {
+    .daily-box::-webkit-scrollbar {
+        display: none !important;
+    }
 }
 </style>
