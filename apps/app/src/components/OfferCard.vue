@@ -20,24 +20,33 @@
                     width="100"
                 />
                 <div v-else class="placeholder"></div>
-
-                <div class="position-absolute bottom-0 end-0 text-uppercase offer-category">
-                    {{ offer.categories && offer.categories.length ? offer.categories[0] : '' }}
-                </div>
                 <div v-if="filteredPlatforms.length" class="corner-icons">
-                    <span v-for="(platform, index) in filteredPlatforms" :key="index">
-                        <i :class="getPlatformIcon(platform)" class="d-flex justify-content-center"></i>
+                    <span
+                        v-for="(platform, index) in filteredPlatforms"
+                        :key="index"
+                        class="d-flex justify-content-center"
+                    >
+                        <img
+                            v-if="platform === 'android'"
+                            :src="androidImg"
+                            alt="android"
+                            style="width: 14px !important; height: 14px !important"
+                        />
+                        <i v-else :class="getPlatformIcon(platform)" class="d-flex justify-content-center"></i>
                     </span>
                 </div>
             </div>
 
-            <div class="px-2 my-3 d-flex flex-column flex-grow-1">
-                <div class="d-flex align-items-end justify-content-between flex-grow-1">
+            <div class="px-1 my-2 d-flex flex-column flex-grow-1">
+                <div class="d-flex flex-column justify-content-between">
                     <b-card-text
                         v-if="offer.description"
                         class="flex-grow-1 quest-title-main offer-title-main"
                         v-html="decodeHTML(offer.title)"
                     />
+                    <p class="text-capitalize offer-category m-0">
+                        {{ offer.categories && offer.categories.length ? offer.categories[0] : '' }}
+                    </p>
                 </div>
                 <!-- <div class="d-flex justify-content-center mb-1 hr-divider">
                     <img :src="hrDivider" alt="hr divider" width="72" height="2" />
@@ -50,7 +59,9 @@
                     </div>
                 </div> -->
             </div>
-            <div class="offer-btn">${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}</div>
+            <div class="d-flex align-items-baseline mx-1 offer-btn">
+                ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
+            </div>
         </b-collapse>
         <b-modal v-model="showModal" size="lg" hide-footer hide-header centered>
             <div class="offer-wrap">
@@ -147,6 +158,8 @@ import { useAccountStore } from '../stores/Account';
 import { mapStores } from 'pinia';
 import imgSanta from '../assets/santa-logo.png';
 import hrDivider from '../assets/hr-line.png';
+import androidImg from '../assets/android.png';
+
 export default defineComponent({
     name: 'OfferCard',
     components: {
@@ -158,7 +171,9 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         filteredPlatforms(): string[] {
-            return (this.offer.platforms || []).filter((platform: string) => this.getPlatformIcon(platform) !== '');
+            return (this.offer.platforms || []).filter(
+                (platform: string) => platform === 'android' || this.getPlatformIcon(platform) !== '',
+            );
         },
     },
     data() {
@@ -173,6 +188,7 @@ export default defineComponent({
             } as { [provider: string]: string },
             imgSanta,
             hrDivider,
+            androidImg,
         };
     },
     methods: {
@@ -186,9 +202,6 @@ export default defineComponent({
             switch (platform) {
                 case 'ios':
                     return 'fab fa-apple';
-                case 'android':
-                case 'smartphone':
-                    return 'fab fa-android';
                 case 'desktop':
                     return 'fas fa-laptop';
                 default:
@@ -329,6 +342,7 @@ export default defineComponent({
     background: var(--quest-item-bg);
     padding: 10px;
     height: 100%;
+    padding-bottom: 15px;
 }
 .modal-content {
     background-color: var(--modal-bg);
@@ -365,11 +379,10 @@ export default defineComponent({
     top: 0;
     right: 0;
     z-index: 10;
-    color: #fff;
-    font-size: 1rem;
-    background: rgba(52, 52, 52, 0.65);
-    border-top-right-radius: 4px;
-    padding: 5px;
+    color: rgba(255, 255, 255, 0.75);
+    background: rgba(52, 52, 52, 0.8);
+    border-radius: 0 4px 4px 4px;
+    padding: 3px;
 }
 .corner-icons i {
     width: 20px;
@@ -383,12 +396,14 @@ export default defineComponent({
     font-style: normal;
     font-weight: 500;
     line-height: normal;
+    margin-bottom: 3px !important;
 }
 .offer-category {
-    background: var(--offers-tag-bg);
-    border-radius: 3px;
-    padding: 2px 6px;
+    color: var(--offer-secondary-color);
     font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 @media (max-width: 1400px) {
     .my-offer-card {
