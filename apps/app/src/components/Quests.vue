@@ -1026,7 +1026,6 @@ export default defineComponent({
 
     &:hover {
         transform: scale(1.02);
-        cursor: pointer;
     }
     .card {
         border: 0 !important;

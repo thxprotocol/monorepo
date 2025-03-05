@@ -6,8 +6,8 @@
     --dropdown-background: #202020;
     --dropdown-border-color: #292929;
     --avatar-background: rgba(131, 75, 196, 0.5);
-    --modal-title-color: #d4d4d4;
-    --modal-bg: #15171a;
+    --modal-title-color: #ededed;
+    --modal-bg: #131313;
     --nav-link-bg: #202020;
     --nav-link-active-bg: rgba(255, 255, 255, 0.03);
     --nav-border-color: #414141;
@@ -98,5 +98,13 @@
     --input-ref-bg: #484848;
 
     --offer-secondary-color: #979797;
+    --offer-modal-desc-color: #a3a3a3;
+    --offer-reward-bg: #232323;
+    --offer-reward-amount-bg: rgba(0, 244, 84, 0.21);
+    --offer-reward-amount-color: #65ff9a;
+    --offer-cat-bg: #0e2240;
+    --offer-cat-color: #5d9aee;
+    --offer-close-bg: rgba(187, 187, 187, 0.2);
+    --offer-back-btn-bg: #252529;
     // Add other dark theme variables as needed
 }

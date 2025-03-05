@@ -9,7 +9,7 @@
             </div>
         </div> -->
 
-        <b-collapse v-model="isVisible" class="h-100 d-flex flex-column" @click="openModal">
+        <b-collapse v-model="isVisible" class="h-100 d-flex flex-column">
             <div class="d-flex justify-content-center w-100 offer-card-img">
                 <img
                     v-if="offer.imageUrl"
@@ -63,49 +63,83 @@
                 ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
             </div>
         </b-collapse>
+        <button class="slide-up-button" @click.stop="openModal">Activate</button>
         <b-modal v-model="showModal" size="lg" hide-footer hide-header centered>
             <div class="offer-wrap">
-                <button type="button" class="modal-btn-close" aria-label="Close" @click="showModal = false">
+                <button type="button" class="modal-btn-close" aria-label="Close" @click="closeModal">
                     <i class="fas fa-times"></i>
                 </button>
-                <h2 class="modal-title">{{ decodeHTML(offer.title) }}</h2>
-                <div class="modal-body d-flex flex-column">
-                    <div class="d-flex offer-details">
-                        <img
-                            v-if="offer.imageUrl"
-                            class="img-fluid mb-3"
-                            :src="offer.imageUrl"
-                            alt="header image"
-                            loading="lazy"
-                            width="156"
-                            height="156"
-                            style="border-radius: 5px; object-fit: cover"
-                        />
-                        <div class="modal-details ms-3">
-                            <p class="offer-payout">
-                                ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
-                            </p>
-                            <p class="offer-provider">{{ offer.provider }}</p>
-                            <p v-if="offer.categories" class="offer-categories">
-                                <span v-for="category in offer.categories" :key="category" class="me-1">
-                                    {{ category }}
-                                </span>
-                            </p>
-                            <p v-else class="offer-categories">
-                                <span v-if="offer.platforms">
-                                    <span v-for="platform in offer.platforms" :key="platform" class="me-1">
-                                        {{ platform }}
-                                    </span>
-                                </span>
-                            </p>
+                <div class="content-section offer-section modal-body" :class="{ 'slide-out': showQR }">
+                    <h2 class="modal-title mb-3">{{ decodeHTML(offer.title) }}</h2>
+                    <div class="d-flex flex-column justify-content-between h-100">
+                        <div class="overflow-auto mb-2" style="max-height: calc(100% - 80px)">
+                            <div class="d-flex offer-details">
+                                <img
+                                    v-if="offer.imageUrl"
+                                    class="img-fluid mb-3"
+                                    :src="offer.imageUrl"
+                                    alt="header image"
+                                    loading="lazy"
+                                    width="156"
+                                    height="156"
+                                    style="border-radius: 5px; object-fit: cover"
+                                />
+                                <div class="modal-details ms-3">
+                                    <p class="offer-payout">
+                                        ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
+                                    </p>
+                                    <p class="offer-provider">{{ offer.provider }}</p>
+                                    <p v-if="offer.categories" class="offer-categories">
+                                        <span v-for="category in offer.categories" :key="category" class="me-1">
+                                            {{ category }}
+                                        </span>
+                                    </p>
+                                    <p v-else-if="offer.platforms" class="offer-categories">
+                                        <span v-for="platform in offer.platforms" :key="platform" class="me-1">
+                                            {{ platform }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="modal-offer-description" v-html="decodeHTML(offer.description)"></p>
+                            <OfferSteps :offer="offer" />
                         </div>
 
-                        <!-- <div v-if="accountStore.isMobile">
-                            <OfferSteps :offer="offer" />
-                        </div> -->
+                        <b-button
+                            variant="primary"
+                            block
+                            class="w-100 mb-2 position-absolute bottom-0"
+                            style="width: calc(100% - 32px) !important"
+                            @click="earnClick"
+                        >
+                            Earn ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
+                        </b-button>
                     </div>
                 </div>
-                <div :class="['d-flex flex-column', 'modal-info-wrap']">
+                <div class="qr-section" :class="{ 'slide-in': showQR }">
+                    <div class="d-flex gap-1 align-items-center mt-2">
+                        <div
+                            type="button"
+                            class="offer-back-btn d-flex align-items-center justify-content-center"
+                            @click="showQR = false"
+                        >
+                            <i class="fas fa-less-than"></i>
+                        </div>
+                        back
+                    </div>
+                    <div class="d-flex flex-column mt-4">
+                        <h2 class="modal-title mb-3 fs-4 ms-5">{{ decodeHTML(offer.title) }}</h2>
+                        <div class="d-flex justify-content-center">
+                            <div class="position-relative">
+                                <Qrcode :value="offer.santaClickUrl" :size="200" style="border-radius: 8px" />
+                                <img class="qr-icon" :src="imgSanta" alt="icon" />
+                            </div>
+                        </div>
+                        <p class="text-center pt-2">Scan to Install</p>
+                        <button class="offer-cls-btn" @click="closeModal">Close</button>
+                    </div>
+                </div>
+                <!-- <div :class="['d-flex flex-column', 'modal-info-wrap']">
                     <div
                         :class="[
                             'd-flex',
@@ -118,7 +152,6 @@
                     >
                         <div class="overflow-auto">
                             <div>
-                                <h4 class="fs-5" style="color: var(--modal-title-color)">Description</h4>
                                 <p class="modal-offer-description" v-html="decodeHTML(offer.description)"></p>
                             </div>
                             <div v-if="offer.events">
@@ -144,7 +177,7 @@
                             </b-button>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </b-modal>
     </b-card>
@@ -162,9 +195,7 @@ import androidImg from '../assets/android.png';
 
 export default defineComponent({
     name: 'OfferCard',
-    components: {
-        Qrcode,
-    },
+    components: { Qrcode },
     props: {
         offer: { required: true, type: Object as PropType<any> },
     },
@@ -189,6 +220,7 @@ export default defineComponent({
             imgSanta,
             hrDivider,
             androidImg,
+            showQR: false,
         };
     },
     methods: {
@@ -206,6 +238,17 @@ export default defineComponent({
                     return 'fas fa-laptop';
                 default:
                     return '';
+            }
+        },
+        closeModal() {
+            this.showModal = false;
+            this.showQR = false;
+        },
+        earnClick() {
+            if (this.accountStore.isMobile) {
+                this.openOffer();
+            } else {
+                this.showQR = true;
             }
         },
     },
@@ -235,12 +278,12 @@ export default defineComponent({
     color: var(--popup-tag-color);
     font-size: 10px;
     padding: 0.1rem 0.6rem;
-    background-color: rgba(14, 34, 64, 1);
-    color: rgba(93, 154, 238, 1);
+    background-color: var(--offer-cat-bg);
+    color: var(--offer-cat-color);
 }
 .modal-title {
     color: var(--modal-title-color) !important;
-    font-size: 1rem;
+    font-size: 18px;
     font-weight: 600;
     padding-right: 24px;
     display: block;
@@ -263,19 +306,16 @@ export default defineComponent({
     padding: 0.5rem 0;
 }
 .modal-offer-description {
-    font-size: 14px;
     margin: 0;
-    white-space: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
-    padding-left: 10px;
+    color: var(--offer-modal-desc-color);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
 }
 .reward-amount {
     padding: 0 0.4rem;
-    background: rgba(95, 185, 126, 0.13);
     font-size: 0.8rem;
     border-radius: 5px;
     text-align: center;
@@ -287,8 +327,9 @@ export default defineComponent({
     min-height: 24px;
     border-radius: 5px;
     border: 0.25px solid rgba(95, 185, 126, 0.5);
-    background: rgba(95, 185, 126, 0.13);
-    color: rgba(95, 185, 126, 1);
+    background: var(--offer-reward-amount-bg);
+    color: var(--offer-reward-amount-color);
+    font-weight: 500;
 }
 .reward-name {
     font-size: 0.9rem;
@@ -337,12 +378,15 @@ export default defineComponent({
     font-weight: 600;
     line-height: 14px;
     text-align: center;
+    margin-top: 10px;
 }
 .my-offer-card {
+    position: relative;
     background: var(--quest-item-bg);
     padding: 10px;
     height: 100%;
     padding-bottom: 15px;
+    overflow: hidden;
 }
 .modal-content {
     background-color: var(--modal-bg);
@@ -404,6 +448,80 @@ export default defineComponent({
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+}
+.slide-up-button {
+    position: absolute;
+    bottom: -40px;
+    left: 0;
+    right: 0;
+    transition: all 0.3s ease-in-out;
+    opacity: 0;
+    background: var(--btn-primary-santa);
+    padding: 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 10;
+    font-weight: 600;
+    margin: 20px;
+    margin-bottom: 10px;
+    &:hover {
+        opacity: 0.9 !important;
+    }
+}
+
+.my-offer-card:hover .slide-up-button {
+    bottom: 0;
+    opacity: 1;
+}
+
+.content-section {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 1rem;
+}
+
+.offer-section {
+    transform: translateX(0);
+
+    &.slide-out {
+        transform: translateX(-100%);
+    }
+}
+
+.qr-section {
+    transform: translateX(100%);
+
+    &.slide-in {
+        transform: translateX(0);
+    }
+}
+.offer-wrap {
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+}
+.offer-cls-btn {
+    border: none;
+    background: var(--offer-close-bg);
+    border-radius: 5px;
+    padding: 7px 0;
+}
+.offer-back-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    background: var(--offer-back-btn-bg);
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.09);
+}
+.offer-back-btn i {
+    color: #8e8e8e;
+    transform: scaleY(1.5);
+    font-size: 7px;
 }
 @media (max-width: 1400px) {
     .my-offer-card {

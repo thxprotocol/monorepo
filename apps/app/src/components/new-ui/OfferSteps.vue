@@ -1,8 +1,12 @@
 <template>
     <div v-if="offer.events && offer.events.length">
-        <h2 class="modal-title mt-4">Rewards</h2>
+        <h2 class="modal-title mt-4 fs-5">Rewards</h2>
         <div class="rewards-list">
-            <div v-for="event in offer.events" :key="event.name" class="reward-item d-flex align-items-center mb-2">
+            <div
+                v-for="event in offer.events"
+                :key="event.name"
+                class="offer-reward-item d-flex align-items-center mb-2"
+            >
                 <div class="reward-amount me-2">${{ event.payout.toFixed(2) }}</div>
                 <div class="reward-name">
                     {{ event.name }}
@@ -11,8 +15,8 @@
         </div>
     </div>
     <div v-if="offer.terms">
-        <h2 class="modal-title mt-4">Steps</h2>
-        <p class="offer-steps">{{ offer.terms }}</p>
+        <h2 class="modal-title mt-4 fs-5">Steps</h2>
+        <p class="modal-offer-description">{{ offer.terms }}</p>
     </div>
 </template>
 
@@ -26,3 +30,13 @@ export default defineComponent({
     },
 });
 </script>
+
+<style lang="scss">
+.offer-reward-item {
+    background: var(--offer-reward-bg);
+    width: 100%;
+    gap: 15px;
+    padding: 13px 15px;
+    border-radius: 2px;
+}
+</style>
