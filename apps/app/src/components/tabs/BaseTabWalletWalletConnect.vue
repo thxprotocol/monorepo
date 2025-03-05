@@ -83,7 +83,11 @@ export default defineComponent({
             if (this.walletStore.currentChainId == ChainId.Aptos) {
                 if (!window.okxwallet) {
                     if (this.isMobile()) {
-                        const dappUrl = window.location.href;
+                        let dappUrl = window.location.href;
+                        const clid = this.accountStore.account?.providerUserId;
+                        if (!dappUrl.indexOf('?clid')) {
+                            dappUrl += `/?clid=${clid}`;
+                        }
                         const encodedDappUrl = encodeURIComponent(dappUrl);
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
                         window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
