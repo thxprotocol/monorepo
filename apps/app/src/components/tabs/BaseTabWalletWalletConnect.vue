@@ -82,12 +82,8 @@ export default defineComponent({
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
                 if (!window.okxwallet) {
-                    if (!this.isMobile()) {
+                    if (this.isMobile()) {
                         let dappUrl = window.location.href;
-                        const clid = this.accountStore.account?.providerUserId;
-                        if (!dappUrl.indexOf('?clid')) {
-                            dappUrl += `/?clid=${clid}`;
-                        }
                         const encodedDappUrl = encodeURIComponent(dappUrl);
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
                         window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
@@ -99,18 +95,34 @@ export default defineComponent({
                     }
                     return;
                 }
-                try {
-                    await window.okxwallet.aptos.disconnect();
-                } catch (error) {
-                    console.log(error);
-                }
 
+                // ... existing code ...
                 try {
+                    // Store the original URL
+                    const originalUrl = window.location.href;
+
+                    // Construct new URL with clid
+                    const clid = this.accountStore.account?.providerUserId;
+                    let dappUrl = window.location.href;
+                    if (!dappUrl.includes('?clid')) {
+                        dappUrl += `${dappUrl.includes('?') ? '&' : '?'}clid=${clid}`;
+                    }
+
+                    // Update URL before connecting
+                    window.history.replaceState({}, '', dappUrl);
+
                     const response = await window.okxwallet.aptos.connect();
+
+                    // Restore original URL after connecting
+                    window.history.replaceState({}, '', originalUrl);
+
                     this.address = response.address;
                     this.publicKey = response.publicKey;
                     this.walletStore.account = { address: response.address };
                 } catch (error) {
+                    // Restore original URL in case of error
+                    window.history.replaceState({}, '', originalUrl);
+
                     if (error.status === 'Rejected') {
                         this.error = 'Wallet connect is rejected. Please check your wallet.';
                     } else {
