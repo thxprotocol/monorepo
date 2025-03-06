@@ -82,7 +82,7 @@ export default defineComponent({
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
                 if (!window.okxwallet) {
-                    if (this.isMobile()) {
+                    if (!this.isMobile()) {
                         let dappUrl = window.location.href;
                         const clid = this.accountStore.account?.providerUserId;
                         if (!dappUrl.indexOf('?clid')) {
