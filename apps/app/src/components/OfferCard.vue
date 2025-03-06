@@ -1,14 +1,5 @@
 <template>
     <b-card class="w-100 my-offer-card m-0" header-class="p-0" body-class="d-flex flex-column p-0">
-        <!-- <div class="d-flex p-3 m-0 align-items-center pt-0">
-            <div class="d-flex align-items-center justify-content-center" style="width: 25px">
-                <i class="me-2 text-primary fas fa-gift fs-5"></i>
-            </div>
-            <div class="flex-grow-1 pe-2 offer-description fs-5">
-                {{ decodeHTML(offer.title) }}
-            </div>
-        </div> -->
-
         <b-collapse v-model="isVisible" class="h-100 d-flex flex-column">
             <div class="d-flex justify-content-center w-100 offer-card-img">
                 <img
@@ -48,136 +39,87 @@
                         {{ offer.categories && offer.categories.length ? offer.categories[0] : '' }}
                     </p>
                 </div>
-                <!-- <div class="d-flex justify-content-center mb-1 hr-divider">
-                    <img :src="hrDivider" alt="hr divider" width="72" height="2" />
-                </div> -->
-
-                <!-- <div class="d-flex align-items-center justify-content-between mt-2 pb-2" style="opacity: 0.5">
-                    <div class="d-flex align-items-center text-opaque small">
-                        <span v-if="offer.provider" class="text-white me-1"> {{ offer.provider }} &CenterDot; </span>
-                        <span>{{ offer.epc }} </span>
-                    </div>
-                </div> -->
             </div>
             <div class="d-flex align-items-baseline mx-1 offer-btn">
                 ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
             </div>
         </b-collapse>
+
         <button class="slide-up-button" @click.stop="openModal">Activate</button>
+
         <b-modal v-model="showModal" size="lg" hide-footer hide-header centered>
             <div class="offer-wrap">
                 <button type="button" class="modal-btn-close" aria-label="Close" @click="closeModal">
                     <i class="fas fa-times"></i>
                 </button>
-                <div class="content-section offer-section modal-body" :class="{ 'slide-out': showQR }">
-                    <h2 class="modal-title mb-3">{{ decodeHTML(offer.title) }}</h2>
-                    <div class="d-flex flex-column justify-content-between h-100">
-                        <div class="overflow-auto mb-2" style="max-height: calc(100% - 80px)">
-                            <div class="d-flex offer-details">
-                                <img
-                                    v-if="offer.imageUrl"
-                                    class="img-fluid mb-3"
-                                    :src="offer.imageUrl"
-                                    alt="header image"
-                                    loading="lazy"
-                                    width="156"
-                                    height="156"
-                                    style="border-radius: 5px; object-fit: cover"
-                                />
-                                <div class="modal-details ms-3">
-                                    <p class="offer-payout">
-                                        ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
-                                    </p>
-                                    <p class="offer-provider">{{ offer.provider }}</p>
-                                    <p v-if="offer.categories" class="offer-categories">
-                                        <span v-for="category in offer.categories" :key="category" class="me-1">
-                                            {{ category }}
-                                        </span>
-                                    </p>
-                                    <p v-else-if="offer.platforms" class="offer-categories">
-                                        <span v-for="platform in offer.platforms" :key="platform" class="me-1">
-                                            {{ platform }}
-                                        </span>
-                                    </p>
-                                </div>
-                            </div>
-                            <p class="modal-offer-description" v-html="decodeHTML(offer.description)"></p>
-                            <OfferSteps :offer="offer" />
-                        </div>
 
-                        <b-button
-                            variant="primary"
-                            block
-                            class="w-100 mb-2 position-absolute bottom-0"
-                            style="width: calc(100% - 32px) !important"
-                            @click="earnClick"
-                        >
-                            Earn ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
-                        </b-button>
-                    </div>
-                </div>
-                <div class="qr-section" :class="{ 'slide-in': showQR }">
-                    <div class="d-flex gap-1 align-items-center mt-2">
-                        <div
-                            type="button"
-                            class="offer-back-btn d-flex align-items-center justify-content-center"
-                            @click="showQR = false"
-                        >
-                            <i class="fas fa-less-than"></i>
-                        </div>
-                        back
-                    </div>
-                    <div class="d-flex flex-column mt-4">
-                        <h2 class="modal-title mb-3 fs-4 ms-5">{{ decodeHTML(offer.title) }}</h2>
-                        <div class="d-flex justify-content-center">
-                            <div class="position-relative">
-                                <Qrcode :value="offer.santaClickUrl" :size="200" style="border-radius: 8px" />
-                                <img class="qr-icon" :src="imgSanta" alt="icon" />
-                            </div>
-                        </div>
-                        <p class="text-center pt-2">Scan to Install</p>
-                        <button class="offer-cls-btn" @click="closeModal">Close</button>
-                    </div>
-                </div>
-                <!-- <div :class="['d-flex flex-column', 'modal-info-wrap']">
-                    <div
-                        :class="[
-                            'd-flex',
-                            {
-                                'justify-content-center flex-column': !offer.events,
-                                'justify-content-between': offer.events,
-                            },
-                            'offer-action-wrap',
-                        ]"
-                    >
-                        <div class="overflow-auto">
-                            <div>
+                <transition name="slide" mode="out-in" tag="div">
+                    <div v-if="!showQR" class="offer-section">
+                        <h2 class="modal-title mb-3">{{ decodeHTML(offer.title) }}</h2>
+                        <div class="d-flex flex-column justify-content-between h-100">
+                            <div class="overflow-auto mb-2 pb-5" style="max-height: 400px">
+                                <div class="d-flex offer-details">
+                                    <img
+                                        v-if="offer.imageUrl"
+                                        class="img-fluid mb-3"
+                                        :src="offer.imageUrl"
+                                        alt="header image"
+                                        loading="lazy"
+                                        width="156"
+                                        height="156"
+                                        style="border-radius: 5px; object-fit: cover"
+                                    />
+                                    <div class="modal-details ms-3">
+                                        <p class="offer-payout">
+                                            ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
+                                        </p>
+                                        <p class="offer-provider">{{ offer.provider }}</p>
+                                        <p v-if="offer.categories" class="offer-categories">
+                                            <span v-for="category in offer.categories" :key="category" class="me-1">
+                                                {{ category }}
+                                            </span>
+                                        </p>
+                                        <p v-else-if="offer.platforms" class="offer-categories">
+                                            <span v-for="platform in offer.platforms" :key="platform" class="me-1">
+                                                {{ platform }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
                                 <p class="modal-offer-description" v-html="decodeHTML(offer.description)"></p>
-                            </div>
-                            <div v-if="offer.events">
                                 <OfferSteps :offer="offer" />
                             </div>
-                        </div>
-                        <div
-                            v-if="!accountStore.isMobile"
-                            class="d-flex justify-content-center"
-                            :class="`${!offer.events ? 'w-100' : ''}`"
-                        >
-                            <div class="qr-code" :style="`margin-top: ${offer.events ? '150px' : '20px'}`">
-                                <h3 class="modal-title">Scan on your mobile</h3>
-                                <div class="position-relative">
-                                    <Qrcode :value="offer.santaClickUrl" :size="200" />
-                                    <img class="qr-icon" :src="imgSanta" alt="icon" />
-                                </div>
-                            </div>
-                        </div>
-                        <div v-else class="w-100">
-                            <b-button variant="primary" block class="w-100" @click="openOffer">
+
+                            <b-button variant="primary" block class="w-100" @click="earnClick">
                                 Earn ${{ offer.payout % 1 === 0 ? offer.payout : offer.payout.toFixed(2) }}
                             </b-button>
                         </div>
                     </div>
-                </div> -->
+
+                    <div v-else class="qr-section">
+                        <div class="d-flex gap-1 align-items-center mt-2">
+                            <div
+                                type="button"
+                                class="offer-back-btn d-flex align-items-center justify-content-center"
+                                @click="showQR = false"
+                            >
+                                <i class="fas fa-less-than"></i>
+                            </div>
+                            back
+                        </div>
+                        <div class="d-flex flex-column mt-4">
+                            <h2 class="modal-title mb-3 fs-4 ms-5">{{ decodeHTML(offer.title) }}</h2>
+                            <div class="d-flex justify-content-center">
+                                <div class="position-relative">
+                                    <Qrcode :value="offer.santaClickUrl" :size="200" style="border-radius: 8px" />
+                                    <img class="qr-icon" :src="imgSanta" alt="icon" />
+                                </div>
+                            </div>
+                            <p class="text-center pt-2">Scan to Install</p>
+                            <button class="offer-cls-btn" @click="closeModal">Close</button>
+                        </div>
+                    </div>
+                </transition>
             </div>
         </b-modal>
     </b-card>
@@ -486,24 +428,13 @@ export default defineComponent({
 }
 
 .offer-section {
-    transform: translateX(0);
-
-    &.slide-out {
-        transform: translateX(-100%);
-    }
 }
 
 .qr-section {
-    transform: translateX(100%);
-
-    &.slide-in {
-        transform: translateX(0);
-    }
 }
 .offer-wrap {
     position: relative;
     overflow: hidden;
-    min-height: 400px;
 }
 .offer-cls-btn {
     border: none;
@@ -522,6 +453,22 @@ export default defineComponent({
     color: #8e8e8e;
     transform: scaleY(1.5);
     font-size: 7px;
+}
+.slide-enter-active,
+.slide-leave-active {
+    transition: transform 0.2s ease;
+}
+.slide-enter-from {
+    transform: translateX(100%);
+}
+.slide-enter-to {
+    transform: translateX(0);
+}
+.slide-leave-from {
+    transform: translateX(0);
+}
+.slide-leave-to {
+    transform: translateX(-100%);
 }
 @media (max-width: 1400px) {
     .my-offer-card {
