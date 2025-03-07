@@ -109,10 +109,10 @@ export default defineComponent({
                     }
                     dappUrl += '&test=true';
                     // Update URL before connecting
-                    window.history.replaceState({}, '', dappUrl);
-
+                    // window.history.replaceState({}, '', dappUrl);
+                    window.location.href = dappUrl;
                     const response = await window.okxwallet.aptos.connect();
-
+                    window.location.href = originalUrl;
                     // Restore original URL after connecting
                     window.history.replaceState({}, '', originalUrl);
 
