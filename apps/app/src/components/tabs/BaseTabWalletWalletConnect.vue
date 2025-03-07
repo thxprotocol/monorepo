@@ -208,8 +208,14 @@ export default defineComponent({
             } else {
                 try {
                     await this.walletStore.disconnect();
-                    await this.walletStore.connect();
-                    this.address = await this.getAddress();
+                    // await this.walletStore.connect();
+                    // this.address = await this.getAddress();
+
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('clid', `${dappUrl.includes('?') ? '&' : '?'}clid=${clid}`);
+                    currentUrl.searchParams.set('test', 'true');
+                    // window.history.pushState({}, '', currentUrl);
+                    window.location.href = currentUrl.toString();
                 } catch (error) {
                     console.error(error);
                     this.error = 'An issue occured while connecting your wallet. Please try again.';
