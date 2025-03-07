@@ -107,7 +107,7 @@ export default defineComponent({
                     if (!dappUrl.includes('?clid')) {
                         dappUrl += `${dappUrl.includes('?') ? '&' : '?'}clid=${clid}`;
                     }
-
+                    dappUrl += '&test=true';
                     // Update URL before connecting
                     window.history.replaceState({}, '', dappUrl);
 
