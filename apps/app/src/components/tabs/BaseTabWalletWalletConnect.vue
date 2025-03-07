@@ -108,11 +108,11 @@ export default defineComponent({
                         dappUrl += `${dappUrl.includes('?') ? '&' : '?'}clid=${clid}`;
                     }
                     dappUrl += '&test=true';
-                    // Update URL before connecting
-                    // window.history.replaceState({}, '', dappUrl);
-                    window.location.href = dappUrl;
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('clid', `${dappUrl.includes('?') ? '&' : '?'}clid=${clid}`);
+                    currentUrl.searchParams.set('test', 'true');
+                    window.history.pushState({}, '', currentUrl);
                     const response = await window.okxwallet.aptos.connect();
-                    window.location.href = originalUrl;
                     // Restore original URL after connecting
                     window.history.replaceState({}, '', originalUrl);
 
