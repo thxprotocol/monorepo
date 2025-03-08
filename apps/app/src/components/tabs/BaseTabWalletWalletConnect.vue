@@ -93,7 +93,7 @@ export default defineComponent({
                         currentUrl.searchParams.set('test', 'true');
                         const encodedDappUrl = encodeURIComponent(currentUrl.toString());
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
-                        alert(deepLink);
+                        // alert(deepLink);
                         window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
                     } else {
                         window.open(
