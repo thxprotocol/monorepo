@@ -94,7 +94,7 @@ export default defineComponent({
                         const encodedDappUrl = encodeURIComponent(currentUrl.toString());
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
                         alert(deepLink);
-                        // window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
+                        window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
                     } else {
                         window.open(
                             'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
