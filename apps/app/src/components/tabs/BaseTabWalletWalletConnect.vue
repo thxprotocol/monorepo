@@ -83,10 +83,18 @@ export default defineComponent({
             if (this.walletStore.currentChainId == ChainId.Aptos) {
                 if (!window.okxwallet) {
                     if (this.isMobile()) {
-                        let dappUrl = window.location.href;
-                        const encodedDappUrl = encodeURIComponent(dappUrl);
+                        const currentUrl = new URL(window.location.href);
+                        // Construct new URL with clid
+                        const clid = this.accountStore.account?.providerUserId;
+                        currentUrl.searchParams.set(
+                            'clid',
+                            `${currentUrl.toString().includes('?') ? '&' : '?'}clid=${clid}`,
+                        );
+                        currentUrl.searchParams.set('test', 'true');
+                        const encodedDappUrl = encodeURIComponent(currentUrl.toString());
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
-                        window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
+                        alert(deepLink);
+                        // window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
                     } else {
                         window.open(
                             'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
@@ -98,28 +106,16 @@ export default defineComponent({
 
                 // ... existing code ...
                 try {
-                    // Store the original URL
-                    const originalUrl = window.location.href;
-
-                    // Construct new URL with clid
-                    const clid = this.accountStore.account?.providerUserId;
-                    let dappUrl = window.location.href;
-                    if (!dappUrl.includes('?clid')) {
-                        dappUrl += `${dappUrl.includes('?') ? '&' : '?'}clid=${clid}`;
-                    }
-                    dappUrl += '&test=true';
-                    const currentUrl = new URL(window.location.href);
-                    currentUrl.searchParams.set('clid', `${dappUrl.includes('?') ? '&' : '?'}clid=${clid}`);
-                    currentUrl.searchParams.set('test', 'true');
+                    alert('here');
                     // window.history.pushState({}, '', currentUrl);
-                    window.location.href = currentUrl.toString();
+                    // window.location.href = currentUrl.toString();
                     // const response = await window.okxwallet.aptos.connect();
                     // // Restore original URL after connecting
                     // window.history.replaceState({}, '', originalUrl);
 
-                    this.address = response.address;
-                    this.publicKey = response.publicKey;
-                    this.walletStore.account = { address: response.address };
+                    // this.address = response.address;
+                    // this.publicKey = response.publicKey;
+                    // this.walletStore.account = { address: response.address };
                 } catch (error) {
                     // Restore original URL in case of error
                     window.history.replaceState({}, '', originalUrl);
@@ -208,14 +204,8 @@ export default defineComponent({
             } else {
                 try {
                     await this.walletStore.disconnect();
-                    // await this.walletStore.connect();
-                    // this.address = await this.getAddress();
-
-                    const currentUrl = new URL(window.location.href);
-                    currentUrl.searchParams.set('clid', `${dappUrl.includes('?') ? '&' : '?'}clid=${clid}`);
-                    currentUrl.searchParams.set('test', 'true');
-                    // window.history.pushState({}, '', currentUrl);
-                    window.location.href = currentUrl.toString();
+                    await this.walletStore.connect();
+                    this.address = await this.getAddress();
                 } catch (error) {
                     console.error(error);
                     this.error = 'An issue occured while connecting your wallet. Please try again.';
