@@ -83,17 +83,15 @@ export default defineComponent({
             if (this.walletStore.currentChainId == ChainId.Aptos) {
                 if (!window.okxwallet) {
                     if (this.isMobile()) {
+                        // ... existing code ...
                         const currentUrl = new URL(window.location.href);
-                        // Construct new URL with clid
-                        const clid = this.accountStore.account?.providerUserId;
-                        currentUrl.searchParams.set(
-                            'clid',
-                            `${currentUrl.toString().includes('?') ? '&' : '?'}clid=${clid}`,
-                        );
-                        currentUrl.searchParams.set('test', 'true');
+                        // Check if clid already exists in URL
+                        if (!currentUrl.searchParams.has('clid')) {
+                            const clid = this.accountStore.account?.providerUserId;
+                            currentUrl.searchParams.set('clid', clid);
+                        }
                         const encodedDappUrl = encodeURIComponent(currentUrl.toString());
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
-                        // alert(deepLink);
                         window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
                     } else {
                         window.open(
@@ -106,20 +104,12 @@ export default defineComponent({
 
                 // ... existing code ...
                 try {
-                    alert('here');
-                    // window.history.pushState({}, '', currentUrl);
-                    // window.location.href = currentUrl.toString();
-                    // const response = await window.okxwallet.aptos.connect();
-                    // // Restore original URL after connecting
-                    // window.history.replaceState({}, '', originalUrl);
-
-                    // this.address = response.address;
-                    // this.publicKey = response.publicKey;
-                    // this.walletStore.account = { address: response.address };
+                    await window.okxwallet.aptos.disconnect();
+                    const response = await window.okxwallet.aptos.connect();
+                    this.address = response.address;
+                    this.publicKey = response.publicKey;
+                    this.walletStore.account = { address: response.address };
                 } catch (error) {
-                    // Restore original URL in case of error
-                    window.history.replaceState({}, '', originalUrl);
-
                     if (error.status === 'Rejected') {
                         this.error = 'Wallet connect is rejected. Please check your wallet.';
                     } else {
