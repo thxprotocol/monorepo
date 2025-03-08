@@ -92,6 +92,7 @@ export default defineComponent({
                         }
                         const encodedDappUrl = encodeURIComponent(currentUrl.toString());
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
+                        alert(deepLink);
                         window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
                     } else {
                         window.open(
@@ -104,6 +105,7 @@ export default defineComponent({
 
                 // ... existing code ...
                 try {
+                    alert('here');
                     await window.okxwallet.aptos.disconnect();
                     const response = await window.okxwallet.aptos.connect();
                     this.address = response.address;
