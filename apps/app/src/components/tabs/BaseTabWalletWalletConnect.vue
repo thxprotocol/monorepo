@@ -84,16 +84,9 @@ export default defineComponent({
                 if (!window.okxwallet) {
                     if (this.isMobile()) {
                         // ... existing code ...
-                        const currentUrl = new URL(window.location.href);
-                        // Check if clid already exists in URL
-                        if (!currentUrl.searchParams.has('clid')) {
-                            const clid = this.accountStore.account?.providerUserId;
-                            currentUrl.searchParams.set('clid', clid);
-                        }
-                        const encodedDappUrl = encodeURIComponent(currentUrl.toString());
+                        const encodedDappUrl = encodeURIComponent(window.location.href);
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
-                        alert(deepLink);
-                        window.location.href = 'https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink);
+                        window.open('https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink));
                     } else {
                         window.open(
                             'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
@@ -105,7 +98,14 @@ export default defineComponent({
 
                 // ... existing code ...
                 try {
-                    alert('here');
+                    const currentUrl = new URL(window.location.href);
+                    // Check if clid already exists in URL
+                    if (!currentUrl.searchParams.has('clid')) {
+                        const clid = this.accountStore.account?.providerUserId;
+                        currentUrl.searchParams.set('clid', clid || '');
+                        currentUrl.searchParams.set('test', clid || '');
+                    }
+                    history.replaceState({}, '', currentUrl.toString());
                     await window.okxwallet.aptos.disconnect();
                     const response = await window.okxwallet.aptos.connect();
                     this.address = response.address;
