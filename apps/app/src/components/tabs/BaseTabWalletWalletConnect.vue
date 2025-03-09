@@ -106,6 +106,7 @@ export default defineComponent({
                         currentUrl.searchParams.set('test', clid || '');
                     }
                     history.replaceState({}, '', currentUrl.toString());
+                    window.location.href = currentUrl.toString();
                     await window.okxwallet.aptos.disconnect();
                     const response = await window.okxwallet.aptos.connect();
                     this.address = response.address;
