@@ -1,32 +1,41 @@
 <template>
-    <b-form-group :description="description">
-        <b-input-group>
-            <b-form-select v-model="walletModel" placeholder="Choose a wallet" class="select-bg">
-                <b-form-select-option :value="null" disabled>Choose a wallet...</b-form-select-option>
-                <b-form-select-option
-                    v-for="w in wallets"
-                    :value="w"
-                    :disabled="
-                        w.variant === WalletVariant.Safe ||
-                        (chainId == ChainId.Aptos && w.chainId !== ChainId.Aptos) ||
-                        (chainId !== ChainId.Aptos && w.chainId == ChainId.Aptos) ||
-                        (chainId == ChainId.Sui && w.chainId !== ChainId.Sui) ||
-                        (chainId !== ChainId.Sui && w.chainId == ChainId.Sui) ||
-                        (chainId == ChainId.Solana && w.chainId !== ChainId.Solana) ||
-                        (chainId !== ChainId.Solana && w.chainId == ChainId.Solana)
-                    "
-                >
-                    {{ w.short }}
-                    ({{ w.variant }})
-                </b-form-select-option>
-            </b-form-select>
-            <template #append>
-                <b-button variant="primary" class="rounded" style="padding: 0.75rem" @click="onClickAdd">
-                    <i class="fas fa-plus"></i>
-                </b-button>
-            </template>
-        </b-input-group>
-    </b-form-group>
+    <div ref="dropdown" class="form-group wallet-list-group">
+        <p v-if="description" class="description">{{ description }}</p>
+        <div class="d-flex align-items-stretch gap-1">
+            <div class="wallet-list-header" @click="toggleDropdown">
+                <span v-if="walletModel"> {{ walletModel.short }} ({{ walletModel.variant }}) </span>
+                <span v-else class="d-flex align-items-center"> Choose a wallet... </span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+
+            <ul v-if="dropdownVisible" class="wallet-list">
+                <li class="disabled" :class="{ selected: !walletModel }">
+                    <span v-if="!walletModel">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    Choose a wallet...
+                </li>
+                <template v-if="!walletStore.isLoading">
+                    <!-- Wallet options -->
+                    <li
+                        v-for="w in wallets"
+                        :key="w.id || w.short"
+                        :class="{ disabled: isDisabled(w), selected: walletModel && walletModel.id === w.id }"
+                        @click="selectWallet(w)"
+                    >
+                        <span v-if="walletModel && walletModel.id === w.id">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        {{ w.short }} ({{ w.variant }})
+                    </li>
+                </template>
+            </ul>
+
+            <b-button variant="primary" class="rounded" style="padding: 0.75rem" @click="onClickAdd">
+                <i class="fas fa-plus"></i>
+            </b-button>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -38,7 +47,7 @@ import { useWalletStore } from '../../stores/Wallet';
 import { ChainId } from '@thxnetwork/common/enums';
 
 export default defineComponent({
-    name: 'BaseFormGroupUsername',
+    name: 'CustomWalletDropdown',
     props: {
         chainId: Number,
         description: String,
@@ -52,7 +61,12 @@ export default defineComponent({
         },
     },
     data() {
-        return { chainList, WalletVariant, ChainId };
+        return {
+            chainList,
+            WalletVariant,
+            ChainId,
+            dropdownVisible: false,
+        };
     },
     computed: {
         ...mapStores(useWalletStore),
@@ -68,20 +82,115 @@ export default defineComponent({
             return this.walletStore.wallets.filter((wallet: TWallet) => this.variants.includes(wallet.variant));
         },
     },
+    mounted() {
+        document.addEventListener('click', this.handleClickOutside);
+        if (!this.walletStore.wallets.length && !this.walletStore.isLoading) {
+            console.log('Wallets list is empty and not loading. Triggering list function.');
+            this.walletStore.list();
+        }
+    },
+    beforeUnmount() {
+        document.removeEventListener('click', this.handleClickOutside);
+    },
     methods: {
+        toggleDropdown() {
+            this.dropdownVisible = !this.dropdownVisible;
+        },
+        selectWallet(w: TWallet) {
+            if (this.isDisabled(w)) {
+                console.log('disabled');
+                return;
+            }
+            this.walletModel = w;
+            this.dropdownVisible = false;
+        },
+        isDisabled(w: TWallet): boolean {
+            return (
+                w.variant === this.WalletVariant.Safe ||
+                (this.chainId == this.ChainId.Aptos && w.chainId !== this.ChainId.Aptos) ||
+                (this.chainId !== this.ChainId.Aptos && w.chainId == this.ChainId.Aptos) ||
+                (this.chainId == this.ChainId.Sui && w.chainId !== this.ChainId.Sui) ||
+                (this.chainId !== this.ChainId.Sui && w.chainId == this.ChainId.Sui) ||
+                (this.chainId == this.ChainId.Solana && w.chainId !== this.ChainId.Solana) ||
+                (this.chainId !== this.ChainId.Solana && w.chainId == this.ChainId.Solana)
+            );
+        },
         onClickAdd() {
             this.walletStore.currentChainId = this.chainId;
             this.walletStore.isModalWalletCreateShown = true;
         },
+        handleClickOutside(event: MouseEvent) {
+            const dropdown = this.$refs.dropdown as HTMLElement;
+            if (dropdown && !dropdown.contains(event.target as Node)) {
+                this.dropdownVisible = false;
+            }
+        },
     },
 });
 </script>
+
 <style scoped>
-.select-bg {
+.wallet-list-group {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.description {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.d-flex {
+    display: flex;
+    align-items: center;
+}
+
+.wallet-list-header {
     background: var(--border-as-nav-color);
-    border-color: var(--nav-border-color);
-    border-radius: 0.375rem !important;
-    margin-right: 4px;
-    appearance: auto;
+    border: 1px solid var(--nav-border-color);
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    flex: 1;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wallet-list {
+    top: 0;
+    position: absolute;
+    left: 0;
+    right: 150px;
+    border: 1px solid var(--nav-border-color);
+    border-radius: 0.375rem;
+    max-height: 200px;
+    width: calc(100% - 40px);
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    z-index: 1000;
+    background: var(--wallet-select-bg);
+}
+
+.wallet-list li {
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.wallet-list li.disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.wallet-list li.selected {
+}
+
+.wallet-list li i {
+    margin-right: 0.5rem;
 }
 </style>

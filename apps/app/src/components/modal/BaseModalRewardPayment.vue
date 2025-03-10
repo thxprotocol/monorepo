@@ -46,6 +46,7 @@
             <BaseFormGroupWalletSelect
                 v-if="isWalletRequired"
                 :chain-id="reward.erc20.chainId"
+                :wallet="wallet"
                 class="mb-0"
                 @update="wallet = $event"
             />
@@ -89,7 +90,7 @@ export default defineComponent({
             RewardVariant,
             isAlertSuccessShown: false,
             error: '',
-            wallet: null,
+            wallet: undefined,
             isModalShown: false,
             isLoading: false,
             chainList,
@@ -139,6 +140,9 @@ export default defineComponent({
             this.isAlertSuccessShown = false;
             this.isLoading = false;
             this.error = '';
+            const walletStore = useWalletStore();
+            walletStore.list();
+            walletStore.listWallets();
         },
         async onSubmit() {
             this.isLoading = true;
