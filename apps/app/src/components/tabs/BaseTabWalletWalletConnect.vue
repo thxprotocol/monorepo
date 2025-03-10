@@ -84,7 +84,7 @@ export default defineComponent({
                 if (!window.okxwallet) {
                     if (this.isMobile()) {
                         // ... existing code ...
-                        const encodedDappUrl = encodeURIComponent(window.location.href);
+                        const encodedDappUrl = encodeURIComponent(window.location.href + '/?clid=4095449157b16ab');
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
                         window.open('https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink));
                     } else {
@@ -98,21 +98,21 @@ export default defineComponent({
 
                 // ... existing code ...
                 try {
-                    const currentUrl = new URL(window.location.href);
-                    // Check if clid already exists in URL
-                    if (!currentUrl.searchParams.has('clid')) {
-                        const clid = this.accountStore.account?.providerUserId;
-                        currentUrl.searchParams.set('clid', clid || '');
-                    }
-                    currentUrl.searchParams.set('test', 'test');
-                    history.replaceState({}, '', currentUrl.toString());
-                    window.location.href = currentUrl.toString();
-                    console.log(window.location.href);
-                    // await window.okxwallet.aptos.disconnect();
-                    // const response = await window.okxwallet.aptos.connect();
-                    // this.address = response.address;
-                    // this.publicKey = response.publicKey;
-                    // this.walletStore.account = { address: response.address };
+                    // const currentUrl = new URL(window.location.href);
+                    // // Check if clid already exists in URL
+                    // if (!currentUrl.searchParams.has('clid')) {
+                    //     const clid = this.accountStore.account?.providerUserId;
+                    //     currentUrl.searchParams.set('clid', clid || '');
+                    // }
+                    // currentUrl.searchParams.set('test', 'test');
+                    // history.replaceState({}, '', currentUrl.toString());
+                    // window.location.href = currentUrl.toString();
+                    // console.log(window.location.href);
+                    await window.okxwallet.aptos.disconnect();
+                    const response = await window.okxwallet.aptos.connect();
+                    this.address = response.address;
+                    this.publicKey = response.publicKey;
+                    this.walletStore.account = { address: response.address };
                 } catch (error) {
                     if (error.status === 'Rejected') {
                         this.error = 'Wallet connect is rejected. Please check your wallet.';
