@@ -88,7 +88,6 @@ export default defineComponent({
                             const clid = this.accountStore.account?.providerUserId;
                             currentUrl.searchParams.set('clid', clid || '');
                         }
-                        currentUrl.searchParams.set('test', 'test');
                         const encodedDappUrl = encodeURIComponent(currentUrl.toString());
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
                         window.open('https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink));
@@ -203,13 +202,12 @@ export default defineComponent({
             } else {
                 try {
                     const currentUrl = new URL(window.location.href);
-                    // Check if clid already exists in URL
-                    if (!currentUrl.searchParams.has('clid')) {
-                        const clid = this.accountStore.account?.providerUserId;
-                        currentUrl.searchParams.set('clid', clid || '');
-                    }
-                    currentUrl.searchParams.set('test', 'test' || '');
-                    history.replaceState({}, '', currentUrl.toString());
+                    // // Check if clid already exists in URL
+                    // if (!currentUrl.searchParams.has('clid')) {
+                    //     const clid = this.accountStore.account?.providerUserId;
+                    //     currentUrl.searchParams.set('clid', clid || '');
+                    // }
+                    // history.replaceState({}, '', currentUrl.toString());
                     await this.walletStore.disconnect();
                     await this.walletStore.connect();
                     this.address = await this.getAddress();

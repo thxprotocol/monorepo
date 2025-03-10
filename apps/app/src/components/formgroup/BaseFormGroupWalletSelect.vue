@@ -65,6 +65,7 @@ export default defineComponent({
             },
         },
         wallets() {
+            alert(this.walletStore.wallets);
             return this.walletStore.wallets.filter((wallet: TWallet) => this.variants.includes(wallet.variant));
         },
     },
