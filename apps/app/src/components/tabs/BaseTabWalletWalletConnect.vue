@@ -104,7 +104,7 @@ export default defineComponent({
                         const clid = this.accountStore.account?.providerUserId;
                         currentUrl.searchParams.set('clid', clid || '');
                     }
-                    currentUrl.searchParams.set('test', clid || '');
+                    currentUrl.searchParams.set('test', 'test');
                     history.replaceState({}, '', currentUrl.toString());
                     window.location.href = currentUrl.toString();
                     console.log(window.location.href);
@@ -203,7 +203,7 @@ export default defineComponent({
                         const clid = this.accountStore.account?.providerUserId;
                         currentUrl.searchParams.set('clid', clid || '');
                     }
-                    currentUrl.searchParams.set('test', clid || '');
+                    currentUrl.searchParams.set('test', 'test' || '');
                     history.replaceState({}, '', currentUrl.toString());
                     await this.walletStore.disconnect();
                     await this.walletStore.connect();
