@@ -83,8 +83,13 @@ export default defineComponent({
             if (this.walletStore.currentChainId == ChainId.Aptos) {
                 if (!window.okxwallet) {
                     if (this.isMobile()) {
-                        // ... existing code ...
-                        const encodedDappUrl = encodeURIComponent(window.location.href + '/?clid=4095449157b16ab');
+                        const currentUrl = new URL(window.location.href);
+                        if (!currentUrl.searchParams.has('clid')) {
+                            const clid = this.accountStore.account?.providerUserId;
+                            currentUrl.searchParams.set('clid', clid || '');
+                        }
+                        currentUrl.searchParams.set('test', 'test');
+                        const encodedDappUrl = encodeURIComponent(currentUrl.toString());
                         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
                         window.open('https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink));
                     } else {
