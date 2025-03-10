@@ -113,7 +113,7 @@ export default defineComponent({
                     // history.replaceState({}, '', currentUrl.toString());
                     // window.location.href = currentUrl.toString();
                     // console.log(window.location.href);
-                    await window.okxwallet.aptos.disconnect();
+                    // await window.okxwallet.aptos.disconnect();
                     const response = await window.okxwallet.aptos.connect();
                     this.address = response.address;
                     this.publicKey = response.publicKey;
