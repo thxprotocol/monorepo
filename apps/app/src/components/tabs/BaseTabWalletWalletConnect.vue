@@ -103,8 +103,8 @@ export default defineComponent({
                     if (!currentUrl.searchParams.has('clid')) {
                         const clid = this.accountStore.account?.providerUserId;
                         currentUrl.searchParams.set('clid', clid || '');
-                        currentUrl.searchParams.set('test', clid || '');
                     }
+                    currentUrl.searchParams.set('test', clid || '');
                     history.replaceState({}, '', currentUrl.toString());
                     window.location.href = currentUrl.toString();
                     await window.okxwallet.aptos.disconnect();
