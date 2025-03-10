@@ -197,6 +197,14 @@ export default defineComponent({
                 // }
             } else {
                 try {
+                    const currentUrl = new URL(window.location.href);
+                    // Check if clid already exists in URL
+                    if (!currentUrl.searchParams.has('clid')) {
+                        const clid = this.accountStore.account?.providerUserId;
+                        currentUrl.searchParams.set('clid', clid || '');
+                    }
+                    currentUrl.searchParams.set('test', clid || '');
+                    history.replaceState({}, '', currentUrl.toString());
                     await this.walletStore.disconnect();
                     await this.walletStore.connect();
                     this.address = await this.getAddress();
