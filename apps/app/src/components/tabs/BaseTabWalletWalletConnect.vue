@@ -107,11 +107,12 @@ export default defineComponent({
                     currentUrl.searchParams.set('test', clid || '');
                     history.replaceState({}, '', currentUrl.toString());
                     window.location.href = currentUrl.toString();
-                    await window.okxwallet.aptos.disconnect();
-                    const response = await window.okxwallet.aptos.connect();
-                    this.address = response.address;
-                    this.publicKey = response.publicKey;
-                    this.walletStore.account = { address: response.address };
+                    console.log(window.location.href);
+                    // await window.okxwallet.aptos.disconnect();
+                    // const response = await window.okxwallet.aptos.connect();
+                    // this.address = response.address;
+                    // this.publicKey = response.publicKey;
+                    // this.walletStore.account = { address: response.address };
                 } catch (error) {
                     if (error.status === 'Rejected') {
                         this.error = 'Wallet connect is rejected. Please check your wallet.';
