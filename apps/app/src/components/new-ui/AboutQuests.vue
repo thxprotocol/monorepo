@@ -338,7 +338,7 @@ nav > div:not(:first-child) .about-header {
     }
     .about-aside {
         position: sticky;
-        top: -5px;
+        top: -21px;
         background: var(--sticky-header-bg);
         z-index: 11;
         height: 50px;

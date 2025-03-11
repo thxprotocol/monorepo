@@ -476,7 +476,9 @@ export default defineComponent({
     height: 100vh;
     overflow: hidden;
 }
-
+.mainComponent::-webkit-scrollbar {
+    display: none !important;
+}
 .main-content {
     flex-grow: 1;
     padding: 8px 0 16px 16px;
@@ -543,7 +545,7 @@ export default defineComponent({
         overflow: unset;
     }
     .mainComponent {
-        overflow: unset;
+        overflow: auto;
         min-height: 100vh;
     }
     .components-wrap {
