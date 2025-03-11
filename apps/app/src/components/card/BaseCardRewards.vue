@@ -1,5 +1,5 @@
 <template>
-    <div style="min-height: 70%" class="wallet-wrap">
+    <div class="wallet-wrap h-100 d-flex flex-column">
         <!-- <BaseNavbarSecondary v-if="accountStore.isMobile" class="ms-auto" /> -->
 
         <div class="d-flex p-2 m-0 align-items-center">
@@ -23,7 +23,7 @@
                 </b-dropdown-item-button>
             </b-dropdown> -->
         </div>
-        <div v-if="accountStore.isAuthenticated" class="d-flex h-wallet h-100">
+        <div v-if="accountStore.isAuthenticated" class="d-flex overflow-auto flex-grow-1">
             <div v-if="walletStore.isLoading" class="spinner-container">
                 <b-spinner variant="primary" small />
             </div>
@@ -117,6 +117,7 @@
                         <div
                             class="d-flex flex-column wallet-connected w-100"
                             :class="{ 'd-none': !walletStore.wallets.length }"
+                            style="max-height: 245px"
                         >
                             <div class="d-flex justify-content-between px-2 wallet-text">
                                 <span class="selected-wallet">{{ walletStore?.wallet?.short }}</span>
@@ -359,6 +360,7 @@ export default defineComponent({
     padding: 17px 10px 0 10px;
     max-height: 100px;
     max-width: 360px;
+    flex-shrink: 0;
 }
 .wallet-online-word {
     color: var(--wallet-online-color);
