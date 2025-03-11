@@ -16,7 +16,7 @@
                         <Transactions />
                     </div>
                     <div v-if="selectedPart === 'about'" class="h-100 leaderboard-mobile">
-                        <AboutQuests />
+                        <AboutQuests @scrollToTop="handleScrollToTop" />
                     </div>
                 </div>
             </div>
@@ -230,6 +230,14 @@ export default defineComponent({
         },
         handleNavClick(item: string) {
             this.selectedPart = item;
+        },
+        handleScrollToTop() {
+            if (this.$refs.mainComponent) {
+                this.$refs.mainComponent.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                });
+            }
         },
     },
 });
