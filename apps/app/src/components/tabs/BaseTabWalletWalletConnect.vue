@@ -117,24 +117,6 @@ export default defineComponent({
                     this.address = response.address;
                     this.publicKey = response.publicKey;
                     this.walletStore.account = { address: response.address };
-                    if (this.isMobile()) {
-                        const santaDeepLink = 'santa://';
-                        this.$bvModal
-                            .msgBoxConfirm(`Wallet added successfully! Please return to Santa app.`, {
-                                title: 'Return to Santa App',
-                                okTitle: 'Return to App',
-                                cancelTitle: 'Stay Here',
-                                centered: true,
-                                okVariant: 'primary',
-                            })
-                            .then((confirmed) => {
-                                if (confirmed) {
-                                    // window.location.href = santaDeepLink;
-                                } else {
-                                    this.$emit('close');
-                                }
-                            });
-                    }
                 } catch (error) {
                     if (error.status === 'Rejected') {
                         this.error = 'Wallet connect is rejected. Please check your wallet.';
@@ -258,6 +240,10 @@ export default defineComponent({
                     if (!wallet) throw new Error('New wallet not found');
 
                     this.walletStore.setWallet(wallet);
+
+                    if (this.isMobile()) {
+                        alert(`Wallet added successfully! Please return to Santa app.`);
+                    }
                     this.$emit('close');
                 } catch (error) {
                     console.error(error);
