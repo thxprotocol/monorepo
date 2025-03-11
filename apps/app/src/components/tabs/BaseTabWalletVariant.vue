@@ -19,7 +19,11 @@
             </div>
             <p class="small text-start mb-0">
                 Connect one of your existing wallets using
-                {{ walletStore.currentChainId == ChainId.Aptos ? 'SantaWallet' : 'WalletConnect' }}.
+                {{ walletStore.currentChainId == ChainId.Aptos ? 'OKX Wallet app' : 'WalletConnect' }}.
+            </p>
+            <p v-if="isMobile" class="small text-start mb-0 mt-1 text-warning">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                You’ll be redirected to the OKX app or prompted to download the OKX Wallet app.
             </p>
         </b-button>
         <b-button
@@ -73,6 +77,9 @@ export default defineComponent({
         isDisabledSafeCreate() {
             return false;
             // return !!this.walletStore.wallets.find((wallet) => wallet.variant === WalletVariant.Safe);
+        },
+        isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         },
     },
 });

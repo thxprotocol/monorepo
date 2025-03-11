@@ -76,7 +76,7 @@ export default defineComponent({
             isUsernameInvalid: false,
             error: '',
             show: false,
-            message: 'This signature will be used to proof ownership of a web3 account.',
+            message: 'This signature will be used to prove ownership of a web3 account.',
             signature: '',
             isLoading: false,
             chainId: ChainId.Polygon,

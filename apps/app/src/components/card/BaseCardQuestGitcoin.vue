@@ -81,7 +81,7 @@ export default defineComponent({
             walletVariants: [WalletVariant.WalletConnect],
             show: false,
             message:
-                'This signed message will be used to proof ownership of your web3 account and verify the quest requirements.',
+                'This signed message will be used to prove ownership of your web3 account and verify the quest requirements.',
         };
     },
     computed: {

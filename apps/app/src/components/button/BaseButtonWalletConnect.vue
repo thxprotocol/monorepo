@@ -46,7 +46,7 @@ export default defineComponent({
         chainId: Number,
         message: {
             type: String,
-            default: 'This signature will be used to proof ownership of a web3 account.',
+            default: 'This signature will be used to prove ownership of a web3 account.',
         },
     },
     data() {

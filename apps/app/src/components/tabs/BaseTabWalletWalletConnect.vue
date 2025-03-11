@@ -2,7 +2,7 @@
     <b-alert v-model="isAlertShown" variant="primary" class="p-2" style="font-weight: 600; font-size: 14px">{{
         error
     }}</b-alert>
-    <b-form-group label="Proof ownership">
+    <b-form-group label="Prove ownership">
         <p class="text-opaque">Sign this message using your wallet to confirm it's address.</p>
         <blockquote class="mb-0">
             <code>
@@ -43,7 +43,7 @@ export default defineComponent({
             publicKey: '',
             walletLogoMap,
             WalletVariant,
-            message: 'This signature will be used to proof ownership of a web3 account.',
+            message: 'This signature will be used to prove ownership of a web3 account.',
             signature: '',
             isLoading: false,
             shortenAddress,
@@ -117,6 +117,26 @@ export default defineComponent({
                     this.address = response.address;
                     this.publicKey = response.publicKey;
                     this.walletStore.account = { address: response.address };
+                    if (this.isMobile()) {
+                        const santaDeepLink = 'santa://';
+                        this.$bvModal
+                            .msgBoxConfirm(`Wallet added successfully! Click OK to return to Santa app.`, {
+                                title: 'Return to Santa App',
+                                okTitle: 'Return to App',
+                                cancelTitle: 'Stay Here',
+                                centered: true,
+                                okVariant: 'primary',
+                            })
+                            .then((confirmed) => {
+                                if (confirmed) {
+                                    window.location.href = santaDeepLink;
+                                } else {
+                                    this.$emit('close');
+                                }
+                            });
+                    } else {
+                        this.$emit('close');
+                    }
                 } catch (error) {
                     if (error.status === 'Rejected') {
                         this.error = 'Wallet connect is rejected. Please check your wallet.';
@@ -201,13 +221,6 @@ export default defineComponent({
                 // }
             } else {
                 try {
-                    const currentUrl = new URL(window.location.href);
-                    // // Check if clid already exists in URL
-                    // if (!currentUrl.searchParams.has('clid')) {
-                    //     const clid = this.accountStore.account?.providerUserId;
-                    //     currentUrl.searchParams.set('clid', clid || '');
-                    // }
-                    // history.replaceState({}, '', currentUrl.toString());
                     await this.walletStore.disconnect();
                     await this.walletStore.connect();
                     this.address = await this.getAddress();
