@@ -81,61 +81,31 @@ export default defineComponent({
         },
         async onClickConnect() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {
-                if (!window.okxwallet) {
-                    if (this.isMobile()) {
-                        const currentUrl = new URL(window.location.href);
-                        if (!currentUrl.searchParams.has('clid')) {
-                            const clid = this.accountStore.account?.providerUserId;
-                            currentUrl.searchParams.set('clid', clid || '');
-                        }
-                        const encodedDappUrl = encodeURIComponent(currentUrl.toString());
-                        const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
-                        window.open('https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink));
-                    } else {
-                        window.open(
-                            'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
-                            '_blank',
-                        );
-                    }
-                    return;
-                }
-
-                // ... existing code ...
-                try {
-                    // const currentUrl = new URL(window.location.href);
-                    // // Check if clid already exists in URL
-                    // if (!currentUrl.searchParams.has('clid')) {
-                    //     const clid = this.accountStore.account?.providerUserId;
-                    //     currentUrl.searchParams.set('clid', clid || '');
-                    // }
-                    // currentUrl.searchParams.set('test', 'test');
-                    // history.replaceState({}, '', currentUrl.toString());
-                    // window.location.href = currentUrl.toString();
-                    // console.log(window.location.href);
-                    // await window.okxwallet.aptos.disconnect();
-                    const response = await window.okxwallet.aptos.connect();
-                    this.address = response.address;
-                    this.publicKey = response.publicKey;
-                    this.walletStore.account = { address: response.address };
-                } catch (error) {
-                    if (error.status === 'Rejected') {
-                        this.error = 'Wallet connect is rejected. Please check your wallet.';
-                    } else {
-                        console.log(error);
-                    }
-                }
-                // if (!window.santaAptos) return;
-                // try {
-                //     await window.santaAptos.disconnect();
-                // } catch (error) {
-                //     console.log(error);
+                // if (!window.okxwallet) {
+                //     if (this.isMobile()) {
+                //         const currentUrl = new URL(window.location.href);
+                //         if (!currentUrl.searchParams.has('clid')) {
+                //             const clid = this.accountStore.account?.providerUserId;
+                //             currentUrl.searchParams.set('clid', clid || '');
+                //         }
+                //         const encodedDappUrl = encodeURIComponent(currentUrl.toString());
+                //         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
+                //         window.open('https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink));
+                //     } else {
+                //         window.open(
+                //             'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
+                //             '_blank',
+                //         );
+                //     }
+                //     return;
                 // }
 
+                // // ... existing code ...
                 // try {
-                //     const response = await window.santaAptos.connect();
-                //     this.address = response.args.address;
-                //     this.publicKey = response.args.publicKey;
-                //     this.walletStore.account = { address: response.args.address };
+                //     const response = await window.okxwallet.aptos.connect();
+                //     this.address = response.address;
+                //     this.publicKey = response.publicKey;
+                //     this.walletStore.account = { address: response.address };
                 // } catch (error) {
                 //     if (error.status === 'Rejected') {
                 //         this.error = 'Wallet connect is rejected. Please check your wallet.';
@@ -143,6 +113,25 @@ export default defineComponent({
                 //         console.log(error);
                 //     }
                 // }
+                if (!window.santaAptos) return;
+                try {
+                    await window.santaAptos.disconnect();
+                } catch (error) {
+                    console.log(error);
+                }
+
+                try {
+                    const response = await window.santaAptos.connect();
+                    this.address = response.args.address;
+                    this.publicKey = response.args.publicKey;
+                    this.walletStore.account = { address: response.args.address };
+                } catch (error) {
+                    if (error.status === 'Rejected') {
+                        this.error = 'Wallet connect is rejected. Please check your wallet.';
+                    } else {
+                        console.log(error);
+                    }
+                }
             } else if (this.walletStore.currentChainId == ChainId.Sui) {
                 console.log('Not supporting Sui at the moment.');
                 // try {
@@ -220,13 +209,13 @@ export default defineComponent({
                 // });
 
                 try {
-                    const response = await window.okxwallet.aptos.signMessage({
-                        message: this.message,
-                        nonce: 'random',
-                    });
-                    // const response = await window.santaAptos.signMessage(
-                    //     `APTOS\nmessage: ${this.message}\nnonce: random`,
-                    // );
+                    // const response = await window.okxwallet.aptos.signMessage({
+                    //     message: this.message,
+                    //     nonce: 'random',
+                    // });
+                    const response = await window.santaAptos.signMessage(
+                        `APTOS\nmessage: ${this.message}\nnonce: random`,
+                    );
                     await this.walletStore.create({
                         chainId: ChainId.Aptos,
                         variant: this.variant,
