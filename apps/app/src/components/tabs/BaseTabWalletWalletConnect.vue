@@ -13,7 +13,9 @@
     <b-form-group v-if="address" label="Address">
         <span class="text-opaque">{{ address }}</span>
     </b-form-group>
-    <b-button v-if="!address" variant="primary" class="w-100" @click="onClickConnect"> Connect Wallet </b-button>
+    <b-button v-if="!address" variant="primary" class="w-100" :disabled="isLoadingConnect" @click="onClickConnect">
+        Connect Wallet
+    </b-button>
     <b-button v-else :disabled="isLoading" class="w-100 btn-primary" @click="onClickAdd">
         <b-spinner v-if="isLoading" small />
         <template v-else>
@@ -47,6 +49,7 @@ export default defineComponent({
             signature: '',
             isLoading: false,
             shortenAddress,
+            isLoadingConnect: false,
         };
     },
     computed: {
@@ -80,124 +83,141 @@ export default defineComponent({
             return this.walletStore.account.address;
         },
         async onClickConnect() {
-            if (this.walletStore.currentChainId == ChainId.Aptos) {
-                // if (!window.okxwallet) {
-                //     if (this.isMobile()) {
-                //         const currentUrl = new URL(window.location.href);
-                //         if (!currentUrl.searchParams.has('clid')) {
-                //             const clid = this.accountStore.account?.providerUserId;
-                //             currentUrl.searchParams.set('clid', clid || '');
-                //         }
-                //         const encodedDappUrl = encodeURIComponent(currentUrl.toString());
-                //         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
-                //         window.open('https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink));
-                //     } else {
-                //         window.open(
-                //             'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
-                //             '_blank',
-                //         );
-                //     }
-                //     return;
-                // }
+            if (this.isLoadingConnect) return;
+            this.isLoadingConnect = true;
+            try {
+                this.resetConnectionState();
 
-                // // ... existing code ...
-                // try {
-                //     const response = await window.okxwallet.aptos.connect();
-                //     this.address = response.address;
-                //     this.publicKey = response.publicKey;
-                //     this.walletStore.account = { address: response.address };
-                // } catch (error) {
-                //     if (error.status === 'Rejected') {
-                //         this.error = 'Wallet connect is rejected. Please check your wallet.';
-                //     } else {
-                //         console.log(error);
-                //     }
-                // }
-                if (!window.santaAptos) return;
-                try {
-                    await window.santaAptos.disconnect();
-                } catch (error) {
-                    console.log(error);
-                }
+                if (this.walletStore.currentChainId == ChainId.Aptos) {
+                    // if (!window.okxwallet) {
+                    //     if (this.isMobile()) {
+                    //         const currentUrl = new URL(window.location.href);
+                    //         if (!currentUrl.searchParams.has('clid')) {
+                    //             const clid = this.accountStore.account?.providerUserId;
+                    //             currentUrl.searchParams.set('clid', clid || '');
+                    //         }
+                    //         const encodedDappUrl = encodeURIComponent(currentUrl.toString());
+                    //         const deepLink = 'okx://wallet/dapp/url?dappUrl=' + encodedDappUrl;
+                    //         window.open('https://www.okx.com/download?deeplink=' + encodeURIComponent(deepLink));
+                    //     } else {
+                    //         window.open(
+                    //             'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
+                    //             '_blank',
+                    //         );
+                    //     }
+                    //     return;
+                    // }
 
-                try {
-                    const response = await window.santaAptos.connect();
-                    this.address = response.args.address;
-                    this.publicKey = response.args.publicKey;
-                    this.walletStore.account = { address: response.args.address };
-                } catch (error) {
-                    if (error.status === 'Rejected') {
-                        this.error = 'Wallet connect is rejected. Please check your wallet.';
-                    } else {
-                        console.log(error);
+                    // // ... existing code ...
+                    // try {
+                    //     const response = await window.okxwallet.aptos.connect();
+                    //     this.address = response.address;
+                    //     this.publicKey = response.publicKey;
+                    //     this.walletStore.account = { address: response.address };
+                    // } catch (error) {
+                    //     if (error.status === 'Rejected') {
+                    //         this.error = 'Wallet connect is rejected. Please check your wallet.';
+                    //     } else {
+                    //         console.log(error);
+                    //     }
+                    // }
+                    if (!window.santaAptos) return;
+                    try {
+                        await window.santaAptos.disconnect();
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                    } catch (error) {
+                        console.log('Disconnect error:', error);
+                    }
+
+                    try {
+                        const response = await window.santaAptos.connect();
+                        this.address = response.args.address;
+                        this.publicKey = response.args.publicKey;
+                        this.walletStore.account = { address: response.args.address };
+                    } catch (error) {
+                        this.resetConnectionState();
+                        if (error.status === 'Rejected') {
+                            this.error = 'Wallet connect is rejected. Please check your wallet.';
+                        } else {
+                            console.log(error);
+                        }
+                    }
+                } else if (this.walletStore.currentChainId == ChainId.Sui) {
+                    console.log('Not supporting Sui at the moment.');
+                    // try {
+                    //     if (window.martian.sui._isConnected) await window.martian.sui.disconnect();
+                    //     const accountInfo = await window.martian.sui.connect(['viewAccount', 'suggestTransactions']);
+                    //     try {
+                    //         await this.walletStore.create({
+                    //             chainId: ChainId.Sui,
+                    //             variant: this.variant,
+                    //             rawAddress: accountInfo.address,
+                    //         });
+                    //         const wallet = this.walletStore.wallets.find(
+                    //             (wallet: TWallet) => wallet.address === accountInfo.address,
+                    //         );
+                    //         if (!wallet) throw new Error('New wallet not found');
+
+                    //         this.walletStore.setWallet(wallet);
+                    //         this.$emit('close');
+                    //     } catch (error) {
+                    //         console.error(error);
+                    //         this.error = 'An issue occured while creating your wallet. Please try again.';
+                    //     } finally {
+                    //         this.isLoading = false;
+                    //     }
+                    // } catch (error) {
+                    //     console.error(error);
+                    // }
+                } else if (this.walletStore.currentChainId == ChainId.Solana) {
+                    console.log('Not supporting Solana at the moment.');
+                    // try {
+                    //     const provider = window.phantom?.solana;
+                    //     const resp = await provider.connect();
+                    //     const accountAddress = resp.publicKey.toString();
+                    //     console.log(accountAddress);
+                    //     try {
+                    //         await this.walletStore.create({
+                    //             chainId: ChainId.Solana,
+                    //             variant: this.variant,
+                    //             rawAddress: accountAddress,
+                    //         });
+                    //         const wallet = this.walletStore.wallets.find(
+                    //             (wallet: TWallet) => wallet.address === accountAddress,
+                    //         );
+                    //         if (!wallet) throw new Error('New wallet not found');
+
+                    //         this.walletStore.setWallet(wallet);
+                    //         this.$emit('close');
+                    //     } catch (error) {
+                    //         console.error(error);
+                    //         this.error = 'An issue occured while creating your wallet. Please try again.';
+                    //     } finally {
+                    //         this.isLoading = false;
+                    //     }
+                    // } catch (error) {
+                    //     console.error(error);
+                    // }
+                } else {
+                    try {
+                        await this.walletStore.disconnect();
+                        await this.walletStore.connect();
+                        this.address = await this.getAddress();
+                    } catch (error) {
+                        console.error(error);
+                        this.error = 'An issue occured while connecting your wallet. Please try again.';
                     }
                 }
-            } else if (this.walletStore.currentChainId == ChainId.Sui) {
-                console.log('Not supporting Sui at the moment.');
-                // try {
-                //     if (window.martian.sui._isConnected) await window.martian.sui.disconnect();
-                //     const accountInfo = await window.martian.sui.connect(['viewAccount', 'suggestTransactions']);
-                //     try {
-                //         await this.walletStore.create({
-                //             chainId: ChainId.Sui,
-                //             variant: this.variant,
-                //             rawAddress: accountInfo.address,
-                //         });
-                //         const wallet = this.walletStore.wallets.find(
-                //             (wallet: TWallet) => wallet.address === accountInfo.address,
-                //         );
-                //         if (!wallet) throw new Error('New wallet not found');
-
-                //         this.walletStore.setWallet(wallet);
-                //         this.$emit('close');
-                //     } catch (error) {
-                //         console.error(error);
-                //         this.error = 'An issue occured while creating your wallet. Please try again.';
-                //     } finally {
-                //         this.isLoading = false;
-                //     }
-                // } catch (error) {
-                //     console.error(error);
-                // }
-            } else if (this.walletStore.currentChainId == ChainId.Solana) {
-                console.log('Not supporting Solana at the moment.');
-                // try {
-                //     const provider = window.phantom?.solana;
-                //     const resp = await provider.connect();
-                //     const accountAddress = resp.publicKey.toString();
-                //     console.log(accountAddress);
-                //     try {
-                //         await this.walletStore.create({
-                //             chainId: ChainId.Solana,
-                //             variant: this.variant,
-                //             rawAddress: accountAddress,
-                //         });
-                //         const wallet = this.walletStore.wallets.find(
-                //             (wallet: TWallet) => wallet.address === accountAddress,
-                //         );
-                //         if (!wallet) throw new Error('New wallet not found');
-
-                //         this.walletStore.setWallet(wallet);
-                //         this.$emit('close');
-                //     } catch (error) {
-                //         console.error(error);
-                //         this.error = 'An issue occured while creating your wallet. Please try again.';
-                //     } finally {
-                //         this.isLoading = false;
-                //     }
-                // } catch (error) {
-                //     console.error(error);
-                // }
-            } else {
-                try {
-                    await this.walletStore.disconnect();
-                    await this.walletStore.connect();
-                    this.address = await this.getAddress();
-                } catch (error) {
-                    console.error(error);
-                    this.error = 'An issue occured while connecting your wallet. Please try again.';
-                }
+            } finally {
+                this.isLoadingConnect = false;
             }
+        },
+        resetConnectionState() {
+            this.address = '';
+            this.publicKey = '';
+            this.signature = '';
+            this.walletStore.setWallet(null);
+            this.walletStore.account = { address: '' };
         },
         async onClickAdd() {
             if (this.walletStore.currentChainId == ChainId.Aptos) {

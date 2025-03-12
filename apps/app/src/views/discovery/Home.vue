@@ -16,7 +16,7 @@
                         <Transactions />
                     </div>
                     <div v-if="selectedPart === 'about'" class="h-100 leaderboard-mobile">
-                        <AboutQuests />
+                        <AboutQuests @scrollToTop="handleScrollToTop" />
                     </div>
                 </div>
             </div>
@@ -230,6 +230,14 @@ export default defineComponent({
         },
         handleNavClick(item: string) {
             this.selectedPart = item;
+        },
+        handleScrollToTop() {
+            if (this.$refs.mainComponent) {
+                this.$refs.mainComponent.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                });
+            }
         },
     },
 });
@@ -476,7 +484,9 @@ export default defineComponent({
     height: 100vh;
     overflow: hidden;
 }
-
+.mainComponent::-webkit-scrollbar {
+    display: none !important;
+}
 .main-content {
     flex-grow: 1;
     padding: 8px 0 16px 16px;
@@ -543,7 +553,7 @@ export default defineComponent({
         overflow: unset;
     }
     .mainComponent {
-        overflow: unset;
+        overflow: auto;
         min-height: 100vh;
     }
     .components-wrap {

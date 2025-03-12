@@ -59,6 +59,8 @@ const props = defineProps({
     },
 });
 
+const emit = defineEmits(['scrollToTop']);
+
 const accountStore = useAccountStore();
 const themeStore = useThemeStore();
 const content = ref([]);
@@ -95,7 +97,16 @@ const scrollToSection = (refName) => {
     isManualScrolling = true;
     activeNavItem.value = refName;
     const section = sectionRefs.value[refName];
-    if (mainContent.value && section && !accountStore.isMobile) {
+
+    if (accountStore.isMobile) {
+        emit('scrollToTop');
+        setTimeout(() => {
+            isManualScrolling = false;
+        }, 600);
+        return;
+    }
+
+    if (mainContent.value && section) {
         const offsetTop = section.offsetTop;
         const mainContentHeight = mainContent.value.offsetHeight;
         const sectionHeight = section.offsetHeight;
@@ -338,7 +349,7 @@ nav > div:not(:first-child) .about-header {
     }
     .about-aside {
         position: sticky;
-        top: -5px;
+        top: -21px;
         background: var(--sticky-header-bg);
         z-index: 11;
         height: 50px;
