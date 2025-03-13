@@ -20,10 +20,10 @@
                     <li
                         v-for="w in wallets"
                         :key="w.id || w.short"
-                        :class="{ disabled: isDisabled(w), selected: walletModel && walletModel.id === w.id }"
+                        :class="{ disabled: isDisabled(w), selected: walletModel && walletModel.address === w.address }"
                         @click="selectWallet(w)"
                     >
-                        <span v-if="walletModel && walletModel.id === w.id">
+                        <span v-if="walletModel && walletModel.address === w.address">
                             <i class="fas fa-check"></i>
                         </span>
                         {{ w.short }} ({{ w.variant }})
@@ -51,7 +51,7 @@ export default defineComponent({
     props: {
         chainId: Number,
         description: String,
-        wallet: {
+        modelValue: {
             type: Object as PropType<TWallet>,
             default: null,
         },
@@ -72,10 +72,10 @@ export default defineComponent({
         ...mapStores(useWalletStore),
         walletModel: {
             get() {
-                return this.wallet;
+                return this.modelValue;
             },
             set(value: TWallet) {
-                this.$emit('update', value);
+                this.$emit('update:modelValue', value);
             },
         },
         wallets() {
