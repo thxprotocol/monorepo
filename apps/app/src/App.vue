@@ -9,7 +9,7 @@
         <div>
             <router-view v-slot="{ Component }">
                 <transition name="fade" mode="out-in">
-                    <component :is="Component" class="router-view-app order-lg-0" />
+                    <component :is="Component" class="router-view-app order-lg-0 overflow-hidden" />
                 </transition>
             </router-view>
             <!-- <BaseSidebar /> -->
