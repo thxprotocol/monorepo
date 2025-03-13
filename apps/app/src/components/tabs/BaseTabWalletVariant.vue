@@ -19,12 +19,12 @@
             </div>
             <p class="small text-start mb-0">
                 Connect one of your existing wallets using
-                {{ walletStore.currentChainId == ChainId.Aptos ? 'OKX Wallet app' : 'WalletConnect' }}.
+                {{ walletStore.currentChainId == ChainId.Aptos ? 'Santa Wallet' : 'WalletConnect' }}.
             </p>
-            <p v-if="isMobile" class="small text-start mb-0 mt-1 text-warning">
+            <!-- <p v-if="isMobile" class="small text-start mb-0 mt-1 text-warning">
                 <i class="bi bi-exclamation-triangle-fill me-1"></i>
                 You’ll be redirected to the OKX app or prompted to download the OKX Wallet app.
-            </p>
+            </p> -->
         </b-button>
         <b-button
             v-if="accountStore.config.isQRCodeCampaign"
