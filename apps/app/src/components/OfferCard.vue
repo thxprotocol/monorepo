@@ -57,7 +57,7 @@
                     <div v-if="!showQR" class="offer-section">
                         <h2 class="modal-title mb-3">{{ decodeHTML(offer.title) }}</h2>
                         <div class="d-flex flex-column justify-content-between h-100">
-                            <div class="overflow-auto mb-2 pb-5" style="max-height: 400px">
+                            <div class="overflow-auto mb-2 pb-3" style="max-height: 400px">
                                 <div class="d-flex offer-details">
                                     <img
                                         v-if="offer.imageUrl"
@@ -75,13 +75,12 @@
                                         </p>
                                         <p class="offer-provider">{{ offer.provider }}</p>
                                         <p v-if="offer.categories" class="offer-categories">
-                                            <span v-for="category in offer.categories" :key="category" class="me-1">
+                                            <span
+                                                v-for="category in offer.categories"
+                                                :key="category"
+                                                class="me-1 text-capitalize"
+                                            >
                                                 {{ category }}
-                                            </span>
-                                        </p>
-                                        <p v-else-if="offer.platforms" class="offer-categories">
-                                            <span v-for="platform in offer.platforms" :key="platform" class="me-1">
-                                                {{ platform }}
                                             </span>
                                         </p>
                                     </div>
@@ -234,7 +233,7 @@ export default defineComponent({
     text-overflow: ellipsis;
 }
 .offer-payout {
-    color: var(--title-color);
+    color: var(--offer-text-color);
     font-size: 1.87rem;
     font-weight: 600;
     margin: 0;
@@ -300,8 +299,8 @@ export default defineComponent({
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 0;
+    right: 0;
     border: none;
     color: var(--body-text);
     opacity: 0.5;
@@ -356,6 +355,8 @@ export default defineComponent({
 }
 .offer-card-img {
     position: relative;
+    border-radius: 4px;
+    overflow: hidden;
 }
 .corner-icons {
     display: flex;
@@ -405,7 +406,7 @@ export default defineComponent({
     cursor: pointer;
     z-index: 10;
     font-weight: 600;
-    margin: 20px;
+    margin: 10px;
     margin-bottom: 10px;
     &:hover {
         opacity: 0.9 !important;
@@ -417,6 +418,12 @@ export default defineComponent({
     opacity: 1;
 }
 
+.my-offer-card img {
+    transition: transform 0.2s ease-in-out;
+}
+.my-offer-card:hover img {
+    transform: scale(1.1);
+}
 .content-section {
     position: absolute;
     width: 100%;
