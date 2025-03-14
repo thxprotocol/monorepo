@@ -112,7 +112,7 @@ const scrollToSection = (refName) => {
         const sectionHeight = section.offsetHeight;
         const maxScrollTop = mainContent.value.scrollHeight - mainContentHeight;
 
-        let targetScrollTop = offsetTop;
+        let targetScrollTop = offsetTop - 50;
         if (offsetTop + sectionHeight > mainContent.value.scrollHeight) {
             targetScrollTop = maxScrollTop;
         }
