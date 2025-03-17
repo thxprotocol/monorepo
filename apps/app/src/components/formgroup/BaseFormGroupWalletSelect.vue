@@ -9,7 +9,7 @@
             </div>
 
             <ul v-if="dropdownVisible" class="wallet-list">
-                <li class="disabled" :class="{ selected: !walletModel }">
+                <li class="disabled">
                     <span v-if="!walletModel">
                         <i class="fas fa-check"></i>
                     </span>
@@ -180,16 +180,28 @@ export default defineComponent({
     cursor: pointer;
     display: flex;
     align-items: center;
+    opacity: 0.5;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
 .wallet-list li.disabled {
-    color: #ccc;
+    opacity: 0.5;
     cursor: not-allowed;
 }
 
 .wallet-list li.selected {
+    background-color: var(--selected-wallet-bg);
+    cursor: default;
+    color: var(--selected-wallet-list-color);
+    opacity: 1;
 }
 
+.wallet-list li:not(.disabled):not(.selected):hover {
+    background-color: var(--selected-wallet-bg);
+    cursor: pointer;
+    color: var(--selected-wallet-list-color);
+    opacity: 1;
+}
 .wallet-list li i {
     margin-right: 0.5rem;
 }
