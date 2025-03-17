@@ -250,7 +250,8 @@ export default defineComponent({
             return this.list.length;
         },
         twoTokens() {
-            const tokens = this.list.filter((token) => token.erc20.symbol === 'USDC' || token.erc20.symbol === 'USDT');
+            // const tokens = this.list.filter((token) => token.erc20.symbol === 'USDC' || token.erc20.symbol === 'USDT');
+            const tokens = this.list.filter((token) => token.erc20.symbol === 'USDT');
 
             // if (!tokens.some((t) => t.erc20.symbol === 'USDC')) {
             //     tokens.push({
