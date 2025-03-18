@@ -124,6 +124,7 @@ export default defineComponent({
                     if (!window.santaAptos) return;
                     try {
                         await window.santaAptos.disconnect();
+                        this.resetConnectionState();
                         await new Promise((resolve) => setTimeout(resolve, 500));
                     } catch (error) {
                         console.log('Disconnect error:', error);
@@ -136,6 +137,7 @@ export default defineComponent({
                         this.walletStore.account = { address: response.args.address };
                     } catch (error) {
                         this.resetConnectionState();
+                        alert(error);
                         if (error.status === 'Rejected') {
                             this.error = 'Wallet connect is rejected. Please check your wallet.';
                         } else {
