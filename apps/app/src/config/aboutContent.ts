@@ -211,7 +211,7 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
                     content: `
                 <h1>Reach Out To Us</h1>
                 <h2>Still confused or have a question left unanswered?</h2>
-                <p>Reach out to a team member in a ‘help’ channel or consult the community on the official Santa Browser <a href="${inviteURL}" target=_blank>discord</a> server.</p>
+                <p>Reach out to a team member in a ‘help’ channel or consult the community on the official Santa Browser <a href="${inviteURL}" target=_blank><strong>discord</strong></a> server.</p>
             `,
                 },
             ],

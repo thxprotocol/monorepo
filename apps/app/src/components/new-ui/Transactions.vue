@@ -46,7 +46,9 @@
                     <div class="chain-name">
                         {{ getChainName(tx.chainId) }}
                     </div>
-                    <div class="chain-amount">{{ (tx.amount / 1000000).toFixed(4).replace(/\.?0+$/, '') }}</div>
+                    <div class="chain-amount">
+                        {{ (Math.floor((tx.amount / 1000000) * 10000) / 10000).toFixed(4).replace(/\.?0+$/, '') }}
+                    </div>
                     <div class="chain-token">{{ parseTokenNameFromTo(tx.to) }}</div>
                     <div class="chain-hash">
                         <a
@@ -59,7 +61,13 @@
                         </a>
                     </div>
                     <div class="chain-type">
-                        {{ tx.data === SANTA_ACCOUNT ? 'Santa Reward' : tx.data === CASH_ACCOUNT ? 'Cash Reward' : '' }}
+                        {{
+                            tx.data === SANTA_ACCOUNT
+                                ? 'Santa Reward'
+                                : tx.data === CASH_ACCOUNT
+                                ? 'Cash Reward'
+                                : 'Santa Reward'
+                        }}
                     </div>
                     <div class="chain-date">{{ formatDate(tx.createdAt) }}</div>
 
@@ -81,37 +89,37 @@ export default defineComponent({
     name: 'Transactions',
     data() {
         return {
-            // transactions: [
-            //     {
-            //         _id: '1',
-            //         chainId: 1000000001,
-            //         amount: 1234567,
-            //         to: 'user::asset::TokenA',
-            //         createdAt: '2024-12-27T10:00:00Z',
-            //         transactionHash: '0x79add2e46ba630ec8fbd44570be4dff74b15e2afd40314c52fb648955465c400',
-            //         data: '0x2621a987609ddd646e223d7519a1a2fb273614d92da334b6fb9a0c31025e9b8c',
-            //     },
-            //     {
-            //         _id: '2',
-            //         chainId: 1000000001,
-            //         amount: 9876543,
-            //         to: 'user::asset::TokenB',
-            //         createdAt: '2024-12-26T14:30:00Z',
-            //         transactionHash: '0x79add2e46ba630ec8fbd44570be4dff74b15e2afd40314c52fb648955465c400',
-            //         data: '0x2621a987609ddd646e223d7519a1a2fb273614d92da334b6fb9a0c31025e9b8c',
-            //     },
-            //     {
-            //         _id: '3',
-            //         chainId: 1000000001,
-            //         amount: 4567890,
-            //         to: 'user::asset::TokenC',
-            //         createdAt: '2024-12-25T18:45:00Z',
-            //         transactionHash: '0x79add2e46ba630ec8fbd44570be4dff74b15e2afd40314c52fb648955465c400',
-            //         data: '0xd9f898a11156a8b889bf2aef8b60de9c7fcbc8d9450b0a2a8cf72e5c5bfc1ea2',
-            //     },
-            // ],
-            transactions: [],
-            isTransLoading: true,
+            transactions: [
+                {
+                    _id: '1',
+                    chainId: 1000000001,
+                    amount: 1110000,
+                    to: 'user::asset::TokenA',
+                    createdAt: '2024-12-27T10:00:00Z',
+                    transactionHash: '0x79add2e46ba630ec8fbd44570be4dff74b15e2afd40314c52fb648955465c400',
+                    data: '0x2621a987609ddd646e223d7519a1a2fb273614d92da334b6fb9a0c31025e9b8c',
+                },
+                {
+                    _id: '2',
+                    chainId: 1000000001,
+                    amount: 9876543,
+                    to: 'user::asset::TokenB',
+                    createdAt: '2024-12-26T14:30:00Z',
+                    transactionHash: '0x79add2e46ba630ec8fbd44570be4dff74b15e2afd40314c52fb648955465c400',
+                    data: '0x2621a987609ddd646e223d7519a1a2fb273614d92da334b6fb9a0c31025e9b8c',
+                },
+                {
+                    _id: '3',
+                    chainId: 1000000001,
+                    amount: 4567890,
+                    to: 'user::asset::TokenC',
+                    createdAt: '2024-12-25T18:45:00Z',
+                    transactionHash: '0x79add2e46ba630ec8fbd44570be4dff74b15e2afd40314c52fb648955465c400',
+                    data: '0xd9f898a11156a8b889bf2aef8b60de9c7fcbc8d9450b0a2a8cf72e5c5bfc1ea2',
+                },
+            ],
+            // transactions: [],
+            isTransLoading: false,
             aptosLogo,
             windowWidth: window.innerWidth,
             SANTA_ACCOUNT,
@@ -122,17 +130,17 @@ export default defineComponent({
         ...mapStores(useWalletStore),
     },
     watch: {
-        'walletStore.wallet': {
-            handler(newWallet, oldWallet) {
-                if (newWallet && newWallet._id) {
-                    this.fetchTransactions();
-                } else {
-                    this.transactions = [];
-                    this.isTransLoading = false;
-                }
-            },
-            immediate: true,
-        },
+        // 'walletStore.wallet': {
+        //     handler(newWallet, oldWallet) {
+        //         if (newWallet && newWallet._id) {
+        //             this.fetchTransactions();
+        //         } else {
+        //             this.transactions = [];
+        //             this.isTransLoading = false;
+        //         }
+        //     },
+        //     immediate: true,
+        // },
     },
     mounted() {
         window.addEventListener('resize', this.updateWindowWidth);
@@ -141,18 +149,18 @@ export default defineComponent({
         window.removeEventListener('resize', this.updateWindowWidth);
     },
     methods: {
-        async fetchTransactions() {
-            try {
-                this.isTransLoading = true;
-                const newTransactions = await this.walletStore.getTransactions();
-                this.transactions = newTransactions;
-            } catch (error) {
-                console.error('Error fetching transactions:', error);
-                this.transactions = [];
-            } finally {
-                this.isTransLoading = false;
-            }
-        },
+        // async fetchTransactions() {
+        //     try {
+        //         this.isTransLoading = true;
+        //         const newTransactions = await this.walletStore.getTransactions();
+        //         this.transactions = newTransactions;
+        //     } catch (error) {
+        //         console.error('Error fetching transactions:', error);
+        //         this.transactions = [];
+        //     } finally {
+        //         this.isTransLoading = false;
+        //     }
+        // },
 
         formatDate(dateString) {
             if (!dateString) return '';
@@ -314,7 +322,7 @@ export default defineComponent({
 }
 .hash-link {
     color: var(--transaction-chain-color);
-    text-decoration: none;
+    text-decoration: underline !important;
     cursor: pointer;
 }
 .hash-link:hover {
@@ -346,6 +354,18 @@ export default defineComponent({
 @media (max-width: 350px) {
     .transaction-table {
         overflow: auto;
+    }
+}
+@media (max-width: 460px) {
+    .table-header .t-image-column,
+    .table-row .t-image-column {
+        display: none !important;
+    }
+
+    .table-header,
+    .table-row {
+        grid-template-columns: repeat(6, 1fr);
+        padding: 10px;
     }
 }
 @keyframes skeleton-loading {

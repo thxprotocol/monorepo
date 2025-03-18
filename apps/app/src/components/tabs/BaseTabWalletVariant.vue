@@ -2,7 +2,7 @@
     <b-form-group>
         <b-button
             :variant="variant === WalletVariant.WalletConnect ? 'primary' : 'outline-primary'"
-            class="rounded mb-2 w-100 wallet-hover-btn"
+            class="rounded mb-2 w-100 wallet-hover-btn px-3"
             @click="$emit('change', WalletVariant.WalletConnect)"
         >
             <div class="d-flex align-items-center">
