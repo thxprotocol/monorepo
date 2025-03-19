@@ -139,7 +139,8 @@ export default defineComponent({
                         this.resetConnectionState();
                         alert(JSON.stringify(error));
                         if (error.status === 'Rejected') {
-                            this.error = 'Wallet connect is rejected. Please check your wallet.';
+                            this.error =
+                                'Wallet already connected. Please click on the Wallet button from the settings menu of the browser.';
                         } else {
                             console.log(error);
                         }
