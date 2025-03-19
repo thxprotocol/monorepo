@@ -137,7 +137,7 @@ export default defineComponent({
                         this.walletStore.account = { address: response.args.address };
                     } catch (error) {
                         this.resetConnectionState();
-                        alert(error);
+                        alert(JSON.stringify(error));
                         if (error.status === 'Rejected') {
                             this.error = 'Wallet connect is rejected. Please check your wallet.';
                         } else {
