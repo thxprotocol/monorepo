@@ -16,8 +16,6 @@
             class="d-none"
             type="file"
             accept="image/*"
-            capture="environment"
-            multiple="false"
             @change="onChangeProfileImg"
         />
         <label
