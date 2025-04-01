@@ -10,8 +10,19 @@
         >
             <template #label> </template>
         </b-form-file> -->
-        <label>
-            <input ref="fileInput" class="d-none" type="file" accept="image/*" @change="onChangeProfileImg" />
+        <input
+            id="avatarUpload"
+            ref="fileInput"
+            class="d-none"
+            type="file"
+            accept="image/*"
+            @change="onChangeProfileImg"
+        />
+        <label
+            for="avatarUpload"
+            class="cursor-pointer"
+            style="touch-action: manipulation; -webkit-tap-highlight-color: transparent"
+        >
             <b-avatar size="100" class="cursor-pointer gradient-border-xl" :src="profileImg" />
             <br />
             <div v-if="!isRemoveable" class="mt-2 cursor-pointer text-primary">Upload</div>
@@ -38,6 +49,7 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         profileImg() {
+            console.log('pic');
             if (!this.accountStore.account) return '';
             return this.accountStore.account.profileImg || '';
         },
@@ -60,6 +72,9 @@ export default defineComponent({
         },
         onClickUpload() {
             //
+        },
+        triggerFileInput() {
+            (this.$refs.fileInput as HTMLInputElement)?.click();
         },
     },
 });
