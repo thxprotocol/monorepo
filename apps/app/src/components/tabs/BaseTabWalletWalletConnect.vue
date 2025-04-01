@@ -122,13 +122,12 @@ export default defineComponent({
                     //     }
                     // }
                     if (!window.santaAptos) return;
-                    try {
-                        await window.santaAptos.disconnect();
-                        this.resetConnectionState();
-                        await new Promise((resolve) => setTimeout(resolve, 500));
-                    } catch (error) {
-                        console.log('Disconnect error:', error);
-                    }
+                    // try {
+                    //     await window.santaAptos.disconnect();
+                    //     this.resetConnectionState();
+                    // } catch (error) {
+                    //     console.log('Disconnect error:', error);
+                    // }
 
                     try {
                         const response = await window.santaAptos.connect();
@@ -136,8 +135,6 @@ export default defineComponent({
                         this.publicKey = response.args.publicKey;
                         this.walletStore.account = { address: response.args.address };
                     } catch (error) {
-                        this.resetConnectionState();
-                        alert(JSON.stringify(error));
                         if (error.status === 'Rejected') {
                             window.open('santa://wallet');
                         } else {
