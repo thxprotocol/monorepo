@@ -136,7 +136,9 @@ export default defineComponent({
                         this.walletStore.account = { address: response.args.address };
                     } catch (error) {
                         if (error.status === 'Rejected') {
-                            window.open('santa://wallet');
+                            // window.open('santa://wallet');
+                            alert(error);
+                            alert(JSON.parse(window.santaAptos));
                         } else {
                             console.log(error);
                         }
