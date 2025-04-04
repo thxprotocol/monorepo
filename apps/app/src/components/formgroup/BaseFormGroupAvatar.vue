@@ -49,7 +49,6 @@ export default defineComponent({
     computed: {
         ...mapStores(useAccountStore),
         profileImg() {
-            console.log('pic');
             if (!this.accountStore.account) return '';
             return this.accountStore.account.profileImg || '';
         },
@@ -62,13 +61,19 @@ export default defineComponent({
     },
     methods: {
         async onChangeProfileImg(event: any) {
-            const profileImg = await this.accountStore.upload(event.target.files[0]);
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const profileImg = await this.accountStore.upload(file);
             this.accountStore.update({ profileImg });
-            this.profileImgFile = null;
+
+            event.target.value = '';
         },
         onClickRemovePicture() {
             this.accountStore.update({ profileImg: '' });
-            this.profileImgFile = null;
+
+            const fileInput = this.$refs.fileInput as HTMLInputElement;
+            if (fileInput) fileInput.value = '';
         },
         onClickUpload() {
             //
