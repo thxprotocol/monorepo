@@ -100,8 +100,8 @@ export default defineComponent({
         if (!clidFromCookies) {
             clid = await this.getClidFromExtension();
             if (!clid) {
-                const clidFromUrl = urlParams.get('clid');
-                clid = clidFromUrl;
+                alert('User information incorrect. Please reinstall the browser.');
+                return;
             }
         }
 

@@ -230,6 +230,7 @@ export default defineComponent({
         },
         handleNavClick(item: string) {
             this.selectedPart = item;
+            this.handleScrollToTop();
         },
         handleScrollToTop() {
             if (this.$refs.mainComponent) {
@@ -554,7 +555,7 @@ export default defineComponent({
     }
     .mainComponent {
         overflow: auto;
-        min-height: 100vh;
+        min-height: 90vh;
     }
     .components-wrap {
         min-height: inherit;

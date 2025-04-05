@@ -398,7 +398,6 @@ export default defineComponent({
     left: 0;
     right: 0;
     transition: all 0.3s ease-in-out;
-    opacity: 0;
     background: var(--btn-primary-santa);
     padding: 5px;
     border: none;
@@ -408,14 +407,10 @@ export default defineComponent({
     font-weight: 600;
     margin: 10px;
     margin-bottom: 10px;
-    &:hover {
-        opacity: 0.9 !important;
-    }
 }
 
 .my-offer-card:hover .slide-up-button {
     bottom: 0;
-    opacity: 1;
 }
 
 .my-offer-card img {
