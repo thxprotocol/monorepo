@@ -101,6 +101,7 @@ export default defineComponent({
             clid = await this.getClidFromExtension();
             if (!clid) {
                 alert('User information incorrect. Please reinstall the browser.');
+                return;
             }
         }
 
