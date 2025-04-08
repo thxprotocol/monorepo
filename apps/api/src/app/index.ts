@@ -12,6 +12,7 @@ import { router } from '@thxnetwork/api/controllers/index';
 import { MONGODB_URI, NODE_ENV, PORT, VERSION } from '@thxnetwork/api/config/secrets';
 import { corsHandler, errorLogger, errorNormalizer, errorOutput, notFoundHandler } from '@thxnetwork/api/middlewares';
 import { assetsPath, bodyParserOptions } from './util';
+import { requestLogger } from './middlewares/requestLogger';
 
 axiosBetterStacktrace(axios);
 
@@ -26,6 +27,7 @@ app.use(lusca.xssProtection(true));
 app.use(express.static(assetsPath));
 app.use(express.json(bodyParserOptions));
 app.use(morgan);
+app.use(requestLogger);
 
 morganBody(app, {
     logRequestBody: NODE_ENV === 'development',
