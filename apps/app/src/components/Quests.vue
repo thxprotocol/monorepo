@@ -63,14 +63,15 @@
                 <div v-if="activeTab === 0">
                     <!-- Available content -->
                     <div class="quests-box">
-                        <div v-if="questStore.isLoading || isLoadingOffers" class="d-flex justify-content-center">
-                            <div class="w-100 quest-skeleton-group">
-                                <div v-for="n in 10" :key="n" class="quest-skeleton-loader mb-3">
-                                    <div class="skeleton-image"></div>
-                                    <div class="skeleton-title"></div>
-                                    <div class="skeleton-description"></div>
-                                    <div class="skeleton-button"></div>
-                                </div>
+                        <div v-if="questStore.isLoading || isLoadingOffers">
+                            <div v-if="!accountStore.isMobile">
+                                <SkeletonLoader :count="10" size="regular" />
+                            </div>
+                            <div v-else>
+                                <SkeletonLoader :count="10" size="regular" />
+                                <SkeletonLoader :count="8" size="small" />
+                                <SkeletonLoader :count="10" size="regular" />
+                                <SkeletonLoader :count="8" size="small" />
                             </div>
                         </div>
                         <div v-else class="d-flex flex-column gap-5">
@@ -137,15 +138,9 @@
                 </div>
                 <div v-else-if="activeTab === 1">
                     <div class="quests-box">
-                        <div v-if="questStore.isLoading" class="d-flex justify-content-center">
-                            <div class="w-100 quest-skeleton-group">
-                                <div v-for="n in 10" :key="n" class="quest-skeleton-loader mb-3">
-                                    <div class="skeleton-image"></div>
-                                    <div class="skeleton-title"></div>
-                                    <div class="skeleton-description"></div>
-                                    <div class="skeleton-button"></div>
-                                </div>
-                            </div>
+                        <div v-if="questStore.isLoading">
+                            <SkeletonLoader :count="10" size="regular" />
+                            <SkeletonLoader :count="10" size="regular" />
                         </div>
                         <div v-else class="d-flex flex-column gap-5">
                             <div
@@ -249,13 +244,8 @@
                             v-if="rewardStore.isLoading || reward2Store.isLoading"
                             class="d-flex justify-content-center"
                         >
-                            <div class="w-100 quest-skeleton-group">
-                                <div v-for="n in 10" :key="n" class="quest-skeleton-loader mb-3">
-                                    <div class="skeleton-image"></div>
-                                    <div class="skeleton-title"></div>
-                                    <div class="skeleton-description"></div>
-                                    <div class="skeleton-button"></div>
-                                </div>
+                            <div class="w-100">
+                                <SkeletonLoader :count="10" size="rewards" />
                             </div>
                         </div>
                         <div v-else class="reward-group">
@@ -276,13 +266,8 @@
                             v-if="rewardStore.isLoading || reward2Store.isLoading"
                             class="d-flex justify-content-center"
                         >
-                            <div class="w-100 quest-skeleton-group">
-                                <div v-for="n in 10" :key="n" class="quest-skeleton-loader mb-3">
-                                    <div class="skeleton-image"></div>
-                                    <div class="skeleton-title"></div>
-                                    <div class="skeleton-description"></div>
-                                    <div class="skeleton-button"></div>
-                                </div>
+                            <div class="w-100">
+                                <SkeletonLoader :count="10" size="rewards" />
                             </div>
                         </div>
                         <div v-else class="reward-group">
@@ -1079,50 +1064,6 @@ export default defineComponent({
         line-height: 18px;
     }
 }
-.quest-skeleton-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.quest-skeleton-loader {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: var(--skeleton-item-bg);
-    animation: pulse 1.5s infinite;
-}
-
-.skeleton-title {
-    height: 20px;
-    width: 60%;
-    margin-bottom: 10px;
-    background-color: #c0c0c0; /* Slightly darker gray */
-    border-radius: 4px;
-}
-
-.skeleton-description {
-    height: 15px;
-    width: 80%;
-    margin-bottom: 10px;
-    background-color: #c0c0c0;
-    border-radius: 4px;
-}
-
-.skeleton-button {
-    height: 25px;
-    width: 40%;
-    background-color: #c0c0c0;
-    border-radius: 4px;
-}
-
-.skeleton-image {
-    height: 130px;
-    background-color: #c0c0c0;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
 
 .quests-column .nav-item {
     flex-grow: 0;
@@ -1334,17 +1275,6 @@ export default defineComponent({
 }
 .quest-cont {
     margin: 0;
-}
-@keyframes pulse {
-    0% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-    100% {
-        opacity: 1;
-    }
 }
 
 @media (max-width: 992px) {
