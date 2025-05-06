@@ -17,57 +17,64 @@ import { logger } from '../util/logger';
 
 export async function updateCampaignRanks() {
     try {
+        // Helper to create $lookup with pipeline for counting
+        function countLookup(model) {
+            return {
+                $lookup: {
+                    from: model.collection.name,
+                    let: { poolId: { $toString: '$_id' } },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$poolId', '$$poolId'] } } },
+                        { $count: 'count' }
+                    ],
+                    as: `${model.collection.name}Count`
+                }
+            };
+        }
+
         const questModels = [QuestDaily, QuestInvite, QuestSocial, QuestCustom, QuestWeb3, QuestGitcoin];
         const rewardModels = [RewardCoin, RewardNFT, RewardCustom, RewardCoupon, RewardDiscordRole];
-        const questLookupStages = questModels.map((model) => {
-            return {
-                $lookup: {
-                    from: model.collection.name,
-                    localField: 'id',
-                    foreignField: 'poolId',
-                    as: model.collection.name,
-                },
-            };
-        });
-        const rewardLookupStages = rewardModels.map((model) => {
-            return {
-                $lookup: {
-                    from: model.collection.name,
-                    localField: 'id',
-                    foreignField: 'poolId',
-                    as: model.collection.name,
-                },
-            };
-        });
+
+        // Lookups for counts only
+        const questCountLookups = questModels.map(countLookup);
+        const rewardCountLookups = rewardModels.map(countLookup);
+
+        // Participant count lookup
+        const participantCountLookup = countLookup(Participant);
+
         const campaigns = await Pool.aggregate([
             {
                 $addFields: {
                     id: { $toString: '$_id' },
                 },
             },
-            {
-                $lookup: {
-                    from: Participant.collection.name,
-                    localField: 'id',
-                    foreignField: 'poolId',
-                    as: Participant.collection.name,
-                },
-            },
-            // Rewards
-            ...questLookupStages,
-            ...rewardLookupStages,
+            participantCountLookup,
+            ...questCountLookups,
+            ...rewardCountLookups,
             {
                 $addFields: {
-                    participantCount: { $size: `$${Participant.collection.name}` },
+                    participantCount: {
+                        $ifNull: [{ $arrayElemAt: [`$${Participant.collection.name}Count.count`, 0] }, 0]
+                    },
                     totalQuestCount: {
-                        $size: {
-                            $concatArrays: questModels.map((model) => `$${model.collection.name}`),
-                        },
+                        $sum: questModels.map(
+                            (model) => ({
+                                $ifNull: [
+                                    { $arrayElemAt: [`$${model.collection.name}Count.count`, 0] },
+                                    0
+                                ]
+                            })
+                        )
                     },
                     totalRewardsCount: {
-                        $size: {
-                            $concatArrays: rewardModels.map((model) => `$${model.collection.name}`),
-                        },
+                        $sum: rewardModels.map(
+                            (model) => ({
+                                $ifNull: [
+                                    { $arrayElemAt: [`$${model.collection.name}Count.count`, 0] },
+                                    0
+                                ]
+                            })
+                        )
                     },
                 },
             },
