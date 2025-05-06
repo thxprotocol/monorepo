@@ -60,3 +60,6 @@ docker/data/**/*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# logs
+/logs

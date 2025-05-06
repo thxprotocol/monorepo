@@ -11,3 +11,4 @@ export * from './assertPayment';
 export * from './assertQuestAccess';
 export * from './assertAccount';
 export * from './assertWallet';
+export * from './requestLogger';
