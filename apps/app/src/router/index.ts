@@ -1,5 +1,6 @@
 import { useAccountStore } from '../stores/Account';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import TelegramRewards from '../views/TelegramRewards.vue';
 
 async function beforeEnter(to: any, from: any, next: any) {
     // Redirect to last match
@@ -166,6 +167,14 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import(/* webpackChunkName: "identities" */ '../views/campaign/Identities.vue'),
             },
         ],
+    },
+    {
+        path: '/telegram/rewards/:userId',
+        name: 'telegram-rewards',
+        component: TelegramRewards,
+        meta: {
+            requiresAuth: true,
+        },
     },
 ];
 

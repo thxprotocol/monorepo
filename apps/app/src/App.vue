@@ -98,13 +98,18 @@ export default defineComponent({
         const clidFromCookies = this.getCookieReduce('clid');
         clid = clidFromCookies;
         if (!clidFromCookies) {
-            clid = await this.getClidFromExtension();
+            if (process.env.NODE_ENV === 'local') {
+                clid = urlParams.get('clid');
+                console.log('clid', clid);
+            }
             if (!clid) {
-                alert('User information incorrect. Please reinstall the browser.');
-                return;
+                clid = await this.getClidFromExtension();
+                if (!clid && process.env.NODE_ENV === 'production') {
+                    alert('User information incorrect. Please reinstall the browser.');
+                    return;
+                }
             }
         }
-
         const user = this.accountStore.isAuthenticated;
         if (clid && !user) {
             await this.authenticateUser(clid);

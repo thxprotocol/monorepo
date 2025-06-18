@@ -7,6 +7,7 @@ export enum AccessTokenKind {
     Discord = 'discord',
     Twitch = 'twitch',
     Github = 'github',
+    Telegram = 'telegram',
 }
 
 export enum OAuthGoogleScope {
@@ -40,6 +41,10 @@ export enum OAuthGithubScope {
     PublicRepo = 'public_repo',
 }
 
+export enum OAuthTelegramScope {
+    Bot = 'bot',
+}
+
 // Different scope requirements should always be elevating based on the invasiveness of the required scope
 // This allows for better privacy by design
 export const OAuthRequiredScopes = {
@@ -64,6 +69,13 @@ export const OAuthRequiredScopes = {
     DiscordValidateGuild: [OAuthDiscordScope.Identify, OAuthDiscordScope.Email, OAuthDiscordScope.Guilds],
     TwitchAuth: [OAuthTwitchScope.Email, OAuthTwitchScope.Follows, OAuthTwitchScope.Broadcast],
     GithubAuth: [OAuthGithubScope.PublicRepo],
+    TelegramAuth: [OAuthTelegramScope.Bot],
 };
 
-export type OAuthScope = OAuthGoogleScope | OAuthTwitterScope | OAuthDiscordScope | OAuthTwitchScope | OAuthGithubScope;
+export type OAuthScope =
+    | OAuthGoogleScope
+    | OAuthTwitterScope
+    | OAuthDiscordScope
+    | OAuthTwitchScope
+    | OAuthGithubScope
+    | OAuthTelegramScope;

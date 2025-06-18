@@ -128,6 +128,7 @@ declare module 'vue' {
     BaseTabWalletWalletConnect: typeof import('./src/components/tabs/BaseTabWalletWalletConnect.vue')['default']
     BaseTabWalletWeb3Auth: typeof import('./src/components/tabs/BaseTabWalletWeb3Auth.vue')['default']
     BaseTabWithdraw: typeof import('./src/components/tabs/BaseTabWithdraw.vue')['default']
+    BaseTelegramLogin: typeof import('./src/components/BaseTelegramLogin.vue')['default']
     BAvatar: typeof import('bootstrap-vue-next')['BAvatar']
     BBadge: typeof import('bootstrap-vue-next')['BBadge']
     BButton: typeof import('bootstrap-vue-next')['BButton']

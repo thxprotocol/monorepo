@@ -88,6 +88,13 @@
             <b-button variant="primary" class="rounded me-2 px-3" @click="onClickSigninOAuth(AccountVariant.SSOGithub)">
                 <i class="fab fa-github"></i>
             </b-button>
+            <b-button
+                variant="primary"
+                class="rounded me-2 px-3"
+                @click="onClickSigninOAuth(AccountVariant.SSOTelegram)"
+            >
+                <i class="fab fa-telegram"></i>
+            </b-button>
         </b-form-group>
     </b-modal>
 </template>

@@ -381,7 +381,7 @@ export default defineComponent({
                 { label: 'Santa', value: 'santa' },
                 { label: 'X', value: 'x' },
                 { label: 'Discord', value: 'discord' },
-                // { label: 'Youtube Quest', value: 'youtube' },
+                { label: 'Telegram', value: 'telegram' },
             ],
             showDropdown: false,
             activeTab: 0,
@@ -438,48 +438,6 @@ export default defineComponent({
         referralClaimed() {
             return !!this.accountStore.inviter;
         },
-        // mergedQuestsAndOffers() {
-        //     let merged = [];
-        //     let offerIndex = 0;
-        //     const questBatchSize = 4;
-        //     let rowQuests = [];
-
-        //     for (let i = 0; i < this.quests.length; i++) {
-        //         const quest = this.quests[i];
-        //         const isEndOfBatch = (i + 1) % questBatchSize === 0;
-
-        //         if (quest.variant === QuestVariant.Daily) {
-        //             merged.push({ quest, isDaily: true });
-        //             continue;
-        //         }
-
-        //         rowQuests.push(quest);
-
-        //         if (isEndOfBatch) {
-        //             merged.push(...this.formatQuests(rowQuests));
-        //             rowQuests = [];
-        //             merged.push({
-        //                 isOfferRow: true,
-        //                 offers: this.offers.slice(offerIndex, offerIndex + this.offersPerRow).filter(Boolean),
-        //             });
-        //             offerIndex += this.offersPerRow;
-        //         }
-        //     }
-
-        //     if (rowQuests.length > 0) {
-        //         merged.push(...this.formatQuests(rowQuests));
-        //     }
-
-        //     while (offerIndex < this.offers.length) {
-        //         merged.push({
-        //             isOfferRow: true,
-        //             offers: this.offers.slice(offerIndex, offerIndex + this.offersPerRow).filter(Boolean),
-        //         });
-        //         offerIndex += this.offersPerRow;
-        //     }
-
-        //     return merged;
-        // },
         filteredCompletedQuests() {
             let completedQuests = this.mergedQuestsAndOffers('completed');
             completedQuests = completedQuests.filter((group) => !group.isOfferRow);
@@ -495,6 +453,8 @@ export default defineComponent({
                             return group.title === 'Discord Quests';
                         case 'youtube':
                             return group.title === 'YouTube Quests';
+                        case 'telegram':
+                            return group.title === 'Telegram Quests';
                         default:
                             return true;
                     }
@@ -661,6 +621,7 @@ export default defineComponent({
             const xQuests: TBaseQuest[] = [];
             const discordQuests: TBaseQuest[] = [];
             const youtubeQuests: TBaseQuest[] = [];
+            const telegramQuests: TBaseQuest[] = [];
             const otherQuests: TBaseQuest[] = [];
 
             this.quests.forEach((quest: TBaseQuest) => {
@@ -681,6 +642,9 @@ export default defineComponent({
                         break;
                     case QuestVariant.YouTube:
                         youtubeQuests.push(quest);
+                        break;
+                    case QuestVariant.Telegram:
+                        telegramQuests.push(quest);
                         break;
                     default:
                         otherQuests.push(quest);
@@ -703,6 +667,7 @@ export default defineComponent({
                 { title: 'X Quests', quests: xQuests },
                 { title: 'Discord Quests', quests: discordQuests },
                 { title: 'YouTube Quests', quests: youtubeQuests },
+                { title: 'Telegram Quests', quests: telegramQuests },
                 { title: 'Other Quests', quests: otherQuests },
             ];
             if (filterType === 'completed') {

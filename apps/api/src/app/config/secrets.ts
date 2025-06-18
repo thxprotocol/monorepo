@@ -16,6 +16,9 @@ const required = [
     'AWS_S3_PUBLIC_BUCKET_REGION',
     'AWS_S3_PRIVATE_BUCKET_NAME',
     'AWS_S3_PRIVATE_BUCKET_REGION',
+    'TELEGRAM_BOT_TOKEN',
+    'TELEGRAM_CHANNEL_ID',
+    'TELEGRAM_CHANNEL_CHAT_ID',
     'CWD',
 ];
 
@@ -190,3 +193,6 @@ export const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 export const SUPABASE_URL = process.env.SUPABASE_URL || '';
 export const SECURE_KEY = process.env.SECURE_KEY || '';
 export const JWKS_JSON = process.env.JWKS_JSON || '';
+export const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+export const TELEGRAM_CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || '';
+export const TELEGRAM_CHANNEL_CHAT_ID = process.env.TELEGRAM_CHANNEL_CHAT_ID || '';
