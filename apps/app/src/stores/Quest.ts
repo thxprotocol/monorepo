@@ -59,6 +59,7 @@ export const useQuestStore = defineStore('quest', {
                 [QuestVariant.Custom]: { apiKey: 'custom', eventKey: 'milestone reward claim' },
                 [QuestVariant.Gitcoin]: { apiKey: 'gitcoin', eventKey: 'gitcoin quest entry' },
                 [QuestVariant.Webhook]: { apiKey: 'webhook', eventKey: 'webhook quest entry' },
+                [QuestVariant.Telegram]: { apiKey: 'telegram', eventKey: 'telegram quest entry' },
             };
 
             const key = QuestVariant[quest.variant].toLowerCase();
@@ -85,7 +86,7 @@ export const useQuestStore = defineStore('quest', {
 
             /// Non generic data for quest types. Should be refactored.
             const callback = () => {
-                const index = this.quests.findIndex((r) => r._id === quest._id);
+                const index = this.quests.findIndex((r: TQuest) => r._id === quest._id);
                 this.quests[index].isAvailable = false;
             };
             const questEntrySocialDetails = { apiKey: 'social', eventKey: 'conditional reward claim', callback };
@@ -93,6 +94,7 @@ export const useQuestStore = defineStore('quest', {
                 [QuestVariant.Daily]: { apiKey: 'daily', eventKey: 'daily reward claim', callback },
                 [QuestVariant.Twitter]: questEntrySocialDetails,
                 [QuestVariant.YouTube]: questEntrySocialDetails,
+                [QuestVariant.Telegram]: questEntrySocialDetails,
                 [QuestVariant.Discord]: questEntrySocialDetails,
                 [QuestVariant.Invite]: { apiKey: 'invite', eventKey: 'invite quest entry', callback },
                 [QuestVariant.Web3]: { apiKey: 'web3', eventKey: 'web3 quest entry', callback },
@@ -144,12 +146,21 @@ export const useQuestStore = defineStore('quest', {
             const { api } = useAccountStore();
             this.isLoading = true;
 
-            const { gitcoin, invite, twitter, discord, youtube, custom, daily, web3, webhook } = await api.quests.list(
-                poolId,
-            );
-            const socialQuestList = [...twitter, ...discord, ...youtube];
+            const { gitcoin, invite, twitter, discord, youtube, custom, daily, telegram, web3, webhook } =
+                await api.quests.list(poolId);
+            console.log(JSON.stringify(telegram));
+            const socialQuestList = [...twitter, ...discord, ...youtube, ...telegram];
 
-            this.quests = [...gitcoin, ...invite, ...socialQuestList, ...custom, ...daily, ...web3, ...webhook];
+            this.quests = [
+                ...gitcoin,
+                ...invite,
+                ...socialQuestList,
+                ...custom,
+                ...daily,
+                ...telegram,
+                ...web3,
+                ...webhook,
+            ];
             this.isLoading = false;
         },
     },

@@ -7,6 +7,7 @@ export enum AccountVariant {
     SSOGithub = 5,
     SSODiscord = 6,
     SSOTwitch = 7,
+    SSOTelegram = 8,
 }
 
 export enum WalletVariant {
