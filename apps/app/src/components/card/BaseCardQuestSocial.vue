@@ -182,8 +182,6 @@ import BaseBlockquoteDiscordServerJoin from '../../components/blockquote/BaseBlo
 import BaseBlockquoteDiscordServerRole from '../../components/blockquote/BaseBlockquoteDiscordServerRole.vue';
 import BaseBlockquoteDiscordMessage from '../../components/blockquote/BaseBlockquoteDiscordMessage.vue';
 import BaseBlockquoteDiscordInviteUsed from '../../components/blockquote/BaseBlockquoteDiscordInviteUsed.vue';
-// import BaseBlockquoteTelegramJoin from '../blockquote/BaseBlockquoteTelegramJoin.vue';
-// import BaseBlockquoteTelegramMessage from '../blockquote/BaseBlockquoteTelegramMessage.vue';
 import { interactionLabelMap } from '../../utils/social';
 
 export default defineComponent({
@@ -215,7 +213,6 @@ export default defineComponent({
                 [AccessTokenKind.Google]: 'YouTube',
                 [AccessTokenKind.Twitter]: 'X',
                 [AccessTokenKind.Discord]: 'Discord',
-                [AccessTokenKind.Telegram]: 'Telegram',
             } as any,
             error: '',
             isLoadingView: false,
@@ -254,8 +251,6 @@ export default defineComponent({
                 [QuestSocialRequirement.DiscordGuildJoined]: this.quest.contentMetadata.inviteURL,
                 [QuestSocialRequirement.DiscordGuildRole]: '',
                 [QuestSocialRequirement.DiscordMessage]: '',
-                [QuestSocialRequirement.TelegramJoin]: '',
-                [QuestSocialRequirement.TelegramMessage]: '',
             };
             return map[this.quest.interaction];
         },

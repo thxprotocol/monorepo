@@ -63,14 +63,6 @@ class QuestManager extends BaseManager {
             },
         },
     };
-
-    telegram = {
-        entry: {
-            create: async (id: string) => {
-                return await this.client.request.post(`/v1/quests/telegram/${id}/entries`);
-            },
-        },
-    };
 }
 
 export default QuestManager;

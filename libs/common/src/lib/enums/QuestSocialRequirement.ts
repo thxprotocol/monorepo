@@ -10,6 +10,4 @@ export enum QuestSocialRequirement {
     DiscordMessage = 8,
     DiscordMessageReaction = 9,
     DiscordGuildRole = 10,
-    TelegramJoin = 11,
-    TelegramMessage = 12,
 }

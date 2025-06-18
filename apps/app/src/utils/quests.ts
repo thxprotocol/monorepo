@@ -10,7 +10,6 @@ export const questComponentMap: any = {
     [QuestVariant.Twitter]: 'BaseCardQuestSocial',
     [QuestVariant.Discord]: 'BaseCardQuestSocial',
     [QuestVariant.YouTube]: 'BaseCardQuestSocial',
-    [QuestVariant.Telegram]: 'BaseCardQuestSocial',
     [QuestVariant.Custom]: 'BaseCardQuestCustom',
     [QuestVariant.Web3]: 'BaseCardQuestWeb3',
     [QuestVariant.Gitcoin]: 'BaseCardQuestGitcoin',

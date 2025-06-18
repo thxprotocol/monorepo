@@ -15,7 +15,6 @@ export enum QuestVariant {
     Web3 = 6,
     Gitcoin = 7,
     Webhook = 8,
-    Telegram = 9,
 }
 
 export enum RewardVariant {
@@ -50,6 +49,4 @@ export enum QuestSocialRequirement {
     DiscordMessage = 8,
     DiscordMessageReaction = 9,
     DiscordGuildRole = 10,
-    TelegramJoin = 11,
-    TelegramMessage = 12,
 }

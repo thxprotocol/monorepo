@@ -89,10 +89,4 @@ type TWidgetConfig = {
     ref?: string;
 };
 
-type TOAuthScope =
-    | OAuthGoogleScope
-    | OAuthTwitterScope
-    | OAuthDiscordScope
-    | OAuthTwitchScope
-    | OAuthGithubScope
-    | OAuthTelegramScope;
+type TOAuthScope = OAuthGoogleScope | OAuthTwitterScope | OAuthDiscordScope | OAuthTwitchScope | OAuthGithubScope;

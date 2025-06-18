@@ -61,6 +61,7 @@ export default class QuestService {
                     { expiryDate: null },
                 ],
             });
+
             return (
                 await Promise.all(
                     quests.map(async (q) => {

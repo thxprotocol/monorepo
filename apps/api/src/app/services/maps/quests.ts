@@ -3,7 +3,6 @@ import { logger } from '@thxnetwork/api/util/logger';
 import DiscordDataProxy from '@thxnetwork/api/proxies/DiscordDataProxy';
 import TwitterDataProxy from '@thxnetwork/api/proxies/TwitterDataProxy';
 import YouTubeDataProxy from '@thxnetwork/api/proxies/YoutubeDataProxy';
-import TelegramDataProxy from '@thxnetwork/api/proxies/TelegramDataProxy';
 
 export const requirementMap: {
     [interaction: number]: (account: TAccount, quest: TQuestSocial) => Promise<TValidationResult>;
@@ -61,14 +60,6 @@ export const requirementMap: {
     [QuestSocialRequirement.DiscordMessageReaction]: async (account, quest) => {
         return { result: true, reason: '' };
     },
-    [QuestSocialRequirement.TelegramJoin]: async (account, quest) => {
-        logger.info(`[${quest.poolId}][${account.sub}] Telegram Quest ${quest._id} Join verification started`);
-        return await TelegramDataProxy.validateJoin(account, quest.content);
-    },
-    [QuestSocialRequirement.TelegramMessage]: async (account, quest) => {
-        logger.info(`[${quest.poolId}][${account.sub}] Telegram Quest ${quest._id} Message verification started`);
-        return await TelegramDataProxy.validateMessage(account, quest.content);
-    },
 };
 
 export const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; scopes: OAuthScope[] } } = {
@@ -108,13 +99,5 @@ export const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKi
     [QuestSocialRequirement.DiscordMessageReaction]: {
         kind: AccessTokenKind.Discord,
         scopes: OAuthRequiredScopes.DiscordAuth,
-    },
-    [QuestSocialRequirement.TelegramJoin]: {
-        kind: AccessTokenKind.Telegram,
-        scopes: OAuthRequiredScopes.TelegramAuth,
-    },
-    [QuestSocialRequirement.TelegramMessage]: {
-        kind: AccessTokenKind.Telegram,
-        scopes: OAuthRequiredScopes.TelegramAuth,
     },
 };

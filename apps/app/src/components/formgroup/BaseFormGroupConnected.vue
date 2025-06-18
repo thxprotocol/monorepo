@@ -51,12 +51,6 @@ export default defineComponent({
                     label: 'Discord',
                     color: '#7289DA',
                 },
-                [AccessTokenKind.Telegram]: {
-                    kind: AccessTokenKind.Telegram,
-                    scopes: OAuthRequiredScopes.TelegramAuth,
-                    label: 'Telegram',
-                    color: '#0088cc',
-                },
             };
         },
     },

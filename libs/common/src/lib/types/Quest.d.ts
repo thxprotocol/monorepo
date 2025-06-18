@@ -1,13 +1,4 @@
-type TQuest =
-    | TQuestDaily
-    | TQuestInvite
-    | TQuestSocial
-    | TQuestCustom
-    | TQuestWeb3
-    | TQuestGitcoin
-    | TQuestWebhook
-    | TQuestCashback
-    | TQuestTelegram;
+type TQuest = TQuestDaily | TQuestInvite | TQuestSocial | TQuestCustom | TQuestWeb3 | TQuestGitcoin | TQuestWebhook | TQuestCashback;
 type TQuestEntry =
     | TQuestDailyClaim
     | TQuestInviteEntry
@@ -16,8 +7,7 @@ type TQuestEntry =
     | TQuestWeb3Entry
     | TQuestGitcoinEntry
     | TQuestWebhookEntry
-    | TQuestCashbackEntry
-    | TQuestTelegramEntry;
+    | TQuestCashbackEntry;
 
 type TQuestEntryMetadata = TQuestSocialEntryMetadata | TQuestWeb3EntryMetadata;
 type TQuestLock = { variant: QuestVariant; questId: string };

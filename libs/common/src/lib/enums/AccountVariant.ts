@@ -7,7 +7,6 @@ export enum AccountVariant {
     SSOGithub = 5,
     SSODiscord = 6,
     SSOTwitch = 7,
-    SSOTelegram = 8,
 }
 
 export enum ReCaptchaAction {
@@ -16,5 +15,4 @@ export enum ReCaptchaAction {
     QuestCustomEntryCreate = 'QUEST_CUSTOM_ENTRY_CREATE',
     QuestWeb3EntryCreate = 'QUEST_WEB3_ENTRY_CREATE',
     QuestGitcoinEntryCreate = 'QUEST_GITCOIN_ENTRY_CREATE',
-    QuestTelegramEntryCreate = 'QUEST_TELEGRAM_ENTRY_CREATE',
 }

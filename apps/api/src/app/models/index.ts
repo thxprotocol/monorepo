@@ -60,4 +60,3 @@ export { Wallet, WalletDocument } from './Wallet';
 export { Webhook, WebhookDocument } from './Webhook';
 export { WebhookRequest, WebhookRequestDocument } from './WebhookRequest';
 export { Widget, WidgetDocument } from './Widget';
-export { TelegramUserActivity, TelegramUserReward } from './QuestTelegram';
