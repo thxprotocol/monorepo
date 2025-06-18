@@ -204,6 +204,7 @@ export default defineComponent({
                 [QuestVariant.Discord]: 'fab fa-discord',
                 [QuestVariant.Twitter]: 'fab fa-x-twitter',
                 [QuestVariant.YouTube]: 'fab fa-youtube',
+                [QuestVariant.Telegram]: 'fab fa-telegram',
                 [QuestVariant.Custom]: 'fas fa-flag',
                 [QuestVariant.Web3]: 'fab fa-ethereum',
                 [QuestVariant.Gitcoin]: 'fas fa-fingerprint',

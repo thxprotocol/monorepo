@@ -7,4 +7,5 @@ export enum AccessTokenKind {
     Discord = 'discord',
     Twitch = 'twitch',
     Github = 'github',
+    Telegram = 'telegram',
 }

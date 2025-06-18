@@ -10,4 +10,6 @@ export const questInteractionVariantMap = {
     [QuestSocialRequirement.DiscordGuildRole]: QuestVariant.Discord,
     [QuestSocialRequirement.DiscordMessage]: QuestVariant.Discord,
     [QuestSocialRequirement.DiscordMessageReaction]: QuestVariant.Discord,
+    [QuestSocialRequirement.TelegramJoin]: QuestVariant.Telegram,
+    [QuestSocialRequirement.TelegramMessage]: QuestVariant.Telegram,
 };

@@ -8,6 +8,7 @@ import QuestCustomService from '../QuestCustomService';
 import QuestGitcoinService from '../QuestGitcoinService';
 import QuestWeb3Service from '../QuestWeb3Service';
 import QuestWebhookService from '../QuestWebhookService';
+import QuestTelegramService from '../QuestTelegramService';
 import { QuestVariant } from '@thxnetwork/common/enums';
 import { PoolDocument } from '@thxnetwork/api/models';
 import { Request } from 'express';
@@ -40,9 +41,10 @@ export const serviceMap: {
     [QuestVariant.Discord]: new QuestDiscordService(),
     [QuestVariant.Twitter]: new QuestTwitterService(),
     [QuestVariant.YouTube]: new QuestYouTubeService(),
+    [QuestVariant.Telegram]: new QuestTelegramService(),
     [QuestVariant.Custom]: new QuestCustomService(),
     [QuestVariant.Web3]: new QuestWeb3Service(),
     [QuestVariant.Gitcoin]: new QuestGitcoinService(),
     [QuestVariant.Webhook]: new QuestWebhookService(),
-    [QuestVariant.CashbackPlaywall]: new QuestCashbackService()
+    [QuestVariant.CashbackPlaywall]: new QuestCashbackService(),
 };

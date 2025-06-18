@@ -16,6 +16,7 @@ export enum AccessTokenKind {
     Discord = 'discord',
     Twitch = 'twitch',
     Github = 'github',
+    Telegram = 'telegram',
 }
 
 const interactionLabelMap: { [i: number]: string } = {
@@ -26,6 +27,8 @@ const interactionLabelMap: { [i: number]: string } = {
     [QuestSocialRequirement.YouTubeLike]: 'Watch & Like on YouTube',
     [QuestSocialRequirement.YouTubeSubscribe]: 'Subscribe on YouTube',
     [QuestSocialRequirement.DiscordGuildJoined]: 'Join Discord',
+    [QuestSocialRequirement.TelegramJoin]: 'Join Telegram',
+    [QuestSocialRequirement.TelegramMessage]: 'Post on Telegram',
     [QuestSocialRequirement.DiscordMessage]: '',
 };
 
@@ -61,6 +64,8 @@ const interactionComponentMap: { [req: number]: string } = {
     [QuestSocialRequirement.DiscordGuildJoined]: 'BaseBlockquoteDiscordServerJoin',
     [QuestSocialRequirement.DiscordGuildRole]: 'BaseBlockquoteDiscordServerRole',
     [QuestSocialRequirement.DiscordMessage]: 'BaseBlockquoteDiscordMessage',
+    [QuestSocialRequirement.TelegramJoin]: 'BaseBlockquoteTelegramJoin',
+    [QuestSocialRequirement.TelegramMessage]: 'BaseBlockquoteTelegramMessage',
 };
 export enum OAuthGoogleScope {
     OpenID = 'openid',
@@ -93,6 +98,10 @@ export enum OAuthGithubScope {
     PublicRepo = 'public_repo',
 }
 
+export enum OAuthTelegramScope {
+    Bot = 'bot',
+}
+
 export const OAuthRequiredScopes = {
     GoogleAuth: [OAuthGoogleScope.OpenID, OAuthGoogleScope.Email],
     GoogleYoutubeSubscribe: [OAuthGoogleScope.OpenID, OAuthGoogleScope.Email, OAuthGoogleScope.YoutubeReadOnly],
@@ -112,6 +121,7 @@ export const OAuthRequiredScopes = {
     DiscordValidateGuild: [OAuthDiscordScope.Identify, OAuthDiscordScope.Email, OAuthDiscordScope.Guilds],
     TwitchAuth: [OAuthTwitchScope.Email, OAuthTwitchScope.Follows, OAuthTwitchScope.Broadcast],
     GithubAuth: [OAuthGithubScope.PublicRepo],
+    TelegramAuth: [OAuthTelegramScope.Bot],
 };
 
 export const OAuthScopes: { [provider: string]: string[] } = {
@@ -159,6 +169,14 @@ const tokenInteractionMap: { [interaction: number]: { kind: AccessTokenKind; sco
     [QuestSocialRequirement.DiscordMessageReaction]: {
         kind: AccessTokenKind.Discord,
         scopes: OAuthRequiredScopes.DiscordAuth,
+    },
+    [QuestSocialRequirement.TelegramJoin]: {
+        kind: AccessTokenKind.Telegram,
+        scopes: OAuthRequiredScopes.TelegramAuth,
+    },
+    [QuestSocialRequirement.TelegramMessage]: {
+        kind: AccessTokenKind.Telegram,
+        scopes: OAuthRequiredScopes.TelegramAuth,
     },
 };
 

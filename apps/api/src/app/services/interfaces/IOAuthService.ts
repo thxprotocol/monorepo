@@ -5,6 +5,7 @@ import OAuthTwitterService from '../OAuthTwitterService';
 import OAuthDiscordService from '../OAuthDiscordService';
 import OAuthTwitchService from '../OAuthTwitchService';
 import OAuthGithubService from '../OAuthGithubService';
+import OAuthTelegramService from '../OAuthTelegramService';
 
 export const serviceMap: { [variant: string]: IOAuthService } = {
     [AccessTokenKind.Google]: new OAuthYouTubeService(),
@@ -12,6 +13,7 @@ export const serviceMap: { [variant: string]: IOAuthService } = {
     [AccessTokenKind.Discord]: new OAuthDiscordService(),
     [AccessTokenKind.Twitch]: new OAuthTwitchService(),
     [AccessTokenKind.Github]: new OAuthGithubService(),
+    [AccessTokenKind.Telegram]: new OAuthTelegramService(),
 };
 
 export interface IOAuthService {
