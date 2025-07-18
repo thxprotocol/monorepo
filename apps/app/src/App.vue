@@ -95,13 +95,18 @@ export default defineComponent({
     async mounted() {
         const urlParams = new URLSearchParams(window.location.search);
         let clid: string | null = null;
-        const clidFromCookies = this.getCookieReduce('clid');
-        clid = clidFromCookies;
-        if (!clidFromCookies) {
-            clid = await this.getClidFromExtension();
-            if (!clid) {
-                alert('User information incorrect. Please reinstall the browser.');
-                return;
+
+        if (process.env.NODE_ENV === 'local') {
+            clid = urlParams.get('clid');
+        } else {
+            const clidFromCookies = this.getCookieReduce('clid');
+            clid = clidFromCookies;
+            if (!clidFromCookies) {
+                clid = await this.getClidFromExtension();
+                if (!clid) {
+                    alert('User information incorrect. Please reinstall the browser.');
+                    return;
+                }
             }
         }
 
