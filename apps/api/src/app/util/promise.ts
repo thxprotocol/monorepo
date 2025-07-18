@@ -7,9 +7,12 @@ export class PromiseParser {
             if (result.status === 'fulfilled') {
                 acc.push(result.value);
             } else {
-                logger.error('Token decoration failed:', result.reason);
+                // Log error but don't let it crash the application
+                logger.error('Promise failed:', result.reason);
+                // Return a default value instead of failing completely
+                acc.push(null);
             }
             return acc;
-        }, []);
+        }, []).filter(item => item !== null); // Remove null results
     }
 }

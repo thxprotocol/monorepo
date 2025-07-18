@@ -180,7 +180,23 @@ export const getTokensForSub = (sub: string) => {
 export const getTokensForWallet = async (wallet: WalletDocument, chainId: ChainId) => {
     const tokens = await ERC20Token.find({ sub: wallet.sub });
     const erc20s = await ERC20.find({ chainId });
-    const erc20Tokens = await PromiseParser.parse(erc20s.map((erc20) => decorateERC20(tokens[0], erc20, wallet)));
+    
+    // Process in smaller batches to avoid overwhelming the API
+    const BATCH_SIZE = 5;
+    const erc20Tokens = [];
+    
+    for (let i = 0; i < erc20s.length; i += BATCH_SIZE) {
+        const batch = erc20s.slice(i, i + BATCH_SIZE);
+        const batchResults = await PromiseParser.parse(
+            batch.map((erc20) => decorateERC20(tokens[0], erc20, wallet))
+        );
+        erc20Tokens.push(...batchResults);
+        
+        // Add delay between batches to respect rate limits
+        if (i + BATCH_SIZE < erc20s.length) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+    }
 
     // We add additional veTHX related tokens for Polygon and Hardhat
     const defaults = await findDefaultTokens(wallet, chainId);
