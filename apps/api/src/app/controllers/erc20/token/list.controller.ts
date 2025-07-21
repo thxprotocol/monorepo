@@ -11,9 +11,19 @@ const controller = async (req: Request, res: Response) => {
     const wallet = await WalletService.findById(walletId as string);
     if (!wallet) throw new BadRequestError('Wallet not found');
 
-    const tokens = await ERC20Service.getTokensForWallet(wallet, Number(chainId));
-
-    res.json(tokens.reverse());
+    try {
+        const tokens = await ERC20Service.getTokensForWallet(wallet, Number(chainId));
+        res.json(tokens.reverse());
+    } catch (error) {
+        console.error('Error fetching tokens:', error);
+        // Return empty array instead of crashing
+        res.json([]);
+    } finally {
+        // Force garbage collection if available
+        if (global.gc) {
+            global.gc();
+        }
+    }
 };
 
 export { controller, validation };

@@ -326,6 +326,7 @@ import BaseCardQuestReferral from './card/BaseCardQuestReferral.vue';
 import imgRefferal from '@thxnetwork/app/assets/referral.jpg';
 import * as crypto from 'crypto';
 import dropdownIcon from '@thxnetwork/app/assets/dropdown.png';
+import { detectDevice, isCompatibleWithOffer } from '@thxnetwork/app/utils/device';
 
 const selectedValue = ref<string>('All');
 const componentMap: { [variant: string]: string } = {
@@ -398,6 +399,7 @@ export default defineComponent({
                 { label: 'Completed', index: 1 },
             ],
             showRewardTabDropdown: false,
+            deviceInfo: detectDevice(),
         };
     },
     computed: {
@@ -438,48 +440,9 @@ export default defineComponent({
         referralClaimed() {
             return !!this.accountStore.inviter;
         },
-        // mergedQuestsAndOffers() {
-        //     let merged = [];
-        //     let offerIndex = 0;
-        //     const questBatchSize = 4;
-        //     let rowQuests = [];
-
-        //     for (let i = 0; i < this.quests.length; i++) {
-        //         const quest = this.quests[i];
-        //         const isEndOfBatch = (i + 1) % questBatchSize === 0;
-
-        //         if (quest.variant === QuestVariant.Daily) {
-        //             merged.push({ quest, isDaily: true });
-        //             continue;
-        //         }
-
-        //         rowQuests.push(quest);
-
-        //         if (isEndOfBatch) {
-        //             merged.push(...this.formatQuests(rowQuests));
-        //             rowQuests = [];
-        //             merged.push({
-        //                 isOfferRow: true,
-        //                 offers: this.offers.slice(offerIndex, offerIndex + this.offersPerRow).filter(Boolean),
-        //             });
-        //             offerIndex += this.offersPerRow;
-        //         }
-        //     }
-
-        //     if (rowQuests.length > 0) {
-        //         merged.push(...this.formatQuests(rowQuests));
-        //     }
-
-        //     while (offerIndex < this.offers.length) {
-        //         merged.push({
-        //             isOfferRow: true,
-        //             offers: this.offers.slice(offerIndex, offerIndex + this.offersPerRow).filter(Boolean),
-        //         });
-        //         offerIndex += this.offersPerRow;
-        //     }
-
-        //     return merged;
-        // },
+        filteredOffers() {
+            return this.offers.filter((offer) => isCompatibleWithOffer(offer, this.deviceInfo));
+        },
         filteredCompletedQuests() {
             let completedQuests = this.mergedQuestsAndOffers('completed');
             completedQuests = completedQuests.filter((group) => !group.isOfferRow);
@@ -727,13 +690,13 @@ export default defineComponent({
 
                 const isVisible = group.quests && group.quests.some((quest: TBaseQuest) => quest.isAvailable);
 
-                if (isVisible && offerIndex < this.offers.length) {
+                if (isVisible && offerIndex < this.filteredOffers.length) {
                     let offersForGroup;
                     if (index < totalGroups - 1) {
-                        offersForGroup = this.offers.slice(offerIndex, offerIndex + this.offersPerRow);
+                        offersForGroup = this.filteredOffers.slice(offerIndex, offerIndex + this.offersPerRow);
                         offerIndex += this.offersPerRow;
                     } else {
-                        offersForGroup = this.offers.slice(offerIndex);
+                        offersForGroup = this.filteredOffers.slice(offerIndex);
                     }
                     merged.push({
                         title: 'Top Performing Offers',
