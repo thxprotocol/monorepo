@@ -108,7 +108,8 @@ class AptosService {
                 return result;
             } catch (error) {
                 console.error('Failed to fetch coin info:', error);
-                return ['', '', 0];
+                // TODO: Adding default value to 6 to support USDT for default as a hot fix
+                return ['', '', 6];
             }
         });
     }
