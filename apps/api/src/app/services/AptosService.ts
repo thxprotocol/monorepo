@@ -20,9 +20,9 @@ class AptosService {
 
     private static async processQueue() {
         if (this.isProcessing || this.requestQueue.length === 0) return;
-        
+
         this.isProcessing = true;
-        
+
         while (this.requestQueue.length > 0) {
             const request = this.requestQueue.shift();
             if (request) {
@@ -31,11 +31,11 @@ class AptosService {
                     const now = Date.now();
                     const timeSinceLastRequest = now - this.lastRequestTime;
                     if (timeSinceLastRequest < this.MIN_REQUEST_INTERVAL) {
-                        await new Promise(resolve => 
+                        await new Promise(resolve =>
                             setTimeout(resolve, this.MIN_REQUEST_INTERVAL - timeSinceLastRequest)
                         );
                     }
-                    
+
                     await request();
                     this.lastRequestTime = Date.now();
                 } catch (error) {
@@ -43,7 +43,7 @@ class AptosService {
                 }
             }
         }
-        
+
         this.isProcessing = false;
     }
 
@@ -75,7 +75,7 @@ class AptosService {
 
     private static setCache(key: string, data: any) {
         this.cache.set(key, { data, timestamp: Date.now() });
-        
+
         // Clean up old cache entries
         if (this.cache.size > 1000) {
             const now = Date.now();
@@ -120,20 +120,13 @@ class AptosService {
         }
 
         return AptosService.queueRequest(async () => {
-            const client = AptosService.getClient();
+            const url = `${APTOS_NODE_URL}/v1/accounts/${accountAddress}/balance/${encodeURIComponent(contractAddress)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-            try {
-                const coinInfo = await client.getAccountResource(
-                    accountAddress,
-                    `0x1::coin::CoinStore<${contractAddress}>`,
-                );
-                const result = coinInfo.data['coin']['value'];
-                AptosService.setCache(cacheKey, result);
-                return result;
-            } catch (error) {
-                console.error('Failed to fetch coin balance:', error);
-                return '0';
-            }
+            const data = await response.json();
+            AptosService.setCache(cacheKey, data.balance || "0");
+            return data.balance || '0';
         });
     }
 }
