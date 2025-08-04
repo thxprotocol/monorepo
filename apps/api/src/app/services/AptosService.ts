@@ -1,5 +1,6 @@
 import { AptosClient, HexString } from 'aptos';
 import { APTOS_NODE_URL } from '../config/secrets';
+import axios from 'axios';
 
 class AptosService {
     private static client: AptosClient;
@@ -120,13 +121,12 @@ class AptosService {
         }
 
         return AptosService.queueRequest(async () => {
-            const url = `${APTOS_NODE_URL}/v1/accounts/${accountAddress}/balance/${encodeURIComponent(contractAddress)}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const url = `${APTOS_NODE_URL}/v1/accounts/${accountAddress}/balance/${contractAddress}`;
+            const response = await axios.get(url);
 
-            const data = await response.json();
-            AptosService.setCache(cacheKey, data.balance || "0");
-            return data.balance || '0';
+            const data = response.data;
+            AptosService.setCache(cacheKey, data || "0");
+            return data || '0';
         });
     }
 }
