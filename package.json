@@ -21,6 +21,7 @@
     },
     "private": true,
     "dependencies": {
+        "@aptos-labs/ts-sdk": "1.33.0",
         "@aws-sdk/client-s3": "^3.576.0",
         "@aws-sdk/client-ses": "^3.576.0",
         "@balancer-labs/sdk": "1.1.6-beta.23",
