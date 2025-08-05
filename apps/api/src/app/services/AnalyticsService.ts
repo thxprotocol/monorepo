@@ -46,8 +46,13 @@ class AnalyticsService {
     // Triggered when a quest entry is added
     async updateLeaderboardJob(job: TJob) {
         logger.debug('UpdateLeaderboard Start', job.attrs.data);
+        const data = job.attrs.data;
+        if (!data) {
+            logger.error('UpdateLeaderboardJob: job.attrs.data is null or undefined', job);
+            return;
+        }
         try {
-            const { poolId } = job.attrs.data;
+            const { poolId } = data;
             const pool = await Pool.findById(poolId);
             const now = new Date();
             const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
