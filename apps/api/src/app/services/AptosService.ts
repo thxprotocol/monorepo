@@ -1,4 +1,6 @@
 import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+import { APTOS_NODE_URL } from "../config/secrets";
+import axios from "axios";
 const COIN_INFO_CACHE_TTL = 24 * 60 * 60 * 1000; // 1 day, token info doesnot change
 const COIN_BALANCE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -143,12 +145,9 @@ class AptosService {
         }
 
         return AptosService.queueRequest(async () => {
-            const client = AptosService.getClient();
-
-            const balance = await client.getAccountCoinAmount({
-              accountAddress,
-              coinType: contractAddress as `${string}::${string}::${string}`,
-            });
+            const url = `${APTOS_NODE_URL}/v1/accounts/${accountAddress}/balance/${contractAddress}`;
+            const response = await axios.get(url);
+            const balance = response.data;
 
             AptosService.setCache(cacheKey, balance || 0, COIN_BALANCE_CACHE_TTL);
             return balance || 0;
