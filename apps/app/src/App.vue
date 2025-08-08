@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { GTM, MAINTENANCE } from './config/secrets';
+import { GTM, MAINTENANCE, SNOWPLOW_URL } from './config/secrets';
 import { initGTM } from './utils/ga';
 import { mapStores } from 'pinia';
 import { useAuthStore } from './stores/Auth';
@@ -125,7 +125,7 @@ export default defineComponent({
 
     if (clid) {
       // Snowplow tracker
-      initializeTracker('https://snowplow-test.santabrowser.com', clid);
+      initializeTracker(SNOWPLOW_URL, clid);
     }
 
   },

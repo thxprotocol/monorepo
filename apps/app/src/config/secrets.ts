@@ -27,3 +27,4 @@ export const SUPABASE_PUBLIC_KEY = import.meta.env.VITE_SUPABASE_PUBLIC_KEY || '
 export const SANTA_ACCOUNT = import.meta.env.VITE_SANTA_ACCOUNT || '';
 export const CASH_ACCOUNT = import.meta.env.VITE_CASH_ACCOUNT || '';
 export const PROD = import.meta.env.PROD;
+export const SNOWPLOW_URL = import.meta.env.VITE_SNOWPLOW_URL ||

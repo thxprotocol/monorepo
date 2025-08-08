@@ -1,7 +1,3 @@
-
-
-
-
 import {
   newTracker,
   trackPageView,
