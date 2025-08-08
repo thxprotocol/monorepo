@@ -9,12 +9,18 @@ import {
   setUserId,
   addGlobalContexts,
   trackSelfDescribingEvent,
+  enableActivityTracking
 } from '@snowplow/browser-tracker';
 
 let tracker: BrowserTracker | null | undefined;
 
 const initializeTracker = (endpoint: string, clid: string) => {
-  tracker = newTracker('playwall', endpoint, { appId: 'playwall' });
+  tracker = newTracker('rewards', endpoint, { appId: 'rewards' });
+
+  enableActivityTracking({
+    heartbeatDelay: 30,
+    activityTimeout: 10,
+  });
 
   addGlobalContexts([
     {
