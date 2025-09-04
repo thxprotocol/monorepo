@@ -85,7 +85,7 @@
                                 } else {
                                     return !quest.isAvailable;
                                 }
-                            }), 
+                            }),
                             }"
                             >
                                 <div v-if="!group.isOfferRow">
@@ -147,7 +147,7 @@
                                 v-for="group in filteredCompletedQuests"
                                 :key="group.title"
                                 :class="{
-                                'd-none': 
+                                'd-none':
                                     group.quests &&
                                     group.quests.every((quest: TBaseQuest) =>
                                         quest.variant === 0 ? !quest.isCompleted : quest.isAvailable
@@ -451,7 +451,7 @@ export default defineComponent({
                 completedQuests = completedQuests.filter((group) => {
                     switch (this.selectedQuestFilter) {
                         case 'santa':
-                            return group.title === "Santa's Quests";
+                            return group.title === "Santa's Quests 1";
                         case 'x':
                             return group.title === 'X Quests';
                         case 'discord':
@@ -475,7 +475,7 @@ export default defineComponent({
 
                 switch (this.selectedQuestFilter) {
                     case 'santa':
-                        return group.title === "Santa's Quests";
+                        return group.title === "Santa's Quests 1";
                     case 'x':
                         return group.title === 'X Quests';
                     case 'discord':
@@ -662,7 +662,7 @@ export default defineComponent({
             xQuests.sort((a: any, b: any) => a.amount - b.amount);
 
             const groupedQuests = [
-                { title: "Santa's Quests", quests: santaQuests, refQuest: this.referralClaimed },
+                { title: "Santa's Quests 1", quests: santaQuests, refQuest: this.referralClaimed },
                 { title: 'X Quests', quests: xQuests },
                 { title: 'Discord Quests', quests: discordQuests },
                 { title: 'YouTube Quests', quests: youtubeQuests },
