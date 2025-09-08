@@ -134,9 +134,9 @@ export default defineComponent({
                         this.address = response.args.address;
                         this.publicKey = response.args.publicKey;
                         this.walletStore.account = { address: response.args.address };
-                    } catch (error) {
-                        if (error.status === 'Rejected') {
-                            // window.open('santa://wallet');                            alert(error);
+                    } catch (error: unknown) {
+                        if (typeof error === 'object' && error && 'status' in error && error.status === 'Rejected') {
+                            alert('Kindly check your Santa wallet and confirm the connection request to proceed.');
                         } else {
                             console.log(error);
                         }
