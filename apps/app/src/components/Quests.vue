@@ -1,13 +1,8 @@
 <template>
     <b-container v-if="selectedPart === 'quests' || selectedPart === 'rewards'" class="quest-cont">
         <b-row>
-            <b-col
-                v-if="selectedPart === 'quests'"
-                lg="6"
-                xl="7"
-                offset-xl="0"
-                class="quests-column flex-grow-1 my-col-xl-7"
-            >
+            <b-col v-if="selectedPart === 'quests'" lg="6" xl="7" offset-xl="0"
+                class="quests-column flex-grow-1 my-col-xl-7">
                 <!-- <div class="mb-2 align-items-center bg-quests rounded">
                     <div class="quests-title d-flex p-2">
                         <div>
@@ -18,23 +13,16 @@
                     </div>
                 </div> -->
                 <div class="d-flex gap-2 sticky-tabs">
-                    <div
-                        v-if="[0, 1].includes(activeTab)"
-                        ref="filterDropdown"
-                        class="filter-wrapper"
-                        @click="toggleDropdown"
-                    >
+                    <div v-if="[0, 1].includes(activeTab)" ref="filterDropdown" class="filter-wrapper"
+                        @click="toggleDropdown">
                         <div class="custom-dropdown">
                             <span class="selected-option">{{ selectedQuestFilterLabel }}</span>
                             <img :src="dropdownIcon" alt="dropdown" height="3.91" width="6.76" />
                         </div>
                         <transition name="fade">
                             <ul v-if="showDropdown" class="custom-dropdown-options" @click.stop>
-                                <li
-                                    v-for="filter in questFilters"
-                                    :key="filter.value"
-                                    @click="selectFilter(filter.value)"
-                                >
+                                <li v-for="filter in questFilters" :key="filter.value"
+                                    @click="selectFilter(filter.value)">
                                     {{ filter.label }}
                                 </li>
                             </ul>
@@ -43,13 +31,8 @@
                     <div ref="tabDropdown" class="filter-wrapper" @click="toggleTabDropdown">
                         <div class="custom-dropdown tabs-wrapper">
                             <span class="selected-option">{{ currentTabLabel }}</span>
-                            <img
-                                :src="dropdownIcon"
-                                alt="dropdown"
-                                height="3.91"
-                                width="6.76"
-                                style="filter: var(--invert-img)"
-                            />
+                            <img :src="dropdownIcon" alt="dropdown" height="3.91" width="6.76"
+                                style="filter: var(--invert-img)" />
                         </div>
                         <transition name="fade">
                             <ul v-if="showTabDropdown" class="custom-dropdown-options" @click.stop>
@@ -75,47 +58,30 @@
                             </div>
                         </div>
                         <div v-else class="d-flex flex-column gap-5">
-                            <div
-                                v-for="group in filteredQuests"
-                                :key="group.title"
-                                :class="{
-                            'd-none': group.quests && group.quests.every((quest: TBaseQuest) => {
-                                if (quest.variant === 0) {
-                                    return quest.isCompleted;
-                                } else {
-                                    return !quest.isAvailable;
-                                }
-                            }),
-                            }"
-                            >
+                            <div v-for="group in filteredQuests" :key="group.title" :class="{
+                                'd-none': group.quests && group.quests.every((quest: TBaseQuest) => {
+                                    if (quest.variant === 0) {
+                                        return quest.isCompleted;
+                                    } else {
+                                        return !quest.isAvailable;
+                                    }
+                                }),
+                            }">
                                 <div v-if="!group.isOfferRow">
                                     <h3 class="quest-group-title">{{ group.title }}</h3>
                                     <div class="quest-group">
-                                        <div
-                                            v-for="quest in group.quests"
-                                            :key="quest._id"
-                                            :class="{
-                                                'd-none': quest.variant === 0 ? quest.isCompleted : !quest.isAvailable,
-                                                'quest-item': true,
-                                            }"
-                                            class="quest-group-item"
-                                        >
-                                            <component
-                                                :is="questComponentMap[quest.variant]"
-                                                :quest="quest"
-                                                :group-title="group.title"
-                                            />
+                                        <div v-for="quest in group.quests" :key="quest._id" :class="{
+                                            'd-none': quest.variant === 0 ? quest.isCompleted : !quest.isAvailable,
+                                            'quest-item': true,
+                                        }" class="quest-group-item">
+                                            <component :is="questComponentMap[quest.variant]" :quest="quest"
+                                                :group-title="group.title" />
                                         </div>
-                                        <div
-                                            v-if="group.title === 'Santa\'s Quests' && !referralClaimed"
-                                            class="quest-item quest-group-item"
-                                        >
-                                            <BaseCardQuestReferral
-                                                :referral="
-                                                    'https://santabrowser.com/download?install_referrer=' + hashedCode
+                                        <div v-if="group.title === 'Santa\'s Quests' && !referralClaimed"
+                                            class="quest-item quest-group-item">
+                                            <BaseCardQuestReferral :referral="'https://santabrowser.com/download?install_referrer=' + hashedCode
                                                 "
-                                                :imageurl="'https://thx-public.s3.ap-south-1.amazonaws.com/newreferral-neGnhMMfjymfApS8jx7BaJ.jpg'"
-                                            />
+                                                :imageurl="'https://thx-public.s3.ap-south-1.amazonaws.com/newreferral-neGnhMMfjymfApS8jx7BaJ.jpg'" />
                                         </div>
                                     </div>
                                 </div>
@@ -143,10 +109,7 @@
                             <SkeletonLoader :count="10" size="regular" />
                         </div>
                         <div v-else class="d-flex flex-column gap-5">
-                            <div
-                                v-for="group in filteredCompletedQuests"
-                                :key="group.title"
-                                :class="{
+                            <div v-for="group in filteredCompletedQuests" :key="group.title" :class="{
                                 'd-none':
                                     group.quests &&
                                     group.quests.every((quest: TBaseQuest) =>
@@ -154,77 +117,50 @@
                                     ) &&
                                     !group.isOfferRow &&
                                     (group.title === 'Santa\'s Quests' ? !referralClaimed : true)
-                                }"
-                            >
+                            }">
                                 <h3 class="quest-group-title">{{ group.title }}</h3>
                                 <div class="quest-group">
-                                    <div
-                                        v-if="group.title === 'Santa\'s Quests' && referralClaimed"
-                                        class="quest-item quest-group-item"
-                                    >
-                                        <BaseCardQuestReferral
-                                            v-if="referralClaimed"
-                                            :completed="true"
-                                            :referral="
-                                                'https://santabrowser.com/download?install_referrer=' + hashedCode
+                                    <div v-if="group.title === 'Santa\'s Quests' && referralClaimed"
+                                        class="quest-item quest-group-item">
+                                        <BaseCardQuestReferral v-if="referralClaimed" :completed="true" :referral="'https://santabrowser.com/download?install_referrer=' + hashedCode
                                             "
-                                            :imageurl="'https://thx-public.s3.ap-south-1.amazonaws.com/newreferral-neGnhMMfjymfApS8jx7BaJ.jpg'"
-                                        />
+                                            :imageurl="'https://thx-public.s3.ap-south-1.amazonaws.com/newreferral-neGnhMMfjymfApS8jx7BaJ.jpg'" />
                                     </div>
-                                    <div
-                                        v-for="quest in group.quests"
-                                        :key="quest._id"
-                                        :class="{
-                                            'd-none': quest.isAvailable === true,
-                                            'quest-item': true,
-                                        }"
-                                        class="quest-group-item"
-                                    >
+                                    <div v-for="quest in group.quests" :key="quest._id" :class="{
+                                        'd-none': quest.isAvailable === true,
+                                        'quest-item': true,
+                                    }" class="quest-group-item">
                                         <component :is="questComponentMap[quest.variant]" :quest="quest" />
                                     </div>
                                 </div>
                             </div>
-                            <div
-                                v-if="
-                                    referralClaimed
-                                        ? filteredCompletedQuests.length === 0 ||
-                                          (filteredCompletedQuests.every((group) =>
-                                              group.quests.every((quest) => quest.isAvailable),
-                                          ) &&
-                                              !referralClaimed)
-                                        : filteredCompletedQuests.length === 0 ||
-                                          filteredCompletedQuests.every((group) =>
-                                              group.quests.every((quest) => quest.isAvailable),
-                                          )
-                                "
-                                class="text-center text-muted mt-3 text-opaque empty-message"
-                            >
+                            <div v-if="
+                                referralClaimed
+                                    ? filteredCompletedQuests.length === 0 ||
+                                    (filteredCompletedQuests.every((group) =>
+                                        group.quests.every((quest) => quest.isAvailable),
+                                    ) &&
+                                        !referralClaimed)
+                                    : filteredCompletedQuests.length === 0 ||
+                                    filteredCompletedQuests.every((group) =>
+                                        group.quests.every((quest) => quest.isAvailable),
+                                    )
+                            " class="text-center text-muted mt-3 text-opaque empty-message">
                                 You haven't completed any quests yet.
                             </div>
                         </div>
                     </div>
                 </div>
             </b-col>
-            <b-col
-                v-if="selectedPart === 'rewards'"
-                lg="5"
-                xl="5"
-                xxl="4"
-                class="quests-column flex-grow-1"
-                offset-xl="0"
-            >
+            <b-col v-if="selectedPart === 'rewards'" lg="5" xl="5" xxl="4" class="quests-column flex-grow-1"
+                offset-xl="0">
                 <!-- Rewards Tabs Dropdown (mimicking quests design) -->
                 <div class="d-flex gap-2 sticky-tabs">
                     <div ref="rewardTabDropdown" class="filter-wrapper" @click="toggleRewardTabDropdown">
                         <div class="custom-dropdown tabs-wrapper">
                             <span class="selected-option">{{ rewardCurrentTabLabel }}</span>
-                            <img
-                                :src="dropdownIcon"
-                                alt="dropdown"
-                                height="3.91"
-                                width="6.76"
-                                style="filter: var(--invert-img)"
-                            />
+                            <img :src="dropdownIcon" alt="dropdown" height="3.91" width="6.76"
+                                style="filter: var(--invert-img)" />
                         </div>
                         <transition name="fade">
                             <ul v-if="showRewardTabDropdown" class="custom-dropdown-options" @click.stop>
@@ -240,20 +176,15 @@
                 <div v-if="activeRewardTab === 0">
                     <!-- Available Rewards -->
                     <div class="quests-box">
-                        <div
-                            v-if="rewardStore.isLoading || reward2Store.isLoading"
-                            class="d-flex justify-content-center"
-                        >
+                        <div v-if="rewardStore.isLoading || reward2Store.isLoading"
+                            class="d-flex justify-content-center">
                             <div class="w-100">
                                 <SkeletonLoader :count="10" size="rewards" />
                             </div>
                         </div>
                         <div v-else class="reward-group">
-                            <div
-                                v-for="reward in availableRewards"
-                                :key="reward._id"
-                                :class="[reward.isPromoted ? 'reward-item-promoted' : 'reward-item']"
-                            >
+                            <div v-for="reward in availableRewards" :key="reward._id"
+                                :class="[reward.isPromoted ? 'reward-item-promoted' : 'reward-item']">
                                 <component :is="componentMap[reward.variant]" :reward="reward" />
                             </div>
                         </div>
@@ -262,27 +193,19 @@
                 <div v-else-if="activeRewardTab === 1">
                     <!-- Completed Rewards -->
                     <div class="quests-box">
-                        <div
-                            v-if="rewardStore.isLoading || reward2Store.isLoading"
-                            class="d-flex justify-content-center"
-                        >
+                        <div v-if="rewardStore.isLoading || reward2Store.isLoading"
+                            class="d-flex justify-content-center">
                             <div class="w-100">
                                 <SkeletonLoader :count="10" size="rewards" />
                             </div>
                         </div>
                         <div v-else class="reward-group">
-                            <div
-                                v-for="reward in completedRewards"
-                                :key="reward._id"
-                                :class="{ 'reward-item-promoted': reward.isPromoted }"
-                                class="reward-item"
-                            >
+                            <div v-for="reward in completedRewards" :key="reward._id"
+                                :class="{ 'reward-item-promoted': reward.isPromoted }" class="reward-item">
                                 <component :is="componentMap[reward.variant]" :reward="reward" />
                             </div>
-                            <div
-                                v-if="!completedRewards.length"
-                                class="text-center text-muted mt-3 text-opaque empty-message"
-                            >
+                            <div v-if="!completedRewards.length"
+                                class="text-center text-muted mt-3 text-opaque empty-message">
                                 You haven't completed any rewards yet.
                             </div>
                         </div>
@@ -329,7 +252,7 @@ import dropdownIcon from '@thxnetwork/app/assets/dropdown.png';
 import { detectDevice, isCompatibleWithOffer } from '@thxnetwork/app/utils/device';
 
 const selectedValue = ref<string>('All');
-const componentMap: { [variant: string]: string } = {
+const componentMap: { [variant: string]: string; } = {
     [RewardVariant.Coin]: 'BaseCardRewardCoin',
     [RewardVariant.NFT]: 'BaseCardRewardNFT',
     [RewardVariant.Custom]: 'BaseCardRewardCustom',
@@ -451,7 +374,7 @@ export default defineComponent({
                 completedQuests = completedQuests.filter((group) => {
                     switch (this.selectedQuestFilter) {
                         case 'santa':
-                            return group.title === "Santa's Quests 1";
+                            return group.title === "Santa's Quests";
                         case 'x':
                             return group.title === 'X Quests';
                         case 'discord':
@@ -475,7 +398,7 @@ export default defineComponent({
 
                 switch (this.selectedQuestFilter) {
                     case 'santa':
-                        return group.title === "Santa's Quests 1";
+                        return group.title === "Santa's Quests";
                     case 'x':
                         return group.title === 'X Quests';
                     case 'discord':
@@ -494,7 +417,7 @@ export default defineComponent({
         currentTabLabel() {
             return this.tabs[this.activeTab].label;
         },
-        otherTabs(): Array<{ label: string; index: number }> {
+        otherTabs(): Array<{ label: string; index: number; }> {
             return this.tabs.filter((tab) => tab.index !== this.activeTab);
         },
         rewardCurrentTabLabel(): string {
@@ -662,7 +585,7 @@ export default defineComponent({
             xQuests.sort((a: any, b: any) => a.amount - b.amount);
 
             const groupedQuests = [
-                { title: "Santa's Quests 1", quests: santaQuests, refQuest: this.referralClaimed },
+                { title: "Santa's Quests", quests: santaQuests, refQuest: this.referralClaimed },
                 { title: 'X Quests', quests: xQuests },
                 { title: 'Discord Quests', quests: discordQuests },
                 { title: 'YouTube Quests', quests: youtubeQuests },
@@ -736,11 +659,13 @@ export default defineComponent({
     background-image: url('../../assets/bg-mosaic.png');
     background-size: cover;
 }
+
 .custom-select-wrapper {
     position: relative;
     display: flex;
     align-items: center;
 }
+
 .rewards-select {
     appearance: none;
     width: 100px;
@@ -754,6 +679,7 @@ export default defineComponent({
     padding-right: 30px;
     cursor: pointer;
 }
+
 .custom-select-icon {
     position: absolute;
     right: 10px;
@@ -814,6 +740,7 @@ export default defineComponent({
     padding: 7px 2px;
     min-height: 36px;
 }
+
 .btn-primary::before {
     content: '';
     position: absolute;
@@ -837,6 +764,7 @@ export default defineComponent({
     border-color: transparent !important;
     box-shadow: inherit;
 }
+
 .btn-primary:disabled {
     background: var(--btn-disabled-bg) !important;
     border: 1px solid var(--btn-disabled-border);
@@ -844,6 +772,7 @@ export default defineComponent({
     color: var(--btn-disabled-color);
     font-weight: 500;
 }
+
 .my-leader {
     background-color: #151515;
 }
@@ -890,12 +819,10 @@ export default defineComponent({
     height: calc(100vh - 70px);
     position: sticky;
     top: 70px;
-    background: radial-gradient(
-            57.91% 58.02% at 50% 50%,
+    background: radial-gradient(57.91% 58.02% at 50% 50%,
             rgba(0, 0, 0, 0) 0%,
             rgba(62, 0, 0, 0.05) 80.65%,
-            rgba(112, 5, 5, 0.11) 100%
-        ),
+            rgba(112, 5, 5, 0.11) 100%),
         rgba(0, 0, 0, 0.2);
 
     box-shadow: 0px 0px 49px 0px rgba(0, 7, 72, 0.12);
@@ -927,6 +854,7 @@ export default defineComponent({
     column-gap: 2%;
     margin-bottom: 8px;
 }
+
 .title-q {
     font-size: 25px;
     line-height: 25px;
@@ -975,9 +903,11 @@ export default defineComponent({
     &:hover {
         transform: scale(1.02);
     }
+
     .card {
         border: 0 !important;
         border-radius: 10px !important;
+
         img {
             border-radius: 4px;
             overflow: hidden;
@@ -987,11 +917,13 @@ export default defineComponent({
         }
     }
 }
+
 .regular-quest {
     width: 100%;
     margin-bottom: 15px;
 }
-.regular-quest > .card {
+
+.regular-quest>.card {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -1016,6 +948,7 @@ export default defineComponent({
     border-radius: 20px;
     // padding: 15px 20px;
     padding-bottom: 0;
+
     h3 {
         font-family: 'Poppins', sans-serif;
         color: var(--title-color);
@@ -1031,10 +964,12 @@ export default defineComponent({
 .quests-column .nav-item {
     flex-grow: 0;
 }
+
 .nav-link {
     background: var(--nav-link-bg);
     color: #8e8e8e !important;
 }
+
 .quests-column .nav-link {
     width: 158px !important;
     display: flex;
@@ -1054,6 +989,7 @@ export default defineComponent({
     border-bottom-width: 1px;
     font-weight: 600;
 }
+
 .nav-link.active {
     background-color: var(--nav-link-active-bg) !important;
     border-color: var(--nav-border-color) !important;
@@ -1077,6 +1013,7 @@ export default defineComponent({
     height: 1px;
     background: var(--border-tab-gradient);
 }
+
 .quests-column .nav-item .nav-link.active::before {
     content: '';
     position: absolute;
@@ -1084,21 +1021,26 @@ export default defineComponent({
     height: 1px;
     background: var(--nav-border-color);
 }
+
 .quests-column .nav-item:nth-child(1) .nav-link.active::before {
     display: none;
 }
+
 .quests-column .nav-item:nth-child(2) .nav-link.active::after {
     left: 319px;
     width: 60%;
 }
+
 .quests-column .nav-item:nth-child(2) .nav-link.active::before {
     left: 0;
     width: 161px;
 }
+
 .quests-column .nav-item:nth-child(3) .nav-link.active::after {
     left: 480px;
     width: 50%;
 }
+
 .quests-column .nav-item:nth-child(3) .nav-link.active::before {
     left: 0;
     width: 322px;
@@ -1121,18 +1063,22 @@ export default defineComponent({
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     min-height: 280px;
 }
+
 .quest-item-daily {
     background-color: var(--quest-item-bg);
     padding: 10px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 .quest-item-daily {
     grid-column: span 2;
 }
+
 .reward-item-promoted {
     grid-column: span 3;
 }
+
 .quest-group-title {
     color: var(--title-color);
     font-feature-settings: 'liga' off, 'clig' off;
@@ -1210,38 +1156,46 @@ export default defineComponent({
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     border: 1px solid var(--dropdown-border-color);
     background: var(--dropdown-background);
+
     li {
         padding: 8px 12px;
         font-size: 12px;
         color: var(--body-text);
+
         &:hover {
             background: var(--dropdown-border-color);
         }
+
         cursor: pointer;
     }
 }
+
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.3s;
 }
+
 .fade-enter,
 .fade-leave-to {
     opacity: 0;
 }
+
 .reward-item {
     grid-column: span 2;
 }
+
 .tabs-wrapper {
     background: var(--tabs-bg);
     color: var(--body-text);
     box-shadow: var(--balance-box-shadow);
 }
+
 .quest-cont {
     margin: 0;
 }
 
 @media (max-width: 992px) {
-    .quest-cont .row > * {
+    .quest-cont .row>* {
         flex-shrink: unset;
         display: flex;
         flex: 1;
@@ -1253,6 +1207,7 @@ export default defineComponent({
         padding-top: 10px;
         padding: 0 0 10px 0;
     }
+
     .quest-cont {
         max-width: 100%;
         flex: 1;
@@ -1260,11 +1215,13 @@ export default defineComponent({
         // overflow: hidden;
         flex-direction: column;
     }
+
     .rewards-column {
         width: 100% !important;
         margin: 0 12px;
         max-width: 100%;
     }
+
     .quest-cont .row {
         height: 100%;
         display: flex;
@@ -1272,46 +1229,56 @@ export default defineComponent({
         // overflow: hidden;
         flex-wrap: nowrap;
     }
+
     .rewards-column {
         position: relative;
         height: calc(100vh - 140px);
     }
+
     .rewards-container {
         height: calc(100vh - 205px);
     }
+
     .quests-box {
         height: 100%;
         overflow: hidden;
         margin: 0;
         margin-top: 22px;
     }
+
     .reward-group {
         gap: 0;
         column-gap: 10px;
         row-gap: 10px;
     }
+
     .quests-column .nav-item {
         flex: 1 1 20%;
         box-sizing: border-box;
     }
+
     .quests-column .nav-link {
         width: 100% !important;
         padding: 12px 16px;
     }
+
     .quest-item {
         grid-column: span 1;
         min-width: 235px;
     }
+
     .quest-item-daily {
         grid-column: span 2;
     }
+
     .quests-column .tabs {
         flex: 1;
         display: flex;
         flex-direction: column;
         // overflow: hidden;
     }
-    .quests-column .tabs > div:first-child {
+
+    .quests-column .tabs>div:first-child {
         padding-top: 15px;
         position: sticky;
         top: -5px;
@@ -1319,6 +1286,7 @@ export default defineComponent({
         background-color: var(--sticky-header-bg);
         padding-bottom: 10px;
     }
+
     .quests-column .tabs .tab-content {
         flex: 1;
         margin-top: 10px;
@@ -1326,10 +1294,12 @@ export default defineComponent({
         -ms-overflow-style: none;
         padding: 0 10px;
     }
+
     .nav-link.active::before,
     .nav-link.active::after {
         display: none;
     }
+
     .quests-column .nav {
         //border-bottom: 1px solid var(--nav-border-color);
         align-items: center;
@@ -1341,12 +1311,14 @@ export default defineComponent({
         top: 0;
         left: 0;
     }
+
     .quest-group {
         grid-auto-flow: column;
         grid-auto-columns: 260px;
         overflow-x: auto;
         grid-template-columns: none;
     }
+
     .offer-row {
         gap: 20px;
         display: grid !important;
@@ -1361,9 +1333,11 @@ export default defineComponent({
     .reward-item-promoted {
         grid-column: 1/-1;
     }
+
     .quests-column {
         overflow: unset;
     }
+
     .sticky-tabs {
         position: sticky;
         top: -17px;
@@ -1372,6 +1346,7 @@ export default defineComponent({
         z-index: 111;
     }
 }
+
 @media (max-width: 774px) {
     .reward-group {
         grid-template-columns: repeat(2, 1fr);
@@ -1403,48 +1378,58 @@ export default defineComponent({
         flex: 1 1 49%;
     }
 }
+
 @media (max-width: 576px) {
     .reward-group {
         grid-template-columns: repeat(1, 1fr);
         gap: 10px;
     }
+
     .reward-item-promoted {
         grid-column: span 2;
     }
+
     .offer-item {
         flex: 1 0 100%;
         max-width: 100% !important;
         width: 100% !important;
     }
 }
+
 @media (max-width: 340px) {
     .quests-column .nav-link {
         padding: 10px;
         font-size: 10px;
     }
 }
+
 @media (min-width: 1400px) {
     .quest-cont {
         max-width: 100%;
     }
 }
+
 @media (max-width: 476px) {
     .quests-column .nav-link {
         padding: 12px 12px;
     }
+
     .quests-column .nav-item {
         flex: 1 1 0;
     }
 }
+
 @media (max-width: 447px) {
     .quests-column .nav-link {
         padding: 12px 5px;
     }
 }
+
 @media (max-width: 388px) {
     .quests-column .nav-link {
         font-size: 10px;
     }
+
     .quests-column .nav {
         border: none;
     }
