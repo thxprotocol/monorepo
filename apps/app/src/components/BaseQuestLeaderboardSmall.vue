@@ -197,7 +197,8 @@ export default defineComponent({
 }
 .leaderboard-wrapper {
     background: transparent;
-    width: 800px;
+    width: 100%;
+    max-width: 800px;
 }
 
 .my-list .list-group-item {

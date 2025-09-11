@@ -1,16 +1,33 @@
-import { newTracker, trackPageView, enableActivityTracking, BrowserTracker } from '@snowplow/browser-tracker';
+import {
+    newTracker,
+    trackPageView,
+    BrowserTracker,
+    setUserId,
+    addGlobalContexts,
+    trackSelfDescribingEvent,
+    enableActivityTracking,
+} from '@snowplow/browser-tracker';
 
 let tracker: BrowserTracker | null | undefined;
 
-const initializeTracker = (endpoint: string) => {
-    tracker = newTracker('rewards', endpoint, {
-        appId: 'rewards',
-        plugins: [],
-    });
+const initializeTracker = (endpoint: string, clid: string) => {
+    tracker = newTracker('rewards', endpoint, { appId: 'rewards' });
+
     enableActivityTracking({
-        minimumVisitLength: 5,
-        heartbeatDelay: 5,
+        heartbeatDelay: 30,
+        minimumVisitLength: 10,
     });
+
+    addGlobalContexts([
+        {
+            schema: 'iglu:com.santabrowser/user_context/jsonschema/1-0-0',
+            data: {
+                clid,
+            },
+        },
+    ]);
+
+    setUserId(clid);
 };
 
 const useTrackPageview = () => {
@@ -19,6 +36,20 @@ const useTrackPageview = () => {
     }
 };
 
-const isTrackerInitialized = () => tracker !== undefined;
+const useTrackSelfDescribingEvent = (clid: string, eventType: string) => {
+    if (tracker) {
+        trackSelfDescribingEvent({
+            event: {
+                schema: 'iglu:com.santabrowser/user_context/jsonschema/1-0-0',
+                data: {
+                    clid,
+                    eventType,
+                },
+            },
+        });
+    }
+};
 
-export { tracker, initializeTracker, useTrackPageview, isTrackerInitialized };
+const isTrackerInitialized = () => (tracker ? true : false);
+
+export { tracker, initializeTracker, useTrackPageview, isTrackerInitialized, useTrackSelfDescribingEvent };
