@@ -41,11 +41,11 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
             header: 'OVERVIEW',
             sections: [
                 {
-                    name: 'Starting Your Journey X',
-                    shortName: 'Starting Your Journey X',
+                    name: 'Starting Your Journey',
+                    shortName: 'Starting Your Journey',
                     ref: 'journey',
                     content: `
-                <h1>🚀 Starting Your Journey X</h1>
+                <h1>🚀 Starting Your Journey</h1>
                 <h2>Rewards Dashboard Overview</h2>
                 <h3>Welcome to Santa Rewards</h3>
                 <p>We're all about making your web experiences richer and your online time more rewarding! This Rewards Dashboard is your go-to spot where you can oversee how your browser is working for you!</p>
