@@ -1,3 +1,14 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100vh;
+}
+
 body,
 #app,
 #main {
@@ -8,7 +19,7 @@ body {
     overflow: hidden !important;
     height: 100vh;
     position: relative;
-    border: 1px solid violet;
+    border: 1px solid green;
 }
 
 #app {

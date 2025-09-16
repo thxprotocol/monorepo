@@ -1,13 +1,13 @@
 html,
 body {
-    // min-height: 100dvh;
+    min-height: 100vh;
     font-size: 16px;
 }
 
 #app {
     display: flex;
     flex-direction: column;
-    height: 100dvh;
+    height: 100vh;
 }
 
 .pt-lg-10 {
@@ -29,13 +29,12 @@ body {
     }
     @media (min-width: map-get($grid-breakpoints, 'xl')) {
         max-height: 850px;
- 
     }
 }
 
 .table-hover tbody tr {
-    transition: .2s ease background-color;
-    
+    transition: 0.2s ease background-color;
+
     &:hover {
         background-color: $light;
     }
