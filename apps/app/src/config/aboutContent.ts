@@ -105,7 +105,7 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
                 <h1>🔍 Engaging with Quests</h1>
                 <h2>Quests</h2>
                 <p>The Quests section of your Santa Rewards Dashboard is where simple online interactions can propel you towards fabulous rewards! This is where you can engage in various browser-related tasks, track your progress and start racking up those Santa Points!</p>
-                
+
                 <h3>What are Santa Quests?</h3>
                 <p class="text-before-bullet">Santa Quests usually involve simple browser-related tasks that you can complete (both passively & actively) in order to earn Santa Points. Here's how each quest can make browsing more rewarding for you:</p>
                 <ul>
@@ -119,7 +119,7 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
                     <li><strong>Monthly Marathoner:</strong> The biggest usage reward, earned by hitting 80 hours of active browsing over a month (between the first and last day of the calendar Month).</li>
                 </ul>
                 <p><b>Note:</b> Apart from the “First Quest” every other quest is repeatable indefinitely. Please also keep in mind that browser usage time for quest completion only counts while actively browsing. Which means that simply leaving the browser on, or letting it run in the background will not add any time towards your quest.</p>
-                
+
                 <h3>What are Social Quests?</h3>
                 <p>Santa's social quests involve quick easy interactions on your favorite social media platforms. All to help you rack up rewards in no time.</p>
                 <h3>Most quests require you to:</h3>
@@ -128,7 +128,7 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
                     <li><strong>Complete the social task:</strong> (Make sure to follow any extra instructions provided in the quest. Like for example, using a specific hashtag in a quest with the objective of commenting on a particular social media post)</li>
                     <li>Start collecting Santa points!</li>
                 </ul>
-                
+
                 <h3>Currently Social Quests include:</h3>
                 <ul>
                     <li><strong>X/Twitter:</strong>
@@ -154,7 +154,7 @@ export async function getAboutContent(theme: string): Promise<ContentGroup[]> {
                     </li>
                 </ul>
                 <p><b>Note:</b> Most social quests (except the ones that require you to follow/subscribe) are repeatable daily. Please ensure to follow any extra instructions provided in the quest, in order to ensure your entry is counted.</p>
-                
+
                 <h4>All this is cool but what are ‘Top Performing Offers’?</h4>
                 <p>This is a dynamic quick access display aimed at helping you discover the most exciting opportunities to earn Cash Rewards! These keep changing from time to time and can have varying payout periods based on Playwall partner providers.
     Using this window, you can conveniently keep track of the highest earnings, available at the time of viewing, from the Santa Playwall. Unlike Quests which earn you Santa Points, completing these will reward you with Cash rewards.

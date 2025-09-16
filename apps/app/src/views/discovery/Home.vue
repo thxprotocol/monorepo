@@ -1,6 +1,6 @@
 <template>
-    <div ref="mainComponent" class="mainComponent pt-3 px-3">
-        <div class="d-flex flex-column components-wrap">
+    <div ref="mainComponent" class="mainComponent">
+        <div class="d-flex flex-column components-wrap pt-3 px-3">
             <HeaderNav :is-visible="true" />
             <div class="d-flex component-wrap">
                 <Sidebar :selected-part="selectedPart" @nav-clicked="handleNavClick" />
@@ -532,7 +532,6 @@ export default defineComponent({
     }
     .component-wrap {
         height: unset;
-        margin-bottom: 75px;
         flex-direction: column;
         flex: 1;
     }
@@ -560,6 +559,7 @@ export default defineComponent({
     .components-wrap {
         min-height: inherit;
         height: auto;
+        padding-bottom: 85px;
     }
     .leaderboard-mobile {
         margin-top: 15px;
