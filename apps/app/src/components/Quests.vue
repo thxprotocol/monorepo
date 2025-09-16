@@ -1340,7 +1340,7 @@ export default defineComponent({
 
     .sticky-tabs {
         position: sticky;
-        top: -17px;
+        top: 0;
         padding: 15px 0;
         background: var(--body-rewards-bg);
         z-index: 111;
