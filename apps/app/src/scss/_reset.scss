@@ -1,16 +1,24 @@
-html,
 body,
 #app,
 #main {
-    height: 100dvh;
+    height: 100%;
 }
 
 body {
-    overflow: hidden;
+    overflow: hidden !important;
+    height: 100vh;
+    position: relative;
 }
 
 #app {
     top: 0;
+    height: 100%;
+    overflow: hidden !important;
+}
+
+#main {
+    height: 100%;
+    overflow: hidden;
 }
 
 .text-opaque {
