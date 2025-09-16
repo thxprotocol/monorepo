@@ -532,7 +532,7 @@ export default defineComponent({
     }
     .component-wrap {
         height: unset;
-        margin-bottom: 75px;
+        padding-bottom: 75px;
         flex-direction: column;
         flex: 1;
     }
