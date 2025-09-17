@@ -139,7 +139,6 @@ export default defineComponent({
     },
     methods: {
         setBodyHeight() {
-            console.log("Enforcing body height to:", window.innerHeight);
             document.body.style.setProperty('min-height', window.innerHeight + 'px', 'important')
             document.body.style.setProperty('height', window.innerHeight + 'px', 'important')
         },

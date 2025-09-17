@@ -559,7 +559,7 @@ export default defineComponent({
     .components-wrap {
         min-height: inherit;
         height: auto;
-        padding-bottom: 85px;
+        padding-bottom: 100px;
     }
     .leaderboard-mobile {
         margin-top: 15px;
