@@ -805,7 +805,6 @@ export default defineComponent({
 
 .quests-column {
     height: calc(100vh - 70px);
-    margin-right: 20px;
     overflow: hidden;
     padding: 0;
 }
