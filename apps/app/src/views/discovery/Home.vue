@@ -493,6 +493,7 @@ export default defineComponent({
     padding: 8px 0 16px 16px;
     overflow: hidden;
     border-top: 1px solid var(--main-content-border-color);
+    padding-right: 50px;
 }
 .component-wrap {
     height: 100%;
@@ -545,6 +546,7 @@ export default defineComponent({
         padding-left: 0;
         // margin-bottom: 98px;
         // overflow: hidden;
+        padding-right: 0;
     }
     .component-wrap {
         overflow: unset;
