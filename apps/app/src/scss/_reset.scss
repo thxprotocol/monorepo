@@ -1,8 +1,35 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 html,
+body {
+    min-height: 100vh;
+}
+
 body,
 #app,
 #main {
     height: 100%;
+}
+
+body {
+    overflow: hidden !important;
+    height: 100vh;
+    position: relative;
+}
+
+#app {
+    top: 0;
+    height: 100%;
+    overflow: hidden !important;
+}
+
+#main {
+    height: 100%;
+    overflow: hidden;
 }
 
 .text-opaque {
@@ -14,5 +41,5 @@ body,
 }
 
 .container-fluid-s {
-  max-width: 100% !important;
+    max-width: 100% !important;
 }

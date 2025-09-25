@@ -114,7 +114,7 @@ export default defineComponent({
 <style>
 .navbar-bottom {
     width: 100%;
-    position: fixed;
+    position: absolute !important;
     bottom: -5px;
     z-index: 22;
     background: var(--navbar-bottom-bg);

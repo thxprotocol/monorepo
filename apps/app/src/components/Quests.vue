@@ -882,7 +882,6 @@ export default defineComponent({
 
 .quests-column {
     height: calc(100vh - 70px);
-    margin-right: 20px;
     overflow: hidden;
     padding: 0;
 }
@@ -1419,7 +1418,7 @@ export default defineComponent({
 
     .sticky-tabs {
         position: sticky;
-        top: -17px;
+        top: 0;
         padding: 15px 0;
         background: var(--body-rewards-bg);
         z-index: 111;

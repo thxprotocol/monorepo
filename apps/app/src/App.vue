@@ -94,6 +94,8 @@ export default defineComponent({
         this.currentTheme = initialTheme;
     },
     async mounted() {
+        this.setBodyHeight();
+        window.addEventListener('resize', this.setBodyHeight);
         const urlParams = new URLSearchParams(window.location.search);
         let clid: string | null = null;
 
@@ -133,8 +135,13 @@ export default defineComponent({
         }
 
         cookieStore.removeEventListener('change', this.handleCookieChange);
+        window.removeEventListener('resize', this.setBodyHeight);
     },
     methods: {
+        setBodyHeight() {
+            document.body.style.setProperty('min-height', window.innerHeight + 'px', 'important');
+            document.body.style.setProperty('height', window.innerHeight + 'px', 'important');
+        },
         getCookieReduce(name: string): string {
             return document.cookie.split('; ').reduce((r, v) => {
                 const [n, ...val] = v.split('='); // cookie value can contain "="
