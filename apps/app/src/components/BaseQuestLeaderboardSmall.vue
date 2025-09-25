@@ -5,7 +5,7 @@
         body-class="d-flex flex-column pt-0"
         class="leaderboard-wrapper"
     >
-        <b-card-title class="d-flex m-0 align-items-center">
+        <b-card-title class="d-flex m-0 align-items-center leaderboard-head">
             <!-- <div class="d-flex align-items-center justify-content-center" style=""> -->
             <!-- <i class="fa fa-trophy me-2 text-opaque" /> -->
             <!-- <img :src="trophyImage" alt="trophy" loading="lazy" width="17" height="17" class="me-2" /> -->
@@ -20,12 +20,12 @@
                         >
                     </span>
                 </h3>
-                <span
+                <p
                     class="d-block flex-grow-1 pe-2 fa-xs mt-2"
                     style="color: var(--body-color); opacity: 0.6; font-family: Poppins"
                 >
                     (Monthly)
-                </span>
+                </p>
             </div>
             <!-- <b-button class="text-primary refresh-color" variant="link" @click="onClickRefresh">
                 <b-spinner v-if="isLoading" small />
@@ -140,10 +140,12 @@ export default defineComponent({
 .card-header {
     border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);
 }
+
 .list-group-item {
     position: relative;
     padding-left: 40px !important;
 }
+
 .list-item-field-rank {
     position: absolute;
     top: 1px;
@@ -160,11 +162,13 @@ export default defineComponent({
     font-weight: 400;
     line-height: normal;
 }
+
 .list-item-field-user {
     flex-grow: 1;
     display: flex;
     align-items: center;
 }
+
 .list-item-field-questcount {
     display: flex;
     align-items: center;
@@ -176,12 +180,15 @@ export default defineComponent({
     font-weight: 400;
     line-height: 21px;
 }
+
 .list-item-field-questcount span {
     width: 20px;
 }
+
 .list-item-field-questcount i {
     color: #888888;
 }
+
 .list-item-field-score {
     width: 50px;
     text-align: right;
@@ -192,22 +199,41 @@ export default defineComponent({
     line-height: 175%;
     letter-spacing: 0.48px;
 }
+
 .refresh-color {
     --bs-primary-rgb: #515151 !important;
 }
+
 .leaderboard-wrapper {
     background: transparent;
     width: 100%;
     max-width: 800px;
+    height: calc(100vh - 160px);
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+.leaderboard-head {
+    position: sticky;
+    top: 0;
+    padding: 15px 0 !important;
+    background: var(--body-rewards-bg);
+    z-index: 111;
+}
+
+.my-list {
+    margin-top: 0 !important;
 }
 
 .my-list .list-group-item {
     border: none;
     border-radius: 0;
     padding: 4px 0;
+
     &:nth-child(odd) {
         background-color: var(--quest-item-bg);
     }
+
     &:nth-child(even) {
         background-color: var(--main-content-bg);
     }
@@ -233,6 +259,7 @@ export default defineComponent({
 .leaderboard-wrapper .list-group {
     margin: 13.5px 0;
 }
+
 .skeleton-loader {
     display: flex;
     flex-direction: column;
@@ -243,6 +270,7 @@ export default defineComponent({
     &:nth-child(odd) {
         background-color: var(--quest-item-bg);
     }
+
     &:nth-child(even) {
         background-color: var(--main-content-bg);
     }
@@ -291,11 +319,13 @@ export default defineComponent({
     width: 32px;
     height: 32px;
 }
+
 .my-list,
 .skeleton-loader {
     border: 1px solid var(--btn-sidebar-border-color);
     border-radius: 3px;
 }
+
 .reward-info-wrap {
     position: relative;
     display: inline-block;
@@ -336,13 +366,16 @@ export default defineComponent({
         opacity: 1;
     }
 }
+
 @keyframes pulse {
     0% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.5;
     }
+
     100% {
         opacity: 1;
     }
@@ -356,10 +389,18 @@ export default defineComponent({
         overflow: hidden;
         margin: 0;
         width: 100%;
+        height: unset;
+        overflow: unset;
     }
+
+    .leaderboard-head {
+        top: -17px;
+    }
+
     .username-text {
         padding-left: 5px;
     }
+
     .leaderboard-wrapper .list-group {
         flex: 1;
         overflow-y: auto;
@@ -367,13 +408,16 @@ export default defineComponent({
         -webkit-overflow-scrolling: touch;
         margin: 13.5px 0;
     }
+
     .list-group-item {
         padding-left: 30px !important;
     }
+
     .leaderboard-wrapper .card-title {
         padding-left: 0;
     }
 }
+
 @media (max-width: 420px) {
     .list-item-field-questcount {
         display: none;
@@ -385,6 +429,7 @@ export default defineComponent({
         width: 110px;
     }
 }
+
 //@media (max-height: 894px) {
 //.my-list {
 //    max-height: 200px;
