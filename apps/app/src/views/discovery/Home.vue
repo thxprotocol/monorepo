@@ -274,6 +274,7 @@ export default defineComponent({
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+
     span {
         background: #fff;
         -webkit-background-clip: text;
@@ -291,6 +292,7 @@ export default defineComponent({
     line-height: 16px;
     text-align: center;
 }
+
 .window-container {
     //height: calc(100vh - 70px);
     //background-color: #0c0d15;
@@ -313,6 +315,7 @@ export default defineComponent({
     box-shadow: drop-shadow(0px 4px 49px rgba(0, 0, 0, 0.38));
     backdrop-filter: blur(6.5px);
 }
+
 .pagination {
     --bs-pagination-focus-bg: var(--bs-purple-dark);
     --bs-pagination-focus-color: rgba(255, 255, 255, 0.5);
@@ -330,41 +333,53 @@ export default defineComponent({
     --bs-pagination-disabled-bg: #37277b;
     --bs-pagination-disabled-border-color: #37277b;
 }
+
 .form-control {
     border-color: var(--bs-primary);
 }
+
 .nav-pills .nav-link {
     text-transform: capitalize;
     color: rgba(255, 255, 255, 0.5);
 }
+
 #table-campaigns th:nth-child(1) {
     width: 50px;
 }
+
 #table-campaigns th:nth-child(2) {
     width: 120px;
 }
+
 #table-campaigns td:nth-child(2) {
     padding: 0px !important;
     text-align: center;
 }
+
 #table-campaigns th:nth-child(3) {
     width: auto;
 }
+
 #table-campaigns th:nth-child(4) {
     width: 150px;
 }
+
 #table-campaigns th:nth-child(5) {
     width: 120px;
 }
+
 #table-campaigns th:nth-child(6) {
     width: 100px;
 }
+
 #table-campaigns th:nth-child(7) {
     width: 100px;
 }
+
 #table-campaigns tr td {
     cursor: pointer;
 }
+
 .carousel-inner > div > img,
 .carousel-inner > img {
     display: none !important;
@@ -394,6 +409,7 @@ export default defineComponent({
         border-radius: 50%;
     }
 }
+
 .trending-title {
     display: flex;
     flex-direction: column;
@@ -470,6 +486,7 @@ export default defineComponent({
     border-radius: 36px;
     height: fit-content;
 }
+
 .bestofwrapper {
     height: 60vh;
     justify-content: center;
@@ -485,33 +502,40 @@ export default defineComponent({
     height: 100vh;
     overflow: hidden;
 }
+
 .mainComponent::-webkit-scrollbar {
     display: none !important;
 }
+
 .main-content {
     flex-grow: 1;
     padding: 8px 0 16px 16px;
     overflow: hidden;
     border-top: 1px solid var(--main-content-border-color);
 }
+
 .component-wrap {
     height: 100%;
     overflow: hidden;
 }
+
 .components-wrap {
     height: 100%;
 }
+
 .leaderboard-mobile {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: unset;
 }
+
 @media (max-width: 424px) {
     .campaigns-box {
         flex-direction: column;
         margin-top: 16px !important;
     }
+
     .carousel-cont {
         justify-content: start !important;
         margin-top: 32px !important;
@@ -523,19 +547,23 @@ export default defineComponent({
         //height: calc(100vh - 70px);
         padding-bottom: 70px;
     }
+
     .unwrap {
         line-height: 28vh;
     }
+
     .leaderboard-cont {
         height: 100%;
         padding: 12px 12px 0;
     }
+
     .component-wrap {
         height: unset;
         margin-bottom: 75px;
         flex-direction: column;
         flex: 1;
     }
+
     .main-content {
         flex: 1;
         display: flex;
@@ -547,20 +575,25 @@ export default defineComponent({
         // margin-bottom: 98px;
         // overflow: hidden;
     }
+
     .component-wrap {
         overflow: unset;
     }
+
     .main-content {
         overflow: unset;
     }
+
     .mainComponent {
         overflow: auto;
         min-height: 90vh;
     }
+
     .components-wrap {
         min-height: inherit;
         height: auto;
     }
+
     .leaderboard-mobile {
         margin-top: 15px;
     }
