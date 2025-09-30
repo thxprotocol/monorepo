@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Account, Client, Identity, Pool, QuestCustom } from '@thxnetwork/api/models';
 import { body, param } from 'express-validator';
-import { JobType, QuestVariant } from '@thxnetwork/common/enums';
+import { AccountPlanType, AccountVariant, JobType, QuestVariant } from '@thxnetwork/common/enums';
 import { agenda } from '@thxnetwork/api/util/agenda';
 import QuestService from '@thxnetwork/api/services/QuestService';
 import { BadRequestError, NotFoundError } from '@thxnetwork/api/util/errors';
@@ -35,7 +35,20 @@ const controller = async (req: Request, res: Response) => {
     const { providerUserId, amount, santaQuestType, santaQuestId } = req.body;
 
     const account = await Account.findOne({providerUserId: providerUserId});
-    if (!account) throw new NotFoundError('Invalid providerUserId');
+
+    if (!account) {
+       const email = (providerUserId.toLowerCase() + '@santa.network');
+
+        return await Account.create({
+            plan: AccountPlanType.Lite,
+            username: await AccountProxy.genName(),
+            variant: AccountVariant.EmailPassword,
+            providerUserId,
+            email: email,
+            // We can assume emails are verified in case of OTP flows
+            isEmailVerified: true,
+          });
+    }
 
     const quest = await QuestCashback.findById(req.params.id);
     if (!quest) throw new NotFoundError('Quest not found.');

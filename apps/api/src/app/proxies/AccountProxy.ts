@@ -152,7 +152,7 @@ class AccountProxy {
         };
     }
 
-    private async genName() {
+    public async genName() {
         const username = generateUsername('', 2, 14);
         const isUsed = await Account.exists({
             username: username,
